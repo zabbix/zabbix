@@ -207,7 +207,14 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
 				])
 			]),
-		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))->setId('preprocessing_div')
+		(new CDiv([
+			(new CRadioButtonList('mass_update_preprocessing', 0))
+				->addValue(_('Replace'), 0)
+				->addValue(_('Remove all'), 1)
+				->setModern(true)
+				->addStyle('margin-bottom: 10px;'),
+			getItemPreprocessing([], false, $data['preprocessing_types'], true)
+		]))->setId('preprocessing_div')
 	);
 
 $custom_intervals = (new CTable())

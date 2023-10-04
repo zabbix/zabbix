@@ -427,7 +427,20 @@
 			update: function() {
 				let i = 0;
 
+				const  mass_update_form = document.getElementById('massupdate-form') !== null;
+
 				$(this).find('li.sortable').each(function() {
+					if (mass_update_form) {
+						let remove_button = $(this).find('button.btn-link.element-table-remove');
+
+						if (i === 0) {
+							remove_button.attr('disabled', 'disabled');
+						}
+						else {
+							remove_button.removeAttr('disabled');
+						}
+					}
+
 					$(this).find('[name*="sortorder"]').val(i++);
 				});
 			}

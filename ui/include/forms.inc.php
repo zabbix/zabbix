@@ -1246,7 +1246,7 @@ function getItemFormData(array $item = [], array $options = []) {
  *
  * @return CList
  */
-function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
+function getItemPreprocessing(array $preprocessing, $readonly, array $types, bool $mass_update = false) {
 	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
@@ -1260,12 +1260,78 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				(new CDiv(_('Actions')))->addClass('step-action')
 			]))
 				->addClass('preprocessing-list-head')
-				->addStyle(!$preprocessing ? 'display: none;' : null)
+				->addStyle(!$preprocessing && !$mass_update ? 'display: none;' : null)
 		);
 
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
+
+	if ($mass_update) {
+		$first_preproc_types_select = (new CSelect('preprocessing[0][type]'))
+			->setId('preprocessing_0_type')
+			->setValue(ZBX_PREPROC_REGSUB)
+			->setWidthAuto();
+
+		foreach (get_preprocessing_types(null, true, $types) as $group) {
+			$opt_group = new CSelectOptionGroup($group['label']);
+
+			foreach ($group['types'] as $type => $label) {
+				$opt_group->addOption(new CSelectOption($type, $label));
+			}
+
+			$first_preproc_types_select->addOptionGroup($opt_group);
+		}
+
+		$preprocessing_list->addItem(
+			(new CListItem([
+				(new CDiv([
+					(new CDiv(new CVar('preprocessing[0][sortorder]', 0)))
+						->addClass(ZBX_STYLE_DRAG_ICON),
+					(new CDiv($first_preproc_types_select))
+						->addClass('list-numbered-item')
+						->addClass('step-name'),
+					(new CDiv([
+						(new CTextBox('preprocessing[0][params][0]', ''))
+							->setReadonly($readonly)
+							->setAttribute('placeholder', _('pattern')),
+						(new CTextBox('preprocessing[0][params][1]', ''))
+							->setReadonly($readonly)
+							->setAttribute('placeholder', _('output'))
+					]))->addClass('step-parameters'),
+					(new CDiv(new CCheckBox('preprocessing[0][on_fail]')))->addClass('step-on-fail'),
+					(new CDiv([
+						(new CButton('preprocessing[0][test]', _('Test')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('preprocessing-step-test')
+							->removeId(),
+						(new CButton('preprocessing[0][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+							->setEnabled(false)
+							->removeId()
+					]))->addClass('step-action')
+				]))->addClass('preprocessing-step'),
+				(new CDiv([
+					new CLabel(_('Custom on fail')),
+					(new CRadioButtonList('preprocessing[0][error_handler]', ZBX_PREPROC_FAIL_DISCARD_VALUE))
+						->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
+						->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
+						->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
+						->setModern(true)
+						->setEnabled(false),
+					(new CTextBox('preprocessing[0][error_handler_params]'))
+						->setEnabled(false)
+						->addStyle('display: none;')
+				]))
+					->addClass('on-fail-options')
+					->addStyle('display: none;')
+			]))
+				->addClass('preprocessing-list-item')
+				->addClass('sortable')
+				->setAttribute('data-step', '0')
+		);
+	}
 
 	foreach ($preprocessing as $step) {
 		// Create a select with preprocessing types.

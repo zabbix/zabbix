@@ -167,4 +167,12 @@
 
 	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
 })();
+
+document.getElementById('mass_update_preprocessing_1').addEventListener('click', (event) => {
+	document.getElementById('preprocessing').style.display = "none";
+})
+
+document.getElementById('mass_update_preprocessing_0').addEventListener('click', (event) => {
+	document.getElementById('preprocessing').style.display = "";
+})
 </script>
