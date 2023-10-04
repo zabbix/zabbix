@@ -1,1 +1,1 @@
-..F....... [ZBX-23265] fixed transfer of PSK encryption details on cloning proxy (jfreibergs)
+..F....... [ZBX-23265] fixed transfer of PSK encryption details when cloning proxy (jfreibergs)
