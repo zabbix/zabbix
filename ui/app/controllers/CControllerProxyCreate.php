@@ -77,7 +77,14 @@ class CControllerProxyCreate extends CController {
 			return false;
 		}
 
-		if ($this->hasInput('clone_proxyid')) {
+		$clone_psk = $this->hasInput('clone_proxyid') && $this->getInput('psk_edit_mode', 0) == 0;
+
+		if ($clone_psk) {
+			$clone_psk = $this->getInput('tls_connect', HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_PSK
+				|| ($this->getInput('tls_accept', HOST_ENCRYPTION_NONE) & HOST_ENCRYPTION_PSK);
+		}
+
+		if ($clone_psk) {
 			$this->clone_proxy = API::Proxy()->get([
 				'output' => ['tls_psk_identity', 'tls_psk'],
 				'proxyids' => $this->getInput('clone_proxyid')
@@ -109,8 +116,7 @@ class CControllerProxyCreate extends CController {
 			if ($this->getInput('psk_edit_mode', 0) == 1) {
 				array_push($fields, 'tls_psk', 'tls_psk_identity');
 			}
-
-			if ($this->hasInput('clone_proxyid')) {
+			elseif ($this->hasInput('clone_proxyid')) {
 				$proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity'];
 				$proxy['tls_psk'] = $this->clone_proxy['tls_psk'];
 			}
