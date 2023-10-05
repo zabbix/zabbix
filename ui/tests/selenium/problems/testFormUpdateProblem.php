@@ -49,6 +49,9 @@ class testFormUpdateProblem extends CWebTest {
 	 * @var string
 	 */
 	protected static $acktime;
+	protected static $eventid_for_unsigned;
+	protected static $eventid_for_text;
+	protected static $eventid_for_icon_test;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -106,76 +109,71 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				'description' => 'Trigger for float',
 				'expression' => 'last(/Host for Problems Update/float)=0',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => 'Trigger for char',
 				'expression' => 'last(/Host for Problems Update/char)=0',
 				'priority' => 1,
-				'manual_close' => 1
+				'manual_close' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
 				'description' => 'Trigger for log',
 				'expression' => 'last(/Host for Problems Update/log)=0',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Trigger for unsigned',
 				'expression' => 'last(/Host for Problems Update/unsigned)=0',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => 'Trigger for text',
 				'expression' => 'last(/Host for Problems Update/text)=0',
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => 'Trigger for icon test',
 				'expression' => 'last(/Host for Problems Update/log)=0',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
 		self::$triggerids = CDataHelper::getIds('description');
 
-		// Create events.
+		// Create prblems and events.
 		$time = time();
-		$i=0;
 		foreach (self::$triggerids as $name => $id) {
-			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.(100550 + $i).', 0, 0, '.
-					zbx_dbstr($id).', '.$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
-			);
-			$i++;
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, $time);
 		}
 
-		// Create problems.
-		$j=0;
-		foreach (self::$triggerids as $name => $id) {
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.(100550 + $j).', 0, 0, '.
-					zbx_dbstr($id).', '.$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
-			);
-			$j++;
-		}
-
-		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for float').', '.
-				zbx_dbstr('Trigger for log').', '.zbx_dbstr('Trigger for unsigned').', '.zbx_dbstr('Trigger for text').', '.
-				zbx_dbstr('Trigger for icon test').')'
-		);
 		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
 
+		// Get eventid.
+		self::$eventid_for_text = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
+				zbx_dbstr('Trigger for text')
+		);
+		self::$eventid_for_unsigned = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
+				zbx_dbstr('Trigger for unsigned')
+		);
+		self::$eventid_for_icon_test = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
+				zbx_dbstr('Trigger for icon test')
+		);
+
 		// Suppress the problem: 'Trigger for text'.
-		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, 100554, NULL, 0)');
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, '.
+				self::$eventid_for_text.', NULL, 0)'
+		);
 
 		// Acknowledge the problem: 'Trigger for unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
-			'eventids' => 100553,
+			'eventids' => self::$eventid_for_unsigned,
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
 
 		$event = CDataHelper::call('event.get', [
-			'eventids' => 100553,
+			'eventids' => self::$eventid_for_unsigned,
 			'selectAcknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
@@ -898,7 +896,9 @@ class testFormUpdateProblem extends CWebTest {
 		);
 
 		// Suppress the problem in DB: 'Trigger for icon test'.
-		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10051, 100555, NULL, 0)');
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until)
+				VALUES (10051, '.self::$eventid_for_icon_test.', NULL, 0)'
+		);
 
 		// Assert that eye icon stopped blinking.
 		$this->page->refresh();
