@@ -1411,6 +1411,7 @@ form {
 	}
 
 	.table-forms-td-left {
+		position: relative;
 		display: table-cell;
 		padding: 5px 0;
 		text-align: right;
@@ -1422,6 +1423,12 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+		}
+
+		.checkbox-radio {
+			right: 0;
+			margin-right: 0;
+			margin-left: 0;
 		}
 	}
 
@@ -3132,13 +3139,7 @@ $form-icon-btn: (
 			}
 
 			.table-forms {
-				.table-forms-td-left {
-					position: relative;
 
-					.checkbox-radio {
-						right: 0;
-					}
-				}
 
 				.table-forms-td-right {
 					padding-right: 8px;
