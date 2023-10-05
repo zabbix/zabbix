@@ -200,6 +200,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 		}
 		else {
 			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+			$data['tags'] = array_values($data['tags']);
 		}
 
 		$data['expr_temp'] = $data['expression'];

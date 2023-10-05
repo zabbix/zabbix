@@ -1102,7 +1102,11 @@ void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
 	zbx_free(version_info->ext_friendly_current_version);
 }
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 #ifdef HAVE_ORACLE
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
@@ -1352,7 +1356,11 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num)
 {
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 	int	i, cnt = 0;
 	char	*value_esc;

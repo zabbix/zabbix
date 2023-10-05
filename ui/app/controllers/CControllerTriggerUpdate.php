@@ -21,11 +21,6 @@
 
 class CControllerTriggerUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $db_trigger;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -71,29 +66,27 @@ class CControllerTriggerUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if ($this->getInput('hostid') && !isWritableHostTemplates([$this->getInput('hostid')])) {
+			return false;
+		}
+
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	}
+
+	protected function doAction(): void {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'templateid', 'flags'],
 			'triggerids' => $this->getInput('triggerid')
 		]);
 
-		if (!$db_triggers) {
-			return false;
-		}
+		$db_trigger = $db_triggers ? reset($db_triggers) : null;
 
-		$this->db_trigger = reset($db_triggers);
-
-		if ($this->getInput('hostid') && !isWritableHostTemplates([$this->getInput('hostid')])) {
-			return false;
-		}
-
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-	}
-
-	protected function doAction(): void {
 		$trigger = [];
 
-		if ($this->db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			if ($this->db_trigger['templateid'] == 0) {
+		if ($db_trigger && $db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			if ($db_trigger['templateid'] == 0) {
 				$trigger += [
 					'description' => $this->getInput('name'),
 					'event_name' => $this->getInput('event_name', ''),
@@ -131,8 +124,6 @@ class CControllerTriggerUpdate extends CController {
 					unset($tags[$key]['type']);
 				}
 			}
-
-			CArrayHelper::sort($tags, ['tag', 'value']);
 
 			$trigger += [
 				'type' => $this->getInput('type', 0),
