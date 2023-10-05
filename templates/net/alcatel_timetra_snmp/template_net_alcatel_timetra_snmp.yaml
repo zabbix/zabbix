@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:31:44Z'
+  date: '2023-09-20T10:46:47Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -546,27 +546,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -574,6 +553,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -1233,6 +1233,16 @@ zabbix_export:
             - name: 'Alcatel Timetra TiMOS: General'
               widgets:
                 - type: GRAPH_CLASSIC
+                  name: 'memory utilization'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Alcatel Timetra TiMOS by SNMP'
+                        name: 'Alcatel Timetra TiMOS: Memory utilization'
+                - type: GRAPH_CLASSIC
                   name: 'cpu utilization'
                   'y': '5'
                   width: '12'
@@ -1254,16 +1264,6 @@ zabbix_export:
                       value:
                         host: 'Alcatel Timetra TiMOS by SNMP'
                         name: 'Alcatel Timetra TiMOS: Memory usage'
-                - type: GRAPH_CLASSIC
-                  name: 'memory utilization'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Alcatel Timetra TiMOS by SNMP'
-                        name: 'Alcatel Timetra TiMOS: Memory utilization'
       valuemaps:
         - uuid: b31f48e2216f441daa0b05561ac2ab6a
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'

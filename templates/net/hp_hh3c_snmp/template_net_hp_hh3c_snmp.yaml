@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:36:04Z'
+  date: '2023-09-20T10:47:39Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -488,10 +488,10 @@ zabbix_export:
             evaltype: OR
             conditions:
               - macro: '{#SNMPVALUE}'
-                value: '^(MODULE|Module) (LEVEL|level)1$'
+                value: '(Fabric|FABRIC) (.+) (Module|MODULE)'
                 formulaid: A
               - macro: '{#SNMPVALUE}'
-                value: '(Fabric|FABRIC) (.+) (Module|MODULE)'
+                value: '^(MODULE|Module) (LEVEL|level)1$'
                 formulaid: B
           description: 'Filter limits results to ''Module level1'' or Fabric Modules'
           item_prototypes:
@@ -586,27 +586,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -614,6 +593,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -1113,13 +1113,13 @@ zabbix_export:
             evaltype: OR
             conditions:
               - macro: '{#SNMPVALUE}'
-                value: '^(MODULE|Module) (LEVEL|level)1$'
+                value: '(Fabric|FABRIC) (.+) (Module|MODULE)'
                 formulaid: A
               - macro: '{#SNMPVALUE}'
-                value: '(Fabric|FABRIC) (.+) (Module|MODULE)'
+                value: '(T|t)emperature.*(s|S)ensor'
                 formulaid: B
               - macro: '{#SNMPVALUE}'
-                value: '(T|t)emperature.*(s|S)ensor'
+                value: '^(MODULE|Module) (LEVEL|level)1$'
                 formulaid: C
           description: 'Discovering modules temperature (same filter as in Module Discovery) plus and temperature sensors'
           item_prototypes:
@@ -1263,14 +1263,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HP Comware HH3C by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
         - uuid: 74325ab2f9e346a89eb281df04154ab2
           name: Resources
           pages:
@@ -1282,14 +1282,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HP Comware HH3C by SNMP'
                         name: '{#MODULE_NAME}: CPU utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1298,14 +1298,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HP Comware HH3C by SNMP'
                         name: '{#MODULE_NAME}: Memory utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: ec3b9adaa2ad448db5a613cfb6e02fd3
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'

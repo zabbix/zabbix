@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:55:58Z'
+  date: '2023-09-20T10:50:42Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -392,13 +392,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#ZYXEL.IF.NAME}'
-                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
-                formulaid: C
-              - macro: '{#ZYXEL.IF.NAME}'
-                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
                 formulaid: A
@@ -406,6 +399,13 @@ zabbix_export:
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           item_prototypes:
             - uuid: 43cf7ba65c39475b9614ed4b95e9b398
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Administrative status'
@@ -1368,14 +1368,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'ZYXEL MGS3520-28x by SNMP'
                         name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '5'
       valuemaps:
         - uuid: 5c5037a96f084a8182a5fb00f49ff285
           name: 'SNMP available'

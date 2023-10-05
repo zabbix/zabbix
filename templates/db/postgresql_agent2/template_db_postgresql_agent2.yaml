@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-24T11:23:44Z'
+  date: '2023-09-20T10:46:07Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2372,30 +2372,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: pg_stat_database metrics'
-                - type: GRAPH_PROTOTYPE
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: INTEGER
                       name: rows
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent 2'
-                        name: 'DB [{#DBNAME}]: Locks'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -2403,15 +2387,47 @@ zabbix_export:
                   fields:
                     - type: INTEGER
                       name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
                       value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Size'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_PROTOTYPE
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB [{#DBNAME}]: Queries'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_PROTOTYPE
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB [{#DBNAME}]: Locks'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -2421,30 +2437,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Number of bloating tables'
-                - type: GRAPH_PROTOTYPE
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: INTEGER
                       name: rows
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent 2'
-                        name: 'DB [{#DBNAME}]: Queries'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -2454,14 +2454,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Slow queries'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: cd2d975b0d7e4f8e89afb1033fce4ce2
           name: 'PostgreSQL checksum failure status'

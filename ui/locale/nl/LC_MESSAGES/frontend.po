@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-19 06:55+0000\n"
+"PO-Revision-Date: 2023-09-19 07:07+0000\n"
 "Last-Translator: Michiel C. <michiel.cornille@gmail.com>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -2104,6 +2104,10 @@ msgstr "Kan het gebruikerstype van de eigen rol niet wijzigen."
 msgid "Cannot clear history"
 msgstr "Kan de geschiedenis niet wissen"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Kan grafiek prototypes niet klonen"
@@ -3733,6 +3737,14 @@ msgstr "Geschiedenis wissen"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Wis geschiedenis en trends"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7965,6 +7977,10 @@ msgstr "Markeer hele rij"
 msgid "History"
 msgstr "Geschiedenis"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
 msgstr "Geschiedenis en trends compressie"
@@ -11591,24 +11607,24 @@ msgstr "Maximaal aantal kolommen en rijen in overzichtstabellen"
 
 #: app/views/administration.gui.edit.php:137
 msgid "Max period for time selector"
-msgstr ""
+msgstr "Maximale periode voor tijdsselectiev"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
-msgstr ""
+msgstr "Maximaal zoomniveau"
 
 #: include/classes/data/CItemData.php:881
 msgid "Maximum number of opened files supported by OS. Returns integer"
-msgstr ""
+msgstr "Het maximale aantal geopende bestanden ondersteund door het besturingssysteem. Geeft een geheel getal terug."
 
 #: include/classes/data/CItemData.php:885
 msgid "Maximum number of processes supported by OS. Returns integer"
-msgstr ""
+msgstr "Het maximale aantal processen dat wordt ondersteund door het besturingssysteem. Geeft een geheel getal terug."
 
 #: app/partials/administration.system.info.php:150
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
-msgstr ""
+msgstr "De maximale vereiste %1$s databaseversie is %2$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:312
@@ -11617,17 +11633,17 @@ msgstr ""
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "De maximale tijdsperiode om weer te geven is %1$s dag."
+msgstr[1] "De maximale tijdsperiode om weer te geven is %1$s dagen."
 
 #: include/classes/api/services/CUser.php:941
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
-msgstr ""
+msgstr "De maximale totale lengte van het e-mailadres is overschreden voor mediatype met ID \"%1$s\"."
 
 #: app/views/administration.geomaps.edit.php:61
 msgid "Maximum zoom level of the map."
-msgstr ""
+msgstr "Het maximale zoomniveau van de kaart."
 
 #: include/func.inc.php:104 include/func.inc.php:257 jsLoader.php:237
 msgid "May"
@@ -11652,7 +11668,7 @@ msgstr "Media type"
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
 msgid "Media type \"%1$s\" already exists."
-msgstr ""
+msgstr "Mediatype \"%1$s\" bestaat al."
 
 #: app/controllers/CControllerMediatypeCreate.php:158
 msgid "Media type added"
@@ -11679,15 +11695,15 @@ msgstr[1] "Mediatypen ingeschakeld"
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
 msgid "Media type test failed."
-msgstr ""
+msgstr "Mediatype-test is mislukt."
 
 #: app/views/js/popup.mediatypetest.edit.js.php:108
 msgid "Media type test log"
-msgstr ""
+msgstr "Logboek van mediatype-test"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:142
 msgid "Media type test successful."
-msgstr ""
+msgstr "Mediatype-test succesvol."
 
 #: app/controllers/CControllerMediatypeUpdate.php:173
 msgid "Media type updated"
@@ -11696,7 +11712,7 @@ msgstr "Media type bijgewerkt"
 #: include/classes/api/services/CUser.php:865
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Mediatype met ID \"%1$s\" is niet beschikbaar."
 
 #: app/views/administration.mediatype.edit.php:30
 #: app/views/administration.mediatype.list.php:31 app/views/popup.import.php:45
@@ -11708,7 +11724,7 @@ msgstr "Media types"
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
 msgid "Media types used by action \"%1$s\"."
-msgstr ""
+msgstr "Mediatypen gebruikt door actie \"%1$s\"."
 
 #: app/views/administration.usergroup.list.php:75
 #: include/views/configuration.hostgroups.list.php:69
@@ -11718,27 +11734,27 @@ msgstr "Leden"
 #: include/classes/debug/CProfiler.php:165
 #, c-format
 msgid "Memory limit: %1$s"
-msgstr ""
+msgstr "Geheugenlimiet: %1$s"
 
 #: include/classes/data/CItemData.php:1217
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Geheugengrootte in bytes of als percentage van het totaal. Geeft een geheel getal voor bytes en een decimaal getal voor het percentage."
 
 #: include/classes/data/CItemData.php:1005
 msgid "Memory used by process in bytes. Returns integer"
-msgstr ""
+msgstr "Geheugengebruik door het proces in bytes. Geeft een geheel getal terug."
 
 #: app/views/administration.mediatype.edit.php:255
 msgid "Menu entry URL"
-msgstr ""
+msgstr "Menu-item URL"
 
 #: app/views/administration.mediatype.edit.php:246
 msgid "Menu entry name"
-msgstr ""
+msgstr "Menunaam"
 
 #: app/views/administration.script.edit.php:106
 msgid "Menu path"
-msgstr ""
+msgstr "Menupad"
 
 #: app/partials/popup.operations.php:160
 #: app/partials/scheduledreport.formgrid.html.php:178
@@ -11754,15 +11770,15 @@ msgstr "Bericht"
 
 #: app/views/administration.mediatype.edit.php:205
 msgid "Message format"
-msgstr ""
+msgstr "Berichtformaat"
 
 #: app/controllers/CControllerPopupMediatypeMessage.php:98
 msgid "Message template"
-msgstr ""
+msgstr "Berichtsjabloon"
 
 #: app/views/administration.mediatype.edit.php:297
 msgid "Message templates"
-msgstr ""
+msgstr "Berichtsjablonen"
 
 #: app/views/administration.user.edit.php:656
 #: app/views/administration.user.edit.php:668
@@ -11772,11 +11788,11 @@ msgstr "Bericht timeout"
 #: app/views/administration.mediatype.edit.php:279
 #: app/views/popup.mediatype.message.php:44
 msgid "Message type"
-msgstr ""
+msgstr "Berichttype"
 
 #: include/actions.inc.php:1827 include/actions.inc.php:1921
 msgid "Message/Command"
-msgstr ""
+msgstr "Bericht/Commando"
 
 #: app/views/administration.authentication.edit.php:269
 #: include/classes/screens/CScreenProblem.php:1212
@@ -11785,7 +11801,7 @@ msgstr "Berichten"
 
 #: app/views/administration.user.edit.php:746
 msgid "Messaging"
-msgstr ""
+msgstr "Berichtgeving"
 
 #: include/classes/core/CJsonRpc.php:181
 msgid "Method not found."
@@ -11793,7 +11809,7 @@ msgstr "Methode niet gevonden."
 
 #: include/httptest.inc.php:399
 msgid "Microsoft Edge"
-msgstr ""
+msgstr "Microsoft Edge"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:107
 #: include/classes/widgets/forms/CWidgetFormItem.php:188
@@ -11809,51 +11825,51 @@ msgstr "Midden"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
 msgid "Min"
-msgstr ""
+msgstr "Min"
 
 #: app/views/administration.authentication.edit.php:39
 msgid "Minimum password length"
-msgstr ""
+msgstr "Minimale wachtwoordlengte"
 
 #: app/partials/administration.system.info.php:144
 #, c-format
 msgid "Minimum required %1$s database version is %2$s."
-msgstr ""
+msgstr "De vereiste minimale %1$s databaseversie is %2$s."
 
 #: include/classes/setup/CFrontendSetup.php:124
 #, c-format
 msgid "Minimum required PHP memory limit is %1$s (configuration option \"memory_limit\")."
-msgstr ""
+msgstr "Het vereiste minimale PHP-geheugenlimiet is %1$s (configuratieoptie \"memory_limit\")."
 
 #: include/classes/setup/CFrontendSetup.php:162
 #, c-format
 msgid "Minimum required PHP upload filesize is %1$s (configuration option \"upload_max_filesize\")."
-msgstr ""
+msgstr "Het vereiste minimale PHP-uploadbestandsgrootte is %1$s (configuratieoptie \"upload_max_filesize\")."
 
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
-msgstr ""
+msgstr "De vereiste minimale PHP-versie is %1$s."
 
 #: app/views/administration.housekeeping.edit.php:174
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "De vereiste minimale TimescaleDB-versie is %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
-msgstr ""
+msgstr "Het vereiste minimale limiet voor de uitvoeringstijd van PHP-scripts is %1$s (configuratieoptie \"max_execution_time\")."
 
 #: include/classes/setup/CFrontendSetup.php:216
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %1$s (configuration option \"max_input_time\")."
-msgstr ""
+msgstr "Het vereiste minimale limiet voor de invoer parseertijd van PHP-scripts is %1$s (configuratieoptie \"max_input_time\")."
 
 #: include/classes/setup/CFrontendSetup.php:143
 #, c-format
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
-msgstr ""
+msgstr "De vereiste minimale grootte van PHP POST is %1$s (configuratieoptie \"post_max_size\")."
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:267
@@ -11867,8 +11883,8 @@ msgstr "Minimale ernst"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "De minimale tijdsperiode om weer te geven is %1$s minuut."
+msgstr[1] "De minimale tijdsperiode om weer te geven is %1$s minuten."
 
 #: app/views/popup.maintenance.period.php:175
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -11894,7 +11910,7 @@ msgstr "Veld \"naam\" ontbreekt voor grafiek."
 #: include/classes/widgets/CWidgetHelper.php:1010
 #: include/classes/widgets/CWidgetHelper.php:1263
 msgid "Missing data"
-msgstr ""
+msgstr "Ontbrekende gegevens"
 
 #: include/classes/api/services/CGraph.php:38
 #, c-format
@@ -11924,35 +11940,35 @@ msgstr "Model"
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/views/administration.module.edit.php:52
 msgid "Module"
-msgstr ""
+msgstr "Module"
 
 #: app/controllers/CControllerModuleScan.php:98
 #, c-format
 msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Module toegevoegd: %1$s."
+msgstr[1] "Modules toegevoegd: %1$s."
 
 #: app/controllers/CControllerModuleScan.php:113
 #, c-format
 msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Module verwijderd: %1$s."
+msgstr[1] "Modules verwijderd: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Module uitgeschakeld: %1$s."
+msgstr[1] "Modules uitgeschakeld: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Module ingeschakeld: %1$s."
+msgstr[1] "Modules ingeschakeld: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format

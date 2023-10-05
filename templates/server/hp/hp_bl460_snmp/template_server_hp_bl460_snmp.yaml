@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T20:05:44Z'
+  date: '2023-09-20T10:52:05Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -957,12 +957,12 @@ zabbix_export:
           delay: 1h
           filter:
             conditions:
-              - macro: '{#SNMPINDEX}'
-                value: 0\.1
-                formulaid: B
               - macro: '{#SENSOR_LOCALE}'
                 value: '11'
                 formulaid: A
+              - macro: '{#SNMPINDEX}'
+                value: 0\.1
+                formulaid: B
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter

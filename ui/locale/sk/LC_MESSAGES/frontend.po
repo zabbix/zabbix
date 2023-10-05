@@ -2129,6 +2129,10 @@ msgstr "Nemožno zmeniť typ používateľa vlastnej roly."
 msgid "Cannot clear history"
 msgstr "Nie je možné zmazať históriu"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Nie je možné klonovať prototypy grafov."
@@ -3811,6 +3815,14 @@ msgstr "Vyčistiť históriu"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Vyčistiť históriu a trendy"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -8052,6 +8064,10 @@ msgstr "Zvýraznite celý riadok"
 #: jsLoader.php:372
 msgid "History"
 msgstr "História"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
