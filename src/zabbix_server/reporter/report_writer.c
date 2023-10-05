@@ -98,11 +98,12 @@ static int	rw_get_report(const char *url, const char *cookie, char **report,
 		const char *config_tls_key_file, const char *config_source_ip, const char *config_webservice_url,
 		char **error)
 {
+#define ZBX_REPORT_DEFAULT_WIDTH	1920
+#define ZBX_REPORT_DEFAULT_HEIGHT	1080
+
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(url);
 	ZBX_UNUSED(cookie);
-	ZBX_UNUSED(width);
-	ZBX_UNUSED(height);
 	ZBX_UNUSED(report);
 	ZBX_UNUSED(report_size);
 	ZBX_UNUSED(config_tls_ca_file);
@@ -134,6 +135,13 @@ static int	rw_get_report(const char *url, const char *cookie, char **report,
 
 	zbx_json_addobject(&j, ZBX_PROTO_TAG_HTTP_HEADERS);
 	zbx_json_addstring(&j, "Cookie", cookie_value, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&j);
+
+	zbx_json_addobject(&j, ZBX_PROTO_TAG_PARAMETERS);
+	zbx_snprintf(buffer, sizeof(buffer), "%d", ZBX_REPORT_DEFAULT_WIDTH);
+	zbx_json_addstring(&j, "width", buffer, ZBX_JSON_TYPE_STRING);
+	zbx_snprintf(buffer, sizeof(buffer), "%d", ZBX_REPORT_DEFAULT_HEIGHT);
+	zbx_json_addstring(&j, "height", buffer, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
 	if (NULL == (curl = curl_easy_init()))
@@ -252,6 +260,9 @@ out:
 
 	return ret;
 #endif
+
+#undef ZBX_REPORT_DEFAULT_WIDTH
+#undef ZBX_REPORT_DEFAULT_HEIGHT
 }
 
 /******************************************************************************

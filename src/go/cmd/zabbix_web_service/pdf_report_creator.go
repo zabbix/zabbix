@@ -28,6 +28,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -39,15 +40,14 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-const dashboardWidthPx = 1920
-
 type requestBody struct {
-	URL    string            `json:"url"`
-	Header map[string]string `json:"headers"`
+	URL        string            `json:"url"`
+	Header     map[string]string `json:"headers"`
+	Parameters map[string]string `json:"parameters"`
 }
 
 func newRequestBody() *requestBody {
-	return &requestBody{"", make(map[string]string)}
+	return &requestBody{"", make(map[string]string), make(map[string]string)}
 }
 
 // httpCookiesGet parses Cookie HTTP request header returns HTTP cookies
@@ -120,6 +120,20 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
+	width, err := strconv.ParseInt(req.Parameters["width"], 10, 64)
+	if err != nil {
+		logAndWriteError(w, fmt.Sprintf("Incorrect parameter width: %s", err.Error()), http.StatusBadRequest)
+
+		return
+	}
+
+	height, err := strconv.ParseInt(req.Parameters["height"], 10, 64)
+	if err != nil {
+		logAndWriteError(w, fmt.Sprintf("Incorrect parameter height: %s", err.Error()), http.StatusBadRequest)
+
+		return
+	}
+
 	u, err := parseUrl(req.URL)
 	if err != nil {
 		logAndWriteError(w, fmt.Sprintf("Incorrect request url: %s", err.Error()), http.StatusBadRequest)
@@ -149,7 +163,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	log.Tracef(
 		"making chrome headless request with parameters url: %s, width: %s, height: %s for report request from %s",
-		u.String(), r.RemoteAddr)
+		u.String(), req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
 	var cookieParams []*network.CookieParam
 
@@ -170,7 +184,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
 		network.SetCookies(cookieParams),
-		emulation.SetDeviceMetricsOverride(dashboardWidthPx, 0, 1, false),
+		emulation.SetDeviceMetricsOverride(width, height, 1, false),
 		navigateAndWaitFor(u.String(), "networkIdle"),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
@@ -179,6 +193,8 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 			buf, _, err = page.PrintToPDF().
 				WithPrintBackground(true).
 				WithPreferCSSPageSize(true).
+				WithPaperWidth(pixels2inches(width)).
+				WithPaperHeight(pixels2inches(height)).
 				Do(timeoutContext)
 
 			return err
@@ -195,6 +211,10 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	w.Write(buf)
 
 	return
+}
+
+func pixels2inches(value int64) float64 {
+	return float64(value) * 0.0104166667
 }
 
 func navigateAndWaitFor(url string, eventName string) chromedp.ActionFunc {
