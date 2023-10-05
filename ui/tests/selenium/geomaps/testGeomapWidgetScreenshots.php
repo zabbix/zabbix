@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -127,13 +128,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			];
 		}
 
-		$triggers = CDataHelper::call('trigger.create', $triggers_data);
-
-		self::$cities['triggerids']['Riga'] = $triggers['triggerids'][0];
-		self::$cities['triggerids']['Tallin'] = $triggers['triggerids'][1];
-		self::$cities['triggerids']['Vilnius'] = $triggers['triggerids'][2];
-		self::$cities['triggerids']['Oslo'] = $triggers['triggerids'][3];
-		self::$cities['triggerids']['Bergen'] = $triggers['triggerids'][4];
+		CDataHelper::call('trigger.create', $triggers_data);
 
 		// Create dashboard with geomap widgets.
 		$dashboards = CDataHelper::call('dashboard.create', [
@@ -251,6 +246,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 		$this->assertArrayHasKey('dashboardids', $dashboards);
 		self::$zoom_dashboardid = $dashboards['dashboardids'][0];
+
+		// Create events and problems.
+		foreach (['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'] as $name) {
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE);
+		}
 	}
 
 	public static function getZoomWidgetData() {
@@ -297,45 +297,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		];
 	}
 
-
 	/**
-	 * Function for creating problems in DB for hosts being screenshoted.
-	 */
-	public static function pepareProblemsData() {
-		// Create events.
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10500, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Riga']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger Riga').', 0)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10501, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Tallin']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger Tallin').', 1)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10502, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Vilnius']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger Vilnius').', 2)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10503, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Oslo']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger Oslo').', 3)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10504, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Bergen']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger Bergen').', 4)');
-
-		// Create problems.
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10500, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Riga']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger Riga').', 0)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10501, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Tallin']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger Tallin').', 1)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10502, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Vilnius']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger Vilnius').', 2)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10503, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Oslo']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger Oslo').', 3)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10504, 0, 0, '.
-				zbx_dbstr(self::$cities['triggerids']['Bergen']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger Bergen').', 4)');
-
-		// Change triggers' state to Problem.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Riga'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Tallin'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Vilnius'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Oslo'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Bergen'));
-	}
-
-	/**
-	 * @onBeforeOnce pepareProblemsData
 	 *
 	 * @dataProvider getZoomWidgetData
 	 */
