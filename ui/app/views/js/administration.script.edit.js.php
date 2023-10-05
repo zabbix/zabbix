@@ -486,8 +486,8 @@ window.script_edit_popup = new class {
 
 				const updateTestUserInput = () => {
 					test_user_input.disabled = !(
-						input_prompt.value !== '' && input_validation.value !== ''
-						&& this.user_input_checked
+						input_prompt.value.trim() !== '' && input_validation.value.trim() !== ''
+							&& this.user_input_checked
 					);
 				};
 
@@ -517,7 +517,8 @@ window.script_edit_popup = new class {
 
 				const updateTestUserInput = () => {
 					test_user_input.disabled = !(
-						input_prompt.value !== '' && dropdown_options.value !== '' && this.user_input_checked
+						input_prompt.value.trim() !== '' && dropdown_options.value.trim() !== ''
+							&& this.user_input_checked
 					);
 				};
 
