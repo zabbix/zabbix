@@ -111,8 +111,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			[
 				'description' => 'Trigger for widget 1 char',
 				'expression' => 'last(/Host for Problems Widgets/char)=0',
-				'priority' => 1,
-				'manual_close' => TRIGGER_SEVERITY_INFORMATION
+				'priority' => TRIGGER_SEVERITY_INFORMATION,
+				'manual_close' => 1
 			],
 			[
 				'description' => 'Trigger for widget 2 log',
