@@ -2103,6 +2103,10 @@ msgstr "Impossible de modifier le type d'utilisateur de son propre rôle."
 msgid "Cannot clear history"
 msgstr "Impossible de nettoyer l'historique"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Impossible de cloner les prototypes de graphiques."
@@ -3732,6 +3736,14 @@ msgstr "Effacer l'historique"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Effacer l'historique et les tendances"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7963,6 +7975,10 @@ msgstr "Mettre en surbrillance la ligne entière"
 #: jsLoader.php:372
 msgid "History"
 msgstr "Historique"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"

@@ -2102,6 +2102,10 @@ msgstr "אי אפשר לשנות את סוג המשתמש של תפקיד עצמ
 msgid "Cannot clear history"
 msgstr "לא ניתן לפנות את ההיסטוריה"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "לא ניתן לשכפל את האבטיפוס לתרשימים."
@@ -3731,6 +3735,14 @@ msgstr "פינוי ההיסטוריה"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "פינוי היסטוריה ומגמות"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7962,6 +7974,10 @@ msgstr "הדגשת שורה שלמה"
 #: jsLoader.php:372
 msgid "History"
 msgstr "היסטוריה"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"

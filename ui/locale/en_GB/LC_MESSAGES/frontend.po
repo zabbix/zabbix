@@ -2105,6 +2105,10 @@ msgstr "Cannot change the user type of own role."
 msgid "Cannot clear history"
 msgstr "Cannot clear history"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Cannot clone graph prototypes."
@@ -3734,6 +3738,14 @@ msgstr "Clear history"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Clear history and trends"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7964,6 +7976,10 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:64 items.php:259
 #: jsLoader.php:372
 msgid "History"
+msgstr ""
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158

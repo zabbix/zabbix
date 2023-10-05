@@ -2103,6 +2103,10 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr "Не може да се изчисти историята"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Не може да се клонират графичните прототипи"
@@ -3736,6 +3740,14 @@ msgstr ""
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Изчисти историята и динамиката на промените"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7962,6 +7974,10 @@ msgstr ""
 #: jsLoader.php:372
 msgid "History"
 msgstr "История"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
