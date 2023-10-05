@@ -113,8 +113,8 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				'description' => 'Trigger for char',
 				'expression' => 'last(/Host for Problems Update/char)=0',
-				'priority' => 1,
-				'manual_close' => TRIGGER_SEVERITY_INFORMATION
+				'priority' => TRIGGER_SEVERITY_INFORMATION,
+				'manual_close' => 1
 			],
 			[
 				'description' => 'Trigger for log',
