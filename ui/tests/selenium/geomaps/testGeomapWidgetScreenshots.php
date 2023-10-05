@@ -128,7 +128,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			];
 		}
 
-		$triggers = CDataHelper::call('trigger.create', $triggers_data);
+		CDataHelper::call('trigger.create', $triggers_data);
 
 		// Create dashboard with geomap widgets.
 		$dashboards = CDataHelper::call('dashboard.create', [
