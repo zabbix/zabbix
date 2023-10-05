@@ -948,7 +948,11 @@ int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 }
 #endif
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 #ifdef HAVE_ORACLE
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
@@ -1204,7 +1208,11 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num)
 {
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 	int	i, cnt = 0;
 	char	*value_esc;
