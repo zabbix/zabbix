@@ -30,9 +30,9 @@ ROW   |1      |b21d61561974b06cbeb97a71ca880e92f0fc06d49ac3246280afb88dfa6050a6|
 ROW   |2      |a70c48089996fbf82c9ba3cc81795dede0017ec88ac3abd067ca31e58382e13e|
 
 TABLE |users
-FIELDS|userid|username|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|rows_per_page|roleid|ugsetid|
-ROW   |1     |Admin   |Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |50           |3     |2      |
-ROW   |2     |guest   |      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|    |0        |15m       |30s    |50           |4     |1      |
+FIELDS|userid|username|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|rows_per_page|roleid|
+ROW   |1     |Admin   |Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |50           |3     |
+ROW   |2     |guest   |      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|    |0        |15m       |30s    |50           |4     |
 
 TABLE |hstgrp
 FIELDS|groupid|name                        |flags|uuid                            |type|
@@ -985,6 +985,11 @@ ROW   |1      |8       |
 ROW   |1      |9       |
 ROW   |2      |13      |
 ROW   |2      |7       |
+
+TABLE |ugset_user
+FIELDS|userid|ugsetid|
+ROW   |1     |2      |
+ROW   |2     |1      |
 
 TABLE |scripts
 FIELDS|scriptid|name                   |command                                                       |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|timeout|scope|port|authtype|username|password|publickey|privatekey|menu_path|url |new_window|
