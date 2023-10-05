@@ -524,6 +524,30 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	zbx_discovery_eoj_down_update(void *handle, zbx_uint64_t druleid, int job_time_start, int job_time_end)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() druleid:" ZBX_FS_UI64 " job_start_time:%d", __func__, druleid,
+			job_time_start);
+
+	ZBX_UNUSED(handle);
+
+	zbx_db_execute("update dhosts set status=%d,lastup=%d,lastdown=%d"
+			" where status=%d and"
+				" lastup<%d and"
+				" druleid=" ZBX_FS_UI64,
+			DOBJECT_STATUS_DOWN, 0, job_time_end, DOBJECT_STATUS_UP, job_time_start, druleid);
+
+	zbx_db_execute("update dservices set status=%d,lastup=%d,lastdown=%d"
+			" where status=%d and"
+				" lastup<%d and"
+				" dhostid in ("
+					"select dhostid from dhosts"
+					" where druleid=" ZBX_FS_UI64 ")",
+			DOBJECT_STATUS_DOWN, 0, job_time_end, DOBJECT_STATUS_UP, job_time_start, druleid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 void	*zbx_discovery_open(void)
 {
 	return NULL;

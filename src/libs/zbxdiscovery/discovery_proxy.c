@@ -51,5 +51,12 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 			value, (int)now);
 }
 
+void	zbx_discovery_eoj_down_update(void *handle, zbx_uint64_t druleid, int job_time_start, int job_time_end)
+{
+	char	buf[16];
 
+	zbx_snprintf(buf, sizeof(buf), "%d", job_time_start);
+	zbx_pb_discovery_write_service((zbx_pb_discovery_data_t *)handle, druleid, 0, "", "", 0,
+			DOBJECT_STATUS_ENDOFJOB, buf, job_time_end);
+}
 

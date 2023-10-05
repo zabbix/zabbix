@@ -221,7 +221,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 	const char	*service = NULL;
 	AGENT_RESULT	result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() wid:%d", __func__, log_worker_id);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
 
 	zbx_init_agent_result(&result);
 
@@ -392,7 +392,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 	}
 	zbx_free_agent_result(&result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() wid:%d ret:%s", __func__, log_worker_id, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ret:%s", log_worker_id, __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -923,6 +923,33 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	process_results_validate_end_of_job(const zbx_hashset_t *incomplete_druleids,
+		zbx_vector_discoverer_results_ptr_t *results, zbx_discoverer_manager_t *manager)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() results:%d manager:%d", __func__, results->values_num,
+			manager->results.num_data);
+
+	for (i = results->values_num - 1; i >= 0; i--)
+	{
+		if ('\0' != *results->values[i]->ip)
+			continue;
+
+		if (NULL == zbx_hashset_search(incomplete_druleids, &results->values[i]->druleid))
+			continue;
+
+		/* return EOJ to results hashset */
+
+		zbx_hashset_insert(&manager->results, results->values[i], sizeof(zbx_discoverer_results_t));
+		zbx_free(results->values[i]);
+		zbx_vector_discoverer_results_ptr_remove_noorder(results, i);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() results:%d manager:%d", __func__, results->values_num,
+			manager->results.num_data);
+}
+
 static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
 		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks, const zbx_events_funcs_t *events_cbs)
 {
@@ -932,6 +959,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_discoverer_results_t		*result, *result_tmp;
 	zbx_hashset_iter_t			iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_discoverer_results_ptr_create(&results);
 	zbx_hashset_clear(incomplete_druleids);
@@ -975,6 +1004,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 		zbx_hashset_iter_remove(&iter);
 	}
 
+	process_results_validate_end_of_job(incomplete_druleids, &results, manager);	/* druleid must be compleated */
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() results=%d checks:" ZBX_FS_UI64 "/" ZBX_FS_UI64 " del_druleids=%d"
 			" incomplete_druleids=%d", __func__, results.values_num, res_check_count, res_check_total,
 			del_druleids->values_num, incomplete_druleids->num_data);
@@ -986,8 +1017,9 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 		void	*handle;
 
 		handle = zbx_discovery_open();
+		zbx_vector_discoverer_results_ptr_sort(&results, discoverer_results_ptr_compare);
 
-		for (i = 0; i < results.values_num; i++)
+		for (i = results.values_num - 1; i >= 0; i--)	/* result with END_OF_JOB must be last one */
 		{
 			zbx_db_dhost	dhost;
 			int		host_status;
@@ -1002,14 +1034,18 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 				continue;
 			}
 
-			memset(&dhost, 0, sizeof(zbx_db_dhost));
+			if ('\0' != *result->ip)
+			{
+				memset(&dhost, 0, sizeof(zbx_db_dhost));
+				host_status = process_services(handle, result->druleid, &dhost, result->ip,
+						result->dnsname,result->now, result->unique_dcheckid, &result->services,
+						events_cbs->add_event_cb);
 
-			host_status = process_services(handle, result->druleid, &dhost, result->ip, result->dnsname,
-					result->now, result->unique_dcheckid, &result->services,
-					events_cbs->add_event_cb);
-
-			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip, result->dnsname,
-					host_status, result->now, events_cbs->add_event_cb);
+				zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip, result->dnsname,
+						host_status, result->now, events_cbs->add_event_cb);
+			}
+			else
+				zbx_discovery_eoj_down_update(handle, result->druleid, result->now, (int)time(NULL));
 
 			if (NULL != events_cbs->process_events_cb)
 				events_cbs->process_events_cb(NULL, NULL);
@@ -1025,6 +1061,9 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
 	zbx_vector_discoverer_results_ptr_destroy(&results);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__,
+			DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ? 1 : 0);
 
 	return DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ? 1 : 0;
 #undef DISCOVERER_BATCH_RESULTS_NUM
@@ -1263,6 +1302,8 @@ static void	discovery_icmp_result_proc(const zbx_uint64_t druleid, const int dch
 {
 	int	i;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
+
 	for (i = 0; i < hosts->values_num; i++)
 	{
 		ZBX_FPING_HOST			*h = &hosts->values[i];
@@ -1306,6 +1347,8 @@ static void	discovery_icmp_result_proc(const zbx_uint64_t druleid, const int dch
 		*service->value = '\0';
 		zbx_vector_discoverer_services_ptr_append(&result->services, service);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() results:%d", log_worker_id, __func__, results->values_num);
 }
 
 static void	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t *task,
@@ -1316,8 +1359,8 @@ static void	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_
 	zbx_vector_fping_host_t		hosts;
 	const zbx_dc_dcheck_t		*dcheck = task->dchecks.values[dcheck_idx];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() wid:%d ranges:%d resolve_dns:%d dchecks:%d key[0]:%s", __func__,
-			log_worker_id, DISCOVERY_ADDR_RANGE == task->addr_type ? task->addr.ipranges->values_num : -1,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d resolve_dns:%d dchecks:%d key[0]:%s", log_worker_id,
+			__func__, DISCOVERY_ADDR_RANGE == task->addr_type ? task->addr.ipranges->values_num : -1,
 			task->resolve_dns, task->dchecks.values_num, 0 != task->dchecks.values_num ?
 			task->dchecks.values[0]->key_ : "empty");
 
@@ -1381,12 +1424,14 @@ static void	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_
 			if (SUCCEED != zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, 0, dcheck->allow_redirect,
 					1, error, sizeof(error)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() wid:%d %d icmp checks failed with error:%s",
-						__func__, log_worker_id, worker_max, error);
+				zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with error:%s",
+						log_worker_id, __func__, worker_max, error);
 			}
-
-			discovery_icmp_result_proc(druleid, dcheck_idx, task->unique_dcheckid, dcheck->dcheckid, task,
-					&hosts, results);
+			else
+			{
+				discovery_icmp_result_proc(druleid, dcheck_idx, task->unique_dcheckid,
+						dcheck->dcheckid, task, &hosts, results);
+			}
 
 			for (i = 0; i < hosts.values_num; i++)
 			{
@@ -1405,12 +1450,14 @@ static void	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_
 		if (SUCCEED != zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, 0, dcheck->allow_redirect,
 				1, error, sizeof(error)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() wid:%d %d icmp checks failed with error:%s", __func__,
-					log_worker_id, worker_max, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with error:%s", log_worker_id,
+					__func__, worker_max, error);
 		}
-
-		discovery_icmp_result_proc(druleid, dcheck_idx, task->unique_dcheckid, dcheck->dcheckid, task,
-				&hosts, results);
+		else
+		{
+			discovery_icmp_result_proc(druleid, dcheck_idx, task->unique_dcheckid, dcheck->dcheckid, task,
+					&hosts, results);
+		}
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
@@ -1422,7 +1469,7 @@ static void	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_
 	zbx_vector_fping_host_clear(&hosts);
 	zbx_vector_fping_host_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() wid:%d results:%d", __func__, log_worker_id, results->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() results:%d", log_worker_id, __func__, results->values_num);
 }
 
 static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src)
@@ -1488,8 +1535,8 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 	char					*value = NULL;
 	size_t					value_alloc = 128;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() wid:%d ip:%s resolve_dns:%d dchecks:%d key[0]:%s", __func__,
-			log_worker_id, DISCOVERY_ADDR_IP == task->addr_type ? task->addr.ip : "ipranges",
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ip:%s resolve_dns:%d dchecks:%d key[0]:%s", log_worker_id, __func__,
+			DISCOVERY_ADDR_IP == task->addr_type ? task->addr.ip : "ipranges",
 			task->resolve_dns, task->dchecks.values_num, 0 != task->dchecks.values_num ?
 			task->dchecks.values[0]->key_ : "empty");
 
@@ -1554,8 +1601,24 @@ out:
 
 	zbx_vector_discoverer_services_ptr_destroy(&services);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() wid:%d result services:%d", __func__, log_worker_id,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() result services:%d", log_worker_id, __func__,
 			result->services.values_num);
+}
+
+static void	discoverer_job_end_register(zbx_discoverer_job_t *job)
+{
+	zbx_discoverer_results_t	result;
+
+	zbx_vector_discoverer_services_ptr_create(&result.services);
+	result.druleid = job->druleid;
+	result.now = job->start_time;
+	result.unique_dcheckid = 0;
+	result.ip = zbx_strdup(NULL, "");
+	result.dnsname = zbx_strdup(NULL, "");
+
+	pthread_mutex_lock(&dmanager.results_lock);
+	zbx_hashset_insert(&dmanager.results, &result, sizeof(zbx_discoverer_results_t));
+	pthread_mutex_unlock(&dmanager.results_lock);
 }
 
 static void	*discoverer_worker_entry(void *net_check_worker)
@@ -1601,7 +1664,10 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
 			{
 				if (0 == job->workers_used)
+				{
+					discoverer_job_end_register(job);
 					discoverer_job_remove(job);
+				}
 				else
 					job->status = DISCOVERER_JOB_STATUS_REMOVING;
 
@@ -1648,6 +1714,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 			else if (DISCOVERER_JOB_STATUS_REMOVING == job->status && 0 == job->workers_used)
 			{
+				discoverer_job_end_register(job);
 				discoverer_job_remove(job);
 			}
 

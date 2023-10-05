@@ -60,6 +60,7 @@ typedef struct
 	unsigned char			status;
 	zbx_vector_dc_dcheck_ptr_t	*dchecks_common;
 	zbx_vector_iprange_t		*ipranges;
+	int				start_time;
 }
 zbx_discoverer_job_t;
 

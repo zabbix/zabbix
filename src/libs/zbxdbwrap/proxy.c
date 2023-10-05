@@ -1697,8 +1697,8 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
 				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu status:%d value:'%s'",
 				__func__, drule.druleid, service->dcheckid, drule.unique_dcheckid,
-				zbx_date2str(service->itemtime, NULL), zbx_time2str(service->itemtime, NULL), ip, service->dns,
-				service->port, service->status, service->value);
+				zbx_date2str(service->itemtime, NULL), zbx_time2str(service->itemtime, NULL), ip,
+				service->dns, service->port, service->status, service->value);
 
 		if (0 == service->dcheckid)
 			break;
@@ -1899,14 +1899,24 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 		else
 			dcheckid = 0;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
-			goto json_parse_error;
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp), NULL))
+			status = atoi(tmp);
+		else
+			status = 0;
 
-		if (SUCCEED != zbx_is_ip(ip))
+		if (DOBJECT_STATUS_ENDOFJOB != status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid IP address", __func__, ip);
-			continue;
+			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
+				goto json_parse_error;
+
+			if (SUCCEED != zbx_is_ip(ip))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid IP address", __func__, ip);
+				continue;
+			}
 		}
+		else
+			*ip = '\0';
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp), NULL))
 		{
@@ -1930,11 +1940,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __func__, dns);
 			continue;
 		}
-
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp), NULL))
-			status = atoi(tmp);
-		else
-			status = 0;
 
 		if (FAIL == (i = zbx_vector_ptr_search(&drules, &druleid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2004,7 +2009,13 @@ json_parse_error:
 
 			while (processed_num != drule_ip->services.values_num)
 			{
-				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip,
+				if (DOBJECT_STATUS_ENDOFJOB == drule_ip->services.values[0]->status)
+				{
+					zbx_discovery_eoj_down_update(NULL, drule->druleid,
+							atoi(drule_ip->services.values[0]->value),
+							drule_ip->services.values[0]->itemtime);
+				}
+				else if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip,
 						events_cbs->add_event_cb, drule->druleid, &drule->dcheckids,
 						unique_dcheckid, &processed_num, j)))
 				{
