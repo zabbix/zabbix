@@ -116,7 +116,7 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 
 	conn, err := c.create(uri, params)
 	if err != nil {
-		return conn, nil
+		return nil, err
 	}
 
 	c.connections[uri] = conn
