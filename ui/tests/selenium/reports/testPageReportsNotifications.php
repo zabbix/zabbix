@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * @dataSource LoginUsers
+ * @dataSource LoginUsers, Actions
  */
 class testPageReportsNotifications extends CLegacyWebTest {
 

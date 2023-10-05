@@ -352,6 +352,51 @@ class Actions {
 						'opcommand_hst' => [['hostid' => 0]]
 					]
 				]
+			],
+			[
+				'name' => 'Simple action',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => []
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => ['mediatypeid' => 1],
+						'opmessage_grp' => [['usrgrpid' => 7]]
+					]
+				]
+			],
+			[
+				'name' => 'Trigger action 2',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => []
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => ['mediatypeid' => 1],
+						'opmessage_grp' => [['usrgrpid' => 7]]
+					]
+				]
+			],
+			[
+				'name' => 'Trigger action 3',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => []
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => ['mediatypeid' => 3],
+						'opmessage_grp' => [['usrgrpid' => 7]]
+					]
+				]
 			]
 		]);
 		$actionids = CDataHelper::getIds('name');
@@ -363,6 +408,78 @@ class Actions {
 				'sortorder' => 1
 			]
 		]);
+
+		// Add Actions to Action Log in database.
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			" message, status, retries, error, esc_step, alerttype, parameters) VALUES (1, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724800, 1, 'igor.danoshaites@zabbix.com',".
+			" 'PROBLEM: Value of item key1 > 5', 'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: ".
+			" PROBLEM Last value: 6', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			" message, status, retries, error, esc_step, alerttype, parameters) VALUES (2, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724810, 1, 'igor.danoshaites@zabbix.com', ".
+			" 'PROBLEM: Value of item key1 > 6','Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: ".
+			"PROBLEM', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,"
+			." message, status, retries, error, esc_step, alerttype, parameters) VALUES (3, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724820, 1, 'igor.danoshaites@zabbix.com',".
+			" 'PROBLEM: Value of item key1 > 7', 'Event at 2012.02.20 10:00:20 Hostname: H1 Value of item key1 > 7:".
+			" PROBLEM', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			" message, status, retries, error, esc_step, alerttype, parameters) VALUES (4, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724830, 1, 'igor.danoshaites@zabbix.com',".
+			" 'PROBLEM: Value of item key1 > 10', 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: ".
+			"PROBLEM', 2, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused',".
+			" 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,".
+			" message, status, retries, error, esc_step, alerttype, parameters) VALUES (5, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724840, 1, 'igor.danoshaites@zabbix.com', ".
+			" 'PROBLEM: Value of item key1 > 20', 'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: ".
+			"PROBLEM', 0, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: ".
+			"[111] Connection refused', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,".
+			" message, status, retries, error, esc_step, alerttype, parameters) VALUES (6, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, NULL, 1329724850, NULL, '', '',".
+			" 'Command: H1:ls -la', 1, 0, '', 1, 1, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,".
+			" message, status, retries, error, esc_step, alerttype, parameters) VALUES (7, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, NULL, 1329724860, NULL, '', '',".
+			" 'Command: H1:ls -la', 1, 0, '', 1, 1, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			"message, status, retries, error, esc_step, alerttype, parameters) VALUES (134, ".
+			zbx_dbstr($actionids['Trigger action 2']).", 1, 9, 1597440000, 3, 'igor.danoshaites@zabbix.com',".
+			"'time_subject_2', 'time_message_', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			"message, status, retries, error, esc_step, alerttype, parameters) VALUES (130, ".
+			zbx_dbstr($actionids['Trigger action 3']).", 1, 1, 1329724870, 10, 'test.test@zabbix.com',".
+			"'subject here', 'message here', 1, 0, '', 1, 0, '');"
+		);
+
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			"message, status, retries, error, esc_step, alerttype, parameters) VALUES (131, ".
+			zbx_dbstr($actionids['Trigger action 3']).", 1, 9, 1329724880, 3, '77777777', 'subject here',".
+			"'message here', 1, 0, '', 1, 0, '');"
+		);
+
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			"message, status, retries, error, esc_step, alerttype, parameters) VALUES (132, ".
+			zbx_dbstr($actionids['Trigger action 3']).", 1, 9, ".
+			"1329724890, 3, '77777777', 'subject_no_space', 'message_no_space', 1, 0, '', 1, 0, '');"
+		);
+
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			"message, status, retries, error, esc_step, alerttype, parameters) VALUES (133, ".
+			zbx_dbstr($actionids['Trigger action 3']).", 1, 1, 1597439400, 3, 'igor.danoshaites@zabbix.com',".
+			"'time_subject_1', 'time_message_1', 1, 0, '', 1, 0, '');"
+		);
 
 		return $actionids;
 	}
