@@ -165,6 +165,7 @@ class CRouter {
 		'item.prototype.list'						=> ['CControllerItemPrototypeList',						'layout.htmlpage',		'item.prototype.list'],
 		'item.prototype.massupdate'					=> ['CControllerItemMassupdate',						'layout.json',			'item.massupdate'],
 		'item.prototype.update'						=> ['CControllerItemPrototypeUpdate',					'layout.json',			null],
+		'item.tags.list'							=> ['CControllerItemTagsList',							'layout.json',			'item.tags.list'],
 		'latest.view'								=> ['CControllerLatestView',							'layout.htmlpage',		'monitoring.latest.view'],
 		'latest.view.refresh'						=> ['CControllerLatestViewRefresh',						'layout.json',			'monitoring.latest.view.refresh'],
 		'macros.edit'								=> ['CControllerMacrosEdit',							'layout.htmlpage',		'administration.macros.edit'],

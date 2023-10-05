@@ -144,15 +144,6 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			}
 		}
 
-		if ($this->getInput('show_inherited_tags', 0)) {
-			$data['form']['tags'] = CItemPrototypeHelper::getTagsWithInherited([
-				'item' => $data['form'] + ['discoveryRule' => $data['discovery_rule']],
-				'itemid' => $data['form']['itemid'],
-				'tags' => $data['form']['tags'],
-				'hostid' => [$host['hostid']]
-			]);
-		}
-
 		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
 			$data['inherited_timeouts'] = getInheritedTimeouts($host['proxyid'])['timeouts'];
 			$data['inherited_timeout'] = $timeout_config['timeouts'][$data['form']['type']] ?? '';
@@ -177,10 +168,6 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 		if ($data['form']['templateid']) {
 			$data['readonly'] = true;
-		}
-
-		if ($data['form']['tags']) {
-			CArrayHelper::sort($data['form']['tags'], ['tag', 'value']);
 		}
 
 		$response = new CControllerResponseData($data);

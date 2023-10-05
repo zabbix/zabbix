@@ -39,11 +39,13 @@ const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
+const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
 const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
 const ZBX_STYLE_BTN_GREY = <?= json_encode(ZBX_STYLE_BTN_GREY) ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 const ZBX_STYLE_FORM_INPUT_MARGIN = <?= json_encode(ZBX_STYLE_FORM_INPUT_MARGIN) ?>;
+const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE) ?>;
 
 window.item_edit_form = new class {
 
@@ -95,7 +97,7 @@ window.item_edit_form = new class {
 
 		this.updateFieldsVisibility();
 
-		this.initial_form_fields = getFormFields(this.form);
+		this.initial_form_fields = this.#getFormFields(this.form);
 	}
 
 	initForm(field_switches) {
@@ -232,7 +234,7 @@ window.item_edit_form = new class {
 
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
-			.forEach(o => o.addEventListener('change', e => reloadPopup(this.form, this.actions.form)));
+			.forEach(o => o.addEventListener('change', this.#inheritedTagsChangeHandler.bind(this)));
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
@@ -391,6 +393,16 @@ window.item_edit_form = new class {
 			}
 		}
 
+		if ('tags' in fields) {
+			fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
+				if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
+					tags.push({tag: tag.tag, value: tag.value});
+				}
+
+				return tags;
+			}, []);
+		}
+
 		return fields;
 	}
 
@@ -457,7 +469,15 @@ window.item_edit_form = new class {
 	}
 
 	#isFormModified() {
-		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(getFormFields(this.form));
+		const fields = this.#getFormFields(this.form);
+
+		fields.show_inherited_tags = this.initial_form_fields.show_inherited_tags;
+
+		if (!fields.tags.length) {
+			fields.tags.push({tag: '', value: ''});
+		}
+
+		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(fields);
 	}
 
 	#isConfirmed() {
@@ -484,6 +504,62 @@ window.item_edit_form = new class {
 		const switcher = globalAllObjForViewSwitcher['type'];
 
 		fields.forEach(id => switcher[action]({id}));
+	}
+
+	#updateTagsList(table) {
+		const fields = this.#getFormFields();
+		const url = new Curl('zabbix.php');
+		const data = {
+			tags: fields.tags,
+			show_inherited_tags: fields.show_inherited_tags,
+			itemid: fields.itemid,
+			hostid: fields.hostid
+		}
+
+		url.setArgument('action', 'item.tags.list');
+		this.overlay.setLoading();
+
+		fetch(url.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				const div = document.createElement('div');
+
+				div.innerHTML = response.body;
+
+				const new_table = div.firstChild;
+
+				table.replaceWith(new_table);
+				this.#initTagsTableEvents(new_table);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
+	#initTagsTableEvents(table) {
+		const $table = jQuery(table);
+
+		$table
+			.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
+			.on('afteradd.dynamicRows', () => {
+				$(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`, $table).textareaFlexible();
+			})
+			.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`)
+			.textareaFlexible();
+
+		table.addEventListener('click', e => {
+			const target = e.target;
+
+			if (target.matches('.element-table-disable')) {
+				const type_input = target.closest('.form_row').querySelector('input[name$="[type]"]');
+
+				type_input.value &= ~ZBX_PROPERTY_OWN;
+			}
+		});
 	}
 
 	#updateTimeoutOverrideVisibility() {
@@ -636,6 +712,10 @@ window.item_edit_form = new class {
 			dstfld1: 'key',
 			itemtype: this.field.type.value
 		}, {dialogue_class: 'modal-popup-generic'});
+	}
+
+	#inheritedTagsChangeHandler(e) {
+		this.#updateTagsList(this.form.querySelector('.tags-table'));
 	}
 
 	#openRelatedItem(parameters) {
