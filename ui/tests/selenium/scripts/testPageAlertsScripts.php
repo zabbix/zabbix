@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  *
  * @dataSource HostTemplateGroups, Actions
  *
- * @onBefore prepareData
+ * @onBefore prepareScriptData
  */
 class testPageAlertsScripts extends CWebTest {
 
@@ -58,7 +58,7 @@ class testPageAlertsScripts extends CWebTest {
 	private static $script_scope_event = 'Manual event action for filter check';
 	private static $custom_action = 'Trigger action for Scripts page testing';
 
-	public static function prepareData() {
+	public function prepareScriptData() {
 		CDataHelper::call('script.create', [
 			[
 				'name' => self::$script_scope_event,
@@ -95,8 +95,14 @@ class testPageAlertsScripts extends CWebTest {
 					'esc_step_from' => '1',
 					'esc_step_to' => '1',
 					'operationtype' => OPERATION_TYPE_COMMAND,
-					'opcommand' => ['scriptid' => $scriptids[self::$custom_script]],
-					'opcommand_hst' => [['hostid'=> '0']]
+					'opcommand' => [
+						'scriptid' => $scriptids[self::$custom_script]
+					],
+					'opcommand_hst' => [
+						[
+							'hostid'=> '0'
+						]
+					]
 				]
 			]
 		]);
