@@ -3684,8 +3684,7 @@ select {
   z-index: 1;
   width: 16px !important;
   height: 16px !important;
-  opacity: 0;
-  pointer-events: none; }
+  opacity: 0; }
   .checkbox-radio + label span {
     position: relative;
     display: inline-block;
@@ -4661,6 +4660,10 @@ z-select[readonly] .focusable,
       position: relative; }
       .overlay-dialogue.modal .overlay-dialogue-body > form {
         padding: 2px 0; }
+      .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-left {
+        position: relative; }
+        .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-left .checkbox-radio {
+          right: 0; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
