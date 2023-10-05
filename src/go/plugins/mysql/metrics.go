@@ -41,6 +41,11 @@ const (
 	keyStatusVars             = "mysql.get_status_variables"
 	keyVersion                = "mysql.version"
 
+	uriParam        = "URI"
+	tlsConnectParam = "TLSConnect"
+	tlsCAParam      = "TLSCAFile"
+	tlsCertParam    = "TLSCertFile"
+	tlsKeyParam     = "TLSKeyFile"
 	masterHostParam = "Master"
 )
 
@@ -94,12 +99,6 @@ var (
 			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
 				paramTLSKeyFile}, false),
 	}
-
-	uriParam        = "URI"
-	tlsConnectParam = "TLSConnect"
-	tlsCAParam      = "TLSCAFile"
-	tlsCertParam    = "TLSCertFile"
-	tlsKeyParam     = "TLSKeyFile"
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
