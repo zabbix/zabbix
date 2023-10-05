@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-22T15:42:23Z'
+  date: '2023-09-20T10:50:21Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -496,20 +496,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: G
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: E
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
                 formulaid: C
@@ -517,6 +503,20 @@ zabbix_export:
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: E
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: G
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: I
@@ -929,6 +929,16 @@ zabbix_export:
             - name: 'Ubiquiti AirOS: General'
               widgets:
                 - type: GRAPH_CLASSIC
+                  name: 'Memory utilization'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Ubiquiti AirOS by SNMP'
+                        name: 'Ubiquiti AirOS: Memory utilization'
+                - type: GRAPH_CLASSIC
                   name: 'CPU utilization'
                   x: '12'
                   width: '12'
@@ -939,16 +949,6 @@ zabbix_export:
                       value:
                         host: 'Ubiquiti AirOS by SNMP'
                         name: 'Ubiquiti AirOS: CPU utilization'
-                - type: GRAPH_CLASSIC
-                  name: 'Memory utilization'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Ubiquiti AirOS by SNMP'
-                        name: 'Ubiquiti AirOS: Memory utilization'
       valuemaps:
         - uuid: 2fc5bef495074d0e86641cc136e3dcde
           name: 'IF-MIB::ifOperStatus'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:54:39Z'
+  date: '2023-09-20T10:50:31Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -2080,14 +2080,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'ZYXEL IES-6000 by SNMP'
                         name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '5'
       valuemaps:
         - uuid: 5247e9e5efcd4b29b864e336619eafcf
           name: 'SNMP available'

@@ -197,7 +197,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 				goto pc_fail;
 			}
 
-			if (NULL == add_perf_counter(name, counterpath, period, lang, &error))
+			if (NULL == zbx_add_perf_counter(name, counterpath, period, lang, &error))
 			{
 				if (NULL == error)
 					error = zbx_strdup(error, "Failed to add new performance counter.");

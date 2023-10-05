@@ -2514,13 +2514,13 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 	else if (min_version > current_version && ZBX_DBVERSION_UNDEFINED != min_version)
 	{
 		flag = DB_VERSION_LOWER_THAN_MINIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version is %lu which is smaller than minimum of %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is older than minimum required %lu",
 				database, (unsigned long)current_version, (unsigned long)min_version);
 	}
 	else if (max_version < current_version && ZBX_DBVERSION_UNDEFINED != max_version)
 	{
 		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version is %lu which is higher than maximum of %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is newer than maximum allowed %lu",
 				database, (unsigned long)current_version, (unsigned long)max_version);
 	}
 	else if (min_supported_version > current_version && ZBX_DBVERSION_UNDEFINED != min_supported_version)

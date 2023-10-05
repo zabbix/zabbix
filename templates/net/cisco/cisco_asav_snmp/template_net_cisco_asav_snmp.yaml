@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:32:44Z'
+  date: '2023-09-20T10:46:59Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -295,6 +295,13 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
+              - macro: '{#CISCO.IF.DESC}'
+                value: '{$CISCO.LLD.FILTER.IF.DESC.MATCHES}'
+                formulaid: A
+              - macro: '{#CISCO.IF.DESC}'
+                value: '{$CISCO.LLD.FILTER.IF.DESC.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#CISCO.IF.NAME}'
                 value: '{$CISCO.LLD.FILTER.IF.NAME.MATCHES}'
                 formulaid: C
@@ -309,13 +316,6 @@ zabbix_export:
                 value: '{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-              - macro: '{#CISCO.IF.DESC}'
-                value: '{$CISCO.LLD.FILTER.IF.DESC.MATCHES}'
-                formulaid: A
-              - macro: '{#CISCO.IF.DESC}'
-                value: '{$CISCO.LLD.FILTER.IF.DESC.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Network interfaces discovery'
           item_prototypes:
             - uuid: c4be70b6d6934281ba1c78ef056c7d79
@@ -1333,14 +1333,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.IF.NAME} Traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1349,14 +1349,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.IF.NAME}: Packets traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -1365,14 +1365,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.IF.NAME}: Utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
             - name: Resources
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1382,14 +1382,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: Memory[{#SNMPVALUE}] Utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1398,14 +1398,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: CPU[{#SNMPINDEX}] Utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
             - name: 'Sessions traffic'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1415,14 +1415,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: 764f7c162b8a45d9b41e795cf2f5f8da
           name: 'Cisco ASAv algorithm validate packets'
