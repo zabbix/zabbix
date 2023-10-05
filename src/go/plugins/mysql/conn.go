@@ -114,7 +114,14 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 		return conn, nil
 	}
 
-	return c.create(uri, params)
+	conn, err := c.create(uri, params)
+	if err != nil {
+		return conn, nil
+	}
+
+	c.connections[uri] = conn
+
+	return conn, nil
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
@@ -209,15 +216,9 @@ func (c *ConnManager) create(uri uri.URI, params map[string]string) (*MyConn, er
 
 	client := sql.OpenDB(connector)
 
-	c.connections[uri] = &MyConn{
-		client:         client,
-		lastTimeAccess: time.Now(),
-		queryStorage:   &c.queryStorage,
-	}
-
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
 
-	return c.connections[uri], nil
+	return &MyConn{client: client, lastTimeAccess: time.Now(), queryStorage: &c.queryStorage}, nil
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
