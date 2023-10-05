@@ -79,8 +79,8 @@ class CScript extends CApiService {
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'groupids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'usrgrpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'confirmation', 'type', 'url', 'new_window', 'execute_on', 'scope', 'menu_path']],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'command', 'url', 'description', 'confirmation', 'username', 'menu_path']],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'confirmation', 'type', 'url', 'new_window', 'execute_on', 'scope', 'menu_path', 'manualinput', 'manualinput_prompt', 'manualinput_validator', 'manualinput_validator_type', 'manualinput_default_value']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'command', 'url', 'description', 'confirmation', 'username', 'menu_path', 'manualinput', 'manualinput_prompt', 'manualinput_validator', 'manualinput_validator_type', 'manualinput_default_value']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -269,7 +269,9 @@ class CScript extends CApiService {
 
 			$scope_rules = $this->getScopeValidationRules(
 				$script['scope'],
-				$script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED ? $script['manualinput_validator_type'] : null,
+				$script['scope'] != ZBX_SCRIPT_SCOPE_ACTION && $script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED
+					? $script['manualinput_validator_type']
+					: null,
 				$scope_fields
 			);
 
@@ -484,7 +486,9 @@ class CScript extends CApiService {
 			$type_rules = $this->getTypeValidationRules($script['type'], $method, $type_fields);
 			$scope_rules = $this->getScopeValidationRules(
 				$script['scope'],
-				$script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED ? $script['manualinput_validator_type'] : null,
+				$script['scope'] != ZBX_SCRIPT_SCOPE_ACTION && $script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED
+					? $script['manualinput_validator_type']
+					: null,
 				$scope_fields
 			);
 
@@ -610,7 +614,6 @@ class CScript extends CApiService {
 				$script['host_access'] = DB::getDefault('scripts', 'host_access');
 				$script['confirmation'] = '';
 			}
-
 		}
 		unset($script);
 
@@ -672,7 +675,7 @@ class CScript extends CApiService {
 			]],
 			'url' =>						['type' => API_URL],
 			'new_window' =>					['type' => API_INT32],
-			'manualinput' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_ENABLED, SCRIPT_MANUALINPUT_DISABLED])],
+			'manualinput' =>				['type' => API_INT32],
 			'manualinput_prompt' =>			['type' => API_STRING_UTF8],
 			'manualinput_validator_type' =>	['type' => API_INT32],
 			'manualinput_validator' =>		['type' => API_STRING_UTF8],
@@ -701,7 +704,7 @@ class CScript extends CApiService {
 				'usrgrpid' =>		['type' => API_ID],
 				'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
 				'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
-				'manualinput' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_DISABLED, SCRIPT_MANUALINPUT_ENABLED])]
+				'manualinput' =>	['type' => API_INT32, 'in' => implode(',', [SCRIPT_MANUALINPUT_DISABLED, SCRIPT_MANUALINPUT_ENABLED])]
 			];
 
 			if ($manualinput_type !== null) {
@@ -717,11 +720,6 @@ class CScript extends CApiService {
 					];
 				}
 			}
-		}
-		else {
-			$common_fields += [
-				'manualinput' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_DISABLED]
-			];
 		}
 
 		$api_input_rules['fields'] += $common_fields;

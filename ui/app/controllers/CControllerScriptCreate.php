@@ -166,11 +166,6 @@ class CControllerScriptCreate extends CController {
 			}
 		}
 
-		// Reset the manualinput values to default, if scope changed to Action operation.
-		if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
-			$script['manualinput'] = DB::getDefault('scripts', 'manualinput');
-		}
-
 		switch ($script['type']) {
 			case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 				$script['command'] = $this->getInput('command', '');

@@ -2871,6 +2871,83 @@ class testScripts extends CAPITest {
 					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "new_window".'
+			],
+			'Test script.create unexpected "manualinput" field for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'command' => 'reboot server',
+					'manualinput' => SCRIPT_MANUALINPUT_ENABLED
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+			],
+			'Test script.create unexpected "manualinput_prompt" field when manualinput is disabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+					'manualinput_prompt' => 'manualinput prompt text'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
+			],
+			'Test script.create unexpected "manualinput_validator_type" field when manualinput is disabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+					'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_LIST
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
+			],
+			'Test script.create unexpected "manualinput_default_value" field when manualinput is disabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+					'manualinput_default_value' => 'default value'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+			],
+			'Test script.create unexpected "manualinput_validator" field when manualinput is disabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+					'manualinput_validator' => 'regular expression'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+			],
+			'Test script.create unexpected "dropdown_options" field when manualinput is disabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+					'dropdown_options' => 'comma,separated,list'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "dropdown_options".'
+			],
+			'Test script.create unexpected "manualinput_default_value" field when input type is set to Dropdown' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_default_value' => 'default value'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
 			]
 		];
 	}
@@ -3134,6 +3211,39 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+
+			// Check create with manualinput.
+			'Test script.create successful custom type script with manualinput (string manualinput type)' => [
+				'script' => [
+					[
+						'name' => 'API create Manual host action script with string type manualinput',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'ping -c {MANUALINPUT} {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
+						'manualinput' => SCRIPT_MANUALINPUT_ENABLED,
+						'manualinput_prompt' => 'Add number of packets to transmit',
+						'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+						'manualinput_default_value' => '3',
+						'manualinput_validator' => '\d'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.create successful custom type script with manualinput (dropdown manualinput type)' => [
+				'script' => [
+					[
+						'name' => 'API create Manual event action script with dropdown type manualinput',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+						'command' => 'ping -c {MANUALINPUT} {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
+						'manualinput' => SCRIPT_MANUALINPUT_ENABLED,
+						'manualinput_prompt' => 'Add number of packets to transmit',
+						'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_LIST,
+						'manualinput_validator' => '1,2,3,4,5,6,7'
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -3186,6 +3296,13 @@ class testScripts extends CAPITest {
 					$this->assertEquals(0, $db_script['usrgrpid']);
 					$this->assertEquals(DB::getDefault('scripts', 'host_access'), $db_script['host_access']);
 					$this->assertEmpty($db_script['confirmation']);
+					$this->assertEquals(DB::getDefault('scripts', 'manualinput'), $db_script['manualinput']);
+					$this->assertEmpty($db_script['manualinput_prompt']);
+					$this->assertEmpty($db_script['manualinput_validator']);
+					$this->assertEmpty($db_script['manualinput_default_value']);
+					$this->assertEquals(DB::getDefault('scripts', 'manualinput_validator_type'),
+						$db_script['manualinput_validator_type']
+					);
 				}
 				else {
 					// Check menu path.
@@ -3219,6 +3336,60 @@ class testScripts extends CAPITest {
 					}
 					else {
 						$this->assertEmpty($db_script['confirmation']);
+					}
+
+					// Check manualinput fields.
+					if (array_key_exists('manualinput', $scripts[$num])) {
+						$this->assertEquals($scripts[$num]['manualinput'], $db_script['manualinput']);
+					}
+					else {
+						$this->assertEquals(DB::getDefault('scripts', 'manualinput'), $db_script['manualinput']);
+					}
+
+					if ($db_script['manualinput'] == SCRIPT_MANUALINPUT_DISABLED) {
+						$this->assertEmpty($db_script['manualinput_prompt']);
+						$this->assertEmpty($db_script['manualinput_validator']);
+						$this->assertEmpty($db_script['manualinput_default_value']);
+						$this->assertEquals(DB::getDefault('scripts', 'manualinput_validator_type'),
+							$db_script['manualinput_validator_type']
+						);
+					}
+					else {
+						if (array_key_exists('manualinput_validator_type', $scripts[$num])) {
+							$this->assertEquals($scripts[$num]['manualinput_validator_type'],
+								$db_script['manualinput_validator_type']
+							);
+						}
+						else {
+							$this->assertEquals(DB::getDefault('scripts', 'manualinput_validator_type'),
+								$db_script['manualinput_validator_type']
+							);
+						}
+
+						if (array_key_exists('manualinput_prompt', $scripts[$num])) {
+							$this->assertSame($scripts[$num]['manualinput_prompt'], $db_script['manualinput_prompt']);
+						}
+						else {
+							$this->assertEmpty($db_script['manualinput_prompt']);
+						}
+
+						if (array_key_exists('manualinput_validator', $scripts[$num])) {
+							$this->assertSame($scripts[$num]['manualinput_validator'],
+								$db_script['manualinput_validator']
+							);
+						}
+						else {
+							$this->assertEmpty($db_script['manualinput_validator']);
+						}
+
+						if (array_key_exists('manualinput_default_value', $scripts[$num])) {
+							$this->assertSame($scripts[$num]['manualinput_default_value'],
+								$db_script['manualinput_default_value']
+							);
+						}
+						else {
+							$this->assertEmpty($db_script['manualinput_default_value']);
+						}
 					}
 				}
 
@@ -3852,6 +4023,61 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/filter/confirmation": an array is expected.'
 			],
 
+			// Check "manualinput" in filter.
+			'Test script.get invalid parameter "manualinput" in filter (bool)' => [
+				'request' => [
+					'filter' => [
+						'manualinput' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/filter/manualinput": an array is expected.'
+			],
+
+			// Check "manualinput_prompt" in filter.
+			'Test script.get invalid parameter "manualinput_prompt" in filter (bool)' => [
+				'request' => [
+					'filter' => [
+						'manualinput_prompt' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/filter/manualinput_prompt": an array is expected.'
+			],
+
+			// Check "manualinput_validator" in filter.
+			'Test script.get invalid parameter "manualinput_validator" in filter (bool)' => [
+				'request' => [
+					'filter' => [
+						'manualinput_validator' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/filter/manualinput_validator": an array is expected.'
+			],
+
+			// Check "manualinput_validator_type" in filter.
+			'Test script.get invalid parameter "manualinput_validator_type" in filter (bool)' => [
+				'request' => [
+					'filter' => [
+						'manualinput_validator_type' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/filter/manualinput_validator_type": an array is expected.'
+			],
+
+			// Check "manualinput_default_value" in filter.
+			'Test script.get invalid parameter "manualinput_default_value" in filter (bool)' => [
+				'request' => [
+					'filter' => [
+						'manualinput_default_value' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/filter/manualinput_default_value": an array is expected.'
+			],
+
 			// Check "url" in filter.
 			'Test script.get invalid parameter "url" in filter (bool)' => [
 				'request' => [
@@ -3949,6 +4175,61 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/confirmation": an array is expected.'
 			],
 
+			// Check "manualinput" in search.
+			'Test script.get invalid parameter "manualinput" in search (bool)' => [
+				'request' => [
+					'search' => [
+						'manualinput' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/search/manualinput": an array is expected.'
+			],
+
+			// Check "manualinput_prompt" in search.
+			'Test script.get invalid parameter "manualinput_prompt" in search (bool)' => [
+				'request' => [
+					'search' => [
+						'manualinput_prompt' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/search/manualinput_prompt": an array is expected.'
+			],
+
+			// Check "manualinput_validator" in search.
+			'Test script.get invalid parameter "manualinput_validator" in search (bool)' => [
+				'request' => [
+					'search' => [
+						'manualinput_validator' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/search/manualinput_validator": an array is expected.'
+			],
+
+			// Check "manualinput_validator_type" in search.
+			'Test script.get invalid parameter "manualinput_validator_type" in search (bool)' => [
+				'request' => [
+					'search' => [
+						'manualinput_validator_type' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/search/manualinput_validator_type": an array is expected.'
+			],
+
+			// Check "manualinput_default_value" in search.
+			'Test script.get invalid parameter "manualinput_default_value" in search (bool)' => [
+				'request' => [
+					'search' => [
+						'manualinput_default_value' => false
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/search/manualinput_default_value": an array is expected.'
+			],
+
 			// Check "username" in search.
 			'Test script.get invalid parameter "username" in search (bool)' => [
 				'request' => [
@@ -3984,7 +4265,7 @@ class testScripts extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "scriptid", "name", "command", "host_access", "usrgrpid", "groupid", "description", "confirmation", "type", "execute_on", "timeout", "parameters", "scope", "port", "authtype", "username", "password", "publickey", "privatekey", "menu_path", "url", "new_window".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "scriptid", "name", "command", "host_access", "usrgrpid", "groupid", "description", "confirmation", "type", "execute_on", "timeout", "parameters", "scope", "port", "authtype", "username", "password", "publickey", "privatekey", "menu_path", "url", "new_window", "manualinput", "manualinput_prompt", "manualinput_validator", "manualinput_validator_type", "manualinput_default_value".'
 			],
 
 			// Check "selectHostGroups" option.
@@ -4514,35 +4795,40 @@ class testScripts extends CAPITest {
 			'Test script.update existing name in default menu_path' => [
 				'script' => [[
 					'scriptid' => 'update_existing_name_two_fail',
-					'name' => 'API test script.update name - A, default path (fail)'
+					'name' => 'API test script.update name - A, default path (fail)',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				]],
 				'expected_error' => 'Script "API test script.update name - A, default path (fail)" already exists.'
 			],
 			'Test script.update existing name in identical menu_path' => [
 				'script' => [
 					'scriptid' => 'update_existing_menu_path_two_fail',
-					'menu_path' => 'folder1/folder2'
+					'menu_path' => 'folder1/folder2',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
 			],
 			'Test script.update existing name in custom menu_path with leading slash' => [
 				'script' => [
 					'scriptid' => 'update_existing_menu_path_two_fail',
-					'menu_path' => '/folder1/folder2'
+					'menu_path' => '/folder1/folder2',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
 			],
 			'Test script.update existing name in custom menu_path with trailing slash' => [
 				'script' => [
 					'scriptid' => 'update_existing_menu_path_two_fail',
-					'menu_path' => 'folder1/folder2/'
+					'menu_path' => 'folder1/folder2/',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
 			],
 			'Test script.update existing name in custom menu_path with both leading and trailing slashes' => [
 				'script' => [
 					'scriptid' => 'update_existing_menu_path_two_fail',
-					'menu_path' => '/folder1/folder2/'
+					'menu_path' => '/folder1/folder2/',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
 			],
@@ -4550,7 +4836,8 @@ class testScripts extends CAPITest {
 				'script' => [
 					'scriptid' => 'update_existing_both_two_fail',
 					'name' => 'API test script.update both - A, custom path (fail)',
-					'menu_path' => 'folder1/folder2'
+					'menu_path' => 'folder1/folder2',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
 			],
@@ -4558,7 +4845,8 @@ class testScripts extends CAPITest {
 				'script' => [
 					'scriptid' => 'update_existing_both_two_fail',
 					'name' => 'API test script.update both - A, custom path (fail)',
-					'menu_path' => '/folder1/folder2'
+					'menu_path' => '/folder1/folder2',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
 			],
@@ -4566,7 +4854,8 @@ class testScripts extends CAPITest {
 				'script' => [
 					'scriptid' => 'update_existing_both_two_fail',
 					'name' => 'API test script.update both - A, custom path (fail)',
-					'menu_path' => 'folder1/folder2/'
+					'menu_path' => 'folder1/folder2/',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
 			],
@@ -4574,7 +4863,8 @@ class testScripts extends CAPITest {
 				'script' => [
 					'scriptid' => 'update_existing_both_two_fail',
 					'name' => 'API test script.update both - A, custom path (fail)',
-					'menu_path' => '/folder1/folder2/'
+					'menu_path' => '/folder1/folder2/',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
 			],
@@ -4811,14 +5101,16 @@ class testScripts extends CAPITest {
 			'Test script.update invalid "usrgrpid" field for host scope (empty string)' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_host',
-					'usrgrpid' => ''
+					'usrgrpid' => '',
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			'Test script.update invalid "usrgrpid" field for host scope' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_host',
-					'usrgrpid' => 999999
+					'usrgrpid' => 999999,
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'User group with ID "999999" is not available.'
 			],
@@ -4830,6 +5122,51 @@ class testScripts extends CAPITest {
 					'confirmation' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+			],
+
+			// Check script manualinput for action scope.
+			'Test script.update unexpected manualinput for action scope' => [
+				'script' => [
+					'scriptid' => 'update_ipmi',
+					'manualinput' => 1
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+			],
+
+			// Check script manualinput_prompt for action scope.
+			'Test script.update unexpected manualinput_prompt for action scope' => [
+				'script' => [
+					'scriptid' => 'update_ipmi',
+					'manualinput_prompt' => 'prompt for manualinput'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
+			],
+
+			// Check script manualinput_validator for action scope.
+			'Test script.update unexpected manualinput_validator for action scope' => [
+				'script' => [
+					'scriptid' => 'update_ipmi',
+					'manualinput_validator' => ' '
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+			],
+
+			// Check script manualinput_validator_type for action scope.
+			'Test script.update unexpected manualinput_validator_type for action scope' => [
+				'script' => [
+					'scriptid' => 'update_ipmi',
+					'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_LIST
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
+			],
+
+			// Check script manualinput_default_value for action scope.
+			'Test script.update unexpected manualinput_default_value for action scope' => [
+				'script' => [
+					'scriptid' => 'update_ipmi',
+					'manualinput_default_value' => '2'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
 			],
 
 			// Check script host group.
@@ -5487,7 +5824,8 @@ class testScripts extends CAPITest {
 			'Test script.update URL change to custom' => [
 				'script' => [
 					'scriptid' => 'update_url',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'manualinput' => SCRIPT_MANUALINPUT_DISABLED
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
 			]
@@ -6407,11 +6745,36 @@ class testScripts extends CAPITest {
 
 		if ($expected_error === null) {
 			$scriptids = array_column($scripts, 'scriptid');
+
 			$db_scripts = $this->getScripts($scriptids);
+
+			foreach($db_scripts as &$db_script) {
+				if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+					unset ($db_script['manualinput_prompt']);
+				}
+				else if ($db_script['manualinput'] == SCRIPT_MANUALINPUT_DISABLED) {
+					unset ($db_script['manualinput_prompt'], $db_script['manualinput_validator'],
+						$db_script['manualinput_validator_type'], $db_script['manualinput_default_value']
+					);
+				}
+			}
+			unset ($db_script);
 
 			$this->call('script.update', $scripts, $expected_error);
 
 			$scripts_upd = $this->getScripts($scriptids);
+
+			foreach($scripts_upd as &$script) {
+				if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+					unset ($script['manualinput_prompt']);
+				}
+				else if ($script['manualinput'] == SCRIPT_MANUALINPUT_DISABLED) {
+					unset ($script['manualinput_prompt'], $script['manualinput_validator'],
+						$script['manualinput_validator_type'], $script['manualinput_default_value']
+					);
+				}
+			}
+			unset ($script);
 
 			// Compare records from DB before and after API call.
 			foreach ($scripts as $script) {
@@ -6899,6 +7262,7 @@ class testScripts extends CAPITest {
 								// Check that parameters remain the same. Order is not important.
 								$this->assertEqualsCanonicalizing($db_script['parameters'], $script_upd['parameters']);
 							}
+
 							break;
 
 						case ZBX_SCRIPT_TYPE_URL:
@@ -6939,6 +7303,32 @@ class testScripts extends CAPITest {
 					$this->assertEmpty($script_upd['confirmation']);
 				}
 				else {
+					// Check "manualinput" fields.
+					if (array_key_exists('manualinput', $script)) {
+						$this->assertEquals($script['manualinput'], $script_upd['manualinput']);
+					}
+					else {
+						$this->assertSame($db_script['manualinput'], $script_upd['manualinput']);
+					}
+
+					if ($script_upd['manualinput'] != SCRIPT_MANUALINPUT_DISABLED) {
+						if (array_key_exists('manualinput_prompt', $script)) {
+							$this->assertSame($script['manualinput_prompt'], $script_upd['manualinput_prompt']);
+						}
+						else {
+							$this->assertSame($db_script['manualinput_prompt'], $script_upd['manualinput_prompt']);
+						}
+
+						if (array_key_exists('manualinput_validator', $script)) {
+							$this->assertSame($script['manualinput_validator'], $script_upd['manualinput_validator']);
+						}
+						else {
+							$this->assertSame($db_script['manualinput_validator'],
+								$script_upd['manualinput_validator']
+							);
+						}
+					}
+
 					// Check "menu_path" field.
 					if (array_key_exists('menu_path', $script)) {
 						$this->assertSame($script_upd['menu_path'], $script['menu_path']);
@@ -7412,7 +7802,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_hosts_ipmi',
@@ -7437,7 +7832,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						// Webhook does not return parameters. Mostly frontend needs only  script ID anyway.
 						[
@@ -7462,7 +7862,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_hosts_ssh',
@@ -7487,7 +7892,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						]
 					],
 					'host_macros' => [
@@ -7822,7 +8232,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_hosts_ipmi',
@@ -7847,7 +8262,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_hosts_ssh',
@@ -7872,7 +8292,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						]
 					],
 					'host_macros' => [
@@ -8177,7 +8602,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_hosts_webhook',
@@ -8201,7 +8631,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_hosts_ssh',
@@ -8226,7 +8661,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						]
 					],
 					'host_macros' => [
@@ -8521,8 +8961,15 @@ class testScripts extends CAPITest {
 			}
 
 			foreach ($result['result'] as $hostid => $result_scripts) {
-				foreach ($result_scripts as $result_script) {
+				foreach ($result_scripts as &$result_script) {
 					foreach ($expected_result['scripts'] as $expected_script) {
+						if ($result_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+							unset ($result_script['manualinput'], $result_script['manualinput_prompt'],
+								$result_script['manualinput_validator'], $result_script['manualinput_validator_type'],
+								$result_script['manualinput_default_value']
+							);
+						}
+
 						if (bccomp($result_script['scriptid'], $expected_script['scriptid']) == 0) {
 
 							$expected_script['url'] = strtr($expected_script['url'],
@@ -8643,7 +9090,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_ipmi',
@@ -8669,7 +9121,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_webhook',
@@ -8693,7 +9150,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_ssh',
@@ -8718,7 +9180,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_url_cause',
@@ -8743,7 +9210,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						]
 					],
 					'event_macros' => [
@@ -9251,7 +9723,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_ipmi',
@@ -9277,7 +9754,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_ssh',
@@ -9302,7 +9784,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_url_cause',
@@ -9327,7 +9814,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						]
 					],
 					'event_macros' => [
@@ -9760,7 +10252,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_webhook',
@@ -9784,7 +10281,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_ssh',
@@ -9809,7 +10311,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						],
 						[
 							'scriptid' => 'get_events_url_cause',
@@ -9834,7 +10341,12 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
-							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
 						]
 					],
 					// CSeverityHelper cannot be used here. Use untranslated plain text.
@@ -10227,6 +10739,7 @@ class testScripts extends CAPITest {
 
 			if (array_key_exists('!has.eventid:scriptid', $expected_result)) {
 				foreach ($expected_result['!has.eventid:scriptid'] as $eventid => $scriptids) {
+
 					$this->assertTrue(array_key_exists($eventid, $result['result']), 'expected eventid ID '.$eventid);
 					$ids = array_column($result['result'][$eventid], 'scriptid');
 					$this->assertEquals($scriptids, array_diff($scriptids, $ids));
@@ -10248,8 +10761,7 @@ class testScripts extends CAPITest {
 						}
 					}
 				}
-			}
-		}
+			}}
 	}
 
 	/**
@@ -10263,7 +10775,8 @@ class testScripts extends CAPITest {
 		$response = $this->call('script.get', [
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
-				'publickey', 'privatekey', 'menu_path', 'url', 'new_window', 'parameters'
+				'publickey', 'privatekey', 'menu_path', 'url', 'new_window', 'parameters', 'manualinput',
+				'manualinput_prompt', 'manualinput_validator', 'manualinput_validator_type', 'manualinput_default_value'
 			],
 			'scriptids' => $scriptids,
 			'preservekeys' => true,
@@ -10327,7 +10840,10 @@ class testScripts extends CAPITest {
 			}
 
 			if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
-				unset($script['menu_path'], $script['usrgrpid'], $script['host_access'], $script['confirmation']);
+				unset($script['menu_path'], $script['usrgrpid'], $script['host_access'], $script['confirmation'],
+					$script['manualinput'], $script['manualinput_validator_type'], $script['manualinput_validator'],
+					$script['manualinput_default_value']
+				);
 			}
 		}
 		unset($script);

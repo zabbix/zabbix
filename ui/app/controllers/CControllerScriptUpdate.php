@@ -160,14 +160,8 @@ class CControllerScriptUpdate extends CController {
 					$script['manualinput_default_value'] = trim($default_input);
 					$script['manualinput_validator'] = $input_validation;
 				}
-
 				$script['manualinput_prompt'] = $this->getInput('input_prompt');
 			}
-		}
-
-		// Reset the manualinput values to default, if scope changed to Action operation.
-		if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
-			$script['manualinput'] = DB::getDefault('scripts', 'manualinput');
 		}
 
 		switch ($script['type']) {
