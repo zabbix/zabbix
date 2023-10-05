@@ -724,7 +724,7 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 
 			if (0 <= bytes_written && 2 <= len - (size_t)bytes_written)
 			{
-				len -= 2;
+				len = bytes_written;
 				goto finish;
 			}
 
