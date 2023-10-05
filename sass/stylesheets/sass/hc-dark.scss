@@ -192,6 +192,9 @@ $gauge-fill-color: #ffffff;
 $gauge-needle-fill-color: #ffffff;
 $gauge-needle-stroke-color: rgba(0, 0, 0, 0.2);
 
+// Pie chart.
+$pie-chart-arc-no-data-color: #111111;
+
 // Statuses
 $problem-unack-fg-color: #ff3333;
 $problem-ack-fg-color: #ff3333;
@@ -668,10 +671,8 @@ a.link-action {
 }
 
 .multiselect-suggest {
-	li {
-		&.suggest-hover {
-			background-color: $ui-bg-color;
-		}
+	.suggest-hover {
+		background-color: $ui-bg-color;
 	}
 }
 

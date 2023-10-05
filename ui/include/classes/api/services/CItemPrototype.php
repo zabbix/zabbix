@@ -40,7 +40,7 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN,
 		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE,
 		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
-		ZBX_PREPROC_SNMP_WALK_TO_JSON
+		ZBX_PREPROC_SNMP_WALK_TO_JSON, ZBX_PREPROC_SNMP_GET_VALUE
 	];
 
 	/**
@@ -419,6 +419,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
@@ -564,6 +565,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);

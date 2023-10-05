@@ -59,19 +59,6 @@ class CControllerChartsView extends CControllerCharts {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
-		else {
-			if ($this->hasInput('from') || $this->hasInput('to')) {
-				validateTimeSelectorPeriod(
-					$this->hasInput('from') ? $this->getInput('from') : null,
-					$this->hasInput('to') ? $this->getInput('to') : null
-				);
-			}
-
-			$this->from = $this->getInput('from', CProfile::get('web.charts.filter.from',
-				'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
-			));
-			$this->to = $this->getInput('to', CProfile::get('web.charts.filter.to', 'now'));
-		}
 
 		return $ret;
 	}
@@ -81,6 +68,11 @@ class CControllerChartsView extends CControllerCharts {
 	}
 
 	protected function doAction() {
+		$this->from = $this->getInput('from', CProfile::get('web.charts.filter.from',
+			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
+		));
+		$this->to = $this->getInput('to', CProfile::get('web.charts.filter.to', 'now'));
+
 		if ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.charts.filter.hostids');
 			CProfile::deleteIdx('web.charts.filter.name');

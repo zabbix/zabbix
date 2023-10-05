@@ -152,6 +152,16 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 					'formula' => 'bitand(last(/host/key,{#LLD}:now-24h),123)',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
 				]
+			],
+			[
+				[
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#10:{#LLD}),"$.[0].last_name","LastName")'
+				]
+			],
+			[
+				[
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#4:{#LLD}),"/zabbix_export/version/text()",5.0)'
+				]
 			]
 		];
 	}

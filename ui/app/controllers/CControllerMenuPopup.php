@@ -404,6 +404,7 @@ class CControllerMenuPopup extends CController {
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
+				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
 				'trigger_prototypes' => $db_item_prototype['triggers']

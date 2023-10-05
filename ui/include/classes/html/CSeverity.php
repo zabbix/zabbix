@@ -30,6 +30,7 @@ class CSeverity extends CRadioButtonList {
 
 		$this->setModern(true);
 		$this->setEnabled($enabled);
+		$this->addClass(ZBX_STYLE_SEVERITY);
 	}
 
 	/**
