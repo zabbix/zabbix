@@ -26,9 +26,9 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup scripts
  *
- * @dataSource HostTemplateGroups
+ * @dataSource HostTemplateGroups, Actions
  *
- * @onBefore prepareActionData, prepareScriptData
+ * @onBefore prepareData
  */
 class testPageAlertsScripts extends CWebTest {
 
@@ -36,6 +36,8 @@ class testPageAlertsScripts extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
+	 *
+	 * @dataSource Actions
 	 *
 	 * @return array
 	 */
@@ -56,27 +58,7 @@ class testPageAlertsScripts extends CWebTest {
 	private static $script_scope_event = 'Manual event action for filter check';
 	private static $custom_action = 'Trigger action for Scripts page testing';
 
-	public static function prepareActionData() {
-		CDataHelper::call('action.create', [
-			[
-				'name' => 'Action with Reboot script',
-				'eventsource' => EVENT_SOURCE_TRIGGERS,
-				'filter' => [
-					'evaltype' => 0,
-					'conditions' => []
-				],
-				'operations' => [
-					[
-						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => 4],
-						'opcommand_hst' => [['hostid' => 0]]
-					]
-				]
-			]
-		]);
-	}
-
-	public function prepareScriptData() {
+	public static function prepareData() {
 		CDataHelper::call('script.create', [
 			[
 				'name' => self::$script_scope_event,
@@ -113,14 +95,8 @@ class testPageAlertsScripts extends CWebTest {
 					'esc_step_from' => '1',
 					'esc_step_to' => '1',
 					'operationtype' => OPERATION_TYPE_COMMAND,
-					'opcommand' => [
-						'scriptid' => $scriptids[self::$custom_script]
-					],
-					'opcommand_hst' => [
-						[
-							'hostid'=> '0'
-						]
-					]
+					'opcommand' => ['scriptid' => $scriptids[self::$custom_script]],
+					'opcommand_hst' => [['hostid'=> '0']]
 				]
 			]
 		]);
@@ -177,7 +153,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => 'Reboot',
 						'Scope' => 'Action operation',
-						'Used in actions' => 'Action with Reboot script',
+						'Used in actions' => 'Autoregistration action 1, Autoregistration action 2, Minimal trigger action',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
 						'Commands' => '/sbin/shutdown -r',
@@ -559,7 +535,7 @@ class testPageAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => 'Cannot delete scripts. Script "Reboot" is used in action operation "Action with Reboot script".'
+					'error' => 'Cannot delete scripts. Script "Reboot" is used in action operation "Minimal trigger action".'
 				]
 			],
 			[
