@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -152,7 +152,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node {#NODE.NAME}: Node cannot takeover it's HA partner {#PARTNER.NAME}. Reason: {ITEM.VALUE}|<p>Possible reasons:  unknownReason(2),  disabledByOperator(3),  interconnectOffline(4),  disabledByPartner(5),  takeoverFailed(6),  mailboxIsInDegradedState(7),  partnermailboxIsInUninitialisedState(8),  mailboxVersionMismatch(9),  nvramSizeMismatch(10),  kernelVersionMismatch(11),  partnerIsInBootingStage(12),  diskshelfIsTooHot(13),  partnerIsPerformingRevert(14),  nodeIsPerformingRevert(15),  sametimePartnerIsAlsoTryingToTakeUsOver(16),  alreadyInTakenoverMode(17),  nvramLogUnsynchronized(18),  stateofBackupMailboxIsDoubtful(19).</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"])<>1`|High||
+|Node {#NODE.NAME}: Node cannot takeover it's HA partner {#PARTNER.NAME}. Reason: {ITEM.VALUE}|<p>Possible reasons:<br>  unknownReason(2),<br>  disabledByOperator(3),<br>  interconnectOffline(4),<br>  disabledByPartner(5),<br>  takeoverFailed(6),<br>  mailboxIsInDegradedState(7),<br>  partnermailboxIsInUninitialisedState(8),<br>  mailboxVersionMismatch(9),<br>  nvramSizeMismatch(10),<br>  kernelVersionMismatch(11),<br>  partnerIsInBootingStage(12),<br>  diskshelfIsTooHot(13),<br>  partnerIsPerformingRevert(14),<br>  nodeIsPerformingRevert(15),<br>  sametimePartnerIsAlsoTryingToTakeUsOver(16),<br>  alreadyInTakenoverMode(17),<br>  nvramLogUnsynchronized(18),<br>  stateofBackupMailboxIsDoubtful(19).</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"])<>1`|High||
 |Node {#NODE.NAME}: Node has been taken over|<p>The thisNodeDead(5) setting indicates that this node has been takenover.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=5`|High||
 |Node {#NODE.NAME}: HA is not licensed|<p>The value notConfigured(1) indicates that the HA is not licensed.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=1`|Average||
 

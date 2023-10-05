@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -341,7 +341,7 @@ If your instance uses a non-default TCP port, set the port in your section of od
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is disconnected|<p>The response of an availability replica to the DISCONNECTED state depends on its role:On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect; On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.</p>|`last(/MSSQL by ODBC/mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 and last(/MSSQL by ODBC/mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"])=2`|Warning||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is disconnected|<p>The response of an availability replica to the DISCONNECTED state depends on its role:<br>On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect; On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.</p>|`last(/MSSQL by ODBC/mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 and last(/MSSQL by ODBC/mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"])=2`|Warning||
 |MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Pending" or "Offline".</p>|`last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 or last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=1 or last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=3`|Warning||
 |MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Failed".</p>|`last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=4`|Average||
 |MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Failed, no quorum".</p>|`last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=5`|High||

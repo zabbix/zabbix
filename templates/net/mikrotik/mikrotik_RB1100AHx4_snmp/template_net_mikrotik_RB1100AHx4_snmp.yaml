@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:46:37Z'
+  date: '2023-09-20T10:49:18Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -682,12 +682,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#IFTYPE}'
-                value: ^1$
-                formulaid: B
               - macro: '{#IFNAME}'
                 value: '{$IFNAME.LTEMODEM.MATCHES}'
                 formulaid: A
+              - macro: '{#IFTYPE}'
+                value: ^1$
+                formulaid: B
           description: 'MIKROTIK-MIB::mtxrLTEModemInterfaceIndex'
           item_prototypes:
             - uuid: c69a7cf907b940bda9881ffc4a13c6f9
@@ -838,12 +838,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#IFTYPE}'
-                value: ^71$
-                formulaid: B
               - macro: '{#IFADMINSTATUS}'
                 value: ^1$
                 formulaid: A
+              - macro: '{#IFTYPE}'
+                value: ^71$
+                formulaid: B
           description: 'MIKROTIK-MIB::mtxrWlAp'
           item_prototypes:
             - uuid: c8379a61cf50439ca8fcf6e7bd9e1882
@@ -952,12 +952,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#IFTYPE}'
-                value: ^1$
-                formulaid: B
               - macro: '{#IFNAME}'
                 value: '{$IFNAME.WIFI.MATCHES}'
                 formulaid: A
+              - macro: '{#IFTYPE}'
+                value: ^1$
+                formulaid: B
           description: 'MIKROTIK-MIB::mtxrWlCMChannel'
           item_prototypes:
             - uuid: 0e75174bf57445c3852ef11b342b2892
@@ -1063,27 +1063,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -1091,6 +1070,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -1689,14 +1689,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'MikroTik RB1100AHx4 by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: 7c2123a387904176a8285e3e1405622f
           name: 'IF-MIB::ifOperStatus'

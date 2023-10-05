@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:36:50Z'
+  date: '2023-09-20T10:47:48Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -672,27 +672,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -700,6 +679,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -1219,6 +1219,22 @@ zabbix_export:
             - name: 'Juniper: General'
               widgets:
                 - type: GRAPH_PROTOTYPE
+                  name: 'Memory utilization'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'Juniper by SNMP'
+                        name: '{#SNMPVALUE}: Memory utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_PROTOTYPE
                   name: 'CPU utilization'
                   x: '12'
                   width: '12'
@@ -1227,30 +1243,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Juniper by SNMP'
                         name: '{#SNMPVALUE}: CPU utilization'
-                - type: GRAPH_PROTOTYPE
-                  name: 'Memory utilization'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: INTEGER
                       name: rows
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'Juniper by SNMP'
-                        name: '{#SNMPVALUE}: Memory utilization'
       valuemaps:
         - uuid: 69625f8a027542638c3ca9b64522602d
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'
