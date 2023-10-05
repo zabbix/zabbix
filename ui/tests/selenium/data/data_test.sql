@@ -19,10 +19,6 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (1
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90278, 10053, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10030,10084,1,4,1,'127.0.0.1','jmxagent.zabbix.com','10051');
 
--- autoregistration actions
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (9,'Autoregistration action 1',2,0,0,'1h');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (15,'Autoregistration action 2',2,0,1,'1h');
-
 INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20000, 'Proxy for Discovery rule', 0, '');
 INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20001, 'Proxy for Actions', 0, '');
 

@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup alerts
  *
+ * @dataSource LoginUsers
+ *
  * @onBefore prepareActionsData
  */
 class testPageReportsActionLog extends CWebTest {
@@ -83,10 +85,6 @@ class testPageReportsActionLog extends CWebTest {
 		$actionids = CDataHelper::getIds('name');
 
 		// Add Actions to Action Log in database.
-		DBexecute("INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES ".
-				" (1, 0, 0, 13545, 1329724790, 1, 0, 0);"
-		);
-
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
 				" message, status, retries, error, esc_step, alerttype, parameters) VALUES (1, ".
 				zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724800, 1, 'igor.danoshaites@zabbix.com',".
