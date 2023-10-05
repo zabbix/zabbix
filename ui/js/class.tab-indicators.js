@@ -64,8 +64,8 @@ class TabIndicators {
 		const SERVICE = document.querySelector('#service-form');
 		const SLA = document.querySelector('#sla-form');
 		const TEMPLATE = document.querySelector('#templates-form');
-		const TRIGGER = document.querySelector('#triggers-form');
-		const TRIGGER_PROTOTYPE = document.querySelector('#triggers-prototype-form');
+		const TRIGGER = document.querySelector('#trigger-form');
+		const TRIGGER_PROTOTYPE = document.querySelector('#trigger-prototype-form');
 		const USER = document.querySelector('#user-form');
 		const USER_GROUP = document.querySelector('#user-group-form');
 		const WEB_SCENARIO = document.querySelector('#webscenario-form');
@@ -202,8 +202,8 @@ class TabIndicatorFactory {
 				return new GraphOverridesTabIndicatorItem;
 			case 'GraphProblems':
 				return new GraphProblemsTabIndicatorItem;
-			case 'GraphTime':
-				return new GraphTimeTabIndicatorItem;
+			case 'GraphTimePeriod':
+				return new GraphTimePeriodTabIndicatorItem;
 			case 'HostMacros':
 				return new HostMacrosTabIndicatorItem;
 			case 'HostPrototypeMacros':
@@ -240,8 +240,8 @@ class TabIndicatorFactory {
 				return new PieDisplayOptionsTabIndicatorItem;
 			case 'PieLegend':
 				return new PieLegendTabIndicatorItem;
-			case 'PieTime':
-				return new PieTimeTabIndicatorItem;
+			case 'PieTimePeriod':
+				return new PieTimePeriodTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
@@ -1419,17 +1419,17 @@ class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class GraphTimeTabIndicatorItem extends TabIndicatorItem {
+class GraphTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.querySelector('#graph_time');
+		const element = document.querySelector('input[name="time_period[data_source]"]');
 
 		if (element !== null) {
-			return element.checked;
+			return !element.checked;
 		}
 
 		return false;
@@ -1718,17 +1718,17 @@ class PieDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class PieTimeTabIndicatorItem extends TabIndicatorItem {
+class PieTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.getElementById('graph_time');
+		const element = document.querySelector('input[name="time_period[data_source]"]');
 
 		if (element !== null) {
-			return element.checked;
+			return !element.checked;
 		}
 
 		return false;

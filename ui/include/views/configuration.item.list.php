@@ -192,15 +192,11 @@ foreach ($data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		$trigger_description[] = new CLink(
-			$trigger['description'],
-			(new CUrl('triggers.php'))
-				->setArgument('form', 'update')
-				->setArgument('hostid', key($trigger['hosts']))
-				->setArgument('triggerid', $trigger['triggerid'])
-				->setArgument('context', $data['context'])
-				->setArgument('backurl', $backurl)
-		);
+		$trigger_description[] = (new CLink($trigger['description']))
+			->addClass('js-trigger-edit')
+			->setAttribute('data-hostid', key($trigger['hosts']))
+			->setAttribute('data-triggerid', $trigger['triggerid'])
+			->setAttribute('data-context', $data['context']);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -315,9 +311,9 @@ $button_list = [
 
 if ($data['context'] === 'host') {
 	$massclearhistory = [
-		'name' => _('Clear history'),
-		'confirm_singular' => _('Delete history of selected item?'),
-		'confirm_plural' => _('Delete history of selected items?'),
+		'name' => _('Clear history and trends'),
+		'confirm_singular' => _('Clear history and trends of selected item?'),
+		'confirm_plural' => _('Clear history and trends of selected items?'),
 		'csrf_token' => $csrf_token
 	];
 

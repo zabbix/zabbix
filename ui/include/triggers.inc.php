@@ -728,8 +728,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					}
 
 					$url = (new CLinkAction($element['expression']))
-						->setId($expressionId)
-						->onClick('copy_expression(this.id, '.$type.');');
+						->setId($expressionId);
 				}
 
 				$expr = expressionLevelDraw($next, $level);
@@ -1809,15 +1808,18 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 	foreach ($templates as $template) {
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('trigger_prototypes.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
 					->setArgument('context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl('triggers.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('filter_set', 1)
+					->setArgument('uncheck', 1)
 					->setArgument('context', 'template');
 			}
 
@@ -1868,22 +1870,23 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 		foreach ($templates as $template) {
 			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$url = (new CUrl('trigger_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-						->setArgument('context', 'template');
+					$attribute_name = 'data-parent_discoveryid';
+					$attribute_value = $parent_templates['links'][$triggerid]['lld_ruleid'];
+					$prototype = '1';
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {
-					$url = (new CUrl('triggers.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('hostid', $template['hostid'])
-						->setArgument('context', 'template');
+					$attribute_name = 'data-hostid';
+					$attribute_value = $template['hostid'];
+					$prototype = '0';
 				}
 
-				$name = new CLink($template['name'], $url);
+				$name = (new CLink($template['name']))
+					->addClass('js-related-trigger-edit')
+					->setAttribute('data-prototype', $prototype)
+					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+					->setAttribute('data-context', 'template')
+					->setAttribute($attribute_name, $attribute_value);
 			}
 			else {
 				$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);

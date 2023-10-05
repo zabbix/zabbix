@@ -24,7 +24,6 @@ namespace Widgets\PieChart\Actions;
 use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CRangeTimeParser,
 	CHousekeepingHelper,
 	CMacrosResolverHelper,
 	CParser,
@@ -48,43 +47,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'from' => 'range_time',
-			'to' => 'range_time',
-			'with_config' => 'in 1',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'has_custom_time_period' => 'in 1',
+			'with_config' => 'in 1'
 		]);
 	}
 
 	protected function doAction(): void {
-		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
-
-		if ($dashboard_time) {
-			$from = $this->getInput('from');
-			$to = $this->getInput('to');
-		}
-		else {
-			$from = $this->fields_values['time_from'];
-			$to = $this->fields_values['time_to'];
-		}
-
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($from);
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($to);
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+		$has_custom_time_period = $this->hasInput('has_custom_time_period');
 
 		$pie_chart_options = [
 			'data_sets' => array_values($this->fields_values['ds']),
 			'data_source' => $this->fields_values['source'],
-			'dashboard_time' => $dashboard_time,
 			'time_period' => [
-				'time_from' => $time_from,
-				'time_to' => $time_to
+				'time_from' => $this->fields_values['time_period']['from_ts'],
+				'time_to' => $this->fields_values['time_period']['to_ts']
 			],
 			'templateid' => $this->getInput('templateid', ''),
-			'dynamic_hostid' => $this->getInput('dynamic_hostid', ''),
+			'override_hostid' => $this->fields_values['override_hostid']
+				? $this->fields_values['override_hostid'][0]
+				: '',
 			'merge_sectors' => [
 				'merge' => $this->fields_values['merge'],
 				'percent' => $this->fields_values['merge'] == self::MERGE_SECTORS_ON
@@ -143,12 +124,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$total_value = [];
 		$all_sectorids = [];
 
-		self::getItems($metrics, $options['data_sets'], $options['templateid'], $options['dynamic_hostid']);
+		self::getItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::getChartDataSource($metrics, $errors, $options['data_source'], $options['time_period']);
 		self::getMetricsData($metrics, $options['time_period'], $options['legend_aggregation_show'],
-			$options['templateid'], $options['dynamic_hostid']);
+			$options['templateid'], $options['override_hostid']);
 		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
-			$options['units'], $options['templateid'], $options['dynamic_hostid'], $all_sectorids);
+			$options['units'], $options['templateid'], $options['override_hostid'], $all_sectorids);
 
 		return [
 			'sectors' => $metrics,
@@ -161,10 +142,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function makeWidgetInfo(): array {
 		$info = [];
 
-		if (WidgetForm::hasOverrideTime($this->fields_values)) {
+		if ($this->hasInput('has_custom_time_period')) {
 			$info[] = [
 				'icon' => ZBX_ICON_TIME_PERIOD,
-				'hint' => relativeDateToText($this->fields_values['time_from'], $this->fields_values['time_to'])
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
 			];
 		}
 
@@ -172,7 +155,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getItems(array &$metrics, array $data_sets, string $templateid,
-			string $dynamic_hostid): void {
+			string $override_hostid): void {
 		$metrics = [];
 		$max_metrics = 50;
 
@@ -182,10 +165,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
-				$ds_metrics = self::getMetricsSingleItemDS($data_set, $max_metrics, $dynamic_hostid);
+				$ds_metrics = self::getMetricsSingleItemDS($data_set, $max_metrics, $override_hostid);
 			}
 			else {
-				$ds_metrics = self::getMetricsPatternItemDS($data_set, $max_metrics, $templateid, $dynamic_hostid);
+				$ds_metrics = self::getMetricsPatternItemDS($data_set, $max_metrics, $templateid, $override_hostid);
 			}
 
 			foreach ($ds_metrics as $ds_metric) {
@@ -196,7 +179,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
-	private static function getMetricsSingleItemDS(array $data_set, int $max_metrics, string $dynamic_hostid): array {
+	private static function getMetricsSingleItemDS(array $data_set, int $max_metrics, string $override_hostid): array {
 		$metrics = [];
 		$ds_items = [];
 
@@ -214,7 +197,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		unset($data_set['itemids'], $data_set['color'], $data_set['type']);
 
-		if ($dynamic_hostid !== '') {
+		if ($override_hostid !== '') {
 			// Host dashboard (view).
 			$tmp_items = API::Item()->get([
 				'output' => ['itemid', 'key_'],
@@ -225,7 +208,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($tmp_items) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'key_'],
-					'hostids' => [$dynamic_hostid],
+					'hostids' => [$override_hostid],
 					'webitems' => true,
 					'filter' => [
 						'key_' => array_column($tmp_items, 'key_')
@@ -273,7 +256,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getMetricsPatternItemDS(array $data_set, int $max_metrics, string $templateid,
-			string $dynamic_hostid): array {
+			string $override_hostid): array {
 		$metrics = [];
 
 		if (($templateid === '' && (!$data_set['hosts'] || !$data_set['items']))
@@ -282,7 +265,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $metrics;
 		}
 
-		if ($dynamic_hostid === '' && $templateid === '') {
+		if ($override_hostid === '' && $templateid === '') {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'search' => [
@@ -296,7 +279,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$hostids = array_keys($hosts);
 		}
 		else {
-			$hostids = $dynamic_hostid !== '' ? [$dynamic_hostid] : [$templateid];
+			$hostids = $override_hostid !== '' ? [$override_hostid] : [$templateid];
 		}
 
 		if (!$hostids) {
@@ -432,7 +415,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getMetricsData(array &$metrics, array $time_period, bool $legend_aggregation_show,
-			string $templateid, string $dynamic_hostid): void {
+			string $templateid, string $override_hostid): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -476,7 +459,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($metric);
 
 		foreach ($metrics as &$metric) {
-			if ($templateid !== '' && $dynamic_hostid === '') {
+			if ($templateid !== '' && $override_hostid === '') {
 				continue;
 			}
 
@@ -523,7 +506,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getSectorsData(array &$metrics, array &$total_value, array $merge_sectors,
-			array $total_config, array $units_config, string $templateid, string $dynamic_hostid,
+			array $total_config, array $units_config, string $templateid, string $override_hostid,
 			array &$all_sectorids): void {
 		$has_total = false;
 		$chart_units = null;
@@ -532,7 +515,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$below_threshold_sectors = [];
 		$sectors = [];
 
-		if ($templateid !== '' && $dynamic_hostid === '') {
+		if ($templateid !== '' && $override_hostid === '') {
 			foreach ($metrics as $metric) {
 				$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
 					&& $metric['options']['type'] == CWidgetFieldDataSet::ITEM_TYPE_TOTAL);

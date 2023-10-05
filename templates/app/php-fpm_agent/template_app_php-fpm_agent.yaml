@@ -616,20 +616,26 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PHP-FPM by Zabbix agent'
                         name: 'PHP-FPM: Process'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   x: '12'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PHP-FPM by Zabbix agent'
                         name: 'PHP-FPM: Queue'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: 1caa1e7c41e14c7492ab8112f93ea068
           name: 'Service state'

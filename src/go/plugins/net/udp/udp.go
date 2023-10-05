@@ -182,7 +182,13 @@ func (p *Plugin) exportNetService(params []string, timeout int) int {
 		port = service
 	}
 
-	return p.udpExpect(service, net.JoinHostPort(ip, port), timeout)
+	udpTimeout := timeout
+
+	if timeout >= 2 {
+		udpTimeout--
+	}
+
+	return p.udpExpect(service, net.JoinHostPort(ip, port), udpTimeout)
 }
 
 func toFixed(num float64, precision int) float64 {

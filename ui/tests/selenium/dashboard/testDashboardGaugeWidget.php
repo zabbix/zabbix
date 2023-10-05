@@ -176,7 +176,7 @@ class testDashboardGaugeWidget extends CWebTest {
 			// Value.
 			'id:decimal_places' => ['value' => 2, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 			'id:value_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			'id:value_arc' => ['value' => true, 'enabled' => true, 'visible' => false],
+			'id:show_5' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Value arc.
 			'id:value_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'xpath:.//input[@id="value_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => false],
 			'id:value_arc_size' => ['value' => 20, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
@@ -190,21 +190,23 @@ class testDashboardGaugeWidget extends CWebTest {
 			'xpath:.//input[@id="units_color"]/..'=> ['color' => '', 'enabled' => true, 'visible' => false],
 
 			// Needle.
-			'id:needle_show' => ['value' => false, 'enabled' => true, 'visible' => false],
+			'id:show_3' => ['value' => false, 'enabled' => true, 'visible' => true], // Show Needle.
 			'xpath:.//input[@id="needle_color"]/..' => ['color' => '', 'enabled' => false, 'visible' => false],
 
 			// Scale.
-			'id:scale_show' => ['value' => true, 'enabled' => true, 'visible' => false],
-			'id:scale_size' => ['value' => 10, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
+			'id:show_4' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Scale.
+			'id:scale_size' => ['value' => 15, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:scale_decimal_places' => ['value' => 0, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 			'id:scale_show_units' => ['value' => true, 'enabled' => true, 'visible' => false],
 
 			// Tresholds.
 			'id:th_show_labels' => ['value' => false, 'enabled' => false, 'visible' => false],
 			'id:th_show_arc' => ['value' => false, 'enabled' => false, 'visible' => false],
-			'id:th_arc_size' => ['value' => 10, 'maxlength' => 3, 'enabled' => false, 'visible' => false],
+			'id:th_arc_size' => ['value' => 5, 'maxlength' => 3, 'enabled' => false, 'visible' => false],
 
-			'Enable host selection' => ['value' => false, 'enabled' => true, 'visible' => true]
+			'id:override_hostid_ms' => [
+				'value' => false, 'placeholder' => 'type here to search', 'enabled' => true, 'visible' => true
+			]
 		];
 
 		$not_visible = [];
@@ -233,7 +235,8 @@ class testDashboardGaugeWidget extends CWebTest {
 				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
 			}
 
-			if ($attributes['visible'] === false) {
+			// Show Needle is unchecked and Needle color remains invisible by default.
+			if ($attributes['visible'] === false && $label !== 'xpath:.//input[@id="needle_color"]/..') {
 				$not_visible[] = $label;
 			}
 		}
@@ -276,11 +279,11 @@ class testDashboardGaugeWidget extends CWebTest {
 				'status' => false,
 				'depending' => ['id:units', 'id:units_size', 'id:units_pos', 'id:units_bold', 'xpath:.//input[@id="units_color"]/..']
 			],
-			'id:needle_show' => [
+			'id:show_3' => [ // Show Needle.
 				'status' => true,
 				'depending' => ['xpath:.//input[@id="needle_color"]/..']
 			],
-			'id:scale_show' => [
+			'id:show_4' => [ // Show Scale.
 				'status' => false,
 				'depending' =>  ['id:scale_show_units', 'id:scale_decimal_places', 'id:scale_size']
 			]
@@ -325,12 +328,12 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		// Check fields' labels and required fields.
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colours',
-				'Advanced configuration', 'Angle', 'Description', 'Value', 'Needle', 'Scale', 'Thresholds',
-				'Enable host selection'],
+				'Show', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
+				'Thresholds', 'Override host'],
 				$form->getLabels()->asText()
 		);
 
-		$this->assertEquals(['Item', 'Min', 'Max'], $form->getRequiredLabels());
+		$this->assertEquals(['Item', 'Min', 'Max', 'Description'], $form->getRequiredLabels());
 	}
 
 	public static function getWidgetCommonData() {
@@ -501,6 +504,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
+						'Invalid parameter "Max": a number is expected.',
 						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
@@ -559,22 +563,37 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => '😽'
 					],
 					'Thresholds' => [
-						['threshold' => '𒀐']
+						['threshold' => '11']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
 						'Invalid parameter "Description size": value must be one of 1-100.',
 						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Units size": value must be one of 1-100.',
 						'Invalid parameter "Scale size": value must be one of 1-100.',
-						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
 			],
 			// #10 Too big numbers in decimal places.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character in Threshold',
+						'Item' => self::GAUGE_ITEM
+					],
+					'Thresholds' => [
+						['threshold' => '😽']
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			// #11 Too big numbers in decimal places.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -589,7 +608,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-			// #11 All fields successful case.
+			// #12 All fields successful case.
 			[
 				[
 					'fields' => [
@@ -610,28 +629,28 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:value_size' => 50,
 						'id:value_bold' => true,
 						'xpath:.//input[@id="value_color"]/..' => '283593',
-						'id:value_arc' => true,
+						'id:show_5' => true, // Show Value arc.
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Above value',
 						'xpath:.//input[@id="units_color"]/..' => '4E342E',
-						'id:needle_show' => true,
+						'id:show_3' => true, // Show Needle.
 						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
 						'id:scale_size' => 33,
 						'id:scale_decimal_places' => 8,
 						'id:th_show_arc' => true,
 						'id:th_arc_size' => 85,
 						'id:th_show_labels' => true,
-						'Enable host selection' => true
+						'Override host' => 'Dashboard'
 					],
 					'Thresholds' => [
 						['threshold' => '555', 'color' => '1976D2']
 					]
 				]
 			],
-			// #12 Multiple thresholds.
+			// #13 Multiple thresholds.
 			[
 				[
 					'fields' => [
@@ -648,16 +667,48 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-			// #13 False default checkboxes.
+			// #14 False default checkboxes.
 			[
 				[
 					'fields' => [
 						'Name' => 'False default checkboxes',
 						'Item' => self::GAUGE_ITEM,
 						'Show header' => false,
-						'id:value_arc' => false,
-						'id:units_show' => false,
-						'id:scale_show' => false
+						'id:show_5' => true, // Show Value arc.
+						'id:show_1' => false, // Show Description.
+						'id:show_2' => false, // Show Value.
+						'id:show_3' => false, // Show Needle.
+						'id:show_4' => false // Show Scale.
+					]
+				]
+			],
+			// #15 False default checkboxes - vol.2.
+			[
+				[
+					'fields' => [
+						'Name' => 'False default checkboxes 2',
+						'Item' => self::GAUGE_ITEM,
+						'Show header' => false,
+						'id:show_1' => true, // Show Description.
+						'id:show_3' => false, // Show Needle.
+						'id:show_4' => false, // Show Scale.
+						'id:show_2' => false, // Show Value.
+						'id:show_5' => false // Show Value arc.
+					]
+				]
+			],
+			// #16 False default checkboxes - vol.3.
+			[
+				[
+					'fields' => [
+						'Name' => 'False default checkboxes 3',
+						'Item' => self::GAUGE_ITEM,
+						'Show header' => false,
+						'id:show_2' => true, // Show Value.
+						'id:show_3' => false, // Show Needle.
+						'id:show_4' => false, // Show Scale.
+						'id:show_1' => false, // Show Description.
+						'id:show_5' => false // Show Value arc.
 					]
 				]
 			]
@@ -666,7 +717,7 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	public static function getWidgetCreateData() {
 		return [
-			// #14 Minimal required fields.
+			// #17 Minimal required fields.
 			[
 				[
 					'fields' => [
@@ -1000,14 +1051,14 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:value_size' => 17,
 						'id:value_bold' => true,
 						'xpath:.//input[@id="value_color"]/..' => '00796B',
-						'id:value_arc' => true,
+						'id:show_5' => true, // Show Value arc.
 						'id:value_arc_size' => 35,
 						'id:units' => 'Bytes 😁',
 						'id:units_size' => 12,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Below value',
 						'xpath:.//input[@id="units_color"]/..' => '6D4C41',
-						'id:needle_show' => true,
+						'id:show_3' => true,
 						'xpath:.//input[@id="needle_color"]/..' => 'FF0000',
 						'id:scale_size' => 11,
 						'id:scale_decimal_places' => 2,

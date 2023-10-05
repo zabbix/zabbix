@@ -1122,89 +1122,101 @@ zabbix_export:
           pages:
             - name: Main
               widgets:
-                - type: graph
-                  'y': '2'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zookeeper by HTTP'
-                        name: 'Zookeeper: Nodes'
-                - type: graph
-                  x: '12'
-                  'y': '2'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zookeeper by HTTP'
-                        name: 'Zookeeper: Packets'
-                - type: graph
-                  'y': '7'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zookeeper by HTTP'
-                        name: 'Zookeeper: Latency'
-                - type: graph
-                  x: '12'
-                  'y': '7'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zookeeper by HTTP'
-                        name: 'Zookeeper: File descriptors usage'
                 - type: item
                   name: Mode
                   width: '4'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Zookeeper by HTTP'
                         key: zookeeper.server_state
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: graph
+                  'y': '2'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zookeeper by HTTP'
+                        name: 'Zookeeper: Nodes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                - type: graph
+                  'y': '7'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zookeeper by HTTP'
+                        name: 'Zookeeper: Latency'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: item
                   name: Uptime
                   x: '4'
                   width: '4'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Zookeeper by HTTP'
                         key: zookeeper.uptime
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: item
                   name: Version
                   x: '8'
                   width: '4'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Zookeeper by HTTP'
                         key: zookeeper.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: graph
+                  x: '12'
+                  'y': '2'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zookeeper by HTTP'
+                        name: 'Zookeeper: Packets'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                - type: graph
+                  x: '12'
+                  'y': '7'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zookeeper by HTTP'
+                        name: 'Zookeeper: File descriptors usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
             - name: Clients
               widgets:
                 - type: graphprototype
@@ -1214,14 +1226,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '3'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zookeeper by HTTP'
                         name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Latency'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                    - type: INTEGER
+                      name: rows
+                      value: '3'
                 - type: graphprototype
                   x: '12'
                   width: '12'
@@ -1230,14 +1245,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '3'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zookeeper by HTTP'
                         name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Packets'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
+                    - type: INTEGER
+                      name: rows
+                      value: '3'
   triggers:
     - uuid: 53a97045bfd8473899849e429e3e7017
       expression: 'min(/Zookeeper by HTTP/zookeeper.open_file_descriptor_count,5m) * 100 / last(/Zookeeper by HTTP/zookeeper.max_file_descriptor_count) > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}'

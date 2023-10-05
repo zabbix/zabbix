@@ -30,7 +30,7 @@ $scripts = $data['javascript']['files'];
 $page_title = $data['page']['title'];
 
 if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
-	$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title;
+	$page_title = $page_title !== '' ? $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title : $ZBX_SERVER_NAME;
 }
 
 $page_header = new CHtmlPageHeader($page_title, CWebUser::getLang());

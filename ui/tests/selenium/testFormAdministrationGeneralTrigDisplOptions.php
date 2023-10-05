@@ -697,18 +697,18 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => '!@#$%^&*()_+'
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -738,24 +738,24 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => ''
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": cannot be empty.',
 						'Incorrect value for field "blink_period": cannot be empty.',
 						'Incorrect value for field "severity_name_0": cannot be empty.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_1": cannot be empty.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_2": cannot be empty.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_3": cannot be empty.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_4": cannot be empty.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_5": cannot be empty.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -779,18 +779,18 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => '-1    '
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			]

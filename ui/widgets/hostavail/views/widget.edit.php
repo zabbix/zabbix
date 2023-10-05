@@ -28,7 +28,7 @@
 
 (new CWidgetFormView($data))
 	->addField(array_key_exists('groupids', $data['fields'])
-		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
+		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
 		: null
 	)
 	->addField(
@@ -40,4 +40,9 @@
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
 	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['only_totals'])
+	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_host_availability_form.init();')
 	->show();
