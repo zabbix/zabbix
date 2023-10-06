@@ -134,7 +134,6 @@ int	zbx_property_collection_init(CURL *easyhandle, const char *property_collecti
 int	zbx_property_collection_next(const char *fn_parent, zbx_property_collection_iter *iter, xmlDoc **xdoc,
 		char **error);
 
-
 void	zbx_property_collection_free(zbx_property_collection_iter *iter);
 
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
@@ -168,10 +167,8 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
-
 #define ZBX_XPATH_OBJS_BY_TYPE(type)									\
 	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
-
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

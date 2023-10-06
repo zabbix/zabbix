@@ -34,7 +34,6 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxip.h"
 #include "zbxjson.h"
 #include "zbxsysinc.h"
 
@@ -197,7 +196,6 @@ int	vmware_hv_compare(const void *d1, const void *d2)
 
 	return strcmp(hv1->uuid, hv2->uuid);
 }
-
 
 /* string pool support */
 
