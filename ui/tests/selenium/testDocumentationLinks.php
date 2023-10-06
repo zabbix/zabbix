@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Proxies
+ * @dataSource Proxies, Actions
  *
  * @backup profiles, module, services, token, connector
  *
