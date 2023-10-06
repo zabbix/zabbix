@@ -3,6 +3,7 @@ Changes for 7.0.0alpha7
 New features:
 
 Bug fixes:
+........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0alpha6
