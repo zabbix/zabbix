@@ -29,6 +29,8 @@
 #	include <libxml/xpath.h>
 #endif
 
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #define ZBX_XPATH_HV_VMS()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
 	"/*[local-name()='val']/*[@type='VirtualMachine']"
@@ -37,6 +39,8 @@
 	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
+
+#define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
 
 #define ZBX_HVPROPMAP_EXT(property, func, ver)								\
 	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
@@ -2831,3 +2835,5 @@ out:
 #	undef ZBX_XPATH_GET_ROOT_ALARMS
 #	undef ZBX_POST_VCENTER_HV_DS_LIST
 }
+
+#endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

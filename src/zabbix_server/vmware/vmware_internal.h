@@ -105,11 +105,8 @@ typedef struct
 zbx_vmware_alarms_data_t;
 /* VMware alarms cache information END */
 
-
 #define ZBX_XPATH_PROP_OBJECT_ID(type, id)								\
 	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']" id "][1]"
-
-#define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
 
 #define ZBX_XPATH_PROP_NAME_NODE(property)								\
 	"*[local-name()='propSet'][*[local-name()='name'][text()='" property "']][1]/*[local-name()='val']"
