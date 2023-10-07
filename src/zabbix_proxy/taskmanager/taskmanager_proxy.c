@@ -35,11 +35,9 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 /**************************************************************************************
  *                                                                                    *
- * Purpose: execute remote command task                                               *
+ * Purpose: executes remote command task                                              *
  *                                                                                    *
  * Parameters: taskid                        - [IN]                                   *
  *             clock                         - [IN] task creation time                *
@@ -50,6 +48,7 @@ extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
  *             config_source_ip              - [IN]                                   *
  *             config_enable_remote_commands - [IN]                                   *
  *             config_log_remote_commands    - [IN]                                   *
+ *             get_config_forks              - [IN]                                   *
  *                                                                                    *
  * Return value: SUCCEED - remote command was executed                                *
  *               FAIL    - otherwise                                                  *
@@ -57,7 +56,7 @@ extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
  **************************************************************************************/
 static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, time_t now, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, int config_enable_remote_commands,
-		int config_log_remote_commands)
+		int config_log_remote_commands, zbx_get_config_forks_f get_config_forks)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -137,7 +136,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	}
 
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_trapper_timeout,
-			config_source_ip, CONFIG_FORKS, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
+			config_source_ip, get_config_forks, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}
@@ -165,9 +164,9 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process check now tasks for item rescheduling                     *
+ * Purpose: processes 'check now' tasks for item rescheduling                 *
  *                                                                            *
- * Return value: The number of successfully processed tasks                   *
+ * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
@@ -221,7 +220,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process data task with json contents                              *
+ * Purpose: processes data task with json contents                            *
  *                                                                            *
  * Return value: SUCCEED - data task was executed                             *
  *               FAIL    - otherwise                                          *
@@ -255,7 +254,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process data task                                                 *
+ * Purpose: processes data task                                               *
  *                                                                            *
  * Return value: SUCCEED - data task was executed                             *
  *               FAIL    - otherwise                                          *
@@ -328,14 +327,14 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process task manager tasks depending on task type                 *
+ * Purpose: processes task manager tasks depending on task type               *
  *                                                                            *
- * Return value: The number of successfully processed tasks                   *
+ * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands,
-		unsigned char program_type)
+		unsigned char program_type, zbx_get_config_forks_f get_config_forks)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -366,7 +365,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now,
 						config_comms->config_timeout, config_comms->config_trapper_timeout,
 						config_comms->config_source_ip, config_enable_remote_commands,
-						config_log_remote_commands))
+						config_log_remote_commands, get_config_forks))
 				{
 					processed_num++;
 				}
@@ -398,7 +397,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove old done/expired tasks                                     *
+ * Purpose: removes old done/expired tasks                                    *
  *                                                                            *
  ******************************************************************************/
 static void	tm_remove_old_tasks(time_t now)
@@ -411,8 +410,8 @@ static void	tm_remove_old_tasks(time_t now)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create config cache reload request to be sent to the server       *
- *          (only from passive proxy)                                         *
+ * Purpose: Creates config cache reload request to be sent to the server      *
+ *          (only from passive proxy).                                        *
  *                                                                            *
  ******************************************************************************/
 static void	force_config_sync(const char *config_hostname)
@@ -517,7 +516,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		tasks_num = tm_process_tasks(&rtc, (time_t)sec1, taskmanager_args_in->config_comms,
 				taskmanager_args_in->config_startup_time,
 				taskmanager_args_in->config_enable_remote_commands,
-				taskmanager_args_in->config_log_remote_commands, info->program_type);
+				taskmanager_args_in->config_log_remote_commands, info->program_type,
+				taskmanager_args_in->get_process_forks_cb_arg);
 
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{

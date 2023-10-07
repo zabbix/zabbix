@@ -34,6 +34,7 @@ typedef struct
 	int				config_enable_remote_commands;
 	int				config_log_remote_commands;
 	const char			*config_hostname;
+	zbx_get_config_forks_f		get_process_forks_cb_arg;
 }
 zbx_thread_taskmanager_args;
 
