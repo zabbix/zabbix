@@ -19,8 +19,14 @@
 
 #include "zbxsnmptrapper.h"
 
+#include "zbxtimekeeper.h"
+#include "zbxthreads.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 #include "zbxexpression.h"
-#include "zbxdbwrap.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
@@ -69,9 +75,9 @@ static void	DBupdate_lastsize(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add trap to all matching items for the specified interface        *
+ * Purpose: adds trap to all matching items for specified interface           *
  *                                                                            *
- * Return value: SUCCEED - a matching item was found                          *
+ * Return value: SUCCEED - matching item was found                            *
  *               FAIL - no matching item was found (including fallback items) *
  *                                                                            *
  ******************************************************************************/
@@ -80,10 +86,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	zbx_dc_item_t		*items = NULL;
 	const char		*regex;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
-	size_t			num, i;
-	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, regexp_ret;
-	zbx_uint64_t		*itemids = NULL;
-	AGENT_RESULT		*results = NULL;
+	int			ret = FAIL, fb = -1, value_type, regexp_ret;
 	AGENT_REQUEST		request;
 	zbx_vector_expression_t	regexps;
 	zbx_dc_um_handle_t	*um_handle;
@@ -92,14 +95,13 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	um_handle = zbx_dc_open_user_macros();
 
-	num = zbx_dc_config_get_snmp_items_by_interfaceid(interfaceid, &items);
+	size_t			num = zbx_dc_config_get_snmp_items_by_interfaceid(interfaceid, &items);
+	zbx_uint64_t		*itemids = (zbx_uint64_t *)zbx_malloc(NULL, sizeof(zbx_uint64_t) * num);
+	int			*lastclocks = (int *)zbx_malloc(NULL, sizeof(int) * num),
+				*errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
+	AGENT_RESULT		*results = (AGENT_RESULT *)zbx_malloc(NULL, sizeof(AGENT_RESULT) * num);
 
-	itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
-	lastclocks = (int *)zbx_malloc(lastclocks, sizeof(int) * num);
-	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * num);
-	results = (AGENT_RESULT *)zbx_malloc(results, sizeof(AGENT_RESULT) * num);
-
-	for (i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		zbx_init_agent_result(&results[i]);
 		errcodes[i] = FAIL;
@@ -175,7 +177,7 @@ next:
 		ret = SUCCEED;
 	}
 
-	for (i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		switch (errcodes[i])
 		{
@@ -187,16 +189,16 @@ next:
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type, items[i].flags,
-						&results[i], ts, items[i].state, NULL);
+				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
+						items[i].flags, &results[i], ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				lastclocks[i] = ts->sec;
 				break;
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
-				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type, items[i].flags, NULL,
-						ts, items[i].state, results[i].msg);
+				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
+						items[i].flags, NULL, ts, items[i].state, results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				lastclocks[i] = ts->sec;
@@ -230,26 +232,27 @@ next:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process a single trap                                             *
+ * Purpose: processes single trap                                             *
  *                                                                            *
- * Parameters: addr - [IN] address of the target interface(s)                 *
- *             begin - [IN] beginning of the trap message                     *
- *             end - [IN] end of the trap message                             *
+ * Parameters: addr  - [IN] address of target interface(s)                    *
+ *             begin - [IN] beginning of trap message                         *
+ *             end   - [IN] end of trap message                               *
  *                                                                            *
  ******************************************************************************/
 static void	process_trap(const char *addr, char *begin, char *end)
 {
 	zbx_timespec_t	ts;
 	zbx_uint64_t	*interfaceids = NULL;
-	int		count, i, ret = FAIL;
+	int		ret = FAIL;
 	char		*trap = NULL;
 
 	zbx_timespec(&ts);
+
 	trap = zbx_dsprintf(trap, "%s%s", begin, end);
 
-	count = zbx_dc_config_get_snmp_interfaceids_by_addr(addr, &interfaceids);
+	int	count = zbx_dc_config_get_snmp_interfaceids_by_addr(addr, &interfaceids);
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		if (SUCCEED == process_trap_for_interface(interfaceids[i], trap, &ts))
 			ret = SUCCEED;
@@ -273,7 +276,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: split traps and process them with process_trap()                  *
+ * Purpose: splits traps and processes them with process_trap()               *
  *                                                                            *
  ******************************************************************************/
 static void	parse_traps(int flag)
@@ -379,22 +382,19 @@ static void	parse_traps(int flag)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delay SNMP trapper file related issue log entries for 60 seconds  *
- *          unless this is the first time this issue has occurred             *
+ * Purpose: Delays SNMP trapper file related issue log entries for 60 seconds *
+ *          unless this is the first time this issue has occurred.            *
  *                                                                            *
  * Parameters: error     - [IN] string containing log entry text              *
- *             log_level - [IN] the log entry log level                       *
+ *             log_level - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 static void	delay_trap_logs(char *error, int log_level)
 {
-	int			now;
 	static int		lastlogtime = 0;
 	static zbx_hash_t	last_error_hash = 0;
-	zbx_hash_t		error_hash;
-
-	now = (int)time(NULL);
-	error_hash = zbx_default_string_hash_func(error);
+	int			now = (int)time(NULL);
+	zbx_hash_t		error_hash = zbx_default_string_hash_func(error);
 
 	if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || last_error_hash != error_hash)
 	{
@@ -406,7 +406,7 @@ static void	delay_trap_logs(char *error, int log_level)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: read the traps and then parse them with parse_traps()             *
+ * Purpose: reads traps and then parses them with parse_traps()               *
  *                                                                            *
  ******************************************************************************/
 static int	read_traps(const char *config_snmptrap_file)
@@ -449,7 +449,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: close trap file and reset lastsize                                *
+ * Purpose: closes trap file and resets lastsize                              *
  *                                                                            *
  * Comments: !!! do not reset lastsize elsewhere !!!                          *
  *                                                                            *
@@ -466,9 +466,9 @@ static void	close_trap_file(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: open the trap file and get it's node number                       *
+ * Purpose: opens trap file and gets it's node number                         *
  *                                                                            *
- * Return value: file descriptor of the opened file or -1 otherwise           *
+ * Return value: file descriptor of opened file or -1 otherwise               *
  *                                                                            *
  ******************************************************************************/
 static int	open_trap_file(const char *config_snmptrap_file)
@@ -506,8 +506,8 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Open the latest trap file. If the current file has been rotated,  *
- *          process that and then open the latest file.                       *
+ * Purpose: Opens the latest trap file. If the current file has been rotated, *
+ *          processes that and then opens the latest file.                    *
  *                                                                            *
  * Return value: SUCCEED - there are new traps to be parsed                   *
  *               FAIL - there are no new traps or trap file does not exist    *
@@ -588,8 +588,8 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 {
 	double			sec;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num,
+				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_thread_snmptrapper_args	*snmptrapper_args_in = (zbx_thread_snmptrapper_args *)
