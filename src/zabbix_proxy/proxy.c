@@ -43,7 +43,6 @@
 #include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "../zabbix_server/trapper/trapper_request.h"
-#include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager.h"
@@ -66,6 +65,7 @@
 #include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
 #include "zbxscripts.h"
+#include "zbxsnmptrapper.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"

@@ -45,7 +45,6 @@
 #include "poller/poller.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
-#include "snmptrapper/snmptrapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
@@ -85,6 +84,7 @@
 #include "lld/lld_protocol.h"
 #include "zbxdiscovery.h"
 #include "zbxscripts.h"
+#include "zbxsnmptrapper.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
