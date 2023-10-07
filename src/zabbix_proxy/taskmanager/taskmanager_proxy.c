@@ -59,26 +59,27 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 		int config_log_remote_commands, zbx_get_config_forks_f get_config_forks)
 {
 	zbx_db_row_t	row;
-	zbx_db_result_t	result;
 	zbx_uint64_t	parent_taskid, hostid, alertid;
-	zbx_tm_task_t	*task = NULL;
 	int		ret = FAIL;
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
 	zbx_dc_host_t	host;
-	double		t;
 
-	result = zbx_db_select("select command_type,execute_on,port,authtype,username,password,publickey,privatekey,"
-					"command,parent_taskid,hostid,alertid"
+	zbx_db_result_t	result = zbx_db_select("select command_type,execute_on,port,authtype,username,password,"
+					"publickey,privatekey,command,parent_taskid,hostid,alertid"
 				" from task_remote_command"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
+	zbx_tm_task_t	*task;
+	double		t;
 
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
 	t = zbx_time();
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
+
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)t,
+			0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
 
@@ -205,7 +206,8 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
 				ZBX_TM_STATUS_DONE);
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values,
+				taskids->values_num);
 
 		zbx_db_execute("%s", sql);
 	}
@@ -264,23 +266,23 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	zbx_db_row_t		row;
-	zbx_db_result_t		result;
-	zbx_tm_task_t		*task = NULL;
 	int			ret = FAIL, data_type;
 	char			*info = NULL;
 	zbx_uint64_t		parent_taskid;
-	double			t;
 
-	result = zbx_db_select("select parent_taskid,data,type"
+	zbx_db_result_t		result = zbx_db_select("select parent_taskid,data,type"
 				" from task_data"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
+	double			t;
+	zbx_tm_task_t		*task;
 
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
 	t = zbx_time();
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
+
 	ZBX_STR2UINT64(parent_taskid, row[0]);
 
 	if (0 != ttl && clock + ttl < now)
@@ -337,7 +339,6 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 		unsigned char program_type, zbx_get_config_forks_f get_config_forks)
 {
 	zbx_db_row_t		row;
-	zbx_db_result_t		result;
 	int			processed_num = 0, clock, ttl;
 	zbx_uint64_t		taskid;
 	unsigned char		type;
@@ -345,11 +346,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 
 	zbx_vector_uint64_create(&check_now_taskids);
 
-	result = zbx_db_select("select taskid,type,clock,ttl"
-				" from task"
-				" where status=%d"
-					" and type in (%d, %d, %d)"
-				" order by taskid",
+	zbx_db_result_t		result = zbx_db_select("select taskid,type,clock,ttl"
+			" from task"
+			" where status=%d"
+				" and type in (%d, %d, %d)"
+			" order by taskid",
 			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_TASK_CHECK_NOW, ZBX_TM_TASK_DATA);
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -416,15 +417,12 @@ static void	tm_remove_old_tasks(time_t now)
  ******************************************************************************/
 static void	force_config_sync(const char *config_hostname)
 {
-	zbx_tm_task_t	*task;
-	zbx_uint64_t	taskid;
 	struct zbx_json	j;
-
-	taskid = zbx_db_get_maxid("task");
+	zbx_uint64_t	taskid = zbx_db_get_maxid("task");
 
 	zbx_db_begin();
 
-	task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+	zbx_tm_task_t	*task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
 
 	zbx_json_init(&j, 1024);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAME, config_hostname, ZBX_JSON_TYPE_STRING);
@@ -440,24 +438,22 @@ static void	force_config_sync(const char *config_hostname)
 	zbx_json_free(&j);
 }
 
-#define ZBX_TM_PROCESS_PERIOD		5
-#define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
-
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
+#define ZBX_TM_PROCESS_PERIOD		5
+#define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 							(((zbx_thread_args_t *)args)->args);
 	static time_t			sleeptime, nextcheck;
 	static double			cleanup_time = 0.0;
 	double				sec1, sec2;
-	int				tasks_num;
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int				tasks_num, rtc_msgs_num = 1,
+					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SNMP_CACHE_RELOAD};
-	int				rtc_msgs_num = 1;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -541,6 +537,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-}
 #undef ZBX_TM_PROCESS_PERIOD
 #undef ZBX_TM_CLEANUP_PERIOD
+}
