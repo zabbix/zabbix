@@ -38,8 +38,6 @@
 #include "zbx_item_constants.h"
 #include "zbxlog.h"
 
-//extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
 #define ZBX_ESCALATION_SOURCE_DEFAULT	0
@@ -1960,6 +1958,7 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
  *             config_timeout         - [IN]                                  *
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
+ *             get_config_forks       - [IN]                                  *
  *                                                                            *
  * Comments: Action recovery operations have a single escalation step, so     *
  *           alerts created by escalation recovery operations must have       *
@@ -2035,6 +2034,7 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
  *             config_timeout         - [IN]                                  *
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
+ *             get_config_forks       - [IN]                                  *
  *                                                                            *
  * Comments: Action update operations have a single escalation step, so       *
  *           alerts created by escalation update operations must have         *
@@ -2487,6 +2487,7 @@ static void	escalation_cancel(zbx_db_escalation *escalation, const zbx_db_action
  *             config_timeout         - [IN]                                  *
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
+ *             get_config_forks       - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute(zbx_db_escalation *escalation, const zbx_db_action *action, zbx_db_event *event,
@@ -2516,6 +2517,7 @@ static void	escalation_execute(zbx_db_escalation *escalation, const zbx_db_actio
  *             config_timeout         - [IN]                                  *
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
+ *             get_config_forks       - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(zbx_db_escalation *escalation, const zbx_db_action *action, zbx_db_event *event,
@@ -2547,6 +2549,7 @@ static void	escalation_recover(zbx_db_escalation *escalation, const zbx_db_actio
  *             config_timeout         - [IN]                                  *
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
+ *             get_config_forks       - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_action *action,
@@ -2604,6 +2607,7 @@ static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_a
  *             config_timeout         - [IN]                                  *
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
+ *             get_config_forks       - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_update(zbx_db_escalation *escalation, const zbx_db_action *action,
@@ -3326,6 +3330,7 @@ out:
  *             config_timeout         - [IN]                                   *
  *             config_trapper_timeout - [IN]                                   *
  *             config_source_ip       - [IN]                                   *
+ *             get_config_forks       - [IN]                                   *
  *                                                                             *
  * Return value: the count of deleted escalations                              *
  *                                                                             *

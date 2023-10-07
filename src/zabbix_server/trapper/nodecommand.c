@@ -28,8 +28,6 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 
-//extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 /******************************************************************************
  *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
@@ -230,6 +228,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *              config_timeout         - [IN]                                         *
  *              config_trapper_timeout - [IN]                                         *
  *              config_source_ip       - [IN]                                         *
+ *              get_config_forks       - [IN]                                         *
  *              result                 - [OUT] result of script execution             *
  *              debug                  - [OUT] debug data (optional)                  *
  *                                                                                    *

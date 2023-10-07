@@ -39,7 +39,7 @@ typedef struct
 	zbx_socket_t			*listen_sock;
 	int				config_startup_time;
 	int				proxydata_frequency;
-	zbx_get_config_forks_f          get_process_forks_cb_arg;
+	zbx_get_config_forks_f		get_process_forks_cb_arg;
 }
 zbx_thread_trapper_args;
 
