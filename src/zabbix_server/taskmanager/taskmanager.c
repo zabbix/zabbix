@@ -21,12 +21,13 @@
 
 #include "../db_lengths.h"
 #include "../events/events.h"
+#include "../actions.h"
+
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
-#include "../actions.h"
 #include "zbxexport.h"
 #include "zbxdiag.h"
 #include "zbxservice.h"
@@ -41,14 +42,6 @@
 #include "zbxdbwrap.h"
 #include "zbxevent.h"
 
-#define ZBX_TM_PROCESS_PERIOD		5
-#define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
-#define ZBX_TASKMANAGER_TIMEOUT		5
-
-#define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
-#define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
-#define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
-
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
 {
@@ -57,22 +50,21 @@ static zbx_export_file_t	*get_problems_export(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: close the specified problem event and remove task                 *
+ * Purpose: closes specified problem event and removes task                   *
  *                                                                            *
- * Parameters: triggerid         - [IN] the source trigger id                 *
- *             eventid           - [IN] the problem eventid to close          *
- *             userid            - [IN] the user that requested to close the  *
- *                                      problem                               *
+ * Parameters: taskid            - [IN]                                       *
+ *             triggerid         - [IN] source trigger id                     *
+ *             eventid           - [IN] problem eventid to close              *
+ *             userid            - [IN] user that requested to close problem  *
  *                                                                            *
  ******************************************************************************/
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
 		zbx_uint64_t userid)
 {
-	zbx_db_result_t	result;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
-	result = zbx_db_select("select null from problem where eventid=" ZBX_FS_UI64 " and r_eventid is null", eventid);
+	zbx_db_result_t	result = zbx_db_select("select null from problem where eventid=" ZBX_FS_UI64
+			" and r_eventid is null", eventid);
 
 	/* check if the task hasn't been already closed by another process */
 	if (NULL != zbx_db_fetch(result))
@@ -87,9 +79,9 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 /******************************************************************************
  *                                                                            *
- * Purpose: try to close problem by event acknowledgment action               *
+ * Purpose: tries to close problem by event acknowledgment action             *
  *                                                                            *
- * Parameters: taskid - [IN] the task identifier                              *
+ * Parameters: taskid - [IN]                                                  *
  *                                                                            *
  * Return value: SUCCEED - task was executed and removed                      *
  *               FAIL    - otherwise                                          *
@@ -123,7 +115,8 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process close problem task because related event"
 					" was removed");
-			zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+			zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
+					taskid);
 
 			ret = SUCCEED;
 		}
@@ -205,9 +198,9 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process remote command result task                                *
+ * Purpose: processes remote command result task                              *
  *                                                                            *
- * Return value: SUCCEED - the task was processed successfully                *
+ * Return value: SUCCEED - task was processed successfully                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -243,8 +236,8 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 			if (SUCCEED == status)
 			{
-				zbx_db_execute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT,
-						alertid);
+				zbx_db_execute("update alerts set status=%d where alertid=" ZBX_FS_UI64,
+						ALERT_STATUS_SENT, alertid);
 			}
 			else
 			{
@@ -277,7 +270,7 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process data task result                                          *
+ * Purpose: processes data task result                                        *
  *                                                                            *
  ******************************************************************************/
 static void	tm_process_data_result(zbx_uint64_t taskid)
@@ -317,10 +310,10 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: rank event/problem as cause                                       *
+ * Purpose: ranks event/problem as cause                                      *
  *                                                                            *
- * Parameters: eventid     - [IN] the event/problem, which should be ranked   *
- *                           as cause                                         *
+ * Parameters: eventid     - [IN] event/problem, which should be ranked       *
+ *                                as cause                                    *
  *                                                                            *
  * Return value: SUCCEED - if there are no database errors                    *
  *               FAIL    - otherwise                                          *
@@ -354,12 +347,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: rank event/problem as symptom                                     *
+ * Purpose: ranks event/problem as symptom                                    *
  *                                                                            *
  * Parameters:                                                                *
- *     eventid           - [IN] event id of the new symptom                   *
- *     cause_eventid     - [IN] event id of the new cause                     *
- *     old_cause_eventid - [IN] event id of the old cause before the ranking  *
+ *     eventid           - [IN] event id of new symptom                       *
+ *     cause_eventid     - [IN] event id of new cause                         *
+ *     old_cause_eventid - [IN] event id of old cause before ranking          *
  *                                                                            *
  * Return value: SUCCEED - if there are no database errors                    *
  *               FAIL    - otherwise                                          *
@@ -414,15 +407,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: rank event task                                                   *
+ * Purpose: ranks event task                                                  *
  *                                                                            *
  * Parameters: taskid - [IN]                                                  *
  *             data   - [IN] JSON with with acknowledge id, action, event id  *
- *                      for all actions and cause_eventid for rank to symptom *
- *                      action                                                *
+ *                           for all actions and cause_eventid for rank to    *
+ *                           symptom action                                   *
  *                                                                            *
  * Comments: Logic of this function is described in comments to test cases in *
- *           the integration test testEventsCauseAndSymptoms                  *
+ *           the integration test testEventsCauseAndSymptoms.                 *
  *                                                                            *
  ******************************************************************************/
 static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
@@ -534,17 +527,16 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: notify service manager about problem severity changes             *
+ * Purpose: notifies service manager about problem severity changes           *
  *                                                                            *
  ******************************************************************************/
 static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
 {
-	int			i;
 	zbx_vector_ptr_t	event_severities;
 
 	zbx_vector_ptr_create(&event_severities);
 
-	for (i = 0; i < ack_tasks->values_num; i++)
+	for (int i = 0; i < ack_tasks->values_num; i++)
 	{
 		zbx_ack_task_t	*ack_task = (zbx_ack_task_t *)ack_tasks->values[i];
 
@@ -607,7 +599,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 				" on ta.taskid=t.taskid"
 			" where t.status=%d and",
 			ZBX_TM_STATUS_NEW);
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values, ack_taskids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values,
+			ack_taskids->values_num);
 	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -644,7 +637,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_DONE);
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", ack_taskids->values, ack_taskids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", ack_taskids->values,
+			ack_taskids->values_num);
 	zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
@@ -659,16 +653,16 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process check now tasks for item rescheduling                     *
+ * Purpose: processes 'check now' tasks for item rescheduling                 *
  *                                                                            *
- * Return value: The number of successfully processed tasks                   *
+ * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
-	int			i, processed_num = 0;
+	int			processed_num = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	tasks;
@@ -726,7 +720,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	{
 		zbx_vector_uint64_create(&itemids);
 
-		for (i = 0; i < tasks.values_num; i++)
+		for (int i = 0; i < tasks.values_num; i++)
 		{
 			task = (zbx_tm_task_t *)tasks.values[i];
 			data = (zbx_tm_check_now_t *)task->data;
@@ -739,7 +733,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		sql_offset = 0;
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = 0; i < tasks.values_num; i++)
+		for (int i = 0; i < tasks.values_num; i++)
 		{
 			task = (zbx_tm_task_t *)tasks.values[i];
 
@@ -803,7 +797,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process diaginfo task                                             *
+ * Purpose: processes diaginfo task                                           *
  *                                                                            *
  ******************************************************************************/
 static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
@@ -830,14 +824,12 @@ static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create config cache reload task to be sent to active proxy        *
+ * Purpose: creates config cache reload task to be sent to active proxy       *
  *                                                                            *
  ******************************************************************************/
 static zbx_tm_task_t	*tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 {
-	zbx_tm_task_t	*task;
-
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL),
+	zbx_tm_task_t	*task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL),
 			ZBX_DATA_ACTIVE_PROXY_CONFIG_RELOAD_TTL, proxyid);
 
 	task->data = zbx_tm_data_create(0, "", 0, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
@@ -847,16 +839,15 @@ static zbx_tm_task_t	*tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process task for reload of configuration cache on proxies         *
+ * Purpose: processes task for reload of configuration cache on proxies       *
  *                                                                            *
- * Parameters: rtc    - [IN] the RTC service                                  *
- *             data   - [IN] the JSON with request                            *
+ * Parameters: rtc    - [IN] RTC service                                      *
+ *             data   - [IN] JSON with request                                *
  *                                                                            *
  ******************************************************************************/
 static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, const char *data)
 {
 	struct zbx_json_parse	jp, jp_data;
-	const char		*ptr;
 	char			buffer[MAX_ID_LEN + 1];
 	int			passive_proxy_count = 0;
 	zbx_vector_tm_task_t	tasks_active;
@@ -878,7 +869,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 	zbx_vector_tm_task_create(&tasks_active);
 	zbx_vector_str_create(&proxynames_log);
 
-	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
+	for (const char *ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
 		if (NULL != zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL))
 		{
@@ -968,11 +959,11 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process task for reload of configuration cache on passive proxy   *
+ * Purpose: processes task for reload of configuration cache on passive proxy *
  *          (received from that passive proxy)                                *
  *                                                                            *
- * Parameters: rtc    - [IN] the RTC service                                  *
- *             data   - [IN] the JSON with request                            *
+ * Parameters: rtc    - [IN] RTC service                                      *
+ *             data   - [IN] JSON with request                                *
  *                                                                            *
  ******************************************************************************/
 static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t *rtc, const char *data)
@@ -1018,6 +1009,9 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 
 static void	tm_process_temp_suppression(const char *data)
 {
+#define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
+#define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
+#define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
 	struct zbx_json_parse	jp;
 	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[12];
 	zbx_uint64_t		eventid, userid, action;
@@ -1075,8 +1069,8 @@ static void	tm_process_temp_suppression(const char *data)
 		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
 				FAIL == zbx_is_uint32(tmp_ts, &ts))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
-					" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: "
+					"failed to retrieve \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
 			return;
 		}
 
@@ -1124,13 +1118,16 @@ static void	tm_process_temp_suppression(const char *data)
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
+#undef ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS
+#undef ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS
+#undef ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process data tasks                                                *
+ * Purpose: processes data tasks                                              *
  *                                                                            *
- * Return value: The number of successfully processed tasks                   *
+ * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *taskids)
@@ -1223,7 +1220,7 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
  *                                                                            *
  * Purpose: expires tasks that don't require specific expiration handling     *
  *                                                                            *
- * Return value: The number of successfully expired tasks                     *
+ * Return value: number of successfully expired tasks                         *
  *                                                                            *
  ******************************************************************************/
 static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
@@ -1241,7 +1238,7 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get proxy version compatibility with server version               *
+ * Purpose: gets proxy version compatibility with server version              *
  *                                                                            *
  ******************************************************************************/
 static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxyid)
@@ -1251,9 +1248,8 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxyid
 	if (0 < proxyid)
 	{
 		zbx_db_row_t	row;
-		zbx_db_result_t	result;
 
-		result = zbx_db_select(
+		zbx_db_result_t	result = zbx_db_select(
 				"select compatibility"
 				" from proxy_rtdata"
 				" where proxyid=" ZBX_FS_UI64, proxyid);
@@ -1269,9 +1265,9 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxyid
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process task manager tasks depending on task type                 *
+ * Purpose: processes task manager tasks depending on task type               *
  *                                                                            *
- * Return value: The number of successfully processed tasks                   *
+ * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
@@ -1421,7 +1417,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove old done/expired tasks                                     *
+ * Purpose: removes old done/expired tasks                                    *
  *                                                                            *
  ******************************************************************************/
 static void	tm_remove_old_tasks(time_t now)
@@ -1434,7 +1430,7 @@ static void	tm_remove_old_tasks(time_t now)
 
 static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 {
-	int				i, notify_proxypollers = 0;
+	int				notify_proxypollers = 0;
 	zbx_vector_cached_proxy_ptr_t	proxies;
 	zbx_vector_tm_task_t		tasks_active;
 
@@ -1448,16 +1444,13 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zbx_audit_prepare();
 
-	for (i = 0; i < proxies.values_num; i++)
+	for (int i = 0; i < proxies.values_num; i++)
 	{
-		zbx_tm_task_t		*task;
-		zbx_cached_proxy_t	*proxy;
-
-		proxy = proxies.values[i];
+		zbx_cached_proxy_t	*proxy = proxies.values[i];
 
 		if (PROXY_OPERATING_MODE_ACTIVE == proxy->mode)
 		{
-			task = tm_create_active_proxy_reload_task(proxy->proxyid);
+			zbx_tm_task_t	*task = tm_create_active_proxy_reload_task(proxy->proxyid);
 			zbx_vector_tm_task_append(&tasks_active, task);
 		}
 		else if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
@@ -1496,16 +1489,15 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reload configuration cache on proxies using given proxy names     *
+ * Purpose: reloads configuration cache on proxies using given proxy names    *
  *                                                                            *
- * Parameters: rtc    - [IN] the RTC service                                  *
- *             data   - [IN] the JSON with request                            *
+ * Parameters: rtc    - [IN] RTC service                                      *
+ *             data   - [IN] JSON with request                                *
  *                                                                            *
  ******************************************************************************/
 static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const unsigned char *data)
 {
 	struct zbx_json_parse	jp, jp_data;
-	const char		*ptr;
 	char			name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_vector_tm_task_t	tasks_active;
 	zbx_vector_str_t	proxynames_log;
@@ -1529,7 +1521,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 	zbx_audit_prepare();
 
-	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
+	for (const char *ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
 		if (NULL != zbx_json_decodevalue(ptr, name, sizeof(name), NULL))
 		{
@@ -1612,12 +1604,13 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
+#define ZBX_TM_PROCESS_PERIOD		5
+#define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 	static time_t		cleanup_time = 0;
-	int			tasks_num, sleeptime;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int			tasks_num, sleeptime, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD};
 
@@ -1635,7 +1628,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
 
-	double sec1 = zbx_time();
+	double	sec1 = zbx_time();
 
 	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
 
@@ -1672,9 +1665,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			cleanup_time = (time_t)sec1;
 		}
 
-		double sec2 = zbx_time();
+		double	sec2 = zbx_time();
 
-		time_t nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
+		time_t	nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
 
 		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
@@ -1690,4 +1683,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+#undef ZBX_TM_PROCESS_PERIOD
+#undef ZBX_TM_CLEANUP_PERIOD
 }
