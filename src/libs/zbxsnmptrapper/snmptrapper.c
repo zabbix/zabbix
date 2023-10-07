@@ -409,7 +409,7 @@ static void	delay_trap_logs(char *error, int log_level)
  * Purpose: read the traps and then parse them with parse_traps()             *
  *                                                                            *
  ******************************************************************************/
-static int	read_traps(void)
+static int	read_traps(const char *config_snmptrap_file)
 {
 	int	nbytes = 0;
 	char	*error = NULL;
@@ -419,7 +419,7 @@ static int	read_traps(void)
 	if (-1 == lseek(trap_fd, trap_lastsize, SEEK_SET))
 	{
 		error = zbx_dsprintf(error, "cannot set position to %lld for \"%s\": %s", (long long int)trap_lastsize,
-				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+				config_snmptrap_file, zbx_strerror(errno));
 		delay_trap_logs(error, LOG_LEVEL_WARNING);
 		goto out;
 	}
@@ -427,7 +427,7 @@ static int	read_traps(void)
 	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
 		error = zbx_dsprintf(error, "cannot read from SNMP trapper file \"%s\": %s",
-				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+				config_snmptrap_file, zbx_strerror(errno));
 		delay_trap_logs(error, LOG_LEVEL_WARNING);
 		goto out;
 	}
@@ -471,17 +471,17 @@ static void	close_trap_file(void)
  * Return value: file descriptor of the opened file or -1 otherwise           *
  *                                                                            *
  ******************************************************************************/
-static int	open_trap_file(void)
+static int	open_trap_file(const char *config_snmptrap_file)
 {
 	zbx_stat_t	file_buf;
 	char		*error = NULL;
 
-	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
+	if (-1 == (trap_fd = open(config_snmptrap_file, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
 		{
 			error = zbx_dsprintf(error, "cannot open SNMP trapper file \"%s\": %s",
-					CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+					config_snmptrap_file, zbx_strerror(errno));
 			delay_trap_logs(error, LOG_LEVEL_CRIT);
 		}
 		goto out;
@@ -489,7 +489,7 @@ static int	open_trap_file(void)
 
 	if (0 != zbx_fstat(trap_fd, &file_buf))
 	{
-		error = zbx_dsprintf(error, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+		error = zbx_dsprintf(error, "cannot stat SNMP trapper file \"%s\": %s", config_snmptrap_file,
 				zbx_strerror(errno));
 		delay_trap_logs(error, LOG_LEVEL_CRIT);
 		close(trap_fd);
@@ -513,23 +513,23 @@ out:
  *               FAIL - there are no new traps or trap file does not exist    *
  *                                                                            *
  ******************************************************************************/
-static int	get_latest_data(void)
+static int	get_latest_data(const char *config_snmptrap_file)
 {
 	zbx_stat_t	file_buf;
 
 	if (-1 != trap_fd)	/* a trap file is already open */
 	{
-		if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
+		if (0 != zbx_stat(config_snmptrap_file, &file_buf))
 		{
 			/* file might have been renamed or deleted, process the current file */
 
 			if (ENOENT != errno)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot stat SNMP trapper file \"%s\": %s",
-						CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+						config_snmptrap_file, zbx_strerror(errno));
 			}
 
-			while (0 < read_traps())
+			while (0 < read_traps(config_snmptrap_file))
 				;
 
 			if (0 != offset)
@@ -541,7 +541,7 @@ static int	get_latest_data(void)
 		{
 			/* file has been rotated, process the current file */
 
-			while (0 < read_traps())
+			while (0 < read_traps(config_snmptrap_file))
 				;
 
 			if (0 != offset)
@@ -550,7 +550,7 @@ static int	get_latest_data(void)
 			close_trap_file();
 		}
 		/* in case when file access permission is changed and read permission is denied */
-		else if (0 != access(CONFIG_SNMPTRAP_FILE, R_OK))
+		else if (0 != access(config_snmptrap_file, R_OK))
 		{
 			if (EACCES == errno)
 				close_trap_file();
@@ -573,7 +573,7 @@ static int	get_latest_data(void)
 
 	force = 0;
 
-	if (-1 == trap_fd && -1 == open_trap_file())
+	if (-1 == trap_fd && -1 == open_trap_file(config_snmptrap_file))
 		return FAIL;
 
 	return SUCCEED;
@@ -592,10 +592,13 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
+	zbx_thread_snmptrapper_args	*snmptrapper_args_in = (zbx_thread_snmptrapper_args *)
+			(((zbx_thread_args_t *)args)->args);
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, CONFIG_SNMPTRAP_FILE);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, snmptrapper_args_in->config_snmptrap_file);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -615,8 +618,9 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (ZBX_IS_RUNNING() && SUCCEED == get_latest_data())
-			read_traps();
+		while (ZBX_IS_RUNNING() && SUCCEED == get_latest_data(snmptrapper_args_in->config_snmptrap_file))
+			read_traps(snmptrapper_args_in->config_snmptrap_file);
+
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",
