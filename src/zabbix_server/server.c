@@ -49,7 +49,7 @@
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
-#include "taskmanager/taskmanager.h"
+#include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
 #include "zbxconnector.h"

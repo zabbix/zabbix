@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "taskmanager_server.h"
+
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxtasks.h"
 #include "zbxversion.h"
-#include "taskmanager.h"
 
 /******************************************************************************
  *                                                                            *
