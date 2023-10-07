@@ -41,6 +41,11 @@
 #include "zbx_rtc_constants.h"
 #include "zbxdbwrap.h"
 #include "zbxevent.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxstr.h"
 
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)

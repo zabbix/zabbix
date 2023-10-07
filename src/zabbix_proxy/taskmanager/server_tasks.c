@@ -19,6 +19,7 @@
 
 #include "taskmanager_proxy.h"
 
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxtasks.h"

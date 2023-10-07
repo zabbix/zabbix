@@ -34,6 +34,12 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 /**************************************************************************************
  *                                                                                    *
@@ -70,7 +76,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 				" from task_remote_command"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
-	zbx_tm_task_t	*task;
+	zbx_tm_task_t	*task = NULL;
 	double		t;
 
 	if (NULL == (row = zbx_db_fetch(result)))
