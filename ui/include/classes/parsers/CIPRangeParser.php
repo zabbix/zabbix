@@ -418,10 +418,6 @@ class CIPRangeParser {
 
 		$pos = $p;
 
-		if ($range === '192.168.443.0/432') {
-			var_dump('parseDns');
-		}
-
 		return true;
 	}
 
