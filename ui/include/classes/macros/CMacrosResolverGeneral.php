@@ -135,103 +135,52 @@ class CMacrosResolverGeneral {
 	 */
 	public static function getMacroPositions($text, array $types) {
 		$macros = [];
-		$extract_usermacros = array_key_exists('usermacros', $types);
-		$extract_macros = array_key_exists('macros', $types);
-		$extract_macros_n = array_key_exists('macros_n', $types);
-		$extract_macros_an = array_key_exists('macros_an', $types);
-		$extract_references = array_key_exists('references', $types);
-		$extract_lldmacros = array_key_exists('lldmacros', $types);
-		$extract_functionids = array_key_exists('functionids', $types);
-		$extract_replacements = array_key_exists('replacements', $types);
+		$macro_parsers = [];
 
-		if ($extract_usermacros) {
-			$user_macro_parser = new CUserMacroParser();
+		if (array_key_exists('usermacros', $types)) {
+			array_push($macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 
-		if ($extract_macros) {
-			$macro_parser = new CMacroParser(['macros' => $types['macros']]);
-			$macro_func_parser = new CMacroFunctionParser(['macros' => $types['macros']]);
+		if (array_key_exists('macros', $types)) {
+			$options = ['macros' => $types['macros']];
+			array_push($macro_parsers, new CMacroParser($options), new CMacroFunctionParser($options));
 		}
 
-		if ($extract_macros_n) {
-			$macro_n_parser = new CMacroParser([
-				'macros' => $types['macros_n'],
-				'ref_type' => CMacroParser::REFERENCE_NUMERIC
-			]);
-			$macro_func_n_parser = new CMacroFunctionParser([
-				'macros' => $types['macros_n'],
-				'ref_type' => CMacroParser::REFERENCE_NUMERIC
-			]);
+		if (array_key_exists('macros_n', $types)) {
+			$options = ['macros' => $types['macros_n'], 'ref_type' => CMacroParser::REFERENCE_NUMERIC];
+			array_push($macro_parsers, new CMacroParser($options), new CMacroFunctionParser($options));
 		}
 
-		if ($extract_macros_an) {
-			$macro_an_parser = new CMacroParser([
+		if (array_key_exists('macros_an', $types)) {
+			$macro_parsers[] = new CMacroParser([
 				'macros' => $types['macros_an'],
 				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
 			]);
 		}
 
-		if ($extract_references) {
-			$reference_parser = new CReferenceParser();
+		if (array_key_exists('references', $types)) {
+			$macro_parsers[] = new CReferenceParser;
 		}
 
-		if ($extract_lldmacros) {
-			$lld_macro_parser = new CLLDMacroParser();
-			$lld_macro_function_parser = new CLLDMacroFunctionParser();
+		if (array_key_exists('lldmacros', $types)) {
+			array_push($macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 
-		if ($extract_functionids) {
-			$functionid_parser = new CFunctionIdParser();
+		if (array_key_exists('functionids', $types)) {
+			$macro_parsers[] = new CFunctionIdParser();
 		}
 
-		if ($extract_replacements) {
-			$replacement_parser = new CReplacementParser();
+		if (array_key_exists('replacements', $types)) {
+			$macro_parsers[] = new CReplacementParser();
 		}
 
 		for ($pos = 0; isset($text[$pos]); $pos++) {
-			if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $user_macro_parser->getMatch();
-				$pos += $user_macro_parser->getLength() - 1;
-			}
-			elseif ($extract_macros && $macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $macro_parser->getMatch();
-				$pos += $macro_parser->getLength() - 1;
-			}
-			elseif ($extract_macros && $macro_func_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $macro_func_parser->getMatch();
-				$pos += $macro_func_parser->getLength() - 1;
-			}
-			elseif ($extract_macros_n && $macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $macro_n_parser->getMatch();
-				$pos += $macro_n_parser->getLength() - 1;
-			}
-			elseif ($extract_macros_n && $macro_func_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $macro_func_n_parser->getMatch();
-				$pos += $macro_func_n_parser->getLength() - 1;
-			}
-			elseif ($extract_macros_an && $macro_an_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $macro_an_parser->getMatch();
-				$pos += $macro_an_parser->getLength() - 1;
-			}
-			elseif ($extract_references && $reference_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $reference_parser->getMatch();
-				$pos += $reference_parser->getLength() - 1;
-			}
-			elseif ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $lld_macro_parser->getMatch();
-				$pos += $lld_macro_parser->getLength() - 1;
-			}
-			elseif ($extract_lldmacros && $lld_macro_function_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $lld_macro_function_parser->getMatch();
-				$pos += $lld_macro_function_parser->getLength() - 1;
-			}
-			elseif ($extract_functionids && $functionid_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $functionid_parser->getMatch();
-				$pos += $functionid_parser->getLength() - 1;
-			}
-			elseif ($extract_replacements && $replacement_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $replacement_parser->getMatch();
-				$pos += $replacement_parser->getLength() - 1;
+			foreach ($macro_parsers as $macro_parser) {
+				if ($macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros[$pos] = $macro_parser->getMatch();
+					$pos += $macro_parser->getLength() - 1;
+					break;;
+				}
 			}
 		}
 
@@ -327,6 +276,7 @@ class CMacrosResolverGeneral {
 			$macros['usermacros'] = [];
 
 			$user_macro_parser = new CUserMacroParser();
+			$user_macro_function_parser = new CUserMacroFunctionParser();
 		}
 
 		if ($extract_macros) {
@@ -411,10 +361,31 @@ class CMacrosResolverGeneral {
 
 		foreach ($texts as $text) {
 			for ($pos = 0; isset($text[$pos]); $pos++) {
-				if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-					$macros['usermacros'][$user_macro_parser->getMatch()] = null;
-					$pos += $user_macro_parser->getLength() - 1;
-					continue;
+				if ($extract_usermacros) {
+					if ($user_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+						$macros['usermacros'][$user_macro_parser->getMatch()] = [
+							'macro' => $user_macro_parser->getMacro(),
+							'context' => $user_macro_parser->getContext()
+						];
+						$pos += $user_macro_parser->getLength() - 1;
+						continue;
+					}
+
+					if ($user_macro_function_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+						$user_macro_parser = $user_macro_function_parser->getUserMacroParser();
+						$function_parser = $user_macro_function_parser->getFunctionParser();
+
+						$macros['usermacros'][$user_macro_function_parser->getMatch()] = [
+							'macro' => $user_macro_parser->getMacro(),
+							'context' => $user_macro_parser->getContext(),
+							'macrofunc' => [
+								'function' => $function_parser->getFunction(),
+								'parameters' => $function_parser->getParams()
+							]
+						];
+						$pos += $user_macro_function_parser->getLength() - 1;
+						continue;
+					}
 				}
 
 				if ($extract_macros) {
@@ -1497,13 +1468,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($usermacros_data);
 
-		foreach (self::getUserMacros($usermacros) as $triggerid => $usermacros_data) {
-			$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
-				? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
-
-		return $macro_values;
+		return self::getUserMacros($usermacros, $macro_values);
 	}
 
 	/**
@@ -2630,24 +2595,29 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get macros with values.
 	 *
-	 * @param array $data
-	 * @param array $data[n]['hostids']  The list of host ids; [<hostid1>, ...].
-	 * @param array $data[n]['macros']   The list of user macros to resolve, ['<usermacro1>' => null, ...].
-	 * @param bool  $unset_undefined     Unset undefined macros.
+	 * @param array  $usermacros
+	 * @param array  $usermacros[n]['hostids']                       The list of host ids; [<hostid1>, ...].
+	 * @param array  $usermacros[n]['macros']                        The list of user macros to resolve.
+	 * @param array  $usermacros[n]['macros'][<token>]
+	 * @param string $usermacros[n]['macros'][<token>]['macro']
+	 * @param string $usermacros[n]['macros'][<token>]['context']
+	 * @param array  $usermacros[n]['macros'][<token>]['macrofunc']  (optional)
+	 * @param array  $macro_values
+	 * @param array  $macro_values[<key>]
+	 * @param array  $macro_values[<key>][<macro>]
+	 * @param bool   $unset_undefined     Unset undefined macros.
 	 *
 	 * @return array
 	 */
-	protected static function getUserMacros(array $data, bool $unset_undefined = false) {
-		if (!$data) {
-			return $data;
+	protected static function getUserMacros(array $usermacros, array $macro_values, bool $unset_undefined = false) {
+		if (!$usermacros) {
+			return $macro_values;
 		}
 
 		// User macros.
 		$hostids = [];
-		foreach ($data as $element) {
-			foreach ($element['hostids'] as $hostid) {
-				$hostids[$hostid] = true;
-			}
+		foreach ($usermacros as $usermacros_data) {
+			$hostids += array_flip($usermacros_data['hostids']);
 		}
 
 		$user_macro_parser = new CUserMacroParser();
@@ -2689,11 +2659,7 @@ class CMacrosResolverGeneral {
 					$regex = $user_macro_parser->getRegex();
 					$value = self::getMacroValue($db_host_macro);
 
-					if (!array_key_exists($hostid, $host_macros)) {
-						$host_macros[$hostid] = [];
-					}
-
-					if (!array_key_exists($macro, $host_macros[$hostid])) {
+					if (!array_key_exists($hostid, $host_macros) || !array_key_exists($macro, $host_macros[$hostid])) {
 						$host_macros[$hostid][$macro] = ['value' => null, 'contexts' => [], 'regex' => []];
 					}
 
@@ -2737,34 +2703,22 @@ class CMacrosResolverGeneral {
 		$host_macros = self::sortRegexHostMacros($host_macros);
 
 		$all_macros_resolved = true;
-
-		foreach ($data as &$element) {
-			$hostids = [];
-			foreach ($element['hostids'] as $hostid) {
-				$hostids[$hostid] = true;
-			}
-
-			$hostids = array_keys($hostids);
+		foreach ($usermacros as &$usermacros_data) {
+			$hostids = array_unique($usermacros_data['hostids']);
 			natsort($hostids);
 
-			foreach ($element['macros'] as $usermacro => &$value) {
-				if ($user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
-					$value = self::getHostUserMacros($hostids, $user_macro_parser->getMacro(),
-						$user_macro_parser->getContext(), $host_templates, $host_macros
-					);
+			foreach ($usermacros_data['macros'] as $usermacro => &$data) {
+				$data['value'] = self::getHostUserMacros($hostids, $data['macro'], $data['context'], $host_templates,
+					$host_macros
+				);
 
-					if ($value['value'] === null) {
-						$all_macros_resolved = false;
-					}
-				}
-				else {
-					// This macro cannot be resolved.
-					$value = ['value' => $usermacro, 'value_default' => null];
+				if ($data['value']['value'] === null) {
+					$all_macros_resolved = false;
 				}
 			}
-			unset($value);
+			unset($data);
 		}
-		unset($element);
+		unset($usermacros_data);
 
 		if (!$all_macros_resolved) {
 			// Global macros.
@@ -2809,60 +2763,68 @@ class CMacrosResolverGeneral {
 			// Reordering only regex array.
 			$global_macros = self::sortRegexGlobalMacros($global_macros);
 
-			foreach ($data as &$element) {
-				foreach ($element['macros'] as $usermacro => &$value) {
-					if ($value['value'] === null && $user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
-						$macro = $user_macro_parser->getMacro();
-						$context = $user_macro_parser->getContext();
-
-						if (array_key_exists($macro, $global_macros)) {
-							if ($context !== null && array_key_exists($context, $global_macros[$macro]['contexts'])) {
-								$value['value'] = $global_macros[$macro]['contexts'][$context];
+			foreach ($usermacros as &$usermacros_data) {
+				foreach ($usermacros_data['macros'] as $usermacro => &$data) {
+					if ($data['value']['value'] === null) {
+						if (array_key_exists($data['macro'], $global_macros)) {
+							if ($data['context'] !== null
+									&& array_key_exists($data['context'], $global_macros[$data['macro']]['contexts'])) {
+								$data['value']['value'] = $global_macros[$data['macro']]['contexts'][$data['context']];
 							}
-							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
-								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
-									if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
-										$value['value'] = $val;
+							elseif ($data['context'] !== null && count($global_macros[$data['macro']]['regex'])) {
+								foreach ($global_macros[$data['macro']]['regex'] as $regex => $val) {
+									if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\/']).'/', $data['context'])) {
+										$data['value']['value'] = $val;
 										break;
 									}
 								}
 							}
 
-							if ($value['value'] === null && $global_macros[$macro]['value'] !== null) {
-								if ($context === null) {
-									$value['value'] = $global_macros[$macro]['value'];
+							if ($data['value']['value'] === null && $global_macros[$data['macro']]['value'] !== null) {
+								if ($data['context'] === null) {
+									$data['value']['value'] = $global_macros[$data['macro']]['value'];
 								}
-								elseif ($value['value_default'] === null) {
-									$value['value_default'] = $global_macros[$macro]['value'];
+								elseif ($data['value']['value_default'] === null) {
+									$data['value']['value_default'] = $global_macros[$data['macro']]['value'];
 								}
 							}
 						}
 					}
 				}
-				unset($value);
+				unset($data);
 			}
-			unset($element);
+			unset($usermacros_data);
 		}
 
-		foreach ($data as $key => $element) {
-			foreach ($element['macros'] as $usermacro => $value) {
-				if ($value['value'] !== null) {
-					$data[$key]['macros'][$usermacro] = $value['value'];
+		foreach ($usermacros as $key => $usermacros_data) {
+			foreach ($usermacros_data['macros'] as $usermacro => $data) {
+				if ($data['value']['value'] !== null) {
+					$usermacros[$key]['macros'][$usermacro] = array_key_exists('macrofunc', $data)
+						? self::calcMacrofunc($data['value']['value'], $data['macrofunc'])
+						: $data['value']['value'];
 				}
-				elseif ($value['value_default'] !== null) {
-					$data[$key]['macros'][$usermacro] = $value['value_default'];
+				elseif ($data['value']['value_default'] !== null) {
+					$usermacros[$key]['macros'][$usermacro] = array_key_exists('macrofunc', $data)
+						? self::calcMacrofunc($data['value']['value_default'], $data['macrofunc'])
+						: $data['value']['value_default'];
 				}
 				// Unresolved macro.
 				elseif ($unset_undefined) {
-					unset($data[$key]['macros'][$usermacro]);
+					unset($usermacros[$key]['macros'][$usermacro]);
 				}
 				else {
-					$data[$key]['macros'][$usermacro] = $usermacro;
+					$usermacros[$key]['macros'][$usermacro] = $usermacro;
 				}
 			}
 		}
 
-		return $data;
+		foreach ($usermacros as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		return $macro_values;
 	}
 
 	/**

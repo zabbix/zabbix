@@ -87,8 +87,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'interface_without_port' => []];
-		$usermacros = [];
+		$macros = ['host' => [], 'interface' => [], 'interface_without_port' => [], 'usermacros' => []];
 
 		foreach ($data as $hostid => $texts) {
 			$matched_macros = self::extractMacros($texts, $types);
@@ -104,7 +103,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if (array_key_exists('usermacros', $matched_macros) && $matched_macros['usermacros']) {
-				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
@@ -113,13 +112,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getMainAgentInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		// Interface macros, macro should be resolved to interface with highest priority.
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface_without_port'], $macro_values);
-
-		// Get user macros.
-		foreach (self::getUserMacros($usermacros) as $hostid => $usermacros_data) {
-			$macro_values[$hostid] = array_key_exists($hostid, $macro_values)
-				? array_merge($macro_values[$hostid], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($macro_values as $hostid => $values) {
 			foreach ($data[$hostid] as &$text) {
@@ -157,8 +150,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'references' => [], 'log' => []];
-		$usermacros = [];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'references' => [], 'log' => [], 'usermacros' => []];
 
 		$original_triggers = $triggers;
 		$triggers = self::resolveTriggerExpressions($triggers,
@@ -184,7 +176,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				if ($matched_macros['usermacros']) {
-					$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
+					$macros['usermacros'][$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
 				}
 			}
 
@@ -205,7 +197,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values = self::getIpMacros($macros['interface'], $macro_values);
 			$macro_values = self::getItemMacros($macros['item'], $macro_values);
 			$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
-			$macro_values = self::getTriggerUserMacros($usermacros, $macro_values);
+			$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 		}
 
 		foreach ($macro_values as $triggerid => $values) {
@@ -244,8 +236,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'log' => []];
-		$usermacros = [];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'log' => [], 'usermacros' => []];
 
 		// Find macros.
 		foreach ($triggers as $triggerid => $trigger) {
@@ -270,7 +261,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
@@ -279,7 +270,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacros($macros['item'], $macro_values, $triggers, $options);
 		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
-		$macro_values = self::getTriggerUserMacros($usermacros, $macro_values);
+		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 
 		if ($options['html']) {
 			$types = self::transformToPositionTypes($types);
@@ -353,8 +344,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'event' => [], 'log' => []];
-		$usermacros = [];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'event' => [], 'log' => [], 'usermacros' => []];
 
 		$triggerid = $trigger['triggerid'];
 
@@ -386,7 +376,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		if ($matched_macros['usermacros']) {
-			$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
+			$macros['usermacros'][$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
 		}
 
 		// Get macro value.
@@ -394,9 +384,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacros($macros['item'], $macro_values);
 		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
-		$macro_values = self::getTriggerUserMacros($usermacros, $macro_values);
+		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 
-		$url = strtr($trigger[$options['source']], $macro_values[$triggerid]);
+		$url = array_key_exists($triggerid, $macro_values)
+			? strtr($trigger[$options['source']], $macro_values[$triggerid])
+			: $trigger[$options['source']];
 
 		return true;
 	}
@@ -686,10 +678,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 			unset($usermacros_data);
 
-			// Get user macros values.
-			foreach (self::getUserMacros($usermacros, true) as $key => $usermacros_data) {
-				$usermacro_values[$key] = $usermacros_data['macros'];
-			}
+			$usermacro_values = self::getUserMacros($usermacros, $usermacro_values);
 		}
 
 		// Replace macros to value.
@@ -904,8 +893,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => []];
-		$usermacros = [];
+		$macros = ['host' => [], 'interface' => [], 'usermacros' => []];
 
 		foreach ($items as &$item) {
 			$item['key_expanded'] = $item['key_'];
@@ -924,18 +912,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$itemid] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$itemid] =
+					['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
 		$macro_values = self::getHostMacrosByItemId($macros['host'], $macro_values);
 		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
-
-		foreach (self::getUserMacros($usermacros) as $itemid => $usermacros_data) {
-			$macro_values[$itemid] = array_key_exists($itemid, $macro_values)
-				? array_merge($macro_values[$itemid], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($macro_values as $itemid => $macro_value) {
 			$items[$itemid]['key_expanded'] = self::resolveItemKeyMacros($items[$itemid]['key_expanded'], $macro_value);
@@ -957,7 +941,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = ['usermacros' => true];
 
 		$macro_values = [];
-		$usermacros = [];
+		$macros = ['usermacros' => []];
 
 		foreach ($items as &$item) {
 			$item['description_expanded'] = $item['description'];
@@ -968,15 +952,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$matched_macros = self::extractMacros([$item['description']], $types);
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$itemid] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$itemid] =
+					['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
-		foreach (self::getUserMacros($usermacros) as $itemid => $usermacros_data) {
-			$macro_values[$itemid] = array_key_exists($itemid, $macro_values)
-				? array_merge($macro_values[$itemid], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($macro_values as $itemid => $values) {
 			$items[$itemid]['description_expanded'] = strtr($items[$itemid]['description'], $values);
@@ -1013,8 +994,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => []];
-		$usermacros = [];
+		$macros =
+			['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => [], 'usermacros' => []];
 
 		foreach ($items as $itemid => $item) {
 			$matched_macros = self::extractMacros([$item['widget_description']], $types);
@@ -1028,7 +1009,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$itemid] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$itemid] =
+					['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
@@ -1037,12 +1019,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getItemMacrosByItemId($macros['item'], $macro_values);
 		$macro_values = self::getItemValueMacrosByItemId($macros['item_value'], $macro_values);
 		$macro_values = self::getInventoryMacrosByItemId($macros['inventory'], $macro_values);
-
-		foreach (self::getUserMacros($usermacros) as $itemid => $usermacros_data) {
-			$macro_values[$itemid] = array_key_exists($itemid, $macro_values)
-				? array_merge($macro_values[$itemid], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($macro_values as $itemid => $values) {
 			$items[$itemid]['widget_description'] = strtr($items[$itemid]['widget_description'], $values);
@@ -1070,8 +1047,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'inventory' => []];
-		$usermacros = [];
+		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'usermacros' => []];
 
 		$matched_macros = self::extractMacros($columns, $types);
 
@@ -1087,19 +1063,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
-
-		foreach (self::getUserMacros($usermacros) as $key => $usermacros_data) {
-			$macro_values[$key] = array_key_exists($key, $macro_values)
-				? array_merge($macro_values[$key], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		$data = [];
 
@@ -1130,8 +1101,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 
-		$usermacros = [];
 		$macro_values = [];
+		$macros = ['usermacros' => []];
 
 		// Find macros.
 		foreach ($data as $key => $value) {
@@ -1143,18 +1114,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$matched_macros = self::extractMacros($texts, $types);
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = [
+				$macros['usermacros'][$key] = [
 					'hostids' => array_key_exists('hostid', $value) ? [$value['hostid']] : [],
 					'macros' => $matched_macros['usermacros']
 				];
 			}
 		}
 
-		foreach (self::getUserMacros($usermacros) as $key => $usermacros_data) {
-			$macro_values[$key] = array_key_exists($key, $macro_values)
-				? array_merge($macro_values[$key], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($macro_values as $key => $values) {
 			foreach ($options['sources'] as $source) {
@@ -1179,7 +1146,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = ['usermacros' => true];
 
 		$macro_values = [];
-		$usermacros = [];
+		$macros = ['usermacros' => []];
 
 		foreach ($functions as $key => $function) {
 			$functions[$key]['function_string'] = $function['function'].'('.$function['parameter'].')';
@@ -1193,15 +1160,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$matched_macros = self::extractFunctionMacros($functions[$key]['function_string'], $types);
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = ['hostids' => [$function['hostid']], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$key] =
+					['hostids' => [$function['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
-		foreach (self::getUserMacros($usermacros) as $key => $usermacros_data) {
-			$macro_values[$key] = array_key_exists($key, $macro_values)
-				? array_merge($macro_values[$key], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($macro_values as $key => $values) {
 			$function = self::resolveFunctionMacros($functions[$key]['function_string'], $values);
@@ -1701,7 +1665,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			);
 
 			foreach ($matched_macros['macros'] as $type => $matches) {
-				foreach ($matches as $token => $data) {
+				foreach ($matches as $token => $_data) {
 					$macros[$token] = $data['macros_values'][$type][$token];
 				}
 			}
@@ -1713,14 +1677,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$matched_macros = self::extractMacros($data['texts_support_user_macros'], ['usermacros' => true]);
 
 			$usermacros = [[
-				'macros' => $matched_macros['usermacros'],
-				'hostids' =>  ($data['hostid'] == 0) ? [] : [$data['hostid']]
+				'hostids' => $data['hostid'] == 0 ? [] : [$data['hostid']],
+				'macros' => $matched_macros['usermacros']
 			]];
 
-			$usermacros = self::getUserMacros($usermacros)[0]['macros'];
-			foreach ($usermacros as $macro => $value) {
-				$macros[$macro] = $value;
-			}
+			$macros = array_merge($macros, self::getUserMacros($usermacros, [])[0]);
 		}
 
 		// Extract LLD macros.
@@ -1881,8 +1842,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'user_data' => []];
-		$usermacros = [];
+		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'user_data' => [], 'usermacros' => []];
 
 		foreach ($data as $hostid => $script) {
 			$texts = [];
@@ -1901,7 +1861,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
+				$macros['usermacros'][$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
@@ -1909,12 +1869,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macros['user_data'], $macro_values);
-
-		foreach (self::getUserMacros($usermacros) as $hostid => $usermacros_data) {
-			$macro_values[$hostid] = array_key_exists($hostid, $macro_values)
-				? array_merge($macro_values[$hostid], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($data as $hostid => &$scripts) {
 			if (array_key_exists($hostid, $macro_values)) {
@@ -1991,8 +1946,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['user_data' => [], 'host_n' => [], 'interface_n' => [], 'inventory_n' => []];
-		$usermacros = [];
+		$macros = ['user_data' => [], 'host_n' => [], 'interface_n' => [], 'inventory_n' => [], 'usermacros' => []];
 
 		foreach ($data as $eventid => $script) {
 			$texts = [];
@@ -2091,7 +2045,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$eventid] = [
+				$macros['usermacros'][$eventid] = [
 					'hostids' => array_column($event['hosts'], 'hostid'),
 					'macros' => $matched_macros['usermacros']
 				];
@@ -2106,12 +2060,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getHostNMacros($macros['host_n'], $macro_values, $trigger_hosts_by_f_num);
 		$macro_values = self::getInterfaceNMacros($macros['interface_n'], $macro_values, $trigger_hosts_by_f_num);
 		$macro_values = self::getInventoryNMacros($macros['inventory_n'], $macro_values, $trigger_hosts_by_f_num);
-
-		foreach (self::getUserMacros($usermacros) as $eventid => $usermacros_data) {
-			$macro_values[$eventid] = array_key_exists($eventid, $macro_values)
-				? array_merge($macro_values[$eventid], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
+		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($data as $eventid => &$scripts) {
 			if (array_key_exists($eventid, $macro_values)) {

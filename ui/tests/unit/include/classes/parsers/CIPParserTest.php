@@ -193,6 +193,27 @@ class CIPParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M}.regsub("^([0-9]+)", \1)}', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
+				'{{$M: "context"}.regsub("^([0-9]+)", \1)}', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M: "context"}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
+				'{{$M}.regsub("^([0-9]+)", \1)}TEXT', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
 				'text{$MACRO}', 4, ['v6' => true, 'usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

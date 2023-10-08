@@ -97,6 +97,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['{$USER_URL_MACRO}?a=1',									[],															true],
 			['http://{$USER_URL_MACRO}?a=1',							[],															true],
 			['http://{$USER_URL_MACRO}',								[],															true],
+			['http://{{$M}.regsub("(.*)", \1)}',						[],															true],
 			['http://{{{$USER_URL_MACRO}',								[],															true],
 			['http://{$MACRO{$MACRO}}',									[],															true],
 			['{$MACRO{',												[],															true],

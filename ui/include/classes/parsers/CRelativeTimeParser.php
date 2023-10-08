@@ -32,9 +32,10 @@ class CRelativeTimeParser extends CParser {
 	 */
 	private $tokens;
 
-	private $user_macro_parser;
-	private $lld_macro_parser;
-	private $lld_macro_function_parser;
+	/**
+	 * @var array
+	 */
+	private $macro_parsers = [];
 
 	/**
 	 * An options array.
@@ -57,11 +58,10 @@ class CRelativeTimeParser extends CParser {
 		$this->options = $options + $this->options;
 
 		if ($this->options['usermacros']) {
-			$this->user_macro_parser = new CUserMacroParser();
+			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 	}
 
@@ -188,22 +188,16 @@ class CRelativeTimeParser extends CParser {
 	 * @return bool
 	 */
 	private function parseMacros($source, &$pos) {
-		if ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
-			$pos += $this->user_macro_parser->length;
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
-			$pos += $this->lld_macro_parser->length;
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
-			$pos += $this->lld_macro_function_parser->length;
-		}
-		else {
-			return false;
+		foreach ($this->macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+				$pos += $macro_parser->getLength();
+				return true;
+			}
 		}
 
-		return true;
+		return false;
 	}
+
 	/**
 	 * Returns an array of tokens.
 	 *

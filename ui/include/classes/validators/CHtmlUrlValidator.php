@@ -83,11 +83,13 @@ class CHtmlUrlValidator {
 		}
 
 		if ($options['allow_user_macro'] === true) {
-			$user_macro_parser = new CUserMacroParser();
+			$macro_parsers = [new CUserMacroParser, new CUserMacroFunctionParser];
 
 			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
-				if ($user_macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
-					return true;
+				foreach ($macro_parsers as $macro_parser) {
+					if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
+						return true;
+					}
 				}
 			}
 		}

@@ -573,25 +573,24 @@ class CExpressionParser extends CParser {
 		}
 
 		if ($options['usermacros']) {
-			$user_macro_parser = new CUserMacroParser();
+			if (self::parseUsing(new CUserMacroParser, $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
+				return true;
+			}
 
-			if (self::parseUsing($user_macro_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CUserMacroFunctionParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
 				return true;
 			}
 		}
 
 		if ($options['lldmacros']) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if (self::parseUsing($lld_macro_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CLLDMacroParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
 				return true;
 			}
 
-			$lld_macro_function_parser = new CLLDMacroFunctionParser();
-
-			if (self::parseUsing($lld_macro_function_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CLLDMacroFunctionParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
 				return true;
 			}
@@ -841,15 +840,11 @@ class CExpressionParser extends CParser {
 			}
 
 			if ($allow_macros) {
-				$user_macro_parser = new CUserMacroParser();
-				$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
-				$lld_macro_parser = new CLLDMacroParser();
-				$lld_macro_function_parser = new CLLDMacroFunctionParser;
-
-				if ($user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-						|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
-						|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-						|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				if ((new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]))->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CUserMacroParser)->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CUserMacroFunctionParser)->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CLLDMacroParser)->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CLLDMacroFunctionParser)->parse($value) == CParser::PARSE_SUCCESS) {
 					return $value;
 				}
 			}

@@ -148,6 +148,20 @@ class CDnsParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M}.regsub("^([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
+				'{{$M: "context"}.regsub("^([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M: "context"}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
 				'&&&&zabbix.com{$MACRO2}', 4, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

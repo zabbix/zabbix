@@ -411,6 +411,11 @@ class CFilterParser extends CParser {
 			return true;
 		}
 
+		if ($options['usermacros'] && self::parseUsing(new CUserMacroFunctionParser(), $source, $pos, $tokens,
+				self::TOKEN_TYPE_USER_MACRO)) {
+			return true;
+		}
+
 		if ($options['lldmacros'] && self::parseUsing(new CLLDMacroParser(), $source, $pos, $tokens,
 				self::TOKEN_TYPE_LLD_MACRO)) {
 			return true;

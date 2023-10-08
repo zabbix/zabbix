@@ -250,42 +250,42 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/31'
 				],
-				'Invalid action condition: invalid address range "192.168.0.0/31".'
+				'Invalid action condition: incorrect address starting from "/31".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/16-30'
 				],
-				'Invalid action condition: invalid address range "192.168.0.0/16-30".'
+				'Invalid action condition: incorrect address starting from "-30".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80:0:0:0:0:0:c0a8:0/129'
 				],
-				'Invalid action condition: invalid address range "fe80:0:0:0:0:0:c0a8:0/129".'
+				'Invalid action condition: incorrect address starting from "/129".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80::c0a8:0/129'
 				],
-				'Invalid action condition: invalid address range "fe80::c0a8:0/129".'
+				'Invalid action condition: incorrect address starting from "/129".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.443.0/432'
 				],
-				'Invalid action condition: invalid address range "192.168.443.0/432".'
+				'Invalid action condition: incorrect address starting from "192.168.443.0/432".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '{$A}'
 				],
-				'Invalid action condition: invalid address range "{$A}".'
+				'Invalid action condition: incorrect address starting from "{$A}".'
 			],
 			[[],
 				[
