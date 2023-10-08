@@ -21,7 +21,7 @@ package filemonitor
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/itemutil"
@@ -32,7 +32,7 @@ import (
 
 type watchRequest struct {
 	clientid uint64
-	targets  []*plugin.Request
+	items    []*plugin.Item
 	output   plugin.ResultWriter
 }
 
@@ -59,12 +59,12 @@ func (p *Plugin) run() {
 			if r == nil {
 				return
 			}
-			p.manager.Update(r.clientid, r.output, r.targets)
+			p.manager.Update(r.clientid, r.output, r.items)
 		case event := <-p.watcher.Events:
 			if event.Op&fsnotify.Write == fsnotify.Write {
 				var b []byte
 				var v interface{}
-				if b, v = ioutil.ReadFile(event.Name); v == nil {
+				if b, v = os.ReadFile(event.Name); v == nil {
 					v = b
 				}
 				if es, ok := p.eventSources[event.Name]; ok {
@@ -75,8 +75,8 @@ func (p *Plugin) run() {
 	}
 }
 
-func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
-	p.input <- &watchRequest{clientid: ctx.ClientID(), targets: requests, output: ctx.Output()}
+func (p *Plugin) Watch(items []*plugin.Item, ctx plugin.ContextProvider) {
+	p.input <- &watchRequest{clientid: ctx.ClientID(), items: items, output: ctx.Output()}
 }
 
 func (p *Plugin) Start() {

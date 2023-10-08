@@ -252,7 +252,7 @@ else {
 		$select_filter_hostid = (new CSelect('filter_templateid'))
 			->setValue($data['filter']['hostids'])
 			->setFocusableElementId('filter-templateid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($templates as $templateid => $template) {
 			$select_filter_hostid->addOption(new CSelectOption($templateid, $template['name']));
@@ -295,7 +295,7 @@ else {
 		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
 			->setValue($data['filter']['tpl_triggerid'])
 			->setFocusableElementId('tpl-triggerid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		$tpl_triggerids = [];
 
@@ -322,7 +322,7 @@ else {
 		$select_hostgroupid = (new CSelect('hostgroupid'))
 			->setValue($data['filter']['hostgroupid'])
 			->setFocusableElementId('hostgroupid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($host_groups as $groupid => $group) {
 			$select_hostgroupid->addOption(new CSelectOption($groupid, $group['name']));
@@ -379,7 +379,7 @@ else {
 			->setAttribute('autofocus', 'autofocus')
 			->setValue($data['filter']['groups'])
 			->setFocusableElementId('filter-groups')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($groups as $groupid => $group) {
 			$select_filter_groupid->addOption(new CSelectOption($groupid, $group['name']));

@@ -79,37 +79,37 @@ class testDashboardGeomapWidget extends CWebTest {
 							'fields' => [
 								[
 									'type' => '2',
-									'name' => 'groupids',
+									'name' => 'groupids.0',
 									'value' => '4'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.0',
 									'value' => '15001'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.1',
 									'value' => '99136'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.2',
 									'value' => '15003'
 								],
 								[
 									'type' => '1',
-									'name' => 'tags.tag.0',
+									'name' => 'tags.0.tag',
 									'value' => 'tag1'
 								],
 								[
 									'type' => '0',
-									'name' => 'tags.operator.0',
+									'name' => 'tags.0.operator',
 									'value' => '0'
 								],
 								[
 									'type' => '1',
-									'name' => 'tags.value.0',
+									'name' => 'tags.0.value',
 									'value' => 'value1'
 								],
 								[
@@ -422,10 +422,7 @@ class testDashboardGeomapWidget extends CWebTest {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form->fill(['Type' => 'Geomap']);
-
-		// After changing "Source", the overlay is reloaded.
-		$form->invalidate();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Geomap')]);
 		$form->fill($data['fields']);
 
 		if (array_key_exists('show_header', $data)) {

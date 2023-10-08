@@ -25,8 +25,7 @@ use Zabbix\Widgets\CWidgetForm;
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
-	CWidgetFieldNavTree,
-	CWidgetFieldReference
+	CWidgetFieldNavTree
 };
 
 /**
@@ -36,9 +35,6 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldReference()
-			)
 			->addField(
 				new CWidgetFieldNavTree('navtree')
 			)
