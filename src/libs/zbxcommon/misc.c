@@ -245,7 +245,7 @@ void	zbx_print_usage(const char **usage_message)
 	const char	**p = usage_message;
 
 	if (NULL != *p)
-		printf("usage:\n");
+		printf("Usage:\n");
 
 	while (NULL != *p)
 	{
