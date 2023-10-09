@@ -7,6 +7,9 @@ New features:
 .......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
+A......... [ZBX-23373] fixed result for script.get API call with selectActions option (epulke)
+...G...... [ZBX-23014] fixed Zabbix agent build on HP-UX (arimdjonoks)
 .........T [ZBX-23164] added timespan parameter in JavaScript Cisco Meraki template (egordymov)
 ..F....... [ZBX-23455] fixed inconsistency in button naming, confirmation messages, success and error messages in item and web scenario list pages (dpetra)
 ...G...... [ZBX-20038] fixed master host parameter for MySQL replication.get_slave_status key in Zabbix agent 2 (esneiders)
