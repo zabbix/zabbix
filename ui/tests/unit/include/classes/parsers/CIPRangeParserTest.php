@@ -69,6 +69,14 @@ class CIPRangeParserTest extends TestCase {
 				]
 			],
 			[
+				'Zabbix server', [], [
+					'rc' => false,
+					'error' => 'incorrect address starting from "server"',
+					'max_ip_count' => '0',
+					'max_ip_range' => ''
+				]
+			],
+			[
 				'0.0.0.0/0', [], [
 					'rc' => true,
 					'error' => '',
