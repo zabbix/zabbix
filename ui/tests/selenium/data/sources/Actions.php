@@ -45,18 +45,20 @@ class Actions {
 				'operations' => [
 					[
 						'operationtype' => CONDITION_TYPE_HOST_GROUP,
-						'opmessage' => ['mediatypeid' => 0],
+						'opmessage' => ['mediatypeid' => 1],
 						'opmessage_usr' => [['userid' => 1]]
 					]
 				],
 				'recovery_operations' => [
 					[
-						'operationtype' => OPERATION_TYPE_RECOVERY_MESSAGE,
+						'operationtype' => OPERATION_TYPE_MESSAGE,
 						'opmessage' => [
 							'default_msg' => 0,
 							'subject' => 'Subject',
-							'message' => 'Message'
-						]
+							'message' => 'Message',
+							'mediatypeid' => 1
+						],
+						'opmessage_usr' => [['userid' => 1]]
 					]
 				],
 				'update_operations' => [
@@ -277,13 +279,13 @@ class Actions {
 							'default_msg' => 0,
 							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
 							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
-							'mediatypeid' => 0
+							'mediatypeid' => 1
 						],
 						'opmessage_grp' => [['usrgrpid' => 7]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 0],
+						'opmessage' => ['mediatypeid' => 1],
 						'opmessage_grp' => [['usrgrpid' => 7]]
 					],
 					[
@@ -337,13 +339,13 @@ class Actions {
 							'default_msg' => 0,
 							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
 							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
-							'mediatypeid' => 0
+							'mediatypeid' => 1
 						],
 						'opmessage_grp' => [['usrgrpid' => 7]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 0],
+						'opmessage' => ['mediatypeid' => 1],
 						'opmessage_grp' => [['usrgrpid' => 7]]
 					],
 					[
@@ -403,7 +405,7 @@ class Actions {
 
 		CDataHelper::call('service.create', [
 			[
-				'name' => 'Reference service',
+				'name' => 'Ф',
 				'algorithm' => 1,
 				'sortorder' => 1
 			]
