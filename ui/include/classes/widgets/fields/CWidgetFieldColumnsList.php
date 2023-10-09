@@ -173,7 +173,6 @@ class CWidgetFieldColumnsList extends CWidgetField {
 											['else' => true,
 												'type' => API_STRING_UTF8]
 			]],
-			'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
 			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
 			'time_period'			=> ['type' => API_ANY],
 			'display'				=> ['type' => API_MULTIPLE, 'rules' => [

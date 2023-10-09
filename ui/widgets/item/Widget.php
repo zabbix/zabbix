@@ -53,17 +53,4 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Item value');
 	}
-
-	/**
-	 * Checks if a given set of field values indicates the use of dashboard time selector.
-
-	 * @param array $fields_values An associative array of field values.
-	 *
-	 * @return bool Returns true if the time selector should be used; otherwise, returns false.
-	 */
-	public function usesTimeSelector(array $fields_values): bool {
-		return (array_key_exists('aggregate_function', $fields_values)
-				&& $fields_values['aggregate_function'] != AGGREGATE_NONE)
-			&& !WidgetForm::hasOverrideTime($fields_values);
-	}
 }
