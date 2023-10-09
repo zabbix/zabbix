@@ -817,7 +817,7 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) isTimeoutManagerByPlugin(requestKey string) (bool, error) {
+func (m *Manager) isTimeoutManagedByPlugin(requestKey string) (bool, error) {
 	realKey := m.aliases.Get(requestKey)
 	key, _, err := itemutil.ParseKey(realKey)
 	if err != nil {
@@ -839,7 +839,7 @@ func (m *Manager) PerformTask(
 	var lastLogsize uint64
 	var mtime int
 
-	overrideTimeout, err := m.isTimeoutManagerByPlugin(key)
+	overrideTimeout, err := m.isTimeoutManagedByPlugin(key)
 	if err != nil {
 		return "", err
 	}
