@@ -106,6 +106,7 @@
 
 			ZABBIX.Dashboard.broadcast({
 				_hostid: dashboard_host !== null ? dashboard_host.id : null,
+				_hostids: dashboard_host !== null ? [dashboard_host.id] : null,
 				_timeperiod: {
 					from: dashboard_time_period.from,
 					from_ts: dashboard_time_period.from_ts,
@@ -411,7 +412,10 @@
 
 				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
-				ZABBIX.Dashboard.broadcast({_hostid: host !== null ? host.id : null});
+				ZABBIX.Dashboard.broadcast({
+					_hostid: host !== null ? host.id : null,
+					_hostids: host !== null ? [host.id] : null
+				});
 			},
 
 			dashboardHostChange() {
@@ -436,7 +440,10 @@
 
 				history.pushState({host: host}, '', curl.getUrl());
 
-				ZABBIX.Dashboard.broadcast({_hostid: host !== null ? host.id : null});
+				ZABBIX.Dashboard.broadcast({
+					_hostid: host !== null ? host.id : null,
+					_hostids: host !== null ? [host.id] : null
+				});
 
 				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
 			},

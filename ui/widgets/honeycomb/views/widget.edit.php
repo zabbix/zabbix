@@ -35,14 +35,17 @@ $groupids = array_key_exists('groupids', $data['fields'])
 
 $form
 	->addField($groupids)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
+	->addField($data['templateid'] === null
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+		: null
+	)
+	->addField(array_key_exists('evaltype_host', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['evaltype_host'])
+		: null
 	)
 	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['evaltype_host'])
-	)
-	->addField(array_key_exists('host_tags', $data['fields'])
+		array_key_exists('host_tags', $data['fields'])
 		? new CWidgetFieldTagsView($data['fields']['host_tags'])
 		: null
 	)
@@ -76,10 +79,6 @@ $form
 			->addFieldsGroup(
 				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('js-row-thresholds')
 			)
-	)
-	->addField($data['templateid'] === null
-		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
-		: null
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_honeycomb_form.init('.json_encode([

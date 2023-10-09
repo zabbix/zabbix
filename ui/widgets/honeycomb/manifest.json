@@ -13,7 +13,23 @@
       "width": 8,
       "height": 5
     },
-    "js_class": "CWidgetHoneycomb"
+    "js_class": "CWidgetHoneycomb",
+    "in": {
+      "hostids": {
+        "type": "_hostids"
+      },
+      "groupids": {
+        "type": "_hostgroupids"
+      }
+    },
+    "out": [
+      {
+        "type": "_hostid"
+      },
+      {
+        "type": "_itemid"
+      }
+    ]
   },
   "actions": {
     "widget.honeycomb.view": {

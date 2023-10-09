@@ -80,6 +80,7 @@
 
 			ZABBIX.Dashboard.broadcast({
 				_hostid: null,
+				_hostids: null,
 				_timeperiod: {
 					from: dashboard_time_period.from,
 					from_ts: dashboard_time_period.from_ts,

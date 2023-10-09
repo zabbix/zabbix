@@ -37,6 +37,7 @@ use Zabbix\Widgets\{
 	Fields\CWidgetFieldThresholds
 };
 
+use CWidgetsData;
 use Widgets\Honeycomb\Widget;
 
 /**
@@ -59,9 +60,16 @@ class WidgetForm extends CWidgetForm {
 				? null
 				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+			->addField(
+				(new CWidgetFieldMultiSelectHost('hostids', _('Hosts')))
+					->setDefault($this->isTemplateDashboard()
+						? [
+							CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+								CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_HOST_IDS
+							)
+						]
+						: CWidgetFieldMultiSelectHost::DEFAULT_VALUE
+					)
 			)
 			->addField($this->isTemplateDashboard()
 				? null
@@ -76,10 +84,10 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldMultiSelectItem('itemids', _('Item pattern')))
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: (new CWidgetFieldRadioButtonList('evaltype_item', _('Item tags'), [
+			->addField(
+				(new CWidgetFieldRadioButtonList('evaltype_item', _('Item tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
@@ -92,7 +100,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox(
 					'maintenance',
 					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
-				))->setDefault(1)
+				))->setDefault(0)
 			)
 			->addField(
 				(new CWidgetFieldCheckBoxList('show', _('Show'), [
@@ -104,7 +112,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextArea('primary', _('Primary label')))
-					->setDefault('{ITEM.NAME}')
+					->setDefault('{HOST.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
@@ -125,7 +133,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextArea('secondary', _('Secondary label')))
-					->setDefault('{ITEM.NAME}')
+					->setDefault('{ITEM.LASTVALUE}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
@@ -148,13 +156,22 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				new CWidgetFieldCheckBox('interpolation', _('Color interpolation'))
+				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))->setDefault(1)
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
-			)
-			->addField(
-				new CWidgetFieldMultiSelectOverrideHost()
 			);
+	}
+
+	public function validate(bool $strict = false): array {
+		if ($strict && $this->isTemplateDashboard()) {
+			$this->getField('hostids')->setValue([
+				CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+					CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_HOST_IDS
+				)
+			]);
+		}
+
+		return parent::validate($strict);
 	}
 }
