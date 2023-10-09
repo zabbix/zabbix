@@ -44,30 +44,59 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 	}
 
 	public function doAction() {
-		$form_refresh = $this->hasInput('form_refresh');
-		$form = $form_refresh || !$this->hasInput('itemid') ? $this->getInputForForm() : $this->getItem();
-		$itemid = $this->hasInput('itemid') ? $this->getInput('itemid') : $this->getInput('parent_discoveryid');
-		$host = $this->getInput('context') === 'host' ? $this->getHost($itemid) : $this->getTemplate($itemid);
-		$form['hostid'] = $host['hostid'];
+		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
+		$inherited_timeouts = [];
+		$item = $this->getItemPrototype();
+
+		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
+			$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
+
+			if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
+				$item['timeout'] = $item['inherited_timeout'];
+			}
+		}
+
+		$set_inventory = array_column(API::Item()->get([
+			'output' => ['inventory_link'],
+			'hostids' => [$item['hostid']],
+			'nopermissions' => true
+		]), 'inventory_link', 'inventory_link');
+		$inventory_fields = [];
+
+		foreach (getHostInventories() as $inventory_field) {
+			$inventory_fields[$inventory_field['nr']] = [
+				'label' => $inventory_field['title'],
+				'disabled' => array_key_exists($inventory_field['nr'], $set_inventory)
+			];
+		};
+
+		$value_type_keys = [];
+		$key_value_type = CItemData::getValueTypeByKey();
+
+		foreach (CItemData::getKeysByItemType() as $type => $keys) {
+			foreach ($keys as $key) {
+				$value_type = $key_value_type[$key];
+				$value_type_keys += [$type => []];
+				$value_type_keys[$type][$key] = $value_type;
+			}
+		}
+
 		$data = [
-			'readonly' => false,
+			'item' => $item,
 			'host' => $host,
-			'valuemap' => [],
-			'inventory_fields' => [],
-			'form' => $form,
-			'form_refresh' => $form_refresh,
-			'parent_items' => [],
-			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-			'discovery_rule' => [],
-			'discovery_itemid' => 0,
-			'master_item' => [],
-			'types' => item_type2str(),
+			'readonly' => (bool) $item['templateid'],
+			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
+			'inherited_timeouts' => $inherited_timeouts,
 			'interface_types' => itemTypeInterface(),
+			'inventory_fields' => $inventory_fields,
+			'value_type_keys' => $value_type_keys,
 			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 			'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES,
-			'inherited_timeouts' => [],
-			'can_edit_source_timeouts' => false,
+			'can_edit_source_timeouts' => $host['proxyid']
+				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL),
 			'config' => [
 				'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
@@ -77,98 +106,6 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			],
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
-		unset($data['types'][ITEM_TYPE_HTTPTEST]);
-
-		if ($data['form']['valuemapid']) {
-			$valuemap = API::ValueMap()->get([
-				'output' => ['valuemapid', 'name', 'hostid'],
-				'valuemapids' => [$data['form']['valuemapid']]
-			]);
-
-			if ($valuemap) {
-				$valuemap = reset($valuemap);
-
-				if (!$data['form']['templateid'] && bccomp($valuemap['hostid'], $host['hostid']) != 0) {
-					$valuemap = API::ValueMap()->get([
-						'output' => ['valuemapid', 'name'],
-						'hostids' => [$host['hostid']],
-						'filter' => ['name' => $valuemap['name']]
-					]);
-					$valuemap = $valuemap ? reset($valuemap) : [];
-				}
-
-				$data['valuemap'] = CArrayHelper::renameKeys($valuemap, ['valuemapid' => 'id']);
-			}
-			else {
-				$data['valuemapid'] = DB::getDefault('items', 'valuemapid');
-			}
-		}
-
-		if ($data['form']['master_itemid']) {
-			$master_items = API::Item()->get([
-				'output' => ['itemid', 'name'],
-				'itemids' => [$data['form']['master_itemid']],
-				'webitems' => true
-			]);
-
-			if (!$master_items) {
-				$master_items = API::ItemPrototype()->get([
-					'output' => ['itemid', 'name'],
-					'itemids' => [$data['form']['master_itemid']]
-				]);
-			}
-
-			$data['master_item'] = $master_items ? reset($master_items) : [];
-		}
-
-		if ($data['form']['itemid']) {
-			$item = [
-				'itemid' => $data['form']['itemid'],
-				'templateid' => $data['form']['templateid']
-			];
-			$data['parent_items'] = makeItemTemplatesHtml(
-				$item['itemid'],
-				getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
-				ZBX_FLAG_DISCOVERY_PROTOTYPE,
-				$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-			);
-			[$db_item] = API::ItemPrototype()->get([
-				'output' => ['flags'],
-				'selectDiscoveryRule' => ['name', 'templateid'],
-				'itemids' => [$data['form']['itemid']]
-			]);
-
-			if ($db_item) {
-				$data['flags'] = $db_item['flags'];
-				$data['discovery_rule'] = $db_item['discoveryRule'];
-			}
-		}
-
-		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-			$data['inherited_timeouts'] = getInheritedTimeouts($host['proxyid'])['timeouts'];
-			$data['inherited_timeout'] = $timeout_config['timeouts'][$data['form']['type']] ?? '';
-			$data['can_edit_source_timeouts'] = $host['proxyid']
-				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
-				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
-
-			if (!$form_refresh && $data['form']['timeout'] === DB::getDefault('items', 'timeout')) {
-				$data['form']['timeout'] = $data['inherited_timeout'];
-			}
-		}
-
-		$data['value_type_keys'] = [];
-		$key_value_type = CItemData::getValueTypeByKey();
-		foreach (CItemData::getKeysByItemType() as $type => $keys) {
-			foreach ($keys as $key) {
-				$value_type = $key_value_type[$key];
-				$data['value_type_keys'] += [$type => []];
-				$data['value_type_keys'][$type][$key] = $value_type;
-			}
-		}
-
-		if ($data['form']['templateid']) {
-			$data['readonly'] = true;
-		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Item prototype'));
@@ -217,23 +154,35 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		return $template;
 	}
 
-	protected function getItem(): array {
-		[$item] = API::ItemPrototype()->get([
-			'itemids' => $this->getInput('itemid'),
-			'output' => [
-				'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
-				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid',
-				'description', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
-				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
-				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'discover'
-			],
-			'selectDiscoveryRule' => ['itemid', 'templateid'],
-			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-			'selectTags' => ['tag', 'value']
-		]);
-		$item = CItemPrototypeHelper::convertApiInputForForm($item);
+	/**
+	 * Get item prototype data.
+	 */
+	protected function getItemPrototype(): array {
+		$item = [];
+
+		if ($this->hasInput('itemid')) {
+			$item = API::ItemPrototype()->get([
+				'itemids' => $this->getInput('itemid'),
+				'output' => [
+					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid',
+					'description', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
+					'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
+					'verify_host', 'allow_traps', 'discover'
+				],
+				'selectDiscoveryRule' => ['itemid', 'templateid'],
+				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+				'selectTags' => ['tag', 'value']
+			]);
+			$item = $item ? CItemPrototypeHelper::convertApiInputForForm(reset($item)) : [];
+		}
+
+		if (!$item) {
+			$item = CItemPrototypeHelper::getDefaults();
+		}
+
 		$item['context'] = $this->getInput('context');
 
 		return $item;

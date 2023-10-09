@@ -22,6 +22,78 @@
 class CItemGeneralHelper {
 
 	/**
+	 * Get item fields default values.
+	 */
+	public static function getDefaults(): array {
+		return [
+			'allow_traps' => DB::getDefault('items', 'allow_traps'),
+			'authtype' => DB::getDefault('items', 'authtype'),
+			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
+			'delay_flex' => [],
+			'delay' => ZBX_ITEM_DELAY_DEFAULT,
+			'description' => DB::getDefault('items', 'description'),
+			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+			'headers' => [],
+			'history_mode' => ITEM_STORAGE_CUSTOM,
+			'history' => DB::getDefault('items', 'history'),
+			'hostid' => 0,
+			'http_authtype' => ZBX_HTTP_AUTH_NONE,
+			'http_password' => '',
+			'http_proxy' => DB::getDefault('items', 'http_proxy'),
+			'http_username' => '',
+			'interfaceid' => 0,
+			'inventory_link' => 0,
+			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
+			'itemid' => 0,
+			'jmx_endpoint' => ZBX_DEFAULT_JMX_ENDPOINT,
+			'key' => '',
+			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
+			'master_itemid' => 0,
+			'master_item' => [],
+			'name' => '',
+			'output_format' => DB::getDefault('items', 'output_format'),
+			'parameters' => [],
+			'params' => [],
+			'params_ap' => DB::getDefault('items', 'params'),
+			'params_es' => DB::getDefault('items', 'params'),
+			'params_f' => DB::getDefault('items', 'params'),
+			'parent_items' => [],
+			'password' => DB::getDefault('items', 'password'),
+			'post_type' => DB::getDefault('items', 'post_type'),
+			'posts' => DB::getDefault('items', 'posts'),
+			'preprocessing' => [],
+			'privatekey' => DB::getDefault('items', 'privatekey'),
+			'publickey' => DB::getDefault('items', 'publickey'),
+			'query_fields' => [],
+			'request_method' => DB::getDefault('items', 'request_method'),
+			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
+			'script' => DB::getDefault('items', 'params'),
+			'show_inherited_tags' => 0,
+			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
+			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
+			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
+			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
+			'status_codes' => DB::getDefault('items', 'status_codes'),
+			'status' => DB::getDefault('items', 'status'),
+			'tags' => [],
+			'templateid' => 0,
+			'timeout' => DB::getDefault('items', 'timeout'),
+			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
+			'trends_mode' => ITEM_STORAGE_CUSTOM,
+			'trends' => DB::getDefault('items', 'trends'),
+			'type' => DB::getDefault('items', 'type'),
+			'units' => DB::getDefault('items', 'units'),
+			'url' => '',
+			'username' => DB::getDefault('items', 'username'),
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'valuemapid' => 0,
+			'valuemap' => [],
+			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'verify_peer' => DB::getDefault('items', 'verify_peer')
+		];
+	}
+	/**
 	 * Add inherited from host and template tags to item tags.
 	 *
 	 * @param int   $item_tags['itemid']
@@ -129,6 +201,10 @@ class CItemGeneralHelper {
 		unset($step);
 
 		$item += [
+			'valuemap' => [],
+			'master_item' => [],
+			'templated' => (bool) $item['templateid'],
+			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'http_authtype' => ZBX_HTTP_AUTH_NONE,
 			'http_username' => '',
 			'http_password' => '',
@@ -191,6 +267,69 @@ class CItemGeneralHelper {
 
 		if ($item['tags']) {
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
+		}
+
+		if ($item['valuemapid']) {
+			$valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name', 'hostid'],
+				'valuemapids' => [$item['valuemapid']]
+			]);
+			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
+		}
+
+		if ($item['master_itemid']) {
+			$master_item = API::Item()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $item['master_itemid'],
+				'webitems' => true
+			]);
+			$item['master_item'] = $master_item ? reset($master_item) : [];
+		}
+
+		$item['parent_items'] = makeItemTemplatesHtml(
+			$item['itemid'],
+			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
+			ZBX_FLAG_DISCOVERY_NORMAL,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
+		return $item;
+	}
+
+	/**
+	 * Set item delay and delay_flex properties.
+	 *
+	 * @param CUpdateIntervalParser $parser
+	 * @param array                 $item
+	 */
+	public static function addDelayWithFlexibleIntervals(CUpdateIntervalParser $parser, array $item): array {
+		$item['delay_flex'] = [];
+		$item['delay'] = $parser->getDelay();
+
+		if ($item['delay'][0] !== '{') {
+			$delay = timeUnitToSeconds($item['delay']);
+
+			if ($delay == 0 && ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
+					|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+						&& strncmp($item['key'], 'mqtt.get', 8) == 0))) {
+				$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			}
+		}
+
+		foreach ($parser->getIntervals() as $interval) {
+			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
+				$item['delay_flex'][] = [
+					'delay' => $interval['update_interval'],
+					'period' => $interval['time_period'],
+					'type' => ITEM_DELAY_FLEXIBLE
+				];
+			}
+			else {
+				$item['delay_flex'][] = [
+					'schedule' => $interval['interval'],
+					'type' => ITEM_DELAY_SCHEDULING
+				];
+			}
 		}
 
 		return $item;

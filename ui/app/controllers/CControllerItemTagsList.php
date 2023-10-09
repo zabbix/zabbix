@@ -54,7 +54,12 @@ class CControllerItemTagsList extends CController {
 	}
 
 	protected function doAction() {
-		$item = [];
+		$item = [
+			'itemid' => 0,
+			'templateid' => 0,
+			'hostid' => $this->getInput('hostid', 0),
+			'flag' => ZBX_FLAG_DISCOVERY_NORMAL
+		];
 		$data = [
 			'tags' => [],
 			'show_inherited_tags' => 0,
@@ -95,10 +100,7 @@ class CControllerItemTagsList extends CController {
 			$data['tags'] = CItemHelper::addInheritedTags($item, $data['tags']);
 		}
 
-		if (!$data['tags']) {
-			$data['tags'][] = ['tag' => '', 'value' => '', 'type' => ZBX_PROPERTY_OWN];
-		}
-
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 		$this->setResponse(new CControllerResponseData($data));
 	}
 }

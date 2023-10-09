@@ -27,9 +27,9 @@
 $dir = '/../../include/views/js/';
 $scripts = [
 	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
-	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['form']['hostid']], $dir)
+	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['item']['hostid']], $dir)
 ];
-$item = $data['form'];
+$item = $data['item'];
 $value_types = [
 	ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
@@ -154,32 +154,24 @@ else {
 
 $tabsid = 'items-tab';
 $tabs = (new CTabView(['id' => $tabsid]))
+	->setSelected(0)
 	->addTab('item-tab', _('Item'),
 		new CPartial('item.edit.item.tab', [
 			'can_edit_source_timeouts' => $data['can_edit_source_timeouts'],
 			'config' => $data['config'],
-			'discovered' => $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
-			'discovery_rule' => $data['discovery_rule'],
-			'discovery_itemid' => $data['discovery_itemid'],
-			'form' => $item,
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
-			'inherited_timeout' => $data['inherited_timeout'],
 			'inventory_fields' => $data['inventory_fields'],
-			'master_item' => $data['master_item'],
-			'parent_items' => $data['parent_items'],
-			'proxyid' => $data['host']['proxyid'],
-			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'item' => $item,
 			'source' => 'item',
 			'types' => $data['types'],
-			'valuemap' => $data['valuemap'],
 			'value_types' => $value_types,
 			'type_with_key_select' => $type_with_key_select
 		])
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'readonly' => $item['discovered'],
 			'show_inherited_tags' => $item['show_inherited_tags'],
 			'source' => 'item',
 			'tabs_id' => $tabsid,
@@ -190,18 +182,14 @@ $tabs = (new CTabView(['id' => $tabsid]))
 	)
 	->addTab('processing-tab', _('Preprocessing'),
 		new CPartial('item.edit.preprocessing.tab', [
-			'form' => $item,
+			'item' => $item,
 			'preprocessing' => $item['preprocessing'],
 			'preprocessing_types' => $data['preprocessing_types'],
-			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'readonly' => $item['templated'] || $item['discovered'],
 			'value_types' => $value_types
 		]),
 		TAB_INDICATOR_PREPROCESSING
 	);
-
-if (!$data['form_refresh']) {
-	$tabs->setSelected(0);
-}
 
 $form
 	->addItem($tabs)
@@ -217,7 +205,7 @@ $form
 			'host' => $data['host'],
 			'inherited_timeouts' => $data['inherited_timeouts'],
 			'interface_types' => $data['interface_types'],
-			'readonly' => $data['readonly'],
+			'readonly' => $item['templated'] || $item['discovered'],
 			'source' => 'item',
 			'testable_item_types' => $data['testable_item_types'],
 			'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
@@ -226,7 +214,7 @@ $form
 		]).');'))->setOnDocumentReady()
 	);
 $output = [
-	'header' => $data['form']['itemid'] ? _('Item') : _('New item'),
+	'header' => $data['item']['itemid'] ? _('Item') : _('New item'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,

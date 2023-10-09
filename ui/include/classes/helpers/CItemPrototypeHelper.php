@@ -28,7 +28,6 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 */
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
-		$item['delay_flex'] = [];
 		$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
@@ -36,36 +35,11 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 		]);
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
-			$item['delay'] = $update_interval_parser->getDelay();
-
-			if ($item['delay'][0] !== '{') {
-				$delay = timeUnitToSeconds($item['delay']);
-
-				if ($delay == 0 && ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-						|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-							&& strncmp($item['key'], 'mqtt.get', 8) == 0))) {
-					$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
-				}
-			}
-
-			foreach ($update_interval_parser->getIntervals() as $interval) {
-				if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-					$item['delay_flex'][] = [
-						'delay' => $interval['update_interval'],
-						'period' => $interval['time_period'],
-						'type' => ITEM_DELAY_FLEXIBLE
-					];
-				}
-				else {
-					$item['delay_flex'][] = [
-						'schedule' => $interval['interval'],
-						'type' => ITEM_DELAY_SCHEDULING
-					];
-				}
-			}
+			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
 		}
 		else {
 			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			$item['delay_flex'] = [];
 		}
 
 		return $item;

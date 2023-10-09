@@ -94,14 +94,12 @@ abstract class CControllerItem extends CController {
 			'inventory_link'		=> 'db items.inventory_link',
 			'description'			=> 'db items.description',
 			'status'				=> 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
-			'show_inherited_tags'	=> 'in 0,1',
 			'tags'					=> 'array',
 			'preprocessing'			=> 'array',
 			'context'				=> 'required|in host,template',
 			'hostid'				=> 'id',
 			'itemid'				=> 'id',
-			'templateid'			=> 'id',
-			'form_refresh'			=> 'in 1'
+			'templateid'			=> 'id'
 		];
 
 		foreach ($required_fields as $field) {

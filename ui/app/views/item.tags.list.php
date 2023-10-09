@@ -24,6 +24,10 @@
  * @var array $data
  */
 
+if (!$data['tags']) {
+	$data['tags'][] = ['tag' => '', 'value' => '', 'type' => ZBX_PROPERTY_OWN];
+}
+
 $output = [
 	'body' => (new CPartial('tags.list.html', $data))->getOutput()
 ];

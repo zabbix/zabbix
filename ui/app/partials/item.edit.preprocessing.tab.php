@@ -42,7 +42,7 @@ $formgrid = (new CFormGrid())
 			->addClass('js-item-preprocessing-type'),
 		(new CFormField((new CSelect('value_type_steps'))
 			->setFocusableElementId('label-value-type-steps')
-			->setValue($data['form']['value_type'])
+			->setValue($data['item']['value_type'])
 			->addOptions(CSelect::createOptionsFromArray($data['value_types']))
 			->setReadonly($data['readonly'])
 		))->addClass('js-item-preprocessing-type')
