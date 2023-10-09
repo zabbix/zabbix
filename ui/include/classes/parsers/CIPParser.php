@@ -71,7 +71,10 @@ class CIPParser extends CParser {
 			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 		if ($this->options['macros']) {
-			$this->macro_parsers[] = new CMacroParser(['macros' => $this->options['macros']]);
+			array_push($this->macro_parsers,
+				new CMacroParser(['macros' => $this->options['macros']]),
+				new CMacroFunctionParser(['macros' => $this->options['macros']])
+			);
 		}
 
 		$this->ipv4_parser = new CIPv4Parser();

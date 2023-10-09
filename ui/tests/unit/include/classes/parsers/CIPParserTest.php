@@ -284,6 +284,13 @@ class CIPParserTest extends TestCase {
 				]
 			],
 			[
+				'{{HOST.HOST}.func()}', 0, ['v6' => true, 'usermacros' => true, 'lldmacros' => true, 'macros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{HOST.HOST}.func()}'
+				]
+			],
+			[
 				'{HOST.HOST}', 0, ['v6' => true, 'macros' => []],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -302,6 +309,13 @@ class CIPParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{HOST.HOST}'
+				]
+			],
+			[
+				'{{HOST.HOST}.func()}', 0, ['v6' => true, 'macros' => ['{HOST.NAME}', '{HOST.HOST}', '{HOST.DNS}']],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{HOST.HOST}.func()}'
 				]
 			],
 			[

@@ -477,6 +477,14 @@ class CIPRangeParserTest extends TestCase {
 				]
 			],
 			[
+				'{{HOST.HOST}.regsub("(\d+)", \1)}', ['macros' => ['{HOST.HOST}']], [
+					'rc' => true,
+					'error' => '',
+					'max_ip_count' => '0',
+					'max_ip_range' => ''
+				]
+			],
+			[
 				'{HOST.IP}', ['macros' => ['{HOST.IP}', '{HOST.HOST}']], [
 					'rc' => true,
 					'error' => '',

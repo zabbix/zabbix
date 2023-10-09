@@ -246,6 +246,13 @@ class CDnsParserTest extends TestCase {
 				]
 			],
 			[
+				'{{HOST.HOST}.func()}', 0, ['macros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{HOST.HOST}.func()}'
+				]
+			],
+			[
 				'{HOST.HOST}', 0, ['macros' => false],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -271,6 +278,13 @@ class CDnsParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'zabbix.com{HOST.HOST}'
+				]
+			],
+			[
+				'zabbix.com{{HOST.HOST}.regsub("(\d+)", \1)}', 0, ['macros' => ['{HOST.HOST}']],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'zabbix.com{{HOST.HOST}.regsub("(\d+)", \1)}'
 				]
 			],
 			[
