@@ -3997,7 +3997,7 @@ div.dashboard-widget-gauge {
 
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary {
   display: grid;
-  grid-template-columns: minmax(10px, max-content) 1fr minmax(110px, max-content) 10px minmax(88px, max-content) 25px;
+  grid-template-columns: minmax(25px, max-content) 1fr minmax(70px, max-content) 15px minmax(90px, max-content) 38px;
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
