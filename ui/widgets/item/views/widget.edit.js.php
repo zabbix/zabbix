@@ -33,6 +33,8 @@ window.widget_item_form = new class {
 		this._show_time = document.getElementById(`show_${<?= Widget::SHOW_TIME ?>}`);
 		this._show_change_indicator = document.getElementById(`show_${<?= Widget::SHOW_CHANGE_INDICATOR ?>}`);
 
+		this.item_is_numeric = false;
+
 		this._units_show = document.getElementById('units_show');
 
 		jQuery('#itemid').on('change', () => this.updateWarningIcon());
@@ -65,6 +67,7 @@ window.widget_item_form = new class {
 
 		colorPalette.setThemeColors(thresholds_colors);
 
+		this.updateWarningIcon()
 		this.updateForm();
 	}
 
@@ -114,7 +117,7 @@ window.widget_item_form = new class {
 		];
 
 		document.getElementById('item_value_aggregate_warning').style.display =
-				aggregate_warning_functions.includes(parseInt(aggregate_function.value))
+				aggregate_warning_functions.includes(parseInt(aggregate_function.value)) && !this.item_is_numeric
 			? ''
 			: 'none';
 	}
@@ -138,10 +141,16 @@ window.widget_item_form = new class {
 						case '<?= ITEM_VALUE_TYPE_FLOAT ?>':
 						case '<?= ITEM_VALUE_TYPE_UINT64 ?>':
 							thresholds_warning.style.display = 'none';
+							this.item_is_numeric = true;
+
 							break;
+
 						default:
 							thresholds_warning.style.display = '';
+							this.item_is_numeric = false;
 					}
+
+					this.updateForm();
 				})
 				.catch((exception) => {
 					console.log('Could not get value data type of the item:', exception);
