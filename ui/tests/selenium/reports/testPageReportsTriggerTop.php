@@ -35,6 +35,7 @@ class testPageReportsTriggerTop extends CWebTest {
 
 	protected static $groupids;
 	protected static $time;
+	const LINK = 'toptriggers.php';
 
 	public function prepareData() {
 		// Create hostgroups for hosts.
@@ -246,6 +247,11 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				'name' => 'Problem Warning',
+				'time' => self::$time - 180000, // now - 50 hours.
+				'problem_count' => '1'
+			],
+			[
+				'name' => 'Problem Warning',
 				'time' => self::$time - 691200, // now - 8 days.
 				'problem_count' => '1'
 			],
@@ -263,29 +269,49 @@ class testPageReportsTriggerTop extends CWebTest {
 		}
 	}
 
-	public function testPageReportsTriggerTop_FilterLayout() {
-		$link = 'toptriggers.php';
-		$this->page->login()->open($link)->waitUntilReady();
+	public function testPageReportsTriggerTop_Layout() {
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$this->page->assertTitle('100 busiest triggers');
 		$this->page->assertHeader('100 busiest triggers');
 
 		$filter = CFilterElement::find()->one();
 		$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
-		$this->assertEquals('Last 1 hour', $filter->query('link', 'Last 1 hour')->one()->getText());
+		$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
+
+		// Check time selector fields layout.
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
+
+		$buttons = [
+			'xpath://button[contains(@class, "btn-time-left")]' => true,
+			'xpath://button[contains(@class, "btn-time-right")]' => false,
+			'button:Zoom out' => true,
+			'button:Apply' => true,
+			'id:from_calendar' => true,
+			'id:to_calendar' => true
+		];
+		foreach ($buttons as $selector => $enabled) {
+			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+		}
+
+		foreach (['id:from' => 16, 'id:to' => 16] as $input => $value) {
+			$this->assertEquals($value, $form->getField($input)->getAttribute('maxlength'));
+		}
+
+		$this->assertEquals(1, $this->query('button:Apply')->all()->filter(CElementFilter::CLICKABLE)->count());
 		$this->assertTrue($filter->isExpanded());
 
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
 			// Leave the page and reopen the previous page to make sure the filter state is still saved.
 			$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
-			$this->page->open($link)->waitUntilReady();
+			$this->page->open(self::LINK)->waitUntilReady();
 			$this->assertTrue($filter->isExpanded($state));
 		}
 
+		// Check Filter tab fields layout.
 		$filter->selectTab('Filter');
 		$this->assertEquals('Filter', $filter->getSelectedTabName());
-
-		// Check buttons on the Event correlation page.
 		$this->assertEquals(2, $this->query('button', ['Apply', 'Reset'])
 				->all()->filter(CElementFilter::CLICKABLE)->count()
 		);
@@ -341,7 +367,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Warning' => 'warning-bg'
 					]
 				]
@@ -376,7 +402,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg',
 						'Problem Warning' => 'warning-bg',
 						'Severity status: High' => 'high-bg'
@@ -397,7 +423,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Severity status: High' => 'high-bg'
 					]
 				]
@@ -426,7 +452,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg',
 						'Severity status: High' => 'high-bg'
 					]
@@ -465,7 +491,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Severity status: High' => 'high-bg'
 					]
 				]
@@ -492,7 +518,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
 						'Not classified ❌' => 'na-bg'
 					]
@@ -514,7 +540,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '5'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg'
 					]
 				]
@@ -560,7 +586,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg',
 						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
 						'Not classified ❌' => 'na-bg',
@@ -584,7 +610,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg'
 					]
 				]
@@ -592,7 +618,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'date' => [
-						'locator' => 'Previous week'
+						'locator' => 'Day before yesterday'
 					],
 					'expected' => [
 						[
@@ -602,7 +628,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Warning' => 'warning-bg'
 					]
 				]
@@ -622,7 +648,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Severity status: High' => 'high-bg'
 					]
 				]
@@ -641,7 +667,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Warning' => 'warning-bg'
 					]
 				]
@@ -660,7 +686,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Not classified ❌' => 'na-bg'
 					]
 				]
@@ -693,7 +719,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks',
 							'Trigger' => 'Problem Warning',
 							'Severity' => 'Warning',
-							'Number of status changes' => '2'
+							'Number of status changes' => '3'
 						],
 						[
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
@@ -720,7 +746,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						]
 					],
-					'background_color' => [
+					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg',
 						'Problem Warning' => 'warning-bg',
 						'Severity status: High' => 'high-bg',
@@ -736,8 +762,8 @@ class testPageReportsTriggerTop extends CWebTest {
 	/**
 	 * @dataProvider getFilterData
 	 */
-	public function testPageReportsTriggerTop_FilterData($data) {
-		$this->page->login()->open('toptriggers.php')->waitUntilReady();
+	public function testPageReportsTriggerTop_Filter($data) {
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 
 		$filter = CFilterElement::find()->one();
 		if ($filter->getSelectedTabName() !== 'Filter' && !array_key_exists('date', $data)) {
@@ -751,7 +777,8 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		if (array_key_exists('date', $data)) {
 			if ($filter->getSelectedTabName() === 'Filter') {
-				$this->query('xpath://a[@id="ui-id-1"]')->one()->click();
+				// Select tab with time period selectors.
+				$this->query('xpath:.//a[@href="#tab_1"]')->one()->click();
 			}
 
 			if (array_key_exists('locator', $data['date'])) {
@@ -762,7 +789,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					$this->query('id', $locator)->one()->fill($value);
 				}
 
-				$filter->query('id', 'apply')->one()->click();
+				$filter->query('id:apply')->one()->click();
 			}
 
 			$filter->waitUntilReloaded();
@@ -773,9 +800,9 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		if (array_key_exists('background_color', $data)) {
-			foreach ($data['background_color'] as $trigger => $colors) {
-				$this->assertEquals($colors, $this->query('class:list-table')->asTable()->one()
+		if (array_key_exists('background_colors', $data)) {
+			foreach ($data['background_colors'] as $trigger => $color) {
+				$this->assertEquals($color, $this->query('class:list-table')->asTable()->one()
 						->findRow('Trigger', $trigger)->getColumn('Severity')->getAttribute('class')
 				);
 			}
@@ -786,7 +813,7 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		// Reset filter due to not influence further tests.
 		if ($filter->getSelectedTabName() === 'Filter') {
-			$this->query('button', 'Reset')->waitUntilClickable()->one()->click();
+			$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		}
 	}
 
@@ -794,7 +821,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		// Create problem.
 		CDBHelper::setTriggerProblem('First test trigger with tag priority', TRIGGER_VALUE_TRUE);
 
-		$this->page->login()->open('toptriggers.php')->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 
 		$data = [
 			'trigger_menu' => [
@@ -825,11 +852,11 @@ class testPageReportsTriggerTop extends CWebTest {
 		];
 
 		// Check host context menu links.
-		$this->query('link', 'ЗАББИКС Сервер')->one()->waitUntilClickable()->click();
+		$this->query('link:ЗАББИКС Сервер')->one()->waitUntilClickable()->click();
 		$this->checkContextMenuLinks($data['host_menu']);
 
 		// Check trigger context menu links.
-		$this->query('link', 'First test trigger with tag priority')->one()->waitUntilClickable()->click();
+		$this->query('link:First test trigger with tag priority')->one()->waitUntilClickable()->click();
 		$this->checkContextMenuLinks($data['trigger_menu']);
 	}
 
@@ -843,34 +870,24 @@ class testPageReportsTriggerTop extends CWebTest {
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($popup->hasTitles(array_keys($data)));
 
-		$menu_level1_items = [];
-		foreach (array_values($data) as $menu_items) {
-			foreach ($menu_items as $menu_level1 => $link) {
-				$menu_level1_items[] = $menu_level1;
+		$menu_items = [];
+		foreach (array_values($data) as $menu) {
+			foreach ($menu as $label => $link) {
+				$menu_items = $label;
 
-				if (is_array($link)) {
-					foreach ($link as $menu_level2 => $attribute) {
-						// Check 2-level menu links.
-						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
-						$this->assertEquals($menu_level2, $item_link->getText());
-						$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
-					}
+				// Check menu links.
+				if (str_contains($link, 'menu-popup-item')) {
+					$this->assertEquals($link, $popup->getItem($label)->getAttribute('class'));
 				}
 				else {
-					// Check 1-level menu links.
-					if (str_contains($link, 'menu-popup-item')) {
-						$this->assertEquals($link, $popup->getItem($menu_level1)->getAttribute('class'));
-					}
-					else {
-						$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_level1).
-								" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
-						);
-					}
+					$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($label).
+							" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
+					);
 				}
 			}
 		}
 
-		$this->assertTrue($popup->hasItems($menu_level1_items));
+		$this->assertTrue($popup->hasItems($menu_items));
 		$popup->close();
 	}
 }
