@@ -553,9 +553,13 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
 		$this->checkDialogue('Dashboard properties');
+		// TODO: added updateViewport due to unstable test on Jenkins, scroll appears for 0.5 seconds
+		// after closing the overlay dialog and incorrect click location of $control_buttons occurs.
+		$this->page->updateViewport();
 
 		// Check the default new dashboard state (title, empty, editable).
-		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilReady();
+
 		$this->assertEquals('Dashboards', $dashboard->getTitle());
 		$this->assertTrue($dashboard->isEditable());
 		$this->assertTrue($dashboard->isEmpty());
@@ -1303,7 +1307,12 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Interface type',
 							'type' => 'checkbox_list',
-							'checkboxes' => ['Zabbix agent' => false, 'SNMP' => false, 'JMX' => false, 'IPMI' => false]
+							'checkboxes' => [
+								'Zabbix agent (active checks)' => false,
+								'Zabbix agent (passive checks)' => false,
+								'SNMP' => false,
+								'JMX' => false,
+								'IPMI' => false]
 						],
 						[
 							'field' => 'Layout',
@@ -1313,6 +1322,11 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'Show data in maintenance',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show only totals',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -3287,9 +3301,16 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Host availability'),
 						'Name' => 'Host availability with all possible parameters',
 						'Refresh interval' => '10 minutes',
-						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
+						'Interface type' => [
+							'Zabbix agent (active checks)',
+							'Zabbix agent (passive checks)',
+							'SNMP',
+							'JMX',
+							'IPMI'
+						],
 						'Layout' => 'Vertical',
-						'Show data in maintenance' => true
+						'Show data in maintenance' => true,
+						'Show only totals' => true
 					]
 				]
 			],

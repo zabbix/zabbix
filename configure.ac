@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha6])
+AC_INIT([Zabbix],[7.0.0alpha7])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -2350,7 +2350,7 @@ fi
 
 echo
 echo "***********************************************************"
-echo "*            Now run '${am_make} install'                 *"
+echo "*            Now run '${am_make} install'                       *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
 echo "*              <https://www.zabbix.com>                   *"

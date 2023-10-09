@@ -38,7 +38,10 @@ func New(path string, timeout time.Duration) (conn *Conn, err error) {
 	if path != "" {
 		if _, tmperr := os.Stat(path); !os.IsNotExist(tmperr) {
 			if _, err = SendCommand(path, "version", timeout); err == nil {
-				return nil, fmt.Errorf("An agent is already using control socket %s", path)
+				return nil, fmt.Errorf(
+					"An agent is already using control socket %s",
+					path,
+				)
 			}
 			if err = os.Remove(path); err != nil {
 				return
@@ -55,22 +58,28 @@ func New(path string, timeout time.Duration) (conn *Conn, err error) {
 	return &c, nil
 }
 
-func SendCommand(path, command string, timeout time.Duration) (reply string, err error) {
-	var conn net.Conn
-	if conn, err = net.DialTimeout("unix", path, timeout); err != nil {
-		return
+func SendCommand(path, command string, timeout time.Duration) (string, error) {
+	conn, err := net.DialTimeout("unix", path, timeout)
+	if err != nil {
+		return "", err
 	}
+
 	defer conn.Close()
 
-	if err = conn.SetDeadline(time.Now().Add(timeout)); err != nil {
-		return
+	err = conn.SetDeadline(time.Now().Add(timeout))
+	if err != nil {
+		return "", err
 	}
-	if _, err = conn.Write([]byte(command + "\n")); err != nil {
-		return
+
+	_, err = conn.Write([]byte(command + "\n"))
+	if err != nil {
+		return "", err
 	}
-	var b []byte
-	if b, err = io.ReadAll(conn); err != nil {
-		return
+
+	b, err := io.ReadAll(conn)
+	if err != nil {
+		return "", err
 	}
+
 	return string(b), nil
 }

@@ -143,7 +143,8 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	if args.version {
 		version.Display([]string{fmt.Sprintf(
-			"Plugin communication protocol version is %s", comms.ProtocolVersion,
+			"Plugin communication protocol version is %s",
+			comms.ProtocolVersion,
 		)})
 
 		return
@@ -194,7 +195,9 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	if args.runtimeCommand != "" {
 		if agent.Options.ControlSocket == "" {
-			log.Errf("Cannot send runtime command: ControlSocket configuration parameter is not defined")
+			log.Errf(
+				"Cannot send runtime command: ControlSocket configuration parameter is not defined",
+			)
 
 			return
 		}
@@ -242,7 +245,12 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	}
 
 	if args.verbose {
-		fatalExit("", errors.New("verbose parameter can be specified only with test or print parameters"))
+		fatalExit(
+			"",
+			errors.New(
+				"verbose parameter can be specified only with test or print parameters",
+			),
+		)
 	}
 
 	var logType int
@@ -324,7 +332,12 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		}
 
 		for i := 0; i < len(listenIPs); i++ {
-			listener := serverlistener.New(i, manager, listenIPs[i], &agent.Options)
+			listener := serverlistener.New(
+				i,
+				manager,
+				listenIPs[i],
+				&agent.Options,
+			)
 			listeners = append(listeners, listener)
 		}
 	}
@@ -353,7 +366,10 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	}
 
 	agent.FirstHostname = hostnames[0]
-	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
+	hostmessage := fmt.Sprintf(
+		"Zabbix Agent2 hostname: [%s]",
+		agent.Options.Hostname,
+	)
 	log.Infof(hostmessage)
 
 	if args.foreground {
@@ -369,7 +385,10 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fatalExit("cannot prepare result cache", err)
 	}
 
-	serverConnectors = make([]*serverconnector.Connector, len(addresses)*len(hostnames))
+	serverConnectors = make(
+		[]*serverconnector.Connector,
+		len(addresses)*len(hostnames),
+	)
 
 	var idx int
 	for i := 0; i < len(addresses); i++ {
@@ -390,7 +409,8 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	agent.SetPerformTask(manager.PerformTask)
 
 	for _, listener := range listeners {
-		if err = listener.Start(); err != nil {
+		err = listener.Start()
+		if err != nil {
 			fatalExit("cannot start server listener", err)
 		}
 	}
@@ -611,7 +631,12 @@ func fatalExit(message string, err error) {
 		message = fmt.Sprintf("%s: %s", message, err.Error())
 	}
 
-	fmt.Fprintf(os.Stderr, "zabbix_agent2 [%d]: ERROR: %s\n", os.Getpid(), message)
+	fmt.Fprintf(
+		os.Stderr,
+		"zabbix_agent2 [%d]: ERROR: %s\n",
+		os.Getpid(),
+		message,
+	)
 
 	if agent.Options.LogType == "file" {
 		log.Critf("%s", message)
@@ -717,7 +742,10 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 func run() error {
 	sigs := createSigsChan()
 
-	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
+	control, err := runtimecontrol.New(
+		agent.Options.ControlSocket,
+		runtimeCommandSendingTimeout,
+	)
 	if err != nil {
 		return err
 	}

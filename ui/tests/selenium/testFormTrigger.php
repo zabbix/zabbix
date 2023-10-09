@@ -296,7 +296,7 @@ class testFormTrigger extends CLegacyWebTest {
 				$this->zbxTestAssertAttribute("//button[@name='insert']", 'disabled');
 			}
 			$this->assertEquals(0, $dialog->query('button',['id:add_expression', 'Edit', 'id:insert-macro'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 		else {
@@ -310,20 +310,20 @@ class testFormTrigger extends CLegacyWebTest {
 			if (!isset($data['form'])) {
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='add_expression']");
 			}
-			elseif ((isset($data['templatedHost']))) {
+			elseif (isset($data['templatedHost'])) {
 				$this->assertEquals(0, $dialog->query('button', ['And', 'Or', 'Replace', 'Edit', 'Insert expression'])
-					->all()->filter(CElementFilter::CLICKABLE)->count()
+						->all()->filter(CElementFilter::CLICKABLE)->count()
 				);
 			}
 			else {
 				$this->assertFalse($this->query("xpath://div[@id='expression-row']//button[@id='add_expression']")
-					->one()->isDisplayed()
+						->one()->isDisplayed()
 				);
 				$this->assertEquals(2, $dialog->query('button', ['Edit', 'Insert expression'])
-					->all()->filter(CElementFilter::CLICKABLE)->count()
+						->all()->filter(CElementFilter::CLICKABLE)->count()
 				);
 				$this->assertEquals(0, $dialog->query('button', ['And', 'Or', 'Replace'])->all()
-					->filter(CElementFilter::CLICKABLE)->count()
+						->filter(CElementFilter::CLICKABLE)->count()
 				);
 			}
 
@@ -427,12 +427,12 @@ class testFormTrigger extends CLegacyWebTest {
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
 			$this->assertEquals(4, $dialog_footer->query('button',['Update', 'Clone', 'Delete', 'Cancel'])->all()
-				->filter(CElementFilter::CLICKABLE)->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 		elseif (isset($data['templatedHost'])) {
 			$this->assertEquals(3, $dialog_footer->query('button',['Update', 'Clone', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 			$this->assertFalse($dialog_footer->query('button:Delete')->one()->isClickable());
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
@@ -440,7 +440,7 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 		else {
 			$this->assertEquals(2, $dialog_footer->query('button',['Add', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 
