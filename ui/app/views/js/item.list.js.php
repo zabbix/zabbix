@@ -199,6 +199,8 @@
 				history.replaceState({}, '', original_url);
 				this.#navigate(e.detail, original_url);
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.close', e => history.replaceState({}, '', original_url));
 		}
 
 		openTemplatePopup(template_data) {
