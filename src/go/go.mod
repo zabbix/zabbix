@@ -3,7 +3,7 @@ module zabbix.com
 go 1.19
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20230929083439-ca37e9926171
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20231009113720-8aee7c6a49f7
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/Microsoft/go-winio v0.6.1
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
@@ -46,5 +46,3 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 )
-
-replace git.zabbix.com/ap/plugin-support => /home/user/tmt/plugin-support
