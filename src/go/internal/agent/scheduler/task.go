@@ -153,11 +153,35 @@ type exporterTask struct {
 	output  plugin.ResultWriter
 }
 
+func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.ContextProvider) (any, error) {
+	exporter, _ := a.(plugin.Exporter)
+
+	if a.HandleTimeout() {
+		return exporter.Export(key, params, ctx)
+	}
+
+	var ret any
+	var err error
+	tc := make(chan bool)
+
+	go func() {
+		ret, err = exporter.Export(key, params, ctx)
+		tc <- true
+	}()
+
+	select {
+	case <-tc:
+	case <-time.After(time.Second * time.Duration(ctx.Timeout())):
+		err = fmt.Errorf("Timeout occurred while gathering data.")
+	}
+
+	return ret, err
+}
+
 func (t *exporterTask) perform(s Scheduler) {
 	// pass item key as parameter so it can be safely updated while task is being processed in its goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
-		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
 		var key string
 		var params []string
@@ -166,18 +190,7 @@ func (t *exporterTask) perform(s Scheduler) {
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
 
-			tc := make(chan bool)
-
-			go func() {
-				ret, err = exporter.Export(key, params, t)
-				tc <- true
-			}()
-
-			select {
-			case <-tc:
-			case <-time.After(time.Second * time.Duration(t.item.timeout)):
-				err = fmt.Errorf("Timeout occurred while gathering data.")
-			}
+			ret, err = invokeExport(t.plugin.impl, key, params, t)
 
 			if err == nil {
 				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)

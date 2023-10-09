@@ -46,3 +46,5 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 )
+
+replace git.zabbix.com/ap/plugin-support => /home/user/tmt/plugin-support
