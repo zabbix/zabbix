@@ -83,6 +83,16 @@ class WidgetForm extends CWidgetForm {
 		}
 	}
 
+	public function getFieldsValues(): array {
+		$fields_values = parent::getFieldsValues();
+
+		if ($fields_values['aggregate_function'] == AGGREGATE_NONE) {
+			unset($fields_values['time_period']);
+		}
+
+		return $fields_values;
+	}
+
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 

@@ -20,6 +20,8 @@
 
 class CWidgetItem extends CWidget {
 
+	static AGGREGATE_NONE = 0;
+
 	onStart() {
 		this._events.resize = () => {
 			const margin = 5;
@@ -43,10 +45,14 @@ class CWidgetItem extends CWidget {
 	}
 
 	getUpdateRequestData() {
-		return {
-			...super.getUpdateRequestData(),
-			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
+		const update_request_data = super.getUpdateRequestData();
+
+		if (this.getFieldsData().aggregate_function !== CWidgetItem.AGGREGATE_NONE
+				&& !this.getFieldsReferredData().has('time_period')) {
+			update_request_data.has_custom_time_period = 1;
 		}
+
+		return update_request_data;
 	}
 
 	hasPadding() {
