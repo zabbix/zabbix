@@ -549,17 +549,19 @@ class CExpressionParser extends CParser {
 		}
 
 		if (!$options['calculated']) {
-			$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
+			if (self::parseUsing(new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]), $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
+				return true;
+			}
 
-			if (self::parseUsing($macro_parser, $source, $pos, $tokens, CExpressionParserResult::TOKEN_TYPE_MACRO)) {
+			if (self::parseUsing(new CMacroFunctionParser(['macros' => ['{TRIGGER.VALUE}']]), $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
 				return true;
 			}
 		}
 
 		if ($options['collapsed_expression']) {
-			$functionid_parser = new CFunctionIdParser();
-
-			if (self::parseUsing($functionid_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CFunctionIdParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO)) {
 				return true;
 			}
