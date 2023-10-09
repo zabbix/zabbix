@@ -1227,25 +1227,6 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Calculates macro function for expression macros. Returns UNRESOLVED_MACRO_STRING in case of unsupported function.
-	 *
-	 * @param string $value                    [IN] The input value.
-	 * @param array  $macrofunc                [IN]
-	 * @param string $macrofunc['function']    [IN] The function name.
-	 * @param array  $macrofunc['parameters']  [IN] The function parameters.
-	 *
-	 * @return string
-	 */
-	private static function calcExpressionMacrofunc(string $value, array $macrofunc) {
-		switch ($macrofunc['function']) {
-			case 'fmtnum':
-				return self::macrofuncFmtnum($value, $macrofunc['parameters']);
-		}
-
-		return UNRESOLVED_MACRO_STRING;
-	}
-
-	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -1566,7 +1547,7 @@ class CMacrosResolverGeneral {
 						foreach ($keys[$db_item['key_']] as $macro_data) {
 							if ($db_item['lastclock'] && $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 								$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-									? self::calcExpressionMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
+									? self::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
 									: formatHistoryValue($db_item['lastvalue'], $db_item);
 							}
 							else {
@@ -1593,7 +1574,7 @@ class CMacrosResolverGeneral {
 								foreach ($_macros as $macro_data) {
 									if ($value !== null) {
 										$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-											? self::calcExpressionMacrofunc($value, $macro_data['macrofunc'])
+											? self::calcMacrofunc($value, $macro_data['macrofunc'])
 											: convertUnits(['value' => $value, 'units' => $db_item['units']]);
 									}
 									else {
