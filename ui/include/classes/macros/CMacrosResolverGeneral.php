@@ -1967,22 +1967,30 @@ class CMacrosResolverGeneral {
 			return self::interfacePriorities[$b['type']] <=> self::interfacePriorities[$a['type']];
 		});
 
-		$db_interfaces = array_column(CMacrosResolverHelper::resolveHostInterfaces($db_interfaces), null, 'hostid');
+		$db_interfaces = CMacrosResolverHelper::resolveHostInterfaces($db_interfaces);
 
-		foreach ($db_interfaces as &$db_interface) {
-			$db_interface['conn'] = ($db_interface['useip'] == INTERFACE_USE_IP)
-				? $db_interface['ip']
-				: $db_interface['dns'];
+		$host_interfaces = [];
+
+		foreach ($db_interfaces as $db_interface) {
+			if (!array_key_exists($db_interface['hostid'], $host_interfaces)) {
+				$host_interfaces[$db_interface['hostid']] = $db_interface;
+			}
 		}
-		unset($db_interface);
+
+		foreach ($host_interfaces as &$host_interface) {
+			$host_interface['conn'] = ($host_interface['useip'] == INTERFACE_USE_IP)
+				? $host_interface['ip']
+				: $host_interface['dns'];
+		}
+		unset($host_interface);
 
 		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
 			'HOST.PORT' => 'port'
 		];
 
-		foreach ($db_interfaces as $hostid => $db_interface) {
+		foreach ($host_interfaces as $hostid => $host_interface) {
 			foreach ($macros[$hostid] as $macro => $tokens) {
-				$value = $db_interface[$interface_macros[$macro]];
+				$value = $host_interface[$interface_macros[$macro]];
 
 				foreach ($tokens as $token) {
 					$key = array_key_exists('key', $token) ? $token['key'] : $hostid;
