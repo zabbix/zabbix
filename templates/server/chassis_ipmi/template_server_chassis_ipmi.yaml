@@ -227,47 +227,33 @@ zabbix_export:
           master_item:
             key: ipmi.get
           lld_macro_paths:
-            - lld_macro: '{#SENSOR_HI_CRIT}'
-              path: $.threshold.upper.crit
-            - lld_macro: '{#SENSOR_HI_DISAST}'
-              path: $.threshold.upper.non_recover
-            - lld_macro: '{#SENSOR_HI_WARN}'
-              path: $.threshold.upper.non_crit
             - lld_macro: '{#SENSOR_ID}'
               path: $.id
-            - lld_macro: '{#SENSOR_LO_CRIT}'
-              path: $.threshold.lower.crit
-            - lld_macro: '{#SENSOR_LO_DISAST}'
-              path: $.threshold.lower.non_recover
-            - lld_macro: '{#SENSOR_LO_WARN}'
-              path: $.threshold.lower.non_crit
             - lld_macro: '{#SENSOR_READING_TYPE}'
               path: $.reading.text
             - lld_macro: '{#SENSOR_TYPE}'
               path: $.sensor.text
             - lld_macro: '{#SENSOR_UNIT}'
               path: $.units
+            - lld_macro: '{#SENSOR_LO_WARN}'
+              path: $.threshold.lower.non_crit
+            - lld_macro: '{#SENSOR_LO_CRIT}'
+              path: $.threshold.lower.crit
+            - lld_macro: '{#SENSOR_LO_DISAST}'
+              path: $.threshold.lower.non_recover
+            - lld_macro: '{#SENSOR_HI_WARN}'
+              path: $.threshold.upper.non_crit
+            - lld_macro: '{#SENSOR_HI_CRIT}'
+              path: $.threshold.upper.crit
+            - lld_macro: '{#SENSOR_HI_DISAST}'
+              path: $.threshold.upper.non_recover
           overrides:
-            - name: 'trigger SENSOR_HI_CRIT'
-              step: '5'
+            - name: 'trigger SENSOR_LO_WARN'
+              step: '1'
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
-                  value: '{#SENSOR_HI_CRIT}'
-                  discover: NO_DISCOVER
-            - name: 'trigger SENSOR_HI_DISAST'
-              step: '6'
-              operations:
-                - operationobject: TRIGGER_PROTOTYPE
-                  operator: LIKE
-                  value: '{#SENSOR_HI_DISAST}'
-                  discover: NO_DISCOVER
-            - name: 'trigger SENSOR_HI_WARN'
-              step: '4'
-              operations:
-                - operationobject: TRIGGER_PROTOTYPE
-                  operator: LIKE
-                  value: '{#SENSOR_HI_WARN}'
+                  value: '{#SENSOR_LO_WARN}'
                   discover: NO_DISCOVER
             - name: 'trigger SENSOR_LO_CRIT'
               step: '2'
@@ -283,12 +269,26 @@ zabbix_export:
                   operator: LIKE
                   value: '{#SENSOR_LO_DISAST}'
                   discover: NO_DISCOVER
-            - name: 'trigger SENSOR_LO_WARN'
-              step: '1'
+            - name: 'trigger SENSOR_HI_WARN'
+              step: '4'
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
-                  value: '{#SENSOR_LO_WARN}'
+                  value: '{#SENSOR_HI_WARN}'
+                  discover: NO_DISCOVER
+            - name: 'trigger SENSOR_HI_CRIT'
+              step: '5'
+              operations:
+                - operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: '{#SENSOR_HI_CRIT}'
+                  discover: NO_DISCOVER
+            - name: 'trigger SENSOR_HI_DISAST'
+              step: '6'
+              operations:
+                - operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: '{#SENSOR_HI_DISAST}'
                   discover: NO_DISCOVER
       tags:
         - tag: class

@@ -146,6 +146,21 @@ css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_images
 
 icons: icons_build css icons_cleanup
 
+
+## list of modules which should be built with testing suite
+MODULES = \
+	dummy
+
+modules_build:
+	-@for module in $(MODULES); do \
+		$(MAKE) -C src/modules/$$module; \
+	done
+
+modules_clean:
+	-@for module in $(MODULES); do \
+		$(MAKE) -C src/modules/$$module; \
+	done
+
 ## cmocka test support
 if TESTS
 WRAP_DB_FUNCS = \
@@ -186,7 +201,7 @@ COMMON_WRAP_FUNCS = \
 	$(WRAP_EXIT) \
 	$(WRAP_COMM_FUNCS)
 
-tests_build:
+tests_build: modules_build
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
 	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS)"
@@ -195,8 +210,8 @@ tests: tests_build
 	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(CMOCKA_LIBRARY_PATH):$(YAML_LIBRARY_PATH); \
 	tests/tests_run.pl
 
-clean: clean-recursive
+clean: clean-recursive modules_clean
 	cd tests && $(MAKE) clean
 endif
 
-.PHONY: test tests clean
+.PHONY: test tests clean modules_build modules_clean

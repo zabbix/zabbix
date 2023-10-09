@@ -1,0 +1,1 @@
+..F....... [ZBX-22777] fixed item test form sending incorrectly resolved macros to server if item uses SNMP interface (Ivo)

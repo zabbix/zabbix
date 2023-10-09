@@ -123,6 +123,7 @@ share/man/man8/zabbix_agent2.8
 share/man/man8/zabbix_web_service.8
 src/libs/zbxcunit/cu_modules.h
 src/libs/zbxdbschema/dbschema.c
+src/modules/dummy/dummy.so
 src/zabbix_agent/zabbix_agent
 src/zabbix_agent/zabbix_agentd
 src/zabbix_get/zabbix_get
@@ -134,6 +135,7 @@ src/zabbix_sender/zabbix_sender
 src/zabbix_server/zabbix_server
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxalgo/evaluate_unknown
+tests/libs/zbxalgo/list
 tests/libs/zbxalgo/queue
 tests/libs/zbxcommon/calculate_item_nextcheck
 tests/libs/zbxcommon/calculate_item_nextcheck_unreachable
@@ -253,6 +255,9 @@ tests/zabbix_server/service/service_get_main_status
 tests/zabbix_server/service/service_get_rule_status
 tests/zabbix_server/service/service_get_status
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
+tests/libs/zbxmodules/server_module_load
+tests/libs/zbxmodules/proxy_module_load
+tests/libs/zbxmodules/agent_module_load
 ui/.buildpath
 ui/.htpasswd
 ui/.idea

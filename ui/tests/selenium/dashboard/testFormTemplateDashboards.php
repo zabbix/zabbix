@@ -215,7 +215,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 			switch ($selector) {
 				case 'id:dashboard-config':
-					$controls->query($selector)->one()->click();
+					$controls->query($selector)->waitUntilClickable()->one()->click();
 					$this->checkDialogue('Dashboard properties');
 					break;
 
@@ -1757,7 +1757,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Clock',
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Widget 4 duplicate check'
 					],
 					'duplicate widget' => true
@@ -1767,7 +1767,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Clock',
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => ''
 					]
 				]
@@ -1776,7 +1776,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Clock',
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget server time',
 						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
 					]
@@ -1787,7 +1787,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Clock',
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time no item',
 						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
 					],
@@ -1798,7 +1798,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Clock',
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time',
 						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
 						'Item' => 'Item ZBX6663 Second'
@@ -1809,7 +1809,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Clock',
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => '    Clock widget with trailing and leading spaces    '
 					],
 					'trim' => 'Name'
@@ -1833,7 +1833,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph (classic)',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with empty item',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
 						'Item' => []
@@ -1845,7 +1845,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Graph (classic)',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with graph and legend',
 						'Source' => 'Graph',
 						'Graph' => ['Graph ZBX6663 Second'],
@@ -1857,7 +1857,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Graph (classic)',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Simple graph without legend',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
 						'Item' => ['Item ZBX6663 Second'],
@@ -1883,7 +1883,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty item prototype',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
 						'Item prototype' => []
@@ -1896,7 +1896,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty Columns (dropped to 0)',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
@@ -1910,7 +1910,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
@@ -1924,7 +1924,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
@@ -1938,7 +1938,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with missing Rows (dropped to 0)',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
@@ -1952,7 +1952,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with too much rows',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
@@ -1966,7 +1966,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with too much rows',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
@@ -1979,7 +1979,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget legend',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
@@ -1993,7 +1993,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Simple Graph prototype without legend',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
 						'Item prototype' => ['ItemProto ZBX6663 Second'],
@@ -2020,7 +2020,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Plain text',
+						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget with empty Show lines',
 						'Items' => ['Item ZBX6663 Second'],
 						'Show lines' => ''
@@ -2033,7 +2033,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Plain text',
+						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget with too much lines',
 						'Items' => ['Item ZBX6663 Second'],
 						'Show lines' => 999
@@ -2046,7 +2046,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Plain text',
+						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget with negative Show lines',
 						'Items' => ['Item ZBX6663 Second'],
 						'Show lines' => '-9'
@@ -2058,7 +2058,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Plain text',
+						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget top location HTML',
 						'Items' => ['Item ZBX6663 Second'],
 						'Show lines' => 9,
@@ -2071,7 +2071,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Plain text',
+						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget left location no HTML',
 						'Items' => ['Item ZBX6663 Second'],
 						'Show lines' => 9,
@@ -2095,7 +2095,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'URL',
+						'Type' => CFormElement::RELOADABLE_FILL('URL'),
 						'Name' => 'URL widget with text URL',
 						'URL' => 'home_sweet_home'
 					]
@@ -2105,7 +2105,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'URL',
+						'Type' => CFormElement::RELOADABLE_FILL('URL'),
 						'Name' => 'URL widget with trailing and leading spaces in URL',
 						'URL' => '    URL    '
 					],
@@ -2117,7 +2117,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'URL',
+						'Type' => CFormElement::RELOADABLE_FILL('URL'),
 						'Name' => 'URL widget with space in URL',
 						'URL' => '     '
 					],
@@ -2249,10 +2249,10 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
 		}
 		else {
-			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Geomap', 'Graph',
-					'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
-					'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-					'Top hosts', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
+					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
+					'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+					'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

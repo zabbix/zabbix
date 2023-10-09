@@ -2415,18 +2415,6 @@ zabbix_export:
               parameters:
                 - 1h
           overrides:
-            - name: 'Arbiter metrics'
-              step: '2'
-              filter:
-                conditions:
-                  - macro: '{#NODE_STATE}'
-                    value: '7'
-                    formulaid: A
-              operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
-                  value: 'Replication lag'
-                  discover: NO_DISCOVER
             - name: 'Primary metrics'
               step: '1'
               filter:
@@ -2450,6 +2438,18 @@ zabbix_export:
                   value: 'Number of unhealthy replicas'
                   status: ENABLED
                   discover: DISCOVER
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Replication lag'
+                  discover: NO_DISCOVER
+            - name: 'Arbiter metrics'
+              step: '2'
+              filter:
+                conditions:
+                  - macro: '{#NODE_STATE}'
+                    value: '7'
+                    formulaid: A
+              operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Replication lag'
