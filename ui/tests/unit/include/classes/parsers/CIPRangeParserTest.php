@@ -157,6 +157,14 @@ class CIPRangeParserTest extends TestCase {
 				]
 			],
 			[
+				'2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF', [], [
+					'rc' => true,
+					'error' => '',
+					'max_ip_count' => '1',
+					'max_ip_range' => '2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF'
+				]
+			],
+			[
 				'fe80:0:0:0:0:0:c0a8:0/128', [], [
 					'rc' => true,
 					'error' => '',

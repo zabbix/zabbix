@@ -365,7 +365,7 @@ class CIPRangeParser {
 				$ip_parts[] = $matches[1];
 				$p += strlen($matches[0]);
 			}
-			elseif (preg_match('/^[a-f0-9]{0,4}/', substr($range, $p), $matches)) {
+			elseif (preg_match('/^[a-f0-9]{0,4}/i', substr($range, $p), $matches)) {
 				$ip_parts[] = $matches[0];
 				$p += strlen($matches[0]);
 			}
