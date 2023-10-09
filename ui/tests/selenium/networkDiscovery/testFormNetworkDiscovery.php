@@ -626,7 +626,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/111'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "192.168.4.0/111".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/111".'
 				]
 			],
 			// #23.
@@ -638,7 +638,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/129'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "192.168.4.0/129".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/129".'
 				]
 			],
 			// #24.
@@ -662,7 +662,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '2001:db8::/130'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "2001:db8::/130".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/130".'
 				]
 			],
 			// #26.
