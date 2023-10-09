@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 class testPageHostGroups extends testPageGroups {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach TableBehavior to set column names and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */

@@ -31,14 +31,14 @@ class CTableBehavior extends CBehavior {
 	 *
 	 * @var array
 	 */
-	public $column_names = null;
+	protected $column_names = null;
 
 	/**
 	 * Set names of columns.
 	 *
 	 * @param array $names column names
 	 */
-	protected function setColumnNames($names) {
+	public function setColumnNames($names) {
 		$this->column_names = $names;
 	}
 
