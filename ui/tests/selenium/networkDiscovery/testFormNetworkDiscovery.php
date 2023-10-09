@@ -578,7 +578,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => 12345
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "12345".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "12345".'
 				]
 			],
 			// #19.
@@ -590,7 +590,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => 'Text 😀'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "Text 😀".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "Text 😀".'
 				]
 			],
 			// #20.
@@ -602,7 +602,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.300-305'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "192.168.4.300-305".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "192.168.4.300-305".'
 				]
 			],
 			// #21.
@@ -626,7 +626,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/111'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "192.168.4.0/111".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "192.168.4.0/111".'
 				]
 			],
 			// #23.
@@ -638,7 +638,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/129'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "192.168.4.0/129".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "192.168.4.0/129".'
 				]
 			],
 			// #24.
@@ -662,7 +662,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '2001:db8::/130'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "2001:db8::/130".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "2001:db8::/130".'
 				]
 			],
 			// #26.

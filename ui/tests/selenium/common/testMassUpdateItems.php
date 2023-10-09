@@ -379,7 +379,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
 						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => 'Zabbix server']
 					],
-					'details' => 'Invalid parameter "/1/trapper_hosts": invalid address range "Zabbix server".'
+					'details' => 'Invalid parameter "/1/trapper_hosts": incorrect address starting from "Zabbix server".'
 				]
 			],
 			// #16.
