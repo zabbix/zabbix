@@ -795,7 +795,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	protected function getProfiles(): array {
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
 		$filter = [
 			'filter_evaltype'		=> CProfile::get($prefix.'filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 			'filter_groupids'		=> CProfile::getArray($prefix.'filter_groupids', []),
@@ -850,7 +850,7 @@ class CControllerItemList extends CControllerItem {
 			$filter_tags['operators'][] = $tag['operator'];
 		}
 
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
 		CProfile::updateArray($prefix.'filter_groupids', $this->getInput('filter_groupids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_valuemapids', $this->getInput('filter_valuemapids', []), PROFILE_TYPE_ID);
@@ -875,7 +875,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	protected function updateProfileSort() {
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
 
 		if ($this->hasInput('sort')) {
 			CProfile::update($prefix.'sort', $this->getInput('sort'), PROFILE_TYPE_STR);
@@ -887,7 +887,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	protected function deleteProfiles() {
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.hosts.items.list.' : 'web.templates.items.list.';
 
 		if (count(CProfile::getArray($prefix.'filter_hostids', [])) != 1) {
 			CProfile::deleteIdx($prefix.'filter_hostids');
