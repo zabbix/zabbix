@@ -44,9 +44,10 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	zbx_odbc_query_result_t	*query_result;
 	char			*error = NULL;
 	int			(*query_result_to_text)(zbx_odbc_query_result_t *query_result, char **text, char **error),
-				ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
+				ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __func__, item->key_orig, item->params);
+	zabbix_log(1, "DBG In %s(), key '%s', timeout = %i", __func__, item->key, item->timeout);
 
 	zbx_init_agent_request(&request);
 
@@ -93,17 +94,10 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
-	{
-		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
-		/* failures are handled there */
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
-
-	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, timeout_sec,
+	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, item->timeout,
 			&error)))
 	{
-		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, timeout_sec, &error)))
+		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, item->timeout, &error)))
 		{
 			char	*text = NULL;
 

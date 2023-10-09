@@ -191,7 +191,8 @@ typedef struct
 	char			password_orig[ZBX_ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			jmx_endpoint_orig[ZBX_ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
-	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX], *timeout;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
 	char			url_orig[ZBX_ITEM_URL_LEN_MAX], *url;
 	char			query_fields_orig[ZBX_ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
 	char			*posts;
@@ -668,7 +669,6 @@ typedef struct
 	char		*snmpv3_contextname;
 	unsigned char	allow_redirect;
 	int		timeout_sec;
-	char		*timeout_str;
 }
 zbx_dc_dcheck_t;
 

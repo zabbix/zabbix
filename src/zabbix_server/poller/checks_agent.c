@@ -78,12 +78,12 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
-	int		timeout_sec;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
 			item->interface.addr, item->key, zbx_tcp_connection_type_name(item->host.tls_connect));
+	zabbix_log(1, "DBG In %s(), key '%s', timeout = %i", __func__, item->key, item->timeout);
 
 	switch (item->host.tls_connect)
 	{
@@ -116,19 +116,12 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 			goto out;
 	}
 
-	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
-	{
-		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
-		/* failures are handled there */
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
-
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
-			timeout_sec + 1, item->host.tls_connect, tls_arg1, tls_arg2))
+			item->timeout + 1, item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
 
-		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)timeout_sec,
+		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)item->timeout,
 				ZBX_TCP_PROTOCOL, 0))
 		{
 			ret = NETWORK_ERROR;
