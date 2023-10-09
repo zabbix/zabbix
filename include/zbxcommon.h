@@ -593,6 +593,10 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
+#if defined(__hpux)
+int	zbx_hpux_vsnprintf_is_c99(void);
+#endif
+
 /* used by log */
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
