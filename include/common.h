@@ -1476,6 +1476,9 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 #define ZBX_PSK_FOR_AUTOREG		0x02				/* PSK can be used for host autoregistration */
 #define ZBX_PSK_FOR_PROXY		0x04				/* PSK is configured on proxy */
 
+#define ZBX_BACKSLASH_ESC_OFF		0
+#define ZBX_BACKSLASH_ESC_ON		1
+
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
@@ -1483,6 +1486,11 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
 		char *error, int max_error_len);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
+
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos);
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);
