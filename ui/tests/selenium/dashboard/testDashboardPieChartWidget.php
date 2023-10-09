@@ -90,13 +90,26 @@ class testDashboardPieChartWidget extends CWebTest
 					]
 				]
 			],
-			// Minimum required.
+			// All possible fields.
 			[
 				[
 					'fields' => [
 						'Data set' => [
-							'host' => 'test host',
-							'item' => 'test item'
+							[
+								'host' => 'test host',
+								'item' => 'test item',
+								'Aggregation function' => 'min',
+								'Data set aggregation' => 'max',
+								'Data set label' => 'Label 123'
+							],
+							[
+								'host' => 'test host',
+								'item' => 'test item'
+							]
+						],
+						'Displaying options' => [
+							'History data selection' => 'History',
+							'Draw' => 'Doughnut'
 						]
 					]
 				]
@@ -173,24 +186,65 @@ class testDashboardPieChartWidget extends CWebTest
 	}
 
 	/**
-	 * Check Pie chart widget form contains the provided data.
+	 * Check Pie chart widget edit form contains the provided data.
 	 *
 	 * @param array $fields         field data to check
 	 * @param CFormElement $form    form to be checked
 	 */
 	protected function checkForm($fields, $form) {
-		// ToDo: write the check function.
-		$form->checkValue(['Name' => 'abd9ac388db7de8a01a1f38d8db257f8']);
+		// Check main fields
+		$main_fields = CTestArrayHelper::get($fields, 'main_fields', []);
+		$main_fields['Name'] = $this->calculateWidgetName($fields);
+		$form->checkValue($main_fields);
+
+		// Check Data set tab.
+		if (CTestArrayHelper::isAssociative($fields['Data set'])) {
+			$fields['Data set'] = [$fields['Data set']];
+		}
+
+		$last = count($fields['Data set']) - 1;
+
+		foreach ($fields['Data set'] as $i => $data_set) {
+			// Prepare host and item fields.
+			$mapping = [
+				'host' => 'xpath://div[@id="ds_'.$i.'_hosts_"]/..',
+				'item' => 'xpath://div[@id="ds_'.$i.'_items_"]/..'
+			];
+			foreach ($mapping as $field => $selector) {
+				$data_set = [$selector => $data_set[$field]] + $data_set;
+				unset($data_set[$field]);
+			}
+
+			// Check fields value.
+			$form->checkValue($data_set);
+
+			// Open next data set, if exists.
+			if ($i !== $last) {
+				$i += 2;
+				$form->query('xpath:(//li[contains(@class, "list-accordion-item")])['.$i.']//button')->one()->click();
+				$form->invalidate();
+			}
+		}
+
+		// Check values in other tabs
+		$tabs = ['Displaying options', 'Time period', 'Legend'];
+		foreach ($tabs as $tab) {
+			if (array_key_exists($tab, $fields)) {
+				$form->selectTab($tab);
+				$form->checkValue($fields[$tab]);
+			}
+		}
 	}
 
 	/**
-	 * Fill Pie chart widget form with provided data.
+	 * Fill Pie chart widget edit form with provided data.
 	 *
 	 * @param array $fields         field data to fill
 	 * @param CFormElement $form    form to be filled
 	 */
 	protected function fillForm($fields, $form) {
 		// Fill main fields.
+		$main_fields = CTestArrayHelper::get($fields, 'main_fields', []);
 		$main_fields['Name'] = $this->calculateWidgetName($fields);
 		$form->fill($main_fields);
 
