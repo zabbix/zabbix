@@ -1745,7 +1745,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				foreach ($events as $eventid => $event) {
 					$macro_values[$eventid][$token] = null;
 
-					$macros['event'][$eventid][$data['f_num']][$token] = true;
+					$macros['event'][$eventid][$data['f_num']][] =
+						['token' => $token] + array_intersect_key($data, ['macrofunc' => null]);
 				}
 			}
 		}
@@ -1764,8 +1765,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($macros['event'][$eventid] as $f_num => $tokens) {
 				if (array_key_exists($f_num, $tag_value)) {
-					foreach ($tokens as $token => $foo) {
-						$macro_values[$eventid][$token] = $tag_value[$f_num];
+					foreach ($tokens as $token) {
+						$macro_values[$eventid][$token['token']] = array_key_exists('macrofunc', $token)
+							? self::calcMacrofunc($tag_value[$f_num], $token['macrofunc'])
+							: $tag_value[$f_num];
 					}
 				}
 			}
