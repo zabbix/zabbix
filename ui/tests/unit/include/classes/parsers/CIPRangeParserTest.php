@@ -181,6 +181,14 @@ class CIPRangeParserTest extends TestCase {
 				]
 			],
 			[
+				'::', [], [
+					'rc' => true,
+					'error' => '',
+					'max_ip_count' => '1',
+					'max_ip_range' => '::'
+				]
+			],
+			[
 				'fe80::c0a8:0/112', [], [
 					'rc' => true,
 					'error' => '',

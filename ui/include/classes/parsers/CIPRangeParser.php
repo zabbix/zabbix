@@ -295,7 +295,7 @@ class CIPRangeParser {
 	private function parseRangeIPv4(string $range, int &$pos): bool {
 		$p = $pos;
 		$ip_count = '1';
-		$ip_parts = [];
+		$ip = '';
 
 		while (isset($range[$p])) {
 			if (preg_match('/^([0-9]{1,3})-([0-9]{1,3})/', substr($range, $p), $matches)) {
@@ -304,11 +304,11 @@ class CIPRangeParser {
 				}
 
 				$ip_count = bcmul($ip_count, $matches[2] - $matches[1] + 1, 0);
-				$ip_parts[] = $matches[2];
+				$ip .= $matches[2];
 				$p += strlen($matches[0]);
 			}
 			elseif (preg_match('/^[0-9]{1,3}/', substr($range, $p), $matches)) {
-				$ip_parts[] = $matches[0];
+				$ip .= $matches[0];
 				$p += strlen($matches[0]);
 			}
 			else {
@@ -318,10 +318,10 @@ class CIPRangeParser {
 			if (!isset($range[$p]) || $range[$p] !== '.') {
 				break;
 			}
-			$p++;
+			$ip .= $range[$p++];
 		}
 
-		if ($this->ipv4_parser->parse(implode('.', $ip_parts)) != CParser::PARSE_SUCCESS) {
+		if ($this->ipv4_parser->parse($ip) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
@@ -350,7 +350,7 @@ class CIPRangeParser {
 
 		$p = $pos;
 		$ip_count = '1';
-		$ip_parts = [];
+		$ip = '';
 
 		while (isset($range[$p])) {
 			if (preg_match('/^([a-f0-9]{1,4})-([a-f0-9]{1,4})/i', substr($range, $p), $matches)) {
@@ -362,11 +362,11 @@ class CIPRangeParser {
 				}
 
 				$ip_count = bcmul($ip_count, $to - $from + 1, 0);
-				$ip_parts[] = $matches[1];
+				$ip .= $matches[1];
 				$p += strlen($matches[0]);
 			}
 			elseif (preg_match('/^[a-f0-9]{0,4}/i', substr($range, $p), $matches)) {
-				$ip_parts[] = $matches[0];
+				$ip .= $matches[0];
 				$p += strlen($matches[0]);
 			}
 			else {
@@ -376,10 +376,10 @@ class CIPRangeParser {
 			if (!isset($range[$p]) || $range[$p] !== ':') {
 				break;
 			}
-			$p++;
+			$ip .= $range[$p++];
 		}
 
-		if ($this->ipv6_parser->parse(implode(':', $ip_parts)) != CParser::PARSE_SUCCESS) {
+		if ($this->ipv6_parser->parse($ip) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
