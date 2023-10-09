@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-19 09:22+0000\n"
+"PO-Revision-Date: 2023-10-05 06:00+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2102,6 +2102,10 @@ msgstr "No es pot pas canviar el tipus d'usuari del propi rol."
 msgid "Cannot clear history"
 msgstr "No es pot pas esborrar l'historial"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr "No es poden pas netejar l'historial i tendències"
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "No es poden pas clonar prototips de gràfics."
@@ -3731,6 +3735,14 @@ msgstr "Netejar l'historial"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Netejar historial i tendències"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr "Netegem l'historial i tendències dels elements triats?"
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr "Netegem l'historial i tendències dels escenaris web triats?"
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7962,6 +7974,10 @@ msgstr "Ressalteu la filera sencera"
 #: jsLoader.php:372
 msgid "History"
 msgstr "Història"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr "Històric i tendències netejats"
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
