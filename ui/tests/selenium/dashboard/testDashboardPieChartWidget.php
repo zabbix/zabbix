@@ -348,12 +348,7 @@ class testDashboardPieChartWidget extends CWebTest
 		$form->checkValue($main_fields);
 
 		// Check Data set tab.
-		$data_sets = CTestArrayHelper::get($fields, 'Data set', ['host' => 'Test Host', 'item' => 'Test Item']);
-
-		if (CTestArrayHelper::isAssociative($data_sets)) {
-			$data_sets = [$data_sets];
-		}
-
+		$data_sets = $this->extractDataSets($fields);
 		$last = count($data_sets) - 1;
 
 		foreach ($data_sets as $i => $data_set) {
@@ -403,8 +398,7 @@ class testDashboardPieChartWidget extends CWebTest
 		$form->fill($main_fields);
 
 		// Fill datasets.
-		$data_sets = CTestArrayHelper::get($fields, 'Data set', ['host' => 'Test Host', 'item' => 'Test Item']);
-		$this->fillDatasets($data_sets, $form);
+		$this->fillDatasets($this->extractDataSets($fields), $form);
 
 		// Fill the other tabs.
 		$tabs = ['Displaying options', 'Time period', 'Legend'];
@@ -426,11 +420,6 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @param CFormElement $form    CFormElement to be filled
 	 */
 	protected function fillDatasets($data_sets, $form) {
-		// When there is only one data set defined make it an array.
-		if (CTestArrayHelper::isAssociative($data_sets)) {
-			$data_sets = [$data_sets];
-		}
-
 		$last = count($data_sets) - 1;
 		// Count of data sets that already exist.
 		$count_sets = $form->query('xpath://li[contains(@class, "list-accordion-item")]')->all()->count();
@@ -464,5 +453,23 @@ class testDashboardPieChartWidget extends CWebTest
 				$form->invalidate();
 			}
 		}
+	}
+
+	/**
+	 * Takes field data from data provider and returns uniform Data set array with default values set.
+	 *
+	 * @param $fields    field data from data provider
+	 * @returns array    normalised
+	 */
+	protected function extractDataSets($fields) {
+		$data_sets = array_key_exists('Data set', $fields)
+			? $fields['Data set']
+			: ['host' => 'Test Host', 'item' => 'Test Item'];
+
+		if (CTestArrayHelper::isAssociative($data_sets)) {
+			$data_sets = [$data_sets];
+		}
+
+		return $data_sets;
 	}
 }
