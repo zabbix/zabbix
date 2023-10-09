@@ -32,6 +32,7 @@ class CItemGeneralHelper {
 			'delay_flex' => [],
 			'delay' => ZBX_ITEM_DELAY_DEFAULT,
 			'description' => DB::getDefault('items', 'description'),
+			'discovered' => false,
 			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
 			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
 			'headers' => [],
@@ -77,6 +78,7 @@ class CItemGeneralHelper {
 			'status_codes' => DB::getDefault('items', 'status_codes'),
 			'status' => DB::getDefault('items', 'status'),
 			'tags' => [],
+			'templated' => false,
 			'templateid' => 0,
 			'timeout' => DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
@@ -355,57 +357,46 @@ class CItemGeneralHelper {
 			$field_map['http_authtype'] = 'authtype';
 			$field_map['http_username'] = 'username';
 			$field_map['http_password'] = 'password';
-		}
 
-		if ($input['query_fields']) {
-			$query_fields = [];
+			if ($input['query_fields']) {
+				$query_fields = [];
 
-			foreach ($input['query_fields'] as $query_field) {
-				if ($query_field['name'] === '' && $query_field['value'] === '') {
-					continue;
+				foreach ($input['query_fields']['sortorder'] as $index) {
+					$name = $input['query_fields']['name'][$index];
+					$value = $input['query_fields']['value'][$index];
+
+					if ($name !== '' || $value !== '') {
+						$query_fields[] = [
+							'name' => $name,
+							'value' => $value
+						];
+					}
 				}
 
-				$query_fields[] = [$query_field['name'] => $query_field['value']];
+				$input['query_fields'] = $query_fields;
 			}
 
-			$input['query_fields'] = $query_fields;
-		}
+			if ($input['headers']) {
+				$headers = [];
 
-		if ($input['headers']) {
-			$headers = [];
+				foreach ($input['headers']['sortorder'] as $index) {
+					$name = $input['headers']['name'][$index];
+					$value = $input['headers']['value'][$index];
 
-			foreach ($input['headers'] as $header) {
-				if ($header['name'] === '' && $header['value'] === '') {
-					continue;
+					if ($name !== '' && $value !== '') {
+						$headers[$name] = $value;
+					}
 				}
 
-				$headers[$header['name']] = $header['value'];
+				$input['headers'] = $headers;
 			}
-
-			$input['headers'] = $headers;
+		}
+		else {
+			$input['query_fields'] = [];
+			$input['headers'] = [];
 		}
 
-		if ($input['preprocessing']) {
-			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
-		}
-
-		if ($input['tags']) {
-			$tags = [];
-
-			foreach ($input['tags'] as $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					continue;
-				}
-
-				$tags[] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
-			}
-
-			$input['tags'] = $tags;
-		}
-
+		// ITEM_TYPE_SCRIPT parameters.
 		if ($input['parameters']) {
 			$parameters = [];
 
@@ -418,6 +409,57 @@ class CItemGeneralHelper {
 			}
 
 			$input['parameters'] = $parameters;
+		}
+
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+		$input['params'] = '';
+
+		if (array_key_exists($input['type'], $params_field)) {
+			$field = $params_field[$input['type']];
+			$input['params'] = $input[$field];
+		}
+
+		if ($input['type'] != ITEM_TYPE_JMX) {
+			$input['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		}
+
+		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
+		if ($input['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) {
+			$input['timeout'] = DB::getDefault('items', 'timeout');
+		}
+
+		if ($input['tags']) {
+			$tags = [];
+
+			foreach ($input['tags'] as $tag) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+					// Skip inherited tags.
+					continue;
+				}
+
+				if ($tag['tag'] !== '' && $tag['value'] !== '') {
+					$tags[] = [
+						'tag' => $tag['tag'],
+						'value' => $tag['value']
+					];
+				}
+			}
+
+			$input['tags'] = $tags;
+		}
+
+		if ($input['preprocessing']) {
+			CArrayHelper::sort($input['preprocessing'], ['sortorder']);
+			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
 		}
 
 		return CArrayHelper::renameKeys($input, $field_map);

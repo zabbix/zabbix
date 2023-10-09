@@ -180,182 +180,21 @@ abstract class CControllerItem extends CController {
 	}
 
 	/**
-	 * Get form data for item from input.
-	 *
-	 * @return array
-	 */
-	protected function getInputForForm(): array {
-		$input = [
-			'allow_traps' => DB::getDefault('items', 'allow_traps'),
-			'authtype' => DB::getDefault('items', 'authtype'),
-			'context' => '',
-			'delay_flex' => [],
-			'delay' => ZBX_ITEM_DELAY_DEFAULT,
-			'description' => DB::getDefault('items', 'description'),
-			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
-			'headers' => [],
-			'history_mode' => ITEM_STORAGE_CUSTOM,
-			'history' => DB::getDefault('items', 'history'),
-			'hostid' => 0,
-			'http_authtype' => ZBX_HTTP_AUTH_NONE,
-			'http_password' => '',
-			'http_proxy' => DB::getDefault('items', 'http_proxy'),
-			'http_username' => '',
-			'interfaceid' => 0,
-			'inventory_link' => 0,
-			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
-			'itemid' => 0,
-			'jmx_endpoint' => ZBX_DEFAULT_JMX_ENDPOINT,
-			'key' => '',
-			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
-			'master_itemid' => 0,
-			'name' => '',
-			'output_format' => DB::getDefault('items', 'output_format'),
-			'parameters' => [],
-			'params_ap' => DB::getDefault('items', 'params'),
-			'params_es' => DB::getDefault('items', 'params'),
-			'params_f' => DB::getDefault('items', 'params'),
-			'password' => DB::getDefault('items', 'password'),
-			'post_type' => DB::getDefault('items', 'post_type'),
-			'posts' => DB::getDefault('items', 'posts'),
-			'preprocessing' => [],
-			'privatekey' => DB::getDefault('items', 'privatekey'),
-			'publickey' => DB::getDefault('items', 'publickey'),
-			'query_fields' => [],
-			'request_method' => DB::getDefault('items', 'request_method'),
-			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
-			'script' => DB::getDefault('items', 'params'),
-			'show_inherited_tags' => 0,
-			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
-			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
-			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
-			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
-			'status_codes' => DB::getDefault('items', 'status_codes'),
-			'status' => DB::getDefault('items', 'status'),
-			'tags' => [],
-			'templateid' => 0,
-			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
-			'timeout' => DB::getDefault('items', 'timeout'),
-			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
-			'trends_mode' => ITEM_STORAGE_CUSTOM,
-			'trends' => DB::getDefault('items', 'trends'),
-			'type' => DB::getDefault('items', 'type'),
-			'units' => DB::getDefault('items', 'units'),
-			'url' => '',
-			'username' => DB::getDefault('items', 'username'),
-			'value_type' => ITEM_VALUE_TYPE_UINT64,
-			'valuemapid' => 0,
-			'verify_host' => DB::getDefault('items', 'verify_host'),
-			'verify_peer' => DB::getDefault('items', 'verify_peer')
-		];
-
-		if ($this->hasInput('form_refresh')) {
-			// Set unchecked values.
-			$input = [
-				'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
-				'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
-				'output_format' => HTTPCHECK_STORE_RAW,
-				'status' => ITEM_STATUS_DISABLED,
-				'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
-				'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF
-			] + $input;
-		}
-
-		$this->getInputs($input, array_keys($input));
-
-		if ($input['query_fields']) {
-			$query_fields = [];
-
-			foreach ($input['query_fields']['sortorder'] as $index) {
-				$query_fields[] = [
-					'name' => $input['query_fields']['name'][$index],
-					'value' => $input['query_fields']['value'][$index]
-				];
-			}
-
-			$input['query_fields'] = $query_fields;
-		}
-
-		if ($input['headers']) {
-			$headers = [];
-
-			foreach ($input['headers']['sortorder'] as $index) {
-				$headers[] = [
-					'name' => $input['headers']['name'][$index],
-					'value' => $input['headers']['value'][$index]
-				];
-			}
-
-			$input['headers'] = $headers;
-		}
-
-		if ($input['preprocessing']) {
-			$preprocessings = [];
-
-			foreach ($input['preprocessing'] as $preprocessing) {
-				$preprocessings[] = $preprocessing + [
-					'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-					'error_handler_params' => ''
-				];
-			}
-
-			$input['preprocessing'] = CItemHelper::sortPreprocessingSteps($preprocessings);
-		}
-
-		if ($input['tags']) {
-			// Unset inherited tags.
-			$tags = [];
-
-			foreach ($input['tags'] as $tag) {
-				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-					continue;
-				}
-
-				$tags[] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
-			}
-
-			$input['tags'] = $tags;
-		}
-
-		$params_field = [
-			ITEM_TYPE_SCRIPT => 'script',
-			ITEM_TYPE_SSH => 'params_es',
-			ITEM_TYPE_TELNET => 'params_es',
-			ITEM_TYPE_DB_MONITOR => 'params_ap',
-			ITEM_TYPE_CALCULATED => 'params_f'
-		];
-		$input['params'] = '';
-
-		if (array_key_exists($input['type'], $params_field)) {
-			$field = $params_field[$input['type']];
-			$input['params'] = $input[$field];
-		}
-
-		if ($input['type'] != ITEM_TYPE_JMX) {
-			$input['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
-		}
-
-		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
-			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
-		}
-
-		if ($input['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) {
-			$input['timeout'] = DB::getDefault('items', 'timeout');
-		}
-
-		return $input;
-	}
-
-	/**
-	 * Get data to send to API from input.
+	 * Get form input data to be sent to API.
 	 *
 	 * @return array
 	 */
 	protected function getInputForApi(): array {
-		$input = $this->getInputForForm();
+		$unchecked_values = [
+			'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
+			'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
+			'output_format' => HTTPCHECK_STORE_RAW,
+			'status' => ITEM_STATUS_DISABLED,
+			'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+			'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF
+		];
+		$input = $unchecked_values + CItemHelper::getDefaults();
+		$this->getInputs($input, array_keys($input));
 
 		return CItemHelper::convertFormInputForApi($input);
 	}
