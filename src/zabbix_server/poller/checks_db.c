@@ -47,7 +47,6 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 				ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __func__, item->key_orig, item->params);
-	zabbix_log(1, "DBG In %s(), key '%s', timeout = %i", __func__, item->key, item->timeout);
 
 	zbx_init_agent_request(&request);
 

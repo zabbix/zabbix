@@ -296,7 +296,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, dcheck->timeout_sec) ||
+				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, dcheck->timeout) ||
 						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
 					ret = FAIL;
@@ -341,7 +341,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				if (SVC_AGENT == dcheck->type)
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
-					item.timeout = dcheck->timeout_sec;
+					item.timeout = dcheck->timeout;
 
 					if (SUCCEED == get_value_agent(&item, source_ip, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
@@ -356,7 +356,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				{
 					item.snmp_community = dcheck->snmp_community;
 					item.snmp_oid = dcheck->key_;
-					item.timeout = dcheck->timeout_sec;
+					item.timeout = dcheck->timeout;
 
 					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
@@ -407,7 +407,7 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	dst->uniq = src->uniq;
 	dst->type = src->type;
 	dst->allow_redirect = src->allow_redirect;
-	dst->timeout_sec = src->timeout_sec;
+	dst->timeout = src->timeout;
 
 	if (SVC_SNMPv1 == src->type || SVC_SNMPv2c == src->type || SVC_SNMPv3 == src->type)
 	{
@@ -1039,7 +1039,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 					goto next;
 				}
 
-				dcheck->timeout_sec = tmt_agent;
+				dcheck->timeout = tmt_agent;
 			}
 			else if (SVC_SNMPv1 == dcheck->type || SVC_SNMPv2c == dcheck->type ||
 					SVC_SNMPv3 == dcheck->type)
@@ -1051,7 +1051,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 					goto next;
 				}
 
-				dcheck->timeout_sec = tmt_snmp;
+				dcheck->timeout = tmt_snmp;
 			}
 			else
 			{
@@ -1062,7 +1062,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 					goto next;
 				}
 
-				dcheck->timeout_sec = tmt_simple;
+				dcheck->timeout = tmt_simple;
 			}
 
 			if (0 != dcheck->uniq)

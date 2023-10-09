@@ -31,7 +31,6 @@ int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESUL
 	const char	*port, *dns, *encoding, *ssh_options;
 
 	zbx_init_agent_request(&request);
-	zabbix_log(1, "DBG In %s(), key '%s', timeout = %i", __func__, item->key, item->timeout);
 
 	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{

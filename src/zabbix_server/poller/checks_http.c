@@ -30,7 +30,6 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 	zbx_http_context_t	context;
 
 	zbx_http_context_create(&context);
-	zabbix_log(1, "DBG In %s(), key '%s', timeout = %i", __func__, item->key, item->timeout);
 
 	if (SUCCEED == zbx_http_request_prepare(&context, item->request_method, item->url,
 			item->query_fields, item->headers, item->posts, item->retrieve_mode, item->http_proxy,

@@ -745,11 +745,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				errcodes[i] = CONFIG_ERROR;
 			}
 			else
-			{
-				zabbix_log(1, "setting item timeout as %i for key %s", timeout_sec,
-						items[i].key_orig);
 				items[i].timeout = timeout_sec;
-			}
 		}
 		zbx_free(timeout);
 	}

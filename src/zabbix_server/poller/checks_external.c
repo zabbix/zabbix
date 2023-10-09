@@ -45,7 +45,6 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
-	zabbix_log(1, "DBG In %s(), key '%s', timeout = %i", __func__, item->key, item->timeout);
 
 	zbx_init_agent_request(&request);
 

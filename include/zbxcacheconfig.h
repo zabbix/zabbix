@@ -668,7 +668,7 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	char		*snmpv3_contextname;
 	unsigned char	allow_redirect;
-	int		timeout_sec;
+	int		timeout;
 }
 zbx_dc_dcheck_t;
 
