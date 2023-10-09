@@ -156,6 +156,9 @@ window.widget_item_form = new class {
 					console.log('Could not get value data type of the item:', exception);
 				});
 		}
+		else {
+			thresholds_warning.style.display = '';
+		}
 	}
 
 	setIndicatorColor(name, color) {
