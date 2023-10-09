@@ -240,10 +240,11 @@ const char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm
 
 	if (NULL != (ptr_r = strchr(ptr_l, '}')))
 	{
-		size_t	len = (size_t)(ptr_r - ptr_l), fm_len = fm->macro.r - fm->macro.l + 1;;
+		size_t	len = (size_t)(ptr_r - ptr_l), fm_len = fm->macro.r - fm->macro.l + 1;
 
 		zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid, sizeof(*N_functionid), 1,
 				9);
+		ptr_l = zbx_strdup(NULL, ptr_l);
 		ptr_l[len + 1] = '\0';
 
 		return ptr_l;
