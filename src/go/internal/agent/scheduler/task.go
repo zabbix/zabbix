@@ -292,11 +292,34 @@ type directExporterTask struct {
 func (t *directExporterTask) isRecurring() bool {
 	return !t.done
 }
+
+func (t *directExporterTask) invokeExport(key string, params []string) (any, error) {
+	ret, err := invokeExport(t.plugin.impl, key, params, t)
+
+	if err != nil {
+		log.Debugf("failed to execute direct exporter task for key '%s[%s]' error: '%s'", key, params, err.Error())
+
+		return nil, err
+	}
+
+	log.Debugf("executed direct exporter task for key '%s[%s]'", key, params)
+	if ret != nil {
+		rt := reflect.TypeOf(ret)
+		switch rt.Kind() {
+		case reflect.Slice, reflect.Array:
+			return nil, errors.New("Multiple return values are not supported for single passive checks")
+		default:
+			return ret, nil
+		}
+	}
+
+	return ret, nil
+}
+
 func (t *directExporterTask) perform(s Scheduler) {
 	// pass item key as parameter so it can be safely updated while task is being processed in its goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
-		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
 		var key string
 		var params []string
@@ -310,22 +333,11 @@ func (t *directExporterTask) perform(s Scheduler) {
 				var ret interface{}
 				log.Debugf("executing direct exporter task for key '%s'", itemkey)
 
-				if ret, err = exporter.Export(key, params, t); err == nil {
-					log.Debugf("executed direct exporter task for key '%s'", itemkey)
-					if ret != nil {
-						rt := reflect.TypeOf(ret)
-						switch rt.Kind() {
-						case reflect.Slice, reflect.Array:
-							err = errors.New("Multiple return values are not supported for single passive checks")
-						default:
-							result = itemutil.ValueToResult(t.item.itemid, now, ret)
-							t.output.Write(result)
-							t.done = true
-						}
-					}
-				} else {
-					log.Debugf("failed to execute direct exporter task for key '%s' error: '%s'",
-						itemkey, err.Error())
+				ret, err = t.invokeExport(key, params)
+				if err == nil {
+					result = itemutil.ValueToResult(t.item.itemid, now, ret)
+					t.output.Write(result)
+					t.done = true
 				}
 			}
 		}

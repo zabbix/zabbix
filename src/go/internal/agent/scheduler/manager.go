@@ -817,20 +817,6 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) isTimeoutManagedByPlugin(requestKey string) (bool, error) {
-	realKey := m.aliases.Get(requestKey)
-	key, _, err := itemutil.ParseKey(realKey)
-	if err != nil {
-		return false, err
-	}
-	p, ok := m.plugins[key]
-	if !ok {
-		return false, fmt.Errorf("Unknown metric %s", key)
-	}
-
-	return p.impl.HandleTimeout(), nil
-}
-
 func (m *Manager) PerformTask(
 	key string,
 	timeout time.Duration,
@@ -838,11 +824,6 @@ func (m *Manager) PerformTask(
 ) (string, error) {
 	var lastLogsize uint64
 	var mtime int
-
-	overrideTimeout, err := m.isTimeoutManagedByPlugin(key)
-	if err != nil {
-		return "", err
-	}
 
 	w := make(resultWriter, 1)
 
@@ -862,25 +843,18 @@ func (m *Manager) PerformTask(
 		time.Now(),
 	)
 
-	if overrideTimeout {
-		timeout = time.Minute
-	}
 	var result string
 
-	select {
-	case r := <-w:
-		if r.Error == nil {
-			if r.Value != nil {
-				result = *r.Value
-			} else {
-				// single metric requests do not support empty values, return error instead
-				return "", errors.New("No values have been gathered yet.")
-			}
+	r := <-w
+	if r.Error == nil {
+		if r.Value != nil {
+			result = *r.Value
 		} else {
-			return "", r.Error
+			// single metric requests do not support empty values, return error instead
+			return "", errors.New("No values have been gathered yet.")
 		}
-	case <-time.After(timeout):
-		return "", fmt.Errorf("Timeout occurred while gathering data.")
+	} else {
+		return "", r.Error
 	}
 
 	return result, nil
