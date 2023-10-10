@@ -27,7 +27,7 @@
 $dir = '/../../include/views/js/';
 $scripts = [
 	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
-	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['item']['hostid']], $dir)
+	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['host']['hostid']], $dir)
 ];
 $item = $data['item'];
 $value_types = [

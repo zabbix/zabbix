@@ -274,8 +274,12 @@ window.item_edit_form = new class {
 	}
 
 	clone() {
-		this.form.querySelector('[name="itemid"]').remove();
-		this.form.querySelector('[name="templateid"]').remove();
+		const el = document.createElement('input');
+
+		el.type = 'hidden';
+		el.name = 'clone';
+		el.value = 1;
+		this.form.appendChild(el);
 		reloadPopup(this.form, this.actions.form);
 	}
 

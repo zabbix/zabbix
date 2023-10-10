@@ -27,7 +27,7 @@
 $dir = '/../../include/views/js/';
 $scripts = [
 	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
-	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['form']['hostid']], $dir)
+	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['host']['hostid']], $dir)
 ];
 $item = $data['item'];
 $value_types = [
@@ -158,7 +158,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 	)
 	->addTab('processing-tab', _('Preprocessing'),
 		new CPartial('item.edit.preprocessing.tab', [
-			'form' => $item,
+			'item' => $item,
 			'preprocessing' => $item['preprocessing'],
 			'preprocessing_types' => $data['preprocessing_types'],
 			'readonly' => $item['templated'] || $item['discovered'],
@@ -190,7 +190,7 @@ $form
 		]).');'))->setOnDocumentReady()
 	);
 $output = [
-	'header' => $data['form']['itemid'] ? _('Item prototype') : _('New item prototype'),
+	'header' => $item['itemid'] ? _('Item prototype') : _('New item prototype'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,

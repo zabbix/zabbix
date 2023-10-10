@@ -28,7 +28,24 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateFormInput([]);
+		$fields = [
+			'context'				=> 'required|in host,template',
+			'parent_discoveryid'	=> 'id',
+			'itemid'				=> 'id',
+			'clone'					=> 'in 1'
+		];
+		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			if ($this->hasInput('clone') && !$this->hasInput('itemid')) {
+				$ret = false;
+				error(_s('Incorrect value for "%1$s" field.', 'itemid'));
+			}
+			elseif (!$this->hasInput('itemid') && !$this->hasInput('parent_discoveryid')) {
+				$ret = false;
+				error(_s('Incorrect value for "%1$s" field.', 'parent_discoveryid'));
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -82,6 +99,35 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			}
 		}
 
+		if ($this->hasInput('clone')) {
+			if ($item['valuemap'] && $item['templateid']) {
+				$host_valuemap = API::ValueMap()->get([
+					'output' => ['valuemapid'],
+					'search' => ['name' => $item['valuemap']['name']],
+					'filter' => ['hostid' => $item['hostid']]
+				]);
+
+				if ($host_valuemap) {
+					$host_valuemap = reset($host_valuemap);
+					$item['valuemap']['valuemapid'] = $host_valuemap['valuemapid'];
+					$item['valuemap']['hostid'] = $item['hostid'];
+				}
+				else {
+					$item['valuemapid'] = 0;
+					$item['valuemap'] = [];
+				}
+			}
+
+			$item = [
+				'itemid' => 0,
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+				'templateid' => 0,
+				'parent_items' => [],
+				'discovered' => false,
+				'templated' => false
+			] + $item;
+		}
+
 		$data = [
 			'item' => $item,
 			'host' => $host,
@@ -114,14 +160,12 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	/**
 	 * Get host data.
-	 *
-	 * @param int $itemid  Item prototype or it discovery rule id.
 	 */
-	protected function getHost($itemid): array {
+	protected function getHost(): array {
 		[$host] = API::Host()->get([
 			'output' => ['hostid', 'proxyid', 'name', 'flags', 'status'],
 			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
-			'itemids' => [$itemid]
+			'itemids' => [$this->getInput('itemid', $this->getInput('parent_discoveryid'))]
 		]);
 
 		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
@@ -136,13 +180,11 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	/**
 	 * Get template data.
-	 *
-	 * @param int $itemid  Item prototype or it discovery rule id.
 	 */
-	protected function getTemplate($itemid): array {
+	protected function getTemplate(): array {
 		[$template] = API::Template()->get([
 			'output' => ['templateid', 'name', 'flags'],
-			'itemids' => [$itemid]
+			'itemids' => [$this->getInput('itemid', $this->getInput('parent_discoveryid'))]
 		]);
 		$template += [
 			'hostid' => $template['templateid'],
@@ -162,11 +204,10 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 		if ($this->hasInput('itemid')) {
 			$item = API::ItemPrototype()->get([
-				'itemids' => $this->getInput('itemid'),
 				'output' => [
 					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
-					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid',
+					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
 					'description', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 					'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
@@ -174,13 +215,15 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 				],
 				'selectDiscoveryRule' => ['itemid', 'templateid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-				'selectTags' => ['tag', 'value']
+				'selectTags' => ['tag', 'value'],
+				'itemids' => $this->getInput('itemid')
 			]);
 			$item = $item ? CItemPrototypeHelper::convertApiInputForForm(reset($item)) : [];
 		}
 
 		if (!$item) {
 			$item = CItemPrototypeHelper::getDefaults();
+			$item['parent_discoveryid'] = $this->getInput('parent_discoveryid');
 		}
 
 		$item['context'] = $this->getInput('context');

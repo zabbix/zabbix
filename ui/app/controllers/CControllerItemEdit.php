@@ -28,7 +28,24 @@ class CControllerItemEdit extends CControllerItem {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateFormInput([]);
+		$fields = [
+			'context'	=> 'required|in host,template',
+			'hostid'	=> 'id',
+			'itemid'	=> 'id',
+			'clone'		=> 'in 1'
+		];
+		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			if ($this->hasInput('clone') && !$this->hasInput('itemid')) {
+				$ret = false;
+				error(_s('Incorrect value for "%1$s" field.', 'itemid'));
+			}
+			elseif (!$this->hasInput('itemid') && !$this->hasInput('hostid')) {
+				$ret = false;
+				error(_s('Incorrect value for "%1$s" field.', 'hostid'));
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -80,6 +97,35 @@ class CControllerItemEdit extends CControllerItem {
 				$value_type_keys += [$type => []];
 				$value_type_keys[$type][$key] = $value_type;
 			}
+		}
+
+		if ($this->hasInput('clone')) {
+			if ($item['valuemap'] && $item['templateid']) {
+				$host_valuemap = API::ValueMap()->get([
+					'output' => ['valuemapid'],
+					'search' => ['name' => $item['valuemap']['name']],
+					'filter' => ['hostid' => $item['hostid']]
+				]);
+
+				if ($host_valuemap) {
+					$host_valuemap = reset($host_valuemap);
+					$item['valuemap']['valuemapid'] = $host_valuemap['valuemapid'];
+					$item['valuemap']['hostid'] = $item['hostid'];
+				}
+				else {
+					$item['valuemapid'] = 0;
+					$item['valuemap'] = [];
+				}
+			}
+
+			$item = [
+				'itemid' => 0,
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+				'templateid' => 0,
+				'parent_items' => [],
+				'discovered' => false,
+				'templated' => false
+			] + $item;
 		}
 
 		$data = [
@@ -167,7 +213,8 @@ class CControllerItemEdit extends CControllerItem {
 
 		if ($this->hasInput('itemid')) {
 			$item = API::Item()->get([
-				'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'output' => [
+					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
 					'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
 					'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',

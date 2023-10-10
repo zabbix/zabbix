@@ -22,6 +22,18 @@
 class CItemHelper extends CItemGeneralHelper {
 
 	/**
+	 * Get item fields default values.
+	 */
+	public static function getDefaults(): array {
+		$general_fields = parent::getDefaults();
+
+		return [
+			'flags'				=> ZBX_FLAG_DISCOVERY_NORMAL,
+			'inventory_link'	=> 0
+		] + $general_fields;
+	}
+
+	/**
 	 * @param string $src_templateid
 	 * @param string $dst_templateid
 	 *

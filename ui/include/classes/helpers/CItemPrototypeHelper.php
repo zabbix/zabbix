@@ -22,6 +22,18 @@
 class CItemPrototypeHelper extends CItemGeneralHelper {
 
 	/**
+	 * Get item prototype fields default values.
+	 */
+	public static function getDefaults(): array {
+		$general_fields = parent::getDefaults();
+
+		return [
+			'discover'	=> ZBX_PROTOTYPE_DISCOVER,
+			'flags'		=> ZBX_FLAG_DISCOVERY_PROTOTYPE
+		] + $general_fields;
+	}
+
+	/**
 	 * Convert API data to be ready to use for edit or create form.
 	 *
 	 * @param array $item  Array of API fields data.
