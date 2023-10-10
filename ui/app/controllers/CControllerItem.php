@@ -76,6 +76,7 @@ abstract class CControllerItem extends CController {
 			'username'				=> 'db items.username',
 			'publickey'				=> 'db items.publickey',
 			'privatekey'			=> 'db items.privatekey',
+			'passphrase'			=> 'db items.password',
 			'password'				=> 'db items.password',
 			'params_es'				=> 'db items.params',
 			'params_ap'				=> 'db items.params',

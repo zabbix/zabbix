@@ -314,8 +314,7 @@ $formgrid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('HTTP proxy'), 'http_proxy'))->setId('js-item-http-proxy-label'),
 		(new CFormField(
-			(new CTextBox('http_proxy', $item['http_proxy'], $readonly,
-				DB::getFieldLength('items', 'http_proxy')))
+			(new CTextBox('http_proxy', $item['http_proxy'], $readonly, DB::getFieldLength('items', 'http_proxy')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 				->disableAutocomplete()
@@ -335,9 +334,7 @@ $formgrid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('User name'), 'http_username'))->setId('js-item-http-username-label'),
 		(new CFormField(
-			(new CTextBox('http_username', $item['http_username'], $readonly,
-				DB::getFieldLength('items', 'username')
-			))
+			(new CTextBox('http_username', $item['http_username'], $readonly, DB::getFieldLength('items', 'username')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->disableAutocomplete()
 		))->setId('js-item-http-username-field')
@@ -345,9 +342,7 @@ $formgrid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Password'), 'http_password'))->setId('js-item-http-password-label'),
 		(new CFormField(
-			(new CTextBox('http_password', $item['http_password'], $readonly,
-					DB::getFieldLength('items', 'password')
-			))
+			(new CTextBox('http_password', $item['http_password'], $readonly, DB::getFieldLength('items', 'password')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->disableAutocomplete()
 		))->setId('js-item-http-password-field')
@@ -490,8 +485,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-snmp-oid-label'),
 		(new CFormField(
-			(new CTextBox('snmp_oid', $item['snmp_oid'], $readonly,
-				DB::getFieldLength('items', 'snmp_oid')))
+			(new CTextBox('snmp_oid', $item['snmp_oid'], $readonly, DB::getFieldLength('items', 'snmp_oid')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 				->setAriaRequired()
@@ -500,8 +494,7 @@ $formgrid
 	->addItem([
 		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField(
-			(new CTextBox('ipmi_sensor', $item['ipmi_sensor'], $readonly,
-				DB::getFieldLength('items', 'ipmi_sensor')))
+			(new CTextBox('ipmi_sensor', $item['ipmi_sensor'], $readonly, DB::getFieldLength('items', 'ipmi_sensor')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-impi-sensor-field')
 	])
@@ -534,8 +527,7 @@ $formgrid
 	->addItem([
 		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
 		(new CFormField(
-			(new CTextBox('username', $item['username'], $item['discovered'],
-				DB::getFieldLength('items', 'username')))
+			(new CTextBox('username', $item['username'], $item['discovered'], DB::getFieldLength('items', 'username')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->disableAutocomplete()
 		))->setId('js-item-username-field')
@@ -563,10 +555,17 @@ $formgrid
 		))->setId('js-item-private-key-field')
 	])
 	->addItem([
+		(new CLabel(_('Key passphrase'), 'passphrase'))->setId('js-item-passphrase-label'),
+		(new CFormField(
+			(new CTextBox('passphrase', $item['password'], $item['discovered'], DB::getFieldLength('items', 'password')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableAutocomplete()
+		))->setId('js-item-passphrase-field')
+	])
+	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
 		(new CFormField(
-			(new CTextBox('password', $item['password'], $item['discovered'],
-				DB::getFieldLength('items', 'password')))
+			(new CTextBox('password', $item['password'], $item['discovered'], DB::getFieldLength('items', 'password')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->disableAutocomplete()
 		))->setId('js-item-password-field')
@@ -777,9 +776,8 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Log time format'), 'logtimefmt'))->setId('js-item-log-time-format-label'),
 		(new CFormField(
-			(new CTextBox('logtimefmt', $item['logtimefmt'], $readonly,
-				DB::getFieldLength('items', 'logtimefmt'))
-			)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox('logtimefmt', $item['logtimefmt'], $readonly, DB::getFieldLength('items', 'logtimefmt')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-log-time-format-field')
 	])
 	->addItem($data['source'] === 'itemprototype' || $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED ? [
@@ -820,8 +818,7 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField(
-			(new CTextBox('trapper_hosts', $item['trapper_hosts'], false,
-				DB::getFieldLength('items', 'trapper_hosts')))
+			(new CTextBox('trapper_hosts', $item['trapper_hosts'], false, DB::getFieldLength('items', 'trapper_hosts')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
 	]);

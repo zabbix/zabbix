@@ -58,6 +58,7 @@ class CItemGeneralHelper {
 			'params_es' => DB::getDefault('items', 'params'),
 			'params_f' => DB::getDefault('items', 'params'),
 			'parent_items' => [],
+			'passphrase' => '',
 			'password' => DB::getDefault('items', 'password'),
 			'post_type' => DB::getDefault('items', 'post_type'),
 			'posts' => DB::getDefault('items', 'posts'),
@@ -421,6 +422,10 @@ class CItemGeneralHelper {
 		if (array_key_exists($input['type'], $params_field)) {
 			$field = $params_field[$input['type']];
 			$input['params'] = $input[$field];
+		}
+
+		if ($input['type'] == ITEM_TYPE_SSH && $input['auth_type'] == ITEM_AUTHTYPE_PUBLICKEY) {
+			$field_map['passphrase'] = 'password';
 		}
 
 		if ($input['type'] != ITEM_TYPE_JMX) {
