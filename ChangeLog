@@ -1,3 +1,35 @@
+Changes for 7.0.0alpha7
+
+New features:
+
+Bug fixes:
+........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.0alpha6
+
+New features:
+..F....... [ZBXNEXT-8681] implemented better defaults and 'Show' options for description, value, needle and scale of Gauge widget (apoga, ddauksa)
+..F....... [ZBXNEXT-8453] fixed navigation confirmation window for trigger edit form, permission check, error messages for tag tab (epulke)
+..F.I..... [ZBXNEXT-7736] added support for active checks, "show only totals" option and host total column/row in Host availability widget (dfofanovs, dgoloscapov)
+.........T [ZBXNEXT-8283] implemented role-based authentication for AWS monitoring (abakaldin)
+.........T [ZBXNEXT-8575] added Nextcloud template (abakaldin)
+A.F....PS. [ZBXNEXT-8645] added get[oid] to retrieve single value asynchronously (agriscenko, vso)
+
+Bug fixes:
+.........T [ZBX-23164] added timespan parameter in JavaScript Cisco Meraki template (egordymov)
+..F....... [ZBX-23288] fixed Top triggers widget showing incorrect entries when custom trigger count is set (Ivo)
+..F....... [ZBX-23465] fixed alignment of tag badges (dpetra)
+..F....... [ZBX-23455] fixed inconsistency in button naming, confirmation messages, success and error messages in item and web scenario list pages (dpetra)
+...G...... [ZBX-20038] fixed master host parameter for MySQL replication.get_slave_status key in Zabbix agent 2 (esneiders)
+..F....... [ZBX-23479] fixed empty hints for widget fields referring to another widgets (averza)
+..F.....S. [ZBX-23301] removed checks for PostgreSQL-TimescaleDB versions combination (dimir)
+..F....... [ZBX-23454] fixed runtime errors while resolving macros in the trigger URL name (Sasha)
+...G...... [ZBX-22735] fixed confusing error message on user parameter reload in Zabbix agent 2 (rzvejs)
+.......PS. [ZBX-23477] fixed item test failures due to timeout error (dgoloscapov)
+........S. [ZBX-23154] stopped running housekeeper TimescaleDB 'drop_chunks' query on history_bin table (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0alpha5
 
 New features:
@@ -283,8 +315,22 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.8rc1
 
 New features:
+.........T [ZBXNEXT-8283] implemented role based authentication for AWS monitoring (abakaldin)
+.........T [ZBXNEXT-8575] added Nextcloud template (abakaldin)
+.......PS. [ZBXNEXT-8469] increased PostgreSQL maximum supported version to 16 (mprihodko)
+.......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
+A......... [ZBX-23373] fixed result for script.get API call with selectActions option (epulke)
+...G...... [ZBX-23014] fixed Zabbix agent build on HP-UX (arimdjonoks)
+.........T [ZBX-23164] added timespan parameter in JavaScript Cisco Meraki template (egordymov)
+..F....... [ZBX-23455] fixed inconsistency in button naming, confirmation messages, success and error messages in item and web scenario list pages (dpetra)
+...G...... [ZBX-20038] fixed master host parameter for MySQL replication.get_slave_status key in Zabbix agent 2 (esneiders)
+..F.....S. [ZBX-23301] removed checks for PostgreSQL-TimescaleDB versions combination (dimir)
+..F....... [ZBX-23454] fixed runtime errors while resolving macros in the trigger URL name (Sasha)
+..F....... [ZBX-23211] fixed host dashboard view for multi page dashboard where the first page is empty (dpetra)
+........S. [ZBX-23427] fixed trends not being calculated (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.7
@@ -1717,8 +1763,20 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.23rc1
 
 New features:
+.........T [ZBXNEXT-8283] implemented role based authentication for AWS monitoring (abakaldin)
+.........T [ZBXNEXT-8575] added Nextcloud template (abakaldin)
+.......PS. [ZBXNEXT-8469] increased PostgreSQL maximum supported version to 16 (mprihodko)
+.......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
+A......... [ZBX-23373] fixed result for script.get API call with selectActions option (epulke)
+...G...... [ZBX-23014] fixed Zabbix agent build on HP-UX (arimdjonoks)
+.........T [ZBX-23164] added timespan parameter in JavaScript Cisco Meraki template (egordymov)
+..F....... [ZBX-23455] fixed inconsistency in button naming, confirmation messages, success and error messages in item and web scenario list pages (dpetra)
+...G...... [ZBX-20038] fixed master host parameter for MySQL replication.get_slave_status key in Zabbix agent 2 (esneiders)
+..F.....S. [ZBX-23301] removed checks for PostgreSQL-TimescaleDB versions combination (dimir)
+..F....... [ZBX-23211] fixed host dashboard view for multi page dashboard where the first page is empty (dpetra)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.22

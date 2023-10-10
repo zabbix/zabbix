@@ -422,22 +422,22 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
 			$this->assertEquals(4, $dialog_footer->query('button',['Update', 'Clone', 'Delete', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 		elseif (isset($data['templatedHost'])) {
 			$this->assertEquals(3, $dialog_footer->query('button',['Update', 'Clone', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 			$this->assertEquals(1, $dialog_footer->query('button:Delete')->all()
-				->filter(new CElementFilter(CElementFilter::NOT_CLICKABLE))->count()
+					->filter(CElementFilter::NOT_CLICKABLE)->count()
 			);
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		}
 		else {
 			$this->assertEquals(2, $dialog_footer->query('button',['Add', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 
