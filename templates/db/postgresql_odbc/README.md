@@ -87,6 +87,7 @@ Servername=<instanceip>;Port=5432;Driver=/usr/lib64/psqlodbcw.so;SSLmode=require
 |PostgreSQL: Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Database monitor|db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
 |PostgreSQL: Get replication|<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p>|Database monitor|db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |PostgreSQL: Get queries|<p>Collect all metrics by query execution time.</p>|Database monitor|db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Version|<p>PostgreSQL version.</p>|Database monitor|db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |WAL: Bytes written|<p>WAL write, in bytes.</p>|Dependent item|pgsql.wal.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write`</p></li><li>Change per second</li></ul>|
 |WAL: Bytes received|<p>WAL receive, in bytes.</p>|Dependent item|pgsql.wal.receive<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.receive`</p></li><li>Change per second</li></ul>|
 |WAL: Segments count|<p>Number of WAL segments.</p>|Dependent item|pgsql.wal.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
@@ -145,6 +146,7 @@ Servername=<instanceip>;Port=5432;Driver=/usr/lib64/psqlodbcw.so;SSLmode=require
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: Version has changed||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0`|Info||
 |PostgreSQL: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
 |PostgreSQL: Oldest xid is too big||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) > 18000000`|Average||
 |PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) < 10m`|Average||
