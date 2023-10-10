@@ -99,13 +99,20 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|([+-]\d{2}(:?\d{2})?))?$/', $value)
-				&& !preg_match('/^\d{2}:\d{2}:\d{2}$/', $value)) {
+		$tz = new DateTimeZone(date_default_timezone_get());
+
+		if (ctype_digit($value)) {
+			$now = new DateTime('@'.$value);
+		}
+		elseif (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|([+-]\d{2}(:?\d{2})?))?$/', $value)
+				|| preg_match('/^\d{2}:\d{2}:\d{2}$/', $value) && !preg_match('/^\d+$/', $value)) {
+			$now = new DateTime($value);
+		}
+		else {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		$tz = new DateTimeZone(date_default_timezone_get());
-		$now = (new DateTime($value))->setTimezone($tz);
+		$now->setTimezone($tz);
 
 		if (count($parameters) == 2) {
 			$relative_time_parser = new CRelativeTimeParser;

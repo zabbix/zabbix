@@ -1,5 +1,13 @@
 [
     {
+        "value": "1696954626",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S"]
+        },
+        "result": "2023-10-10 19:17:06"
+    },
+    {
         "value": "02:00:00",
         "macrofunc": {
             "function": "fmttime",
