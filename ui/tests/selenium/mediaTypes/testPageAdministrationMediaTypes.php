@@ -659,9 +659,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	}
 
 	/**
-	 * Function for getting the id of Action and update it to change all operations to one particular Media type,
-	 * in case if some action operation is set to -All- media types.
-	 * Sources of events are: 0 - trigger, 1 - discovery, 2 - autoregistration, 3 - internal, 4 - service action.
+	 * Function for getting the id of an Action and update it for changing all operations to one particular Media type,
+	 * in case if some action operations were set to -All- media types.
+	 * Possible sources of events are: 0 - trigger, 1 - discovery, 2 - autoregistration, 3 - internal, 4 - service action.
 	 *
 	 * @param integer	$sourceid    the code of an action source
 	 */
