@@ -1631,9 +1631,45 @@ static int	DBpatch_6050138(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050139(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select wf.widgetid from widget_field wf,widget w"
+			" where wf.name='interface_type' and w.type='hostavail' and w.widgetid=wf.widgetid"
+			" group by wf.widgetid having count(wf.name)=1");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "name", "type", "value_int",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, "only_totals", 0, 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #define BACKSLASH_MATCH_PATTERN	"\\\\"
 
-static int	DBpatch_6050139(void)
+static int	DBpatch_6050140(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1781,7 +1817,7 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 	return SUCCEED;
 }
 
-static int	DBpatch_6050140(void)
+static int	DBpatch_6050141(void)
 {
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
@@ -1932,49 +1968,49 @@ clean:
 	return ret;
 }
 
-static int	DBpatch_6050141(void)
+#undef BACKSLASH_MATCH_PATTERN
+
+static int	DBpatch_6050142(void)
 {
 	return fix_expression_macro_escaping("select scriptid,command from scripts where command",
 			"update scripts set command='%s' where scriptid=%s;\n",
 			"Failed to parse expression macro \"%s\" in script with id %s, error: %s");
 }
 
-static int	DBpatch_6050142(void)
+static int	DBpatch_6050143(void)
 {
 	return fix_expression_macro_escaping("select mediatype_messageid,message from media_type_message where message",
 			"update media_type_message set message='%s' where mediatype_messageid=%s;\n",
 			"Failed to parse expression macro \"%s\" in media type message with id %s, error: %s");
 }
 
-static int	DBpatch_6050143(void)
+static int	DBpatch_6050144(void)
 {
 	return fix_expression_macro_escaping("select mediatype_messageid,subject from media_type_message where subject",
 			"update media_type_message set subject='%s' where mediatype_messageid=%s;\n",
 			"Failed to parse expression macro \"%s\" in media type subject with id %s, error: %s");
 }
 
-static int	DBpatch_6050144(void)
+static int	DBpatch_6050145(void)
 {
 	return fix_expression_macro_escaping("select operationid,message from opmessage where message",
 			"update opmessage set message='%s' where operationid=%s;\n",
 			"Failed to parse expression macro \"%s\" in action operation message with id %s, error: %s");
 }
 
-static int	DBpatch_6050145(void)
+static int	DBpatch_6050146(void)
 {
 	return fix_expression_macro_escaping("select operationid,subject from opmessage where subject",
 			"update opmessage set subject='%s' where operationid=%s;\n",
 			"Failed to parse expression macro \"%s\" in action operation subject with id %s, error: %s");
 }
 
-static int	DBpatch_6050146(void)
+static int	DBpatch_6050147(void)
 {
 	return fix_expression_macro_escaping("select triggerid,event_name from triggers where event_name",
 			"update triggers set event_name='%s' where triggerid=%s;\n",
 			"Failed to parse expression macro \"%s\" in event name of the trigger with id %s, error: %s");
 }
-
-#undef BACKSLASH_MATCH_PATTERN
 
 #endif
 
@@ -2125,5 +2161,8 @@ DBPATCH_ADD(6050141, 0, 1)
 DBPATCH_ADD(6050142, 0, 1)
 DBPATCH_ADD(6050143, 0, 1)
 DBPATCH_ADD(6050144, 0, 1)
+DBPATCH_ADD(6050145, 0, 1)
+DBPATCH_ADD(6050146, 0, 1)
+DBPATCH_ADD(6050147, 0, 1)
 
 DBPATCH_END()

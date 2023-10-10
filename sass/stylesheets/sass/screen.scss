@@ -2478,8 +2478,8 @@ select {
 		}
 	}
 
-	&:last-child {
-		margin: 0;
+	&:last-of-type {
+		margin-right: 0;
 	}
 
 	&.green-bg {
@@ -4031,6 +4031,11 @@ z-select {
 	&.disabled {
 		background-color: $white;
 		opacity: 1;
+
+		.geomap-filter-button {
+			cursor: default;
+			opacity: .4;
+		}
 	}
 }
 

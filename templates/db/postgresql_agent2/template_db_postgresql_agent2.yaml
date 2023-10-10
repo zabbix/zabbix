@@ -1087,6 +1087,30 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 523528aad175455fbd1daba161365651
+          name: 'PostgreSQL: Version'
+          key: 'pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'PostgreSQL version.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: application
+          triggers:
+            - uuid: 6b3ac2a19e114e1390e6e0793728f576
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]))>0'
+              name: 'PostgreSQL: Version has changed'
+              event_name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              priority: INFO
+              tags:
+                - tag: scope
+                  value: notice
         - uuid: 6d5aa6213cf248749cbffdea9aff694f
           name: 'WAL: Segments count'
           type: DEPENDENT
