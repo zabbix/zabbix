@@ -405,7 +405,7 @@ class Actions {
 
 		CDataHelper::call('service.create', [
 			[
-				'name' => 'Ф',
+				'name' => 'Reference service',
 				'algorithm' => 1,
 				'sortorder' => 1
 			]
