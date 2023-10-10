@@ -74,6 +74,7 @@ class CDropdownElement extends CElement {
 			for ($i = 0; $i < 5; $i++) {
 				try {
 					$this->waitUntilClickable()->click();
+					$option->scrollIntoView();
 					$option->click();
 
 					return $this;

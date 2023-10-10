@@ -553,15 +553,16 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
+		$form = $this->query('id:item-prototype-form')->asForm()->waitUntilVisible()->one();
 
 		if (isset($templateid)) {
-			$this->zbxTestTextPresent('Parent item');
+			$this->zbxTestTextPresent('Parent items');
 			if (isset($data['hostTemplate'])) {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent item');
+			$this->zbxTestTextNotPresent('Parent items');
 		}
 
 		$this->zbxTestTextPresent('Name');
@@ -746,7 +747,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				|| $type == 'Database monitor') {
 			$this->zbxTestTextPresent('User name');
 			$this->zbxTestAssertVisibleId('username');
-			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 255);
 
 			if ($authtype == 'Public key') {
 				$this->zbxTestTextPresent('Key passphrase');
@@ -755,7 +756,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Password');
 			}
 			$this->zbxTestAssertVisibleId('password');
-			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 255);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);
@@ -785,8 +786,20 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
+				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', 'walk[OID1,OID2,...]');
 			}
+
+			//Check hintbox.
+			$hint_text = "Field requirements:".
+				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
+				"\nget[OID] - to retrieve a single value".
+				"\nOID - (legacy) to retrieve a single value synchronously, optionally combined with other values";
+
+			$form->getLabel('SNMP OID')->query('xpath:./button[@data-hintbox]')->one()->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
+			$this->assertEquals($hint_text, $hint->one()->getText());
+			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+			$hint->waitUntilNotPresent();
 		}
 		else {
 			$this->zbxTestTextNotVisible('SNMP OID');
@@ -2273,7 +2286,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestClickButton('itemprototype.massdelete');
 
 			$this->zbxTestAcceptAlert();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototypes deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype deleted');
 		}
 	}
 

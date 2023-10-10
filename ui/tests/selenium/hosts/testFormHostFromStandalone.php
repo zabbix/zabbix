@@ -72,17 +72,7 @@ class testFormHostFromStandalone extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostFromStandalone_Clone($data) {
-		$this->cloneHost($data, 'Clone');
-
-		// Check that items aren't cloned from original host.
-		$this->assertItemsDBCount($data['fields']['Host name'], 0);
-	}
-
-	/**
-	 * @dataProvider getCloneData
-	 */
-	public function testFormHostFromStandalone_FullClone($data) {
-		$this->cloneHost($data, 'Full clone');
+		$this->cloneHost($data);
 
 		// Check that items cloned from original host.
 		$this->assertItemsDBCount($data['fields']['Host name'], $data['items']);
@@ -114,7 +104,7 @@ class testFormHostFromStandalone extends testFormHost {
 	public function testFormHostFromStandalone_DiscoveredHostLinkedTemplates() {
 		$filtered_results = [
 			[
-				'type' => 'items',
+				'type' => 'items.php?',
 				'form' => 'items',
 				'objects' => [
 					'before_unlink' => [
@@ -136,8 +126,8 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'triggers',
-				'form' => 'triggersForm',
+				'type' => 'zabbix.php?action=trigger.list&',
+				'form' => 'trigger_form',
 				'objects' => [
 					'before_unlink' => [
 						'Test of discovered host 1 template for unlink: Template1 trigger',
@@ -153,7 +143,7 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'graphs',
+				'type' => 'graphs.php?',
 				'form' => 'graphForm',
 				'objects' => [
 					'before_unlink' => [
@@ -170,7 +160,7 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'host_discovery',
+				'type' => 'host_discovery.php?',
 				'form' => 'discovery',
 				'objects' => [
 					'before_unlink' => [
@@ -187,7 +177,7 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'httpconf',
+				'type' => 'httpconf.php?',
 				'form' => 'scenarios',
 				'objects' => [
 					'before_unlink' => [
@@ -209,7 +199,7 @@ class testFormHostFromStandalone extends testFormHost {
 		$this->page->login();
 
 		foreach ($filtered_results as $result) {
-			$this->page->open($result['type'].'.php?filter_set=1&filter_hostids%5B0%5D='.
+			$this->page->open($result['type'].'filter_set=1&filter_hostids%5B0%5D='.
 					$discovered_hostid.'&context=host')->waitUntilReady();
 
 			// Check objects on Discovered host before unlinking templates.
@@ -245,7 +235,7 @@ class testFormHostFromStandalone extends testFormHost {
 
 		foreach ($filtered_results as $result) {
 			// Open hosts objects and check objects on Discovered host after unlinking some templates.
-			$this->page->open($result['type'].'.php?filter_set=1&filter_hostids%5B0%5D='.
+			$this->page->open($result['type'].'filter_set=1&filter_hostids%5B0%5D='.
 					$discovered_hostid.'&context=host')->waitUntilReady();
 			$this->assertTableDataColumn($result['objects']['after_unlink'], 'Name', 'xpath://form[@name='.
 					CXPathHelper::escapeQuotes($result['form']).']/table'

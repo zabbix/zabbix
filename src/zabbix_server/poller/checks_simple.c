@@ -21,7 +21,6 @@
 
 #include "checks_simple_vmware.h"
 #include "simple.h"
-#include "log.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
 
@@ -201,11 +200,11 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	return FAIL;
 }
 
-int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	AGENT_REQUEST	request;
 	vmfunc_t	vmfunc;
-	int		ret = NOTSUPPORTED;
+	int		timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
@@ -218,6 +217,13 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	}
 
 	request.lastlogsize = item->lastlogsize;
+
+	if (FAIL == zbx_is_time_suffix(item->timeout, &request.timeout, ZBX_LENGTH_UNLIMITED))
+	{
+		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
+		/* failures are handled there */
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
@@ -258,7 +264,7 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result, timeout_sec))
 			ret = SUCCEED;
 	}
 

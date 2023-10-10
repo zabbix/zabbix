@@ -29,8 +29,10 @@ $form = (new CForm())
 	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid'] ?: 0)
-	->addVar('eventsource', $data['eventsource'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addVar('eventsource', $data['eventsource']);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Action tab.
 $action_tab = (new CFormGrid())
@@ -53,11 +55,10 @@ $condition_table = (new CTable())
 $formula = (new CTextBox('formula', $data['formula'], false, DB::getFieldLength('actions', 'formula')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+	->setAttribute('placeholder', 'A or (B and C) ...');
 
 $condition_hidden_data = (new CCol([
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
+	(new CButtonLink(_('Remove')))
 		->addClass('js-remove-condition'),
 	(new CInput('hidden'))
 		->setAttribute('value', '#{conditiontype}')
@@ -123,21 +124,25 @@ $condition_tag_value_template = (new CTemplateTag('condition-tag-value-row-tmpl'
 $action_tab->addItem([
 	(new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'),
 	(new CFormField([
-		(new CSelect('evaltype'))
-			->setId('evaltype')
-			->setFocusableElementId('evaltype_select')
-			->setValue($data['action']['filter']['evaltype'])
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or'),
-				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan(''))
-			->addStyle('white-space: normal;')
-			->setId('expression'),
-		$formula,
+		(new CDiv([
+			(new CSelect('evaltype'))
+				->setId('evaltype')
+				->setFocusableElementId('evaltype_select')
+				->setValue($data['action']['filter']['evaltype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				])),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		]))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan(''))->setId('expression'),
+			$formula
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION),
 		$condition_suppressed_template,
 		$condition_template_default,
 		$condition_tag_value_template
@@ -148,10 +153,9 @@ $condition_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->setAttribute('data-eventsource', $data['eventsource'])
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))
 					->addClass('js-condition-create')
+					->setAttribute('data-eventsource', $data['eventsource'])
 			))->setColSpan(4)
 		)
 );

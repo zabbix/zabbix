@@ -31,46 +31,44 @@ $token_form = (new CForm())
 
 $token_from_grid = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Name') . ':'),
+		new CLabel(_('Name').':'),
 		new CFormField($data['name'])
 	])
 	->addItem($data['admin_mode'] === '1'
 		? [
-			new CLabel(_('User') . ':'),
+			new CLabel(_('User').':'),
 			new CFormField($data['user_name'])
 		]
 		: null
 	)
 	->addItem([
-		new CLabel(_('Auth token') . ':'),
+		new CLabel(_('Auth token').':'),
 		new CFormField([
-			$data['auth_token'],
-			'&nbsp;',
+			new CSpan($data['auth_token']),
 			makeWarningIcon(
 				_("Make sure to copy the auth token as you won't be able to view it after the page is closed.")
 			),
-			'&nbsp;',
-			(new CLinkAction(_('Copy to clipboard')))
-				->setAttribute('data-auth_token', $data['auth_token'])
+			(new CButtonLink(_('Copy to clipboard')))
 				->onClick('writeTextClipboard(this.dataset.auth_token);')
+				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
 		])
 	])
 	->addItem([
-		new CLabel(_('Expires at') . ':'),
+		new CLabel(_('Expires at').':'),
 		new CFormField([
-			($data['expires_at'] == 0) ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']),
-			($data['expires_at'] != 0 && time() > $data['expires_at'])
-				? ['&nbsp;', makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))]
+			new CSpan($data['expires_at'] == 0 ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at'])),
+			$data['expires_at'] != 0 && time() > $data['expires_at']
+				? makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))
 				: null
 		])
 	])
 	->addItem([
-		new CLabel(_('Description') . ':'),
+		new CLabel(_('Description').':'),
 		(new CFormField($data['description']))->addClass(ZBX_STYLE_WORDBREAK)
 	])
 	->addItem([
-		new CLabel(_('Enabled') . ':'),
+		new CLabel(_('Enabled').':'),
 		new CFormField((new CCheckBox('enabled'))
 			->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			->setEnabled(false)

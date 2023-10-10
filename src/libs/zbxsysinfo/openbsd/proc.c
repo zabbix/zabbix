@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
 
@@ -183,7 +182,6 @@ retry:
 
 static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 {
-	int	i;
 	size_t	args_offset = 0;
 
 	if (0 == *args_alloc)
@@ -192,7 +190,7 @@ static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 		*args = zbx_malloc(*args, *args_alloc);
 	}
 
-	for (i = 0; i < argc; i++)
+	for (int i = 0; i < argc; i++)
 		zbx_snprintf_alloc(args, args_alloc, &args_offset, "%s ", argv[i]);
 
 	if (0 != args_offset)
@@ -382,7 +380,7 @@ out:
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param;
-	int			proccount = 0, invalid_user = 0, zbx_proc_stat, count, i, proc_ok, stat_ok, comm_ok;
+	int			zbx_proc_stat, count, proc_ok, stat_ok, comm_ok, argc, proccount = 0, invalid_user = 0;
 	size_t			sz;
 	struct passwd		*usrinfo;
 #ifdef KERN_PROC2
@@ -394,7 +392,6 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 	char			**argv = NULL, *args = NULL;
 	size_t			argv_alloc = 0, args_alloc = 0;
-	int			argc;
 
 	if (4 < request->nparam)
 	{
@@ -476,6 +473,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proc = (struct kinfo_proc2 *)zbx_malloc(proc, sz);
 	mib[5] = (int)(sz / sizeof(struct kinfo_proc2));
+
 	if (0 != sysctl(mib, 6, proc, &sz, NULL, 0))
 	{
 		zbx_free(proc);
@@ -508,7 +506,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	count = sz / sizeof(struct kinfo_proc);
 #endif
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		proc_ok = 0;
 		stat_ok = 0;
@@ -695,7 +693,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	} while(0)
 
 	char				*procname, *proccomm, *param, *args = NULL, **argv = NULL, *error = NULL;
-	int				invalid_user = 0, count, i, k, zbx_proc_mode, argc, pagesize;
+	int				invalid_user = 0, count, k, zbx_proc_mode, argc, pagesize;
 	size_t				argv_alloc = 0, args_alloc = 0;
 	struct passwd			*usrinfo;
 	zbx_vector_proc_data_ptr_t	proc_data_ctx;
@@ -767,7 +765,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_proc_data_ptr_create(&proc_data_ctx);
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		proc_data_t			*proc_data;
 		int				count_thread;
@@ -887,7 +885,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
-		for (i = 0; i < proc_data_ctx.values_num; i++)
+		for (int i = 0; i < proc_data_ctx.values_num; i++)
 		{
 			proc_data_t	*pdata = proc_data_ctx.values[i];
 
@@ -926,11 +924,9 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < proc_data_ctx.values_num; i++)
+	for (int i = 0; i < proc_data_ctx.values_num; i++)
 	{
-		proc_data_t	*pdata;
-
-		pdata = proc_data_ctx.values[i];
+		proc_data_t	*pdata = proc_data_ctx.values[i];
 
 		zbx_json_addobject(&j, NULL);
 

@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  * @backup dashboard
  *
  * @onBefore prepareDashboardData
+ *
+ * @dataSource WebScenarios
  */
 class testDashboardItemValueWidget extends CWebTest {
 
@@ -163,22 +165,22 @@ class testDashboardItemValueWidget extends CWebTest {
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.color.0',
+										'name' => 'thresholds.0.color',
 										'value' => 'BF00FF'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.threshold.0',
+										'name' => 'thresholds.0.threshold',
 										'value' => '0'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.color.1',
+										'name' => 'thresholds.1.color',
 										'value' => 'FF0080'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.threshold.1',
+										'name' => 'thresholds.1.threshold',
 										'value' => '0.01'
 									]
 								]
@@ -228,7 +230,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:show_3' => true,
 			'id:show_4' => true,
 			'Advanced configuration' => false,
-			'id:dynamic' => false
+			'id:override_hostid_ms' => ''
 		];
 
 		foreach ($default_values as $field => $value) {
@@ -278,13 +280,13 @@ class testDashboardItemValueWidget extends CWebTest {
 		];
 
 		// Merge all Advanced fields into one array.
-		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background color']);
+		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background colour']);
 
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);
 
 			// Check that dynamic item checkbox is not depending on Advanced configuration checkbox state.
-			$dynamic_field = $form->getField('Enable host selection');
+			$dynamic_field = $form->getField('Override host');
 			$this->assertTrue($dynamic_field->isVisible());
 			$this->assertTrue($dynamic_field->isEnabled());
 
@@ -294,9 +296,9 @@ class testDashboardItemValueWidget extends CWebTest {
 			}
 
 			// Check advanced fields when Advanced configuration is true.
-			if ($advanced_config){
+			if ($advanced_config) {
 				// Check hintbox.
-				$form->query('class:icon-help-hint')->one()->click();
+				$form->getLabel('Description')->query('class:zi-help-filled-small')->one()->click();
 				$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 				// Assert text.
@@ -307,7 +309,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						"\nUser macros", $hint->one()->getText());
 
 				// Close the hint-box.
-				$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint->waitUntilNotPresent();
 
 				// Check default values with Advanced configuration = true.
@@ -336,7 +338,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				// Check fields' lengths.
 				$field_lenghts = [
 					'Name' =>  255,
-					'id:description' => 255,
+					'id:description' => 2048,
 					'id:desc_size' => 3,
 					'id:decimal_places' => 2,
 					'id:decimal_size' => 3,
@@ -597,23 +599,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
-						['threshold' => '0.00001']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number has too many fractional digits.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '9999999999999999']
+						['threshold' => '1.79E+400']
 					],
 					'error' => [
 						'Invalid parameter "Thresholds/1/threshold": a number is too large.'
@@ -709,7 +695,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => [
-							'values' => 'Available memory',
+							'values' => 'Linux: Available memory',
 							'context' => [
 								'values' => 'ЗАББИКС Сервер',
 								'context' => 'Zabbix servers'
@@ -776,7 +762,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:show_header' => false,
 						'Name' => '#$%^&*()!@{}[]<>,.|',
 						'Refresh interval' => '10 minutes',
-						'Item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
+						'Item' => 'Response code for step "step 1 of scenario 1" of scenario "Scenario for Update".',
 						// Description checkbox.
 						'id:show_1' => false,
 						// Value checkbox.
@@ -846,7 +832,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '13',
 						'id:time_bold' => true,
-						'Enable host selection' => true
+						'Override host' => 'Dashboard'
 					]
 				]
 			],
@@ -858,7 +844,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:show_header' => false,
 						'Name' => 'Color pick',
 						'Refresh interval' => '10 minutes',
-						'Item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
+						'Item' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".',
 						// Description checkbox.
 						'id:show_1' => true,
 						// Value checkbox.
@@ -874,7 +860,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '99',
 						'id:units_bold' => true,
-						'Background color' => 'FFAAAA',
+						'Background colour' => 'FFAAAA',
 						'xpath://button[@id="lbl_desc_color"]/..' => 'AABBCC',
 						'xpath://button[@id="lbl_value_color"]/..' => 'CC11CC',
 						'xpath://button[@id="lbl_units_color"]/..' => 'BBCC55',
@@ -928,9 +914,9 @@ class testDashboardItemValueWidget extends CWebTest {
 					'thresholds' => [
 						['threshold' => '0.9999'],
 						['color' => 'AABBCC', 'threshold' => '1'],
-						['threshold' => '999999999999999'],
-						['threshold' => '1K'],
-						['color' => 'FFEB3B', 'threshold' => '5G']
+						['threshold' => '5K'],
+						['color' => 'FFEB3B', 'threshold' => '1G'],
+						['threshold' => '999999999999999']
 					]
 				]
 			]
@@ -1045,6 +1031,13 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $dashboard->getWidget($header)->edit();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$saved_form->checkValue(['Advanced configuration' => false]);
+				$saved_form->fill(['Advanced configuration' => true]);
+			}
 			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 
 			// As form is quite complex, show_header field should be checked separately.
@@ -1184,7 +1177,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		if (!$cancel) {
-			$dashboard->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$old_name)->waitUntilReady();
+			$dashboard->waitUntilReady()->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$old_name)->waitUntilReady();
 		}
 
 		if ($save_dashboard) {
@@ -1278,7 +1271,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	 */
 	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
 		$warning = 'id:item-value-thresholds-warning';
-		$info = 'class:icon-info';
+		$info = 'class:zi-i-warning';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -1294,7 +1287,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->assertTrue($form->query($warning)->one()->isVisible());
 
 			// Check that info icon is displayed.
-			$this->assertTrue($form->query($info)->one()->isVisible());
+			$this->assertTrue($form->getLabel('Thresholds')->query($info)->one()->isVisible());
 
 			// Check hint-box.
 			$form->query($warning)->one()->click();
@@ -1302,14 +1295,14 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->assertEquals('This setting applies only to numeric data.', $hint->getText());
 
 			// Close the hint-box.
-			$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotVisible();
+			$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 		}
 		else {
 			// Check that warning item is not displayed.
 			$this->assertFalse($form->query($warning)->one()->isVisible());
 
 			// Check that info icon is not displayed.
-			$this->assertFalse($form->query($info)->one()->isVisible());
+			$this->assertFalse($form->getLabel('Thresholds')->query($info)->one()->isVisible());
 		}
 	}
 
@@ -1352,7 +1345,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$rgb = implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
 
 			$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])
-					->query('xpath:.//div[contains(@class, "dashboard-widget-item")]/div')->one()->getCSSValue('background-color')
+					->query('xpath:.//div[contains(@class, "dashboard-widget-item")]/div/div')->one()->getCSSValue('background-color')
 			);
 			$index++;
 		}

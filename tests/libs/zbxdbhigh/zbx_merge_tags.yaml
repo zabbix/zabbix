@@ -1,0 +1,712 @@
+---
+test case: "Add tags to destination with no tags"
+in:
+  dst_tags: []
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 0
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Perform exact tag + value match (dst tags: NORMAL, src tags NORMAL)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Perform exact tag + value match
+  (dst tags: NORMAL, src tags AUTOMATIC)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
+---
+test case: "Perform exact tag + value match
+  (dst tags: AUTOMATIC, src tags NORMAL)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
+---
+test case: "Perform exact tag + value match
+  (dst tags: AUTOMATIC, src tags AUTOMATIC)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Perform tag match (dst tags: AUTOMATIC, src tags NORMAL)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 2
+      tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+---
+test case: "Perform tag match (dst tags: AUTOMATIC, src tags AUTOMATIC)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 2
+      tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+---
+test case: "Update rest of the tags (dst tags: AUTOMATIC, src tags NORMAL)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 4
+      tag: tag4
+      value: value4
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 5
+      tag: tag5
+      value: value5
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 6
+      tag: tag6
+      value: value6
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 4
+      tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 5
+      tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 6
+      tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+---
+test case: "Create leftover tags (dst tags: AUTOMATIC, src tags NORMAL)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Create leftover tags (dst tags: AUTOMATIC, src tags AUTOMATIC)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Non-empty dst tags, empty src tags, remove automatic tags from
+  destination"
+in:
+  dst_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+  src_tags: []
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_REMOVE]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_REMOVE]
+---
+test case: "Non-empty dst tags, empty src tags, remove normal (manual) tags
+  from destination"
+in:
+  dst_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+  src_tags: []
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Append tags (dst tags: NORMAL, src tags NORMAL)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Append tags (dst tags: NORMAL, src tags AUTOMATIC)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 0
+      tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Replace tags (dst tags: AUTOMATIC, src tags NORMAL)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 0
+      tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 0
+      tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 0
+      tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+---
+test case: "Replace tags (dst tags: AUTOMATIC, src tags AUTOMATIC)"
+in:
+  dst_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+  src_tags:
+    - tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 0
+      tag: tag44
+      value: value44
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 0
+      tag: tag55
+      value: value55
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+    - tagid: 0
+      tag: tag66
+      value: value66
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+...

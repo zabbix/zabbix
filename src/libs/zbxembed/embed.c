@@ -21,14 +21,13 @@
 #include "embed_xml.h"
 #include "embed.h"
 
-#include "log.h"
 #include "httprequest.h"
 #include "zabbix.h"
 #include "global.h"
 #include "console.h"
 #include "zbxstr.h"
 
-#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)
+#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 512)
 #define ZBX_ES_STACK_LIMIT	1000
 
 /* maximum number of consequent runtime errors after which it's treated as fatal error */
@@ -62,6 +61,9 @@ static void	*es_malloc(void *udata, duk_size_t size)
 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
 	uint64_t	*uptr;
 
+	if (env->total_alloc + size + 8 > env->max_total_alloc)
+		env->max_total_alloc = env->total_alloc + size + 8;
+
 	if (env->total_alloc + size + 8 > ZBX_ES_MEMORY_LIMIT)
 	{
 		if (NULL == env->ctx)
@@ -90,6 +92,9 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
 	}
 	else
 		old_size = 0;
+
+	if (env->total_alloc + size + 8 - old_size > env->max_total_alloc)
+		env->max_total_alloc = env->total_alloc + size + 8 - old_size;
 
 	if (env->total_alloc + size + 8 - old_size > ZBX_ES_MEMORY_LIMIT)
 	{
@@ -273,7 +278,7 @@ void	zbx_es_destroy(zbx_es_t *es)
 {
 	char	*error = NULL;
 
-	if (SUCCEED != zbx_es_destroy_env(es, &error))
+	if (SUCCEED == zbx_es_is_env_initialized(es) && SUCCEED != zbx_es_destroy_env(es, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot destroy embedded scripting engine environment: %s", error);
 	}
@@ -283,14 +288,15 @@ void	zbx_es_destroy(zbx_es_t *es)
  *                                                                            *
  * Purpose: initializes embedded scripting engine environment                 *
  *                                                                            *
- * Parameters: es    - [IN] the embedded scripting engine                     *
- *             error - [OUT] the error message                                *
+ * Parameters: es               - [IN] embedded scripting engine              *
+ *             config_source_ip - [IN]                                        *
+ *             error            - [OUT] error message                         *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_init_env(zbx_es_t *es, char **error)
+int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 {
 	volatile int	ret = FAIL;
 
@@ -298,6 +304,9 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	es->env = zbx_malloc(NULL, sizeof(zbx_es_env_t));
 	memset(es->env, 0, sizeof(zbx_es_env_t));
+	es->env->max_total_alloc = 0;
+
+	es->env->config_source_ip = config_source_ip;
 
 	if (0 != setjmp(es->env->loc))
 	{
@@ -326,13 +335,11 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	/* put environment object to be accessible from duktape C calls */
 	duk_push_global_stash(es->env->ctx);
+
+	duk_push_string(es->env->ctx, "\xff""\xff""zbx_env");
 	duk_push_pointer(es->env->ctx, (void *)es->env);
-	if (1 != duk_put_prop_string(es->env->ctx, -2, "\xff""\xff""zbx_env"))
-	{
-		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
-		duk_pop(es->env->ctx);
-		return FAIL;
-	}
+	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	/* initialize HttpRequest prototype */
 	if (FAIL == zbx_es_init_httprequest(es, error))
@@ -545,6 +552,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	zbx_timespec(&es->env->start_time);
 	es->env->http_req_objects = 0;
+	es->env->logged_msgs = 0;
 
 	if (NULL != es->env->json)
 	{
@@ -650,7 +658,11 @@ out:
 		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration_ms(&es->env->start_time));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated or requested "
+			"memory: " ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error), (zbx_fs_size_t)es->env->total_alloc,
+			(zbx_fs_size_t)es->env->max_total_alloc, ZBX_ES_MEMORY_LIMIT);
+	es->env->max_total_alloc = 0;
 
 	return ret;
 }
@@ -698,20 +710,21 @@ void	zbx_es_debug_disable(zbx_es_t *es)
  *                                                                            *
  * Purpose: executes command (script in form of a text)                       *
  *                                                                            *
- * Parameters: command       - [IN] the command in form of a text             *
- *             param         - [IN] the script parameters                     *
- *             timeout       - [IN] the timeout for the execution (seconds)   *
- *             result        - [OUT] the result of an execution               *
- *             error         - [OUT] the error message                        *
- *             max_error_len - [IN] the maximum length of an error            *
- *             debug         - [OUT] the debug data (optional)                *
+ * Parameters: command          - [IN] command in form of a text              *
+ *             param            - [IN] script parameters                      *
+ *             timeout          - [IN] timeout for the execution (seconds)    *
+ *             config_source_ip - [IN]                                        *
+ *             result           - [OUT] result of an execution                *
+ *             error            - [OUT] error message                         *
+ *             max_error_len    - [IN] maximum length of an error             *
+ *             debug            - [OUT] debug data (optional)                 *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_execute_command(const char *command, const char *param, int timeout, char **result,
-		char *error, size_t max_error_len, char **debug)
+int	zbx_es_execute_command(const char *command, const char *param, int timeout, const char *config_source_ip,
+		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int		size, ret = SUCCEED;
 	char		*code = NULL, *errmsg = NULL;
@@ -720,7 +733,7 @@ int	zbx_es_execute_command(const char *command, const char *param, int timeout, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_es_init(&es);
-	if (FAIL == zbx_es_init_env(&es, &errmsg))
+	if (FAIL == zbx_es_init_env(&es, config_source_ip, &errmsg))
 	{
 		zbx_snprintf(error, max_error_len, "cannot initialize scripting environment: %s", errmsg);
 		zbx_free(errmsg);

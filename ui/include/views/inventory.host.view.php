@@ -146,14 +146,14 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['host']['hostid'])
 				->setArgument('show_details', '1')
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 			)
 			: _('Latest data'),
 		$data['allowed_ui_problems']
 			? new CLink(_('Problems'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
 				->setArgument('hostids', [$data['host']['hostid']])
+				->setArgument('filter_set', '1')
 			)
 			: _('Problems'),
 		$data['allowed_ui_hosts']
@@ -185,7 +185,8 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 			->setArgument('context', 'host')
 	);
 	$triggersLink = new CLink(_('Triggers'),
-		(new CUrl('triggers.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'trigger.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 			->setArgument('context', 'host')
@@ -242,7 +243,9 @@ $inventoryValues = false;
 foreach ($data['host']['inventory'] as $key => $value) {
 	if ($value !== '') {
 		$detailsFormList->addRow($data['tableTitles'][$key]['title'],
-			(new CDiv(zbx_str2links($value)))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			(new CDiv(zbx_str2links($value)))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 		);
 
 		$inventoryValues = true;
@@ -258,12 +261,8 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel()]));
 
-$web_layout_mode = CViewHelper::loadLayoutMode();
-
 (new CHtmlPage())
 	->setTitle(_('Host inventory'))
-	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem(
 		(new CForm())
 			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

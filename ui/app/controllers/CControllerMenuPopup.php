@@ -58,13 +58,12 @@ class CControllerMenuPopup extends CController {
 				break;
 
 			case 'history':
-			case 'item':
 				$rules = [
-					'itemid' => 'required|db items.itemid',
-					'backurl' => 'required|string'
+					'itemid' => 'required|db items.itemid'
 				];
 				break;
 
+			case 'item':
 			case 'item_prototype':
 				$rules = [
 					'itemid' => 'required|db items.itemid',
@@ -85,8 +84,9 @@ class CControllerMenuPopup extends CController {
 			case 'trigger':
 				$rules = [
 					'triggerid' => 'required|db triggers.triggerid',
+					'backurl' => 'required|string',
 					'eventid' => 'db events.eventid',
-					'update_problem' => 'in 0,1',
+					'show_update_problem' => 'in 0,1',
 					'show_rank_change_cause' => 'in 0,1',
 					'show_rank_change_symptom' => 'in 0,1',
 					'ids' => 'array_db events.eventid'
@@ -278,9 +278,9 @@ class CControllerMenuPopup extends CController {
 			if (array_key_exists('urls', $menu_data)) {
 				foreach ($menu_data['urls'] as &$url) {
 					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert(\''.
-							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
-						'\');';
+						$url['url'] = 'javascript: alert('.
+							json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
+						');';
 						unset($url['target'], $url['rel']);
 					}
 				}
@@ -357,7 +357,8 @@ class CControllerMenuPopup extends CController {
 				'isExecutable' => $is_executable,
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'binary_value_type' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
 			];
 		}
 
@@ -393,6 +394,7 @@ class CControllerMenuPopup extends CController {
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
+				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
 				'trigger_prototypes' => $db_item_prototype['triggers']
@@ -404,6 +406,25 @@ class CControllerMenuPopup extends CController {
 		error(_('No permissions to referred object or it does not exist!'));
 
 		return null;
+	}
+
+	/**
+	 * Validates URLs for supported schemes.
+	 *
+	 * @param array  $urls
+	 * @param array  $urls[]['url']
+	 *
+	 * @return array
+	 */
+	private static function sanitizeMapElementUrls(array $urls): array {
+		foreach ($urls as &$url) {
+			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
+				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
+			}
+		}
+		unset($url);
+
+		return $urls;
 	}
 
 	/**
@@ -435,10 +456,6 @@ class CControllerMenuPopup extends CController {
 		foreach ($selement['urls'] as $url_nr => $url) {
 			if ($url['name'] === '' || $url['url'] === '') {
 				unset($selement['urls'][$url_nr]);
-			}
-			elseif (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
-				$selement['urls'][$url_nr]['url'] = 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
-					zbx_jsvalue($url['url'], false, false)).'\');';
 			}
 		}
 
@@ -510,7 +527,7 @@ class CControllerMenuPopup extends CController {
 						}
 
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						return $menu_data;
 
@@ -530,7 +547,7 @@ class CControllerMenuPopup extends CController {
 							$menu_data['show_suppressed'] = true;
 						}
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						if ($selement['tags']) {
 							$menu_data['evaltype'] = $selement['evaltype'];
@@ -623,7 +640,7 @@ class CControllerMenuPopup extends CController {
 							'type' => 'map_element_trigger',
 							'triggers' => $triggers,
 							'items' => $items,
-							'showEvents' => $show_events,
+							'show_events' => $show_events,
 							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 							'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 							'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
@@ -640,7 +657,7 @@ class CControllerMenuPopup extends CController {
 						}
 
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 
 						return $menu_data;
@@ -650,7 +667,7 @@ class CControllerMenuPopup extends CController {
 							'type' => 'map_element_image'
 						];
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						return $menu_data;
 				}
@@ -666,14 +683,19 @@ class CControllerMenuPopup extends CController {
 	 * Prepare data for trigger context menu popup.
 	 *
 	 * @param array  $data
-	 * @param string $data['triggerid']
-	 * @param string $data['eventid']         (optional) Mandatory for "Update problem" menu and event rank change.
-	 * @param array  $data['ids']             (optional) Event IDs that are used in event rank change to symptom.
-	 * @param bool   $data['update_problem']  (optional) Whether to show "Update problem" menu.
+	 *        string $data['triggerid']                 Trigger ID.
+	 *        string $data['backurl']                   URL from where the menu popup was called.
+	 *        string $data['eventid']                   (optional) Mandatory for "Update problem", "Mark as cause"
+	 *                                                  and "Mark selected as symptoms" context menus.
+	 *        array  $data['ids']                       (optional) Event IDs that are used in event rank change to
+	 *                                                  symptom.
+	 *        bool   $data['show_update_problem']       (optional) Whether to show "Update problem".
+	 *        bool   $data['show_rank_change_cause']    (optional) Whether to show "Mark as cause".
+	 *        bool   $data['show_rank_change_symptom']  (optional) Whether to show "Mark selected as symptoms".
 	 *
-	 * @return mixed
+	 * @return array|null
 	 */
-	private static function getMenuDataTrigger(array $data) {
+	private static function getMenuDataTrigger(array $data): ?array {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url_name', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
@@ -736,8 +758,9 @@ class CControllerMenuPopup extends CController {
 			$menu_data = [
 				'type' => 'trigger',
 				'triggerid' => $data['triggerid'],
+				'backurl' => $data['backurl'],
 				'items' => $items,
-				'showEvents' => $show_events,
+				'show_events' => $show_events,
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
@@ -755,7 +778,7 @@ class CControllerMenuPopup extends CController {
 
 				$events = API::Event()->get([
 					'output' => ['eventid', 'r_eventid', 'urls', 'cause_eventid'],
-					'select_acknowledges' => ['action'],
+					'selectAcknowledges' => ['action'],
 					'eventids' => $data['eventid']
 				]);
 
@@ -779,24 +802,22 @@ class CControllerMenuPopup extends CController {
 
 						// Show individual menus depending on location.
 						$menu_data['show_rank_change_cause'] = array_key_exists('show_rank_change_cause', $data)
-							? $data['show_rank_change_cause']
-							: false;
+							&& $data['show_rank_change_cause'];
 						$menu_data['show_rank_change_symptom'] = array_key_exists('show_rank_change_symptom', $data)
-							? $data['show_rank_change_symptom']
-							: false;
+							&& $data['show_rank_change_symptom'];
+						$menu_data['csrf_tokens']['acknowledge'] = CCsrfTokenHelper::get('acknowledge');
 					}
 				}
 			}
 
-			if (array_key_exists('update_problem', $data)) {
-				$menu_data['update_problem'] = ((bool) $data['update_problem']
-						&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
-							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-							|| $can_be_closed
-							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
-						)
-				);
+			if (array_key_exists('show_update_problem', $data)) {
+				$menu_data['show_update_problem'] = $data['show_update_problem']
+					&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+						|| $can_be_closed
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
+					);
 			}
 
 			$scripts_by_events = [];
@@ -868,7 +889,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if ($scripts) {
-				$menu_data['csrf_token'] = CCsrfTokenHelper::get('scriptexec');
+				$menu_data['csrf_tokens']['scriptexec'] = CCsrfTokenHelper::get('scriptexec');
 			}
 
 			foreach (array_values($urls) as $url) {
@@ -885,9 +906,9 @@ class CControllerMenuPopup extends CController {
 			if (array_key_exists('urls', $menu_data)) {
 				foreach ($menu_data['urls'] as &$url) {
 					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert(\''.
-							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
-						'\');';
+						$url['url'] = 'javascript: alert('.
+							json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
+						');';
 						unset($url['target'], $url['rel']);
 					}
 				}

@@ -46,7 +46,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			return false;
 		}
 
-		if ($this->hasInput('clone_hostid') && $this->hasInput('full_clone')) {
+		if ($this->hasInput('clone_hostid') && $this->hasInput('clone')) {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'hostids' => $this->getInput('clone_hostid')
@@ -68,7 +68,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			$host = [
 				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-				'proxy_hostid' => $this->getInput('proxy_hostid', 0),
+				'proxyid' => $this->getInput('proxyid', 0),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
 				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 				'tags' => $this->processTags($this->getInput('tags', [])),
@@ -99,7 +99,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
 
-			$full_clone = $this->hasInput('full_clone');
+			$clone = $this->hasInput('clone');
 			$src_hostid = $this->getInput('clone_hostid', '');
 
 			if ($src_hostid) {
@@ -110,7 +110,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			if ($result === false
 					|| !$this->createValueMaps($result['hostids'][0])
-					|| ($full_clone && !$this->copyFromCloneSourceHost($src_hostid, $result['hostids'][0]))) {
+					|| ($clone && !$this->copyFromCloneSourceHost($src_hostid, $result['hostids'][0]))) {
 				throw new Exception();
 			}
 
@@ -202,59 +202,12 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	 */
 	private function copyFromCloneSourceHost(string $src_hostid, string $hostid): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		if (!copyHttpTests($src_hostid, $hostid)) {
+		if (!copyHttpTests($src_hostid, $hostid)
+				|| !CItemHelper::cloneHostItems($src_hostid, $hostid)
+				|| !CTriggerHelper::cloneHostTriggers($src_hostid, $hostid)
+				|| !CGraphHelper::cloneHostGraphs($src_hostid, $hostid)
+				|| !CLldRuleHelper::cloneHostItems($src_hostid, $hostid)) {
 			return false;
-		}
-
-		if (!copyItemsToHosts('hostids', [$src_hostid], false, [$hostid])) {
-			return false;
-		}
-
-		// Copy triggers.
-		if (!copyTriggersToHosts([$hostid], $src_hostid)) {
-			return false;
-		}
-
-		// Copy discovery rules.
-		$db_discovery_rules = API::DiscoveryRule()->get([
-			'output' => ['itemid'],
-			'hostids' => $src_hostid,
-			'inherited' => false
-		]);
-
-		if ($db_discovery_rules) {
-			$copy_discovery_rules = API::DiscoveryRule()->copy([
-				'discoveryids' => array_column($db_discovery_rules, 'itemid'),
-				'hostids' => [$hostid]
-			]);
-
-			if (!$copy_discovery_rules) {
-				return false;
-			}
-		}
-
-		// Copy graphs.
-		$db_graphs = API::Graph()->get([
-			'output' => ['graphid'],
-			'selectHosts' => ['hostid'],
-			'selectItems' => ['type'],
-			'hostids' => $src_hostid,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'inherited' => false
-		]);
-
-		foreach ($db_graphs as $db_graph) {
-			if (count($db_graph['hosts']) > 1) {
-				continue;
-			}
-
-			if (httpItemExists($db_graph['items'])) {
-				continue;
-			}
-
-			if (!copyGraphToHost($db_graph['graphid'], $hostid)) {
-				return false;
-			}
 		}
 
 		return true;

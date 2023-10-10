@@ -20,14 +20,13 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxsymbols.h"
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxwin32.h"
 
 #include <tlhelp32.h>
-#include "sddl.h"
+#include <sddl.h> /* ConvertSidToStringSid */
 
 #define MAX_NAME	256
 
@@ -254,51 +253,51 @@ static int	GetProcessAttribute(HANDLE hProcess, int attr, int type, int count, d
 			break;
 		case 5:        /* gdiobj */
 		case 6:        /* userobj */
-			if (NULL == zbx_GetGuiResources)
+			if (NULL == zbx_get_GetGuiResources())
 				return SYSINFO_RET_FAIL;
 
-			value = (double)zbx_GetGuiResources(hProcess, 5 == attr ? 0 : 1);
+			value = (double)(*zbx_get_GetGuiResources())(hProcess, 5 == attr ? 0 : 1);
 			break;
 		case 7:        /* io_read_b */
-			if (NULL == zbx_GetProcessIoCounters)
+			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_GetProcessIoCounters(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.ReadTransferCount);
 			break;
 		case 8:        /* io_read_op */
-			if (NULL == zbx_GetProcessIoCounters)
+			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_GetProcessIoCounters(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.ReadOperationCount);
 			break;
 		case 9:        /* io_write_b */
-			if (NULL == zbx_GetProcessIoCounters)
+			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_GetProcessIoCounters(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.WriteTransferCount);
 			break;
 		case 10:       /* io_write_op */
-			if (NULL == zbx_GetProcessIoCounters)
+			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_GetProcessIoCounters(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.WriteOperationCount);
 			break;
 		case 11:       /* io_other_b */
-			if (NULL == zbx_GetProcessIoCounters)
+			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_GetProcessIoCounters(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.OtherTransferCount);
 			break;
 		case 12:       /* io_other_op */
-			if (NULL == zbx_GetProcessIoCounters)
+			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_GetProcessIoCounters(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.OtherOperationCount);
 			break;
 		default:       /* Unknown attribute */
@@ -492,7 +491,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->param = -1.0;			\
 	} while(0)
 
-	int				zbx_proc_mode, i;
+	int				zbx_proc_mode;
 	struct zbx_json			j;
 	HANDLE				hProcessSnap, hThreadSnap;
 	PROCESSENTRY32			pe32;
@@ -653,8 +652,8 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				proc_data->cputime_system = proc_data->cputime_user = -1.0;
 
-			if (NULL != zbx_GetProcessIoCounters &&
-					FALSE != zbx_GetProcessIoCounters(hProcess, &ioCounters))
+			if (NULL != zbx_get_GetProcessIoCounters() &&
+					FALSE != (*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters))
 			{
 				proc_data->io_read_b = (double)((__int64)ioCounters.ReadTransferCount);
 				proc_data->io_read_op = (double)((__int64)ioCounters.ReadOperationCount);
@@ -684,14 +683,12 @@ next:
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
-		int	k;
-
-		for (i = 0; i < proc_data_ctx.values_num; i++)
+		for (int i = 0; i < proc_data_ctx.values_num; i++)
 		{
 			proc_data = proc_data_ctx.values[i];
 			proc_data->processes = 1;
 
-			for (k = i + 1; k < proc_data_ctx.values_num; k++)
+			for (int k = i + 1; k < proc_data_ctx.values_num; k++)
 			{
 				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
 
@@ -726,7 +723,7 @@ next:
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < proc_data_ctx.values_num; i++)
+	for (int i = 0; i < proc_data_ctx.values_num; i++)
 	{
 		proc_data = proc_data_ctx.values[i];
 

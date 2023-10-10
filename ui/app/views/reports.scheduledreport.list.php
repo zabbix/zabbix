@@ -86,19 +86,22 @@ $form->addItem([
 		new CActionButtonList('action', 'reportids', [
 			'scheduledreport.enable' => [
 				'name' => _('Enable'),
-				'confirm' => _('Enable selected scheduled reports?'),
+				'confirm_singular' => _('Enable selected scheduled report?'),
+				'confirm_plural' => _('Enable selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
 				'csrf_token' => $csrf_token
 			],
 			'scheduledreport.disable' => [
 				'name' => _('Disable'),
-				'confirm' => _('Disable selected scheduled reports?'),
+				'confirm_singular' => _('Disable selected scheduled report?'),
+				'confirm_plural' => _('Disable selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
 				'csrf_token' => $csrf_token
 			],
 			'scheduledreport.delete' => [
 				'name' => _('Delete'),
-				'confirm' => _('Delete selected scheduled reports?'),
+				'confirm_singular' => _('Delete selected scheduled report?'),
+				'confirm_plural' => _('Delete selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
 				'csrf_token' => $csrf_token
 			]

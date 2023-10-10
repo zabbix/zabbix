@@ -11,32 +11,144 @@
 		grid-template-columns: max-content auto;
 	}
 
+	fieldset {
+		display: contents;
+
+		legend {
+			grid-column: 2 / -1;
+			margin-top: 10px;
+
+			span {
+				font-size: $font-h4-size;
+				color: $font-color;
+			}
+		}
+
+		> label {
+			padding-left: 24px;
+		}
+
+		&.collapsible {
+			legend {
+				grid-column: 1 / -1;
+
+				.toggle {
+					position: relative;
+					padding: 0 5px 0 10px;
+					border: none;
+					background-color: transparent;
+
+					&::before {
+						color: $btn-icon-color;
+					}
+
+					&:hover {
+						&::before {
+							color: $btn-icon-hover-color;
+						}
+					}
+
+					&:active,
+					&:focus {
+						&::before {
+							color: $btn-icon-focus-color;
+						}
+					}
+
+					&::after {
+						content: ' ';
+						position: absolute;
+						top: 20px;
+						left: 11px;
+						width: 2px;
+						height: var(--fieldset-height, 0);
+						background: $ui-border-color;
+						pointer-events: none;
+					}
+
+					span {
+						line-height: normal;
+						border-bottom: 1px dotted $font-color;
+					}
+
+					&:hover {
+						span {
+							border-bottom-style: solid;
+						}
+					}
+
+					&:focus {
+						box-shadow: none;
+
+						span {
+							margin-bottom: -1px;
+							border-bottom-width: 2px;
+							border-bottom-style: solid;
+						}
+					}
+				}
+			}
+
+			&.collapsed {
+				.toggle {
+					&::after {
+						display: none;
+					}
+				}
+
+				label,
+				.fields-group,
+				.form-field {
+					display: none !important;
+				}
+			}
+		}
+	}
+
+	label {
+		align-self: start;
+		line-height: 24px;
+		text-align: right;
+		word-wrap: break-word;
+
+		&.fields-group-label {
+			margin-top: 6px;
+		}
+
+		.btn-icon,
+		.icon {
+			margin-left: 5px;
+		}
+
+		&:not([for]) {
+			pointer-events: none;
+
+			.btn-icon {
+				pointer-events: initial;
+			}
+		}
+	}
+
 	.fields-group {
 		grid-column: 2 / -1;
 		padding: 5px;
 		border: 1px solid $form-fields-group-border-color;
 	}
 
-	> label {
-		line-height: 24px;
-		text-align: right;
-		word-wrap: break-word;
-
-		&.fields-group-label {
-			padding-top: 5px;
-		}
-
-		.icon-help-hint,
-		.icon-info {
-			margin-left: 5px;
-		}
+	> .form-field,
+	> .field-fluid,
+	fieldset > .form-field,
+	fieldset > .field-fluid,
+	.form-actions {
+		grid-column: 2 / -1;
+		text-align: left;
 	}
 
 	> .form-field,
 	> .field-fluid,
+	fieldset > .form-field,
+	fieldset > .field-fluid,
 	.form-actions {
-		grid-column: 2 / -1;
-		text-align: left;
 		line-height: 24px;
 	}
 
@@ -46,6 +158,10 @@
 				margin-left: 10px;
 			}
 		}
+	}
+
+	&.form-grid-actions {
+		margin-top: 10px;
 	}
 
 	.form-field {
@@ -63,37 +179,6 @@
 			&.offset-#{$offset} {
 				grid-column-start: $value !important;
 			}
-		}
-
-		table {
-			width: 100%;
-
-			&.table-initial-width {
-				width: auto;
-			}
-
-			.sortable td {
-				padding-bottom: 0;
-				vertical-align: middle;
-				line-height: 24px;
-			}
-		}
-
-		th {
-			padding: 0 5px 0 0;
-			color: $font-alt-color;
-
-			&:last-child {
-				padding: 0;
-			}
-		}
-
-		td {
-			padding: 0 5px 5px 0;
-		}
-
-		.list-check-radio {
-			line-height: $body-line-height;
 		}
 	}
 
@@ -121,12 +206,92 @@
 		}
 	}
 
+	.form-subfield {
+		margin-top: 5px;
+	}
+
+	table {
+		width: 100%;
+
+		&.table-initial-width {
+			width: auto;
+		}
+
+		.form_row,
+		.sortable {
+			td {
+				line-height: 24px;
+			}
+		}
+
+		.sortable td {
+			&.td-drag-icon {
+				line-height: inherit;
+			}
+
+			&.wordbreak,
+			&.wordwrap {
+				line-height: $body-line-height;
+			}
+		}
+
+		.btn-icon,
+		.icon {
+			@extend %button-size-medium;
+		}
+	}
+
+	th {
+		padding: 0 5px 0 0;
+		color: $font-alt-color;
+
+		&:last-child {
+			padding: 0;
+		}
+	}
+
+	td {
+		padding: 0 5px 5px 0;
+	}
+
+	.table-forms,
 	.table-forms-separator {
-		display: inline-flex;
-		line-height: 1.4;
+		line-height: $body-line-height;
 
 		td {
-			padding: 5px 5px 5px 0;
+			padding: 5px 5px 0 0;
+
+			&:last-child {
+				padding-right: 0;
+			}
+		}
+	}
+
+	.table-forms-separator {
+		display: inline-flex;
+	}
+
+	.btn-split {
+		button {
+			&[aria-expanded="true"] {
+				background-color: $ui-bg-selected-color;
+				border-color: $ui-bg-selected-color;
+			}
+		}
+	}
+
+	a,
+	.btn-icon,
+	.btn-link {
+		&:not(:first-child) {
+			margin-left: 5px;
+		}
+	}
+
+	.btn-icon {
+		&.btn-small {
+			top: 1px;
+			vertical-align: text-bottom;
 		}
 	}
 }

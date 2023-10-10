@@ -38,7 +38,7 @@ class CControllerPopupMassupdateItem extends CController {
 
 			// The fields used for all item types.
 			'type' => 'int32',
-			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
 			'units' => 'string',
 			'history' => 'string',
 			'trends' => 'string',
@@ -55,7 +55,7 @@ class CControllerPopupMassupdateItem extends CController {
 			'authtype' => 'string',
 			'username' => 'string',
 			'password' => 'string',
-			'timeout' => 'string',
+			'timeout' => 'string|not_empty',
 			'delay' => 'string',
 			'trapper_hosts' => 'string',
 
@@ -121,6 +121,7 @@ class CControllerPopupMassupdateItem extends CController {
 	 * @return CControllerResponse
 	 */
 	protected function update(): CControllerResponse {
+		$items_count = count($this->getInput('ids'));
 		$item_prototypes = (bool) $this->getInput('prototype', false);
 
 		try {
@@ -143,7 +144,7 @@ class CControllerPopupMassupdateItem extends CController {
 				'authtype' => DB::getDefault('items', 'authtype'),
 				'username' => DB::getDefault('items', 'username'),
 				'password' => DB::getDefault('items', 'password'),
-				'timeout' => '',
+				'timeout' => DB::getDefault('items', 'timeout'),
 				'delay' => DB::getDefault('items', 'delay'),
 				'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
 
@@ -214,7 +215,7 @@ class CControllerPopupMassupdateItem extends CController {
 
 			if ($item_prototypes) {
 				$db_items = API::ItemPrototype()->get([
-					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps'],
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps', 'snmp_oid'],
 					'selectHosts' => ['status'],
 					'itemids' => $itemids,
 					'preservekeys' => true
@@ -222,7 +223,9 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 			else {
 				$db_items = API::Item()->get([
-					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps'],
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps',
+						'snmp_oid'
+					],
 					'selectHosts' => ['status'],
 					'itemids' => $itemids,
 					'preservekeys' => true
@@ -267,13 +270,18 @@ class CControllerPopupMassupdateItem extends CController {
 		catch (Exception $e) {
 			$result = false;
 			CMessageHelper::setErrorTitle(
-				$item_prototypes ? _('Cannot update item prototypes') : _('Cannot update items')
+				$item_prototypes
+					? _n('Cannot update item prototype', 'Cannot update item prototypes', $items_count)
+					: _n('Cannot update item', 'Cannot update items', $items_count)
 			);
 		}
 
 		if ($result) {
 			$messages = CMessageHelper::getMessages();
-			$output = ['title' => $item_prototypes ? _('Item prototypes updated') : _('Items updated')];
+			$output = ['title' => $item_prototypes
+				? _n('Item prototype updated', 'Item prototypes updated', $items_count)
+				: _n('Item updated', 'Items updated', $items_count)
+			];
 
 			if (count($messages)) {
 				$output['messages'] = array_column($messages, 'message');

@@ -71,7 +71,12 @@ $fields = [
 										]),
 										'isset({add}) || isset({update})'
 									],
-	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
+	'value_type' =>					[T_ZBX_INT, O_OPT, null,
+										IN([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+											ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+										]),
+										'isset({add}) || isset({update})'
+									],
 	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
@@ -141,9 +146,16 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>	 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO|P_ALLOW_LLD_MACRO,	null,
+	'custom_timeout' =>				[T_ZBX_INT, O_OPT, null,
+										IN([ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
+										null
+									],
+	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
 										'(isset({add}) || isset({update})) && isset({type})'.
-											' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
+										' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
+											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+											ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+										], 'type'),
 										_('Timeout')
 									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -253,7 +265,7 @@ unset($_REQUEST[$paramsFieldName]);
 // Permissions.
 $lld_rules = API::DiscoveryRule()->get([
 	'output' => ['itemid', 'hostid'],
-	'selectHosts' => ['status'],
+	'selectHosts' => ['proxyid', 'status'],
 	'itemids' => getRequest('parent_discoveryid'),
 	'editable' => true
 ]);
@@ -350,8 +362,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				? getRequest('http_password', DB::getDefault('items', 'password'))
 				: getRequest('password', DB::getDefault('items', 'password')),
 			'params' => getRequest('params', DB::getDefault('items', 'params')),
-			'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 			'delay' => getDelayWithCustomIntervals(getRequest('delay', DB::getDefault('items', 'delay')), $delay_flex),
+			'timeout' => getRequest('custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
+				? getRequest('timeout', DB::getDefault('items', 'timeout'))
+				: DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
 
 			// Dependent item type specific fields.
@@ -365,7 +379,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'posts' => getRequest('posts', DB::getDefault('items', 'posts')),
 			'headers' => prepareItemHeaders(getRequest('headers', [])),
 			'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-			'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+			'follow_redirects' => getRequest('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF),
 			'retrieve_mode' => getRequest('retrieve_mode', $retrieve_mode_default),
 			'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
 			'http_proxy' => getRequest('http_proxy', DB::getDefault('items', 'http_proxy')),
@@ -416,7 +430,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (hasRequest('update')) {
 			$db_items = API::ItemPrototype()->get([
-				'output' => ['templateid', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
+				'output' => ['templateid'],
 				'itemids' => $itemid
 			]);
 
@@ -480,7 +494,12 @@ elseif (hasRequest('action') && getRequest('action') === 'itemprototype.massdele
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
+
+	$item_prototypes_count = count(getRequest('group_itemid'));
+	$messageSuccess = _n('Item prototype deleted', 'Item prototypes deleted', $item_prototypes_count);
+	$messageFailed = _n('Cannot delete item prototype', 'Cannot delete item prototypes', $item_prototypes_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && hasRequest('group_itemid')
 		&& in_array(getRequest('action'), ['itemprototype.massdiscover.enable', 'itemprototype.massdiscover.disable'])) {
@@ -510,11 +529,11 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
  * Display
  */
 if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
-	$item = [];
+	$itemPrototype = [];
 	$has_errors = false;
 
 	if (hasRequest('itemid') && !hasRequest('clone')) {
-		$items = API::ItemPrototype()->get([
+		$itemPrototype = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
 			'output' => [
 				'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
@@ -529,12 +548,10 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value']
 		]);
-		$item = reset($items);
-
-		$item['hosts'] = $lld_rules[0]['hosts'];
+		$itemPrototype = reset($itemPrototype);
 
 		$i = 0;
-		foreach ($item['preprocessing'] as &$step) {
+		foreach ($itemPrototype['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
 			}
@@ -545,24 +562,24 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		}
 		unset($step);
 
-		if ($item['type'] != ITEM_TYPE_JMX) {
-			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		if ($itemPrototype['type'] != ITEM_TYPE_JMX) {
+			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => [getRequest('master_itemid', $item['master_itemid'])],
-				'hostids' => [$item['hostid']],
+				'itemids' => [getRequest('master_itemid', $itemPrototype['master_itemid'])],
+				'hostids' => [$itemPrototype['hostid']],
 				'webitems' => true
 			])
 			+ API::ItemPrototype()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $item['master_itemid'])
+				'itemids' => getRequest('master_itemid', $itemPrototype['master_itemid'])
 			]);
 
 			if ($master_prototypes) {
-				$item['master_item'] = reset($master_prototypes);
+				$itemPrototype['master_item'] = reset($master_prototypes);
 			}
 		}
 	}
@@ -578,7 +595,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		]);
 
 		if ($master_prototypes) {
-			$item['master_item'] = reset($master_prototypes);
+			$itemPrototype['master_item'] = reset($master_prototypes);
 		}
 		else {
 			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
@@ -587,11 +604,23 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	}
 
 	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
-	$data = getItemFormData($item, ['form' => $form_action]);
-	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
+	$data = getItemFormData($itemPrototype, ['form' => $form_action]);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+
+	$default_timeout = DB::getDefault('items', 'timeout');
+	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);
+	$data['inherited_timeouts'] = getInheritedTimeouts($lld_rules[0]['hosts'][0]['proxyid']);
+	$data['can_edit_source_timeouts'] = $data['inherited_timeouts']['source'] === 'proxy'
+		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+
+	if (!$data['custom_timeout']) {
+		$data['timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
+			? $data['inherited_timeouts']['timeouts'][$data['type']]
+			: $default_timeout;
+	}
 
 	$data['display_interfaces'] = $data['hostid']
 		? (bool) API::Host()->get([
@@ -693,9 +722,8 @@ else {
 			->setArgument('context', $data['context'])
 	);
 
-	$data['parent_items'] = getParentItemPrototypes($data['items'],
-		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-	);
+	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
 

@@ -69,12 +69,12 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	];
 
 	private static $trigger_icons = [
-		'2_trigger_Information' => 'icon-ackn',
-		'3_trigger_Average' => 'icon-ackn',
-		'4_trigger_Average' => 'icon-ackn',
+		'2_trigger_Information' => 'zi-check',
+		'3_trigger_Average' => 'zi-check',
+		'4_trigger_Average' => 'zi-check',
 		'Dependent trigger ONE' => 'icon-depend-down',
-		'Inheritance trigger with tags' => 'icon-depend-down',
-		'Trigger disabled with tags' => 'icon-depend-up'
+		'Inheritance trigger with tags' => 'zi-bullet-alt-down',
+		'Trigger disabled with tags' => 'zi-bullet-alt-up'
 	];
 
 	/**
@@ -156,8 +156,8 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Trigger overview')]);
-		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Hosts', 'Tags',
-				'Show suppressed problems', 'Hosts location'], $form->getLabels()->asText()
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Hosts',
+				'Problem tags', 'Show suppressed problems', 'Hosts location'], $form->getLabels()->asText()
 		);
 
 		$default_values = [
@@ -192,7 +192,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		// Check possible values of radio buttons.
 		$radio_buttons = [
 			'Show' => ['Recent problems', 'Problems', 'Any'],
-			'Tags' => ['And/Or', 'Or'],
+			'Problem tags' => ['And/Or', 'Or'],
 			'Hosts location' => ['Left', 'Top']
 		];
 
@@ -416,7 +416,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Filter triggers by 2 tags with Or operator',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Street', 'operator' => 'Exists'],
@@ -499,7 +499,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Filter by 2 tags without value',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'server', 'operator' => 'Contains', 'value' => ''],
@@ -637,7 +637,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show' => 'Any',
 			'Host groups' => ['Another group to check Overview'],
 			'Hosts' => ['4_Host_to_check_Monitoring_Overview'],
-			'Tags' => 'Or',
+			'Problem tags' => 'Or',
 			'Show suppressed problems' => 'true',
 			'Hosts location' => 'Top'
 		]);
@@ -675,7 +675,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testDashboardSlaReportWidget_Delete() {
+	public function testDashboardTriggerOverviewWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget(self::$delete_widget);
@@ -727,8 +727,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$row = $dashboard->getWidget(self::$update_widget)->getContent()->asTable()->findRow('Hosts', self::$icon_host);
 
 		foreach ($popup_content as $trigger => $dependency) {
-			// Locate hint and check table headers in hint.
-			$hint_table = $row->getColumn($trigger)->query('class:hint-box')->one()->asTable();
+			// Hover hint and check table headers in hint.
+			$row->getColumn($trigger)->query('tag:button')->one()->hoverMouse();
+			$hint_table = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one()
+					->query('class:list-table')->one()->asTable();
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 
 			// Gather data from rows and compare result with reference.
@@ -853,7 +855,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show' => 'Recent problems',
 			'Host groups' => '',
 			'Hosts' => '',
-			'Tags' => 'And/Or',
+			'Problem tags' => 'And/Or',
 			'Show suppressed problems' => false,
 			'Hosts location' => 'Left'
 		];
@@ -890,7 +892,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		// Check trigger icon if such should exist.
 		if (in_array($trigger, self::$trigger_icons)) {
-			$element = (self::$trigger_icons[$trigger] === 'icon-ackn') ? 'span' : 'a';
+			$element = (self::$trigger_icons[$trigger] === 'zi-check') ? 'span' : 'a';
 			$icon = $cell->query('xpath:.//'.$element)->one();
 			$this->assertTrue($icon->isValid());
 			$this->assertStringStartsWith(self::$trigger_icons[$trigger], $cell->getAttribute('class'));

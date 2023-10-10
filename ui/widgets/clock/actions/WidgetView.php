@@ -34,14 +34,6 @@ use Widgets\Clock\Widget;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	protected function init(): void {
-		parent::init();
-
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
-
 	protected function doAction(): void {
 		$config_defaults = [
 			'name' => $this->widget->getDefaultName(),
@@ -170,8 +162,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$items = [];
 		$clock = ['is_enabled' => true];
 
-		if ($this->hasInput('templateid')) {
-			if ($this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard()) {
+			if ($this->fields_values['override_hostid']) {
 				$template_items = API::Item()->get([
 					'output' => ['key_'],
 					'itemids' => $this->fields_values['itemid'],
@@ -182,7 +174,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$items = API::Item()->get([
 						'output' => ['itemid', 'value_type'],
 						'selectHosts' => ['name'],
-						'hostids' => [$this->getInput('dynamic_hostid')],
+						'hostids' => $this->fields_values['override_hostid'],
 						'filter' => [
 							'key_' => $template_items[0]['key_']
 						],
@@ -212,7 +204,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item = $items[0];
 			$clock['name'] = $item['hosts'][0]['name'];
 
-			$last_value = Manager::History()->getLastValues([$item]);
+			$last_value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+				? []
+				: Manager::History()->getLastValues([$item]);
 
 			if ($last_value) {
 				$last_value = $last_value[$item['itemid']][0];

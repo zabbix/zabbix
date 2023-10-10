@@ -26,33 +26,44 @@
  * @var array $data
  */
 
+if (array_key_exists('itemid', $data['fields'])) {
+	$field_itemid = (new CWidgetFieldMultiSelectItemPrototypeView($data['fields']['itemid']))
+		->setPopupParameter('numeric', true);
+
+	if (!$data['fields']['itemid']->isTemplateDashboard()) {
+		$field_itemid->setPopupParameter('with_simple_graph_item_prototypes', true);
+	}
+}
+else {
+	$field_itemid = null;
+}
+
 (new CWidgetFormView($data))
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
+	->addField($field_itemid)
 	->addField(array_key_exists('graphid', $data['fields'])
-		? new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid'],
-			$data['captions']['ms']['graph_prototypes']['graphid']
-		)
-		: null
-	)
-	->addField(array_key_exists('itemid', $data['fields'])
-		? new CWidgetFieldMultiSelectItemPrototypeView($data['fields']['itemid'],
-			$data['captions']['ms']['item_prototypes']['itemid']
-		)
+		? new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid'])
 		: null
 	)
 	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['show_legend'])
+		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
-		: null
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_legend'])
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['columns'])
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['rows'])
+	)
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
+		: null
 	)
 	->show();

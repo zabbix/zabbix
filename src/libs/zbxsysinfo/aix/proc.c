@@ -187,6 +187,10 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procentry, proccomm))
 			continue;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): selected process with procentry.pi_pid=%d procentry.pi_uid=%d"
+				" procentry.pi_comm=[%s] proccomm=[%s]", __func__, procentry.pi_pid, procentry.pi_uid,
+				procentry.pi_comm, proccomm);
+
 		switch (mem_type_code)
 		{
 			case ZBX_VSIZE:

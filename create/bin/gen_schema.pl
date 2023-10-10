@@ -32,12 +32,13 @@ my %table_types;	# for making sure that table types aren't duplicated
 my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
-	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
+	"after"		=>	"\t{0}\n};\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n#undef ZBX_TYPE_SHORTTEXT_LEN\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
+	"t_bin"		=>	"ZBX_TYPE_BLOB",
 	"t_integer"	=>	"ZBX_TYPE_INT",
 	"t_longtext"	=>	"ZBX_TYPE_LONGTEXT",
 	"t_nanosec"	=>	"ZBX_TYPE_INT",
@@ -70,8 +71,6 @@ $c{"before"} = "/*
 #include \"zbxdbschema.h\"
 #include \"zbxcommon.h\"
 
-const ZBX_TABLE\ttables[] = {
-
 #if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_LEN	2048
 #else
@@ -81,6 +80,7 @@ const ZBX_TABLE\ttables[] = {
 #define ZBX_TYPE_LONGTEXT_LEN	0
 #define ZBX_TYPE_TEXT_LEN	65535
 
+static zbx_db_table_t\ttables[] = {
 ";
 
 my %mysql = (
@@ -94,6 +94,7 @@ my %mysql = (
 	"t_double"	=>	"DOUBLE PRECISION",
 	"t_id"		=>	"bigint unsigned",
 	"t_image"	=>	"longblob",
+	"t_bin"		=>	"longblob",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"longtext",
 	"t_nanosec"	=>	"integer",
@@ -115,6 +116,7 @@ my %oracle = (
 	"t_double"	=>	"BINARY_DOUBLE",
 	"t_id"		=>	"number(20)",
 	"t_image"	=>	"blob",
+	"t_bin"		=>	"blob",
 	"t_integer"	=>	"number(10)",
 	"t_longtext"	=>	"nclob",
 	"t_nanosec"	=>	"number(10)",
@@ -136,6 +138,7 @@ my %postgresql = (
 	"t_double"	=>	"DOUBLE PRECISION",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"bytea",
+	"t_bin"		=>	"bytea",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
@@ -157,6 +160,7 @@ my %sqlite3 = (
 	"t_double"	=>	"DOUBLE PRECISION",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"longblob",
+	"t_bin"		=>	"longblob",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
@@ -196,12 +200,12 @@ sub newstate($)
 		{
 			if ($uniq ne "")
 			{
-				print ",\n\t\t{0}\n\t\t}${uniq}\n\t},\n";
+				print ",\n\t\t\t{0}\n\t\t}${uniq}\n\t},\n";
 				$uniq = "";
 			}
 			else
 			{
-				print ",\n\t\t{0}\n\t\t},\n\t\tNULL\n\t},\n";
+				print ",\n\t\t\t{0}\n\t\t},\n\t\tNULL\n\t},\n";
 			}
 		}
 	}
@@ -239,7 +243,7 @@ sub process_table($)
 			s/^$/0/;
 		}
 
-		print "\t{\"${table_name}\",\t\"${pkey_name}\",\t${flags},\n\t\t{\n";
+		print "\t{\"${table_name}\", \"${pkey_name}\", ${flags},\n\t\t{\n";
 	}
 	else
 	{
@@ -361,7 +365,7 @@ sub process_field($)
 			$default = "\"$default\"";
 		}
 
-		print "\t\t{\"${name}\",\t${default},\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
+		print "\t\t\t{\"${name}\", ${default}, ${fk_table}, ${fk_field}, ${length}, $type, ${flags}, ${fk_flags}}";
 	}
 	else
 	{
@@ -590,9 +594,68 @@ sub process_row($)
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
+sub timescaledb_get_version($)
+{
+	my $constant_name = shift;
+
+	my $version_file = dirname($0) . "/../../include/zbx_dbversion_constants.h";
+
+	if (! -r $version_file)
+	{
+		print "Expected file \"$version_file\" not found\n";
+		exit;
+	}
+
+	my $ver = `grep $constant_name $version_file`;
+	chomp($ver);
+	(undef, undef, $ver) = split(' ', $ver);
+	$ver =~ m/"([^\.]+)\.([^\.]+)[\."]/;
+
+	return ($1, $2);
+}
+
 sub timescaledb()
 {
+	my ($minimum_postgres_version_major, $minimum_postgres_version_minor) =
+		timescaledb_get_version("ZBX_POSTGRESQL_MIN_VERSION_STR");
+	my ($minimum_timescaledb_version_major, $minimum_timescaledb_version_minor) =
+		timescaledb_get_version("ZBX_TIMESCALE_MIN_VERSION_STR");
+
 	print<<EOF
+DROP FUNCTION IF EXISTS base36_decode(character varying);
+CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
+RETURNS bigint AS \$\$
+DECLARE
+	a char[];
+	ret bigint;
+	i int;
+	val int;
+	chars varchar;
+BEGIN
+	chars := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+	FOR i IN REVERSE char_length(base36)..1 LOOP
+		a := a || substring(upper(base36) FROM i FOR 1)::char;
+	END LOOP;
+	i := 0;
+	ret := 0;
+	WHILE i < (array_length(a, 1)) LOOP
+		val := position(a[i + 1] IN chars) - 1;
+		ret := ret + (val * (36 ^ i));
+		i := i + 1;
+	END LOOP;
+
+	RETURN ret;
+END;
+\$\$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+DROP FUNCTION IF EXISTS cuid_timestamp(cuid varchar(25));
+CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS integer AS \$\$
+BEGIN
+	RETURN CAST(base36_decode(substring(cuid FROM 2 FOR 8))/1000 AS integer);
+END;
+\$\$ LANGUAGE 'plpgsql' IMMUTABLE;
+
 DO \$\$
 DECLARE
 	minimum_postgres_version_major		INTEGER;
@@ -606,11 +669,13 @@ DECLARE
 	current_timescaledb_version_major	INTEGER;
 	current_timescaledb_version_minor	INTEGER;
 	current_timescaledb_version_full	VARCHAR;
+
+	current_db_extension			VARCHAR;
 BEGIN
-	SELECT 10 INTO minimum_postgres_version_major;
-	SELECT 2 INTO minimum_postgres_version_minor;
-	SELECT 1 INTO minimum_timescaledb_version_major;
-	SELECT 5 INTO minimum_timescaledb_version_minor;
+	SELECT $minimum_postgres_version_major INTO minimum_postgres_version_major;
+	SELECT $minimum_postgres_version_minor INTO minimum_postgres_version_minor;
+	SELECT $minimum_timescaledb_version_major INTO minimum_timescaledb_version_major;
+	SELECT $minimum_timescaledb_version_minor INTO minimum_timescaledb_version_minor;
 
 	SHOW server_version INTO current_postgres_version_full;
 
@@ -624,9 +689,9 @@ BEGIN
 	IF (current_postgres_version_major < minimum_postgres_version_major OR
 			(current_postgres_version_major = minimum_postgres_version_major AND
 			current_postgres_version_minor < minimum_postgres_version_minor)) THEN
-			RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
-					current_postgres_version_full, minimum_postgres_version_major,
-					minimum_postgres_version_minor;
+		RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
+				current_postgres_version_full, minimum_postgres_version_major,
+				minimum_postgres_version_minor;
 	ELSE
 		RAISE NOTICE 'PostgreSQL version % is valid', current_postgres_version_full;
 	END IF;
@@ -651,27 +716,45 @@ BEGIN
 	ELSE
 		RAISE NOTICE 'TimescaleDB version % is valid', current_timescaledb_version_full;
 	END IF;
+
+	SELECT db_extension FROM config INTO current_db_extension;
+
 EOF
 	;
+
+	my $flags = "migrate_data => true, if_not_exists => true";
 
 	for ("history", "history_uint", "history_log", "history_text", "history_str")
 	{
 		print<<EOF
-	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, $flags);
 EOF
 	;
 	}
 
+		print<<EOF
+	PERFORM create_hypertable('auditlog', 'auditid', chunk_time_interval => 604800,
+			time_partitioning_func => 'cuid_timestamp', $flags);
+EOF
+	;
+
 	for ("trends", "trends_uint")
 	{
 		print<<EOF
-	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 2592000, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 2592000, $flags);
 EOF
 	;
 	}
+
 	print<<EOF
-	UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
-	UPDATE config SET compression_status=1,compress_older='7d';
+
+	IF (current_db_extension = 'timescaledb') THEN
+		RAISE NOTICE 'TimescaleDB extension is already installed; not changing configuration';
+	ELSE
+		UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
+		UPDATE config SET compression_status=1,compress_older='7d';
+	END IF;
+
 	RAISE NOTICE 'TimescaleDB is configured successfully';
 END \$\$;
 EOF
@@ -781,7 +864,7 @@ sub close_function($)
 {
 	my $type = shift;
 	my ($out, $ret_row);
-	
+
 	if ($type eq "delete")
 	{
 		$ret_row = "old";
@@ -991,12 +1074,14 @@ sub process()
 
 sub c_append_changelog_tables()
 {
-	print "\nconst zbx_db_table_changelog_t\tchangelog_tables[] = {\n";
-	
+	print "
+static const zbx_db_table_changelog_t\tchangelog_tables[] =
+{\n";
+
 	while (my ($object, $table) = each(%table_types)) {
 		print "\t{\"$table\", $object},\n"
 	}
-	
+
 	print	"\t{0}\n};\n";
 }
 
@@ -1034,7 +1119,7 @@ sub main()
 	if ($format eq "c")
 	{
 		c_append_changelog_tables();
-		
+
 		$eol = "\\n\\";
 		$fk_bol = "\t\"";
 		$fk_eol = "\",";
@@ -1044,15 +1129,17 @@ sub main()
 		$szcol3 = 0;
 		$szcol4 = 0;
 		$sql_suffix="\";\n";
-		$fkeys_prefix = "const char\t*const db_schema_fkeys[] = {\n";
-		$fkeys_suffix = "\tNULL\n};\n";
 
-		print "#if defined(HAVE_SQLITE3)\nconst char\t*const db_schema = \"\\\n";
+		print "#if defined(HAVE_SQLITE3)\nstatic const char\t*db_schema = \"\\\n";
 		%output = %sqlite3;
 		process();
 		print "#else\t/* HAVE_SQLITE3 */\n";
-		print "const char\t*const db_schema = NULL;\n";
+		print "static const char\t*db_schema = NULL;\n";
 		print "#endif\t/* not HAVE_SQLITE3 */\n";
+		print "\nzbx_db_table_t\t*zbx_dbschema_get_tables(void)\n{\n\treturn tables;\n}\n";
+		print "\nconst zbx_db_table_changelog_t\t*zbx_dbschema_get_changelog_tables(void)\n" .
+				"{\n\treturn changelog_tables;\n}\n";
+		print "\nconst char\t*zbx_dbschema_get_schema(void)\n{\n\treturn db_schema;\n}\n";
 	}
 }
 

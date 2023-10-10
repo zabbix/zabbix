@@ -18,18 +18,18 @@
 **/
 
 #include "snmptrapper.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxregexp.h"
-#include "preproc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
@@ -40,8 +40,8 @@ static int	force = 0;
 
 static void	DBget_lastsize(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zbx_db_begin();
 
@@ -77,7 +77,7 @@ static void	DBupdate_lastsize(void)
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
-	DC_ITEM			*items = NULL;
+	zbx_dc_item_t		*items = NULL;
 	const char		*regex;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
@@ -92,7 +92,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	um_handle = zbx_dc_open_user_macros();
 
-	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
+	num = zbx_dc_config_get_snmp_items_by_interfaceid(interfaceid, &items);
 
 	itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
 	lastclocks = (int *)zbx_malloc(lastclocks, sizeof(int) * num);
@@ -106,7 +106,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
 		if (SUCCEED != zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
-				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
+				ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = NOTSUPPORTED;
@@ -134,7 +134,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		{
 			if ('@' == *regex)
 			{
-				DCget_expressions_by_name(&regexps, regex + 1);
+				zbx_dc_get_expressions_by_name(&regexps, regex + 1);
 
 				if (0 == regexps.values_num)
 				{
@@ -209,13 +209,13 @@ next:
 
 	zbx_free(results);
 
-	DCrequeue_items(itemids, lastclocks, errcodes, num);
+	zbx_dc_requeue_items(itemids, lastclocks, errcodes, num);
 
 	zbx_free(errcodes);
 	zbx_free(lastclocks);
 	zbx_free(itemids);
 
-	DCconfig_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, num);
 	zbx_free(items);
 
 	zbx_dc_close_user_macros(um_handle);
@@ -247,7 +247,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
 	zbx_timespec(&ts);
 	trap = zbx_dsprintf(trap, "%s%s", begin, end);
 
-	count = DCconfig_get_snmp_interfaceids_by_addr(addr, &interfaceids);
+	count = zbx_dc_config_get_snmp_interfaceids_by_addr(addr, &interfaceids);
 
 	for (i = 0; i < count; i++)
 	{
@@ -396,7 +396,7 @@ static void	delay_trap_logs(char *error, int log_level)
 	now = (int)time(NULL);
 	error_hash = zbx_default_string_hash_func(error);
 
-	if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || last_error_hash != error_hash)
+	if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || last_error_hash != error_hash)
 	{
 		zabbix_log(log_level, "%s", error);
 		lastlogtime = now;

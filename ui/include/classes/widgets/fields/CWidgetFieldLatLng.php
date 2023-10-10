@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldLatLng extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldLatLngView::class;
 	public const DEFAULT_VALUE = '';
 
 	/**
@@ -35,7 +36,7 @@ class CWidgetFieldLatLng extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setValidationRules(['type' => API_LAT_LNG_ZOOM, 'length' => 255]);
+			->setValidationRules(['type' => API_LAT_LNG_ZOOM])
+			->setMaxLength(255);
 	}
 }

@@ -112,7 +112,7 @@ $html_page = (new CHtmlPage())
 	)
 	->addItem($filter);
 
-$token_form = (new CForm('get'))
+$token_form = (new CForm())
 	->addVar('action_src', 'token.list')
 	->setName('token_form');
 
@@ -200,18 +200,24 @@ $token_form->addItem([
 	$token_table,
 	$data['paging'],
 	new CActionButtonList('action', 'tokenids', [
-		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?'),
+		'token.enable' => [
+			'name' => _('Enable'),
+			'confirm_singular' => _('Enable selected API token?'),
+			'confirm_plural' => _('Enable selected API tokens?'),
 			'csrf_token' => $csrf_token
 		],
-		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?'),
+		'token.disable' => [
+			'name' => _('Disable'),
+			'confirm_singular' => _('Disable selected API token?'),
+			'confirm_plural' => _('Disable selected API tokens?'),
 			'csrf_token' => $csrf_token
 		],
 		'token.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-token')
-				->addClass('no-chkbxrange')
-				->removeid()
+				->addClass('js-no-chkbxrange')
+				->removeId()
 		]
 	], 'token')
 ]);

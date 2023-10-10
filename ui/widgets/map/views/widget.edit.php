@@ -28,14 +28,6 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
-	)
-	->addField(array_key_exists('sysmapid', $data['fields'])
-		? new CWidgetFieldSelectResourceView($data['fields']['sysmapid'], $data['captions']['simple'])
-		: null
-	)
-	->addField(array_key_exists('filter_widget_reference', $data['fields'])
-		? new CWidgetFieldWidgetSelectView($data['fields']['filter_widget_reference'])
-		: null
+		new CWidgetFieldMultiSelectMapView($data['fields']['sysmapid'])
 	)
 	->show();

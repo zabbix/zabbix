@@ -56,12 +56,6 @@ class CControllerDashboardWidgetCheck extends CController {
 			}
 		}
 
-		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
-			error(_('Widget type is not supported in this context.'));
-
-			$ret = false;
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
@@ -92,6 +86,9 @@ class CControllerDashboardWidgetCheck extends CController {
 			}
 
 			$output['error']['messages'] = array_column(get_and_clear_messages(), 'message');
+		}
+		else {
+			$output['fields'] = $form->getFieldsValues();
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

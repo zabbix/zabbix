@@ -28,7 +28,7 @@ class CCheckBoxList extends CList {
 	/**
 	 * @var array $values
 	 */
-	protected $values;
+	protected array $values = [];
 
 	/**
 	 * @var string $name
@@ -53,7 +53,7 @@ class CCheckBoxList extends CList {
 	/**
 	 * @var int $columns
 	 */
-	protected $columns;
+	protected int $columns = 1;
 
 	/**
 	 * @param string $name
@@ -63,8 +63,6 @@ class CCheckBoxList extends CList {
 
 		$this->addClass(self::ZBX_STYLE_CLASS);
 		$this->name = $name;
-		$this->values = [];
-		$this->columns = 1;
 	}
 
 	/**
@@ -142,7 +140,7 @@ class CCheckBoxList extends CList {
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function setVertical(bool $vertical = true): CCheckBoxList {
+	public function setVertical(bool $vertical = true): self {
 		$this->vertical = $vertical;
 
 		return $this;
@@ -155,7 +153,7 @@ class CCheckBoxList extends CList {
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function setColumns(int $columns): CCheckBoxList {
+	public function setColumns(int $columns): self {
 		$this->columns = $columns;
 
 		return $this;

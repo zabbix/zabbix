@@ -92,4 +92,8 @@ typedef enum
 	TIMEPERIOD_TYPE_MONTHLY
 }
 zbx_timeperiod_type_t;
+
+void	zbx_ts_get_deadline(zbx_timespec_t *ts, int sec);
+int	zbx_ts_check_deadline(const zbx_timespec_t *deadline);
+
 #endif /* ZABBIX_TIME_H */

@@ -20,16 +20,17 @@
 
 class CWidgetIterator extends CWidget {
 
-	_init() {
-		super._init();
-
+	onInitialize() {
 		this._css_classes = {
 			...this._css_classes,
 			actions: 'dashboard-grid-iterator-actions',
 			container: 'dashboard-grid-iterator-container',
-			content: 'dashboard-grid-iterator-content',
+			contents: 'dashboard-grid-iterator-contents',
+			messages: 'dashboard-grid-iterator-messages',
+			body: 'dashboard-grid-iterator-body',
+			debug: 'dashboard-grid-iterator-debug',
 			focus: 'dashboard-grid-iterator-focus',
-			head: 'dashboard-grid-iterator-head',
+			header: 'dashboard-grid-iterator-header',
 			hidden_header: 'dashboard-grid-iterator-hidden-header',
 			mask: 'dashboard-grid-iterator-mask',
 			root: 'dashboard-grid-iterator'
@@ -47,7 +48,59 @@ class CWidgetIterator extends CWidget {
 		this._page_count = 1;
 	}
 
-	_doDeactivate() {
+	onStart() {
+		this._events = {
+			...this._events,
+
+			widgetEnter: (e) => {
+				const widget = e.detail.target;
+
+				if (!widget.isEntered()) {
+					widget.enter();
+
+					if (this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
+						this._target.classList.toggle('iterator-double-header', widget.getPos().y === 0);
+					}
+				}
+			},
+
+			widgetLeave: (e) => {
+				const widget = e.detail.target;
+
+				if (widget.isEntered()) {
+					widget.leave();
+				}
+			},
+
+			iteratorEnter: (e) => {
+				if (e.target.closest('.dashboard-grid-iterator-placeholder') !== null) {
+					this._target.classList.remove('iterator-double-header');
+				}
+			},
+
+			previousPageClick: () => {
+				if (this._page > 1) {
+					this._page--;
+					this._startUpdating();
+				}
+			},
+
+			nextPageClick: () => {
+				if (this._page < this._page_count) {
+					this._page++;
+					this._startUpdating();
+				}
+			}
+		};
+	}
+
+	onActivate() {
+		this._target.addEventListener('mousemove', this._events.iteratorEnter);
+		this._button_previous_page.addEventListener('click', this._events.previousPageClick);
+		this._button_next_page.addEventListener('click', this._events.nextPageClick);
+	}
+
+	onDeactivate() {
 		if (this._has_contents) {
 			for (const widget of this._widgets.values()) {
 				if (widget._state === WIDGET_STATE_ACTIVE) {
@@ -57,11 +110,13 @@ class CWidgetIterator extends CWidget {
 			}
 		}
 
-		super._doDeactivate();
+		this._target.removeEventListener('mousemove', this._events.iteratorEnter);
+		this._button_previous_page.removeEventListener('click', this._events.previousPageClick);
+		this._button_next_page.removeEventListener('click', this._events.nextPageClick);
 	}
 
 	getNumHeaderLines() {
-		if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+		if (this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 				&& this._target.classList.contains('iterator-double-header')) {
 			return 2;
 		}
@@ -69,9 +124,7 @@ class CWidgetIterator extends CWidget {
 		return 1;
 	}
 
-	resize() {
-		super.resize();
-
+	onResize() {
 		if (this._has_contents && !this._isTooSmall()) {
 			this._updatePager();
 		}
@@ -94,12 +147,12 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_setFields(fields) {
-		const num_columns = this._getColumnsField();
-		const num_rows = this._getRowsField();
+		const num_columns = this._fields.columns;
+		const num_rows = this._fields.rows;
 
 		super._setFields(fields);
 
-		if (num_columns != this._getColumnsField() || num_rows != this._getRowsField()) {
+		if (num_columns !== this._fields.columns || num_rows !== this._fields.rows) {
 			this._clearContents();
 			this._clearAltContent();
 
@@ -115,7 +168,7 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
-	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
+	_startUpdating({delay_sec = 0} = {}) {
 		if (this._isTooSmall()) {
 			return;
 		}
@@ -126,7 +179,7 @@ class CWidgetIterator extends CWidget {
 			}
 		}
 
-		super._startUpdating(delay_sec, {do_update_once});
+		super._startUpdating({delay_sec});
 	}
 
 	setPos(pos, {is_managed = false} = {}) {
@@ -135,7 +188,7 @@ class CWidgetIterator extends CWidget {
 		super.setPos(pos, {is_managed});
 
 		if (this._grid_pos.length > 0
-				&& this._pos.width == original_pos.width && this._pos.height == original_pos.height) {
+				&& this._pos.width === original_pos.width && this._pos.height === original_pos.height) {
 			return;
 		}
 
@@ -174,8 +227,8 @@ class CWidgetIterator extends CWidget {
 
 				this._alignToGrid(widget.getView(), index);
 
-				if (widget_pos.width != this._grid_pos[index].width
-						|| widget_pos.height != this._grid_pos[index].height) {
+				if (widget_pos.width !== this._grid_pos[index].width
+						|| widget_pos.height !== this._grid_pos[index].height) {
 					widget.setPos(this._grid_pos[index], {is_managed: true});
 					widget.resize();
 				}
@@ -248,7 +301,7 @@ class CWidgetIterator extends CWidget {
 			alt_content.insertAdjacentHTML('beforeend', body);
 		}
 
-		this._content_body.appendChild(alt_content);
+		this._body.appendChild(alt_content);
 		this._target.classList.add('iterator-alt-content');
 
 		this._has_alt_content = true;
@@ -259,30 +312,24 @@ class CWidgetIterator extends CWidget {
 			this._has_alt_content = false;
 
 			this._target.classList.remove('iterator-alt-content');
-			this._content_body.innerHTML = '';
+			this._body.innerHTML = '';
 		}
 	}
 
-	_setErrorContents({error}) {
-		this._clearContents();
-
-		this._setAltContent({
-			messages: error.messages
-		});
-	}
-
-	_getUpdateRequestData() {
-		const request_data = super._getUpdateRequestData();
+	getUpdateRequestData() {
+		const request_data = super.getUpdateRequestData();
 
 		request_data.page = this._page;
 
 		return request_data;
 	}
 
-	_processUpdateResponse(response) {
+	processUpdateResponse(response) {
 		if ('name' in response) {
 			this._setHeaderName(response.name);
 		}
+
+		this._updateInfo(response.info);
 
 		if ('body' in response || 'messages' in response) {
 			this._clearContents();
@@ -298,12 +345,20 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
+	processUpdateErrorResponse(error) {
+		this._clearContents();
+
+		this._setAltContent({
+			messages: error.messages
+		});
+	}
+
 	_addWidget(data) {
 		const widget = this._createWidget(data);
 
 		widget.start();
 
-		this._content_body.append(widget.getView());
+		this._body.append(widget.getView());
 
 		this._truncateWidget(widget);
 
@@ -326,11 +381,9 @@ class CWidgetIterator extends CWidget {
 			dashboard_page: this._dashboard_page,
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
+			min_rows: this._min_rows,
 			is_editable: false,
 			is_edit_mode: false,
-			can_edit_dashboards: this._can_edit_dashboards,
-			time_period: this._time_period,
-			dynamic_hostid: this._dynamic_hostid,
 			unique_id: this._createUniqueId()
 		});
 	}
@@ -342,7 +395,7 @@ class CWidgetIterator extends CWidget {
 	_deleteWidget(widgetid) {
 		const widget = this._widgets.get(widgetid);
 
-		this._content_body.removeChild(widget.getView());
+		this._body.removeChild(widget.getView());
 
 		this._removeWidgetEventListeners(widget);
 		widget.destroy();
@@ -391,7 +444,7 @@ class CWidgetIterator extends CWidget {
 		for (let index = this._widgets.size; index < this._grid_pos.length; index++) {
 			const placeholder_clone = placeholder.cloneNode(true);
 
-			this._content_body.appendChild(placeholder_clone);
+			this._body.appendChild(placeholder_clone);
 			this._alignToGrid(placeholder_clone, index);
 
 			this._placeholders.push(placeholder_clone);
@@ -403,8 +456,8 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_updateTooSmallState() {
-		const is_too_small = this._pos.width < this._getColumnsField()
-			|| this._pos.height < this._getRowsField() * this._min_rows;
+		const is_too_small = this._pos.width < this._fields.columns
+			|| this._pos.height < this._fields.rows * this._min_rows;
 
 		this._target.classList.toggle('iterator-too-small', is_too_small);
 	}
@@ -412,8 +465,8 @@ class CWidgetIterator extends CWidget {
 	_updateGridPositions() {
 		this._grid_pos = [];
 
-		const num_columns = this._getColumnsField();
-		const num_rows = this._getRowsField();
+		const num_columns = this._fields.columns;
+		const num_rows = this._fields.rows;
 
 		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
 			const cell_column = index % num_columns;
@@ -446,32 +499,24 @@ class CWidgetIterator extends CWidget {
 		this._page = page;
 		this._page_count = page_count;
 
-		if (this._page_count == 1) {
-			this._content_header.classList.remove('pager-visible');
+		if (this._page_count === 1) {
+			this._header.classList.remove('pager-visible');
 
 			return;
 		}
 
 		this._pager_stats.textContent = `${this._page} / ${this._page_count}`;
 
-		this._content_header.classList.add('pager-visible');
+		this._header.classList.add('pager-visible');
 
-		const width_available = this._content_header.clientWidth
+		const width_available = this._header.clientWidth
 			- this._pager.offsetWidth - this._actions.offsetWidth
-			- parseFloat(getComputedStyle(this._content_header).paddingLeft)
-			- parseFloat(getComputedStyle(this._content_header).paddingRight)
+			- parseFloat(getComputedStyle(this._header).paddingLeft)
+			- parseFloat(getComputedStyle(this._header).paddingRight)
 			- parseFloat(getComputedStyle(this._pager).marginLeft)
 			- parseFloat(getComputedStyle(this._pager).marginRight);
 
-		this._content_header.classList.toggle('pager-visible', width_available >= 0);
-	}
-
-	_getColumnsField() {
-		return this._fields.columns !== undefined ? this._fields.columns : 2;
-	}
-
-	_getRowsField() {
-		return this._fields.rows !== undefined ? this._fields.rows : 1;
+		this._header.classList.toggle('pager-visible', width_available >= 0);
 	}
 
 	_createUniqueId() {
@@ -502,7 +547,7 @@ class CWidgetIterator extends CWidget {
 		this._button_previous_page = document.createElement('button');
 		this._button_previous_page.type = 'button';
 		this._button_previous_page.title = t('Previous page');
-		this._button_previous_page.classList.add('btn-iterator-page-previous');
+		this._button_previous_page.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_CHEVRON_LEFT);
 		this._pager.appendChild(this._button_previous_page);
 
 		this._pager_stats = document.createElement('span');
@@ -512,10 +557,10 @@ class CWidgetIterator extends CWidget {
 		this._button_next_page = document.createElement('button');
 		this._button_next_page.type = 'button';
 		this._button_next_page.title = t('Next page');
-		this._button_next_page.classList.add('btn-iterator-page-next');
+		this._button_next_page.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_CHEVRON_RIGHT);
 		this._pager.appendChild(this._button_next_page);
 
-		this._content_header.insertBefore(this._pager, this._actions);
+		this._header.insertBefore(this._pager, this._actions);
 
 		this._too_small = document.createElement('div');
 		this._too_small.classList.add('dashboard-grid-iterator-too-small');
@@ -526,69 +571,5 @@ class CWidgetIterator extends CWidget {
 		this._too_small.appendChild(too_small_content);
 
 		this._container.appendChild(this._too_small);
-	}
-
-	_registerEvents() {
-		super._registerEvents();
-
-		this._events = {
-			...this._events,
-
-			widgetEnter: (e) => {
-				const widget = e.detail.target;
-
-				if (!widget.isEntered()) {
-					widget.enter();
-
-					if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
-						this._target.classList.toggle('iterator-double-header', widget.getPos().y == 0);
-					}
-				}
-			},
-
-			widgetLeave: (e) => {
-				const widget = e.detail.target;
-
-				if (widget.isEntered()) {
-					widget.leave();
-				}
-			},
-
-			iteratorEnter: (e) => {
-				if (e.target.closest('.dashboard-grid-iterator-placeholder') !== null) {
-					this._target.classList.remove('iterator-double-header');
-				}
-			},
-
-			previousPageClick: () => {
-				if (this._page > 1) {
-					this._page--;
-					this._startUpdating();
-				}
-			},
-
-			nextPageClick: () => {
-				if (this._page < this._page_count) {
-					this._page++;
-					this._startUpdating();
-				}
-			}
-		};
-	}
-
-	_activateEvents() {
-		super._activateEvents();
-
-		this._target.addEventListener('mousemove', this._events.iteratorEnter);
-		this._button_previous_page.addEventListener('click', this._events.previousPageClick);
-		this._button_next_page.addEventListener('click', this._events.nextPageClick);
-	}
-
-	_deactivateEvents() {
-		super._deactivateEvents();
-
-		this._target.removeEventListener('mousemove', this._events.iteratorEnter);
-		this._button_previous_page.removeEventListener('click', this._events.previousPageClick);
-		this._button_next_page.removeEventListener('click', this._events.nextPageClick);
 	}
 }

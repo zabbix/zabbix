@@ -39,17 +39,21 @@ $html_page = (new CHtmlPage())
 $table = (new CTableInfo())->setHeader([_('Name'), _('Icon map')]);
 
 foreach ($data['iconmaps'] as $icon_map) {
-	$row = [];
+	$mappings = [];
+
 	foreach ($icon_map['mappings'] as $mapping) {
-		$row[] = $data['inventory_list'][$mapping['inventory_link']].NAME_DELIMITER.
-				$mapping['expression'].SPACE.'&rArr;'.SPACE.$data['icon_list'][$mapping['iconid']];
-		$row[] = BR();
+		$mappings[] = [
+			$data['inventory_list'][$mapping['inventory_link']].NAME_DELIMITER.$mapping['expression'],
+			NBSP(), RARR(), NBSP(),
+			$data['icon_list'][$mapping['iconid']],
+			BR()
+		];
 	}
 
 	$table->addRow([new CLink($icon_map['name'], (new CUrl('zabbix.php'))
 		->setArgument('action', 'iconmap.edit')
 		->setArgument('iconmapid', $icon_map['iconmapid'])
-	), $row]);
+	), $mappings]);
 }
 
 $html_page->addItem($table)->show();

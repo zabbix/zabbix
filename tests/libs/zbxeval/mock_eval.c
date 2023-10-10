@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxcommon.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxvariant.h"
 #include "mock_eval.h"
 

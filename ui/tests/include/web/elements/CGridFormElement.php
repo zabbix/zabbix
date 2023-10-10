@@ -34,11 +34,41 @@ class CGridFormElement extends CFormElement {
 	 * @inheritDoc
 	 */
 	public function getLabels($filter = null, $filter_params = []) {
-		$labels = $this->query("xpath:.//div/div/".self::TABLE_FORM."/label|./".self::TABLE_FORM.
-				"/label|./div/div/div/div/".self::TABLE_FORM."/label"
-		)->all();
+		$selectors = ['./'.self::TABLE_FORM, './/div/div/'.self::TABLE_FORM, './div/div/div/div/'.self::TABLE_FORM];
 
-		return $this->filterCollection($labels, $filter, $filter_params);
+		$labels = [];
+
+		foreach ($this->query('xpath', implode('|', $selectors))->all() as $grid) {
+			$has_label = false;
+			foreach ($grid->query('xpath:./*|./fieldset/legend/..|./fieldset/*')->all() as $element) {
+				if ($element->getTagName() === 'label') {
+					$labels[] = $element;
+
+					$has_label = true;
+				}
+				elseif ($element->getTagName() === 'fieldset') {
+					$labels[] = $element->asFieldset();
+
+					$has_label = true;
+				}
+				elseif ($element->hasClass('form-field')) {
+					if (!$has_label) {
+						$input = CElementQuery::getInputElement($element);
+
+						if ($input->isValid() && get_class($input) === CCheckboxElement::class) {
+							$label = $input->query('xpath:../label')->one(false);
+							if ($label->isValid()) {
+								$labels[] = $label;
+							}
+						}
+					}
+
+					$has_label = false;
+				}
+			}
+		}
+
+		return $this->filterCollection(new CElementCollection($labels), $filter, $filter_params);
 	}
 
 	/**
@@ -49,11 +79,22 @@ class CGridFormElement extends CFormElement {
 	 * @return CElement|CNullElement
 	 */
 	public function getFieldByLabelElement($label) {
+		if ($label instanceof CFieldsetElement) {
+			return $label;
+		}
+
 		if (($element = CElementQuery::getInputElement($label, './'.self::TABLE_FORM_FIELD))->isValid()) {
 			return $element;
 		}
 		else {
 			$element = $label->query('xpath:./'.self::TABLE_FORM_FIELD)->one(false);
+			if (!$element->isValid()) {
+				$parent = $label->parents()->one();
+				if ($parent->hasClass('form-field')) {
+					$element = CElementQuery::getInputElement($label, './..');
+				}
+			}
+
 			return $element;
 		}
 	}
@@ -77,6 +118,16 @@ class CGridFormElement extends CFormElement {
 	 * @return CElementCollection
 	 */
 	protected function findLabels($name) {
-		return $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+		$labels = $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.
+				CXPathHelper::escapeQuotes($name).']|.//div[contains(@class, "form-grid")]/fieldset/label[text()='.
+				CXPathHelper::escapeQuotes($name).']|.//div[contains(@class, "form-grid")]/fieldset/div/label[text()='.
+				CXPathHelper::escapeQuotes($name).']')->all();
+
+		if ($labels->isEmpty()) {
+			$labels = $this->query('xpath:.//div[contains(@class, "form-grid")]/fieldset/legend/button/span[text()='.
+					CXPathHelper::escapeQuotes($name).']/../../..')->asFieldset()->all();
+		}
+
+		return $labels;
 	}
 }

@@ -17,16 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
 #endif
-
-ZBX_METRIC	parameter_hostname =
-/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
 
 int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -48,7 +43,7 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	hostname = zbx_strdup(NULL, name.nodename);
 
-	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+	if (FAIL == (rc = hostname_handle_params(request, result, &hostname)))
 		zbx_free(hostname);
 
 	return rc;

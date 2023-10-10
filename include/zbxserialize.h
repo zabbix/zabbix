@@ -38,12 +38,12 @@
 	}									\
 	while(0)
 
-#define zbx_serialize_prepare_vector_uint64_len(len, vector_uint64, vector_uint64_len)			\
-	do												\
-	{												\
-		vector_uint64_len = (zbx_uint32_t)vector_uint64.values_num * sizeof(zbx_uint64_t);	\
-		len += vector_uint64_len + (zbx_uint32_t)sizeof(zbx_uint32_t);				\
-	}												\
+#define zbx_serialize_prepare_vector_uint64_len(len, vector_uint64, vector_uint64_len)					\
+	do														\
+	{														\
+		vector_uint64_len = (zbx_uint32_t)vector_uint64.values_num * (zbx_uint32_t)sizeof(zbx_uint64_t);	\
+		len += vector_uint64_len + (zbx_uint32_t)sizeof(zbx_uint32_t);						\
+	}														\
 	while(0)
 
 #define zbx_serialize_prepare_value(len, value)	do { len += (zbx_uint32_t)sizeof(value); } while(0)
@@ -111,15 +111,15 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 
-#define zbx_deserialize_vector_uint64(buffer, vector_uint64, value_len)												\
-	(																			\
-		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),												\
-		0 < value_len ? 																\
-			zbx_vector_uint64_append_array(vector_uint64, 			\
+#define zbx_deserialize_vector_uint64(buffer, vector_uint64, value_len)			\
+	(										\
+		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
+		0 < value_len ? 							\
+			zbx_vector_uint64_append_array(vector_uint64,			\
 				(const zbx_uint64_t *)(buffer + sizeof(zbx_uint32_t)),	\
 				(int)(value_len / sizeof(zbx_uint64_t)))		\
-		: (void)0,																	\
-		value_len + sizeof(zbx_uint32_t)														\
+		: (void)0,								\
+		value_len + sizeof(zbx_uint32_t)					\
 	)
 
 #define zbx_deserialize_value(buffer, value) \

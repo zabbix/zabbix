@@ -56,7 +56,9 @@ const char	*get_process_type_string(unsigned char proc_type)
 		case ZBX_PROCESS_TYPE_HISTSYNCER:
 			return "history syncer";
 		case ZBX_PROCESS_TYPE_DISCOVERER:
-			return "discoverer";
+			return "discovery worker";
+		case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
+			return "discovery manager";
 		case ZBX_PROCESS_TYPE_ALERTER:
 			return "alerter";
 		case ZBX_PROCESS_TYPE_TIMER:
@@ -115,6 +117,12 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "connector worker";
 		case ZBX_PROCESS_TYPE_MAIN:
 			return "main";
+		case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
+			return "http agent poller";
+		case ZBX_PROCESS_TYPE_AGENT_POLLER:
+			return "agent poller";
+		case ZBX_PROCESS_TYPE_SNMP_POLLER:
+			return "snmp poller";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -174,6 +182,10 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Numeric (unsigned)";
 		case ITEM_VALUE_TYPE_TEXT:
 			return "Text";
+		case ITEM_VALUE_TYPE_BIN:
+			return "Binary";
+		case ITEM_VALUE_TYPE_NONE:
+			return "None";
 		default:
 			return "unknown";
 	}

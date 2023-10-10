@@ -1,5 +1,4 @@
-//go:build linux && amd64
-// +build linux,amd64
+//go:build linux && (amd64 || arm64)
 
 /*
 ** Zabbix
@@ -32,7 +31,6 @@ import (
 func TestFileModifyTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
 
 	var filetime int64
 
@@ -58,7 +56,6 @@ func TestFileModifyTime(t *testing.T) {
 func TestFileAccessTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
 
 	var filetime int64
 
@@ -84,7 +81,6 @@ func TestFileAccessTime(t *testing.T) {
 func TestFileChangeTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
 
 	var filetime int64
 

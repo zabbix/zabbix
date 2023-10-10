@@ -46,7 +46,8 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('backurl', $data['backurl']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -54,21 +55,11 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (array_key_exists('parent_item', $data)) {
-	if ($data['parent_item']['editable']) {
-		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
-			(new CUrl('items.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $data['item']['templateid'])
-				->setArgument('context', 'template')
-		);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
-	$item_tab->addItem([new CLabel(_('Parent item')), new CFormField($parent_template_name)]);
+if (!empty($data['templates'])) {
+	$item_tab->addItem([
+		new CLabel(_('Parent items')),
+		new CFormField($data['templates'])
+	]);
 }
 
 $discovered_item = (array_key_exists('item', $data) && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
@@ -132,11 +123,11 @@ $item_type_options = CSelect::createOptionsFromArray([
 	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
-	ITEM_VALUE_TYPE_TEXT => _('Text')
+	ITEM_VALUE_TYPE_TEXT => _('Text'),
+	ITEM_VALUE_TYPE_BINARY => _('Binary')
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
-	->addStyle('margin: 5px 0 0 5px;')
 	->addClass(ZBX_STYLE_DISPLAY_NONE);
 
 $item_tab
@@ -146,15 +137,14 @@ $item_tab
 		new CFormField($key_controls)
 	])
 	->addItem([
-		new CLabel(_('Type of information'), 'label-value-type'),
+		new CLabel([_('Type of information'), $type_mismatch_hint], 'label-value-type'),
 		new CFormField([
 			(new CSelect('value_type'))
 				->setFocusableElementId('label-value-type')
 				->setId('value_type')
 				->setValue($data['value_type'])
 				->addOptions($item_type_options)
-				->setReadonly($readonly),
-			$type_mismatch_hint
+				->setReadonly($readonly)
 		])
 	])
 	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
@@ -229,11 +219,9 @@ if ($parameters_data) {
 			)
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
-			(new CButton('', _('Remove')))
-				->removeId()
-				->onClick('jQuery(this).closest("tr").remove()')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Remove')))
 				->addClass('element-table-remove')
+				->onClick('jQuery(this).closest("tr").remove();')
 				->setEnabled(!$readonly)
 		]);
 	}
@@ -256,8 +244,7 @@ $item_tab
 					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 					->setFooter(new CRow(
 						(new CCol(
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Add')))
 								->setEnabled(!$readonly)
 								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
@@ -265,20 +252,18 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(
-								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
-							))->addClass(ZBX_STYLE_DRAG_ICON)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->setEnabled(!$readonly)
 							->setAttribute('data-row-action', 'remove_row')
 					])),
@@ -303,11 +288,9 @@ $item_tab
 					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
 						->setAttribute('style', 'width: 100%;')
 						->removeId(),
-					(new CButton('', _('Remove')))
-						->removeId()
-						->onClick('jQuery(this).closest("tr").remove()')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Remove')))
 						->addClass('element-table-remove')
+						->onClick('jQuery(this).closest("tr").remove();')
 				]))
 			)
 	)
@@ -351,16 +334,6 @@ $item_tab
 			->setReadonly($readonly)
 		))->setId('js-item-request-method-field')
 	])
-	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->setAsteriskMark()
-			->setId('js-item-timeout-label'),
-		(new CFormField((new CTextBox('timeout', $data['timeout'], $readonly))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		))->setId('js-item-timeout-field')
-	])
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
 	->addItem([
 		(new CLabel(_('Request body type'), 'post_type'))->setId('js-item-post-type-label'),
@@ -377,6 +350,7 @@ $item_tab
 		(new CLabel(_('Request body'), 'posts'))->setId('js-item-posts-label'),
 		(new CFormField((new CTextArea('posts', $data['posts'], compact('readonly')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 		))->setId('js-item-posts-field')
 	]);
 
@@ -414,8 +388,7 @@ $item_tab
 					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 					->setFooter(new CRow(
 						(new CCol(
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Add')))
 								->setEnabled(!$readonly)
 								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
@@ -423,20 +396,18 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(
-								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
-							))->addClass(ZBX_STYLE_DRAG_ICON)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->setEnabled(!$readonly)
 							->setAttribute('data-row-action', 'remove_row')
 					])),
@@ -488,7 +459,7 @@ $item_tab
 		(new CFormField((new CTextBox('http_proxy', $data['http_proxy'], $readonly,
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
@@ -656,12 +627,34 @@ if ($data['display_interfaces']) {
 
 // Append SNMP common fields.
 $item_tab->addItem([
-	(new CLabel(_('SNMP OID'), 'snmp_oid'))
+	(new CLabel([
+		_('SNMP OID'),
+		makeHelpIcon([
+			_('Field requirements:'),
+			(new CList([
+				new CListItem([
+					(new CSpan('walk[OID1,OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('to retrieve a subtree')
+				]),
+				new CListItem([
+					(new CSpan('get[OID]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('to retrieve a single value')
+				]),
+				new CListItem([
+					(new CSpan('OID'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('(legacy) to retrieve a single value synchronously, optionally combined with other values')
+				])
+			]))->addClass(ZBX_STYLE_LIST_DASHED)
+		])
+	], 'snmp_oid'))
 		->setAsteriskMark()
 		->setId('js-item-snmp-oid-label'),
 	(new CFormField((new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
+		->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 		->setAriaRequired()
 	))->setId('js-item-snmp-oid-field')
 ]);
@@ -698,9 +691,10 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
-		(new CFormField((new CTextBox('username', $data['username'], $discovered_item, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->disableAutocomplete()
+		(new CFormField(
+			(new CTextBox('username', $data['username'], $discovered_item, DB::getFieldLength('items', 'username')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableAutocomplete()
 		))->setId('js-item-username-field')
 	])
 	->addItem([
@@ -723,9 +717,10 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
-		(new CFormField((new CTextBox('password', $data['password'], $discovered_item, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->disableAutocomplete()
+		(new CFormField(
+			(new CTextBox('password', $data['password'], $discovered_item, DB::getFieldLength('items', 'password')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableAutocomplete()
 		))->setId('js-item-password-field')
 	])
 	->addItem([
@@ -735,8 +730,9 @@ $item_tab
 		(new CFormField((new CTextArea('params_es', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly($discovered_item)
 			->setAriaRequired()
+			->disableSpellcheck()
+			->setReadonly($discovered_item)
 		))->setId('js-item-executed-script-field')
 	])
 	->addItem([
@@ -747,6 +743,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 			->setReadonly($discovered_item)
 		))->setId('js-item-sql-query-field')
 	])
@@ -758,6 +755,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 			->setReadonly($discovered_item)
 		))->setId('js-item-formula-field')
 	])
@@ -841,6 +839,44 @@ $item_tab->addItem([
 	))->setId('js-item-flex-intervals-field')
 ]);
 
+/**
+ * Append timeout field to form list for item types:
+ * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ */
+$edit_source_timeouts_link = null;
+
+if ($data['can_edit_source_timeouts']
+		&& (($readonly && $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) || !$readonly)) {
+	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
+		? (new CLink(_('Timeouts')))
+			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
+			->onClick('view.editProxy(event, this.dataset.proxyid);')
+		: (new CLink(_('Timeouts'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+		))->setTarget('_blank');
+}
+
+$item_tab->addItem([
+	(new CLabel(_('Timeout'), 'timeout'))
+		->setAsteriskMark()
+		->setId('js-item-timeout-label'),
+	(new CFormField([
+		(new CRadioButtonList('custom_timeout', $data['custom_timeout']))
+			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+			->setReadonly($readonly)
+			->setModern(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('timeout', $data['timeout'],
+			$readonly || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired(),
+		$edit_source_timeouts_link
+	]))->setId('js-item-timeout-field')
+]);
+
 // Append history storage to form list.
 $keep_history_hint = null;
 
@@ -854,17 +890,13 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_history_hint = (new CSpan(makeWarningIcon([
-		' '._x('Overridden by', 'item_form').' ',
-		$link,
+	$keep_history_hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
 		' ('.$data['config']['hk_history'].')'
-	])))
-		->addStyle('margin: 5px 0 0 5px;')
-		->setId('history_mode_hint');
+	])))->setId('history_mode_hint');
 }
 
 $item_tab->addItem([
-	(new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
+	(new CLabel([_('History storage period'), $keep_history_hint], 'history'))->setAsteriskMark(),
 	new CFormField([
 		(new CRadioButtonList('history_mode', (int) $data['history_mode']))
 			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
@@ -874,8 +906,7 @@ $item_tab->addItem([
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('history', $data['history'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAriaRequired(),
-		$keep_history_hint
+			->setAriaRequired()
 	])
 ]);
 
@@ -891,18 +922,14 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_trend_hint = (new CSpan(makeWarningIcon([
-		' '._x('Overridden by', 'item_form').' ',
-		$link,
+	$keep_trend_hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
 		' ('.$data['config']['hk_trends'].')'
-	])))
-		->addStyle('margin: 5px 0 0 5px;')
-		->setId('trends_mode_hint');
+	])))->setId('trends_mode_hint');
 }
 
 $item_tab
 	->addItem([
-		(new CLabel(_('Trend storage period'), 'trends'))
+		(new CLabel([_('Trend storage period'), $keep_trend_hint], 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
@@ -914,8 +941,7 @@ $item_tab
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('trends', $data['trends'], $discovered_item))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired(),
-			$keep_trend_hint
+				->setAriaRequired()
 		]))->setId('js-item-trends-field')
 	])
 	->addItem([
@@ -1027,7 +1053,7 @@ if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['item
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['hostid'])
 				->setArgument('name', $data['name'])
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		))->setTarget('_blank')))
 	);
 }
@@ -1040,7 +1066,6 @@ $item_tabs = (new CTabView())
 			'source' => 'item',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'context' => $data['context'],
 			'readonly' => $discovered_item,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'
@@ -1051,10 +1076,15 @@ $item_tabs = (new CTabView())
 		(new CFormGrid())
 			->setId('item_preproc_list')
 			->addItem([
-				new CLabel(_('Preprocessing steps')),
-				new CFormField(
-					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
-				)
+				new CLabel([
+					_('Preprocessing steps'),
+					makeHelpIcon([
+						_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
+						BR(), BR(),
+						_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
+					])
+				]),
+				new CFormField(getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types']))
 			])
 			->addItem([
 				(new CLabel(_('Type of information'), 'label-value-type-steps'))
@@ -1130,14 +1160,17 @@ $html_page->show();
 		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'discovered_item' => $discovered_item,
+		'inherited_timeouts' => $data['inherited_timeouts']['timeouts']
 	]).');
 '))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'trends_default' => $data['trends_default']
+		'trends_default' => $data['trends_default'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

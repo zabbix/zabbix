@@ -23,7 +23,7 @@
 #include "zbxcacheconfig.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error);
+int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH) */
 
 #endif /*POLLER_GET_VALUE_SSH_TEST_H*/

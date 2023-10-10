@@ -71,7 +71,7 @@ class EntitiesTags {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
-						'name' => 'Template item with tags for full cloning',
+						'name' => 'Template item with tags for cloning',
 						'key_' => 'template.tags.clone',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -82,7 +82,7 @@ class EntitiesTags {
 							],
 							[
 								'tag' => 'action',
-								'value' => 'fullclone'
+								'value' => 'clone'
 							],
 							[
 								'tag' => 'itemTag without value'
@@ -412,7 +412,7 @@ class EntitiesTags {
 				]
 			],
 			[
-				'description' => 'Template trigger with tags for full cloning',
+				'description' => 'Template trigger with tags for cloning',
 				'expression' => 'last(/Template for tags testing/trap.template)=0',
 				'tags' => [
 					[
@@ -421,7 +421,7 @@ class EntitiesTags {
 					],
 					[
 						'tag' => 'action',
-						'value' => 'fullclone'
+						'value' => 'clone'
 					],
 					[
 						'tag' => 'triggerTag without value'
@@ -522,7 +522,7 @@ class EntitiesTags {
 			[
 				'hostid' => $templates['templateids']['Template for tags testing'],
 				'ruleid' => $templates['discoveryruleids']['Template for tags testing:template_trap_discovery'],
-				'name' => 'Template item prototype with tags for full cloning: {#KEY}',
+				'name' => 'Template item prototype with tags for cloning: {#KEY}',
 				'key_' => 'template.cloning_trap[{#KEY}]',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
@@ -533,7 +533,7 @@ class EntitiesTags {
 					],
 					[
 						'tag' => 'action',
-						'value' => 'fullclone'
+						'value' => 'clone'
 					],
 					[
 						'tag' => 'action'
@@ -604,7 +604,7 @@ class EntitiesTags {
 				]
 			],
 			[
-				'description' => 'Template trigger prototype with tags for full cloning',
+				'description' => 'Template trigger prototype with tags for cloning',
 				'expression' => 'last(/Template for tags testing/template.itemprototype_trap[{#KEY}])=0',
 				'tags' => [
 					[
@@ -613,7 +613,7 @@ class EntitiesTags {
 					],
 					[
 						'tag' => 'action',
-						'value' => 'fullclone'
+						'value' => 'clone'
 					],
 					[
 						'tag' => 'triggerTag without value'
@@ -698,7 +698,7 @@ class EntitiesTags {
 			],
 			[
 				'ruleid' => $templates['discoveryruleids']['Template for tags testing:template_trap_discovery'],
-				'host' => '{#TEMPLATE} prototype with tags for full cloning',
+				'host' => '{#TEMPLATE} prototype with tags for cloning',
 				'groupLinks' => [
 					['groupid' => $host_groupids['HostPrototypeTags']]
 				],
@@ -709,7 +709,7 @@ class EntitiesTags {
 					],
 					[
 						'tag' => 'action',
-						'value' => 'fullclone'
+						'value' => 'clone'
 					],
 					[
 						'tag' => 'action'
@@ -801,7 +801,7 @@ class EntitiesTags {
 				]
 			],
 			[
-				'name' => 'Template web scenario with tags for full cloning',
+				'name' => 'Template web scenario with tags for cloning',
 				'hostid' => $templates['templateids']['Template for tags testing'],
 				'steps' => [
 					[
@@ -817,7 +817,7 @@ class EntitiesTags {
 					],
 					[
 						'tag' => 'action',
-						'value' => 'fullclone'
+						'value' => 'clone'
 					],
 					[
 						'tag' => 'webTag without value'
@@ -938,6 +938,74 @@ class EntitiesTags {
 					],
 					[
 						'tag' => 'problem tag',
+						'operator' => 2
+					]
+				]
+			]
+		]);
+
+		// Create connectors.
+		CDataHelper::call('connector.create', [
+			[
+				'name' => 'Connector with tags for updating',
+				'url' => '{$URL}',
+				'tags' => [
+					[
+						'tag' => 'connector action',
+						'operator' => 2,
+						'value' => 'connector update'
+					],
+					[
+						'tag' => 'connector tag without value'
+					],
+					[
+						'tag' => 'connector test',
+						'operator' => 0,
+						'value' => 'connector update'
+					]
+				]
+			],
+			[
+				'name' => 'Connector with tags for cloning',
+				'url' => '{$URL}',
+				'tags' => [
+					[
+						'tag' => 'connector a',
+						'operator' => 2,
+						'value' => ':connector a'
+					],
+					[
+						'tag' => 'connector action',
+						'operator' => 0,
+						'value' => 'connector clone'
+					],
+					[
+						'tag' => 'connector tag without value',
+						'operator' => 2
+					],
+					[
+						'tag' => 'connector common tag on host and element',
+						'operator' => 0,
+						'value' => 'connector common value'
+					]
+				]
+			],
+			[
+				'name' => 'Connector for removing tags',
+				'url' => '{$URL}',
+				'tags' => [
+					[
+						'tag' => 'tag remove',
+						'operator' => 0,
+						'value' => 'tag remove'
+					],
+					[
+						'tag' => 'connector tag',
+						'operator' => 2,
+						'value' => 'tag remove'
+					],
+					[
+						'tag' => 'connector tag',
 						'operator' => 2
 					]
 				]

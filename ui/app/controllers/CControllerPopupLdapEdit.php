@@ -121,10 +121,6 @@ class CControllerPopupLdapEdit extends CController {
 			$data['bind_password'] = $this->getInput('bind_password');
 		}
 
-		$data['advanced_configuration'] = ($data['start_tls'] != ZBX_AUTH_START_TLS_OFF
-			|| $data['search_filter'] !== ''
-		);
-
 		if (!$this->hasInput('group_configuration')) {
 			$group_filter = $data['group_basedn'].$data['group_member'].$data['user_ref_attr'].$data['group_filter'];
 			$data['group_configuration'] = $group_filter === '' ? self::LDAP_MEMBER_OF : self::LDAP_GROUP_OF_NAMES;

@@ -8,3 +8,6 @@ libservice_a_SOURCES = \
 	service_manager_impl.h \
 	service_actions.c \
 	service_actions.h
+
+libservice_a_CFLAGS = \
+	$(TLS_CFLAGS)

@@ -32,14 +32,20 @@ require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $available_js = [
+	'defines.js' => '',
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
+	'class.widget-base.js' => '',
 	'class.widget.js' => '',
 	'class.widget.inaccessible.js' => '',
 	'class.widget.iterator.js' => '',
+	'class.widget.misconfigured.js' => '',
 	'class.widget.paste-placeholder.js' => '',
+	'class.widget-field.multiselect.js' => '',
+	'class.widget-field.time-period.js' => '',
+	'class.widget-select.popup.js' => '',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',
@@ -62,11 +68,12 @@ $available_js = [
 	'jquery-ui.js' => 'vendors/',
 	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
 	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
+	'd3.v7.min.js' => 'vendors/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
+	'class.event-hub.js' => '',
 	'class.base-component.js' => '',
-	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
@@ -87,7 +94,9 @@ $available_js = [
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
 	'class.csvggraph.js' => '',
+	'class.csvggauge.js' => '',
 	'class.curl.js' => '',
+	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
@@ -115,10 +124,9 @@ $available_js = [
 
 $translate_strings = [
 	'gtlc.js' => [
-		'S_MINUTE_SHORT' => _x('m', 'minute short')
-	],
-	'class.overlay.js' => [
-		'Operation details' => _('Operation details')
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'Failed to update time selector.' => _('Failed to update time selector.'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
@@ -152,32 +160,45 @@ $translate_strings = [
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')
 	],
-	'class.widget.js' => [
+	'class.widget-base.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
 		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
-		'Actions' => _s('Actions'),
-		'Copy' => _s('Copy'),
-		'Delete' => _s('Delete'),
-		'Edit' => _s('Edit'),
+		'Actions' => _('Actions'),
+		'Copy' => _('Copy'),
+		'Delete' => _('Delete'),
+		'Edit' => _('Edit'),
 		'No refresh' => _('No refresh'),
-		'Paste' => _s('Paste'),
-		'Refresh interval' => _s('Refresh interval')
+		'Paste' => _('Paste'),
+		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget.inaccessible.js' => [
-		'Actions' => _s('Actions'),
-		'Copy' => _s('Copy'),
-		'Inaccessible widget' => _('Inaccessible widget'),
-		'Refresh interval' => _s('Refresh interval')
+		'No permissions to referred object or it does not exist!' =>
+			_('No permissions to referred object or it does not exist!'),
+		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget.iterator.js' => [
-		'Next page' => _s('Next page'),
-		'Previous page' => _s('Previous page'),
+		'Next page' => _('Next page'),
+		'Previous page' => _('Previous page'),
 		'Widget is too small for the specified number of columns and rows.' =>
-			_s('Widget is too small for the specified number of columns and rows.')
+			_('Widget is too small for the specified number of columns and rows.')
+	],
+	'class.widget.misconfigured.js' => [
+		'Refresh interval' => _('Refresh interval')
+	],
+	'class.widget-select.popup.js' => [
+		'Name' => _('Name'),
+		'No compatible widgets.' => _('No compatible widgets.'),
+		'Widget' => _('Widget')
+	],
+	'class.widget-field.multiselect.js' => [
+		'Dashboard' => _('Dashboard'),
+		'Widget' => _('Widget'),
+		'Dashboard is used as data source.' => _('Dashboard is used as data source.'),
+		'Another widget is used as data source.' => _('Another widget is used as data source.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -387,6 +408,9 @@ $translate_strings = [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
+	'class.csvgauge.js' => [
+		'No data' => _('No data')
+	],
 	'common.js' => [
 		'Cancel' => _('Cancel'),
 		'Ok' => _('Ok'),
@@ -404,11 +428,14 @@ $translate_strings = [
 $js = '';
 if (empty($_GET['files'])) {
 	$files = [
+		'defines.js',
 		'jquery.js',
 		'jquery-ui.js',
+		'main.js',
 		'common.js',
 		'component.z-bar-gauge.js',
 		'component.z-select.js',
+		'class.event-hub.js',
 		'class.base-component.js',
 		'class.cdebug.js',
 		'class.overlaycollection.js',
@@ -419,12 +446,10 @@ if (empty($_GET['files'])) {
 		'class.menu.js',
 		'class.menu-item.js',
 		'class.rpc.js',
-		'class.bbcode.js',
 		'class.csuggest.js',
 		'class.scrollable.js',
 		'class.sidebar.js',
 		'class.template.js',
-		'main.js',
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',

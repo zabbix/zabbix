@@ -21,10 +21,8 @@
 #define ZABBIX_CHECKS_SNMP_H
 
 #include "config.h"
-#include "module.h"
 #include "zbxcacheconfig.h"
-
-extern char	*CONFIG_SOURCE_IP;
+#include "zbxasyncpoller.h"
 
 #ifdef HAVE_NETSNMP
 
@@ -35,10 +33,28 @@ extern char	*CONFIG_SOURCE_IP;
 #define ZBX_SNMP_STR_ASCII	5
 #define ZBX_SNMP_STR_UNDEFINED	255
 
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout);
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type,
-		int config_timeout);
+typedef struct zbx_snmp_context	zbx_snmp_context_t;
+
+void	zbx_init_library_mt_snmp(void);
+void	zbx_shutdown_library_mt_snmp(void);
+
+int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
+		const char *config_source_ip);
+void	get_values_snmp( zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
+		unsigned char poller_type, const char *config_source_ip);
+
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
+
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
+		const char *config_source_ip);
+zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context);
+void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context);
+void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
+
+void	zbx_set_snmp_bulkwalk_options(void);
+void	zbx_unset_snmp_bulkwalk_options(void);
+
 #endif
 
 #endif

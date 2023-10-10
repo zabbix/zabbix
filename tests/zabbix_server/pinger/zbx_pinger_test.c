@@ -34,6 +34,7 @@ void	zbx_mock_test_entry(void **state)
 	char			error[MAX_ERR_LEN];
 	int			ret;
 	int			count, interval, size, timeout;
+	unsigned char		allow_redirect;
 	char			*returned_addr = NULL;
 
 	ZBX_UNUSED(state);
@@ -42,7 +43,7 @@ void	zbx_mock_test_entry(void **state)
 	key =  zbx_mock_get_parameter_string("in.key");
 
 	ret = zbx_parse_key_params(key, interface, &icmpping, &returned_addr, &count,
-			&interval, &size, &timeout, &type, error, MAX_ERR_LEN);
+			&interval, &size, &timeout, &type, &allow_redirect, error, MAX_ERR_LEN);
 	if (SUCCEED != ret)
 		printf("zbx_pinger_test error: %s\n", error);
 

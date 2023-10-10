@@ -24,7 +24,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtrends.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 

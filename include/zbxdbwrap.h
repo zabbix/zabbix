@@ -37,39 +37,42 @@ typedef enum
 }
 zbx_host_template_link_type;
 
-typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
+typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *, const char *,
 		const zbx_timespec_t *, char **);
+typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
+		zbx_timespec_t *ts, char *error);
+typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
+		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
+typedef void (*zbx_preprocessor_flush_func_t)(void);
+
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
+		zbx_preprocess_item_value_func_t preprocess_item_value_func,
+		zbx_preprocessor_flush_func_t preprocessor_flush_func);
 
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *config_tls, int config_timeout);
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *server);
 
-int	zbx_get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
-int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
+int	zbx_get_active_proxy_from_request(const struct zbx_json_parse *jp, zbx_dc_proxy_t *proxy, char **error);
+int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t *sock, char **error);
 
 int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts);
 
-int	zbx_proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-int	zbx_proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-int	zbx_proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-void	zbx_proxy_set_hist_lastid(const zbx_uint64_t lastid);
-void	zbx_proxy_set_dhis_lastid(const zbx_uint64_t lastid);
-void	zbx_proxy_set_areg_lastid(const zbx_uint64_t lastid);
 int	zbx_proxy_get_host_active_availability(struct zbx_json *j);
 
-int	zbx_proxy_get_history_count(void);
 int	zbx_proxy_get_delay(zbx_uint64_t lastid);
 
 int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
 		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
-void	zbx_update_proxy_data(DC_PROXY *proxy, char *version_str, int version_int, int lastaccess, int compress,
+void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
 		zbx_uint64_t flags_add);
 
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		unsigned char proxy_status, int *more, char **error);
-int	zbx_check_protocol_version(DC_PROXY *proxy, int version);
+int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
+		char **error);
+int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
 		zbx_host_template_link_type link_type, char **error);
@@ -97,7 +100,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		const zbx_uint64_t hostid);
 
 /* event support */
-void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
+void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_event_t *events);
 void		zbx_db_free_event(zbx_db_event *event);
 void		zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
@@ -124,5 +127,17 @@ void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **exp
 		zbx_trigger_func_t eval_func_cb, int recovery);
 void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
 		zbx_trigger_func_t eval_func_cb, int recovery);
+
+int	zbx_db_check_user_perm2system(zbx_uint64_t userid);
+char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
+
+#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
+#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
+
+const char	*zbx_permission_string(int perm);
+int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
+int	zbx_get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids);
+int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
+int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 
 #endif /* ZABBIX_DBWRAP_H */

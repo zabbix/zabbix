@@ -6,11 +6,17 @@ noinst_LIBRARIES = \
 
 # common rtc functionality
 
+libzbxrtc_a_CFLAGS = \
+	$(TLS_CFLAGS)
+
 libzbxrtc_a_SOURCES = \
 	rtc.c \
 	rtc.h
 
 # common rtc service functionality
+
+libzbxrtc_service_a_CFLAGS = \
+	$(TLS_CFLAGS)
 
 libzbxrtc_service_a_SOURCES = \
 	rtc_service.c \

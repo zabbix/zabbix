@@ -20,15 +20,20 @@
 #ifndef ZABBIX_AUDIT_ITEM_H
 #define ZABBIX_AUDIT_ITEM_H
 
-#include "zbxcommon.h"
+#include "zbxalgo.h"
 
-#include "../src/libs/zbxdbwrap/template.h"
-#include "../src/zabbix_server/lld/lld.h"
+int	zbx_audit_item_resource_is_only_item(int resource_type);
+int	zbx_audit_item_resource_is_only_item_prototype(int resource_type);
+int	zbx_audit_item_resource_is_only_item_and_item_prototype(int resource_type);
+int	zbx_audit_item_resource_is_only_lld_rule(int resource_type);
+
+int	zbx_audit_item_flag_to_resource_type(int flag);
+
+#define ZBX_AUDIT_IT_OR_ITP_OR_DR(s) zbx_audit_item_resource_is_only_item(resource_type) ? "item."#s : \
+		(zbx_audit_item_resource_is_only_item_prototype(resource_type) ? "itemprototype."#s : \
+		"discoveryrule."#s)
 
 void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name, int flags);
-void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid);
-void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
-		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid);
 
 #define PREPARE_AUDIT_ITEM_UPDATE_H(resource, type1)								\
 void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,				\

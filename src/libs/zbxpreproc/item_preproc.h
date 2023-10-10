@@ -20,15 +20,11 @@
 #ifndef ZABBIX_ITEM_PREPROC_H
 #define ZABBIX_ITEM_PREPROC_H
 
-#include "zbxcacheconfig.h"
-#include "preproc.h"
 #include "zbxembed.h"
-
-#define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)
+#include "zbxtime.h"
 
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
-
 
 int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
 
@@ -51,10 +47,10 @@ int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
 int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t *ts, const char *params,
 		zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg);
 int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, zbx_variant_t *bytecode,
-		char **errmsg);
-int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *params, char **errmsg);
+		const char *config_source_ip, char **errmsg);
 int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg);
 int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg);
+int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error);
 
 #endif

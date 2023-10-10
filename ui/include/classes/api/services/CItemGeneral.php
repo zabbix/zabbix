@@ -50,14 +50,30 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @var array
 	 */
-	protected const PREPROC_TYPES_WITH_PARAMS = [];
+	protected const PREPROC_TYPES_WITH_PARAMS = [
+		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
+		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
+		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
+		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON, ZBX_PREPROC_SNMP_GET_VALUE
+	];
 
 	/**
 	 * A list of preprocessing types that supports the error handling.
 	 *
 	 * @var array
 	 */
-	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [];
+	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [
+		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
+		ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
+		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
+		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON, ZBX_PREPROC_SNMP_GET_VALUE
+	];
 
 	/**
 	 * A list of supported item types.
@@ -183,7 +199,7 @@ abstract class CItemGeneral extends CApiService {
 				if (in_array($item['type'], $delay_types)) {
 					if (!in_array($db_item['type'], $delay_types)
 							|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($db_item['key_'], 'mqtt.get', 8) === 0)) {
+								&& strncmp($db_item['key_'], 'mqtt.get', 8) == 0)) {
 						$item += array_intersect_key($db_item, array_flip(['delay']));
 					}
 				}
@@ -193,6 +209,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
+						$item += array_intersect_key($db_item, array_flip(['url']));
+					}
+
 					$post_types = [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML];
 
 					if (in_array($item['post_type'], $post_types) && !in_array($db_item['post_type'], $post_types)) {
@@ -210,7 +230,7 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['jmx_endpoint']));
 				}
 
-				if ($item['type'] == ITEM_TYPE_SNMP && $db_item['type'] != ITEM_TYPE_SNMP) {
+				if ($item['type'] == ITEM_TYPE_SNMP) {
 					$item += array_intersect_key($db_item, array_flip(['snmp_oid']));
 				}
 
@@ -288,10 +308,51 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Check preprocessing steps do not have duplicates with "Check for not supported item" with "error any".
+	 *
+	 * @param array $items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkPreprocessingStepsDuplicates(array $items): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+			'preprocessing' => ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
+				'type' =>	['type' => API_ANY],
+				'params' =>	['type' => API_ANY]
+			]]
+		]];
+		$items_steps = [];
+
+		foreach ($items as $i1 => $item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			foreach ($item['preprocessing'] as $i2 => $step) {
+				if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+					[$match_type] = explode("\n", $step['params']);
+
+					if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+						$items_steps[$i1]['preprocessing'][$i2] = [
+							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+							'params' => ZBX_PREPROC_MATCH_ERROR_ANY
+						];
+					}
+				}
+			}
+		}
+
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items_steps, '', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * @param array $items
 	 */
 	protected static function validateUniqueness(array &$items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'key_']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
+			'uuid' =>	['type' => API_ANY],
 			'hostid' =>	['type' => API_ANY],
 			'key_' =>	['type' => API_ANY]
 		]];
@@ -305,7 +366,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array
 	 */
 	protected static function getTagsValidationRules(): array {
-		return ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+		return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 			'tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
 			'value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
 		]];
@@ -319,11 +380,11 @@ abstract class CItemGeneral extends CApiService {
 	public static function getPreprocessingValidationRules(int $flags = 0x00): array {
 		return [
 			'type' => API_OBJECTS,
+			'flags' => API_NORMALIZE,
 			'uniq_by_values' => [
 				['type' => [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED]],
 				['type' => [ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
-				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]],
-				['type' => [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]]
+				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]]
 			],
 			'fields' => [
 				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
@@ -387,7 +448,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Add host_status property to given items in accordance of given hosts and templates statuses.
+	 * Add host_status property to given items in accordance to statuses of given hosts and templates.
 	 *
 	 * @param array $items
 	 * @param array $db_hosts
@@ -395,12 +456,9 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function addHostStatus(array &$items, array $db_hosts, array $db_templates): void {
 		foreach ($items as &$item) {
-			if (array_key_exists($item['hostid'], $db_templates)) {
-				$item['host_status'] = HOST_STATUS_TEMPLATE;
-			}
-			else {
-				$item['host_status'] = $db_hosts[$item['hostid']]['status'];
-			}
+			$item['host_status'] = array_key_exists($item['hostid'], $db_templates)
+				? HOST_STATUS_TEMPLATE
+				: $db_hosts[$item['hostid']]['status'];
 		}
 		unset($item);
 	}
@@ -419,36 +477,77 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Check and add UUID to all item prototypes on templates, if it doesn't exist.
+	 * Add the UUID to those of the given items that belong to a template and don't have the 'uuid' parameter set.
 	 *
 	 * @param array $items
-	 *
-	 * @throws APIException
 	 */
-	protected static function checkAndAddUuid(array &$items): void {
+	protected static function addUuid(array &$items): void {
 		foreach ($items as &$item) {
 			if ($item['host_status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
 				$item['uuid'] = generateUuidV4();
 			}
 		}
 		unset($item);
+	}
 
-		$uuids = array_column($items, 'uuid');
+	/**
+	 * Verify host prototype UUIDs are not repeated.
+	 *
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkUuidDuplicates(array $items, array $db_items = null): void {
+		$item_indexes = [];
 
-		if (!$uuids) {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists('uuid', $item)) {
+				continue;
+			}
+
+			if ($db_items === null || $item['uuid'] !== $db_items[$item['itemid']]['uuid']) {
+				$item_indexes[$item['uuid']] = $i;
+			}
+		}
+
+		if (!$item_indexes) {
 			return;
 		}
 
+		$flags = $items[reset($item_indexes)]['flags'];
+
 		$duplicates = DB::select('items', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => $uuids],
+			'filter' => [
+				'flags' => $flags,
+				'uuid' => array_keys($item_indexes)
+			],
 			'limit' => 1
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
-			);
+			switch ($flags) {
+				case ZBX_FLAG_DISCOVERY_NORMAL:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('item with the same UUID already exists')
+					);
+					break;
+
+				case ZBX_FLAG_DISCOVERY_RULE:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('LLD rule with the same UUID already exists')
+					);
+					break;
+
+				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('item prototype with the same UUID already exists')
+					);
+					break;
+			}
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -550,53 +649,55 @@ abstract class CItemGeneral extends CApiService {
 				continue;
 			}
 
-			$tpl_items = array_column(array_intersect_key($items, array_flip($indexes)), null, 'hostid');
-			$templateids = array_keys($tpl_items);
-			$template_count = count($templateids) - 1;
+			$hostids = [];
 
-			for ($i = 0; $i < $template_count - 1; $i++) {
-				for ($j = $i + 1; $j < $template_count; $j++) {
-					$same_hosts = array_intersect_key($tpl_links[$templateids[$i]], $tpl_links[$templateids[$j]]);
+			foreach ($indexes as $i) {
+				$templateid = $items[$i]['hostid'];
+				$same_hosts = array_intersect_key($tpl_links[$templateid], $hostids);
 
-					if ($same_hosts) {
-						$same_host = reset($same_hosts);
+				if ($same_hosts) {
+					$same_host = reset($same_hosts);
 
-						$hosts = DB::select('hosts', [
-							'output' => ['hostid', 'host'],
-							'hostids' => [$templateids[$i], $templateids[$j], $same_host['hostid']],
-							'preservekeys' => true
-						]);
+					$templateid_first = $hostids[$same_host['hostid']];
+					$templateid_second = $templateid;
 
-						$target_is_host = in_array($same_host['status'],
-							[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
-						);
+					$hosts = DB::select('hosts', [
+						'output' => ['hostid', 'host'],
+						'hostids' => [$templateid_first, $templateid_second, $same_host['hostid']],
+						'preservekeys' => true
+					]);
 
-						switch ($tpl_items[$templateids[$i]]['flags']) {
-							case ZBX_FLAG_DISCOVERY_NORMAL:
-									$error = $target_is_host
-									? _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
-									: _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
-								break;
+					$target_is_host = in_array($same_host['status'],
+						[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
+					);
 
-							case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					switch ($items[$i]['flags']) {
+						case ZBX_FLAG_DISCOVERY_NORMAL:
 								$error = $target_is_host
-									? _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
-									: _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
-								break;
+								? _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+							break;
 
-							case ZBX_FLAG_DISCOVERY_RULE:
-								$error = $target_is_host
-									? _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
-									: _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
-								break;
-						}
+						case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+							$error = $target_is_host
+								? _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+							break;
 
-						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key,
-							$hosts[$templateids[$i]]['host'], $hosts[$templateids[$j]]['host'],
-							$hosts[$same_host['hostid']]['host']
-						));
+						case ZBX_FLAG_DISCOVERY_RULE:
+							$error = $target_is_host
+								? _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+							break;
 					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key,
+						$hosts[$templateid_first]['host'], $hosts[$templateid_second]['host'],
+						$hosts[$same_host['hostid']]['host']
+					));
 				}
+
+				$hostids += array_fill_keys(array_keys($tpl_links[$templateid]), $templateid);
 			}
 		}
 	}
@@ -770,14 +871,14 @@ abstract class CItemGeneral extends CApiService {
 
 			case ZBX_FLAG_DISCOVERY_RULE:
 				$error = $target_is_host
-					? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key is already inherited from template "%4$s".')
-					: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key is already inherited from template "%4$s".');
+					? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule with the same key is already inherited from template "%4$s".')
+					: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule with the same key is already inherited from template "%4$s".');
 				break;
 
 			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 				$error = $target_is_host
-					? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key is already inherited from template "%4$s".')
-					: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key is already inherited from template "%4$s".');
+					? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item prototype with the same key is already inherited from template "%4$s".')
+					: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item prototype with the same key is already inherited from template "%4$s".');
 				break;
 		}
 
@@ -881,10 +982,6 @@ abstract class CItemGeneral extends CApiService {
 		$ins_item_indexes = [];
 		$interface_types = [];
 
-		$required_interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI,
-			INTERFACE_TYPE_JMX
-		];
-
 		$upd_item_indexes_by_interfaceid = [];
 
 		foreach ($upd_items as $i => $upd_item) {
@@ -894,16 +991,37 @@ abstract class CItemGeneral extends CApiService {
 
 			$interface_type = itemTypeInterface($upd_item['type']);
 
-			if (!in_array($interface_type, $required_interface_types)) {
+			if ($interface_type === false) {
 				continue;
 			}
 
 			if ($upd_db_items[$upd_item['itemid']]['interfaceid'] != 0) {
-				$upd_item_indexes_by_interfaceid[$upd_db_items[$upd_item['itemid']]['interfaceid']][] = $i;
+				$db_interface_type = itemTypeInterface($upd_db_items[$upd_item['itemid']]['type']);
+
+				if ($interface_type != $db_interface_type) {
+					if ($db_interface_type == INTERFACE_TYPE_OPT) {
+						$upd_item_indexes_by_interfaceid[$upd_db_items[$upd_item['itemid']]['interfaceid']][] = $i;
+					}
+					elseif ($interface_type != INTERFACE_TYPE_OPT) {
+						$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
+
+						if ($interface_types !== null) {
+							$interface_types[$interface_type] = true;
+						}
+					}
+				}
 			}
 			else {
 				$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
-				$interface_types[$interface_type] = true;
+
+				if ($interface_types !== null) {
+					if ($interface_type == INTERFACE_TYPE_OPT) {
+						$interface_types = null;
+					}
+					else {
+						$interface_types[$interface_type] = true;
+					}
+				}
 			}
 		}
 
@@ -921,7 +1039,10 @@ abstract class CItemGeneral extends CApiService {
 
 					if ($interface_type != $row['type']) {
 						$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
-						$interface_types[$interface_type] = true;
+
+						if ($interface_types !== null) {
+							$interface_types[$interface_type] = true;
+						}
 					}
 				}
 			}
@@ -934,12 +1055,20 @@ abstract class CItemGeneral extends CApiService {
 
 			$interface_type = itemTypeInterface($ins_item['type']);
 
-			if (!in_array($interface_type, $required_interface_types)) {
+			if ($interface_type === false) {
 				continue;
 			}
 
 			$ins_item_indexes[$ins_item['hostid']][$interface_type][] = $i;
-			$interface_types[$interface_type] = true;
+
+			if ($interface_types !== null) {
+				if ($interface_type == INTERFACE_TYPE_OPT) {
+					$interface_types = null;
+				}
+				else {
+					$interface_types[$interface_type] = true;
+				}
+			}
 		}
 
 		if (!$upd_item_indexes && !$ins_item_indexes) {
@@ -950,45 +1079,112 @@ abstract class CItemGeneral extends CApiService {
 			'output' => ['interfaceid', 'hostid', 'type'],
 			'filter' => [
 				'hostid' => array_keys($upd_item_indexes + $ins_item_indexes),
-				'type' => array_keys($interface_types),
 				'main' => INTERFACE_PRIMARY
 			]
 		];
+
+		if ($interface_types !== null) {
+			$options['filter']['type'] = array_keys($interface_types);
+		}
+
 		$result = DBselect(DB::makeSql('interface', $options));
 
+		$priority_interfaces = [];
+
 		while ($row = DBfetch($result)) {
-			if (array_key_exists($row['hostid'], $upd_item_indexes)
-					&& array_key_exists($row['type'], $upd_item_indexes[$row['hostid']])) {
-				foreach ($upd_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
-					$upd_items[$i]['interfaceid'] = $row['interfaceid'];
+			$has_opt_type_items = false;
 
-					unset($upd_item_indexes[$row['hostid']][$row['type']][$_i]);
+			if (array_key_exists($row['hostid'], $upd_item_indexes)) {
+				if (array_key_exists(INTERFACE_TYPE_OPT, $upd_item_indexes[$row['hostid']])) {
+					$has_opt_type_items = true;
 				}
 
-				if (!$upd_item_indexes[$row['hostid']][$row['type']]) {
-					unset($upd_item_indexes[$row['hostid']][$row['type']]);
-				}
+				if (array_key_exists($row['type'], $upd_item_indexes[$row['hostid']])) {
+					foreach ($upd_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
+						$upd_items[$i]['interfaceid'] = $row['interfaceid'];
 
-				if (!$upd_item_indexes[$row['hostid']]) {
-					unset($upd_item_indexes[$row['hostid']]);
+						unset($upd_item_indexes[$row['hostid']][$row['type']][$_i]);
+					}
+
+					if (!$upd_item_indexes[$row['hostid']][$row['type']]) {
+						unset($upd_item_indexes[$row['hostid']][$row['type']]);
+					}
+
+					if (!$upd_item_indexes[$row['hostid']]) {
+						unset($upd_item_indexes[$row['hostid']]);
+					}
 				}
 			}
 
-			if (array_key_exists($row['hostid'], $ins_item_indexes)
-					&& array_key_exists($row['type'], $ins_item_indexes[$row['hostid']])) {
-				foreach ($ins_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
-					$ins_items[$i]['interfaceid'] = $row['interfaceid'];
-
-					unset($ins_item_indexes[$row['hostid']][$row['type']][$_i]);
+			if (array_key_exists($row['hostid'], $ins_item_indexes)) {
+				if (array_key_exists(INTERFACE_TYPE_OPT, $ins_item_indexes[$row['hostid']])) {
+					$has_opt_type_items = true;
 				}
 
-				if (!$ins_item_indexes[$row['hostid']][$row['type']]) {
-					unset($ins_item_indexes[$row['hostid']][$row['type']]);
-				}
+				if (array_key_exists($row['type'], $ins_item_indexes[$row['hostid']])) {
+					foreach ($ins_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
+						$ins_items[$i]['interfaceid'] = $row['interfaceid'];
 
-				if (!$ins_item_indexes[$row['hostid']]) {
-					unset($ins_item_indexes[$row['hostid']]);
+						unset($ins_item_indexes[$row['hostid']][$row['type']][$_i]);
+					}
+
+					if (!$ins_item_indexes[$row['hostid']][$row['type']]) {
+						unset($ins_item_indexes[$row['hostid']][$row['type']]);
+					}
+
+					if (!$ins_item_indexes[$row['hostid']]) {
+						unset($ins_item_indexes[$row['hostid']]);
+					}
 				}
+			}
+
+			if ($has_opt_type_items) {
+				$priority_index = array_search($row['type'], self::INTERFACE_TYPES_BY_PRIORITY);
+
+				if (!array_key_exists($row['hostid'], $priority_interfaces)
+						|| $priority_index < $priority_interfaces[$row['hostid']]['priority_index']) {
+					$priority_interfaces[$row['hostid']] = [
+						'interfaceid' => $row['interfaceid'],
+						'type' => $row['type'],
+						'priority_index' => $priority_index
+					];
+				}
+			}
+		}
+
+		foreach ($upd_item_indexes as $hostid => $item_indexes) {
+			if (!array_key_exists(INTERFACE_TYPE_OPT, $item_indexes)) {
+				continue;
+			}
+
+			foreach ($item_indexes[INTERFACE_TYPE_OPT] as $i) {
+				if (array_key_exists($hostid, $priority_interfaces)) {
+					$upd_items[$i]['interfaceid'] = $priority_interfaces[$hostid]['interfaceid'];
+				}
+			}
+
+			unset($upd_item_indexes[$hostid][INTERFACE_TYPE_OPT]);
+
+			if (!$upd_item_indexes[$hostid]) {
+				unset($upd_item_indexes[$hostid]);
+			}
+		}
+
+		foreach ($ins_item_indexes as $hostid => $item_indexes) {
+			if (!array_key_exists(INTERFACE_TYPE_OPT, $item_indexes)) {
+				continue;
+			}
+
+			foreach ($item_indexes[INTERFACE_TYPE_OPT] as $i) {
+				if (array_key_exists($hostid, $priority_interfaces)) {
+					$ins_items[$i]['interfaceid'] = $priority_interfaces[$hostid]['interfaceid'];
+				}
+			}
+
+			unset($ins_item_indexes[$hostid][INTERFACE_TYPE_OPT]);
+
+			if (!$ins_item_indexes[$hostid]) {
+				unset($ins_item_indexes[$hostid]);
 			}
 		}
 
@@ -1030,7 +1226,7 @@ abstract class CItemGeneral extends CApiService {
 				$error = _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because a host interface of type "%4$s" is required.');
 				break;
 
-			case ZBX_FLAG_DISCOVERY_CREATED:
+			case ZBX_FLAG_DISCOVERY_RULE:
 				$error = _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because a host interface of type "%4$s" is required.');
 				break;
 
@@ -1156,47 +1352,83 @@ abstract class CItemGeneral extends CApiService {
 
 				$field_names = array_flip(array_diff($db_type_field_names, $type_field_names));
 
-				if ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0) {
-					$field_names += array_flip(['delay']);
-				}
-
-				if (array_intersect([$item['type'], $db_item['type']], [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT])) {
-					$field_names += array_flip(['authtype']);
-				}
-
 				if ($item['host_status'] == HOST_STATUS_TEMPLATE && array_key_exists('interfaceid', $field_names)) {
 					unset($field_names['interfaceid']);
 				}
 
 				$item += array_intersect_key($type_field_defaults, $field_names);
 			}
-			elseif ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-				if (array_key_exists('key_', $item) && $item['key_'] !== $db_item['key_']
-						&& strncmp($item['key_'], 'mqtt.get', 8) == 0) {
-					$item += array_intersect_key($type_field_defaults, array_flip(['delay']));
-				}
-			}
-			elseif ($item['type'] == ITEM_TYPE_SSH) {
-				if (array_key_exists('authtype', $item) && $item['authtype'] !== $db_item['authtype']
-						&& $item['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
-					$item += array_intersect_key($type_field_defaults, array_flip(['publickey', 'privatekey']));
-				}
-			}
-			elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('request_method', $item) && $item['request_method'] != $db_item['request_method']
-						&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
-					$item += ['retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS];
-				}
 
-				if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
-						&& $item['authtype'] == ZBX_HTTP_AUTH_NONE) {
-					$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
-				}
+			switch ($item['type']) {
+				case ITEM_TYPE_SIMPLE:
+					if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
+							&& (strncmp($item['key_'], 'icmpping', 8) == 0
+								|| strncmp($item['key_'], 'vmware.', 7) == 0)) {
+						$item += array_intersect_key($type_field_defaults, array_flip(['timeout']));
+					}
+					break;
 
-				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] != $db_item['allow_traps']
-						&& $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
-					$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
-				}
+				case ITEM_TYPE_ZABBIX_ACTIVE:
+					if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
+							&& strncmp($item['key_'], 'mqtt.get', 8) == 0) {
+						$item += array_intersect_key($type_field_defaults, array_flip(['delay']));
+					}
+					break;
+
+				case ITEM_TYPE_SSH:
+					if ($item['type'] != $db_item['type']) {
+						if ($db_item['type'] == ITEM_TYPE_HTTPAGENT) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['authtype']));
+						}
+					}
+					elseif (array_key_exists('authtype', $item) && $item['authtype'] !== $db_item['authtype']
+							&& $item['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+						$item += array_intersect_key($type_field_defaults, array_flip(['publickey', 'privatekey']));
+					}
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					if ($item['type'] != $db_item['type']) {
+						if (!array_key_exists('authtype', $item)) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['authtype']));
+						}
+
+						if ($item['authtype'] == ZBX_HTTP_AUTH_NONE) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
+						}
+
+						if (!array_key_exists('allow_traps', $item)
+								|| $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
+						}
+					}
+					else {
+						if (array_key_exists('request_method', $item)
+								&& $item['request_method'] != $db_item['request_method']
+								&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+							$item += ['retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS];
+						}
+
+						if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
+								&& $item['authtype'] == ZBX_HTTP_AUTH_NONE) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
+						}
+
+						if (array_key_exists('allow_traps', $item) && $item['allow_traps'] != $db_item['allow_traps']
+								&& $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
+						}
+					}
+					break;
+
+				case ITEM_TYPE_SNMP:
+					if (array_key_exists('snmp_oid', $item)
+							&& ($item['type'] != $db_item['type'] || $item['snmp_oid'] !== $db_item['snmp_oid'])
+							&& strncmp($item['snmp_oid'], 'get[', 4) != 0
+							&& strncmp($item['snmp_oid'], 'walk[', 5) != 0) {
+						$item += array_intersect_key($type_field_defaults, array_flip(['timeout']));
+					}
+					break;
 			}
 
 			if (array_key_exists('value_type', $item) && $item['value_type'] != $db_item['value_type']) {
@@ -1220,7 +1452,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updateParameters(array &$items, array $db_items = null,
+	protected static function updateParameters(array &$items, array &$db_items = null,
 			array &$upd_itemids = null): void {
 		$ins_item_parameters = [];
 		$upd_item_parameters = [];
@@ -1293,7 +1525,7 @@ abstract class CItemGeneral extends CApiService {
 					$upd_itemids[$i] = $item['itemid'];
 				}
 				else {
-					unset($item['parameters']);
+					unset($item['parameters'], $db_items[$item['itemid']]['parameters']);
 				}
 			}
 		}
@@ -1331,7 +1563,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updatePreprocessing(array &$items, array $db_items = null,
+	protected static function updatePreprocessing(array &$items, array &$db_items = null,
 			array &$upd_itemids = null): void {
 		$ins_item_preprocs = [];
 		$upd_item_preprocs = [];
@@ -1348,9 +1580,10 @@ abstract class CItemGeneral extends CApiService {
 				: [];
 
 			$step = 1;
+			$item['preprocessing'] = self::sortPreprocessingSteps($item['preprocessing']);
 
 			foreach ($item['preprocessing'] as &$item_preproc) {
-				$item_preproc['step'] = ($item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++;
+				$item_preproc['step'] = $step++;
 
 				if (array_key_exists($item_preproc['step'], $db_item_preprocs)) {
 					$db_item_preproc = $db_item_preprocs[$item_preproc['step']];
@@ -1385,7 +1618,7 @@ abstract class CItemGeneral extends CApiService {
 					$upd_itemids[$i] = $item['itemid'];
 				}
 				else {
-					unset($item['preprocessing']);
+					unset($item['preprocessing'], $db_items[$item['itemid']]['preprocessing']);
 				}
 			}
 		}
@@ -1423,7 +1656,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updateTags(array &$items, array $db_items = null, array &$upd_itemids = null): void {
+	protected static function updateTags(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
 		$ins_tags = [];
 		$del_itemtagids = [];
 
@@ -1462,7 +1695,7 @@ abstract class CItemGeneral extends CApiService {
 					$upd_itemids[$i] = $item['itemid'];
 				}
 				else {
-					unset($item['tags']);
+					unset($item['tags'], $db_items[$item['itemid']]['tags']);
 				}
 			}
 		}
@@ -2014,6 +2247,10 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	private static function checkCircularDependencies(array $items, array $dep_item_links): void {
 		foreach ($items as $i => $item) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+				continue;
+			}
+
 			$master_itemid = $item['master_itemid'];
 
 			while ($master_itemid != 0) {
@@ -2024,53 +2261,6 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				$master_itemid = $dep_item_links[$master_itemid];
-			}
-		}
-	}
-
-	/**
-	 * Check prerpocessing steps for specifics validation rules.
-	 *
-	 * @param array $items
-	 *
-	 * @throws APIException
-	 */
-	protected static function checkPreprocessingSteps(array $items): void {
-		foreach ($items as $i => $item) {
-			if (!array_key_exists('preprocessing', $item)) {
-				continue;
-			}
-
-			foreach ($item['preprocessing'] as $j => $step) {
-				if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-					$params = explode("\n", $step['params']);
-
-					if (count($params) % 3 !== 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
-						);
-					}
-
-					for ($n = 1; $n <= count($params); $n++) {
-						$param = $params[$n - 1];
-
-						if ($param === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
-							);
-						}
-
-						// Field "Treat as" every 3rd value. Check that field is correct.
-						if ($n % 3 === 0) {
-							if (!in_array($param, [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
-									ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('incorrect value'))
-								);
-							}
-						}
-					}
-				}
 			}
 		}
 	}
@@ -2572,11 +2762,25 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	public static function addInheritedItems(array &$db_items): void {
-		$options = [
-			'output' => ['itemid', 'name'],
-			'filter' => ['templateid' => array_keys($db_items)]
-		];
-		$db_items += DBfetchArrayAssoc(DBselect(DB::makeSql('items', $options)), 'itemid');
+		$templateids = array_keys($db_items);
+
+		do {
+			$options = [
+				'output' => ['itemid', 'name'],
+				'filter' => ['templateid' => $templateids]
+			];
+			$result = DBselect(DB::makeSql('items', $options));
+
+			$templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['itemid'], $db_items)) {
+					$templateids[] = $row['itemid'];
+
+					$db_items[$row['itemid']] = $row;
+				}
+			}
+		} while ($templateids);
 	}
 
 	/**
@@ -2588,7 +2792,7 @@ abstract class CItemGeneral extends CApiService {
 		DB::update('graphs', [
 			'values' => [
 				'ymin_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymin_itemid' => 0
+				'ymin_itemid' => null
 			],
 			'where' => ['ymin_itemid' => $del_itemids]
 		]);
@@ -2596,7 +2800,7 @@ abstract class CItemGeneral extends CApiService {
 		DB::update('graphs', [
 			'values' => [
 				'ymax_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymax_itemid' => 0
+				'ymax_itemid' => null
 			],
 			'where' => ['ymax_itemid' => $del_itemids]
 		]);
@@ -2634,5 +2838,36 @@ abstract class CItemGeneral extends CApiService {
 		if ($del_trigger_prototypeids) {
 			CTriggerPrototypeManager::delete($del_trigger_prototypeids);
 		}
+	}
+
+	/**
+	 * Prioritize ZBX_PREPROC_VALIDATE_NOT_SUPPORTED checks, with "match any error" being the last of them.
+	 *
+	 * @param array $steps
+	 *
+	 * @return array
+	 */
+	private static function sortPreprocessingSteps(array $steps): array {
+		$ns_regex = [];
+		$ns_any = [];
+		$other = [];
+
+		foreach ($steps as $step) {
+			if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+				$other[] = $step;
+				continue;
+			}
+
+			[$match_type] = explode("\n", $step['params']);
+
+			if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+				$ns_any[] = $step;
+			}
+			else {
+				$ns_regex[] = $step;
+			}
+		}
+
+		return array_merge($ns_regex, $ns_any, $other);
 	}
 }

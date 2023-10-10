@@ -21,7 +21,9 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
@@ -59,7 +61,7 @@ $html_page = (new CHtmlPage())
 		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
+		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'], true, 'web.auditlog.filter')
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
 				->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
@@ -74,6 +76,7 @@ $html_page = (new CHtmlPage())
 								'srcfld1' => 'userid',
 								'srcfld2' => 'fullname',
 								'dstfrm' => 'zbx_filter',
+								'context' => 'audit',
 								'dstfld1' => 'filter_userids_'
 							]
 						]

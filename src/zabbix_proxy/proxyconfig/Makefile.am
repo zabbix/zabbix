@@ -6,4 +6,6 @@ libzbxproxyconfig_a_SOURCES = \
 	proxyconfig.c \
 	proxyconfig.h
 
-libzbxproxyconfig_a_CFLAGS = -I$(top_srcdir)/src/zabbix_proxy
+libzbxproxyconfig_a_CFLAGS = \
+	-I$(top_srcdir)/src/zabbix_proxy \
+	$(TLS_CFLAGS)

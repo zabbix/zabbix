@@ -28,7 +28,7 @@ const TABFILTERITEM_EVENT_DELETE = 'delete.item.tabfilter';
 const TABFILTERITEM_EVENT_ACTION = 'action.item.tabfilter';
 
 const TABFILTERITEM_STYLE_UNSAVED = 'unsaved';
-const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit';
+const TABFILTERITEM_STYLE_BTN_EDIT = 'tabfilter-edit';
 const TABFILTERITEM_STYLE_SELECTED = 'selected';
 const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';
@@ -177,14 +177,15 @@ class CTabFilterItem extends CBaseComponent {
 	 * Add gear icon and bind click event.
 	 */
 	addActionIcons() {
-		if (this._target.parentNode.querySelector('.' + TABFILTERITEM_STYLE_EDIT_BTN)) {
+		if (this._target.parentNode.querySelector('.' + TABFILTERITEM_STYLE_BTN_EDIT)) {
 			return;
 		}
 
 		let edit = document.createElement('a');
 
-		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN);
+		edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COG_FILLED, TABFILTERITEM_STYLE_BTN_EDIT);
 		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
+
 		this._target.parentNode.appendChild(edit);
 	}
 
@@ -192,7 +193,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * Remove gear icon HTMLElement.
 	 */
 	removeActionIcons() {
-		let icon = this._target.parentNode.querySelector('.' + TABFILTERITEM_STYLE_EDIT_BTN);
+		let icon = this._target.parentNode.querySelector('.' + TABFILTERITEM_STYLE_BTN_EDIT);
 
 		if (icon) {
 			icon.remove();

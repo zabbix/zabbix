@@ -137,12 +137,6 @@ class CControllerAuthenticationUpdate extends CController {
 
 				return false;
 			}
-
-			if (!$ldap_servers) {
-				error(_('At least one LDAP server must exist.'));
-
-				return false;
-			}
 		}
 
 		if ($ldap_servers
@@ -323,15 +317,10 @@ class CControllerAuthenticationUpdate extends CController {
 			'disabled_usrgrpid' => 0,
 			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'ldap_userdirectoryid' => $ldap_userdirectoryid,
-			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
-			'ldap_jit_status' => JIT_PROVISIONING_DISABLED,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
-			'saml_jit_status' => JIT_PROVISIONING_DISABLED,
-			'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
-			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules'),
-			'jit_provision_interval' => '1h'
+			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules')
 		];
 
 		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
@@ -339,6 +328,24 @@ class CControllerAuthenticationUpdate extends CController {
 				'http_case_sensitive' => 0,
 				'http_login_form' => 0,
 				'http_strip_domains' => ''
+			];
+		}
+
+		if ($this->getInput('ldap_auth_enabled', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED) {
+			$fields += [
+				'ldap_jit_status' => JIT_PROVISIONING_DISABLED,
+				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
+			];
+
+			if ($this->getInput('ldap_jit_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
+				$fields['jit_provision_interval'] = '1h';
+			}
+		}
+
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$fields += [
+				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+				'saml_jit_status' => JIT_PROVISIONING_DISABLED
 			];
 		}
 
@@ -441,6 +448,10 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function processSamlConfiguration(): bool {
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) != ZBX_AUTH_SAML_ENABLED) {
+			return true;
+		}
+
 		$saml_data = [
 			'idp_entityid' => '',
 			'sso_url' => '',
@@ -481,7 +492,6 @@ class CControllerAuthenticationUpdate extends CController {
 			$saml_data = array_merge($saml_data, $provisioning_fields);
 		}
 
-		$saml_data['idp_type'] = IDP_TYPE_SAML;
 		$db_saml = API::UserDirectory()->get([
 			'output' => ['userdirectoryid'],
 			'filter' => ['idp_type' => IDP_TYPE_SAML]
@@ -491,7 +501,7 @@ class CControllerAuthenticationUpdate extends CController {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
 		}
 		else {
-			$result = API::UserDirectory()->create($saml_data);
+			$result = API::UserDirectory()->create($saml_data + ['idp_type' => IDP_TYPE_SAML]);
 		}
 
 		return $result !== false;

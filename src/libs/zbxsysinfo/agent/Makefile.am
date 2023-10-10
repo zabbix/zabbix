@@ -5,6 +5,7 @@ noinst_LIBRARIES = libagentsysinfo.a
 libagentsysinfo_a_SOURCES = \
 	agent.c \
 	agent.h \
+	modbtype.h \
 	modbus.c
 
 if HAVE_LIBMODBUS

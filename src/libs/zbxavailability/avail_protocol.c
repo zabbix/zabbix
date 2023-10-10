@@ -19,7 +19,6 @@
 
 #include "zbxserialize.h"
 #include "zbxavailability.h"
-#include "log.h"
 #include "zbxjson.h"
 
 void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_alloc, size_t *data_offset,
@@ -54,7 +53,8 @@ void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_all
 	zbx_serialize_str(ptr, interface_availability->agent.error, error_len);
 }
 
-zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, zbx_uint64_t hostid, int heartbeat_freq)
+zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, zbx_uint64_t hostid,
+		int heartbeat_freq)
 {
 	zbx_uint32_t	data_len = 0;
 	unsigned char	*ptr;
@@ -132,14 +132,14 @@ zbx_uint32_t	zbx_availability_serialize_hostdata(unsigned char **data, zbx_hashs
 
 void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector_proxy_hostdata_ptr_t *hostdata)
 {
-	int	values_num, i;
+	int	values_num;
 
 	data += zbx_deserialize_value(data, &values_num);
 
 	if (0 == values_num)
 		return;
 
-	for (i = 0; i < values_num; i++)
+	for (int i = 0; i < values_num; i++)
 	{
 		zbx_proxy_hostdata_t	*h = (zbx_proxy_hostdata_t *)zbx_malloc(NULL, sizeof(zbx_proxy_hostdata_t));
 
@@ -187,22 +187,21 @@ void	zbx_availability_deserialize_active_status_response(const unsigned char *da
 }
 
 zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_proxy_hostdata_ptr_t *hosts,
-		zbx_uint64_t proxy_hostid)
+		zbx_uint64_t proxyid)
 {
-	zbx_uint32_t		data_len = 0;
-	unsigned char		*ptr;
-	int			i;
+	zbx_uint32_t	data_len = 0;
+	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, proxy_hostid);
+	zbx_serialize_prepare_value(data_len, proxyid);
 	zbx_serialize_prepare_value(data_len, hosts->values_num);
 
 	data_len += (zbx_uint32_t)(sizeof(zbx_uint64_t) + sizeof(int)) * (zbx_uint32_t)hosts->values_num;
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
-	ptr += zbx_serialize_value(ptr, proxy_hostid);
+	ptr += zbx_serialize_value(ptr, proxyid);
 	ptr += zbx_serialize_value(ptr, hosts->values_num);
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		zbx_proxy_hostdata_t	*host;
 
@@ -215,18 +214,18 @@ zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx
 	return data_len;
 }
 
-void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_vector_proxy_hostdata_ptr_t *hostdata,
-		zbx_uint64_t *proxy_hostid)
+void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data,
+		zbx_vector_proxy_hostdata_ptr_t *hostdata, zbx_uint64_t *proxyid)
 {
-	int	values_num, i;
+	int	values_num;
 
-	data += zbx_deserialize_value(data, proxy_hostid);
+	data += zbx_deserialize_value(data, proxyid);
 	data += zbx_deserialize_value(data, &values_num);
 
 	if (0 == values_num)
 		return;
 
-	for (i = 0; i < values_num; i++)
+	for (int i = 0; i < values_num; i++)
 	{
 		zbx_proxy_hostdata_t	*h = (zbx_proxy_hostdata_t *)zbx_malloc(NULL, sizeof(zbx_proxy_hostdata_t));
 
@@ -240,18 +239,17 @@ void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_
 zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids)
 {
 	zbx_uint32_t	data_len = 0;
-	int		i;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, hostids->values_num);
 
-	for (i = 0; i < hostids->values_num; i++)
+	for (int i = 0; i < hostids->values_num; i++)
 		zbx_serialize_prepare_value(data_len, hostids->values[i]);
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, hostids->values_num);
 
-	for (i = 0; i < hostids->values_num; i++)
+	for (int i = 0; i < hostids->values_num; i++)
 		ptr += zbx_serialize_value(ptr, hostids->values[i]);
 
 	return data_len;
@@ -259,7 +257,7 @@ zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector
 
 void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids)
 {
-	int	values_num, i;
+	int	values_num;
 
 	data += zbx_deserialize_value(data, &values_num);
 
@@ -268,7 +266,7 @@ void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_
 
 	zbx_vector_uint64_reserve(hostids, (size_t)values_num);
 
-	for (i = 0; i < values_num; i++)
+	for (int i = 0; i < values_num; i++)
 	{
 		zbx_uint64_t	id;
 
@@ -276,19 +274,6 @@ void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_
 
 		zbx_vector_uint64_append(hostids, id);
 	}
-}
-
-zbx_uint32_t	zbx_availability_serialize_active_proxy_hb_update(unsigned char **data, zbx_uint64_t hostid)
-{
-	zbx_uint32_t	data_len = 0;
-
-	zbx_serialize_prepare_value(data_len, hostid);
-
-	*data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
-
-	(void)zbx_serialize_value(*data, hostid);
-
-	return data_len;
 }
 
 void	zbx_availability_deserialize_active_proxy_hb_update(const unsigned char *data, zbx_uint64_t *hostid)

@@ -21,15 +21,19 @@ package mysql
 
 import (
 	"context"
+	"net/http"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"github.com/omeid/go-yarn"
 )
 
 const (
+	sqlExt     = ".sql"
 	pluginName = "Mysql"
 	hkInterval = 10
 )
@@ -46,7 +50,12 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
-	params, _, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
+	params, extraParams, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
+	if err != nil {
+		return nil, err
+	}
+
+	err = metric.SetDefaults(params, hc, p.options.Default)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +91,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	ctx := context.Background()
 
-	result, err = handleMetric(ctx, conn, params)
+	result, err = handleMetric(ctx, conn, params, extraParams...)
 
 	if err != nil {
 		p.Errf(err.Error())
@@ -98,7 +107,23 @@ func (p *Plugin) Start() {
 		time.Duration(p.options.Timeout)*time.Second,
 		time.Duration(p.options.CallTimeout)*time.Second,
 		hkInterval*time.Second,
+		p.setCustomQuery(),
 	)
+}
+
+func (p *Plugin) setCustomQuery() yarn.Yarn {
+	if p.options.CustomQueriesPath == "" {
+		return yarn.NewFromMap(map[string]string{})
+	}
+
+	queryStorage, err := yarn.New(http.Dir(p.options.CustomQueriesPath), "*"+sqlExt)
+	if err != nil {
+		p.Errf(err.Error())
+		// create empty storage if error occurred
+		return yarn.NewFromMap(map[string]string{})
+	}
+
+	return queryStorage
 }
 
 // Stop implements the Runner interface and frees resources when plugin is deactivated.

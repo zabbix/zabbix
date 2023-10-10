@@ -77,19 +77,17 @@ if (!empty($data['hostid'])) {
 }
 
 // create table
-$object_label = null;
-
-if ($data['hostid'] == 0) {
-	$object_label = $data['context'] === 'host' ? _('Host') : _('Template');
-}
-
 $itemTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
-		$object_label,
+		($data['hostid'] == 0)
+			? ($data['context'] === 'host')
+				? _('Host')
+				: _('Template')
+			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -104,7 +102,7 @@ $itemTable = (new CTableInfo())
 
 $current_time = time();
 
-$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
+$data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
 	'html' => true,
 	'sources' => ['expression', 'recovery_expression'],
 	'context' => $data['context']
@@ -116,27 +114,12 @@ $csrf_token = CCsrfTokenHelper::get('items.php');
 foreach ($data['items'] as $item) {
 	// description
 	$description = [];
-
-	if (array_key_exists($item['templateid'], $data['parent_items'])) {
-		$parent_item = $data['parent_items'][$item['templateid']];
-
-		if ($parent_item['editable']) {
-			$parent_template_name = (new CLink(CHtml::encode($parent_item['template_name']),
-				(new CUrl('items.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$parent_item['templateid']])
-					->setArgument('context', 'template')
-			))->addClass(ZBX_STYLE_LINK_ALT);
-		}
-		else {
-			$parent_template_name = new CSpan(CHtml::encode($parent_item['template_name']));
-		}
-
-		$description[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-	}
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if (!empty($item['discoveryRule'])) {
-		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
+		$description[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('disc_prototypes.php'))
 				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
 				->setArgument('context', $data['context'])
@@ -148,10 +131,10 @@ foreach ($data['items'] as $item) {
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name']);
+			$description[] = $item['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
+			$description[] = (new CLink($item['master_item']['name'],
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('hostid', $item['hostid'])
@@ -165,7 +148,7 @@ foreach ($data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($item['name']),
+	$description[] = new CLink($item['name'],
 		(new CUrl('items.php'))
 			->setArgument('form', 'update')
 			->setArgument('hostid', $item['hostid'])
@@ -200,51 +183,20 @@ foreach ($data['items'] as $item) {
 		->getUrl();
 
 	foreach ($item['triggers'] as $num => &$trigger) {
-		$trigger = $data['triggers'][$trigger['triggerid']];
+		$trigger = $data['itemTriggers'][$trigger['triggerid']];
 
 		$trigger_description = [];
-
-		if (array_key_exists($trigger['templateid'], $data['parent_triggers'])) {
-			$parent_trigger = $data['parent_triggers'][$trigger['templateid']];
-
-			$parent_template_names = [];
-
-			foreach ($parent_trigger['template_names'] as $templateid => $template_name) {
-				if ($parent_template_names) {
-					$parent_template_names[] = ', ';
-				}
-
-				if ($parent_trigger['editable']) {
-					$parent_template_names[] = (new CLink(CHtml::encode($template_name),
-						(new CUrl('triggers.php'))
-							->setArgument('filter_hostids', [$templateid])
-							->setArgument('filter_set', 1)
-							->setArgument('context', 'template')
-					))
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_GREY);
-				}
-				else {
-					$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
-				}
-			}
-
-			$parent_template_names[] = NAME_DELIMITER;
-
-			$trigger_description[] = $parent_template_names;
-		}
+		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
+			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
+		);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		$trigger_description[] = new CLink(
-			CHtml::encode($trigger['description']),
-			(new CUrl('triggers.php'))
-				->setArgument('form', 'update')
-				->setArgument('hostid', key($trigger['hosts']))
-				->setArgument('triggerid', $trigger['triggerid'])
-				->setArgument('context', $data['context'])
-				->setArgument('backurl', $backurl)
-		);
+		$trigger_description[] = (new CLink($trigger['description']))
+			->addClass('js-trigger-edit')
+			->setAttribute('data-hostid', key($trigger['hosts']))
+			->setAttribute('data-triggerid', $trigger['triggerid'])
+			->setAttribute('data-context', $data['context']);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -281,13 +233,14 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
-	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItem([
-			'itemid' => $item['itemid'],
-			'context' => $data['context'],
-			'backurl' => $backurl
-		]));
+	$wizard = (new CButtonIcon(ZBX_ICON_MORE))
+		->setMenuPopup(
+			CMenuPopupHelper::getItem([
+				'itemid' => $item['itemid'],
+				'context' => $data['context'],
+				'backurl' => $backurl
+			])
+		);
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
@@ -296,7 +249,7 @@ foreach ($data['items'] as $item) {
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
 			|| $item['type'] == ITEM_TYPE_DEPENDENT
-			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0)) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -313,7 +266,7 @@ foreach ($data['items'] as $item) {
 
 		// discovered item lifetime indicator
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
+			$info_icons[] = getItemLifetimeIndicator($current_time, (int) $item['itemDiscovery']['ts_delete']);
 		}
 	}
 
@@ -330,7 +283,7 @@ foreach ($data['items'] as $item) {
 		($data['hostid'] == 0) ? $item['host'] : null,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		$triggerInfo,
-		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],
@@ -342,21 +295,31 @@ foreach ($data['items'] as $item) {
 }
 
 $button_list = [
-	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'), 'csrf_token' => $csrf_token],
-	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?'),
+	'item.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' => _('Enable selected item?'),
+		'confirm_plural' => _('Enable selected items?'),
+		'csrf_token' => $csrf_token
+	],
+	'item.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' => _('Disable selected item?'),
+		'confirm_plural' => _('Disable selected items?'),
 		'csrf_token' => $csrf_token
 	]
 ];
 
 if ($data['context'] === 'host') {
 	$massclearhistory = [
-		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?'),
+		'name' => _('Clear history and trends'),
+		'confirm_singular' => _('Clear history and trends of selected item?'),
+		'confirm_plural' => _('Clear history and trends of selected items?'),
 		'csrf_token' => $csrf_token
 	];
 
 	if ($data['config']['compression_status']) {
-		unset($massclearhistory['confirm']);
+		unset($massclearhistory['confirm_singular']);
+		unset($massclearhistory['confirm_plural']);
 	}
 
 	$button_list += [
@@ -373,12 +336,12 @@ if ($data['context'] === 'host') {
 $button_list += [
 	'item.masscopyto' => [
 		'content' => (new CSimpleButton(_('Copy')))
-			->addClass('js-copy')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeId()
+			->addClass('js-copy')
 	],
 	'popup.massupdate.item' => [
-		'content' => (new CButton('', _('Mass update')))
+		'content' => (new CSimpleButton(_('Mass update')))
+			->addClass(ZBX_STYLE_BTN_ALT)
 			->onClick(
 				"openMassupdatePopup('popup.massupdate.item', {".
 					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('item').
@@ -387,10 +350,13 @@ $button_list += [
 					trigger_element: this
 				});"
 			)
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeAttribute('id')
 	],
-	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'), 'csrf_token' => $csrf_token]
+	'item.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected item?'),
+		'confirm_plural' => _('Delete selected items?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.
@@ -406,7 +372,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'group_itemid'
+		'checkbox_object' => 'group_itemid',
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

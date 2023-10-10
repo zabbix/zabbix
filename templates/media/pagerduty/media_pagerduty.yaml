@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.4'
+  version: '7.0'
   media_types:
     -
       name: PagerDuty
@@ -160,8 +160,26 @@ zabbix_export:
             }
             else if ((params.eventvalue == 1) && (params.eventupdate == 1) && (params.eventack == 'Yes'))
                 fields.event_action = 'acknowledge';
-            else if (params.eventvalue == 0)
+            else if (params.eventvalue == 0) {
                 fields.event_action = 'resolve';
+                fields.payload = {
+                    summary: params.eventname,
+                    source: (params.event_source === '1') ? 'Discovery' : params.hostname + ' : ' + params.hostip,
+                    severity: severityMapping[params.severity],
+                };
+
+                if (params.event_source === '0') {
+                    fields.payload.custom_details = {
+                        'Event date': params.eventdate,
+                        'Event time': params.eventtime,
+                        'Trigger description': params.triggerdesc,
+                        'Trigger opdata': params.triggeropdata,
+                        'Event tags': params.eventtags,
+                        'Event host': params.hostname,
+                        'Event host ip': params.hostip
+                    };
+                }
+            }
             else
                 throw 'incorrect values. Update message without ack will not be sent.';
         
@@ -198,7 +216,7 @@ zabbix_export:
             throw 'PagerDuty notification failed : ' + error;
         }
       description: |
-        Please refer to https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2 and https://www.zabbix.com/documentation/6.2/manual/config/notifications/media/webhook#example_scripts.
+        Please refer to https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2 and https://www.zabbix.com/documentation/7.0/manual/config/notifications/media/webhook#example_scripts.
           
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add a dedicated user with the media type "PagerDuty" and place the integration key in the "token" parameter to integrate into the service.

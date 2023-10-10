@@ -50,9 +50,8 @@ $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'charts.view'))
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 	->setActiveTab($data['active_tab'])
-	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
-		$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
-	)
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'], $web_layout_mode != ZBX_LAYOUT_KIOSKMODE,
+		'web.charts.filter')
 	->addFormItem((new CVar('action', 'charts.view'))->removeId());
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
@@ -123,6 +122,7 @@ $html_page->show();
 				'subfilter_tags' => $data['subfilter_tags'],
 				'page' => $data['page']
 			]
-		]
+		],
+		'timeline' => json_encode($data['timeline'], JSON_THROW_ON_ERROR)
 	]).');
 '))->show();

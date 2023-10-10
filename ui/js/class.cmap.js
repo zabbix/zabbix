@@ -186,7 +186,7 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = $('<div>', {
 					id: 'map-window',
 					class: 'overlay-dialogue',
-					style: 'display: none; top: 0; left: 0;'
+					style: 'display: none; top: 0; left: 0; padding-top: 13px;'
 				})
 				.appendTo('.wrapper')
 				.draggable({
@@ -301,12 +301,13 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					$.ajax({
-						url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
+						url: url.getPath() + '?output=ajax',
 						type: 'post',
 						dataType: 'html',
 						data: {
 							favobj: 'sysmap',
 							action: 'expand',
+							_csrf_token: this.csrf_token,
 							sysmapid: this.sysmapid,
 							name: this.data.name,
 							source: JSON.stringify(post)
@@ -773,6 +774,12 @@ ZABBIX.apps.map = (function($) {
 							$('#triggerContainer tbody').html('');
 							break;
 
+						// map
+						case '1':
+							$('#elementNameMap').multiSelect('clean');
+							$('#triggerContainer tbody').html('');
+							break;
+
 						// triggers
 						case '2':
 							$('#elementNameTriggers').multiSelect('clean');
@@ -792,7 +799,14 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
-				$('#elementClose').click(function() {
+				jQuery(document).on('keydown', (event) => {
+					if (event.which == KEY_ESCAPE) {
+						that.clearSelection();
+						that.toggleForm();
+					}
+				});
+
+				$('.btn-overlay-close, #elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});
@@ -869,7 +883,7 @@ ZABBIX.apps.map = (function($) {
 
 				// Init tag fields.
 				$('#selement-tags')
-					.dynamicRows({template: '#tag-row-tmpl', counter: 0})
+					.dynamicRows({template: '#tag-row-tmpl', counter: 0, allow_empty: true})
 					.on('beforeadd.dynamicRows', function() {
 						var options = $('#selement-tags').data('dynamicRows');
 						options.counter = ++options.counter;
@@ -2746,6 +2760,22 @@ ZABBIX.apps.map = (function($) {
 				}
 			});
 
+			// map
+			$('#elementNameMap').multiSelectHelper({
+				id: 'elementNameMap',
+				object_name: 'sysmaps',
+				name: 'elementValue',
+				selectedLimit: 1,
+				popup: {
+					parameters: {
+						srctbl: 'sysmaps',
+						srcfld1: 'sysmapid',
+						dstfrm: 'selementForm',
+						dstfld1: 'elementNameMap'
+					}
+				}
+			});
+
 			// triggers
 			$('#elementNameTriggers').multiSelectHelper({
 				id: 'elementNameTriggers',
@@ -2996,8 +3026,10 @@ ZABBIX.apps.map = (function($) {
 
 					// map
 					case '1':
-						$('#sysmapid').val(selement.elements[0].sysmapid);
-						$('#elementNameMap').val(selement.elements[0].elementName);
+						$('#elementNameMap').multiSelect('addData', [{
+							'id': selement.elements[0].sysmapid,
+							'name': selement.elements[0].elementName
+						}]);
 						break;
 
 					// trigger
@@ -3096,10 +3128,12 @@ ZABBIX.apps.map = (function($) {
 
 					// map
 					case '1':
-						if ($('#elementNameMap').val() !== '') {
+						elementsData = $('#elementNameMap').multiSelect('getData');
+
+						if (elementsData.length != 0) {
 							data.elements[0] = {
-								sysmapid: $('#sysmapid').val(),
-								elementName: $('#elementNameMap').val()
+								sysmapid: elementsData[0].id,
+								elementName: elementsData[0].name
 							};
 						}
 						break;

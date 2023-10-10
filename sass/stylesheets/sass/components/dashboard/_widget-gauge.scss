@@ -1,0 +1,121 @@
+// Widget configuration.
+
+form.dashboard-widget-gauge {
+	.fields-group {
+		&.fields-group-colors,
+		&.fields-group-description,
+		&.fields-group-value,
+		&.fields-group-value-arc,
+		&.fields-group-needle,
+		&.fields-group-scale,
+		&.fields-group-thresholds {
+			display: grid;
+			grid-template-columns: minmax(100px, max-content) 1fr max-content minmax(95px, max-content);
+			align-items: center;
+			column-gap: 10px;
+			row-gap: 5px;
+
+			label {
+				text-align: right;
+			}
+
+			hr {
+				grid-column: 1 / -1;
+				margin: 0;
+				width: 100%;
+				border: solid $table-border-color;
+				border-width: 1px 0 0 0;
+			}
+
+			.field-fluid {
+				grid-column: 2 / -1;
+			}
+
+			.offset-3 {
+				grid-column-start: 3;
+			}
+
+			.field-size {
+				input {
+					margin-right: 5px;
+				}
+			}
+
+			.form-field {
+				line-height: 24px;
+			}
+		}
+
+		&.fields-group-colors {
+			grid-template-columns: repeat(3, minmax(100px, max-content) 1fr);
+		}
+
+		&.fields-group-description {
+			.form-field:nth-child(1) {
+				grid-column: 1 / -1;
+			}
+		}
+
+		&.fields-group-value {
+			.units-show {
+				display: flex;
+
+				label[for='units'] {
+					width: 100%;
+				}
+			}
+		}
+
+		&.fields-group-scale {
+			.scale-show {
+				display: flex;
+
+				label[for='scale_show_units'] {
+					width: 100%;
+				}
+			}
+		}
+
+		&.fields-group-thresholds {
+			.form-field:first-child {
+				grid-column: 1 / -1;
+			}
+		}
+	}
+}
+
+// Widget view.
+
+div.dashboard-widget-gauge {
+	overflow-x: hidden;
+
+	.dashboard-grid-widget-body {
+		a {
+			display: block;
+
+			&:hover,
+			&:focus,
+			&:active {
+				border: 0;
+			}
+
+			svg {
+				display: block;
+			}
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-gauge {
+		.dashboard-grid-widget-body {
+			a {
+				&:link {
+					border: 0;
+				}
+			}
+		}
+	}
+}

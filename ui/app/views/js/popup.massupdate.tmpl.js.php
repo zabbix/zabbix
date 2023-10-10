@@ -31,9 +31,7 @@
 		(new CTextBox('valuemap_rename[#{rowNum}][to]', '', false, DB::getFieldLength('valuemap', 'name')))
 			->addStyle('width: 100%;'),
 		(new CCol(
-			(new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove'))
+			(new CButtonLink(_('Remove')))->addClass('element-table-remove'))
 		)
 			->addClass(ZBX_STYLE_TOP)
 	]))->addClass('form_row')
@@ -46,6 +44,7 @@
 					->addClass('macro')
 					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
+					->disableSpellcheck()
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
@@ -103,7 +102,7 @@
 	<tr id="dependency_#{triggerid}" data-triggerid="#{triggerid}">
 		<td>
 			<input type="hidden" name="dependencies[]" id="dependencies_#{triggerid}" value="#{triggerid}">
-			<a href="#{url}" target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>">#{name}</a>
+			<a href="javascript:void(0)" class="js-edit-dependency" data-triggerid="#{triggerid}" data-context="#{context}" data-parent_discoveryid="#{parent_discoveryid}" data-prototype="#{prototype}" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>">#{name}</a>
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<?= (new CButton('remove', _('Remove')))
@@ -113,4 +112,8 @@
 			?>
 		</td>
 	</tr>
+</script>
+
+<script>
+
 </script>

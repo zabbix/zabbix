@@ -35,7 +35,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			'templates' => 'array',
 			'inventories' => 'array',
 			'description' => 'string',
-			'proxy_hostid' => 'string',
+			'proxyid' => 'string',
 			'ipmi_username' => 'string',
 			'ipmi_password' => 'string',
 			'tls_issuer' => 'string',
@@ -108,6 +108,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$hostids = $this->getInput('hostids');
+			$hosts_count = count($hostids);
 			$visible = $this->getInput('visible', []);
 
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
@@ -194,7 +195,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 
-				$properties = ['description', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+				$properties = ['description', 'proxyid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 					'ipmi_password'
 				];
 
@@ -505,7 +506,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					ob_start();
 					uncheckTableRows('hosts');
 
-					$output = ['title' => _('Hosts updated'), 'script_inline' => ob_get_clean()];
+					$output = [
+						'title' => _n('Host updated', 'Hosts updated', $hosts_count),
+						'script_inline' => ob_get_clean()
+					];
 
 					if ($messages = CMessageHelper::getMessages()) {
 						$output['messages'] = array_column($messages, 'message');
@@ -514,7 +518,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				else {
 					$output = [
 						'error' => [
-							'title' => _('Cannot update hosts'),
+							'title' => _n('Cannot update host', 'Cannot update hosts', $hosts_count),
 							'messages' => array_column(get_and_clear_messages(), 'message')
 						]
 					];
@@ -540,11 +544,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			];
 
 			$data['proxies'] = API::Proxy()->get([
-				'output' => ['proxyid', 'host'],
-				'filter' => [
-					'status' => [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]
-				],
-				'sortfield' => 'host'
+				'output' => ['proxyid', 'name'],
+				'sortfield' => 'name'
 			]);
 
 			$data['discovered_host'] = !(bool) API::Host()->get([

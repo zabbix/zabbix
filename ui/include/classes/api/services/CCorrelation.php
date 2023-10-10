@@ -533,7 +533,9 @@ class CCorrelation extends CApiService {
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Correlation "%1$s" already exists.', $duplicates[0]['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Event correlation "%1$s" already exists.',
+				$duplicates[0]['name'])
+			);
 		}
 	}
 

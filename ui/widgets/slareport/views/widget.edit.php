@@ -28,25 +28,19 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldMultiSelectSlaView($data['fields']['slaid'], $data['captions']['ms']['slas']['slaid'])
+		new CWidgetFieldMultiSelectSlaView($data['fields']['slaid'])
 	)
 	->addField(
-		new CWidgetFieldMultiSelectServiceView($data['fields']['serviceid'],
-			$data['captions']['ms']['services']['serviceid']
-		)
+		new CWidgetFieldMultiSelectServiceView($data['fields']['serviceid'])
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_periods'])
 	)
 	->addField(
-		(new CWidgetFieldDatePickerView($data['fields']['date_from']))
+		(new CWidgetFieldTimePeriodView($data['fields']['date_period']))
 			->setDateFormat(ZBX_DATE)
-			->setPlaceholder(_('YYYY-MM-DD'))
-	)
-	->addField(
-		(new CWidgetFieldDatePickerView($data['fields']['date_to']))
-			->setDateFormat(ZBX_DATE)
-			->setPlaceholder(_('YYYY-MM-DD'))
+			->setFromPlaceholder(_('YYYY-MM-DD'))
+			->setToPlaceholder(_('YYYY-MM-DD'))
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_slareport_form.init('.json_encode([

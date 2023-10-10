@@ -31,8 +31,8 @@
 #define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"
 #define ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT	"verify_full"
 
-typedef char	**DB_ROW;
-typedef struct zbx_db_result	*DB_RESULT;
+typedef char	**zbx_db_row_t;
+typedef struct zbx_db_result	*zbx_db_result_t;
 
 /* database field value */
 typedef union
@@ -75,12 +75,12 @@ zbx_config_dbhigh_t;
 #	define ZBX_FOR_UPDATE	" for update"
 #endif
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, char **error);
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error);
 void	zbx_db_deinit_basic(void);
 
 void	zbx_db_init_autoincrement_options_basic(void);
 
-int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh);
+int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg);
 void	zbx_db_close_basic(void);
 
 int	zbx_db_begin_basic(void);
@@ -108,7 +108,6 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
-#define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
 
 #ifdef HAVE_ORACLE
@@ -135,12 +134,19 @@ int		zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, uns
 void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
 int		zbx_db_statement_execute(int iters);
 #endif
-int		zbx_db_vexecute(const char *fmt, va_list args);
-DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
-DB_RESULT	zbx_db_select_n_basic(const char *query, int n);
 
-DB_ROW		zbx_db_fetch_basic(DB_RESULT result);
-void		zbx_db_free_result(DB_RESULT result);
+#if defined (HAVE_MYSQL)
+void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size);
+#elif defined(HAVE_POSTGRESQL)
+void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size);
+#endif
+
+int		zbx_db_vexecute(const char *fmt, va_list args);
+zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args);
+zbx_db_result_t	zbx_db_select_n_basic(const char *query, int n);
+
+zbx_db_row_t		zbx_db_fetch_basic(zbx_db_result_t result);
+void		zbx_db_free_result(zbx_db_result_t result);
 int		zbx_db_is_null_basic(const char *field);
 
 typedef enum
@@ -156,22 +162,7 @@ char		*zbx_db_dyn_escape_like_pattern_basic(const char *src);
 
 int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
-#define ZBX_DBVERSION_UNDEFINED				0
-
-#define ZBX_DB_EXTENSION_TIMESCALEDB				"timescaledb"
-
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_STR		"10.2"
-#define ZBX_TIMESCALE_MIN_VERSION				10500
-#define ZBX_TIMESCALE_MIN_VERSION_STR				"1.5.0"
-#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
-#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR 		"2.0.1"
-#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				20999
-#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.9"
-#define ZBX_TIMESCALE_LICENSE_APACHE_STR			"TimescaleDB Apache 2 Edition"
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY_STR			"TimescaleDB Community Edition"
+#define ZBX_DB_EXTENSION_TIMESCALEDB	"timescaledb"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -206,8 +197,8 @@ typedef enum
 {	/* db extension error codes shared with FRONTEND */
 	ZBX_EXT_ERR_UNDEFINED = 0,
 	ZBX_EXT_SUCCEED = 1,
-	ZBX_TIMESCALEDB_POSTGRES_TOO_OLD,
-	ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE,
+	/* ZBX_TIMESCALEDB_POSTGRES_TOO_OLD, obsoleted since Zabbix 7.0 */
+	ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE = 3,
 	ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM,
 	ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED,
 	ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM,
@@ -251,11 +242,13 @@ struct zbx_db_version_info_t
 
 	zbx_db_version_status_t	ext_flag;
 
-	char			*ext_lic;
 	zbx_db_ext_err_code_t	ext_err_code;
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+#ifdef HAVE_ORACLE
+	struct zbx_json		tables_json;
+#endif
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

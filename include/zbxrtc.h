@@ -23,14 +23,31 @@
 #include "zbxalgo.h"
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
+#include "zbxjson.h"
 
 #define ZBX_IPC_SERVICE_RTC	"rtc"
 
-typedef struct
+typedef enum
+{
+	ZBX_RTC_SUB_CLIENT,
+	ZBX_RTC_SUB_SERVICE
+}
+zbx_rtc_sub_type_t;
+
+typedef union
 {
 	zbx_ipc_client_t	*client;
+	char			*service;
+}
+zbx_rtc_sub_source_t;
+
+typedef struct
+{
+	zbx_rtc_sub_type_t	type;
+	zbx_rtc_sub_source_t	source;
 	unsigned char		process_type;
 	int			process_num;
+	zbx_vector_uint32_t	msgs;
 }
 zbx_rtc_sub_t;
 
@@ -53,7 +70,7 @@ typedef struct
 }
 zbx_rtc_t;
 
-typedef int	(*zbx_rtc_process_request_ex_func_t)(zbx_rtc_t *, int, const unsigned char *, char **);
+typedef int	(*zbx_rtc_process_request_ex_func_t)(zbx_rtc_t *, zbx_uint32_t, const unsigned char *, char **);
 
 /* provider API */
 int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error);
@@ -65,14 +82,22 @@ void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc);
 /* client API */
 void	zbx_rtc_notify_config_sync(int config_timeout, zbx_ipc_async_socket_t *rtc);
 
-void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout, zbx_ipc_async_socket_t *rtc);
+void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num, int config_timeout,
+		zbx_ipc_async_socket_t *rtc);
+void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num,
+		int config_timeout, const char *service);
 int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, const zbx_thread_info_t *info, zbx_uint32_t *cmd,
 		unsigned char **data, int timeout);
 int	zbx_rtc_reload_config_cache(char **error);
 
-int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error);
-void	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
-		const unsigned char *data, zbx_uint32_t size);
+int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *j, char **error);
+int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
+		const char *data, zbx_uint32_t size);
 
 int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, int config_timeout, char **error);
+
+int	zbx_rtc_get_command_target(const char *data, pid_t *pid, int *proc_type, int *proc_num, int *scope,
+		char **result);
+
+void	zbx_rtc_sub_free(zbx_rtc_sub_t *sub);
 #endif

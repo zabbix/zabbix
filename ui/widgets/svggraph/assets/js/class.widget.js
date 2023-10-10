@@ -20,59 +20,60 @@
 
 class CWidgetSvgGraph extends CWidget {
 
-	_init() {
-		super._init();
-
+	onInitialize() {
 		this._has_contents = false;
 		this._svg_options = {};
 	}
 
-	_doActivate() {
-		super._doActivate();
-
+	onActivate() {
 		this._activateGraph();
 	}
 
-	_doDeactivate() {
-		super._doDeactivate();
-
+	onDeactivate() {
 		this._deactivateGraph();
 	}
 
-	resize() {
-		super.resize();
-
+	onResize() {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._startUpdating();
 		}
 	}
 
-	setEditMode() {
-		super.setEditMode();
-
+	onEdit() {
 		this._deactivateGraph();
 	}
 
-	setTimePeriod(time_period) {
-		super.setTimePeriod(time_period);
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
+	onFeedback({type, value, descriptor}) {
+		if (type === '_timeperiod' && this.getFieldsReferredData().has('time_period')) {
 			this._startUpdating();
+
+			this.feedback({time_period: value});
+
+			return true;
 		}
+
+		return super.onFeedback({type, value, descriptor});
 	}
 
-	_getUpdateRequestData() {
+	promiseUpdate() {
+		if (!this.hasBroadcast('time_period') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		}
+
+		return super.promiseUpdate();
+	}
+
+	getUpdateRequestData() {
 		return {
-			...super._getUpdateRequestData(),
-			from: this._time_period.from,
-			to: this._time_period.to
+			...super.getUpdateRequestData(),
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
 		};
 	}
 
-	_processUpdateResponse(response) {
+	processUpdateResponse(response) {
 		this._destroyGraph();
 
-		super._processUpdateResponse(response);
+		super.processUpdateResponse(response);
 
 		if (response.svg_options !== undefined) {
 			this._has_contents = true;
@@ -93,7 +94,7 @@ class CWidgetSvgGraph extends CWidget {
 
 	_initGraph(options) {
 		this._svg_options = options;
-		this._svg = this._content_body.querySelector('svg');
+		this._svg = this._body.querySelector('svg');
 		jQuery(this._svg).svggraph(this);
 
 		this._activateGraph();
@@ -118,10 +119,10 @@ class CWidgetSvgGraph extends CWidget {
 		}
 	}
 
-	getActionsContextMenu({can_paste_widget}) {
-		const menu = super.getActionsContextMenu({can_paste_widget});
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_copy_widget, can_paste_widget});
 
-		if (this._is_edit_mode) {
+		if (this.isEditMode()) {
 			return menu;
 		}
 
@@ -148,14 +149,14 @@ class CWidgetSvgGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._has_contents,
 			clickCallback: () => {
-				downloadSvgImage(this._svg, 'graph.png');
+				downloadSvgImage(this._svg, 'image.png', '.svg-graph-legend');
 			}
 		});
 
 		return menu;
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return true;
 	}
 }

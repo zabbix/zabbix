@@ -20,7 +20,6 @@
 #ifndef ZABBIX_PID_H
 #define ZABBIX_PID_H
 
-#include "zbxthreads.h"
 #include "zbxsysinc.h"
 
 #ifdef _WINDOWS

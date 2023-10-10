@@ -28,13 +28,23 @@
 		_resize_observer: null,
 		_container: null,
 
-		init({filter_form_name, data}) {
+		init({filter_form_name, data, timeline}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
 			this._container = document.querySelector('main');
 			this._data = data;
 
 			this.initSubfilter();
 			this.initCharts();
+
+			timeControl.addObject('charts_view', timeline, {
+				id: 'timeline_1',
+				domid: 'charts_view',
+				loadSBox: 0,
+				loadImage: 0,
+				dynamic: 0
+			});
+
+			timeControl.processObjects();
 		},
 
 		initSubfilter() {

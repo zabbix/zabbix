@@ -58,7 +58,7 @@ foreach($data['regexs'] as $regexid => $regex) {
 	foreach($regex['expressions'] as $expression) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
-			new CCol(' &raquo; '),
+			new CCol([' ', RARR(), ' ']),
 			new CCol($expression['expression']),
 			new CCol(' ['.CRegexHelper::expression_type2str($expression['expression_type']).']')
 		]);
@@ -78,7 +78,10 @@ foreach($data['regexs'] as $regexid => $regex) {
 $form->addItem([
 	$table,
 	new CActionButtonList('action', 'regexids', [
-		'regex.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'),
+		'regex.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected regular expression?'),
+			'confirm_plural' => _('Delete selected regular expressions?'),
 			'csrf_token' => CCsrfTokenHelper::get('regex')
 		]
 	], 'regex')

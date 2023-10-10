@@ -31,7 +31,6 @@ import (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
 }
 
@@ -46,9 +45,6 @@ var impl Plugin
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
 	}
 }
 
@@ -67,14 +63,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
-	if p.options.LogRemoteCommands == 1 && ctx.ClientID() != agent.LocalChecksClientID {
+	if p.options.LogRemoteCommands == 1 && (ctx == nil || ctx.ClientID() != agent.LocalChecksClientID) {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])
 	}
 
 	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
-		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(p.options.Timeout), "")
+		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(ctx.Timeout()), "")
 		if err != nil {
 			return nil, err
 		}

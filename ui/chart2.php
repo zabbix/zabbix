@@ -142,8 +142,29 @@ $graph->setYMinAxisType($dbGraph['ymin_type']);
 $graph->setYMaxAxisType($dbGraph['ymax_type']);
 $graph->setYAxisMin($dbGraph['yaxismin']);
 $graph->setYAxisMax($dbGraph['yaxismax']);
-$graph->setYMinItemId($dbGraph['ymin_itemid']);
-$graph->setYMaxItemId($dbGraph['ymax_itemid']);
+
+$yaxis_items = array_intersect_key($dbGraph, array_filter([
+	'ymin_itemid' => $dbGraph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $dbGraph['ymin_itemid'] != 0,
+	'ymax_itemid' => $dbGraph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $dbGraph['ymax_itemid'] != 0
+]));
+
+if ($yaxis_items) {
+	$db_items = API::Item()->get([
+		'itemids' => array_values($yaxis_items),
+		'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
+		'webitems' => true,
+		'preservekeys' => true
+	]);
+
+	if (array_key_exists('ymin_itemid', $yaxis_items) && array_key_exists($yaxis_items['ymin_itemid'], $db_items)) {
+		$graph->setYMinItemId($yaxis_items['ymin_itemid']);
+	}
+
+	if (array_key_exists('ymax_itemid', $yaxis_items) && array_key_exists($yaxis_items['ymax_itemid'], $db_items)) {
+		$graph->setYMaxItemId($yaxis_items['ymax_itemid']);
+	}
+}
+
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
 

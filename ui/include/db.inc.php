@@ -377,21 +377,14 @@ function DBexecute($query): bool {
 			break;
 
 		case ZBX_DB_ORACLE:
-			$result = oci_parse($DB['DB'], $query);
+			$handle = oci_parse($DB['DB'], $query);
 
-			if ($result === false) {
-				$e = oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
+			$result = $handle && @oci_execute($handle, $DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS);
 
-				break;
+			if (!$result) {
+				$error = $handle ? oci_error($handle) : oci_error();
+				error('SQL error ['.$error['message'].'] in ['.$error['sqltext'].']', true);
 			}
-
-			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
-			}
-
-			$result = true;
 
 			break;
 	}
@@ -604,7 +597,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$pattern = zbx_dbstr($pattern);
 			}
 
-			$fieldSearch[] = DB::uppercaseField($field, $table, $tableShort).' LIKE '.$pattern." ESCAPE '!'";
+			$fieldSearch[] = DB::uppercaseField($field, $table, $tableShort).$exclude.' LIKE '.$pattern." ESCAPE '!'";
 		}
 
 		$search[$field] = '('.implode($glue, $fieldSearch).')';

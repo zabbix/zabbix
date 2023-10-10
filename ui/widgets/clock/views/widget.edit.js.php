@@ -34,8 +34,6 @@ window.widget_clock_form = new class {
 		this._show_time = document.getElementById('show_2');
 		this._show_tzone = document.getElementById('show_3');
 
-		this._advanced_configuration = document.getElementById('adv_conf');
-
 		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
@@ -66,40 +64,34 @@ window.widget_clock_form = new class {
 			});
 		}
 
-		this._advanced_configuration.addEventListener('change', () => this.updateForm());
-
 		this.updateForm();
 	}
 
 	updateForm() {
 		const is_digital = this._clock_type.querySelector('input:checked').value == <?= Widget::TYPE_DIGITAL ?>;
 
-		const show_date_row = is_digital && this._advanced_configuration.checked && this._show_date.checked;
-		const show_time_row = is_digital && this._advanced_configuration.checked && this._show_time.checked;
-		const show_tzone_row = is_digital && this._advanced_configuration.checked && this._show_tzone.checked;
-
-		for (const element of this._form.querySelectorAll('.js-row-show, .js-row-adv-conf')) {
+		for (const element of this._form.querySelectorAll('.js-row-show')) {
 			element.style.display = is_digital ? '' : 'none';
 		}
 
-		for (const element of this._form.querySelectorAll('.js-row-bg-color')) {
-			element.style.display = is_digital && this._advanced_configuration.checked ? '' : 'none';
-		}
+		this._form.querySelector('.js-fieldset-adv-conf').style.display = is_digital ? 'contents' : 'none';
 
-		for (const element of this._form.querySelectorAll('.fields-group-date')) {
-			element.style.display = show_date_row ? '' : 'none';
-		}
+		if (is_digital) {
+			for (const element of this._form.querySelectorAll('.fields-group-date')) {
+				element.style.display = this._show_date.checked ? '' : 'none';
+			}
 
-		for (const element of this._form.querySelectorAll('.fields-group-time')) {
-			element.style.display = show_time_row ? '' : 'none';
-		}
+			for (const element of this._form.querySelectorAll('.fields-group-time')) {
+				element.style.display = this._show_time.checked ? '' : 'none';
+			}
 
-		for (const element of this._form.querySelectorAll('.fields-group-tzone')) {
-			element.style.display = show_tzone_row ? '' : 'none';
-		}
+			for (const element of this._form.querySelectorAll('.fields-group-tzone')) {
+				element.style.display = this._show_tzone.checked ? '' : 'none';
+			}
 
-		for (const element of this._form.querySelectorAll('.field-tzone-timezone, .field-tzone-format')) {
-			element.style.display = this._time_type.value != <?= TIME_TYPE_HOST ?> ? '' : 'none';
+			for (const element of this._form.querySelectorAll('.field-tzone-timezone, .field-tzone-format')) {
+				element.style.display = this._time_type.value != <?= TIME_TYPE_HOST ?> ? '' : 'none';
+			}
 		}
 	}
 };

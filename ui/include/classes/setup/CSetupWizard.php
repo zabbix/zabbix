@@ -260,7 +260,6 @@ class CSetupWizard extends CForm {
 
 				if ($db_connected) {
 					if ($this->checkConnection()) {
-						$this->setConfig('DB_DOUBLE_IEEE754', DB::getDbBackend()->isDoubleIEEE754());
 						$this->doNext();
 					}
 
@@ -333,8 +332,7 @@ class CSetupWizard extends CForm {
 						'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
 						'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
 						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
-						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
-						'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
+						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
 					] + $db_creds_config + $vault_config,
 					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
 				];
@@ -362,7 +360,7 @@ class CSetupWizard extends CForm {
 	protected function bodyToString($destroy = true): string {
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
-			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
+			->addItem(makeLogo(LOGO_TYPE_NORMAL))
 			->addItem($this->getList());
 
 		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
@@ -454,9 +452,7 @@ class CSetupWizard extends CForm {
 			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 		}
 
-		$language_error = ($language_error !== '')
-			? (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')
-			: null;
+		$language_error = $language_error !== '' ? makeErrorIcon($language_error) : null;
 
 		$language_select = (new CFormList())
 			->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()), [
@@ -518,6 +514,7 @@ class CSetupWizard extends CForm {
 
 	private function stageDbConnection(): array {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
+		$db_warning = _('Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions.');
 
 		$table = (new CFormList())
 			->addItem([
@@ -525,13 +522,14 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_certificate', 0))->removeId(),
 				(new CVar('verify_host', 0))->removeId()
 			])
-			->addRow(new CLabel(_('Database type'), 'label-type'),
+			->addRow(new CLabel(_('Database type'), 'label-type'), [
 				(new CSelect('type'))
 					->setId('type')
 					->setFocusableElementId('label-type')
 					->setValue($DB['TYPE'])
-					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
-			)
+					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases())),
+				makeWarningIcon($db_warning)->setId('db_warning')
+			])
 			->addRow(_('Database host'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -987,8 +985,7 @@ class CSetupWizard extends CForm {
 				'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
 				'CA_FILE' => $this->getConfig('DB_CA_FILE'),
 				'VERIFY_HOST' => $this->getConfig('DB_VERIFY_HOST'),
-				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
-				'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
+				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
 			] + $db_creds_config + $vault_config,
 			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
 		];

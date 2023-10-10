@@ -18,19 +18,51 @@
 **/
 
 #include "checks_agent.h"
+#include "../sysinfo.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
+#include "zbxjson.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
 #endif
 
+void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
+
+	if (0 == strcmp(s->buffer, ZBX_NOTSUPPORTED))
+	{
+		/* 'ZBX_NOTSUPPORTED\0<error message>' */
+		if (sizeof(ZBX_NOTSUPPORTED) < s->read_bytes)
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s->buffer + sizeof(ZBX_NOTSUPPORTED)));
+		else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
+
+		*ret = NOTSUPPORTED;
+	}
+	else if (0 == strcmp(s->buffer, ZBX_ERROR))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
+		*ret = AGENT_ERROR;
+	}
+	else if (0 == received_len)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
+				" Assuming that agent dropped connection because of access permissions.",
+				addr));
+		*ret = NETWORK_ERROR;
+	}
+	else
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s->buffer);
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item             - [IN] item we are interested in              *
+ *             config_source_ip - [IN]                                        *
+ *             result           - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
@@ -42,10 +74,11 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
+	int		timeout_sec;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -83,52 +116,42 @@ int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 	}
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			item->host.tls_connect, tls_arg1, tls_arg2))
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
+		/* failures are handled there */
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
+			timeout_sec + 1, item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
 
-		if (SUCCEED != zbx_tcp_send(&s, item->key))
+		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)timeout_sec,
+				ZBX_TCP_PROTOCOL, 0))
+		{
 			ret = NETWORK_ERROR;
+		}
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
+		{
 			ret = SUCCEED;
-		else if (SUCCEED == zbx_alarm_timed_out())
+		}
+		else if (SUCCEED != zbx_socket_check_deadline(&s))
+		{
 			ret = TIMEOUT_ERROR;
+		}
 		else
 			ret = NETWORK_ERROR;
 	}
 	else
+	{
 		ret = NETWORK_ERROR;
+		goto out;
+	}
 
 	if (SUCCEED == ret)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s.buffer);
-
-		if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED))
-		{
-			/* 'ZBX_NOTSUPPORTED\0<error message>' */
-			if (sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s.buffer + sizeof(ZBX_NOTSUPPORTED)));
-			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
-
-			ret = NOTSUPPORTED;
-		}
-		else if (0 == strcmp(s.buffer, ZBX_ERROR))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
-			ret = AGENT_ERROR;
-		}
-		else if (0 == received_len)
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
-					" Assuming that agent dropped connection because of access permissions.",
-					item->interface.addr));
-			ret = NETWORK_ERROR;
-		}
-		else
-			zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
-	}
+		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result);
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 

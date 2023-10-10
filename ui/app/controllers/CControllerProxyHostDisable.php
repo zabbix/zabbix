@@ -63,7 +63,7 @@ class CControllerProxyHostDisable extends CController {
 		$hosts = API::Host()->get([
 			'output' => ['hostid'],
 			'filter' => [
-				'proxy_hostid' => $this->getInput('proxyids'),
+				'proxyid' => $this->getInput('proxyids'),
 				'status' => HOST_STATUS_MONITORED
 			]
 		]);

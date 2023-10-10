@@ -69,6 +69,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			[
 				'name' => 'Dashboard for SLA report widget tests',
 				'private' => 0,
+				'auto_start' => 1,
 				'pages' => [
 					[
 						'name' => 'Page with widgets',
@@ -123,7 +124,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('SLA report')]);
 		$dialog->waitUntilReady();
 
-		$this->assertEquals(["Type", "Name", "Refresh interval", "SLA", "Service", "Show periods", "From", "To"],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'SLA', 'Service', 'Show periods', 'From', 'To'],
 				$form->getLabels()->asText()
 		);
 		$form->checkValue(['Show header' => true, 'Refresh interval' => 'Default (No refresh)']);
@@ -146,11 +147,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'maxlength' => 3,
 				'value' => 20
 			],
-			'id:date_from' => [
+			'id:date_period_from' => [
 				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			],
-			'id:date_to' => [
+			'id:date_period_to' => [
 				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			]
@@ -163,7 +164,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 
 		// Check that the date pickers are present.
-		foreach (['id:date_from_calendar', 'id:date_to_calendar'] as $selector) {
+		foreach (['id:date_period_from_calendar', 'id:date_period_to_calendar'] as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isVisible());
 		}
 
@@ -313,8 +314,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'expected' => TEST_BAD,
 					'error' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
@@ -328,8 +329,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'expected' => TEST_BAD,
 					'error' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
@@ -1951,7 +1952,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
-			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
+			// Months are excluded as strtotime() calculates month subtraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [
@@ -2031,7 +2032,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
-			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
+			// Months are excluded as strtotime() calculates month subtraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [
@@ -2338,8 +2339,17 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				$quarters = ['01 – 03', '04 – 06', '07 – 09', '10 – 12'];
 				$to_year = date('Y', strtotime($to_date));
 				$to_month = date('m', strtotime($to_date));
-				$from_year = date('Y', strtotime($to_date.' - '.(3 * ($show_periods - 1)).' months'));
-				$from_month = date('m', strtotime($to_date.' - '.(3 * ($show_periods - 1)).' months'));
+
+				// Calculate the year and the month from which the SLA should be displayed via month number in AD.
+				$months_total = 12 * $to_year + $to_month - 3 * ($show_periods - 1);
+				$from_year = floor($months_total/12);
+				$from_month = $months_total - $from_year * 12;
+
+				// In case there is no remaining months after division, then month is december and year should be reduced.
+				if ($from_month == 0) {
+					$from_month = 12;
+					$from_year--;
+				}
 
 				$i = 0;
 				for ($year = $to_year; $year >= $from_year; $year--) {

@@ -5,6 +5,8 @@ SUBDIRS = \
 	zbxdbhigh \
 	zbxhistory \
 	zbxjson \
+	zbxmodules \
+	zbxpreproc \
 	zbxsysinfo \
 	zbxcommshigh \
 	zbxcommon \
@@ -12,7 +14,7 @@ SUBDIRS = \
 	zbxprometheus \
 	zbxcomms \
 	zbxregexp \
-	zbxserver \
+	zbxexpression \
 	zbxtagfilter \
 	zbxtrends \
 	zbxtime \

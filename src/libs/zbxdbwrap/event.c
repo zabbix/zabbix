@@ -33,10 +33,10 @@
  * Comments: use 'zbx_db_free_event' function to release allocated memory     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events)
+void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_event_t *events)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	tagged_eventids, triggerids;
@@ -88,11 +88,11 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		if (EVENT_OBJECT_TRIGGER == event->object)
 			zbx_vector_uint64_append(&triggerids, event->objectid);
 
-		zbx_vector_ptr_append(events, event);
+		zbx_vector_db_event_append(events, event);
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_ptr_sort(events, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_db_event_sort(events, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	/* read event_suppress data */
 
@@ -108,7 +108,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		zbx_uint64_t	eventid;
 
 		ZBX_STR2UINT64(eventid, row[0]);
-		if (FAIL == (index = zbx_vector_ptr_bsearch(events, &eventid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)events, &eventid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -139,7 +140,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 			if (NULL == event || eventid != event->eventid)
 			{
-				if (FAIL == (index = zbx_vector_ptr_bsearch(events, &eventid,
+				if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)events, &eventid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -251,8 +252,8 @@ void	zbx_db_free_event(zbx_db_event *event)
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*filter = NULL;
 	size_t		filter_alloc = 0, filter_offset = 0;
 
@@ -315,8 +316,8 @@ void	zbx_db_prepare_empty_event(zbx_uint64_t eventid, zbx_db_event **event)
  ******************************************************************************/
 void	zbx_db_get_event_data_core(zbx_db_event *event)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_CORE & event->flags))
 		return;
@@ -353,8 +354,8 @@ void	zbx_db_get_event_data_core(zbx_db_event *event)
  ******************************************************************************/
 void	zbx_db_get_event_data_tags(zbx_db_event *event)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_TAGS & event->flags) || (EVENT_SOURCE_TRIGGERS != event->source &&
 			EVENT_SOURCE_INTERNAL != event->source && EVENT_SOURCE_SERVICE != event->source))
@@ -389,8 +390,8 @@ void	zbx_db_get_event_data_tags(zbx_db_event *event)
  ******************************************************************************/
 void	zbx_db_get_event_data_triggers(zbx_db_event *event)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS & event->flags) || EVENT_OBJECT_TRIGGER != event->object)
 		return;
@@ -434,8 +435,8 @@ void	zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ui
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t	s_eventid;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -466,8 +467,8 @@ void	zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ui
  ******************************************************************************/
 zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	cause_eventid;
 
 	result = zbx_db_select("select cause_eventid from event_symptom where eventid=" ZBX_FS_UI64, eventid);
@@ -493,8 +494,8 @@ zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid)
  ******************************************************************************/
 zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	objectid;
 
 	result = zbx_db_select("select objectid from events where eventid=" ZBX_FS_UI64, eventid);

@@ -20,7 +20,9 @@
 package zbxnet
 
 import (
+	"fmt"
 	"net"
+	"regexp"
 	"strings"
 )
 
@@ -33,6 +35,9 @@ type AllowedPeers struct {
 
 // GetAllowedPeers is parses the Server field
 func GetAllowedPeers(servers string) (allowedPeers *AllowedPeers, err error) {
+	const duplicateErrorMessage = "cannot parse the \"Server\" parameter: address \"%s\" specified more than once"
+	const regexDNSString = `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`
+
 	ap := &AllowedPeers{}
 
 	if servers != "" {
@@ -41,8 +46,9 @@ func GetAllowedPeers(servers string) (allowedPeers *AllowedPeers, err error) {
 			peer := strings.Trim(o, " \t")
 			if _, peerNet, err := net.ParseCIDR(peer); nil == err {
 				if ap.isPresent(peerNet) {
-					continue
+					return &AllowedPeers{}, fmt.Errorf(duplicateErrorMessage, peer)
 				}
+
 				ap.nets = append(ap.nets, peerNet)
 				maskLeadSize, maskTotalOnes := peerNet.Mask.Size()
 				if 0 == maskLeadSize && 128 == maskTotalOnes {
@@ -53,10 +59,21 @@ func GetAllowedPeers(servers string) (allowedPeers *AllowedPeers, err error) {
 				}
 			} else if peerip := net.ParseIP(peer); nil != peerip {
 				if ap.isPresent(peerip) {
-					continue
+					return &AllowedPeers{}, fmt.Errorf(duplicateErrorMessage, peer)
 				}
+
 				ap.ips = append(ap.ips, peerip)
-			} else if !ap.isPresent(peer) {
+			} else {
+				if ap.isPresent(peer) {
+					return &AllowedPeers{}, fmt.Errorf(duplicateErrorMessage, peer)
+				}
+
+				regexDNS := regexp.MustCompile(regexDNSString)
+				if !regexDNS.MatchString(peer) {
+					return &AllowedPeers{}, fmt.Errorf("invalid \"Server\" configuration: incorrect address"+
+						" parameter: \"%s\"", peer)
+				}
+
 				ap.names = append(ap.names, peer)
 			}
 		}

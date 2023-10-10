@@ -27,8 +27,6 @@
 #include "valuecache_test.h"
 #include "mocks/valuecache/valuecache_mock.h"
 
-extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
-
 #include "zbx_vc_common.h"
 
 void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_ptr_t *history, int *err, const char **data,

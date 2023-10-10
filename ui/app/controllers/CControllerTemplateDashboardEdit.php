@@ -33,9 +33,7 @@ class CControllerTemplateDashboardEdit extends CController {
 			'dashboardid' => 'db dashboard.dashboardid'
 		];
 
-		$ret = $this->validateInput($fields);
-
-		$ret = $ret && ($this->hasInput('templateid') || $this->hasInput('dashboardid'));
+		$ret = $this->validateInput($fields) && ($this->hasInput('templateid') || $this->hasInput('dashboardid'));
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -68,7 +66,9 @@ class CControllerTemplateDashboardEdit extends CController {
 	protected function doAction(): void {
 		if ($this->hasInput('dashboardid')) {
 			$dashboard = $this->dashboard;
-			$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], $dashboard['templateid'],
+			$dashboard['pages'] = CDashboardHelper::preparePages(
+				CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], $dashboard['templateid']),
+				$dashboard['pages'],
 				false
 			);
 		}
@@ -91,10 +91,11 @@ class CControllerTemplateDashboardEdit extends CController {
 		}
 
 		$data = [
+			// The dashboard property shall only contain data used by the JavaScript framework.
 			'dashboard' => $dashboard,
-			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(true),
-			'widget_last_type' => CDashboardHelper::getWidgetLastType(true),
-			'time_period' => getTimeSelectorPeriod([]),
+			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
+			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
+			'dashboard_time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null)
 		];
 

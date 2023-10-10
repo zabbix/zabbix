@@ -71,7 +71,7 @@ jQuery(function($) {
 	if ($search.length) {
 		createSuggest('search');
 
-		var $search_icon = $search.siblings('.search-icon');
+		var $search_icon = $search.siblings('.js-search');
 
 		$search.on('keyup', function() {
 			$search_icon.prop('disabled', $.trim($search.val()) === '');
@@ -391,6 +391,10 @@ jQuery(function($) {
 		var confirmation = button.attr('data-confirmation');
 
 		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
+			if (button.attr('data-post')) {
+				return redirect(button.attr('data-url'), 'post', '_csrf_token', true);
+			}
+
 			window.location = button.attr('data-url');
 		}
 	});

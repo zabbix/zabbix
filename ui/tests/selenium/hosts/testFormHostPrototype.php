@@ -885,7 +885,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
-			$this->zbxTestClickXpathWait('//span[@class="subfilter-disable-btn"]');
+			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
 			$this->zbxTestMultiselectClear('group_links_');
 			$this->zbxTestClickButtonMultiselect('group_links_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');

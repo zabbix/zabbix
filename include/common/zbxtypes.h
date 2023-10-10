@@ -32,14 +32,6 @@
 #	endif
 #endif
 
-#if defined(_WINDOWS) || defined(__MINGW32__)
-#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#	define PATH_SEPARATOR	'\\'
-#else
-#	define zbx_open(pathname, flags)	open(pathname, flags)
-#	define PATH_SEPARATOR	'/'
-#endif
-
 #if defined(_WINDOWS)
 #	include <strsafe.h>
 
@@ -79,6 +71,7 @@ typedef int	ssize_t;
 typedef long	ssize_t;
 #	endif
 
+typedef DWORD	zbx_syserror_t;
 #else	/* _WINDOWS */
 #	ifndef __UINT64_C
 #		ifdef UINT64_C
@@ -143,6 +136,8 @@ typedef long	ssize_t;
 #	endif
 
 typedef uint32_t	zbx_uint32_t;
+
+typedef int	zbx_syserror_t;
 
 #endif	/* _WINDOWS */
 

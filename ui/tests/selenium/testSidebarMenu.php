@@ -119,8 +119,8 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Triggers top 100',
-					'header' => '100 busiest triggers'
+					'page' => 'Top 100 triggers',
+					'header' => 'Top 100 triggers'
 				]
 			],
 			[
@@ -373,12 +373,12 @@ class testSidebarMenu extends CWebTest {
 			}
 
 			// Clicking hide/collapse button.
-			$this->query('button', $hide)->one()->click();
+			$this->query('xpath://button[@title='.CXPathHelper::escapeQuotes($hide).']')->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.'"]')->waitUntilReady()->exists());
 
 			// Waiting sidemenu to hide/collapse.
 			if ($view === 'compact') {
-				$this->query('class:zabbix-sidebar-logo')->one(false)->waitUntilNotVisible();
+				$this->query('class:zabbix-logo-sidebar')->one(false)->waitUntilNotVisible();
 			}
 			elseif ($view === 'hidden') {
 				$this->query('xpath://aside[@class="sidebar is-hidden"]')->one(false)->waitUntilNotVisible();
@@ -391,7 +391,7 @@ class testSidebarMenu extends CWebTest {
 			$this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->one()->waitUntilVisible();
 
 			// Returning standard sidemenu view clicking on unhide, expand button.
-			$this->query('button', $unhide)->one()->waitUntilClickable()->click();
+			$this->query('xpath://button[@title='.CXPathHelper::escapeQuotes($unhide).']')->one()->waitUntilClickable()->click();
 			$this->assertTrue($this->query('class:sidebar')->one()->isVisible());
 		}
 	}
@@ -413,7 +413,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Help',
-					'link' => 'https://www.zabbix.com/documentation/6.4/'
+					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/'
 				]
 			],
 			[

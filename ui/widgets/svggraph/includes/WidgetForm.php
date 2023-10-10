@@ -23,8 +23,7 @@ namespace Widgets\SvgGraph\Includes;
 
 use CNumberParser,
 	CParser,
-	CRangeTimeParser,
-	CSettingsHelper;
+	CWidgetsData;
 
 use Zabbix\Widgets\{
 	CWidgetField,
@@ -33,17 +32,16 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
-	CWidgetFieldDatePicker,
-	CWidgetFieldGraphDataSet,
-	CWidgetFieldGraphOverride,
 	CWidgetFieldHostPatternSelect,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldNumericBox,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldRangeControl,
 	CWidgetFieldSelect,
 	CWidgetFieldSeverities,
 	CWidgetFieldTags,
-	CWidgetFieldTextBox
+	CWidgetFieldTextBox,
+	CWidgetFieldTimePeriod
 };
 
 /**
@@ -56,8 +54,6 @@ class WidgetForm extends CWidgetForm {
 
 	private bool $percentile_left_on = false;
 	private bool $percentile_right_on = false;
-
-	private bool $graph_time_on = false;
 
 	private bool $lefty_on = true;
 	private bool $lefty_units_static = false;
@@ -114,13 +110,6 @@ class WidgetForm extends CWidgetForm {
 			}
 		}
 
-		// Test graph custom time period.
-		if ($this->getFieldValue('graph_time') == SVG_GRAPH_CUSTOM_TIME_ON) {
-			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
-				$this->getFieldValue('time_to')
-			));
-		}
-
 		// Validate Min/Max values in Axes tab.
 		if ($this->getFieldValue('lefty') == SVG_GRAPH_AXIS_ON) {
 			$lefty_min = $number_parser_w_suffix->parse($this->getFieldValue('lefty_min')) == CParser::PARSE_SUCCESS
@@ -174,14 +163,6 @@ class WidgetForm extends CWidgetForm {
 
 		if (!$this->percentile_right_on) {
 			unset($values['percentile_right_value']);
-		}
-
-		if (array_key_exists('graph_time', $values)) {
-			$this->graph_time_on = $values['graph_time'] == SVG_GRAPH_CUSTOM_TIME_ON;
-		}
-
-		if (!$this->graph_time_on) {
-			unset($values['time_from'], $values['time_to']);
 		}
 
 		if (array_key_exists('lefty', $values)) {
@@ -245,12 +226,15 @@ class WidgetForm extends CWidgetForm {
 			->initAxesFields()
 			->initLegendFields()
 			->initProblemsFields()
-			->initOverridesFields();
+			->initOverridesFields()
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
+			);
 	}
 
 	private function initDataSetFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 
@@ -288,23 +272,14 @@ class WidgetForm extends CWidgetForm {
 	private function initTimePeriodFields(): self {
 		return $this
 			->addField(
-				new CWidgetFieldCheckBox('graph_time', _('Set custom time period'))
-			)
-			->addField(
-				(new CWidgetFieldDatePicker('time_from', _('From')))
-					->setDefault('now-1h')
-					->setFlags($this->graph_time_on
-						? CWidgetField::FLAG_NOT_EMPTY
-						: CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_DISABLED
-					)
-			)
-			->addField(
-				(new CWidgetFieldDatePicker('time_to', _('To')))
-					->setDefault('now')
-					->setFlags($this->graph_time_on
-						? CWidgetField::FLAG_NOT_EMPTY
-						: CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_DISABLED
-					)
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 	}
 
@@ -334,6 +309,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('lefty_static_units'))
 					->setFlags(!$this->lefty_on || !$this->lefty_units_static ? CWidgetField::FLAG_DISABLED : 0x00)
+					->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('righty', _('Right Y'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
@@ -359,6 +335,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('righty_static_units', null))
 					->setFlags(!$this->righty_on || !$this->righty_units_static ? CWidgetField::FLAG_DISABLED : 0x00)
+					->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('axisx', _('X-Axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
@@ -372,6 +349,10 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('legend_statistic', _('Display min/max/avg')))
+					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
+			)
+			->addField(
+				(new CWidgetFieldCheckBox('legend_aggregation', _('Show aggregation function')))
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -400,8 +381,9 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
-			->addField(
-				(new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -413,7 +395,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))
@@ -427,44 +409,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initOverridesFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
-	}
-
-	/**
-	 * Check if widget configuration is set to use overridden time.
-	 */
-	public static function hasOverrideTime(array $fields_values): bool {
-		return array_key_exists('graph_time', $fields_values)
-			&& $fields_values['graph_time'] == SVG_GRAPH_CUSTOM_TIME_ON;
-	}
-
-	private static function validateTimeSelectorPeriod(string $from, string $to): array {
-		$errors = [];
-		$ts = [];
-		$ts['now'] = time();
-		$range_time_parser = new CRangeTimeParser();
-
-		foreach (['from' => $from, 'to' => $to] as $field => $value) {
-			$range_time_parser->parse($value);
-			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
-		}
-
-		$period = $ts['to'] - $ts['from'] + 1;
-		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-		$max_period = 1 + $ts['now'] - $range_time_parser->getDateTime(true)->getTimestamp();
-
-		if ($period < ZBX_MIN_PERIOD) {
-			$errors[] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
-			);
-		}
-		elseif ($period > $max_period) {
-			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
-			);
-		}
-
-		return $errors;
 	}
 }

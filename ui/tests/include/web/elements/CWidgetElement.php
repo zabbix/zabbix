@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
+require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
@@ -33,9 +33,10 @@ class CWidgetElement extends CElement {
 	 * @return integer
 	 */
 	public function getRefreshInterval() {
-		$this->query('xpath:.//button[contains(@class, "btn-widget-action")]')->waitUntilPresent()->one()->click(true);
-		$selected = $this->query('xpath://ul[@role="menu"]//a[contains(@aria-label, "selected")]')->one();
-		$aria_label = explode(', ', $selected->getAttribute('aria-label'), 3);
+		$this->getHeader()->hoverMouse();
+		$this->query('xpath:.//button[contains(@class, "js-widget-action")]')->waitUntilPresent()->one()->click(true);
+		$menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$aria_label = explode(', ', $menu->getSelected()->getAttribute('aria-label'), 3);
 
 		return $aria_label[1];
 	}
@@ -43,11 +44,20 @@ class CWidgetElement extends CElement {
 	/**
 	 * Get header of widget.
 	 *
+	 * @return CElement
+	 */
+	public function getHeader() {
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4')->one();
+	}
+
+	/**
+	 * Get header text of widget.
+	 *
 	 * @return string
 	 */
 	public function getHeaderText() {
-		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
-				' contains(@class, "dashboard-grid-iterator-head")]/h4')->one()->getText();
+		return $this->getHeader()->getText();
 	}
 
 	/**
@@ -56,8 +66,8 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-content") or'.
-				' contains(@class, "dashboard-grid-iterator-content")]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-contents") or'.
+				' contains(@class, "dashboard-grid-iterator-contents")]')->one();
 	}
 
 	/**
@@ -66,7 +76,7 @@ class CWidgetElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEditable() {
-		return $this->query('xpath:.//button[contains(@class, "btn-widget-edit")]')->one()->isPresent();
+		return $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->one()->isPresent();
 	}
 
 	/**
@@ -75,12 +85,21 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		// Edit can sometimes fail so we have to retry this operation.
+		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
+
+		if ($button->isVisible(false)) {
+			$button->hoverMouse();
+		}
+
+		// Edit can sometimes fail, so we have to retry this operation.
 		for ($i = 0; $i < 4; $i++) {
-			$this->query('xpath:.//button[contains(@class, "btn-widget-edit")]')->waitUntilPresent()->one()->click(true);
+			// TODO: remove force: true parameter after DEV-2621 is fixed.
+			$button->click(true);
 
 			try {
-				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()->asForm()->one();
+				// TODO: fix formatting after git-hook improvements DEV-2396.
+				return $this->query("xpath://div[@data-dialogueid=\"widget_properties\"]//form")->waitUntilVisible()
+						->asForm()->one();
 			}
 			catch (\Exception $e) {
 				if ($i === 1) {
@@ -91,7 +110,7 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	public function getReadyCondition() {
 		$target = $this;
@@ -99,5 +118,12 @@ class CWidgetElement extends CElement {
 		return function () use ($target) {
 			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false)->isValid() === false);
 		};
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function isReady() {
+		return call_user_func([$this, 'getReadyCondition']);
 	}
 }

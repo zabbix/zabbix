@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -34,6 +36,7 @@ import (
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/keyaccess"
+	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
@@ -46,6 +49,15 @@ const (
 	// inactive shutdown value
 	shutdownInactive = -1
 )
+
+type Request struct {
+	Itemid      uint64  `json:"itemid"`
+	Key         string  `json:"key"`
+	Delay       string  `json:"delay"`
+	LastLogsize *uint64 `json:"lastlogsize"`
+	Mtime       *int    `json:"mtime"`
+	Timeout     any     `json:"timeout"`
+}
 
 // Manager implements Scheduler interface and manages plugin interface usage.
 type Manager struct {
@@ -63,10 +75,19 @@ type Manager struct {
 // updateRequest contains list of metrics monitored by a client and additional client configuration data.
 type updateRequest struct {
 	clientID                   uint64
-	sink                       plugin.ResultWriter
+	sink                       resultcache.Writer
 	firstActiveChecksRefreshed bool
-	requests                   []*plugin.Request
+	requests                   []*Request
 	expressions                []*glexpr.Expression
+	now                        time.Time
+}
+
+// commandRequest contains list of remote commands
+type commandRequest struct {
+	clientID uint64
+	sink     resultcache.Writer
+	commands []*agent.RemoteCommand
+	now      time.Time
 }
 
 // queryRequest contains status/debug query request.
@@ -81,10 +102,25 @@ type queryRequestUserParams struct {
 }
 
 type Scheduler interface {
-	UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
-		expressions []*glexpr.Expression, requests []*plugin.Request)
+	UpdateTasks(
+		clientID uint64,
+		writer resultcache.Writer, firstActiveChecksRefreshed bool,
+		expressions []*glexpr.Expression,
+		requests []*Request,
+		now time.Time,
+	)
+	UpdateCommands(
+		clientID uint64,
+		writer resultcache.Writer,
+		commands []*agent.RemoteCommand,
+		now time.Time,
+	)
 	FinishTask(task performer)
-	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
+	PerformTask(
+		key string,
+		timeout time.Duration,
+		clientID uint64,
+	) (result string, err error)
 	Query(command string) (status string)
 	QueryUserParams() (status string)
 }
@@ -121,11 +157,19 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 				taskBase: taskBase{plugin: p, active: true},
 			}
 			if err := task.reschedule(now); err != nil {
-				log.Debugf("[%d] cannot schedule stopper task for plugin %s", c.id, p.name())
+				log.Debugf(
+					"[%d] cannot schedule stopper task for plugin %s",
+					c.id,
+					p.name(),
+				)
 				continue
 			}
 			p.enqueueTask(task)
-			log.Debugf("[%d] created stopper task for plugin %s", c.id, p.name())
+			log.Debugf(
+				"[%d] created stopper task for plugin %s",
+				c.id,
+				p.name(),
+			)
 
 			if p.queued() {
 				m.pluginQueue.Update(p)
@@ -141,33 +185,59 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 	}
 }
 
-// processUpdateRequest processes client update request. It's being used for multiple requests
-// (active checks on a server) and also for direct requets (single passive and internal checks).
-func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
-	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
+func parseItemTimeout(s string) (seconds int, e error) {
+	const invalidTimeoutError = "Unsupported timeout value."
+	const maxTimeout = 600
 
-	// immediately fail direct checks and ignore bulk requests when shutting down
-	if m.shutdownSeconds != shutdownInactive {
-		if update.clientID <= agent.MaxBuiltinClientID {
-			if len(update.requests) == 1 {
-				update.sink.Write(&plugin.Result{
-					Itemid: update.requests[0].Itemid,
-					Error:  errors.New("Cannot obtain item value during shutdown process."),
-					Ts:     now,
-				})
-			} else {
-				log.Warningf("[%d] direct checks can contain only single request while received %d requests",
-					update.clientID, len(update.requests))
-			}
-		}
+	if s == "" {
+		e = errors.New(invalidTimeoutError)
+
 		return
 	}
 
+	if intVal, err := strconv.Atoi(s); err != nil {
+		var mult int
+
+		if strings.HasSuffix(s, "m") {
+			mult = 60
+		} else if strings.HasSuffix(s, "s") {
+			mult = 1
+		} else {
+			e = errors.New(invalidTimeoutError)
+
+			return
+		}
+
+		if val, err := strconv.Atoi(s[:len(s)-1]); err != nil {
+			e = errors.New(invalidTimeoutError)
+
+			return
+		} else {
+			seconds = val * mult
+		}
+	} else {
+		seconds = intVal
+	}
+
+	if seconds > maxTimeout {
+		e = errors.New(invalidTimeoutError)
+	}
+
+	return
+}
+
+// processUpdateRequest processes client update request. It's being used for multiple requests
+// (active checks on a server) and also for direct requets (single passive and internal checks).
+func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 	var c *client
 	var ok bool
 	if c, ok = m.clients[update.clientID]; !ok {
 		if len(update.requests) == 0 {
-			log.Debugf("[%d] skipping empty update for unregistered client", update.clientID)
+			log.Debugf(
+				"[%d] skipping empty update for unregistered client",
+				update.clientID,
+			)
+
 			return
 		}
 		log.Debugf("[%d] registering new client", update.clientID)
@@ -192,19 +262,48 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				err = c.addRequest(p, r, update.sink, now, update.firstActiveChecksRefreshed)
+				var timeout int
+
+				switch v := r.Timeout.(type) {
+				case nil:
+					timeout = agent.Options.Timeout
+				case float64:
+					timeout = int(v)
+				case int:
+					timeout = v
+				case string:
+					timeout, err = parseItemTimeout(v)
+				default:
+					err = fmt.Errorf("unexpected timeout %q of type %T", r.Timeout, r.Timeout)
+				}
+
+				if err == nil {
+					err = c.addRequest(p, r, timeout, update.sink, update.now, update.firstActiveChecksRefreshed)
+				}
 			}
 		}
 
 		if err != nil {
 			if c.id > agent.MaxBuiltinClientID {
 				if tacc, ok := c.exporters[r.Itemid]; ok {
-					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+					log.Debugf(
+						"deactivate exporter task for item %d because of error: %s",
+						r.Itemid,
+						err,
+					)
 					tacc.task().deactivate()
 				}
 			}
-			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-			log.Debugf("[%d] cannot monitor metric \"%s\": %s", update.clientID, r.Key, err.Error())
+			update.sink.Write(
+				&plugin.Result{Itemid: r.Itemid, Error: err, Ts: update.now},
+			)
+			log.Debugf(
+				"[%d] cannot monitor metric \"%s\": %s",
+				update.clientID,
+				r.Key,
+				err.Error(),
+			)
+
 			continue
 		}
 
@@ -215,7 +314,96 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 	}
 
-	m.cleanupClient(c, now)
+	m.cleanupClient(c, update.now)
+}
+
+func (m *Manager) processUpdateRequestShutdown(update *updateRequest) {
+	if update.clientID <= agent.MaxBuiltinClientID {
+		if len(update.requests) == 1 {
+			update.sink.Write(&plugin.Result{
+				Itemid: update.requests[0].Itemid,
+				Error: errors.New(
+					"Cannot obtain item value during shutdown process.",
+				),
+				Ts: update.now,
+			})
+		} else {
+			log.Warningf("[%d] direct checks can contain only single request while received %d requests",
+				update.clientID, len(update.requests))
+		}
+	}
+}
+
+func (m *Manager) processUpdateRequest(update *updateRequest) {
+	log.Debugf(
+		"[%d] processing update request (%d requests)",
+		update.clientID,
+		len(update.requests),
+	)
+
+	// immediately fail direct checks and ignore bulk requests when shutting down
+	if m.shutdownSeconds != shutdownInactive {
+		m.processUpdateRequestShutdown(update)
+	} else {
+		m.processUpdateRequestRun(update)
+	}
+}
+
+func (m *Manager) processCommandRequest(update *commandRequest) {
+	log.Debugf(
+		"[%d] processing command request (%d commands)",
+		update.clientID,
+		len(update.commands),
+	)
+
+	var c *client
+	var ok bool
+	if c, ok = m.clients[update.clientID]; !ok {
+		log.Debugf("[%d] registering new client", update.clientID)
+		c = newClient(update.clientID, update.sink)
+		m.clients[update.clientID] = c
+	}
+
+	for _, rc := range update.commands {
+		var wait string
+		if rc.Wait == 1 {
+			wait = "wait"
+		} else {
+			wait = "nowait"
+		}
+		params := []string{rc.Command, wait}
+
+		if !keyaccess.CheckRules("system.run", params) {
+			log.Debugf("Remote command '%s' is not allowed", rc.Command)
+
+			update.sink.WriteCommand(
+				&resultcache.CommandResult{
+					ID:    rc.Id,
+					Error: errors.New("Unsupported item key."),
+				},
+			)
+			update.sink.Flush()
+
+			continue
+		}
+
+		if p, ok := m.plugins["system.run"]; ok {
+			c.addCommand(p, rc.Id, params, update.sink, update.now)
+
+			if !p.queued() {
+				heap.Push(&m.pluginQueue, p)
+			} else {
+				m.pluginQueue.Update(p)
+			}
+		} else {
+			log.Warningf("Remote commands cannot be executed, plugin \"system.run\" is unavailable")
+
+			update.sink.WriteCommand(&resultcache.CommandResult{ID: rc.Id, Error: errors.New("Unsupported item key.")})
+			update.sink.Flush()
+
+			break
+		}
+	}
 }
 
 // processQueue processes queued plugins/tasks
@@ -294,8 +482,12 @@ func (m *Manager) processFinishRequest(task performer) {
 			p.enqueueTask(task)
 		}
 	}
-	if !p.queued() && p.hasCapacity() {
-		heap.Push(&m.pluginQueue, p)
+	if !p.queued() {
+		if p.hasCapacity() {
+			heap.Push(&m.pluginQueue, p)
+		}
+	} else {
+		m.pluginQueue.Update(p)
 	}
 }
 
@@ -379,6 +571,8 @@ run:
 					for _, client := range m.clients {
 						if len(client.pluginsInfo) == 0 {
 							delete(m.clients, client.ID())
+						} else {
+							client.commandCleanup()
 						}
 					}
 					cleaned = now
@@ -394,7 +588,10 @@ run:
 			}
 			switch v := u.(type) {
 			case *updateRequest:
-				m.processUpdateRequest(v, time.Now())
+				m.processUpdateRequest(v)
+				m.processQueue(time.Now())
+			case *commandRequest:
+				m.processCommandRequest(v)
 				m.processQueue(time.Now())
 			case performer:
 				m.processFinishRequest(v)
@@ -409,15 +606,17 @@ run:
 					v.sink <- response
 				}
 			case *queryRequestUserParams:
-				var keys []string
-				var rerr error
-
 				metrics := plugin.ClearUserParamMetrics()
 
-				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
-					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
+				keys, rerr := agent.InitUserParameterPlugin(
+					agent.Options.UserParameter,
+					agent.Options.UnsafeUserParameters,
+					agent.Options.UserParameterDir,
+				)
+				if rerr != nil {
 					plugin.RestoreUserParamMetrics(metrics)
-					v.sink <- "cannot process user parameters request: " + rerr.Error()
+					v.sink <- fmt.Sprintf("cannot process user parameters request: %s", rerr.Error())
+
 					continue
 				}
 
@@ -489,10 +688,18 @@ func (m *Manager) init() {
 	pagent := &pluginAgent{}
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
-			capacity, forceActiveChecksOnStart := getPluginOptions(agent.Options.Plugins[metric.Plugin.Name()], metric.Plugin.Name())
+			capacity, forceActiveChecksOnStart := getPluginOptions(
+				agent.Options.Plugins[metric.Plugin.Name()],
+				metric.Plugin.Name(),
+			)
 			if capacity > metric.Plugin.Capacity() {
-				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
-					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
+				log.Warningf(
+					"lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
+					metric.Plugin.Name(),
+					metric.Plugin.Capacity(),
+					capacity,
+				)
+
 				capacity = metric.Plugin.Capacity()
 			}
 
@@ -528,8 +735,12 @@ func (m *Manager) init() {
 			if metric.Plugin.IsExternal() {
 				ext := metric.Plugin.(*external.Plugin)
 				metric.Plugin.SetCapacity(1)
-				log.Infof("using plugin '%s' (%s) providing following interfaces: %s", metric.Plugin.Name(),
-					ext.Path, interfaces)
+				log.Infof(
+					"using plugin '%s' (%s) providing following interfaces: %s",
+					metric.Plugin.Name(),
+					ext.Path,
+					interfaces,
+				)
 			} else {
 				log.Infof("using plugin '%s' (built-in) providing following interfaces: %s", metric.Plugin.Name(),
 					interfaces)
@@ -540,7 +751,10 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
-	log.Infof("Plugin communication protocol version is %s", comms.ProtocolVersion)
+	log.Infof(
+		"Plugin communication protocol version is %s",
+		comms.ProtocolVersion,
+	)
 
 	monitor.Register(monitor.Scheduler)
 	go m.run()
@@ -550,14 +764,35 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
-	expressions []*glexpr.Expression, requests []*plugin.Request) {
-
-	m.input <- &updateRequest{clientID: clientID,
+func (m *Manager) UpdateTasks(
+	clientID uint64,
+	writer resultcache.Writer,
+	firstActiveChecksRefreshed bool,
+	expressions []*glexpr.Expression,
+	requests []*Request,
+	now time.Time,
+) {
+	m.input <- &updateRequest{
+		clientID:                   clientID,
 		sink:                       writer,
 		requests:                   requests,
 		expressions:                expressions,
 		firstActiveChecksRefreshed: firstActiveChecksRefreshed,
+		now:                        now,
+	}
+}
+
+func (m *Manager) UpdateCommands(
+	clientID uint64,
+	writer resultcache.Writer,
+	commands []*agent.RemoteCommand,
+	now time.Time,
+) {
+	m.input <- &commandRequest{
+		clientID: clientID,
+		sink:     writer,
+		commands: commands,
+		now:      now,
 	}
 }
 
@@ -565,6 +800,10 @@ type resultWriter chan *plugin.Result
 
 func (r resultWriter) Write(result *plugin.Result) {
 	r <- result
+}
+
+func (r resultWriter) WriteCommand(cr *resultcache.CommandResult) {
+	log.Errf("remote commands are not supported by single task requests")
 }
 
 func (r resultWriter) Flush() {
@@ -578,13 +817,31 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error) {
+func (m *Manager) PerformTask(
+	key string,
+	timeout time.Duration,
+	clientID uint64,
+) (result string, err error) {
 	var lastLogsize uint64
 	var mtime int
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+	m.UpdateTasks(
+		clientID,
+		w,
+		false,
+		nil,
+		[]*Request{
+			{
+				Key:         key,
+				LastLogsize: &lastLogsize,
+				Mtime:       &mtime,
+				Timeout:     int(timeout.Seconds()),
+			},
+		},
+		time.Now(),
+	)
 
 	select {
 	case r := <-w:
@@ -624,7 +881,11 @@ func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	for _, p := range plugin.Plugins {
 		if c, ok := p.(plugin.Configurator); ok && !p.IsExternal() {
 			if err = c.Validate(options.Plugins[p.Name()]); err != nil {
-				return fmt.Errorf("invalid plugin %s configuration: %s", p.Name(), err)
+				return fmt.Errorf(
+					"invalid plugin %s configuration: %s",
+					p.Name(),
+					err.Error(),
+				)
 			}
 		}
 	}
@@ -677,13 +938,24 @@ func peekTask(tasks performerHeap) performer {
 	return tasks[0]
 }
 
-func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActiveChecksOnStart int) {
-	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(optsRaw, name)
+func getPluginOptions(
+	optsRaw interface{},
+	name string,
+) (capacity, forceActiveChecksOnStart int) {
+	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(
+		optsRaw,
+		name,
+	)
 
 	if pluginSystemCap > 0 {
 		if pluginCap > 0 {
-			log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity configuration parameters are set, using System.Capacity: %d",
-				name, name, pluginSystemCap)
+			log.Warningf(
+				"both Plugins.%s.Capacity and Plugins.%s.System.Capacity "+
+					"configuration parameters are set, using System.Capacity: %d",
+				name,
+				name,
+				pluginSystemCap,
+			)
 		}
 		capacity = pluginSystemCap
 	} else if pluginCap > 0 {
@@ -697,9 +969,13 @@ func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActi
 	}
 
 	if nil != pluginForceActiveChecksOnStart {
-		if *pluginForceActiveChecksOnStart > 1 || *pluginForceActiveChecksOnStart < 0 {
-			log.Warningf("invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
-				name, *pluginForceActiveChecksOnStart)
+		if *pluginForceActiveChecksOnStart > 1 ||
+			*pluginForceActiveChecksOnStart < 0 {
+			log.Warningf(
+				"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
+				name,
+				*pluginForceActiveChecksOnStart,
+			)
 			forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
 		} else {
 			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
@@ -711,7 +987,10 @@ func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActi
 	return
 }
 
-func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
+func getPluginOpts(
+	optsRaw interface{},
+	name string,
+) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
 	var opt pluginOptions
 
 	if optsRaw == nil {

@@ -59,19 +59,21 @@
 #define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
 #define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
 
-#include "log.h"
-
 #include <OpenIPMI/ipmiif.h>
 #include <OpenIPMI/ipmi_posix.h>
 #include <OpenIPMI/ipmi_lan.h>
 #include <OpenIPMI/ipmi_auth.h>
 
-#define RETURN_IF_CB_DATA_NULL(x, y)							\
-	if (NULL == (x))								\
-	{										\
-		zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", (y));	\
-		return;									\
-	}
+#define RETURN_IF_CB_DATA_NULL(x, y)								\
+	do											\
+	{											\
+		if (NULL == (x))								\
+		{										\
+			zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", (y));	\
+			return;									\
+		}										\
+	}											\
+	while(0)
 
 typedef union
 {

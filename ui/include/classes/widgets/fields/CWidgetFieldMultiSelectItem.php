@@ -23,16 +23,13 @@ namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldMultiSelectItem extends CWidgetFieldMultiSelect {
 
-	public function __construct(string $name, string $label = null, $hostid = null) {
+	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectItemView::class;
+
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
+		$this->inaccessible_caption = _('Inaccessible item');
 
-		if ($hostid === null) {
-			$this->setFilterParameter('real_hosts', true);
-		}
-		else {
-			$this->setFilterParameter('hostid', $hostid);
-		}
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 	}
 }

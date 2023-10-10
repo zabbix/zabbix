@@ -87,9 +87,10 @@ class CImportDataAdapter {
 					$template += array_fill_keys(['vendor_name', 'vendor_version'], '');
 				}
 
-				$templates[] = array_intersect_key($template, array_flip(['uuid', 'host', 'name', 'description',
-					'vendor_name', 'vendor_version', 'groups', 'tags', 'macros'
-				]));
+				$templates[] = CArrayHelper::getByKeys($template, [
+					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
+					'valuemaps', 'vendor_name', 'vendor_version'
+				]);
 			}
 		}
 
@@ -106,55 +107,21 @@ class CImportDataAdapter {
 
 		if (array_key_exists('hosts', $this->data)) {
 			foreach ($this->data['hosts'] as $host) {
-				$host = CArrayHelper::renameKeys($host, ['proxyid' => 'proxy_hostid']);
-
 				if (array_key_exists('interfaces', $host)) {
 					foreach ($host['interfaces'] as $index => $interface) {
 						$host['interfaces'][$index] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
 					}
 				}
 
-				$hosts[] = array_intersect_key($host,
-					array_flip(['inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
-						'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
-						'inventory_mode', 'tags'
-					])
-				);
+				$hosts[] = CArrayHelper::getByKeys($host, [
+					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
+					'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
+					'inventory_mode', 'tags', 'valuemaps'
+				]);
 			}
 		}
 
 		return $hosts;
-	}
-
-	/**
-	 * Get value maps from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getValueMaps(): array {
-		$valuemaps = [];
-
-		if (array_key_exists('hosts', $this->data)) {
-			foreach ($this->data['hosts'] as $host) {
-				if (array_key_exists('valuemaps', $host)) {
-					foreach ($host['valuemaps'] as $valuemap) {
-						$valuemaps[$host['host']][$valuemap['name']] = $valuemap;
-					}
-				}
-			}
-		}
-
-		if (array_key_exists('templates', $this->data)) {
-			foreach ($this->data['templates'] as $template) {
-				if (array_key_exists('valuemaps', $template)) {
-					foreach ($template['valuemaps'] as $valuemap) {
-						$valuemaps[$template['template']][$valuemap['name']] = $valuemap;
-					}
-				}
-			}
-		}
-
-		return $valuemaps;
 	}
 
 	/**
@@ -449,6 +416,10 @@ class CImportDataAdapter {
 	 * @return array
 	 */
 	protected function formatDiscoveryRule(array $discovery_rule, $host) {
+		if (!$discovery_rule['filter']) {
+			unset($discovery_rule['filter']);
+		}
+
 		$discovery_rule = $this->renameItemFields($discovery_rule);
 		$discovery_rule = $this->formatDiscoveryRuleOverrideFields($discovery_rule);
 

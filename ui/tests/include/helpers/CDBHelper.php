@@ -18,19 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../../include/defines.inc.php';
-require_once dirname(__FILE__).'/../../../conf/zabbix.conf.php';
-require_once dirname(__FILE__).'/../../../include/func.inc.php';
-require_once dirname(__FILE__).'/../../../include/classes/api/CApiService.php';
-require_once dirname(__FILE__).'/../../../include/db.inc.php';
-require_once dirname(__FILE__).'/../../../include/classes/db/DB.php';
-require_once dirname(__FILE__).'/../../../include/classes/user/CWebUser.php';
-require_once dirname(__FILE__).'/../../../include/classes/debug/CProfiler.php';
-require_once dirname(__FILE__).'/../../../include/classes/db/DbBackend.php';
-require_once dirname(__FILE__).'/../../../include/classes/db/MysqlDbBackend.php';
-require_once dirname(__FILE__).'/../../../include/classes/db/PostgresqlDbBackend.php';
-require_once dirname(__FILE__).'/CTestArrayHelper.php';
+
+require_once __DIR__.'/../../../include/gettextwrapper.inc.php';
+require_once __DIR__.'/../../../include/defines.inc.php';
+require_once __DIR__.'/../../../conf/zabbix.conf.php';
+require_once __DIR__.'/../../../include/func.inc.php';
+require_once __DIR__.'/../../../include/classes/api/CApiService.php';
+require_once __DIR__.'/../../../include/db.inc.php';
+require_once __DIR__.'/../../../include/classes/db/DB.php';
+require_once __DIR__.'/../../../include/classes/db/DBException.php';
+require_once __DIR__.'/../../../include/classes/user/CWebUser.php';
+require_once __DIR__.'/../../../include/classes/debug/CProfiler.php';
+require_once __DIR__.'/../../../include/classes/db/DbBackend.php';
+require_once __DIR__.'/../../../include/classes/db/MysqlDbBackend.php';
+require_once __DIR__.'/../../../include/classes/db/PostgresqlDbBackend.php';
+require_once __DIR__.'/CTestArrayHelper.php';
 
 /**
  * Database helper.
@@ -285,7 +287,7 @@ class CDBHelper {
 			}
 
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
-			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --dbname='.$DB['DATABASE'];
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=9 --dbname='.$DB['DATABASE'];
 			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
 
 			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
@@ -358,7 +360,7 @@ class CDBHelper {
 			$cmd .= $port;
 
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
-			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --clean --dbname='.$DB['DATABASE'];
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=1 --clean --dbname='.$DB['DATABASE'];
 			$cmd .= ' '.$file;
 
 			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
@@ -508,10 +510,10 @@ class CDBHelper {
 	/**
 	 * Add host groups to user group with these rights.
 	 *
-	 * @param string $usergroup_name
-	 * @param string $hostgroup_name
-	 * @param int $permission
-	 * @param bool $subgroups
+	 * @param string  $usergroup_name    user group name
+	 * @param string  $hostgroup_name    host group name
+	 * @param integer $permission        PERM_READ_WRITE / PERM_READ / PERM_DENY / PERM_NONE
+	 * @param boolean $subgroups         include host subgroups (true) or not (false)
 	 */
 	public static function setHostGroupPermissions($usergroup_name, $hostgroup_name, $permission, $subgroups = false) {
 		$usergroup = DB::find('usrgrp', ['name' => $usergroup_name]);
@@ -546,9 +548,9 @@ class CDBHelper {
 	/**
 	 * Create problem or resolved events of trigger.
 	 *
-	 * @param string $trigger_name
-	 * @param int $value TRIGGER_VALUE_FALSE
-	 * @param array $event_fields
+	 * @param string  $trigger_name    trigger name
+	 * @param integer $value           TRIGGER_VALUE_FALSE for RESOLVED problem / TRIGGER_VALUE_TRUE for PROBLEM
+	 * @param array   $event_fields    values for events table
 	 */
 	public static function setTriggerProblem($trigger_name, $value = TRIGGER_VALUE_TRUE, $event_fields = []) {
 		$trigger = DB::find('triggers', ['description' => $trigger_name]);

@@ -23,3 +23,10 @@ void	DCitem_poller_type_update_test(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_
 {
 	DCitem_poller_type_update(dc_item, dc_host, flags);
 }
+
+void	init_test_configuration_cache(zbx_get_config_forks_f get_config_forks)
+{
+	get_config_forks_cb = get_config_forks;
+	config = (ZBX_DC_CONFIG *)zbx_malloc(NULL, sizeof(ZBX_DC_CONFIG));
+	zbx_hashset_create(&config->snmpitems, 1, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}

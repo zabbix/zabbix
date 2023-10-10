@@ -26,7 +26,8 @@ class CHistory extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'push' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName;
@@ -86,7 +87,7 @@ class CHistory extends CApiService {
 	 */
 	public function get($options = []) {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-			ITEM_VALUE_TYPE_TEXT
+			ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -144,7 +145,8 @@ class CHistory extends CApiService {
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				return $this->getFromElasticsearch($options);
+				$result = $this->getFromElasticsearch($options);
+				break;
 
 			default:
 				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
@@ -152,8 +154,19 @@ class CHistory extends CApiService {
 					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
 				}
 
-				return $this->getFromSql($options);
+				$result = $this->getFromSql($options);
+				break;
 		}
+
+		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
+				&& $this->outputIsRequested('value', $options['output'])) {
+			foreach ($result as &$row) {
+				$row['value'] = base64_encode($row['value']);
+			}
+			unset($row);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -175,7 +188,7 @@ class CHistory extends CApiService {
 
 		// itemids
 		if ($options['itemids'] !== null) {
-			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
 		}
 
 		// time_from
@@ -338,5 +351,45 @@ class CHistory extends CApiService {
 		if (count($db_items) != count($itemids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+	}
+
+	/**
+	 * @param array $history
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function push(array $history): array {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'itemid' =>	['type' => API_ID],
+			'host' =>	['type' => API_STRING_UTF8],
+			'key' =>	['type' => API_STRING_UTF8],
+			'value' =>	['type' => API_VALUE, 'flags' => API_REQUIRED],
+			'clock' =>	['type' => API_TIMESTAMP],
+			'ns' =>		['type' => API_INT32, 'in' => '0:999999999']
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $history, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		$result = $zabbix_server->pushHistory($history, self::getAuthIdentifier());
+
+		if ($result === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $zabbix_server->getError());
+		}
+
+		return [
+			'response' => 'success',
+			'data' => $result
+		];
 	}
 }

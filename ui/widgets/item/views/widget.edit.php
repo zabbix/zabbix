@@ -32,52 +32,41 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid'])
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
+			->setPopupParameter('value_types', [
+				ITEM_VALUE_TYPE_FLOAT,
+				ITEM_VALUE_TYPE_STR,
+				ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT
+			])
 	)
 	->addField(
-		(new CWidgetFieldCheckBoxListView($data['fields']['show']))
-			->addClass(ZBX_STYLE_GRID_COLUMNS)
-			->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(2)
 	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['adv_conf'])
+	->addFieldset(
+		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
+			->addFieldsGroup(
+				getDescriptionFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-description')
+			)
+			->addFieldsGroup(
+				getValueFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value')
+			)
+			->addFieldsGroup(
+				getTimeFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-time')
+			)
+			->addFieldsGroup(
+				getChangeIndicatorFieldsGroupView($data['fields'])->addRowClass('fields-group-change-indicator')
+			)
+			->addField(
+				new CWidgetFieldColorView($data['fields']['bg_color'])
+			)
+			->addFieldsGroup(
+				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
+			)
 	)
-	->addFieldsGroup([
-		_('Description'),
-		makeHelpIcon([
-			_('Supported macros:'),
-			(new CList([
-				'{HOST.*}',
-				'{ITEM.*}',
-				'{INVENTORY.*}',
-				_('User macros')
-			]))->addClass(ZBX_STYLE_LIST_DASHED)
-		])
-	], getDescriptionFieldsGroupViews($form, $data['fields']),
-		'fields-group-description'
-	)
-	->addFieldsGroup(_('Value'), getValueFieldsGroupViews($form, $data['fields']),
-		'fields-group-value'
-	)
-	->addFieldsGroup(_('Time'), getTimeFieldsGroupViews($form, $data['fields']),
-		'fields-group-time'
-	)
-	->addFieldsGroup(_('Change indicator'), getChangeIndicatorFieldsGroupViews($form, $data['fields']),
-		'fields-group-change-indicator'
-	)
-	->addField(
-		new CWidgetFieldColorView($data['fields']['bg_color']),
-		'js-row-bg-color'
-	)
-	->addField(
-		(new CWidgetFieldThresholdsView($data['fields']['thresholds']))
-			->setHint(
-				makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
-			),
-		'js-row-thresholds'
-	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')
@@ -86,152 +75,159 @@ $form
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$description = (new CWidgetFieldTextAreaView($fields['description']))
-		->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 38);
-	$desc_size = new CWidgetFieldIntegerBoxView($fields['desc_size']);
-	$desc_color = new CWidgetFieldColorView($fields['desc_color']);
+function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
-	return [
-		$form->makeCustomField($description, [
-			new CFormField(
-				$description->getView()->setAttribute('maxlength', DB::getFieldLength('widget_field', 'value_str'))
+	return (new CWidgetFieldsGroupView(_('Description')))
+		->setFieldHint(
+			makeHelpIcon([
+				_('Supported macros:'),
+				(new CList([
+					'{HOST.*}',
+					'{ITEM.*}',
+					'{INVENTORY.*}',
+					_('User macros')
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		)
+		->addField(
+			(new CWidgetFieldTextAreaView($fields['description']))
+				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)
+				->removeLabel()
+		)
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['desc_h_pos'])
+		)
+		->addItem([
+			$desc_size_field->getLabel(),
+			(new CFormField([$desc_size_field->getView(), '%']))->addClass('field-size')
+		])
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['desc_v_pos'])
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['desc_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['desc_color']))->addLabelClass('offset-3')
+		);
+}
+
+function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$decimal_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_size']));
+	$value_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
+	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
+	$units_field = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	);
+	$units_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['units_size']));
+
+	return (new CWidgetFieldsGroupView(_('Value')))
+		->addField(
+			new CWidgetFieldIntegerBoxView($fields['decimal_places'])
+		)
+		->addItem([
+			$decimal_size_field->getLabel(),
+			(new CFormField([$decimal_size_field->getView(), '%']))->addClass('field-size')
+		])
+		->addItem(
+			new CTag('hr')
+		)
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['value_h_pos'])
+		)
+		->addItem([
+			$value_size_field->getLabel(),
+			(new CFormField([$value_size_field->getView(), '%']))->addClass('field-size')
+		])
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['value_v_pos'])
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['value_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['value_color']))->addLabelClass('offset-3')
+		)
+		->addItem(
+			new CTag('hr')
+		)
+		->addItem([
+			(new CDiv([$units_show_field->getView(), $units_field->getLabel()]))->addClass('units-show'),
+			(new CFormField($units_field->getView()))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		])
+		->addField(
+			(new CWidgetFieldSelectView($fields['units_pos']))->setFieldHint(
+				makeHelpIcon(_('Position is ignored for s, uptime and unixtime units.'))
 			)
-		]),
-
-		new CWidgetFieldRadioButtonListView($fields['desc_h_pos']),
-
-		$form->makeCustomField($desc_size, [
-			$desc_size->getLabel(),
-			(new CFormField([$desc_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldRadioButtonListView($fields['desc_v_pos']),
-
-		new CWidgetFieldCheckBoxView($fields['desc_bold']),
-
-		$form->makeCustomField($desc_color, [
-			$desc_color->getLabel()->addClass('offset-3'),
-			new CFormField($desc_color->getView())
+		)
+		->addItem([
+			$units_size_field->getLabel(),
+			(new CFormField([$units_size_field->getView(), '%']))->addClass('field-size')
 		])
-	];
+		->addField(
+			(new CWidgetFieldCheckBoxView($fields['units_bold']))->addLabelClass('offset-3')
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['units_color']))->addLabelClass('offset-3')
+		);
 }
 
-function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$decimal_size = new CWidgetFieldIntegerBoxView($fields['decimal_size']);
-	$value_size = new CWidgetFieldIntegerBoxView($fields['value_size']);
-	$value_color = new CWidgetFieldColorView($fields['value_color']);
-	$units_show = new CWidgetFieldCheckBoxView($fields['units_show']);
-	$units = (new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH);
-	$units_size = new CWidgetFieldIntegerBoxView($fields['units_size']);
-	$units_bold = new CWidgetFieldCheckBoxView($fields['units_bold']);
-	$units_color = new CWidgetFieldColorView($fields['units_color']);
+function getTimeFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$time_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
 
-	return [
-		new CWidgetFieldIntegerBoxView($fields['decimal_places']),
-
-		$form->makeCustomField($decimal_size, [
-			$decimal_size->getLabel(),
-			(new CFormField([$decimal_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CTag('hr'),
-
-		new CWidgetFieldRadioButtonListView($fields['value_h_pos']),
-
-		$form->makeCustomField($value_size, [
-			$value_size->getLabel(),
-			(new CFormField([$value_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldRadioButtonListView($fields['value_v_pos']),
-
-		new CWidgetFieldCheckBoxView($fields['value_bold']),
-
-		$form->makeCustomField($value_color, [
-			$value_color->getLabel()->addClass('offset-3'),
-			new CFormField($value_color->getView())
-		]),
-
-		new CTag('hr'),
-
-		(new CDiv([
-			$units_show->getView(),
-			$units->getLabel()
-		]))->addClass('units-show'),
-
-		(new CFormField(
-			$units->getView()
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
-
-		(new CWidgetFieldSelectView($fields['units_pos']))
-			->setHelpHint(_('Position is ignored for s, uptime and unixtime units.')),
-
-		$form->makeCustomField($units_size, [
-			$units_size->getLabel(),
-			(new CFormField([$units_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		$form->makeCustomField($units_bold, [
-			$units_bold->getLabel()->addClass('offset-3'),
-			new CFormField($units_bold->getView())
-		]),
-
-		$form->makeCustomField($units_color, [
-			$units_color->getLabel()->addClass('offset-3'),
-			new CFormField($units_color->getView())
+	return (new CWidgetFieldsGroupView(_('Time')))
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['time_h_pos'])
+		)
+		->addItem([
+			$time_size_field->getLabel(),
+			(new CFormField([$time_size_field->getView(), '%']))->addClass('field-size')
 		])
-	];
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['time_v_pos'])
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['time_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['time_color']))->addLabelClass('offset-3')
+		);
 }
 
-function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$time_size = new CWidgetFieldIntegerBoxView($fields['time_size']);
-	$time_color = new CWidgetFieldColorView($fields['time_color']);
-
-	return [
-		new CWidgetFieldRadioButtonListView($fields['time_h_pos']),
-
-		$form->makeCustomField($time_size, [
-			$time_size->getLabel(),
-			(new CFormField([$time_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldRadioButtonListView($fields['time_v_pos']),
-
-		new CWidgetFieldCheckBoxView($fields['time_bold']),
-
-		$form->makeCustomField($time_color, [
-			$time_color->getLabel()->addClass('offset-3'),
-			new CFormField($time_color->getView())
-		])
-	];
+function getChangeIndicatorFieldsGroupView(array $fields): CWidgetFieldsGroupView {
+	return (new CWidgetFieldsGroupView(_('Change indicator')))
+		->addItem(
+			(new CSvgArrow(['up' => true, 'fill_color' => $fields['up_color']->getValue()]))
+				->setId('change-indicator-up')
+				->setSize(14, 20))
+		->addField(
+			(new CWidgetFieldColorView($fields['up_color']))->removeLabel()
+		)
+		->addItem(
+			(new CSvgArrow(['down' => true, 'fill_color' => $fields['down_color']->getValue()]))
+				->setId('change-indicator-down')
+				->setSize(14, 20),
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['down_color']))->removeLabel()
+		)
+		->addItem(
+			(new CSvgArrow(['up' => true, 'down' => true, 'fill_color' => $fields['updown_color']->getValue()]))
+				->setId('change-indicator-updown')
+				->setSize(14, 20)
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['updown_color']))->removeLabel()
+		);
 }
 
-function getChangeIndicatorFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$up_color = new CWidgetFieldColorView($fields['up_color']);
-	$down_color = new CWidgetFieldColorView($fields['down_color']);
-	$updown_color = new CWidgetFieldColorView($fields['updown_color']);
-
-	return [
-		(new CSvgArrow(['up' => true, 'fill_color' => $fields['up_color']->getValue()]))
-			->setId('change-indicator-up')
-			->setSize(14, 20),
-		$form->makeCustomField($up_color, [
-			new CFormField($up_color->getView())
-		]),
-
-		(new CSvgArrow(['down' => true, 'fill_color' => $fields['down_color']->getValue()]))
-			->setId('change-indicator-down')
-			->setSize(14, 20),
-		$form->makeCustomField($down_color, [
-			new CFormField($down_color->getView())
-		]),
-
-		(new CSvgArrow(['up' => true, 'down' => true, 'fill_color' => $fields['updown_color']->getValue()]))
-			->setId('change-indicator-updown')
-			->setSize(14, 20),
-		$form->makeCustomField($updown_color, [
-			new CFormField($updown_color->getView())
-		])
-	];
+function getThresholdFieldsGroupView(array $fields): CWidgetFieldsGroupView {
+	return (new CWidgetFieldsGroupView(_('Thresholds')))
+		->setFieldHint(
+			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
+		)
+		->addField(
+			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()
+		);
 }

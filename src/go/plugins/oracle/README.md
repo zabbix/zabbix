@@ -22,7 +22,40 @@ You can extend it or create your own template to cater specific needs.
 ## Installation
 
 1. [Install Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html).
-2. Create an Oracle DB user and grant permissions. 
+2. Create an Oracle DB user and grant permissions.
+
+In CDB installations it is possible to monitor tablespaces from CDB _(container database)_ and all PDBs _(pluggable databases)_. In such case, a common user is needed with the correct rights:
+
+```
+CREATE USER c##zabbix_mon IDENTIFIED BY <PASSWORD>;
+-- Grant access to the c##zabbix_mon user.
+ALTER USER c##zabbix_mon SET CONTAINER_DATA=ALL CONTAINER=CURRENT;
+GRANT CONNECT, CREATE SESSION TO c##zabbix_mon;
+GRANT SELECT_CATALOG_ROLE to c##zabbix_mon;
+GRANT SELECT ON v_$instance TO c##zabbix_mon;
+GRANT SELECT ON v_$database TO c##zabbix_mon;
+GRANT SELECT ON v_$sysmetric TO c##zabbix_mon;
+GRANT SELECT ON v_$system_parameter TO c##zabbix_mon;
+GRANT SELECT ON v_$session TO c##zabbix_mon;
+GRANT SELECT ON v_$recovery_file_dest TO c##zabbix_mon;
+GRANT SELECT ON v_$active_session_history TO c##zabbix_mon;
+GRANT SELECT ON v_$osstat TO c##zabbix_mon;
+GRANT SELECT ON v_$restore_point TO c##zabbix_mon;
+GRANT SELECT ON v_$process TO c##zabbix_mon;
+GRANT SELECT ON v_$datafile TO c##zabbix_mon;
+GRANT SELECT ON v_$pgastat TO c##zabbix_mon;
+GRANT SELECT ON v_$sgastat TO c##zabbix_mon;
+GRANT SELECT ON v_$log TO c##zabbix_mon;
+GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
+GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
+GRANT SELECT ON sys.dba_data_files TO c##zabbix_mon;
+GRANT SELECT ON DBA_TABLESPACES TO c##zabbix_mon;
+GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO c##zabbix_mon;
+GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
+```
+This is needed because the template uses ```CDB_*``` views to monitor tablespaces from CDB and different PDBs, and, therefore, the monitoring user needs access to the container data objects on all PDBs.
+
+However, if you wish to monitor only a single PDB or non-CDB instance, a local user is sufficient:
 
 ```
 CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
@@ -76,7 +109,6 @@ To configure plugins, Zabbix agent 2 configuration file is used.
 The connection can be configured using either key parameters or named sessions.
 
 *Notes*:  
-* It is not allowed to use both configuration types simultaneously. You should use either named sessions or key parameters.
 * You can leave any connection parameter value empty; in this case the default, hard-coded value, will be used.
 * Embedded URI credentials (e.g. user credentials) are not supported and will be ignored. It is not possible to override the credentials this way: 
   
@@ -94,11 +126,17 @@ Examples of valid URIs:
     - localhost
     
 * Usernames are supported only if written in uppercase characters.
-      
+
+#### Multitenant architecture tablespace monitoring (across CDB and PDBs)
+
+In order to be able to monitor tablespaces across multiple containers, the Oracle service name needs to be pointed to the root CDB and a common user must be used for connection.
+
 #### Using key parameters
 
 Common parameters for all the keys are: [ConnString][User][Password][Service] where `ConnString` can be either a URI or a session name.
 `ConnString` will be treated as a URI if no session with the given name is found.
+User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator
+e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 If you use `ConnString` as a session name, you can skip the rest of the connection parameters.
  
 #### Using named sessions
@@ -128,15 +166,22 @@ Note: session names are case-sensitive.
 
 ## Supported keys
 
-**oracle.diskgroups.stats[\<commonParams\>]** — returns Automatic Storage Management (ASM) disk groups statistics.
+**oracle.diskgroups.stats[\<commonParams\>,\<diskgroup\>]** — returns Automatic Storage Management (ASM) disk groups statistics.
+
+*Parameters:*  
+`diskgroup` (optional) — the name of the diskgroup.
 
 **oracle.diskgroups.discovery[\<commonParams\>]** — returns the list of ASM disk groups in LLD format.
 
-**oracle.archive.info[\<commonParams\>]** — returns archive logs statistics.
+**oracle.archive.info[\<commonParams\>,\<destination\>]** — returns archive logs statistics.
+*Parameters:*  
+`destination` (optional) — the name of the destination.
 
 **oracle.archive.discovery[\<commonParams\>]** — returns the list of archive logs in LLD format.
 
-**oracle.cdb.info[\<commonParams\>]** — returns the Container Databases (CDBs) info.
+**oracle.cdb.info[\<commonParams\>,\<database\>]** — returns the Container Databases (CDBs) info.
+*Parameters:*  
+`database` (optional) — the name of the database.
 
 **oracle.custom.query[\<commonParams\>,queryName[,args...]]** — returns the result of a custom query.
 
@@ -152,7 +197,9 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>]** — returns the Pluggable Databases (PDBs) information.
+**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
+*Parameters:*  
+`database` (optional) — the name of the database.
 
 **oracle.pdb.discovery[\<commonParams\>]** — returns the list of PDBs in LLD format.
 
@@ -186,7 +233,12 @@ Possible values:
 
 **oracle.sys.params[\<commonParams\>]** — returns a set of the system parameter values.
 
-**oracle.ts.stats[\<commonParams\>]** — returns the tablespace statistics. 
+**oracle.ts.stats[\<commonParams\>,[tablespace],[type],[conname]]** — returns the tablespace statistics. 
+
+*Parameters:*  
+`tablespace` (optional) — the name of the tablespace.
+`type` (optional) — the type of the tablespace.
+`conname` (optional) — the container name for which the information is required.
 
 **oracle.ts.discovery[\<commonParams\>]** — returns the list of tablespaces in Low-level discovery (LLD) format.
 

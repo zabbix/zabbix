@@ -84,7 +84,7 @@ class CScreenDiscovery extends CScreenBase {
 		$macros = zbx_toHash($macros, 'macro');
 
 		$dchecks = API::DCheck()->get([
-			'output' => ['type', 'key_'],
+			'output' => ['type', 'key_', 'allow_redirect'],
 			'dserviceids' => array_keys($dservices),
 			'preservekeys' => true
 		]);
@@ -99,8 +99,13 @@ class CScreenDiscovery extends CScreenBase {
 				}
 				$key_ = ': '.$key_;
 			}
+
+			$allow_redirect = ($dchecks[$dservice['dcheckid']]['allow_redirect'] == 1)
+				? ' "'._('allow redirect').'"'
+				: '';
+
 			$service_name = discovery_check_type2str($dchecks[$dservice['dcheckid']]['type']).
-				discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_;
+				discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_.$allow_redirect;
 			$services[$service_name] = 1;
 		}
 		ksort($services);
@@ -198,8 +203,13 @@ class CScreenDiscovery extends CScreenBase {
 						$key_ = NAME_DELIMITER.$key_;
 					}
 
+					$allow_redirect = ($dchecks[$dservice['dcheckid']]['allow_redirect'] == 1)
+						? ' "'._('allow redirect').'"'
+						: '';
+
 					$service_name = discovery_check_type2str($dchecks[$dservice['dcheckid']]['type']).
-						discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_;
+						discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_.
+						$allow_redirect;
 
 					$discovery_info[$dservice['ip']]['services'][$service_name] = [
 						'class' => $class,
@@ -210,7 +220,7 @@ class CScreenDiscovery extends CScreenBase {
 
 			if ($discovery_info) {
 				$col = new CCol(
-					[bold($drule['name']), SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')']
+					[bold($drule['name']), NBSP(), '('._n('%d device', '%d devices', count($discovery_info)).')']
 				);
 				$col->setColSpan(count($services) + 3);
 
@@ -223,7 +233,7 @@ class CScreenDiscovery extends CScreenBase {
 				$row = [
 					($h_data['type'] === 'primary')
 						? (new CSpan($ip.$dns))->addClass($h_data['class'])
-						: new CSpan(SPACE.SPACE.$ip.$dns),
+						: new CSpan([NBSP(), NBSP(), $ip.$dns]),
 					new CSpan(array_key_exists('host', $h_data) ? $h_data['host'] : ''),
 					(new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 						? ''

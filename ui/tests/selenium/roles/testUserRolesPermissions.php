@@ -381,7 +381,8 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
-					$row->getColumn('Actions')->query('xpath:.//button[contains(@class, "icon-action-msgs")]')->one()->click();
+					$row->getColumn('Actions')->query("xpath:.//button[".
+							CXPathHelper::fromClass('zi-alert-with-content')."]")->one()->click();
 					$message_hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 					$value = $message_hint->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $value);
@@ -562,6 +563,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Module enabled');
 
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
@@ -611,7 +613,7 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'Scheduled reports',
 						'System information',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log',
 						'Notifications'
@@ -626,7 +628,7 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'Scheduled reports',
 						'Availability report',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log',
 						'Notifications'
@@ -641,7 +643,7 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log',
 						'Notifications'
@@ -652,7 +654,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Triggers top 100',
+					'page' => 'Top 100 triggers',
 					'displayed_ui' => [
 						'Availability report',
 						'System information',
@@ -661,7 +663,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Action log',
 						'Notifications'
 					],
-					'link' => ['toptriggers.php']
+					'link' => ['zabbix.php?action=toptriggers.list']
 				]
 			],
 			[
@@ -672,7 +674,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Availability report',
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Action log',
 						'Notifications'
 					],
@@ -687,7 +689,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Availability report',
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Notifications'
 					],
@@ -702,7 +704,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Availability report',
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log'
 					],
@@ -751,7 +753,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['templates.php']
+					'link' => ['zabbix.php?action=template.list']
 				]
 			],
 			[
@@ -1790,7 +1792,7 @@ class testUserRolesPermissions extends CWebTest {
 	 * Click Sign out button.
 	 */
 	private function signOut() {
-		$this->query('xpath://a[@class="icon-signout"]')->waitUntilPresent()->one()->click();
+		$this->query('xpath://a[@class="zi-signout"]')->waitUntilPresent()->one()->click();
 		$this->page->waitUntilReady();
 		$this->query('button:Sign in')->waitUntilVisible();
 	}

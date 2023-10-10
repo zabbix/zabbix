@@ -98,16 +98,6 @@ class CControllerConnectorEdit extends CController {
 					'username' => $this->connector['username'],
 					'password' => $this->connector['password'],
 					'token' => $this->connector['token'],
-					'advanced_configuration' => $this->connector['max_records'] != $db_defaults['max_records']
-						|| $this->connector['max_senders'] != $db_defaults['max_senders']
-						|| $this->connector['max_attempts'] != $db_defaults['max_attempts']
-						|| $this->connector['timeout'] !== $db_defaults['timeout']
-						|| $this->connector['http_proxy'] !== $db_defaults['http_proxy']
-						|| $this->connector['verify_peer'] != $db_defaults['verify_peer']
-						|| $this->connector['verify_host'] != $db_defaults['verify_host']
-						|| $this->connector['ssl_cert_file'] !== $db_defaults['ssl_cert_file']
-						|| $this->connector['ssl_key_file'] !== $db_defaults['ssl_key_file']
-						|| $this->connector['ssl_key_password'] !== $db_defaults['ssl_key_password'],
 					'http_proxy' => $this->connector['http_proxy'],
 					'max_records_mode' => $this->connector['max_records'] == 0 ? 0 : 1,
 					'max_records' => (int) $this->connector['max_records'],
@@ -146,7 +136,6 @@ class CControllerConnectorEdit extends CController {
 					'username' => $db_defaults['username'],
 					'password' => $db_defaults['password'],
 					'token' => $db_defaults['token'],
-					'advanced_configuration' => false,
 					'max_records_mode' => 0,
 					'max_records' => (int) $db_defaults['max_records'],
 					'max_senders' => (int) $db_defaults['max_senders'],

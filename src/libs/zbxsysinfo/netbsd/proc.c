@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
 
@@ -246,8 +245,8 @@ out:
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
-	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
-	int			count, i, proc_ok, stat_ok, comm_ok, op, arg;
+	int			zbx_proc_stat, count, i, proc_ok, stat_ok, comm_ok, op, arg, proccount = 0,
+				invalid_user = 0;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
 
@@ -408,7 +407,7 @@ static char	*get_state(struct kinfo_proc2 *proc)
 int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
-	int				invalid_user = 0, count, i, k, zbx_proc_mode, pagesize, op, arg;
+	int				count, zbx_proc_mode, pagesize, op, arg, invalid_user = 0;
 	struct passwd			*usrinfo;
 	zbx_vector_proc_data_ptr_t	proc_data_ctx;
 	struct zbx_json			j;
@@ -492,7 +491,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_proc_data_ptr_create(&proc_data_ctx);
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		proc_data_t	*proc_data;
 		struct passwd	*pw;
@@ -552,13 +551,13 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
-		for (i = 0; i < proc_data_ctx.values_num; i++)
+		for (int i = 0; i < proc_data_ctx.values_num; i++)
 		{
 			proc_data_t	*pdata = proc_data_ctx.values[i];
 
 			pdata->processes = 1;
 
-			for (k = i + 1; k < proc_data_ctx.values_num; k++)
+			for (int k = i + 1; k < proc_data_ctx.values_num; k++)
 			{
 				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
 
@@ -588,11 +587,9 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < proc_data_ctx.values_num; i++)
+	for (int i = 0; i < proc_data_ctx.values_num; i++)
 	{
-		proc_data_t	*pdata;
-
-		pdata = proc_data_ctx.values[i];
+		proc_data_t	*pdata = proc_data_ctx.values[i];
 
 		zbx_json_addobject(&j, NULL);
 

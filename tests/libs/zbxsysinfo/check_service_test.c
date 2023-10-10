@@ -55,7 +55,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_agent_result(&result);
 	zbx_init_agent_request(&request);
-	zbx_init_library_sysinfo(get_config_timeout);
+
+	zbx_init_library_sysinfo(get_zbx_config_timeout, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 	*key = '\0';
 	strcat(key, "net.tcp.service[smtp");
@@ -70,6 +71,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_parse_item_key(key, &request);
 
 	returned_code = zbx_check_service_default_addr(&request, default_addr, &result, 0);
+
 	if (SUCCEED != returned_code && NULL != result.msg && '\0' != *(result.msg))
 		printf("check_service_test error: %s\n", result.msg);
 

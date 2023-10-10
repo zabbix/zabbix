@@ -60,20 +60,7 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
-		// Autocomplete url.
-		$url = (new CUrl('jsrpc.php'))
-			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
-			->setArgument('method', static::SEARCH_METHOD)
-			->setArgument('object_name', $options['object_name']);
-
-		if (array_key_exists('objectOptions', $options)) {
-			foreach ($options['objectOptions'] as $option_name => $option_value) {
-				$url->setArgument($option_name, $option_value);
-			}
-		}
-
-		$params = [
-			'url' => $url->getUrl(),
+		$this->params = [
 			'name' => $options['name'],
 			'labels' => [
 				'No matches found' => _('No matches found'),
@@ -84,31 +71,47 @@ class CMultiSelect extends CTag {
 			]
 		];
 
-		if (array_key_exists('data', $options)) {
-			$params['data'] = zbx_cleanHashes($options['data']);
+		if (array_key_exists('object_name', $options)) {
+			// Autocomplete url.
+			$url = (new CUrl('jsrpc.php'))
+				->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
+				->setArgument('method', static::SEARCH_METHOD)
+				->setArgument('object_name', $options['object_name']);
+
+			if (array_key_exists('objectOptions', $options)) {
+				foreach ($options['objectOptions'] as $option_name => $option_value) {
+					$url->setArgument($option_name, $option_value);
+				}
+			}
+
+			$this->params['url'] = $url->getUrl();
 		}
 
-		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder'] as $option) {
+		if (array_key_exists('data', $options)) {
+			$this->params['data'] = zbx_cleanHashes($options['data']);
+		}
+
+		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden'] as $option) {
 			if (array_key_exists($option, $options)) {
-				$params[$option] = $options[$option];
+				$this->params[$option] = $options[$option];
 			}
 		}
 
 		if (array_key_exists('autosuggest', $options)
 				&& array_key_exists('filter_preselect', $options['autosuggest'])) {
-			$params['autosuggest']['filter_preselect'] = $options['autosuggest']['filter_preselect'];
+			$this->params['autosuggest']['filter_preselect'] = $options['autosuggest']['filter_preselect'];
 		}
 
 		if (array_key_exists('custom_select', $options)) {
-			$params['custom_select'] = $options['custom_select'];
+			$this->params['custom_select'] = $options['custom_select'];
 		}
 		elseif (array_key_exists('popup', $options)) {
 			if (array_key_exists('filter_preselect', $options['popup'])) {
-				$params['popup']['filter_preselect'] = $options['popup']['filter_preselect'];
+				$this->params['popup']['filter_preselect'] = $options['popup']['filter_preselect'];
 			}
 
 			if (array_key_exists('parameters', $options['popup'])) {
-				$params['popup']['parameters'] = $options['popup']['parameters'];
+				$this->params['popup']['parameters'] = $options['popup']['parameters'];
 
 				$excludeids = array_key_exists('excludeids', $options['popup']['parameters'])
 					? $options['popup']['parameters']['excludeids']
@@ -119,12 +122,12 @@ class CMultiSelect extends CTag {
 					: []);
 
 				if ($excludeids) {
-					$params['excludeids'] = $excludeids;
+					$this->params['excludeids'] = $excludeids;
 				}
 			}
 		}
 
-		$this->params = $params;
+		$this->setAttribute('data-params', $this->params);
 
 		if (!array_key_exists('add_post_js', $options) || $options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());
@@ -136,8 +139,12 @@ class CMultiSelect extends CTag {
 		return $this;
 	}
 
+	public function getParams(): array {
+		return $this->params;
+	}
+
 	public function getPostJS() {
-		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect('.json_encode($this->params).');';
+		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect();';
 	}
 
 	/**
@@ -149,7 +156,7 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest'
+			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
 		];
 
 		foreach ($options as $field => $value) {
@@ -163,6 +170,7 @@ class CMultiSelect extends CTag {
 			'name' => 'name',
 			'object_name' => 'object_name',
 			'disabled' => 'disabled',
+			'hidden' => 'hidden',
 			'default_value' => 'defaultValue',
 			'data' => 'data',
 			'add_new' => 'addNew',
@@ -241,8 +249,8 @@ class CMultiSelect extends CTag {
 					'hostid', 'parent_discoveryid', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
-					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'context', 'enabled_only',
-					'group_status'
+					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
+					'enabled_only', 'group_status', 'hide_host_filter'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -272,6 +280,10 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
 					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
 					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
+				}
+
+				if (array_key_exists('hide_host_filter', $parameters)) {
+					$popup_parameters['hide_host_filter'] = '1';
 				}
 
 				if (array_key_exists('groupid', $parameters) && $parameters['groupid'] > 0) {
@@ -323,7 +335,7 @@ class CMultiSelect extends CTag {
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
-						'with_simple_graph_item_prototypes', 'with_triggers'] as $name) {
+						'with_simple_graph_item_prototypes', 'with_triggers', 'with_inherited'] as $name) {
 					if (array_key_exists($name, $parameters) && $parameters[$name]) {
 						$popup_parameters[$name] = '1';
 						$autocomplete_parameters[$name] = true;

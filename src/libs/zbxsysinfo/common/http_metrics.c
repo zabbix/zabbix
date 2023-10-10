@@ -18,8 +18,9 @@
 **/
 
 #include "http.h"
+#include "http_metrics.h"
 
-ZBX_METRIC	parameters_common_http[] =
+static zbx_metric_t	parameters_common_http[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"web.page.get",	CF_HAVEPARAMS,	web_page_get,		"localhost,,80"},
@@ -28,3 +29,8 @@ ZBX_METRIC	parameters_common_http[] =
 
 	{NULL}
 };
+
+zbx_metric_t	*get_parameters_common_http(void)
+{
+	return &parameters_common_http[0];
+}

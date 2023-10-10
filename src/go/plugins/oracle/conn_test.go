@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/uri"
-
+	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
 )
 

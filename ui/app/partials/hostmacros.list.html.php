@@ -53,6 +53,7 @@ else {
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}')
+				->disableSpellcheck()
 		];
 
 		if (!$data['readonly']) {

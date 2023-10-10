@@ -21,6 +21,7 @@
 #define ZABBIX_ZBXCOMMS_H
 
 #include "zbxalgo.h"
+#include "zbxtime.h"
 
 #define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
@@ -36,6 +37,53 @@
 #	define ZBX_PROTO_ERROR		-1
 #	define ZBX_SOCKET_TO_INT(s)	(s)
 #endif
+
+#ifdef _WINDOWS
+#	if !defined(POLLIN)
+#		define POLLIN	0x001
+#	endif
+#	if !defined(POLLPRI)
+#		define POLLPRI	0x002
+#	endif
+#	if !defined(POLLOUT)
+#		define POLLOUT	0x004
+#	endif
+#	if !defined(POLLERR)
+#		define POLLERR	0x008
+#	endif
+#	if !defined(POLLHUP)
+#		define POLLHUP	0x010
+#	endif
+#	if !defined(POLLNVAL)
+#		define POLLNVAL	0x020
+#	endif
+#	if !defined(POLLRDNORM)
+#		define POLLRDNORM	0x040
+#	endif
+#	if !defined(POLLWRNORM)
+#		define POLLWRNORM	0x100
+#	endif
+
+typedef struct
+{
+	SOCKET	fd;
+	short	events;
+	short	revents;
+}
+zbx_pollfd_t;
+
+int	zbx_socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout);
+
+#else
+#	define zbx_socket_poll(x, y, z)		poll(x, y, z)
+
+typedef struct pollfd zbx_pollfd_t;
+
+#endif
+
+void	zbx_tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
+
+int	zbx_socket_had_nonblocking_error(void);
 
 #ifdef _WINDOWS
 typedef SOCKET	ZBX_SOCKET;
@@ -94,8 +142,11 @@ typedef struct
 {
 	zbx_config_tls_t	*config_tls;
 	const char		*hostname;
+	const char		*server;
 	const int		proxymode;
 	const int		config_timeout;
+	const int		config_trapper_timeout;
+	const char		*config_source_ip;
 }
 zbx_config_comms_args_t;
 
@@ -116,8 +167,14 @@ typedef struct
 	gnutls_session_t		ctx;
 	gnutls_psk_client_credentials_t	psk_client_creds;
 	gnutls_psk_server_credentials_t	psk_server_creds;
+	unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 #elif defined(HAVE_OPENSSL)
 	SSL				*ctx;
+#if defined(HAVE_OPENSSL_WITH_PSK)
+	char	psk_buf[HOST_TLS_PSK_LEN / 2];
+	int	psk_len;
+	size_t	identity_len;
+#endif
 #endif
 } zbx_tls_context_t;
 #endif
@@ -135,7 +192,6 @@ typedef struct
 	unsigned int			connection_type;	/* type of connection actually established: */
 								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
 								/* ZBX_TCP_SEC_TLS_CERT */
-	int				timeout;
 	zbx_buf_type_t			buf_type;
 	unsigned char			accepted;
 	int				num_socks;
@@ -146,19 +202,57 @@ typedef struct
 	/* TLS connection may be shut down at any time and it will not be possible to get peer IP address anymore. */
 	char				peer[ZBX_MAX_DNSNAME_LEN + 1];
 	int				protocol;
+	int				timeout;
+	zbx_timespec_t			deadline;
+	zbx_uint32_t			reserved_payload;
 }
 zbx_socket_t;
 
+typedef struct
+{
+	size_t		buf_dyn_bytes;
+	size_t		buf_stat_bytes;
+	size_t		offset;
+	zbx_uint64_t	expected_len;
+	zbx_uint64_t	reserved;
+	zbx_uint64_t	max_len;
+	unsigned char	expect;
+	int		protocol_version;
+}
+zbx_tcp_recv_context_t;
+
+#define ZBX_MAX_HEADER_LEN 21
+typedef struct
+{
+	unsigned char	header_buf[ZBX_MAX_HEADER_LEN];
+	size_t		header_len;
+	char		*compressed_data;
+	const char	*data;
+	size_t		send_len;
+	ssize_t		written;
+	ssize_t		written_header;
+}
+zbx_tcp_send_context_t;
+
+#undef ZBX_MAX_HEADER_LEN
+
 const char	*zbx_socket_strerror(void);
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
+int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len);
 #endif
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
-void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout);
+
+void	zbx_socket_clean(zbx_socket_t *s);
+int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout);
+
+int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		const char *server_name, short *event, char **error);
 
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPRESS		0x02
@@ -181,6 +275,10 @@ const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
 		int timeout);
+int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, unsigned char flags,
+		zbx_tcp_send_context_t *context);
+void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state);
+int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event);
 
 void	zbx_tcp_close(zbx_socket_t *s);
 
@@ -188,10 +286,10 @@ void	zbx_tcp_close(zbx_socket_t *s);
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif
 
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout);
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
@@ -201,12 +299,22 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 #define	zbx_tcp_recv_to(s, timeout)		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, 0))
 #define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
+ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events);
+ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode);
+void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv_context, unsigned char flags);
+ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events);
+
+void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
+int	zbx_socket_check_deadline(zbx_socket_t *s);
+
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
 int	validate_cidr(const char *ip, const char *cidr, void *value);
 
@@ -246,9 +354,9 @@ void	zbx_udp_close(zbx_socket_t *s);
 int	zbx_socket_start(char **error);
 #endif
 
-int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
-int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
-int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+int	zbx_telnet_test_login(zbx_socket_t *s);
+int	zbx_telnet_login(zbx_socket_t *s, const char *username, const char *password, AGENT_RESULT *result);
+int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *result, const char *encoding);
 
 /* TLS BLOCK */
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -301,9 +409,17 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
+typedef enum
+{
+	ZBX_TLS_INIT_NONE,	/* not initialized */
+	ZBX_TLS_INIT_PROCESS,	/* initialized by each process */
+	ZBX_TLS_INIT_THREADS	/* initialized by parent process */
+}
+zbx_tls_status_t;
+
 void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_forks,
 		int config_passive_forks, zbx_get_program_type_f zbx_get_program_type_cb);
-void	zbx_tls_library_deinit(void);
+void	zbx_tls_library_deinit(zbx_tls_status_t status);
 void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
 void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);

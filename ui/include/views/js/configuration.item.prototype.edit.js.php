@@ -31,39 +31,22 @@ include dirname(__FILE__).'/itemtest.js.php';
 <script>
 	const view = {
 		form_name: null,
+		context: null,
 
-		init({form_name, trends_default}) {
+		init({form_name, trends_default, context}) {
 			this.form_name = form_name;
+			this.context = context;
 
 			// Field switchers.
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
 
+			$('#value_type')
+				.change(this.valueTypeChangeHandler)
+				.data('old-value', $('#value_type').val());
+
 			$('#type')
 				.change(this.typeChangeHandler)
 				.trigger('change');
-
-			// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
-			$('#value_type')
-				.change(function() {
-					const new_value = $(this).val();
-					const old_value = $(this).data('old-value');
-					const trends = $('#trends');
-
-					if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
-							|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
-							&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
-							|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
-						if (trends.val() == 0) {
-							trends.val(trends_default);
-						}
-
-						$('#trends_mode_1').prop('checked', true);
-					}
-
-					$('#trends_mode').trigger('change');
-					$(this).data('old-value', new_value);
-				})
-				.data('old-value', $('#value_type').val());
 
 			$('#history_mode')
 				.change(function() {
@@ -106,6 +89,27 @@ include dirname(__FILE__).'/itemtest.js.php';
 				jQuery('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				jQuery('input[name=username]').removeAttr('aria-required');
 			}
+
+			jQuery('z-select[name="value_type"]').trigger('change');
+		},
+
+		valueTypeChangeHandler() {
+			// If non-numeric type is changed to numeric, set the default value for trends.
+			if ((this.value == <?= ITEM_VALUE_TYPE_FLOAT ?> || this.value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
+					&& <?= json_encode([
+						ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+					]) ?>.includes($(this).data('old-value'))) {
+				const trends = $('#trends');
+
+				if (trends.val() == 0) {
+					trends.val(trends_default);
+				}
+
+				$('#trends_mode_1').prop('checked', true);
+			}
+
+			$('#trends_mode').trigger('change');
+			$(this).data('old-value', this.value);
 		},
 
 		editHost(e, hostid) {
@@ -113,6 +117,13 @@ include dirname(__FILE__).'/itemtest.js.php';
 			const host_data = {hostid};
 
 			this.openHostPopup(host_data);
+		},
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
 		},
 
 		openHostPopup(host_data) {
@@ -123,12 +134,43 @@ include dirname(__FILE__).'/itemtest.js.php';
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay = PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+		},
+
+		editProxy(e, proxyid) {
+			e.preventDefault();
+			const proxy_data = {proxyid};
+
+			this.openProxyPopup(proxy_data);
+		},
+
+		openProxyPopup(proxy_data) {
+			const overlay = PopUp('popup.proxy.edit', proxy_data, {
+				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context)
+			);
 		},
 
 		refresh() {
@@ -140,8 +182,9 @@ include dirname(__FILE__).'/itemtest.js.php';
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(context, e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -149,26 +192,19 @@ include dirname(__FILE__).'/itemtest.js.php';
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				view.refresh();
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('host_discovery.php');
+						curl.setArgument('context', context);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
-
-				location.href = curl.getUrl();
+				if (curl == null) {
+					view.refresh();
+				}
+				else {
+					location.href = curl.getUrl();
+				}
 			}
 		}
 	};

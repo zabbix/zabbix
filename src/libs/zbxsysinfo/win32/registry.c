@@ -21,10 +21,11 @@
 #include "../sysinfo.h"
 
 #include "zbxstr.h"
-#include "base64.h"
+#include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+#include "zbxlog.h"
 
 #include <locale.h>
 #include <winreg.h>
@@ -83,11 +84,9 @@ static const char	*registry_type_to_string(DWORD type)
 
 static void	registry_get_multistring_value(const wchar_t *wbuffer, struct zbx_json *j)
 {
-	char	*buffer;
-
 	while (L'\0' != *wbuffer)
 	{
-		buffer = zbx_unicode_to_utf8(wbuffer);
+		char	*buffer = zbx_unicode_to_utf8(wbuffer);
 		zbx_json_addstring(j, NULL, buffer, ZBX_JSON_TYPE_STRING);
 		zbx_free(buffer);
 		wbuffer += wcslen(wbuffer) + 1 ;
@@ -100,7 +99,7 @@ static int	convert_value(DWORD type, const char *value, DWORD value_len, char **
 
 	switch (type) {
 		case REG_BINARY:
-			str_base64_encode_dyn(value, out, (int)value_len);
+			zbx_base64_encode_dyn(value, out, (int)value_len);
 			return SUCCEED;
 		case REG_DWORD:
 			*out = zbx_dsprintf(NULL, "%u", *(DWORD *)value);
@@ -344,7 +343,7 @@ static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const ch
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(retCode)));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, zbx_strerror_from_system(retCode)));
 		ret = FAIL;
 		goto out;
 	}
@@ -389,7 +388,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 
 	if (ERROR_SUCCESS != errCode)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(errCode)));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, zbx_strerror_from_system(errCode)));
 		ret = FAIL;
 		goto out;
 	}

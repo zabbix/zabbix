@@ -27,12 +27,11 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_NORMAL ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($data['readonly']): ?>
+		<?php if ($readonly): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -51,7 +50,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($data['readonly']): ?>
+			<?php if ($readonly): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -96,7 +95,7 @@
 			?>
 		</td>
 
-		<?php if (!$data['readonly']): ?>
+		<?php if (!$readonly): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -107,12 +106,11 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_STACKED ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($data['readonly']): ?>
+		<?php if ($readonly): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -131,7 +129,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($data['readonly']): ?>
+			<?php if ($readonly): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -167,7 +165,7 @@
 			?>
 		</td>
 
-		<?php if (!$data['readonly']): ?>
+		<?php if (!$readonly): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -178,12 +176,11 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_PIE ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($data['readonly']): ?>
+		<?php if ($readonly): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -202,7 +199,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($data['readonly']): ?>
+			<?php if ($readonly): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -239,7 +236,7 @@
 			?>
 		</td>
 
-		<?php if (!$data['readonly']): ?>
+		<?php if (!$readonly): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -250,12 +247,11 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_EXPLODED ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($data['readonly']): ?>
+		<?php if ($readonly): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -274,7 +270,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($data['readonly']): ?>
+			<?php if ($readonly): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -311,7 +307,7 @@
 			?>
 		</td>
 
-		<?php if (!$data['readonly']): ?>
+		<?php if (!$readonly): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -323,11 +319,15 @@
 	const view = {
 		form_name: null,
 		graphs: null,
+		context: null,
+		parent_discoveryid: null,
 
-		init({form_name, theme_colors, graphs, items}) {
+		init({form_name, theme_colors, graphs, items, context, parent_discoveryid}) {
 			this.form_name = form_name;
 			colorPalette.setThemeColors(theme_colors);
 			this.graphs = graphs;
+			this.context = context;
+			this.is_discovery = parent_discoveryid !== null;
 
 			items.forEach((item, i) => {
 				item.number = i;
@@ -395,7 +395,7 @@
 
 						$(node).find('*[name]').each((_, input) => {
 							if (!$.isEmptyObject(input) && input.name != null) {
-								const regex = /items\[[\d+]\]\[([a-zA-Z0-9\-\_\.]+)\]/;
+								const regex = /items\[\d+\]\[([a-zA-Z0-9\-\_\.]+)\]/;
 								const name = input.name.match(regex);
 
 								short_fmt.push((name[1]).substr(0, 2) + ':' + input.value);
@@ -658,12 +658,12 @@
 
 		initSortable() {
 			$('#itemsTable').sortable({
-				disabled: ($('#itemsTable tr.sortable').length < 2),
-				items: 'tbody tr.sortable',
+				disabled: ($('#itemsTable .sortable').length < 2),
+				items: '.sortable',
 				axis: 'y',
 				containment: 'parent',
 				cursor: 'grabbing',
-				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
 				opacity: 0.6,
 				update: this.recalculateSortOrder,
@@ -671,12 +671,6 @@
 					for (const td of ui.find('>td')) {
 						const $td = $(td);
 						$td.attr('width', $td.width())
-					}
-
-					// When dragging element on safari, it jumps out of the table.
-					if (SF) {
-						// Move back draggable element to proper position.
-						ui.css('left', (ui.offset().left - 2) + 'px');
 					}
 
 					return ui;
@@ -709,12 +703,31 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
+			);
 		},
 
 		refresh() {
@@ -726,8 +739,9 @@
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(context, discovery, e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -735,26 +749,19 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				view.refresh();
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
+						curl.setArgument('context', context);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
-
-				location.href = curl.getUrl();
+				if (curl == null) {
+					view.refresh();
+				}
+				else {
+					location.href = curl.getUrl();
+				}
 			}
 		}
 	};

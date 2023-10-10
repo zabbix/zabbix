@@ -347,7 +347,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach (array_keys($macros) as $hostid) {
 			foreach ($data[$hostid] as &$text) {
-				$matched_macros = $this->getMacroPositions($text, $types);
+				$matched_macros = self::getMacroPositions($text, $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$text = substr_replace($text, $macros[$hostid][$macro], $pos, strlen($macro));
@@ -447,8 +447,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					if (array_key_exists($data['f_num'], $functionids)) {
 						$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
 							'token' => $token,
-							'function' => $data['function'],
-							'parameters' => $data['parameters']
+							'macrofunc' => $data['macrofunc']
 						];
 					}
 				}
@@ -507,7 +506,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
-			$matched_macros = $this->getMacroPositions($trigger['description'], $types);
+			$matched_macros = self::getMacroPositions($trigger['description'], $types);
 
 			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 				if (array_key_exists($macro, $macro_values[$triggerid])) {
@@ -611,8 +610,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				if (array_key_exists($data['f_num'], $functionids)) {
 					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
 						'token' => $token,
-						'function' => $data['function'],
-						'parameters' => $data['parameters']
+						'macrofunc' => $data['macrofunc']
 					];
 				}
 			}
@@ -659,7 +657,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$trigger = &$triggers[$triggerid];
 
 			foreach ($options['sources'] as $source) {
-				$matched_macros = $this->getMacroPositions($trigger[$source], $types);
+				$matched_macros = self::getMacroPositions($trigger[$source], $types);
 
 				if ($options['html']) {
 					$macro_string = [];
@@ -790,8 +788,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if (array_key_exists($data['f_num'], $functionids)) {
 				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
 					'token' => $token,
-					'function' => $data['function'],
-					'parameters' => $data['parameters']
+					'macrofunc' => $data['macrofunc']
 				];
 			}
 		}
@@ -832,7 +829,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$types = $this->transformToPositionTypes($types);
 
-		$matched_macros = $this->getMacroPositions($trigger['url'], $types);
+		$matched_macros = self::getMacroPositions($trigger['url'], $types);
 
 		$url = $trigger['url'];
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
@@ -939,8 +936,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if (array_key_exists($data['f_num'], $functionids)) {
 				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
 					'token' => $token,
-					'function' => $data['function'],
-					'parameters' => $data['parameters']
+					'macrofunc' => $data['macrofunc']
 				];
 			}
 		}
@@ -981,7 +977,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$types = $this->transformToPositionTypes($types);
 
-		$matched_macros = $this->getMacroPositions($trigger['url_name'], $types);
+		$matched_macros = self::getMacroPositions($trigger['url_name'], $types);
 
 		$url_name = $trigger['url_name'];
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
@@ -1696,16 +1692,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve single item widget description macros.
+	 * Resolve macros in descriptions of item-based widgets.
 	 *
 	 * @param array  $items
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['name']    Field to resolve. Required.
+	 *        string $items[n]['hostid']
+	 *        string $items[n]['itemid']
+	 *        string $items[n]['widget_description']  Field to resolve.
 	 *
-	 * @return array                      Returns array of items with macros resolved.
+	 * @return array  Returns array of items with macros resolved.
 	 */
-	public function resolveWidgetItemNames(array $items) {
+	public function resolveItemWidgetDescriptions(array $items): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
@@ -1730,7 +1726,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($items as $key => $item) {
-			$matched_macros = self::extractMacros([$item['name']], $types);
+			$matched_macros = self::extractMacros([$item['widget_description']], $types);
 
 			foreach ($matched_macros['macros']['host'] as $token) {
 				if ($token === '{HOST.ID}') {
@@ -1790,7 +1786,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($macro_values as $key => $macro_value) {
-			$items[$key]['name'] = strtr($items[$key]['name'], $macro_value);
+			$items[$key]['widget_description'] = strtr($items[$key]['widget_description'], $macro_value);
 		}
 
 		return $items;
@@ -1800,11 +1796,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
 	 * @param array $columns
-	 * @param array $items
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	public function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
+	public function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
@@ -1820,36 +1816,36 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$matched_macros = self::extractMacros($columns, $types);
 
-		foreach ($items as $key => $item) {
-			$macro_values[$key] = [];
+		foreach ($hostids as $hostid) {
+			$macro_values[$hostid] = [];
 
 			foreach ($matched_macros['macros']['host'] as $token) {
 				if ($token === '{HOST.ID}') {
-					$macro_values[$key][$token] = $item['hostid'];
+					$macro_values[$hostid][$token] = $hostid;
 				}
 				else {
-					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['host'][$item['hostid']][$key] = true;
+					$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$hostid][$hostid] = true;
 				}
 			}
 
 			foreach ($matched_macros['macros']['interface'] as $token) {
-				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['interface'][$item['itemid']][$key] = true;
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$hostid][$hostid] = true;
 			}
 
 			foreach ($matched_macros['macros']['inventory'] as $token) {
-				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['inventory'][$item['hostid']][$key] = true;
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$hostid][$hostid] = true;
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
-		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 
 		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
@@ -1863,8 +1859,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($columns as $column => $value) {
 			$data[$column] = [];
 
-			foreach ($items as $key => $item) {
-				$data[$column][$key] = strtr($value, $macro_values[$key]);
+			foreach ($hostids as $hostid) {
+				$data[$column][$hostid] = strtr($value, $macro_values[$hostid]);
 			}
 		}
 
@@ -1918,7 +1914,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach (array_keys($macro_values) as $key) {
 			foreach ($options['sources'] as $source) {
-				$matched_macros = $this->getMacroPositions($data[$key][$source], $types);
+				$matched_macros = self::getMacroPositions($data[$key][$source], $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$data[$key][$source] =
@@ -3022,7 +3018,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($scripts as &$fields) {
 				foreach ($fields as &$value) {
-					$matched_macros = $this->getMacroPositions($value, $types);
+					$matched_macros = self::getMacroPositions($value, $types);
 
 					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 						if (array_key_exists($macro, $macro_values[$eventid])) {

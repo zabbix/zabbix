@@ -18,9 +18,9 @@
 **/
 
 #include "ntp.h"
+#include "../sysinfo.h"
 
 #include "zbxcomms.h"
-#include "log.h"
 #include "zbxtime.h"
 
 #define NTP_SCALE		4294967296.0	/* 2^32, of course! */
@@ -54,18 +54,17 @@ static void	pack_ntp(const ntp_data *data, unsigned char *request, int length)
 	/* Pack the essential data into an NTP packet, bypassing struct layout  */
 	/* and endian problems. Note that it ignores fields irrelevant to SNTP. */
 
-	int	i, k;
-	double	d;
-
 	memset(request, 0, length);
 
 	request[0] = (data->version << 3) | data->mode;
 
-	d = data->transmit / NTP_SCALE;
+	double	d = data->transmit / NTP_SCALE;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if ((k = (int)(d *= 256.0)) >= 256)
+		int	k = (int)(d *= 256.0);
+
+		if (k >= 256)
 			k = 255;
 
 		request[NTP_OFFSET_TRANSMIT + i] = k;
@@ -79,7 +78,7 @@ static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsign
 	/* Unpack the essential data from an NTP packet, bypassing struct layout */
 	/* and endian problems. Note that it ignores fields irrelevant to SNTP.  */
 
-	int	i, ret = FAIL;
+	int	ret = FAIL;
 	double	d;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -124,7 +123,7 @@ static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsign
 	}
 
 	d = 0.0;
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		d = 256.0 * d + response[NTP_OFFSET_TRANSMIT + i];
 	data->transmit = d / NTP_SCALE;
 
@@ -150,7 +149,7 @@ int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_udp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+	if (SUCCEED == (ret = zbx_udp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout)))
 	{
 		make_packet(&data);
 

@@ -21,8 +21,7 @@
 #include "zbxsysinfo.h"
 
 #include "../sysinfo.h"
-#include "log.h"
-#include "file.h"
+#include "vfs_file.h"
 #include "dir.h"
 #include "net.h"
 #include "dns.h"
@@ -45,14 +44,19 @@ static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run_no_remote(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-ZBX_METRIC	parameters_common_local[] =
+static zbx_metric_t	parameters_common_local[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.run",		CF_HAVEPARAMS,	system_run_no_remote, 	"echo test"},
 	{NULL}
 };
 
-ZBX_METRIC	parameters_common[] =
+zbx_metric_t	*get_parameters_common_local(void)
+{
+	return &parameters_common_local[0];
+}
+
+static zbx_metric_t	parameters_common[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.localtime",	CF_HAVEPARAMS,	system_localtime,	"utc"},
@@ -87,11 +91,17 @@ ZBX_METRIC	parameters_common[] =
 	{"logrt",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"logrt.count",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"eventlog",		CF_HAVEPARAMS,	only_active,		"system"},
+	{"eventlog.count",	CF_HAVEPARAMS,	only_active,		"system"},
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	zabbix_stats,		"127.0.0.1,10051"},
 
 	{NULL}
 };
+
+zbx_metric_t	*get_parameters_common(void)
+{
+	return &parameters_common[0];
+}
 
 static const char	*user_parameter_dir = NULL;
 
@@ -109,12 +119,12 @@ static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_FAIL;
 }
 
-static int	execute_str_local(const char *command, AGENT_RESULT *result, const char* dir)
+static int	execute_str_local(const char *command, AGENT_RESULT *result, const char* dir, int timeout)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), sysinfo_get_config_timeout(),
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), timeout,
 			ZBX_EXIT_CODE_CHECKS_DISABLED, dir))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
@@ -143,17 +153,17 @@ int	execute_user_parameter(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	return execute_str_local(get_rparam(request, 0), result, user_parameter_dir);
+	return execute_str_local(get_rparam(request, 0), result, user_parameter_dir, request->timeout);
 }
 
-int	execute_str(const char *command, AGENT_RESULT *result)
+int	execute_str(const char *command, AGENT_RESULT *result, int timeout)
 {
-	return execute_str_local(command, result, NULL);
+	return execute_str_local(command, result, NULL, timeout);
 }
 
-int	execute_dbl(const char *command, AGENT_RESULT *result)
+int	execute_dbl(const char *command, AGENT_RESULT *result, int timeout)
 {
-	if (SYSINFO_RET_OK != execute_str(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result, timeout))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_DBL_RESULT(result))
@@ -168,9 +178,9 @@ int	execute_dbl(const char *command, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	execute_int(const char *command, AGENT_RESULT *result)
+int	execute_int(const char *command, AGENT_RESULT *result, int timeout)
 {
-	if (SYSINFO_RET_OK != execute_str(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result, timeout))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_UI64_RESULT(result))
@@ -208,7 +218,7 @@ static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int le
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
-		return execute_str(command, result);
+		return execute_str(command, result, request->timeout);
 	}
 	else if (0 == strcmp(flag, "nowait"))
 	{
@@ -231,11 +241,9 @@ static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int le
 
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	level;
+	int	level = LOG_LEVEL_DEBUG;
 
-	level = LOG_LEVEL_DEBUG;
-
-	if (0 != CONFIG_LOG_REMOTE_COMMANDS)
+	if (0 != sysinfo_get_config_log_remote_commands())
 		level = LOG_LEVEL_WARNING;
 
 	return system_run_local(request, result, level);

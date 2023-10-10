@@ -69,8 +69,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.userTokenSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.userTokenDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.userTokenSuccess, {once: true});
 		},
 
 		massDeleteUserToken(target, tokenids) {
@@ -134,20 +133,6 @@
 
 		events: {
 			userTokenSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			},
-
-			userTokenDelete(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

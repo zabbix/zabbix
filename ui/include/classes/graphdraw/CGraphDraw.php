@@ -194,29 +194,6 @@ abstract class CGraphDraw {
 		return $this->sizeY;
 	}
 
-	public function getLastValue($num) {
-		$data = &$this->data[$this->items[$num]['itemid']];
-
-		if (isset($data)) {
-			for ($i = $this->sizeX - 1; $i >= 0; $i--) {
-				if (!empty($data['count'][$i])) {
-					switch ($this->items[$num]['calc_fnc']) {
-						case CALC_FNC_MIN:
-							return $data['min'][$i];
-						case CALC_FNC_MAX:
-							return $data['max'][$i];
-						case CALC_FNC_ALL:
-						case CALC_FNC_AVG:
-						default:
-							return $data['avg'][$i];
-					}
-				}
-			}
-		}
-
-		return 0;
-	}
-
 	public function drawRectangle() {
 		imagefilledrectangle($this->im, 0, 0,
 			$this->fullSizeX,

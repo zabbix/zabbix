@@ -385,8 +385,7 @@ class testItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => ''
 					],
-					'error' => 'Incorrect value for field "key_": key is empty.',
-					'lld_error' => 'Incorrect value for field "key_": key is empty.'
+					'error' => 'Incorrect value for field "key_": key is empty.'
 				]
 			],
 			[
@@ -396,8 +395,7 @@ class testItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'key space'
 					],
-					'error' => 'Incorrect value for field "key_": incorrect syntax near " space".',
-					'lld_error' => 'Incorrect value for field "key_": incorrect syntax near " space".'
+					'error' => 'Incorrect value for field "key_": incorrect syntax near " space".'
 				]
 			],
 			[
@@ -410,8 +408,7 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '2']
 					],
-					'error' => 'Invalid parameter "/1/params/1": cannot be empty.',
-					'lld_error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -424,8 +421,7 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1', 'parameter_2' => '']
 					],
-					'error' => 'Invalid parameter "/1/params/2": cannot be empty.',
-					'lld_error' => 'Incorrect value for field "params": second parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/2": cannot be empty.'
 				]
 			],
 			[
@@ -438,8 +434,7 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'XML XPath', 'parameter_1' => '']
 					],
-					'error' => 'Invalid parameter "/1/params/1": cannot be empty.',
-					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -457,8 +452,7 @@ class testItemTest extends CWebTest {
 						'error_handler' => 'Set error to',
 						'error_handler_params' => '']
 					],
-					'error' => 'Invalid parameter "/1/error_handler_params": cannot be empty.',
-					'lld_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/error_handler_params": cannot be empty.'
 				]
 			],
 			[
@@ -529,10 +523,43 @@ class testItemTest extends CWebTest {
 		return array_merge($this->getCommonTestItemData(), [
 			[
 				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated0'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated1',
+						'Formula' => '((),9'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "),9".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated2',
+						'Formula' => '{{?{{?{{?'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "{{?{{?{{?".'
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Calculated',
-						'Key' => 'test.calculated'
+						'Key' => 'test.calculated',
+						'Formula' => 'avg(/Zabbix Server/zabbix[wcache,values],10m)'
 					]
 				]
 			],
@@ -713,7 +740,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid',
+						'proxy' => 'id:proxyid',
 						'version' => 'id:interface_details_version',
 						'context' => 'id:interface_details_contextname',
 						'security' => 'id:interface_details_securityname',
@@ -728,7 +755,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid',
+						'proxy' => 'id:proxyid',
 						'version' => 'id:interface_details_version',
 						'community' => 'id:interface_details_community'
 					];
@@ -737,7 +764,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid'
+						'proxy' => 'id:proxyid'
 					];
 				}
 
@@ -745,8 +772,8 @@ class testItemTest extends CWebTest {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
 
-				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
-						"(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
+				$proxy = CDBHelper::getValue("SELECT name FROM proxy WHERE proxyid IN ".
+						"(SELECT proxyid FROM hosts WHERE host = 'Test item host')");
 
 				// Check test item form fields depending on item type.
 				switch ($data['fields']['Type']) {
@@ -1026,8 +1053,12 @@ class testItemTest extends CWebTest {
 				}
 				break;
 			case TEST_BAD:
-				$error_message = ($lld) ? $data['lld_error'] : $data['error'];
-				$this->assertMessage(TEST_BAD, null, $error_message);
+				if (CTestArrayHelper::get($data, 'test_error')) {
+					$overlay->query('button:Get value and test')->one()->click();
+					$data['error'] = $data['test_error'];
+				}
+
+				$this->assertMessage(TEST_BAD, null, $data['error']);
 				$overlay->close();
 				break;
 		}

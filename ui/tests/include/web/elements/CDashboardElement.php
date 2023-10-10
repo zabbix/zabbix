@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * Dashboard element.
  */
@@ -71,8 +73,8 @@ class CDashboardElement extends CElement {
 	 * @return CWidgetElement|CNullElement
 	 */
 	public function getWidget($name, $should_exist = true) {
-		$query = $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
-				' contains(@class, "dashboard-grid-iterator-head")]/h4[text()='.
+		$query = $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
 				CXPathHelper::escapeQuotes($name).']/../../..');
 
 		if ($should_exist) {
@@ -173,8 +175,20 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
 			$button = $controls->query('id:dashboard-save')->one()->waitUntilClickable();
-			$button->getLocationOnScreenOnceScrolledIntoView();
 			$button->click();
+
+			try {
+				$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible(2);
+			}
+			catch (TimeoutException $ex) {
+				try {
+					$button->click(true);
+				}
+				catch (\Exception $ex) {
+					// Code is not missing here.
+				}
+			}
+
 			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible();
 		}
 
@@ -191,8 +205,8 @@ class CDashboardElement extends CElement {
 	 */
 	public function deleteWidget($name) {
 		$this->checkIfEditable();
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()
 				->select('Delete')->waitUntilNotVisible();
 
@@ -207,8 +221,8 @@ class CDashboardElement extends CElement {
 	 * @return $this
 	 */
 	public function copyWidget($name) {
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Copy');
 
 		return $this;
@@ -238,8 +252,8 @@ class CDashboardElement extends CElement {
 	public function replaceWidget($name) {
 		$this->checkIfEditable();
 
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Paste');
 
 		return $this;
@@ -293,5 +307,16 @@ class CDashboardElement extends CElement {
 		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
 		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
 		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return ($target->getWidgets()->filter(CElementFilter::NOT_READY)->count() === 0);
+		};
 	}
 }

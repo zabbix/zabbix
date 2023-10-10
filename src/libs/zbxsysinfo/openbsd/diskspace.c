@@ -23,7 +23,6 @@
 #include "inodes.h"
 
 #include "zbxjson.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 static zbx_mntopt_t	mntopts[] = {
@@ -223,7 +222,7 @@ int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		i, rc;
+	int		rc;
 	struct statfs	*mntbuf;
 	struct zbx_json	j;
 
@@ -235,11 +234,9 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < rc; i++)
+	for (int i = 0; i < rc; i++)
 	{
-		char	*options;
-
-		options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flags & MNT_VISFLAGMASK);
+		char	*options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flags & MNT_VISFLAGMASK);
 
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mntbuf[i].f_mntonname, ZBX_JSON_TYPE_STRING);
@@ -261,18 +258,15 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			i, rc;
+	int			rc, ret = SYSINFO_RET_FAIL;
 	struct statfs		*mntbuf;
 	struct zbx_json		j;
-	zbx_uint64_t		total, not_used, used;
-	zbx_uint64_t		itotal, inot_used, iused;
-	double			pfree, pused;
-	double			ipfree, ipused;
+	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
+	double			pfree, pused, ipfree, ipused;
 	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
-	int			ret = SYSINFO_RET_FAIL;
-	char			*mpoint;
+	zbx_fsname_t		fsname;
 
 	if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
 	{
@@ -282,23 +276,24 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_ptr_create(&mntpoints);
 
-	for (i = 0; i < rc; i++)
+	for (int i = 0; i < rc; i++)
 	{
-		mpoint = mntbuf[i].f_mntonname;
-		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused,&error))
+		fsname.mpoint = mntbuf[i].f_mntonname;
+
+		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused,&error))
 		{
 			zbx_free(error);
 			continue;
 		}
-		if (SYSINFO_RET_OK != get_fs_inode_stat(mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused, "pused",
-				&error))
+		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
+				"pused", &error))
 		{
 			zbx_free(error);
 			continue;
 		}
 
 		mntpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
-		zbx_strlcpy(mntpoint->fsname, mpoint, MAX_STRING_LEN);
+		zbx_strlcpy(mntpoint->fsname, fsname.mpoint, MAX_STRING_LEN);
 		zbx_strlcpy(mntpoint->fstype, mntbuf[i].f_fstypename, MAX_STRING_LEN);
 		mntpoint->bytes.total = total;
 		mntpoint->bytes.used = used;
@@ -322,12 +317,14 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < rc; i++)
+	for (int i = 0; i < rc; i++)
 	{
-		int idx;
-		mpoint = mntbuf[i].f_mntonname;
+		int	idx;
 
-		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, mpoint, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+		fsname.mpoint = mntbuf[i].f_mntonname;
+		fsname.type = mntbuf[i].f_fstypename;
+
+		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
 		{
 			mntpoint = (zbx_mpoint_t *)mntpoints.values[idx];
 			zbx_json_addobject(&j, NULL);

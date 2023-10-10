@@ -21,6 +21,8 @@
 
 namespace Widgets\Item\Includes;
 
+use API;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -32,6 +34,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
@@ -54,6 +57,25 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_VALUE_SIZE = 45;
 	private const DEFAULT_UNITS_SIZE = 35;
 	private const DEFAULT_TIME_SIZE = 15;
+
+	private bool $is_binary_units = false;
+
+	public function __construct(array $values, ?string $templateid) {
+		parent::__construct($values, $templateid);
+
+		if (array_key_exists('units', $this->values) && $this->values['units'] !== '') {
+			$this->is_binary_units = isBinaryUnits($this->values['units']);
+		}
+		elseif (array_key_exists('itemid', $this->values)) {
+			$items = API::Item()->get([
+				'output' => ['units'],
+				'itemids' => $this->values['itemid'],
+				'webitems' => true
+			]);
+
+			$this->is_binary_units = $items && isBinaryUnits($items[0]['units']);
+		}
+	}
 
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
@@ -97,7 +119,7 @@ class WidgetForm extends CWidgetForm {
 	public function addFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
+				(new CWidgetFieldMultiSelectItem('itemid', _('Item')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
 			)
@@ -112,9 +134,6 @@ class WidgetForm extends CWidgetForm {
 						Widget::SHOW_CHANGE_INDICATOR
 					])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			)
-			->addField(
-				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
 			)
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
@@ -182,7 +201,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(1)
 			)
 			->addField(
-				new CWidgetFieldTextBox('units', _('Units'))
+				(new CWidgetFieldTextBox('units', _('Units')))->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldSelect('units_pos', _('Position'), [
@@ -239,11 +258,10 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
+				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
-				: null
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

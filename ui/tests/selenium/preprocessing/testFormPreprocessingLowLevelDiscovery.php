@@ -112,7 +112,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 */
 	public static function getLLDPreprocessingCreateData() {
 		return [
-			// Structured data. CSV to JSON.
+			// #0 Structured data. CSV to JSON.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -125,6 +125,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					]
 				]
 			],
+			// #1
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -137,6 +138,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					]
 				]
 			],
+			// #2
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -149,6 +151,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					]
 				]
 			],
+			// #3
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -166,6 +169,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					]
 				]
 			],
+			// #4
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -183,9 +187,11 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30'],
 						['type' => 'XML to JSON']
-					]
+					],
+					'screenshot' => true
 				]
 			],
+			// #5
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -213,6 +219,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					]
 				]
 			],
+			// #6
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -229,6 +236,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					]
 				]
 			],
+			// #7
 			[
 				[
 					'expected' => TEST_GOOD,

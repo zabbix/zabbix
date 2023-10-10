@@ -119,7 +119,7 @@ else {
 							'popup' => [
 								'filter_preselect' => [
 									'id' => 'filter_groupids_',
-									'submit_as' => 'groupid'
+									'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -179,52 +179,25 @@ $csrf_token = CCsrfTokenHelper::get('graphs.php');
 foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
-	$host_list = null;
-
-	if ($this->data['hostid'] == 0) {
-		$host_list = [];
-
+	$hostList = null;
+	if (empty($this->data['hostid'])) {
+		$hostList = [];
 		foreach ($graph['hosts'] as $host) {
-			$host_list[$host['name']] = $host['name'];
+			$hostList[$host['name']] = $host['name'];
 		}
 
 		foreach ($graph['templates'] as $template) {
-			$host_list[$template['name']] = $template['name'];
+			$hostList[$template['name']] = $template['name'];
 		}
-
-		$host_list = implode(', ', $host_list);
+		$hostList = implode(', ', $hostList);
 	}
 
+	$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 	$name = [];
-
-	if (array_key_exists($graph['templateid'], $data['parent_graphs'])) {
-		$parent_graph = $data['parent_graphs'][$graph['templateid']];
-
-		if ($parent_graph['editable']) {
-			$url = (new CUrl('graphs.php'))->setArgument('context', 'template');
-
-			if ($data['parent_discoveryid'] === null) {
-				$url
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$parent_graph['templateid']]);
-			}
-			else {
-				$url->setArgument('parent_discoveryid', $parent_graph['ruleid']);
-			}
-
-			$name[] = (new CLink(CHtml::encode($parent_graph['template_name']), $url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$name[] = (new CSpan(CHtml::encode($parent_graph['template_name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		$name[] = NAME_DELIMITER;
-	}
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
-		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
+		$name[] = (new CLink($graph['discoveryRule']['name'],
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $graph['discoveryRule']['itemid'])
@@ -245,7 +218,7 @@ foreach ($data['graphs'] as $graph) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
 	}
 
-	$name[] = new CLink(CHtml::encode($graph['name']), $url);
+	$name[] = new CLink($graph['name'], $url);
 	$info_icons = [];
 	$discover = null;
 
@@ -265,12 +238,12 @@ foreach ($data['graphs'] as $graph) {
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
 	else if (array_key_exists('ts_delete', $graph['graphDiscovery']) && $graph['graphDiscovery']['ts_delete'] > 0) {
-		$info_icons[] = getGraphLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
+		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
 	}
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
-		$host_list,
+		$hostList,
 		$name,
 		$graph['width'],
 		$graph['height'],
@@ -290,9 +263,14 @@ if (!$this->data['parent_discoveryid']) {
 			->removeId()
 	];
 }
-$buttons['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
-	? _('Delete selected graph prototypes?')
-	: _('Delete selected graphs?'),
+$buttons['graph.massdelete'] = [
+	'name' => _('Delete'),
+	'confirm_singular' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototype?')
+		: _('Delete selected graph?'),
+	'confirm_plural' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototypes?')
+		: _('Delete selected graphs?'),
 	'csrf_token' => $csrf_token
 ];
 
@@ -307,8 +285,10 @@ $graphForm->addItem([
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $data['hostid'],
-		'checkbox_object' => 'group_graphid'
+		'checkbox_hash' => $data['parent_discoveryid'] ?? $data['hostid'],
+		'checkbox_object' => 'group_graphid',
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

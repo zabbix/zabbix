@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,11 +21,11 @@
 
 class CControllerScriptList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'sort' =>			'in name,command',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
@@ -45,11 +45,11 @@ class CControllerScriptList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$sortField = $this->getInput('sort', CProfile::get('web.scripts.php.sort', 'name'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.scripts.php.sortorder', ZBX_SORT_UP));
 
@@ -84,7 +84,7 @@ class CControllerScriptList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['scripts'] = API::Script()->get([
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on',
-				'scope'
+				'scope', 'menu_path'
 			],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
@@ -97,8 +97,20 @@ class CControllerScriptList extends CController {
 			'preservekeys' => true
 		]);
 
-		// Data sort and pager.
-		order_result($data['scripts'], $sortField, $sortOrder);
+		// Data sort and pager. Trim down menu path and combine with name.
+		foreach ($data['scripts'] as &$script) {
+			$script['menu_path'] = trimPath($script['menu_path']);
+			$script['menu_path'] = trim($script['menu_path'], '/');
+			$script['name_full'] = $script['menu_path'] === ''
+				? $script['name']
+				: $script['menu_path'].'/'.$script['name'];
+		}
+		unset($script);
+
+		CArrayHelper::sort($data['scripts'], [[
+			'field' => $sortField === 'name' ? 'name_full' : $sortField,
+			'order' => $sortOrder
+		]]);
 
 		$page_num = getRequest('page', 1);
 		CPagerHelper::savePage('script.list', $page_num);

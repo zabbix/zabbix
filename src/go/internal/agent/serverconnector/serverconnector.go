@@ -33,7 +33,6 @@ import (
 	"unicode/utf8"
 
 	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/agent/scheduler"
@@ -76,11 +75,12 @@ type activeChecksRequest struct {
 }
 
 type activeChecksResponse struct {
-	Response       string               `json:"response"`
-	Info           string               `json:"info"`
-	ConfigRevision uint64               `json:"config_revision,omitempty"`
-	Data           []*plugin.Request    `json:"data"`
-	Expressions    []*glexpr.Expression `json:"regexp"`
+	Response       string                 `json:"response"`
+	Info           string                 `json:"info"`
+	ConfigRevision uint64                 `json:"config_revision,omitempty"`
+	Data           []*scheduler.Request   `json:"data"`
+	Commands       []*agent.RemoteCommand `json:"commands"`
+	Expressions    []*glexpr.Expression   `json:"regexp"`
 }
 
 type agentDataResponse struct {
@@ -160,15 +160,18 @@ func (c *Connector) refreshActiveChecks() {
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.addresses)
 
-	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostInterface",
-		c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen, agent.LocalChecksClientID); err != nil {
+	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second,
+		"HostInterface", c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen,
+		agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host interface: %s", err)
+
 		return
 	}
 
 	if a.HostMetadata, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostMetadata",
 		c.options.HostMetadata, c.options.HostMetadataItem, agent.HostMetadataLen, agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host metadata: %s", err)
+
 		return
 	}
 
@@ -223,16 +226,22 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
+	now := time.Now()
+
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
 			log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.addresses[0], response.Info)
 		} else {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.addresses[0])
 		}
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
-			[]*glexpr.Expression{}, []*plugin.Request{})
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
+			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
 		return
+	}
+
+	if response.Commands != nil {
+		c.taskManager.UpdateCommands(c.clientID, c.resultCache.(resultcache.Writer), response.Commands, now)
 	}
 
 	if response.Data == nil {
@@ -321,8 +330,9 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
-		response.Expressions, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
+		response.Expressions, response.Data, now)
+
 	c.firstActiveChecksRefreshed = true
 }
 

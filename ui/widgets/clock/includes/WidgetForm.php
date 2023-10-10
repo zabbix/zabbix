@@ -32,6 +32,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTimeZone
@@ -63,7 +64,7 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(TIME_TYPE_LOCAL)
 			)
 			->addField($time_type == TIME_TYPE_HOST
-				? (new CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
+				? (new CWidgetFieldMultiSelectItem('itemid', _('Item')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
 				: null
@@ -82,9 +83,6 @@ class WidgetForm extends CWidgetForm {
 				]))
 					->setDefault([Widget::SHOW_TIME])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			)
-			->addField(
-				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
 			)
 			->addField(
 				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()
@@ -137,6 +135,9 @@ class WidgetForm extends CWidgetForm {
 					Widget::TIMEZONE_SHORT => _('Short'),
 					Widget::TIMEZONE_FULL => _('Full')
 				]))->setDefault(Widget::TIMEZONE_SHORT)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

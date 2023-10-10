@@ -198,9 +198,9 @@ class CUserGroup extends CApiService {
 		}
 		unset($usrgrp);
 
-		self::updateRights($usrgrps, __FUNCTION__);
-		self::updateTagFilters($usrgrps, __FUNCTION__);
-		self::updateUsersGroups($usrgrps, __FUNCTION__);
+		self::updateRights($usrgrps);
+		self::updateTagFilters($usrgrps);
+		self::updateUsers($usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
@@ -738,23 +738,18 @@ class CUserGroup extends CApiService {
 			DB::update('usrgrp', $upd_usrgrps);
 		}
 
-		self::updateRights($usrgrps, 'update', $db_usrgrps);
-		self::updateTagFilters($usrgrps, 'update', $db_usrgrps);
-		self::updateUsersGroups($usrgrps, 'update', $db_usrgrps);
+		self::updateRights($usrgrps, $db_usrgrps);
+		self::updateTagFilters($usrgrps, $db_usrgrps);
+		self::updateUsers($usrgrps, $db_usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 	}
 
 	/**
-	 * Update table "rights".
-	 *
-	 * @static
-	 *
 	 * @param array      $usrgrps
-	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private static function updateRights(array &$usrgrps, string $method, array $db_usrgrps = null): void {
+	private static function updateRights(array &$usrgrps, array $db_usrgrps = null): void {
 		$ins_rights = [];
 		$upd_rights = [];
 		$del_rightids = [];
@@ -765,7 +760,7 @@ class CUserGroup extends CApiService {
 					continue;
 				}
 
-				$db_rights = ($method === 'update')
+				$db_rights = $db_usrgrps !== null
 					? array_column($db_usrgrps[$usrgrp['usrgrpid']][$parameter], null, 'id')
 					: [];
 
@@ -830,15 +825,10 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Update table "tag_filter".
-	 *
-	 * @static
-	 *
 	 * @param array      $usrgrps
-	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private static function updateTagFilters(array &$usrgrps, string $method, array $db_usrgrps = null): void {
+	private static function updateTagFilters(array &$usrgrps, array $db_usrgrps = null): void {
 		$ins_tag_filters = [];
 		$del_tag_filterids = [];
 
@@ -848,7 +838,7 @@ class CUserGroup extends CApiService {
 			}
 
 			$db_tag_filterids_by_tag_value = [];
-			$db_tag_filters = ($method === 'update')
+			$db_tag_filters = $db_usrgrps !== null
 				? $db_usrgrps[$usrgrp['usrgrpid']]['tag_filters']
 				: [];
 
@@ -910,66 +900,67 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Update table "users_groups".
-	 *
-	 * @static
-	 *
-	 * @param array      $usrgrps
-	 * @param string     $method
-	 * @param null|array $db_usrgrps
+	 * @param array      $groups
+	 * @param null|array $db_groups
 	 */
-	private static function updateUsersGroups(array &$usrgrps, string $method, array $db_usrgrps = null): void {
-		$ins_users_groups = [];
-		$del_ids = [];
+	private static function updateUsers(array &$groups, array $db_groups = null): void {
+		$users = [];
+		$db_users = [];
 
-		foreach ($usrgrps as &$usrgrp) {
-			if (!array_key_exists('users', $usrgrp)) {
+		foreach ($groups as &$group) {
+			if (!array_key_exists('users', $group)) {
 				continue;
 			}
 
-			$db_users = ($method === 'update')
-				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['users'], null, 'userid')
+			$_db_users = $db_groups !== null
+				? array_column($db_groups[$group['usrgrpid']]['users'], null, 'userid')
 				: [];
 
-			foreach ($usrgrp['users'] as &$user) {
-				if (array_key_exists($user['userid'], $db_users)) {
-					$user['id'] = $db_users[$user['userid']]['id'];
-					unset($db_users[$user['userid']]);
+			foreach ($group['users'] as $user) {
+				$userid = $user['userid'];
+
+				if (array_key_exists($userid, $_db_users)) {
+					unset($_db_users[$userid]);
 				}
 				else {
-					$ins_users_groups[] = [
-						'userid' => $user['userid'],
-						'usrgrpid' => $usrgrp['usrgrpid']
-					];
+					$users[$userid]['userid'] = $userid;
+					$users[$userid]['usrgrps'][] = ['usrgrpid' => $group['usrgrpid']];
+
+					$db_users[$userid]['userid'] = $userid;
+					$db_users[$userid]['usrgrps'] = [];
 				}
 			}
-			unset($user);
 
-			$del_ids = array_merge($del_ids, array_column($db_users, 'id'));
-		}
-		unset($usrgrp);
+			foreach ($_db_users as $userid => $db_user) {
+				$users[$userid]['userid'] = $userid;
+				$users[$userid] += ['usrgrps' => []];
 
-		if ($ins_users_groups) {
-			$ids = DB::insertBatch('users_groups', $ins_users_groups);
-		}
-
-		if ($del_ids) {
-			DB::delete('users_groups', ['id' => $del_ids]);
-		}
-
-		foreach ($usrgrps as &$usrgrp) {
-			if (!array_key_exists('users', $usrgrp)) {
-				continue;
+				$db_users[$userid]['userid'] = $userid;
+				$db_users[$userid]['usrgrps'][$db_user['id']] = [
+					'id' => $db_user['id'],
+					'usrgrpid' => $group['usrgrpid']
+				];
 			}
 
-			foreach ($usrgrp['users'] as &$user) {
-				if (!array_key_exists('id', $user)) {
-					$user['id'] = array_shift($ids);
-				}
-			}
-			unset($user);
+			unset($group['users'], $db_groups[$group['usrgrpid']]['users']);
 		}
-		unset($usrgrp);
+		unset($group);
+
+		if (!$users) {
+			return;
+		}
+
+		$options = [
+			'output' => ['userid', 'username'],
+			'userids' => array_keys($users)
+		];
+		$result = DBselect(DB::makeSql('users', $options));
+
+		while ($row = DBfetch($result)) {
+			$db_users[$row['userid']]['username'] = $row['username'];
+		}
+
+		CUser::updateForce(array_values($users), $db_users);
 	}
 
 	/**

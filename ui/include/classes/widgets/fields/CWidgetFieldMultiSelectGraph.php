@@ -23,16 +23,13 @@ namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldMultiSelectGraph extends CWidgetFieldMultiSelect {
 
-	public function __construct(string $name, string $label = null, $hostid = null) {
+	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectGraphView::class;
+
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
+		$this->inaccessible_caption = _('Inaccessible graph');
 
-		if ($hostid === null) {
-			$this->setFilterParameter('real_hosts', true);
-		}
-		else {
-			$this->setFilterParameter('hostid', $hostid);
-		}
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 	}
 }

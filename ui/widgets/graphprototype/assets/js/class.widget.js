@@ -20,11 +20,40 @@
 
 class CWidgetGraphPrototype extends CWidgetIterator {
 
+	hasCustomTimePeriod() {
+		return !this.getFieldsReferredData().has('time_period');
+	}
+
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			has_custom_time_period: this.hasCustomTimePeriod() ? 1 : undefined
+		};
+	}
+
+	processUpdateResponse(response) {
+		super.processUpdateResponse(response);
+
+		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		}
+	}
+
+	onFeedback({type, value, descriptor}) {
+		if (type === '_timeperiod' && !this.hasCustomTimePeriod()) {
+			this.feedback({time_period: value});
+
+			return true;
+		}
+
+		return super.onFeedback({type, value, descriptor});
+	}
+
 	_updateWidget(widget) {
 		widget.resize();
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return false;
 	}
 }

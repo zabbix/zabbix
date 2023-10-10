@@ -17,19 +17,111 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "base64.h"
+#include "zbxcrypto.h"
 
 #include <assert.h>
 #include "zbxcommon.h"
+
+/**********************************************************************
+ *  Purpose: Check if supplied character is a valid base64 character. *
+ *           Not a complete check, since it ignores equal sign '='    *
+ *	     as it depends on the context where this is placed.       *
+ *	     Corresponds to the [A-Za-z0-9+\\/] block validation from *
+ *	     zbx_base64_validate() function below.                    *
+ **********************************************************************/
+static int	is_valid_base64_char(const char c)
+{
+	if (('A' <= c && 'Z' >= c) ||
+		('a' <= c && 'z' >= c) ||
+		('/' <= c && '9' >= c) ||
+		'+' == c)
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/*************************************************************************************************
+ *                                                                                               *
+ * Purpose: Checks if the string is a valid Base64 encoded string.                               *
+ *          Check is based on RFC 4648, based on the following regexp:                           *
+ *   "^(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4})$"  *
+ *                                                                                               *
+ *          Note, that pcre regexp matching cannot be used, because it would exceed max          *
+ *          stack frame limit when recursively checking long strings,                            *
+ *          (check compute_recursion_limit() for more details).                                  *
+ *                                                                                               *
+ * Parameters: p_str - [IN] string to validate                                                   *
+ *                                                                                               *
+ * Return value: SUCCEED - string is a valid Base64 encoded string                               *
+ *               FAIL    - otherwise                                                             *
+ *                                                                                               *
+ *************************************************************************************************/
+int	zbx_base64_validate(const char *p_str)
+{
+	size_t	i;
+
+	/* consider empty strings - valid Base64 encodings */
+	if ('\0' == p_str[0])
+		return SUCCEED;
+
+	for (i = 1; '\0' != p_str[i] || (0 == i % 4); i++)
+	{
+		if (0 != i % 4)
+			continue;
+
+		/* validate first/repeated block: (?:[A-Za-z0-9+\\/]{4}) */
+		if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+				SUCCEED == is_valid_base64_char(p_str[i - 3]) &&
+				SUCCEED == is_valid_base64_char(p_str[i - 2]) &&
+				SUCCEED == is_valid_base64_char(p_str[i - 1]))
+		{
+			if ('\0' == p_str[i])
+				return SUCCEED;
+			else
+				continue;
+		}
+		/* validate second/final block: (?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4}) */
+		else if ('\0' == p_str[i])
+		{
+			if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 3]) && '=' == p_str[i - 2] &&
+					'=' == p_str[i - 1])
+			{
+					return SUCCEED;
+			}
+			else if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 3]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 2]) &&
+					'=' == p_str[i - 1])
+			{
+				return SUCCEED;
+			}
+			else if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 3]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 2]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 1]))
+			{
+				return SUCCEED;
+			}
+			else
+				return FAIL;
+		}
+		return FAIL;
+	}
+
+	return FAIL;
+}
 
 /******************************************************************************
  *                                                                            *
  * Purpose: is the character passed in a base64 character?                    *
  *                                                                            *
- * Parameters: c - character to test                                          *
+ * Parameters: c - [IN] character to test                                     *
  *                                                                            *
- * Return value: SUCCEED - the character is a base64 character                *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - character is a base64 character                    *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	is_base64(char c)
@@ -50,9 +142,10 @@ static int	is_base64(char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: encode 6 bits into a base64 character                             *
+ * Purpose: encodes 6 bits into a base64 character                            *
  *                                                                            *
- * Parameters: uc - character to encode. Its value must be 0 ... 63.          *
+ * Parameters: uc - [IN] Character to encode. Its value must be 0 ... 63.     *
+ *                                                                            *
  * Return value: byte encoded into a base64 character                         *
  *                                                                            *
  ******************************************************************************/
@@ -65,11 +158,11 @@ static char	char_base64_encode(unsigned char uc)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: decode a base64 character into a byte                             *
+ * Purpose: decodes base64 character into byte                                *
  *                                                                            *
- * Parameters: c - character to decode                                        *
+ * Parameters: c - [IN] character to decode                                   *
  *                                                                            *
- * Return value: base64 character decoded into a byte                         *
+ * Return value: base64 character decoded into byte                           *
  *                                                                            *
  ******************************************************************************/
 static unsigned char	char_base64_decode(char c)
@@ -99,14 +192,14 @@ static unsigned char	char_base64_decode(char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: encode a string into a base64 string                              *
+ * Purpose: encodes string into base64 string                                 *
  *                                                                            *
- * Parameters: p_str    - [IN] the string to encode                           *
- *             p_b64str - [OUT] the encoded str to return                     *
+ * Parameters: p_str    - [IN] string to encode                               *
+ *             p_b64str - [OUT] encoded str to return                         *
  *             in_size  - [IN] size (length) of input str                     *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_encode(const char *p_str, char *p_b64str, int in_size)
+void	zbx_base64_encode(const char *p_str, char *p_b64str, int in_size)
 {
 	int		i;
 	unsigned char	from1, from2, from3;
@@ -163,17 +256,16 @@ void	str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: encode a string into a base64 string                              *
- *          with dynamic memory allocation                                    *
+ * Purpose: encodes string into base64 string with dynamic memory allocation  *
  *                                                                            *
- * Parameters: p_str    - [IN] the string to encode                           *
- *             p_b64str - [OUT] the pointer to encoded str to return          *
+ * Parameters: p_str    - [IN] string to encode                               *
+ *             p_b64str - [OUT] pointer to encoded str to return              *
  *             in_size  - [IN] size (length) of input str                     *
  *                                                                            *
  * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
+void	zbx_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 {
 	const char 	*pc;
 	char		*pc_r;
@@ -195,11 +287,11 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 	bytes_for_left = (bytes_left + 2) / 3 * 4;
 
 	for (pc = p_str, pc_r = *p_b64str; 0 != full_block_num; pc += c_per_block, pc_r += b_per_block, full_block_num--)
-		str_base64_encode(pc, pc_r, c_per_block);
+		zbx_base64_encode(pc, pc_r, c_per_block);
 
 	if (0 != bytes_left)
 	{
-		str_base64_encode(pc, pc_r, bytes_left);
+		zbx_base64_encode(pc, pc_r, bytes_left);
 		pc_r += bytes_for_left;
 	}
 
@@ -208,15 +300,15 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: decode a base64 string into a string                              *
+ * Purpose: decodes base64 string into string                                 *
  *                                                                            *
- * Parameters: p_b64str   - [IN] the base64 string to decode                  *
- *             p_str      - [OUT] the decoded str to return                   *
- *             maxsize    - [IN] the size of p_str buffer                     *
- *             p_out_size - [OUT] the size (length) of the str decoded        *
+ * Parameters: p_b64str   - [IN] base64 string to decode                      *
+ *             p_str      - [OUT] decoded str to return                       *
+ *             maxsize    - [IN] size of p_str buffer                         *
+ *             p_out_size - [OUT] size (length) of str decoded                *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size)
+void	zbx_base64_decode(const char *p_b64str, char *p_str, size_t maxsize, size_t *p_out_size)
 {
 	const char	*p;
 	char		from[4];

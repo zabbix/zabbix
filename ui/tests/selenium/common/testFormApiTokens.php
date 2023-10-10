@@ -138,7 +138,7 @@ class testFormApiTokens extends CWebTest {
 		$this->checkAuthToken($auth_token, null);
 
 		// Check the hintbox text in the Auth token field.
-		$auth_token->query('xpath:./a[@data-hintbox]')->one()->click();
+		$auth_token->query('xpath:./button[@data-hintbox]')->one()->click();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
 				$this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText()
 		);
@@ -218,12 +218,9 @@ class testFormApiTokens extends CWebTest {
 
 				// Check warning in case if token is already expired.
 				if (CTestArrayHelper::get($data, 'already_expired')) {
-					$form->getField('Expires at:')->query('xpath:./a[@data-hintbox]')->one()->click();
+					$form->getField('Expires at:')->query('xpath:./button[@data-hintbox]')->one()->click();
 					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText();
 					$this->assertEquals('The token has expired. Please update the expiry date to use the token.', $hintbox_text);
-
-					// In case if token is expired an empty space (separator) is added to the value in token generate form.
-					$generate_data['Expires at'] = $generate_data['Expires at'].' ';
 				}
 
 				foreach ($generate_data as $name => $value) {
@@ -346,7 +343,7 @@ class testFormApiTokens extends CWebTest {
 	 */
 	private function checkAuthToken($auth_token, $original_token) {
 		// Get token text.
-		$token_text = str_replace('  Copy to clipboard', '', $auth_token->getText());
+		$token_text = str_replace(' Copy to clipboard', '', $auth_token->query('tag:span')->one()->getText());
 		$this->assertEquals(64, strlen($token_text));
 
 		if ($original_token) {
@@ -354,7 +351,7 @@ class testFormApiTokens extends CWebTest {
 		}
 
 		// Check that token string will be copied to clipboard.
-		$clipboard_element = $auth_token->query('xpath:./a[text()="Copy to clipboard"]')->one();
+		$clipboard_element = $auth_token->query('button:Copy to clipboard')->one();
 		$this->assertEquals($token_text, $clipboard_element->getAttribute('data-auth_token'));
 	}
 }

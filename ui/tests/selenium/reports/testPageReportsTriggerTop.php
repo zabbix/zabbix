@@ -167,9 +167,9 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 	}
 
 	public function testPageReportsTriggerTop_FilterLayout() {
-		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestCheckTitle('100 busiest triggers');
-		$this->zbxTestCheckHeader('100 busiest triggers');
+		$this->zbxTestLogin('zabbix.php?action=toptriggers.list');
+		$this->zbxTestCheckTitle('Top 100 triggers');
+		$this->zbxTestCheckHeader('Top 100 triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestTextPresent('Host groups', 'Hosts', 'Severity', 'Filter', 'From', 'Till');
 		$this->zbxTestClickXpathWait('//button[text()="Reset"]');
@@ -183,11 +183,11 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 
 		// Check closed filter
 		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]');
-		$this->zbxTestAssertNotVisibleId('groupids_');
+		$this->zbxTestAssertNotVisibleId('filter_groupids_');
 
 		// Check opened filter
 		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]');
-		$this->zbxTestAssertVisibleId('groupids_');
+		$this->zbxTestAssertVisibleId('filter_groupids_');
 	}
 
 	public static function getFilterData() {
@@ -276,7 +276,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 					],
 					'date' => [
 						'relative' => true,
-						// Less thant 2 month ago.
+						// Less than 2 month ago.
 						'from' => 501120,
 						'to' => 'now-1d/d'
 					]
@@ -346,8 +346,8 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
-		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestCheckHeader('100 busiest triggers');
+		$this->zbxTestLogin('zabbix.php?action=toptriggers.list');
+		$this->zbxTestCheckHeader('Top 100 triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();

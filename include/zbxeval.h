@@ -23,6 +23,7 @@
 #include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbxexpr.h"
+#include "zbxregexp.h"
 
 /*
  * Token type flags (32 bits):
@@ -180,8 +181,8 @@ typedef zbx_uint32_t zbx_token_type_t;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-typedef	int (*zbx_eval_function_cb_t)(const char *name, size_t len, int args_num, const zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
+typedef	int (*zbx_eval_function_cb_t)(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
 
 typedef struct
 {
@@ -212,6 +213,9 @@ zbx_eval_context_t;
 
 typedef int	(*zbx_macro_expand_func_t)(void *data, char **str, const zbx_uint64_t *hostids, int hostids_num, \
 		char **error);
+typedef void	(*zbx_get_expressions_by_name_f)(zbx_vector_expression_t *expressions, const char *name);
+
+void	zbx_init_library_eval(zbx_get_expressions_by_name_f get_expressions_by_name_func);
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
 void	zbx_eval_init(zbx_eval_context_t *ctx);
@@ -285,4 +289,37 @@ int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error);
+
+int	zbx_eval_var_vector_to_dbl(zbx_vector_var_t *input_vector, zbx_vector_dbl_t *output_vector, char **error);
+
+#define OP_UNKNOWN	-1
+#define OP_EQ		0
+#define OP_NE		1
+#define OP_GT		2
+#define OP_GE		3
+#define OP_LT		4
+#define OP_LE		5
+#define OP_LIKE		6
+#define OP_REGEXP	7
+#define OP_IREGEXP	8
+#define OP_BITAND	9
+#define OP_ANY		10
+
+typedef struct
+{
+	int			op;
+	int			numeric_search;
+	char			*pattern2;
+	zbx_uint64_t		pattern_ui64;
+	zbx_uint64_t		pattern2_ui64;
+	double			pattern_dbl;
+	zbx_vector_expression_t	regexps;
+}
+zbx_eval_count_pattern_data_t;
+
+int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error);
+int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
+		int limit, int *count, char **error);
+void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
 #endif

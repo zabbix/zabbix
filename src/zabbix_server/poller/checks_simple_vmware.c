@@ -24,6 +24,7 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include"../vmware/vmware.h"
+#include "../vmware/vmware_perfcntr.h"
 #include "zbxxml.h"
 #include "zbxsysinfo.h"
 
@@ -1015,8 +1016,8 @@ out:
 	return ret;
 }
 
-static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key, const DC_ITEM *item,
-		zbx_vector_ptr_t *add_results)
+static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key,
+		const zbx_dc_item_t *item, zbx_vector_ptr_t *add_results)
 {
 	int	i;
 
@@ -1053,7 +1054,7 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);
 }
 
-int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
+int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_vector_ptr_t *add_results)
 {
 	const char		*url, *skip;

@@ -22,101 +22,7 @@
 
 #include "zbxcommon.h"
 #include "module.h"
-
-/* CHECK RESULT */
-
-#define ZBX_ISSET_UI64(res)	((res)->type & AR_UINT64)
-#define ZBX_ISSET_DBL(res)	((res)->type & AR_DOUBLE)
-#define ZBX_ISSET_STR(res)	((res)->type & AR_STRING)
-#define ZBX_ISSET_TEXT(res)	((res)->type & AR_TEXT)
-#define ZBX_ISSET_LOG(res)	((res)->type & AR_LOG)
-#define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
-#define ZBX_ISSET_META(res)	((res)->type & AR_META)
-
-#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
-
-/* UNSET RESULT */
-
-#define ZBX_UNSET_UI64_RESULT(res)					\
-									\
-do									\
-{									\
-	(res)->type &= ~AR_UINT64;					\
-	(res)->ui64 = (zbx_uint64_t)0;					\
-}									\
-while (0)
-
-#define ZBX_UNSET_DBL_RESULT(res)					\
-									\
-do									\
-{									\
-	(res)->type &= ~AR_DOUBLE;					\
-	(res)->dbl = (double)0;						\
-}									\
-while (0)
-
-#define ZBX_UNSET_STR_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_STRING)					\
-	{								\
-		zbx_free((res)->str);					\
-		(res)->type &= ~AR_STRING;				\
-	}								\
-}									\
-while (0)
-
-#define ZBX_UNSET_TEXT_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_TEXT)					\
-	{								\
-		zbx_free((res)->text);					\
-		(res)->type &= ~AR_TEXT;				\
-	}								\
-}									\
-while (0)
-
-#define ZBX_UNSET_LOG_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_LOG)					\
-	{								\
-		zbx_log_free((res)->log);				\
-		(res)->log = NULL;					\
-		(res)->type &= ~AR_LOG;					\
-	}								\
-}									\
-while (0)
-
-#define ZBX_UNSET_MSG_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_MESSAGE)					\
-	{								\
-		zbx_free((res)->msg);					\
-		(res)->type &= ~AR_MESSAGE;				\
-	}								\
-}									\
-while (0)
-
-/* AR_META is always excluded */
-#define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type) 				\
-										\
-do										\
-{										\
-	if (!(exc_type & AR_UINT64))	ZBX_UNSET_UI64_RESULT(res);		\
-	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);		\
-	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);		\
-	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);		\
-	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);		\
-	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);		\
-}										\
-while (0)
+#include "zbxthreads.h"
 
 /* RETRIEVE RESULT VALUE */
 
@@ -124,14 +30,11 @@ while (0)
 #define ZBX_GET_DBL_RESULT(res)		((double *)get_result_value_by_type(res, AR_DOUBLE))
 #define ZBX_GET_STR_RESULT(res)		((char **)get_result_value_by_type(res, AR_STRING))
 #define ZBX_GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
+#define ZBX_GET_BIN_RESULT(res)		((char **)get_result_value_by_type(res, AR_BIN))
 #define ZBX_GET_LOG_RESULT(res)		((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
 #define ZBX_GET_MSG_RESULT(res)		((char **)get_result_value_by_type(res, AR_MESSAGE))
 
 void	*get_result_value_by_type(AGENT_RESULT *result, int require_type);
-
-extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int	CONFIG_LOG_REMOTE_COMMANDS;
-extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 
 /* collector */
 #define ZBX_MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
@@ -185,11 +88,16 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
-void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f);
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
+		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
+		zbx_get_config_int_f get_config_unsafe_user_parameters_cb, zbx_get_config_str_f
+		get_config_source_ip_f, zbx_get_config_str_f get_config_hostname_f, zbx_get_config_str_f
+		get_config_hostnames_f, zbx_get_config_str_f get_config_host_metadata_f, zbx_get_config_str_f
+		get_config_host_metadata_item_f);
 
 void	zbx_init_metrics(void);
-int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
-void	zbx_free_metrics_ext(ZBX_METRIC **metrics);
+int	zbx_add_metric(zbx_metric_t *metric, char *error, size_t max_error_len);
+void	zbx_free_metrics_ext(zbx_metric_t **metrics);
 void	zbx_free_metrics(void);
 
 void	zbx_init_key_access_rules(void);
@@ -200,27 +108,20 @@ int	zbx_check_key_access_rules(const char *metric);
 int	zbx_check_request_access_rules(AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
 
-int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result);
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout);
 
 void	zbx_set_user_parameter_dir(const char *path);
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
 void	zbx_remove_user_parameters(void);
-void	zbx_get_metrics_copy(ZBX_METRIC **metrics);
-void	zbx_set_metrics(ZBX_METRIC *metrics);
+void	zbx_get_metrics_copy(zbx_metric_t **metrics);
+void	zbx_set_metrics(zbx_metric_t *metrics);
 void	zbx_test_parameters(void);
 void	zbx_test_parameter(const char *key);
-
-void	zbx_init_agent_result(AGENT_RESULT *result);
-void	zbx_log_free(zbx_log_t *log);
-void	zbx_free_agent_result(AGENT_RESULT *result);
 
 void	zbx_init_agent_request(AGENT_REQUEST *request);
 void	zbx_free_agent_request(AGENT_REQUEST *request);
 
 int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request);
-
-void	zbx_unquote_key_param(char *param);
-int	zbx_quote_key_param(char **param, int forced);
 
 int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
 void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
@@ -244,5 +145,37 @@ zbx_uint32_t	zbx_get_thread_global_mutex_flag(void);
 void		zbx_add_alias(const char *name, const char *value);
 void		zbx_alias_list_free(void);
 const char	*zbx_alias_get(const char *orig);
+
+int		zbx_init_modbus(char **error);
+void		zbx_deinit_modbus(void);
+
+/* stats */
+ZBX_THREAD_ENTRY(collector_thread, args);
+
+int	zbx_init_collector_data(char **error);
+void	zbx_free_collector_data(void);
+
+#if defined(_WINDOWS)
+/* perfstat */
+#include "zbxwin32.h"
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
+		zbx_perf_counter_lang_t lang, char **error);
+void			zbx_remove_perf_counter(zbx_perf_counter_data_t *counter);
+
+typedef enum
+{
+	ZBX_SINGLE_THREADED,
+	ZBX_MULTI_THREADED
+}
+zbx_threadedness_t;
+
+int	zbx_init_perf_collector(zbx_threadedness_t threadedness, char **error);
+void	zbx_free_perf_collector(void);
+#endif
+
+#define ZBX_CHECK_TIMEOUT_UNDEFINED	0
+int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len);
+
+int	sysinfo_get_config_timeout(void);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

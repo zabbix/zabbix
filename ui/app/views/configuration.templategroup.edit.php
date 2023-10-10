@@ -33,7 +33,7 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 $data += [
 	'buttons' => ($data['groupid'] == 0)
 		? [
-			(new CSubmit('add', _('Add')))->addClass('js-create-templategroup'),
+			new CSubmit('add', _('Add')),
 			$cancel_button
 		]
 		: [
@@ -50,6 +50,7 @@ $data += [
 
 (new CHtmlPage())
 	->setTitle(($data['groupid'] == 0) ? _('New template group') : _('Template group'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATE_GROUPS_EDIT))
 	->addItem(new CPartial('configuration.templategroup.edit.html', $data))
 	->show();
 

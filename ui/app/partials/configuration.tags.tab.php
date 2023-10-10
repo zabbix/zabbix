@@ -24,22 +24,17 @@
  * @var array    $data
  */
 
+$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
+$with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
+$field_label = array_key_exists('field_label', $data) ? $data['field_label'] : null;
+$data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
+
 if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
-$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
-$with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
-$parent_template_header = null;
-
-if ($show_inherited_tags && $data['context'] === 'host') {
-	$parent_template_header = in_array($data['source'], ['trigger', 'trigger_prototype'])
-		? _('Parent templates')
-		: _('Parent template');
-}
-
 // form list
-$tags_form_list = new CFormList('tagsFormList');
+$form_grid = (new CFormGrid())->setId('tagsFormList');
 
 $table = (new CTable())
 	->addClass('tags-table')
@@ -48,7 +43,7 @@ $table = (new CTable())
 		_('Name'),
 		_('Value'),
 		'',
-		$parent_template_header
+		$show_inherited_tags ? _('Parent templates') : null
 	]);
 
 $allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -113,30 +108,30 @@ foreach ($data['tags'] as $i => $tag) {
 			->addClass(ZBX_STYLE_TOP)
 	];
 
-	if ($show_inherited_tags && $data['context'] === 'host') {
+	if ($show_inherited_tags) {
 		$template_list = [];
 
-		if (array_key_exists('parent_object', $tag)) {
-			foreach ($tag['parent_object']['template_names'] as $templateid => $template_name) {
-				if (array_key_exists('templateids', $tag) && !in_array($templateid, $tag['templateids'])) {
-					continue;
-				}
+		if (array_key_exists('parent_templates', $tag)) {
+			CArrayHelper::sort($tag['parent_templates'], ['name']);
 
-				if ($template_list) {
-					$template_list[] = ', ';
-				}
+			foreach ($tag['parent_templates'] as $templateid => $template) {
+				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
+					$template_link = (new CLink($template['name']))->setAttribute('data-templateid', $templateid);
 
-				if ($tag['parent_object']['editable']) {
-					$template_list[] = (new CLink($template_name,
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $templateid)
-					))->setTarget('_blank');
+					($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype')
+						? $template_link->addClass('js-edit-template')
+						: $template_link->onClick('view.editTemplate(event, this.dataset.templateid);');
+
+					$template_list[] = $template_link;
 				}
 				else {
-					$template_list[] = (new CSpan($template_name))->addClass(ZBX_STYLE_GREY);
+					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 				}
+
+				$template_list[] = ', ';
 			}
+
+			array_pop($template_list);
 		}
 
 		$row[] = $template_list;
@@ -158,12 +153,12 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 		case 'trigger':
 		case 'trigger_prototype':
 			$btn_labels = [_('Trigger tags'), _('Inherited and trigger tags')];
-			$on_change = 'this.form.submit()';
+			$on_change = '';
 			break;
 
 		case 'httptest':
 			$btn_labels = [_('Scenario tags'), _('Inherited and scenario tags')];
-			$on_change = 'window.httpconf.$form.submit()';
+			$on_change = 'this.form.submit()';
 			break;
 
 		case 'item':
@@ -172,14 +167,24 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 			break;
 	}
 
-	$tags_form_list->addRow(null,
-		(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
-			->addValue($btn_labels[0], 0, null, $on_change)
-			->addValue($btn_labels[1], 1, null, $on_change)
-			->setModern(true)
+	$form_grid->addItem(
+		new CFormField(
+			(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
+				->addValue($btn_labels[0], 0, null, $on_change)
+				->addValue($btn_labels[1], 1, null, $on_change)
+				->setModern()
+		)
 	);
 }
 
-$tags_form_list->addRow(null, $table);
+if ($field_label) {
+	$form_grid->addItem([
+		new CLabel($field_label),
+		new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
+	]);
+}
+else {
+	$form_grid->addItem(new CFormField($table));
+}
 
-$tags_form_list->show();
+$form_grid->show();

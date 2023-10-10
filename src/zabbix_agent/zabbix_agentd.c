@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
-#include "modbtype.h"
+#include "agent_conf/agent_conf.h"
+
+#include "zbxlog.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "zbxconf.h"
 #include "zbxexpr.h"
 #include "zbxgetopt.h"
 #include "zbxip.h"
@@ -30,36 +31,37 @@
 
 static char	*CONFIG_PID_FILE = NULL;
 
-char	*CONFIG_HOSTS_ALLOWED		= NULL;
-char	*CONFIG_HOSTNAMES		= NULL;
+static char	*zbx_config_hosts_allowed	= NULL;
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-char	*CONFIG_HOST_METADATA		= NULL;
-char	*CONFIG_HOST_METADATA_ITEM	= NULL;
-char	*CONFIG_HOST_INTERFACE		= NULL;
-char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata_item, NULL)
+static char	*zbx_config_host_interface = NULL;
+static char	*zbx_config_host_interface_item = NULL;
+ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
+ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 1)
+ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
+ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
-ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
+static int	zbx_config_listen_port			= ZBX_DEFAULT_AGENT_PORT;
+static char	*zbx_config_listen_ip			= NULL;
+static int	zbx_config_refresh_active_checks	= 5;
 
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 1;
-int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
-int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
-int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
-int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
-char	*CONFIG_LISTEN_IP		= NULL;
-char	*CONFIG_SOURCE_IP		= NULL;
+ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
+
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
-int	CONFIG_BUFFER_SIZE		= 100;
-int	CONFIG_BUFFER_SEND		= 5;
+int	zbx_config_buffer_size		= 100;
+int	zbx_config_buffer_send		= 5;
 
-int	CONFIG_MAX_LINES_PER_SECOND		= 20;
-int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND	= 20;
+static int	zbx_config_max_lines_per_second	= 20;
+static int	zbx_config_eventlog_max_lines_per_second = 20;
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 
 char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
-char	**CONFIG_USER_PARAMETERS	= NULL;
+char	**zbx_config_user_parameters	= NULL;
 char	*CONFIG_USER_PARAMETER_DIR	= NULL;
 #if defined(_WINDOWS)
 char	**CONFIG_PERF_COUNTERS		= NULL;
@@ -77,24 +79,20 @@ static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
+int	zbx_config_heartbeat_frequency	= 60;
 
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
 #	include "zbxmodules.h"
 #endif
 
-#include "stats.h"
 #ifdef _WINDOWS
-#	include "perfstat.h"
 #	include "zbxwin32.h"
 #else
 #	include "zbxnix.h"
 #endif
-#include "active.h"
-#include "listener.h"
-
-#include "zbxsymbols.h"
+#include "active_checks/active_checks.h"
+#include "listener/listener.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -102,7 +100,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #	include "zbxnix.h"
 #endif
 
-#include "setproctitle.h"
 #include "zbxcrypto.h"
 
 const char	*progname = NULL;
@@ -149,7 +146,11 @@ const char	*help_message[] = {
 	"",
 	"Options:",
 	"  -c --config config-file        Path to the configuration file",
+#ifdef _WINDOWS
+	"                                 (default: \"{DEFAULT_CONFIG_FILE}\")",
+#else
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
+#endif
 	"  -f --foreground                Run Zabbix agent in foreground",
 	"  -p --print                     Print known items and exit",
 	"  -t --test item-key             Test specified item and exit",
@@ -251,11 +252,7 @@ static const char	*get_progname(void)
 }
 #endif
 
-static int	config_timeout = 3;
-static int	get_config_timeout(void)
-{
-	return config_timeout;
-}
+ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
@@ -297,13 +294,15 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
 	0, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
-	0 /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
+	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
+	0, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
+	0 /* ZBX_PROCESS_TYPE_AGENT_POLLER */
 };
 
-static char	*config_file		= NULL;
+static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 
-static zbx_config_log_t	log_file_cfg	= {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 char	*opt = NULL;
 
@@ -384,7 +383,12 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #endif
 			case 'h':
 				t->task = ZBX_TASK_SHOW_HELP;
+#ifdef _WINDOWS
+				goto cf_out;
+#else
 				goto out;
+#endif
+
 			case 'V':
 				t->task = ZBX_TASK_SHOW_VERSION;
 				goto out;
@@ -550,6 +554,37 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		goto out;
 	}
 
+#ifdef _WINDOWS
+#define PATH_BUF_LEN	4096
+cf_out:
+	if (NULL == config_file)
+	{
+		char	*ptr, *process_path = NULL;
+		wchar_t	szProcessName[PATH_BUF_LEN];
+
+		if (0 == GetModuleFileNameEx(GetCurrentProcess(), NULL, szProcessName, ARRSIZE(szProcessName)))
+		{
+			zbx_error("failed to get Zabbix agent executable file path while initializing default config"
+					" path");
+			goto skip;
+		}
+
+		process_path = zbx_unicode_to_utf8(szProcessName);
+
+		if (NULL == (ptr = get_program_name(process_path)))
+		{
+			zbx_error("got unexpected Zabbix agent executable file path '%s' while initializing"
+					" default config path", ptr);
+			goto skip;
+		}
+
+		*ptr = '\0';
+		config_file = zbx_dsprintf(config_file, "%s%s", process_path, get_program_name(DEFAULT_CONFIG_FILE));
+skip:
+		zbx_free(process_path);
+	}
+#undef PATH_BUF_LEN
+#endif
 	if (NULL == config_file)
 		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 out:
@@ -572,7 +607,7 @@ static void	set_defaults(void)
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
-	if (NULL == CONFIG_HOSTNAMES)
+	if (NULL == zbx_config_hostnames)
 	{
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
@@ -580,7 +615,8 @@ static void	set_defaults(void)
 		zbx_init_agent_result(&result);
 
 		if (SUCCEED == zbx_execute_agent_check(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND |
-				ZBX_PROCESS_WITH_ALIAS, &result) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
+				ZBX_PROCESS_WITH_ALIAS, &result, ZBX_CHECK_TIMEOUT_UNDEFINED) &&
+				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 			zbx_trim_str_list(*value, ',');
@@ -591,7 +627,7 @@ static void	set_defaults(void)
 				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
 			}
 
-			CONFIG_HOSTNAMES = zbx_strdup(CONFIG_HOSTNAMES, *value);
+			zbx_config_hostnames = zbx_strdup(zbx_config_hostnames, *value);
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
@@ -599,18 +635,21 @@ static void	set_defaults(void)
 		zbx_free_agent_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
-		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAMES);
-
-	if (NULL != CONFIG_HOST_METADATA && NULL != CONFIG_HOST_METADATA_ITEM)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "both HostMetadata and HostMetadataItem defined, using [%s]",
-				CONFIG_HOST_METADATA);
+		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]",
+				zbx_config_hostnames);
 	}
 
-	if (NULL != CONFIG_HOST_INTERFACE && NULL != CONFIG_HOST_INTERFACE_ITEM)
+	if (NULL != zbx_config_host_metadata && NULL != zbx_config_host_metadata_item)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "both HostMetadata and HostMetadataItem defined, using [%s]",
+				zbx_config_host_metadata);
+	}
+
+	if (NULL != zbx_config_host_interface && NULL != zbx_config_host_interface_item)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "both HostInterface and HostInterfaceItem defined, using [%s]",
-				CONFIG_HOST_INTERFACE);
+				zbx_config_host_interface);
 	}
 
 #ifndef _WINDOWS
@@ -664,12 +703,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
-		if (NULL == CONFIG_HOSTS_ALLOWED)
+		if (NULL == zbx_config_hosts_allowed)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "StartAgents is not 0, parameter \"Server\" must be defined");
 			err = 1;
 		}
-		else if (SUCCEED != zbx_validate_peer_list(CONFIG_HOSTS_ALLOWED, &ch_error))
+		else if (SUCCEED != zbx_validate_peer_list(zbx_config_hosts_allowed, &ch_error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
 			zbx_free(ch_error);
@@ -677,7 +716,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
+	if (NULL != zbx_config_host_interface && HOST_INTERFACE_LEN < zbx_strlen_utf8(zbx_config_host_interface))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
 				" than %d characters", HOST_INTERFACE_LEN);
@@ -691,9 +730,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP && SUCCEED != zbx_is_supported_ip(CONFIG_SOURCE_IP))
+	if (NULL != zbx_config_source_ip && SUCCEED != zbx_is_supported_ip(zbx_config_source_ip))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", zbx_config_source_ip);
 		err = 1;
 	}
 
@@ -735,10 +774,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 != err)
 		exit(EXIT_FAILURE);
 
-	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
+	zbx_config_eventlog_max_lines_per_second = zbx_config_max_lines_per_second;
 }
 
-static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	int	i, forks, new_forks;
 
@@ -753,15 +792,30 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		zbx_vector_ptr_create(&config_active_args[forks].addrs);
+		zbx_vector_addr_ptr_create(&config_active_args[forks].addrs);
 		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
-		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
-				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
-		config_active_args[forks].config_timeout = config_timeout;
-		config_active_args[forks].config_file = config_file;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].config_file = config_file;
+		config_active_args[forks].config_timeout = zbx_config_timeout;
+		config_active_args[forks].config_source_ip = zbx_config_source_ip;
+		config_active_args[forks].config_listen_ip = zbx_config_listen_ip;
+		config_active_args[forks].config_listen_port = zbx_config_listen_port;
+		config_active_args[forks].config_hostname = zbx_config_hostname = zbx_strdup(NULL,
+				0 < hostnames->values_num ? hostnames->values[i] : "");
+		config_active_args[forks].config_host_metadata = zbx_config_host_metadata;
+		config_active_args[forks].config_host_metadata_item = zbx_config_host_metadata_item;
+		config_active_args[forks].config_heartbeat_frequency = zbx_config_heartbeat_frequency;
+		config_active_args[forks].config_host_interface = zbx_config_host_interface;
+		config_active_args[forks].config_host_interface_item = zbx_config_host_interface_item;
+		config_active_args[forks].config_buffer_send = zbx_config_buffer_send;
+		config_active_args[forks].config_buffer_size = zbx_config_buffer_size;
+		config_active_args[forks].config_eventlog_max_lines_per_second =
+				zbx_config_eventlog_max_lines_per_second;
+		config_active_args[forks].config_max_lines_per_second = zbx_config_max_lines_per_second;
+		config_active_args[forks].config_refresh_active_checks = zbx_config_refresh_active_checks;
+		config_active_args[forks].config_user_parameters = zbx_config_user_parameters;
 	}
 
 	return SUCCEED;
@@ -847,25 +901,25 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING_LIST,
+		{"Server",			&zbx_config_hosts_allowed,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"ServerActive",		&active_hosts,				TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"Hostname",			&CONFIG_HOSTNAMES,			TYPE_STRING_LIST,
+		{"Hostname",			&zbx_config_hostnames,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostMetadata",		&CONFIG_HOST_METADATA,			TYPE_STRING,
+		{"HostMetadata",		&zbx_config_host_metadata,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostMetadataItem",		&CONFIG_HOST_METADATA_ITEM,		TYPE_STRING,
+		{"HostMetadataItem",		&zbx_config_host_metadata_item,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostInterface",		&CONFIG_HOST_INTERFACE,			TYPE_STRING,
+		{"HostInterface",		&zbx_config_host_interface,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostInterfaceItem",		&CONFIG_HOST_INTERFACE_ITEM,		TYPE_STRING,
+		{"HostInterfaceItem",		&zbx_config_host_interface_item,	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
+		{"BufferSize",			&zbx_config_buffer_size,		TYPE_INT,
 			PARM_OPT,	2,			65535},
-		{"BufferSend",			&CONFIG_BUFFER_SEND,			TYPE_INT,
+		{"BufferSend",			&zbx_config_buffer_send,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 #ifndef _WINDOWS
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
@@ -877,32 +931,32 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
-		{"Timeout",			&config_timeout,			TYPE_INT,
+		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
+		{"ListenPort",			&zbx_config_listen_port,	       	TYPE_INT,
 			PARM_OPT,	1024,			32767},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
+		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
+		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			5},
-		{"StartAgents",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER],			TYPE_INT,
+		{"StartAgents",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER],TYPE_INT,
 			PARM_OPT,	0,			100},
-		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
+		{"RefreshActiveChecks",		&zbx_config_refresh_active_checks,	TYPE_INT,
 			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
 			MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY},
-		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
+		{"MaxLinesPerSecond",		&zbx_config_max_lines_per_second,	TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
 			PARM_OPT,	0,			1},
-		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
+		{"LogRemoteCommands",		&zbx_config_log_remote_commands,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		TYPE_INT,
+		{"UnsafeUserParameters",	&zbx_config_unsafe_user_parameters,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"Alias",			&CONFIG_ALIASES,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
+		{"UserParameter",		&zbx_config_user_parameters,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{"UserParameterDir",		&CONFIG_USER_PARAMETER_DIR,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -960,7 +1014,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
-		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
+		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	TYPE_INT,
 			PARM_OPT,	0,			3600},
 		{NULL}
 	};
@@ -970,7 +1024,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
-	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_init(&zbx_config_user_parameters);
 #ifndef _WINDOWS
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 #endif
@@ -987,7 +1041,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
 
 	zbx_vector_str_create(&hostnames);
-	parse_hostnames(CONFIG_HOSTNAMES, &hostnames);
+	parse_hostnames(zbx_config_hostnames, &hostnames);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
 	{
@@ -1027,7 +1081,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 static void	zbx_free_config(void)
 {
 	zbx_strarr_free(&CONFIG_ALIASES);
-	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(&zbx_config_user_parameters);
 #ifndef _WINDOWS
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 #endif
@@ -1083,14 +1137,12 @@ static void	zbx_on_exit(int ret)
 
 	zbx_free_service_resources(ret);
 
-#if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
-	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
+	zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);	/* deinitialize crypto library from parent thread */
 #endif
 	zbx_config_tls_free(zbx_config_tls);
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
+	zbx_setproctitle_deinit();
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
@@ -1129,7 +1181,8 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 
 			break;
 		case ZBX_RTC_USER_PARAMETERS_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags, NULL);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags,
+					NULL);
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags, NULL);
 			break;
 		default:
@@ -1148,12 +1201,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 
-	AddVectoredExceptionHandler(1, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_exception_filter);
+#ifdef _M_X64
+	if (NULL == AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_veh_handler))
+		zabbix_log(LOG_LEVEL_TRACE, "failed to register vectored exception handler");
+#endif /* _M_X64 */
 #endif
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
-				CONFIG_HOSTNAMES, ZABBIX_VERSION, ZABBIX_REVISION);
+				zbx_config_hostnames, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
@@ -1163,7 +1219,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1182,7 +1238,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
-			CONFIG_HOSTNAMES, ZABBIX_VERSION, ZABBIX_REVISION);
+			zbx_config_hostnames, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
@@ -1200,7 +1256,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #endif
 #ifndef _WINDOWS
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, config_timeout, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		zbx_free_service_resources(FAIL);
@@ -1208,7 +1264,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #endif
 
-	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+	if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 		zbx_free(error);
@@ -1218,7 +1274,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
-		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
+		if (FAIL == zbx_tcp_listen(&listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
+				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			zbx_free_service_resources(FAIL);
@@ -1234,7 +1291,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_collector_data(&error))
+	if (SUCCEED != zbx_init_collector_data(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
 		zbx_free(error);
@@ -1243,7 +1300,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #ifdef _WINDOWS
-	if (SUCCEED != init_perf_collector(ZBX_MULTI_THREADED, &error))
+	if (SUCCEED != zbx_init_perf_collector(ZBX_MULTI_THREADED, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize performance counter collector: %s", error);
 		zbx_free(error);
@@ -1280,7 +1337,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_thread_args_t		*thread_args;
 		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
-								config_file, config_timeout};
+								config_file, zbx_config_timeout,
+								zbx_config_hosts_allowed, zbx_config_user_parameters};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;
@@ -1338,7 +1396,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		/* Wait for the service worker thread to terminate us. Listener threads may not exit up to */
 		/* config_timeout seconds if they're waiting for external processes to finish / timeout */
-		zbx_sleep(config_timeout);
+		zbx_sleep(zbx_config_timeout);
 
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -1354,6 +1412,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
+
+	zbx_log_exit_signal();
 
 	ret = ZBX_EXIT_STATUS();
 
@@ -1372,7 +1432,9 @@ void	zbx_free_service_resources(int ret)
 {
 	if (NULL != threads)
 	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
+		/* wait for all child processes to exit */
+		zbx_threads_kill_and_wait(threads, threads_flags, threads_num, ret);
+
 		zbx_free(threads);
 		zbx_free(threads_flags);
 	}
@@ -1381,10 +1443,10 @@ void	zbx_free_service_resources(int ret)
 #endif
 	zbx_free_metrics();
 	zbx_alias_list_free();
-	free_collector_data();
+	zbx_free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
-	free_perf_collector();
+	zbx_free_perf_collector();
 	zbx_co_uninitialize();
 #endif
 #ifndef _WINDOWS
@@ -1393,7 +1455,7 @@ void	zbx_free_service_resources(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
+	zbx_close_log();
 
 #ifndef _WINDOWS
 	zbx_locks_destroy();
@@ -1407,8 +1469,11 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
-	zbx_init_library_cfg(program_type);
-	zbx_init_library_sysinfo(get_config_timeout);
+	zbx_init_library_common(zbx_log_impl);
+	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
+			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
+			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
 #endif
@@ -1420,9 +1485,7 @@ int	main(int argc, char **argv)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 	zbx_config_tls = zbx_config_tls_new();
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
-#endif
+	argv = zbx_setproctitle_init(argc, argv);
 	progname = get_program_name(argv[0]);
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
@@ -1433,9 +1496,9 @@ int	main(int argc, char **argv)
 	/* into windows event log while zabbix_log is not ready */
 	if (ZBX_TASK_START == t.task && 0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		zbx_config_log_t	log_cfg	= {NULL, NULL, LOG_TYPE_SYSTEM, 1};
+		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zabbix_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
 	}
 #endif
 
@@ -1452,6 +1515,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	zbx_init_metrics();
@@ -1478,9 +1543,9 @@ int	main(int argc, char **argv)
 
 				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 
-				first_hostname = NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ? zbx_dsprintf(NULL,
-						"%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
-						zbx_strdup(NULL, CONFIG_HOSTNAMES);
+				first_hostname = NULL != (p = strchr(zbx_config_hostnames, ',')) ? zbx_dsprintf(NULL,
+						"%.*s", (int)(p - zbx_config_hostnames), zbx_config_hostnames) :
+						zbx_strdup(NULL, zbx_config_hostnames);
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
 				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
@@ -1505,7 +1570,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
-			if (SUCCEED != init_perf_collector(ZBX_SINGLE_THREADED, &error))
+			if (SUCCEED != zbx_init_perf_collector(ZBX_SINGLE_THREADED, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot initialize performance counter collector: %s",
 						error);
@@ -1517,7 +1582,8 @@ int	main(int argc, char **argv)
 			zbx_set_common_signal_handlers(zbx_on_exit);
 #endif
 #ifndef _WINDOWS
-			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, config_timeout, 0))
+			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout,
+					0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(EXIT_FAILURE);
@@ -1525,7 +1591,7 @@ int	main(int argc, char **argv)
 #endif
 			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 
-			if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+			if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 				zbx_free(error);
@@ -1539,7 +1605,7 @@ int	main(int argc, char **argv)
 			else
 				zbx_test_parameters();
 #ifdef _WINDOWS
-			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
+			zbx_free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 
 			while (0 == WSACleanup())
 				;
@@ -1566,7 +1632,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			zbx_help();
+			zbx_help(config_file);
 			exit(EXIT_SUCCESS);
 			break;
 		default:
@@ -1575,7 +1641,7 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 #ifdef _WINDOWS
 			if (0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
-				zabbix_close_log();
+				zbx_close_log();
 #endif
 			break;
 	}

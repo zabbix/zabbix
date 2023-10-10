@@ -1,0 +1,88 @@
+// Widget colors.
+
+$host-avail-true-bg-color: $status-green-bg-color;
+$host-avail-false-bg-color: $status-red-bg-color;
+$host-avail-mixed-bg-color: $status-yellow-bg-color;
+$host-avail-unknown-bg-color: #acbbc2;
+$host-avail-total-bg-color: transparent;
+
+@if $theme-name == 'dark' {
+	$host-avail-unknown-bg-color: #737373;
+}
+
+// Widget view.
+
+div.dashboard-widget-hostavail {
+	.host-avail-table {
+		thead {
+			.host-avail-total {
+				padding-top: 5px;
+				border-top: 1px solid $table-border-color;
+			}
+		}
+
+		th {
+			width: 15%;
+			min-width: 100px;
+			color: $font-alt-color;
+		}
+
+		td {
+			min-width: 95px;
+			border-left: 1px dotted $table-border-color;
+		}
+
+		th:last-child,
+		td:last-child {
+			padding-right: 5px;
+		}
+
+		@each $class, $color in (
+			host-avail-true: $host-avail-true-bg-color,
+			host-avail-false: $host-avail-false-bg-color,
+			host-avail-mixed: $host-avail-mixed-bg-color,
+			host-avail-unknown: $host-avail-unknown-bg-color,
+			host-avail-total: $host-avail-total-bg-color
+		) {
+			.#{$class} {
+				color: $font-color;
+				background-color: $color;
+			}
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-hostavail {
+		.host-avail-table {
+			thead {
+				th {
+					color: $font-color;
+				}
+
+				.host-avail-total {
+					padding-top: 6px;
+					border-top: none;
+				}
+			}
+
+			th {
+				color: $font-color;
+			}
+
+			td {
+				border-left: 1px solid $ui-border-color;
+			}
+
+			.host-avail-true,
+			.host-avail-false,
+			.host-avail-mixed,
+			.host-avail-unknown,
+			.host-avail-total {
+				background-color: transparent;
+			}
+		}
+	}
+}

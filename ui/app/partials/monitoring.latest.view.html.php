@@ -66,7 +66,7 @@ else {
 
 if ($data['filter']['show_details']) {
 	$table->setHeader([
-		$col_check_all->addStyle('width: 15px;'),
+		$col_check_all->addStyle('width: 16px;'),
 		$col_host->addStyle('width: 13%'),
 		$col_name->addStyle('width: 21%'),
 		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
@@ -83,7 +83,7 @@ if ($data['filter']['show_details']) {
 }
 else {
 	$table->setHeader([
-		$col_check_all->addStyle('width: 15px'),
+		$col_check_all->addStyle('width: 16px'),
 		$col_host->addStyle('width: 17%'),
 		$col_name->addStyle('width: 40%'),
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
@@ -145,12 +145,18 @@ foreach ($data['items'] as $itemid => $item) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']), '', true, '', 0);
 
-		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
-			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint(
-				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
-				'', true, '', 0
-			);
+		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			$last_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->setHint(
+					(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+						->addClass(ZBX_STYLE_HINTBOX_WRAP),
+					'', true, '', 0
+				);
+		}
 
 		$change = '';
 
@@ -251,7 +257,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
-				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
 			$item_delay = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -305,7 +311,7 @@ $button_list = [
 		'content' => (new CSimpleButton(_('Execute now')))
 			->onClick('view.massCheckNow(this);')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('no-chkbxrange')
+			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	]
 ];

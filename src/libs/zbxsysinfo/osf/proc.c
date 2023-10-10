@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxstr.h"
 
 #include <sys/procfs.h>
@@ -37,8 +36,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		filename[MAX_STRING_LEN];
 	char		*procname, *proccomm, *param;
 	double		memsize = -1;
-	int		pgsize = getpagesize();
-	int		proccount = 0, invalid_user = 0, do_task;
+	int		do_task, pgsize = getpagesize(), proccount = 0, invalid_user = 0;
 	pid_t		curr_pid = getpid();
 
 	if (4 < request->nparam)
@@ -155,14 +153,13 @@ out:
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DIR		*dir;
-	int		proc;
-	struct  dirent	*entries;
+	struct dirent	*entries;
 	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
 	char		filename[MAX_STRING_LEN];
 	char		*procname, *proccomm, *param;
-	int		proccount = 0, invalid_user = 0, zbx_proc_stat;
+	int		zbx_proc_stat, proc, proccount = 0, invalid_user = 0;
 	pid_t		curr_pid = getpid();
 
 	if (4 < request->nparam)

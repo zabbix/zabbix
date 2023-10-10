@@ -21,7 +21,6 @@
 #include "net.h"
 
 #include "zbxcomms.h"
-#include "log.h"
 #include "cfg.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
@@ -35,8 +34,8 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 	*value_int = 0;
 
-	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
-			NULL)))
+	if (SUCCEED != (net = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		goto out;
 	}
@@ -103,7 +102,7 @@ int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, request->timeout, NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
 
 	return ret;

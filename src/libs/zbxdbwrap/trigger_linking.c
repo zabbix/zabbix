@@ -22,7 +22,6 @@
 #include "trigger_dep_linking.h"
 
 #include "zbxeval.h"
-#include "log.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
@@ -337,8 +336,8 @@ static void	trigger_tags_free(zbx_trigger_tags_t *trigger_tags)
 static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerids,
 		const zbx_vector_uint64_t *cur_triggerids)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	int				i, j, ret = SUCCEED, insert_num = 0, update_num = 0, delete_num = 0;
@@ -461,7 +460,8 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != insert_num)
 	{
-		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
+				(char *)NULL);
 		tagid = zbx_db_get_maxid_num("trigger_tag", insert_num);
 	}
 
@@ -587,8 +587,8 @@ static int	get_trigger_funcs(zbx_vector_uint64_t *triggerids, zbx_hashset_t *fun
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
 	int		res = SUCCEED;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -668,8 +668,8 @@ static int	get_templates_triggers_data(zbx_uint64_t hostid, const zbx_vector_uin
 	size_t			sql_alloc = 512, sql_offset = 0;
 	int			res = SUCCEED;
 	zbx_trigger_copy_t	*trigger_copy;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -738,8 +738,8 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
 	int		res = SUCCEED;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1199,8 +1199,8 @@ static int	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *insert
 	int		res = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	itemid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1296,11 +1296,12 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 			&sql_update_triggers_expr_offset);
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
-			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode", "correlation_mode",
-			"correlation_tag", "manual_close", "opdata", "discover", "event_name", NULL);
+			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode",
+			"correlation_mode", "correlation_tag", "manual_close", "opdata", "discover", "event_name",
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_funcs, "functions", "functionid", "itemid", "triggerid", "name",
-			"parameter", NULL);
+			"parameter", (char *)NULL);
 
 	triggerid = triggerid2 = zbx_db_get_maxid_num("triggers", trigger_copies_insert->values_num);
 	functionid = zbx_db_get_maxid_num("functions", *funcs_insert_count);

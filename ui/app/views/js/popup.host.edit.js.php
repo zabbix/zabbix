@@ -29,20 +29,54 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({popup_url, form_name, host_interfaces, host_is_discovered, warning}) {
+	init({popup_url, form_name, host_interfaces, host_is_discovered, warnings}) {
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		history.replaceState({}, '', popup_url);
-
 		host_edit.init({form_name, host_interfaces, host_is_discovered});
 
-		if (warning !== null) {
-			const message_box = makeMessageBox('warning', [warning], null, true, false)[0];
+		if (warnings.length) {
+			const message_box = warnings.length == 1
+				? makeMessageBox('warning', warnings, null, true, false)[0]
+				: makeMessageBox('warning', warnings,
+						<?= json_encode(_('Cloned host parameter values have been modified.')) ?>, true, false
+					)[0];
 
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
+
+		this.form.addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-edit-linked-template')) {
+
+				this.editTemplate({templateid: e.target.dataset.templateid});
+			}
+		})
+
+		this.initial_form_fields = getFormFields(this.form);
+	},
+
+	editTemplate(parameters) {
+		const form_fields = getFormFields(this.form);
+
+		if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
+			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+				return;
+			}
+		}
+
+		overlayDialogueDestroy(this.overlay.dialogueid);
+
+		const overlay = PopUp('template.edit', parameters, {
+			dialogueid: 'templates-form',
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+		);
 	},
 
 	submit() {
@@ -65,14 +99,14 @@ window.host_edit_popup = {
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
 				if ('hostid' in fields) {
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 						detail: {
 							success: response.success
 						}
 					}));
 				}
 				else {
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.create', {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 						detail: {
 							success: response.success
 						}
@@ -90,19 +124,6 @@ window.host_edit_popup = {
 		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
 		delete parameters.sid;
 		parameters.clone = 1;
-
-		PopUp('popup.host.edit', parameters, {
-			dialogueid: 'host_edit',
-			dialogue_class: 'modal-popup-large',
-			prevent_navigation: true
-		});
-	},
-
-	fullClone() {
-		this.overlay.setLoading();
-		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
-		delete parameters.sid;
-		parameters.full_clone = 1;
 
 		PopUp('popup.host.edit', parameters, {
 			dialogueid: 'host_edit',
@@ -131,7 +152,7 @@ window.host_edit_popup = {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 					detail: {
 						success: response.success
 					}

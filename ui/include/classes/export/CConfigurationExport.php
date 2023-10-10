@@ -48,11 +48,19 @@ class CConfigurationExport {
 	protected $options;
 
 	/**
+	 * Array with templates to be unlinked entity data.
+	 *
+	 * @var array
+	 */
+	protected $unlink_templates_data;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param array $options IDs of elements that should be exported.
+	 * @param array $options                IDs of elements that should be exported.
+	 * @param array $unlink_templates_data  Template IDs with parent template ids that should be unlinked.
 	 */
-	public function __construct(array $options) {
+	public function __construct(array $options, array $unlink_templates_data = []) {
 		$this->options = array_merge([
 			'hosts' => [],
 			'templates' => [],
@@ -62,6 +70,59 @@ class CConfigurationExport {
 			'maps' => [],
 			'mediaTypes' => []
 		], $options);
+
+		$this->unlink_templates_data = $unlink_templates_data;
+
+		if ($this->unlink_templates_data) {
+			$unlink_templateids = [];
+
+			$unlink_templates_data_keys = ['unlink_itemids', 'unlink_discoveries', 'unlink_httptests',
+				'unlink_graphs', 'unlink_triggers'
+			];
+
+			foreach ($this->unlink_templates_data as &$template_data) {
+				$unlink_templateids = array_merge($unlink_templateids, $template_data['unlink_templateids']);
+
+				foreach ($unlink_templates_data_keys as $data_key) {
+					$template_data[$data_key] = [];
+				}
+			}
+			unset($template_data);
+
+			$unlink_templates_entities = API::Template()->get([
+				'output' => [],
+				'selectItems' => ['itemid'],
+				'selectDiscoveries' => ['itemid'],
+				'selectHttpTests' => ['httptestid'],
+				'selectGraphs' => ['graphid'],
+				'selectTriggers' => ['triggerid'],
+				'templateids' => $unlink_templateids,
+				'preservekeys' => true
+			]);
+
+			foreach ($unlink_templates_entities as $template_entity) {
+				foreach ($this->unlink_templates_data as &$template_data) {
+					if (in_array($template_entity['templateid'], $template_data['unlink_templateids'])) {
+						$template_data['unlink_itemids'] = array_merge($template_data['unlink_itemids'],
+							array_column($template_entity['items'], 'itemid')
+						);
+						$template_data['unlink_discoveries'] = array_merge($template_data['unlink_discoveries'],
+							array_column($template_entity['discoveries'], 'itemid')
+						);
+						$template_data['unlink_httptests'] = array_merge($template_data['unlink_httptests'],
+							array_column($template_entity['httpTests'], 'httptestid')
+						);
+						$template_data['unlink_graphs'] = array_merge($template_data['unlink_graphs'],
+							array_column($template_entity['graphs'], 'graphid')
+						);
+						$template_data['unlink_triggers'] = array_merge($template_data['unlink_triggers'],
+							array_column($template_entity['triggers'], 'triggerid')
+						);
+					}
+				}
+				unset($template_data);
+			}
+		}
 
 		$this->data = [
 			'template_groups' => [],
@@ -102,15 +163,15 @@ class CConfigurationExport {
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps', 'discover', 'uuid'
 			],
-			'trigger_prototype' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments',
+			'trigger_prototype' => ['expression', 'description', 'url', 'url_name', 'status', 'priority', 'comments',
 				'type', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
 				'manual_close', 'opdata', 'discover', 'event_name', 'uuid'
 			],
-			'httptests' => ['name', 'hostid', 'delay', 'retries', 'agent', 'http_proxy', 'variables', 'headers',
-				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host', 'ssl_cert_file',
-				'ssl_key_file', 'ssl_key_password', 'uuid'
+			'httptests' => ['name', 'hostid', 'delay', 'retries', 'agent', 'http_proxy', 'variables',
+				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'uuid'
 			],
-			'trigger' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'type',
+			'trigger' => ['expression', 'description', 'url', 'url_name', 'status', 'priority', 'comments', 'type',
 				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
 				'opdata', 'event_name', 'uuid'
 			]
@@ -153,7 +214,15 @@ class CConfigurationExport {
 
 			$simple_triggers = [];
 			if ($this->data['triggers']) {
-				$simple_triggers = $this->builder->extractSimpleTriggers($this->data['triggers']);
+				$unlink_itemids = [];
+
+				if ($this->unlink_templates_data) {
+					foreach ($this->unlink_templates_data as $template_data) {
+						$unlink_itemids = array_merge($unlink_itemids, $template_data['unlink_itemids']);
+					}
+				}
+
+				$simple_triggers = $this->builder->extractSimpleTriggers($this->data['triggers'], $unlink_itemids);
 			}
 
 			if ($this->data['template_groups']) {
@@ -326,6 +395,7 @@ class CConfigurationExport {
 		$templates = API::Template()->get([
 			'output' => ['host', 'name', 'description', 'uuid', 'vendor_name', 'vendor_version'],
 			'selectTemplateGroups' => ['groupid', 'name', 'uuid'],
+			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
@@ -350,6 +420,7 @@ class CConfigurationExport {
 			$templates = $this->gatherItems($templates);
 			$templates = $this->gatherDiscoveryRules($templates);
 			$templates = $this->gatherHttpTests($templates);
+			$templates = $this->removeHttpTestItems($templates);
 		}
 
 		$this->data['templates'] = $templates;
@@ -363,7 +434,7 @@ class CConfigurationExport {
 	protected function gatherHosts(array $hostIds) {
 		$hosts = API::Host()->get([
 			'output' => [
-				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+				'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 				'name', 'description', 'inventory_mode'
 			],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -392,6 +463,7 @@ class CConfigurationExport {
 			$hosts = $this->gatherItems($hosts);
 			$hosts = $this->gatherDiscoveryRules($hosts);
 			$hosts = $this->gatherHttpTests($hosts);
+			$hosts = $this->removeHttpTestItems($hosts);
 		}
 
 		$this->data['hosts'] = $hosts;
@@ -432,6 +504,12 @@ class CConfigurationExport {
 		$hostids = [];
 		$itemids = [];
 		$graphids = [];
+		$mapids = [];
+		$serviceids = [];
+		$slaids = [];
+		$userids = [];
+		$actionids = [];
+		$mediatypeids = [];
 
 		// Collect IDs.
 		foreach ($dashboard_pages as $dashboard_page) {
@@ -451,6 +529,30 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 							$graphids[$field['value']] = true;
 							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MAP:
+							$mapids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+							$serviceids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SLA:
+							$slaids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_USER:
+							$userids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ACTION:
+							$actionids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+							$mediatypeids[$field['value']] = true;
+							break;
 					}
 				}
 			}
@@ -459,6 +561,12 @@ class CConfigurationExport {
 		$hosts = $this->getHostsReferences(array_keys($hostids));
 		$items = $this->getItemsReferences(array_keys($itemids));
 		$graphs = $this->getGraphsReferences(array_keys($graphids));
+		$sysmaps = $this->getMapsReferences(array_keys($mapids));
+		$services = $this->getServicesReferences(array_keys($serviceids));
+		$slas = $this->getSlasReferences(array_keys($slaids));
+		$users = $this->getUsersReferences(array_keys($userids));
+		$actions = $this->getActionsReferences(array_keys($actionids));
+		$media_types = $this->getMediaTypesReferences(array_keys($mediatypeids));
 
 		// Replace IDs.
 		foreach ($dashboard_pages as &$dashboard_page) {
@@ -477,6 +585,30 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 							$field['value'] = $graphs[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MAP:
+							$field['value'] = $sysmaps[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+							$field['value'] = $services[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SLA:
+							$field['value'] = $slas[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_USER:
+							$field['value'] = $users[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ACTION:
+							$field['value'] = $actions[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+							$field['value'] = $media_types[$field['value']];
 							break;
 					}
 				}
@@ -497,27 +629,26 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function gatherProxies(array $hosts) {
-		$proxy_hostids = [];
-		$db_proxies = [];
+		$proxyids = [];
 
 		foreach ($hosts as $host) {
-			if ($host['proxy_hostid'] != 0) {
-				$proxy_hostids[$host['proxy_hostid']] = true;
+			if ($host['proxyid'] != 0) {
+				$proxyids[$host['proxyid']] = true;
 			}
 		}
 
-		if ($proxy_hostids) {
-			$db_proxies = DBfetchArray(DBselect(
-				'SELECT h.hostid,h.host'.
-				' FROM hosts h'.
-				' WHERE '.dbConditionInt('h.hostid', array_keys($proxy_hostids))
-			));
-			$db_proxies = zbx_toHash($db_proxies, 'hostid');
-		}
+		$db_proxies = $proxyids
+			? DBfetchArray(DBselect(
+				'SELECT p.proxyid,p.name'.
+				' FROM proxy p'.
+				' WHERE '.dbConditionId('p.proxyid', array_keys($proxyids))
+			))
+			: [];
+		$db_proxies = array_column($db_proxies, null, 'proxyid');
 
 		foreach ($hosts as &$host) {
-			$host['proxy'] = ($host['proxy_hostid'] != 0 && array_key_exists($host['proxy_hostid'], $db_proxies))
-				? ['name' => $db_proxies[$host['proxy_hostid']]['host']]
+			$host['proxy'] = ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies))
+				? ['name' => $db_proxies[$host['proxyid']]['name']]
 				: [];
 		}
 		unset($host);
@@ -533,16 +664,53 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function gatherItems(array $hosts) {
-		$items = API::Item()->get([
-			'output' => $this->dataFields['item'],
+		$options = [
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
-			'hostids' => array_keys($hosts),
-			'inherited' => false,
 			'webitems' => true,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
-		]);
+		];
+
+		// Find inherited template items.
+		$inherited_items = [];
+
+		if ($this->unlink_templates_data) {
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_itemids']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
+
+			$inherit_options = [
+				'output' => array_merge($this->dataFields['item'], ['templateid']),
+				'templateids' => $templateids,
+				'inherited' => true
+			];
+
+			$inherited_items = API::Item()->get($options + $inherit_options);
+
+			foreach ($inherited_items as $itemid => $item) {
+				foreach ($this->unlink_templates_data as $templates_data) {
+					if($item['hostid'] == $templates_data['templateid']
+							&& !in_array($item['templateid'], $templates_data['unlink_itemids'])) {
+						unset($inherited_items[$itemid]);
+					}
+				}
+			}
+		}
+
+		$options += [
+			'output' => $this->dataFields['item'],
+			'hostids' => array_keys($hosts),
+			'inherited' => false
+		];
+
+		$items = API::Item()->get($options);
+
+		$items = $items + $inherited_items;
 
 		foreach ($items as $itemid => &$item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
@@ -557,11 +725,7 @@ class CConfigurationExport {
 		}
 		unset($item);
 
-		foreach ($items as $itemid => $item) {
-			if ($item['type'] == ITEM_TYPE_HTTPTEST) {
-				unset($items[$itemid]);
-			}
-		}
+		// Web items will be removed from result after all items and discovery rules are gathered and processed.
 
 		$items = $this->prepareItems($items);
 
@@ -614,16 +778,52 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function gatherDiscoveryRules(array $hosts) {
-		$discovery_rules = API::DiscoveryRule()->get([
-			'output' => $this->dataFields['drule'],
+		$options = [
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
-			'hostids' => array_keys($hosts),
-			'inherited' => false,
 			'preservekeys' => true
-		]);
+		];
+		// Find inherited discovery rules.
+		$inherited_discovery_rules = [];
+
+		if ($this->unlink_templates_data) {
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_discoveries']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
+
+			$inherit_options = [
+				'output' => array_merge($this->dataFields['drule'], ['templateid']),
+				'templateids' => $templateids,
+				'inherited' => true
+			];
+
+			$inherited_discovery_rules = API::DiscoveryRule()->get($options + $inherit_options);
+
+			foreach ($inherited_discovery_rules as $id => $discovery_rule) {
+				foreach ($this->unlink_templates_data as $templates_data) {
+					if($discovery_rule['hostid'] == $templates_data['templateid']
+							&& !in_array($discovery_rule['templateid'], $templates_data['unlink_discoveries'])) {
+						unset($discovery_rule[$id]);
+					}
+				}
+			}
+		}
+
+		$options += [
+			'output' => $this->dataFields['drule'],
+			'hostids' => array_keys($hosts),
+			'inherited' => false
+		];
+
+		$discovery_rules = API::DiscoveryRule()->get($options);
+
+		$discovery_rules = $discovery_rules + $inherited_discovery_rules;
 
 		$itemids = [];
 		foreach ($hosts as $host_data) {
@@ -634,14 +834,14 @@ class CConfigurationExport {
 
 		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
+		// Discovery rules may use web items as master items.
 		foreach ($discovery_rules as $discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
-				if (!array_key_exists($discovery_rule['master_itemid'], $itemids)) {
-					// Do not export dependent discovery rule with master item from template.
-					continue;
-				}
+				$master_itemid = $discovery_rule['master_itemid'];
 
-				$discovery_rule['master_item'] = ['key_' => $itemids[$discovery_rule['master_itemid']]];
+				if (array_key_exists($master_itemid, $itemids)) {
+					$discovery_rule['master_item'] = ['key_' => $itemids[$master_itemid]];
+				}
 			}
 
 			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {
@@ -679,13 +879,6 @@ class CConfigurationExport {
 			// Unset unnecessary filter field and prepare the operations.
 			if ($item['overrides']) {
 				foreach ($item['overrides'] as &$override) {
-					if (array_key_exists('filter', $override)) {
-						if (!$override['filter']['conditions']) {
-							unset($override['filter']);
-						}
-						unset($override['filter']['eval_formula']);
-					}
-
 					foreach ($override['operations'] as &$operation) {
 						if (array_key_exists('opstatus', $operation)) {
 							$operation['status'] = $operation['opstatus']['status'];
@@ -763,15 +956,18 @@ class CConfigurationExport {
 		}
 
 		// gather item prototypes
-		$item_prototypes = API::ItemPrototype()->get([
+		$options = [
 			'output' => $this->dataFields['item_prototype'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'inherited' => false,
+			'discoveryids' => array_column($items, 'itemid'),
 			'preservekeys' => true
-		]);
+		];
+
+		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+
+		$item_prototypes = API::ItemPrototype()->get($options);
 
 		$unresolved_master_itemids = [];
 
@@ -834,14 +1030,17 @@ class CConfigurationExport {
 		}
 
 		// gather graph prototypes
-		$graphs = API::GraphPrototype()->get([
+		$options = [
 			'output' => API_OUTPUT_EXTEND,
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
+			'discoveryids' => array_column($items, 'itemid'),
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'inherited' => false,
 			'preservekeys' => true
-		]);
+		];
+
+		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+
+		$graphs = API::GraphPrototype()->get($options);
 
 		$graphs = $this->prepareGraphs($graphs);
 
@@ -850,7 +1049,7 @@ class CConfigurationExport {
 		}
 
 		// gather trigger prototypes
-		$triggers = API::TriggerPrototype()->get([
+		$options = [
 			'output' => $this->dataFields['trigger_prototype'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
@@ -858,9 +1057,12 @@ class CConfigurationExport {
 			'selectItems' => ['itemid', 'flags', 'type'],
 			'selectTags' => ['tag', 'value'],
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'inherited' => false,
 			'preservekeys' => true
-		]);
+		];
+
+		$options +=  $this->unlink_templates_data ? ['templated' => true] : ['inherited' => false];
+
+		$triggers = API::TriggerPrototype()->get($options);
 
 		$triggers = $this->prepareTriggers($triggers);
 
@@ -869,9 +1071,9 @@ class CConfigurationExport {
 		}
 
 		// gather host prototypes
-		$host_prototypes = API::HostPrototype()->get([
-			'output' => API_OUTPUT_EXTEND,
+		$options = [
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
+			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
@@ -879,9 +1081,14 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
-			'inherited' => false,
 			'preservekeys' => true
-		]);
+		];
+
+		if (!$this->unlink_templates_data) {
+			$options += ['inherited' => false];
+		}
+
+		$host_prototypes = API::HostPrototype()->get($options);
 
 		// Replace group prototype group IDs with references.
 		$groupids = [];
@@ -915,16 +1122,53 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function gatherHttpTests(array $hosts) {
-		$httptests = API::HttpTest()->get([
-			'output' => $this->dataFields['httptests'],
+		$options = [
 			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects',
 				'retrieve_mode', 'timeout', 'required', 'status_codes'
 			],
 			'selectTags' => ['tag', 'value'],
-			'hostids' => array_keys($hosts),
-			'inherited' => false,
 			'preservekeys' => true
-		]);
+		];
+
+		// Get inherited templates http tests.
+		$inherited_httptests = [];
+
+		if ($this->unlink_templates_data) {
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_httptests']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
+
+			$inherit_options = [
+				'output' => array_merge($this->dataFields['httptests'], ['templateid']),
+				'templateids' => $templateids,
+				'inherited' => true
+			];
+
+			$inherited_httptests = API::HttpTest()->get($options + $inherit_options);
+
+			foreach ($inherited_httptests as $id => $httptest) {
+				foreach ($this->unlink_templates_data as $templates_data) {
+					if($httptest['hostid'] == $templates_data['templateid']
+							&& !in_array($httptest['templateid'], $templates_data['unlink_httptests'])) {
+						unset($inherited_httptests[$id]);
+					}
+				}
+			}
+		}
+
+		$options += [
+			'output' => $this->dataFields['httptests'],
+			'hostids' => array_keys($hosts),
+			'inherited' => false
+		];
+
+		$httptests = API::HttpTest()->get($options);
+
+		$httptests += $inherited_httptests;
 
 		foreach ($httptests as $httptest) {
 			$hosts[$httptest['hostid']]['httptests'][] = $httptest;
@@ -940,16 +1184,51 @@ class CConfigurationExport {
 	 * @param array $templateIds
 	 */
 	protected function gatherGraphs(array $hostIds, array $templateIds) {
-		$hostIds = array_merge($hostIds, $templateIds);
-
-		$graphs = API::Graph()->get([
-			'hostids' => $hostIds,
+		$options = [
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		]);
+		];
+
+		// Get inherited template graphs.
+		$inherited_graphs = [];
+
+		if ($this->unlink_templates_data) {
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_graphs']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
+
+			$inherit_options = [
+				'selectHosts' => ['hostid'],
+				'templateids' => $templateids,
+				'inherited' => true
+			];
+
+			$inherited_graphs = API::Graph()->get($options + $inherit_options);
+
+			foreach ($inherited_graphs as $id => $graph) {
+				foreach ($this->unlink_templates_data as $templates_data) {
+					if(in_array($templates_data['templateid'], $graph['hosts'])
+							&& !in_array($graph['templateid'], $templates_data['unlink_graphs'])) {
+						unset($inherited_graphs[$id]);
+					}
+				}
+			}
+		}
+
+		$options += [
+			'hostids' => array_merge($hostIds, $templateIds),
+			'inherited' => false
+		];
+
+		$graphs = API::Graph()->get($options);
+
+		$graphs += $inherited_graphs;
 
 		$this->data['graphs'] = $this->prepareGraphs($graphs);
 	}
@@ -1048,19 +1327,54 @@ class CConfigurationExport {
 	 * @param array $templateIds
 	 */
 	protected function gatherTriggers(array $hostIds, array $templateIds) {
-		$hostIds = array_merge($hostIds, $templateIds);
-
-		$triggers = API::Trigger()->get([
-			'output' => $this->dataFields['trigger'],
+		$options = [
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],
 			'selectTags' => ['tag', 'value'],
 			'selectHosts' => ['status'],
-			'hostids' => $hostIds,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'inherited' => false,
 			'preservekeys' => true
-		]);
+		];
+
+		// Get templates inherited triggers.
+		$inherited_triggers = [];
+
+		if ($this->unlink_templates_data) {
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_triggers']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
+
+			$inherit_options = [
+				'output' => array_merge($this->dataFields['trigger'], ['templateid']),
+				'templateids' => $templateids,
+				'inherited' => true
+			];
+
+			$inherited_triggers = API::Trigger()->get($options + $inherit_options);
+
+			foreach ($inherited_triggers as $id => $trigger) {
+				foreach ($this->unlink_templates_data as $templates_data) {
+					if(in_array($templates_data['templateid'], $trigger['hosts'])
+							&& !in_array($trigger['templateid'], $templates_data['unlink_triggers'])) {
+						unset($inherited_triggers[$id]);
+					}
+				}
+			}
+		}
+
+		$options += [
+			'output' => $this->dataFields['trigger'],
+			'hostids' => array_merge($hostIds, $templateIds),
+			'inherited' => false
+		];
+
+		$triggers = API::Trigger()->get($options);
+
+		$triggers += $inherited_triggers;
 
 		$this->data['triggers'] = $this->prepareTriggers($triggers);
 	}
@@ -1386,8 +1700,8 @@ class CConfigurationExport {
 			$host = reset($graph['hosts']);
 
 			$ids[$id] = [
-				'name' => $graph['name'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'name' => $graph['name']
 			];
 		}
 
@@ -1422,8 +1736,8 @@ class CConfigurationExport {
 			$host = reset($item['hosts']);
 
 			$ids[$id] = [
-				'key' => $item['key_'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'key' => $item['key_']
 			];
 		}
 
@@ -1492,5 +1806,167 @@ class CConfigurationExport {
 		}
 
 		return $ids;
+	}
+
+	/**
+	 * Get services references by service ids.
+	 *
+	 * @param array $serviceids
+	 *
+	 * @return array
+	 */
+	protected function getServicesReferences(array $serviceids) {
+		$ids = [];
+
+		$services = API::Service()->get([
+			'output' => ['name'],
+			'serviceids' => $serviceids,
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($services) != count($serviceids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($services as $id => $service) {
+			$ids[$id] = ['name' => $service['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get SLAs references by SLA ids.
+	 *
+	 * @param array $slaids
+	 *
+	 * @return array
+	 */
+	protected function getSlasReferences(array $slaids) {
+		$ids = [];
+
+		$slas = API::Sla()->get([
+			'output' => ['name'],
+			'slaids' => $slaids,
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($slas) != count($slaids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($slas as $id => $sla) {
+			$ids[$id] = ['name' => $sla['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get users references by user ids.
+	 *
+	 * @param array $userids
+	 *
+	 * @return array
+	 */
+	protected function getUsersReferences(array $userids) {
+		$ids = [];
+
+		$users = API::User()->get([
+			'userids' => $userids,
+			'output' => ['username'],
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($users) != count($userids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($users as $id => $user) {
+			$ids[$id] = ['username' => $user['username']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get actions references by action ids.
+	 *
+	 * @param array $actionids
+	 *
+	 * @return array
+	 */
+	protected function getActionsReferences(array $actionids) {
+		$ids = [];
+
+		$actions = API::Action()->get([
+			'actionids' => $actionids,
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($actions) != count($actionids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($actions as $id => $action) {
+			$ids[$id] = ['name' => $action['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get media types references by media type ids.
+	 *
+	 * @param array $mediatypeids
+	 *
+	 * @return array
+	 */
+	protected function getMediaTypesReferences(array $mediatypeids) {
+		$ids = [];
+
+		$media_types = API::MediaType()->get([
+			'mediatypeids' => $mediatypeids,
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($media_types) != count($mediatypeids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($media_types as $id => $media_type) {
+			$ids[$id] = ['name' => $media_type['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Remove web items.
+	 *
+	 * @param array $hosts  Array of hosts or templates to remove the web items from.
+	 *
+	 * @return array
+	 */
+	protected function removeHttpTestItems(array $hosts): array {
+		foreach ($hosts as &$host) {
+			if ($host['items']) {
+				foreach ($host['items'] as $idx => $item) {
+					if ($item['type'] == ITEM_TYPE_HTTPTEST) {
+						unset($host['items'][$idx]);
+					}
+				}
+			}
+		}
+		unset($host);
+
+		return $hosts;
 	}
 }

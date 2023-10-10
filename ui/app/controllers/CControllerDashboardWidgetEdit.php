@@ -24,27 +24,13 @@ use Zabbix\Core\{
 	CWidget
 };
 
-use Zabbix\Widgets\CWidgetForm;
-
-use Zabbix\Widgets\Fields\{
-	CWidgetFieldMultiSelectAction,
-	CWidgetFieldMultiSelectGraph,
-	CWidgetFieldMultiSelectGraphPrototype,
-	CWidgetFieldMultiSelectGroup,
-	CWidgetFieldMultiSelectHost,
-	CWidgetFieldMultiSelectItem,
-	CWidgetFieldMultiSelectItemPrototype,
-	CWidgetFieldMultiSelectMediaType,
-	CWidgetFieldMultiSelectService,
-	CWidgetFieldMultiSelectSla,
-	CWidgetFieldMultiSelectUser,
-	CWidgetFieldSelectResource};
+use \Zabbix\Widgets\CWidgetField;
 
 class CControllerDashboardWidgetEdit extends CController {
 
 	private ?CWidget $widget;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
@@ -75,12 +61,6 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 
-		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
-			error(_('Widget type is not supported in this context.'));
-
-			$ret = false;
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
@@ -108,7 +88,7 @@ class CControllerDashboardWidgetEdit extends CController {
 		$deprecated_types = [];
 
 		/** @var CWidget $widget */
-		foreach (APP::ModuleManager()->getWidgets($this->hasInput('templateid')) as $widget) {
+		foreach (APP::ModuleManager()->getWidgets() as $widget) {
 			if (!$widget->isDeprecated()) {
 				$known_types[$widget->getId()] = $widget->getDefaultName();
 			}
@@ -120,25 +100,32 @@ class CControllerDashboardWidgetEdit extends CController {
 		natcasesort($known_types);
 		natcasesort($deprecated_types);
 
-		$form = $this->widget->getForm($this->getInput('fields', []),
-			$this->hasInput('templateid') ? $this->getInput('templateid') : null
-		);
+		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
 
-		// Transforms corrupted data to default values.
+		$form = $this->widget->getForm($this->getInput('fields', []), $templateid);
 		$form->validate();
+
+		$captions = $this->getValuesCaptions($form->fieldsToApi());
+		$form_fields = $form->getFields();
+
+		/** @var CWidgetField $field */
+		foreach ($form_fields as $field) {
+			$field->setValuesCaptions($captions);
+		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', ''),
 			'type' => $this->getInput('type'),
 			'known_types' => $known_types,
 			'deprecated_types' => $deprecated_types,
-			'fields' => $form->getFields(),
+			'templateid' => $templateid,
+			'fields' => $form_fields,
 			'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
 			'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null,
 			'dashboard_page_unique_id' => $this->hasInput('dashboard_page_unique_id')
 				? $this->getInput('dashboard_page_unique_id')
 				: null,
-			'captions' => $this->getCaptions($form),
+			'url' => $this->widget->getUrl(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -148,331 +135,219 @@ class CControllerDashboardWidgetEdit extends CController {
 	/**
 	 * Prepares mapped list of names for all required resources.
 	 */
-	private function getCaptions(CWidgetForm $form): array {
-		$captions = ['simple' => [], 'ms' => []];
-
-		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldSelectResource) {
-				$resource_type = $field->getResourceType();
-				$id = $field->getValue();
-
-				if (!array_key_exists($resource_type, $captions['simple'])) {
-					$captions['simple'][$resource_type] = [];
-				}
-
-				if ($id != 0 && $resource_type == CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP) {
-					$captions['simple'][$resource_type][$id] = _('Inaccessible map');
-				}
-			}
-		}
-
-		foreach ($captions['simple'] as $resource_type => &$list) {
-			if (!$list) {
-				continue;
-			}
-
-			if ($resource_type == CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP) {
-				$maps = API::Map()->get([
-					'sysmapids' => array_keys($list),
-					'output' => ['sysmapid', 'name']
-				]);
-
-				if ($maps) {
-					foreach ($maps as $map) {
-						$list[$map['sysmapid']] = $map['name'];
-					}
-				}
-			}
-		}
-		unset($list);
-
-		// Prepare data for CMultiSelect controls.
-		$ids = [
-			'group' => [],
-			'host' => [],
-			'item' => [],
-			'graph' => [],
-			'prototype_item' => [],
-			'prototype_graph' => [],
-			'service' => [],
-			'sla' => [],
-			'user' => [],
-			'action' => [],
-			'media_type' => []
+	private function getValuesCaptions(array $api_fields): array {
+		$captions = $ids = [
+			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
+			ZBX_WIDGET_FIELD_TYPE_HOST => [],
+			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
+			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
+			ZBX_WIDGET_FIELD_TYPE_MAP => [],
+			ZBX_WIDGET_FIELD_TYPE_SERVICE => [],
+			ZBX_WIDGET_FIELD_TYPE_SLA => [],
+			ZBX_WIDGET_FIELD_TYPE_USER => [],
+			ZBX_WIDGET_FIELD_TYPE_ACTION => [],
+			ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE => []
 		];
 
-		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldMultiSelectGroup) {
-				$key = 'groups';
-				$var = 'group';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectHost) {
-				$key = 'hosts';
-				$var = 'host';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectItem) {
-				$key = 'items';
-				$var = 'item';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectGraph) {
-				$key = 'graphs';
-				$var = 'graph';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectItemPrototype) {
-				$key = 'item_prototypes';
-				$var = 'prototype_item';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectGraphPrototype) {
-				$key = 'graph_prototypes';
-				$var = 'prototype_graph';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectService) {
-				$key = 'services';
-				$var = 'service';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectSla) {
-				$key = 'slas';
-				$var = 'sla';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectUser) {
-				$key = 'users';
-				$var = 'user';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectAction) {
-				$key = 'actions';
-				$var = 'action';
-			}
-			elseif ($field instanceof CWidgetFieldMultiSelectMediaType) {
-				$key = 'media_types';
-				$var = 'media_type';
-			}
-			else {
-				continue;
-			}
-
-			$field_name = $field->getName();
-			$captions['ms'][$key][$field_name] = [];
-
-			foreach ($field->getValue() as $id) {
-				$captions['ms'][$key][$field_name][$id] = ['id' => $id];
-				$ids[$var][$id][] = $field_name;
+		foreach ($api_fields as $api_field) {
+			if (array_key_exists($api_field['type'], $ids)) {
+				$ids[$api_field['type']][$api_field['value']] = true;
 			}
 		}
 
-		if ($ids['group']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]) {
 			$db_groups = API::HostGroup()->get([
 				'output' => ['name'],
-				'groupids' => array_keys($ids['group']),
+				'groupids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_groups as $groupid => $group) {
-				foreach ($ids['group'][$groupid] as $field_name) {
-					$captions['ms']['groups'][$field_name][$groupid]['name'] = $group['name'];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_GROUP][$groupid] = [
+					'id' => $groupid,
+					'name' => $group['name']
+				];
 			}
 		}
 
-		if ($ids['host']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_HOST]) {
 			$db_hosts = API::Host()->get([
 				'output' => ['name'],
-				'hostids' => array_keys($ids['host']),
+				'hostids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_HOST]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_hosts as $hostid => $host) {
-				foreach ($ids['host'][$hostid] as $field_name) {
-					$captions['ms']['hosts'][$field_name][$hostid]['name'] = $host['name'];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_HOST][$hostid] = [
+					'id' => $hostid,
+					'name' => $host['name']
+				];
 			}
 		}
 
-		if ($ids['item']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]) {
 			$db_items = API::Item()->get([
 				'output' => ['name'],
 				'selectHosts' => ['name'],
-				'itemids' => array_keys($ids['item']),
+				'itemids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]),
 				'webitems' => true,
 				'preservekeys' => true
 			]);
 
 			foreach ($db_items as $itemid => $item) {
-				foreach ($ids['item'][$itemid] as $field_name) {
-					$captions['ms']['items'][$field_name][$itemid] += [
-						'name' => $item['name'],
-						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_ITEM][$itemid] = [
+					'id' => $itemid,
+					'name' => $item['name'],
+					'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+				];
 			}
 		}
 
-		if ($ids['graph']) {
-			$db_graphs = API::Graph()->get([
-				'output' => ['graphid', 'name'],
-				'selectHosts' => ['name'],
-				'graphids' => array_keys($ids['graph']),
-				'preservekeys' => true
-			]);
-
-			foreach ($db_graphs as $graphid => $graph) {
-				foreach ($ids['graph'][$graphid] as $field_name) {
-					$captions['ms']['graphs'][$field_name][$graphid] += [
-						'name' => $graph['name'],
-						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
-					];
-				}
-			}
-		}
-
-		if ($ids['prototype_item']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]) {
 			$db_item_prototypes = API::ItemPrototype()->get([
 				'output' => ['name'],
 				'selectHosts' => ['name'],
-				'itemids' => array_keys($ids['prototype_item']),
+				'itemids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_item_prototypes as $itemid => $item) {
-				foreach ($ids['prototype_item'][$itemid] as $field_name) {
-					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
-						'name' => $item['name'],
-						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE][$itemid] = [
+					'id' => $itemid,
+					'name' => $item['name'],
+					'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+				];
 			}
 		}
 
-		if ($ids['prototype_graph']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH]) {
+			$db_graphs = API::Graph()->get([
+				'output' => ['graphid', 'name'],
+				'selectHosts' => ['name'],
+				'graphids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH]),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_graphs as $graphid => $graph) {
+				$captions[ZBX_WIDGET_FIELD_TYPE_GRAPH][$graphid] = [
+					'id' => $graphid,
+					'name' => $graph['name'],
+					'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+				];
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]) {
 			$db_graph_prototypes = API::GraphPrototype()->get([
 				'output' => ['graphid', 'name'],
 				'selectHosts' => ['hostid', 'name'],
 				'selectDiscoveryRule' => ['hostid'],
-				'graphids' => array_keys($ids['prototype_graph']),
+				'graphids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_graph_prototypes as $graphid => $graph) {
 				$host_names = array_column($graph['hosts'], 'name', 'hostid');
 
-				foreach ($ids['prototype_graph'][$graphid] as $field_name) {
-					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
-						'name' => $graph['name'],
-						'prefix' => $host_names[$graph['discoveryRule']['hostid']].NAME_DELIMITER
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE][$graphid] = [
+					'id' => $graphid,
+					'name' => $graph['name'],
+					'prefix' => $host_names[$graph['discoveryRule']['hostid']].NAME_DELIMITER
+				];
 			}
 		}
 
-		if ($ids['service']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_MAP]) {
+			$db_sysmaps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MAP]),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_sysmaps as $sysmapid => $sysmap) {
+				$captions[ZBX_WIDGET_FIELD_TYPE_MAP][$sysmapid] = [
+					'id' => $sysmapid,
+					'name' => $sysmap['name']
+				];
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_SERVICE]) {
 			$db_services = API::Service()->get([
 				'output' => ['serviceid', 'name'],
-				'serviceids' => array_keys($ids['service']),
+				'serviceids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_SERVICE]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_services as $serviceid => $service) {
-				foreach ($ids['service'][$serviceid] as $field_name) {
-					$captions['ms']['services'][$field_name][$serviceid] += [
-						'name' => $service['name']
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_SERVICE][$serviceid] = [
+					'id' => $serviceid,
+					'name' => $service['name']
+				];
 			}
 		}
 
-		if ($ids['sla']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_SLA]) {
 			$db_slas = API::Sla()->get([
 				'output' => ['slaid', 'name'],
-				'slaids' => array_keys($ids['sla']),
+				'slaids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_SLA]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_slas as $slaid => $sla) {
-				foreach ($ids['sla'][$slaid] as $field_name) {
-					$captions['ms']['slas'][$field_name][$slaid] += [
-						'name' => $sla['name']
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_SLA][$slaid] = [
+					'id' => $slaid,
+					'name' => $sla['name']
+				];
 			}
 		}
 
-		if ($ids['user']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_USER]) {
 			$db_users = API::User()->get([
 				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => array_keys($ids['user']),
+				'userids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_USER]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_users as $userid => $user) {
-				foreach ($ids['user'][$userid] as $field_name) {
-					$captions['ms']['users'][$field_name][$userid] += [
-						'name' => getUserFullname($user)
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_USER][$userid] = [
+					'id' => $userid,
+					'name' => getUserFullname($user)
+				];
 			}
 		}
 
-		if ($ids['action']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ACTION]) {
 			$db_actions = API::Action()->get([
 				'output' => ['actionid', 'name'],
-				'actionids' => array_keys($ids['action']),
+				'actionids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ACTION]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_actions as $actionid => $action) {
-				foreach ($ids['action'][$actionid] as $field_name) {
-					$captions['ms']['actions'][$field_name][$actionid] += [
-						'name' => $action['name']
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_ACTION][$actionid] = [
+					'id' => $actionid,
+					'name' => $action['name']
+				];
 			}
 		}
 
-		if ($ids['media_type']) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE]) {
 			$db_media_types = API::MediaType()->get([
 				'output' => ['mediatypeid', 'name'],
-				'mediatypeids' => array_keys($ids['media_type']),
+				'mediatypeids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_media_types as $mediatypeid => $media_type) {
-				foreach ($ids['media_type'][$mediatypeid] as $field_name) {
-					$captions['ms']['media_types'][$field_name][$mediatypeid] += [
-						'name' => $media_type['name']
-					];
-				}
+				$captions[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE][$mediatypeid] = [
+					'id' => $mediatypeid,
+					'name' => $media_type['name']
+				];
 			}
 		}
-
-		$inaccessible_resources = [
-			'groups' => _('Inaccessible group'),
-			'hosts' => _('Inaccessible host'),
-			'items' => _('Inaccessible item'),
-			'graphs' => _('Inaccessible graph'),
-			'item_prototypes' => _('Inaccessible item prototype'),
-			'graph_prototypes' => _('Inaccessible graph prototype'),
-			'services' => _('Inaccessible service'),
-			'slas' => _('Inaccessible SLA'),
-			'users' => _('Inaccessible user'),
-			'actions' => _('Inaccessible action'),
-			'media_types' => _('Inaccessible media type')
-		];
-
-		foreach ($captions['ms'] as $resource_type => &$fields_captions) {
-			foreach ($fields_captions as &$field_captions) {
-				$n = 0;
-
-				foreach ($field_captions as &$caption) {
-					if (!array_key_exists('name', $caption)) {
-						$postfix = (++$n > 1) ? ' ('.$n.')' : '';
-						$caption['name'] = $inaccessible_resources[$resource_type].$postfix;
-						$caption['inaccessible'] = true;
-					}
-				}
-				unset($caption);
-			}
-			unset($field_captions);
-		}
-		unset($fields_captions);
 
 		return $captions;
 	}

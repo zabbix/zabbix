@@ -239,14 +239,18 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// Override item history setting with housekeeping settings, if they are enabled in config.
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-				$item['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+				if ($item['history'] != 0) {
+					$item['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+				}
 			}
 			else {
 				$to_resolve[] = 'history';
 			}
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				$item['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+				if ($item['trends'] != 0) {
+					$item['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+				}
 			}
 			else {
 				$to_resolve[] = 'trends';
@@ -306,18 +310,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$result = $results[$item['itemid']];
 
 				foreach ($result['data'] as $data_row) {
-					$idx = $data_row['i'] - 1;
-					if ($idx < 0) {
-						continue;
-					}
+					$idx = $data_row['i'];
 
-					/* --------------------------------------------------
-						We are taking graph on 1px more than we need,
-						and here we are skipping first px, because of MOD (in SELECT),
-						it combines prelast point (it would be last point if not that 1px in beginning)
-						and first point, but we still losing prelast point :(
-						but now we've got the first point.
-					--------------------------------------------------*/
 					$data['count'][$idx] = $data_row['count'];
 					$data['min'][$idx] = (float) $data_row['min'];
 					$data['max'][$idx] = (float) $data_row['max'];
@@ -337,7 +331,7 @@ class CLineGraphDraw extends CGraphDraw {
 				cj - count of missed in one go
 				dx - offset to first value (count to last existing point)
 			*/
-			for ($ci = 0, $cj = 0; $ci < $this->sizeX; $ci++) {
+			for ($ci = 0, $cj = 0; $ci <= $this->sizeX; $ci++) {
 				if (!array_key_exists($ci, $data['count']) || ($data['count'][$ci] == 0)) {
 					$data['count'][$ci] = 0;
 					$data['shift_min'][$ci] = 0;
@@ -420,7 +414,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 					$prev_data = &$this->data[$item2['itemid']];
 
-					for ($ci = 0; $ci < $this->sizeX; $ci++) {
+					for ($ci = 0; $ci <= $this->sizeX; $ci++) {
 						foreach (['min', 'max', 'avg'] as $var_name) {
 							$shift_var_name = 'shift_'.$var_name;
 							$curr_shift = &$curr_data[$shift_var_name];
@@ -995,7 +989,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Date and time label formats.
 		$formats = [
-			'PT1M' => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
+			'PT1M' => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT_SECONDS],
 			'PT1H' => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
 			'P1D' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => TIME_FORMAT],
 			'P1W' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => _('m-d')],
@@ -1115,7 +1109,7 @@ class CLineGraphDraw extends CGraphDraw {
 		// Calculate standard label width in time units.
 		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 2;
 
-		$preferred_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
+		$preferred_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX) ?: 1;
 
 		foreach (['Y', 'm', 'd', 'H', 'i', 's'] as $magnitude) {
 			if (date($magnitude, $this->stime) !== date($magnitude, $this->stime + $this->period)) {
@@ -1388,6 +1382,25 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
+	private function getLastValue(array $data, int $calc_fnc) {
+		for ($i = $this->sizeX; $i >= 0; $i--) {
+			if ($data['count'][$i] != 0) {
+				switch ($calc_fnc) {
+					case CALC_FNC_MIN:
+						return $data['min'][$i];
+					case CALC_FNC_MAX:
+						return $data['max'][$i];
+					case CALC_FNC_ALL:
+					case CALC_FNC_AVG:
+					default:
+						return $data['avg'][$i];
+				}
+			}
+		}
+
+		return 0;
+	}
+
 	protected function drawLegend() {
 		// if graph is small, we are not drawing legend
 		if (!$this->drawItemsLegend) {
@@ -1464,7 +1477,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$legend->addCell($rowNum, ['text' => '['.$fncRealName.']']);
 				$legend->addCell($rowNum, [
 					'text' => convertUnits([
-						'value' => $this->getLastValue($i),
+						'value' => $this->getLastValue($data, $this->items[$i]['calc_fnc']),
 						'units' => $this->items[$i]['units'],
 						'convert' => ITEM_CONVERT_NO_UNITS
 					]),
@@ -1642,7 +1655,7 @@ class CLineGraphDraw extends CGraphDraw {
 		return true;
 	}
 
-	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
+	protected function drawElement(&$data, $from, $to, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
 		if (!isset($data['max'][$from]) || !isset($data['max'][$to])) {
 			return;
 		}
@@ -1685,7 +1698,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$avg_from = $data['avg'][$from] + $shift_avg_from;
 		$avg_to = $data['avg'][$to] + $shift_avg_to;
 
-		$x1 = $from + $this->shiftXleft - 1;
+		$x1 = $from + $this->shiftXleft;
 		$x2 = $to + $this->shiftXleft;
 
 		$y1min = (int) round($zero - ($min_from - $oxy) / $unit2px);
@@ -2035,7 +2048,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'master_itemid', 'delay'],
-				'itemids' => $master_itemids
+				'itemids' => $master_itemids,
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+				]
 			]);
 		} while ($items);
 
@@ -2132,9 +2148,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// for each metric
 		for ($item = 0; $item < $this->num; $item++) {
-			$minY = $this->m_minY[$this->items[$item]['yaxisside']];
-			$maxY = $this->m_maxY[$this->items[$item]['yaxisside']];
-
 			if (!array_key_exists($this->items[$item]['itemid'], $this->data)) {
 				continue;
 			}
@@ -2151,8 +2164,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// for each X
 			$prevDraw = true;
-			for ($i = 1, $j = 0; $i < $this->sizeX; $i++) { // new point
-				if ($data['count'][$i] == 0 && $i != $this->sizeX - 1) {
+			for ($i = 1, $j = 0; $i <= $this->sizeX; $i++) { // new point
+				if ($data['count'][$i] == 0 && $i != $this->sizeX) {
 					continue;
 				}
 
@@ -2196,10 +2209,6 @@ class CLineGraphDraw extends CGraphDraw {
 						$data,
 						$i,
 						$j,
-						0,
-						$this->sizeX,
-						$minY,
-						$maxY,
 						$valueDrawType,
 						$max_color,
 						$avg_color,

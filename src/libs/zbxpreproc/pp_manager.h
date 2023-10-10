@@ -25,19 +25,22 @@
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
+#include "zbxcacheconfig.h"
 
 struct zbx_pp_manager
 {
-	zbx_pp_worker_t		*workers;
-	int			workers_num;
-	int			program_type;
+	zbx_pp_worker_t			*workers;
+	int				workers_num;
+	int				program_type;
 
-	zbx_hashset_t		items;
-	zbx_uint64_t		revision;
+	zbx_hashset_t			items;
+	zbx_uint64_t			revision;
 
-	zbx_pp_queue_t		queue;
+	zbx_pp_queue_t			queue;
 
-	zbx_timekeeper_t	*timekeeper;
+	zbx_timekeeper_t		*timekeeper;
+
+	zbx_dc_um_shared_handle_t	*um_handle;
 };
 
 #endif

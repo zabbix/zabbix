@@ -52,6 +52,7 @@ AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],
 	# Is it OpenSSL 3? Test OPENSSL_VERSION_MAJOR - it is defined only in OpenSSL 3.0.
 	found_openssl_version=`grep OPENSSL_VERSION_MAJOR "$1" | head -n 1`
 	found_openssl_version=`expr "$found_openssl_version" : '^#.*define.*OPENSSL_VERSION_MAJOR.*\(3\)$'`
+	mt_required="$2"
 
 	if test "$found_openssl_version" = "3"; then
 		# OpenSSL 3.x found
@@ -61,6 +62,7 @@ AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],
 		# specify version number without the last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the
 		# last byte it is 0x1000100.
 		minimal_openssl_version=0x1000100
+		test "$mt_required" = "yes" && minimal_openssl_version=0x1010000
 
 		found_openssl_version=`grep OPENSSL_VERSION_NUMBER "$1"`
 		found_openssl_version=`expr "$found_openssl_version" : '.*\(0x[[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]]\).*'`
@@ -94,6 +96,7 @@ AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
 	    _libopenssl_dir_lib="$withval/lib"
 	fi
 	accept_openssl_version="no"
+	mt_required=$2
     ],[want_openssl=ifelse([$1],,[no],[$1])]
   )
 
@@ -116,13 +119,13 @@ AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
          OPENSSL_LDFLAGS=-L/usr/local/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
-         LIBOPENSSL_ACCEPT_VERSION([/usr/local/include/openssl/opensslv.h])
+         LIBOPENSSL_ACCEPT_VERSION([/usr/local/include/openssl/opensslv.h], [$mt_required])
        elif test -f /usr/include/openssl/ssl.h -a -f /usr/include/openssl/crypto.h; then
          OPENSSL_CFLAGS=-I/usr/include
          OPENSSL_LDFLAGS=-L/usr/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
-         LIBOPENSSL_ACCEPT_VERSION([/usr/include/openssl/opensslv.h])
+         LIBOPENSSL_ACCEPT_VERSION([/usr/include/openssl/opensslv.h], [$mt_required])
        else						# libraries are not found in default directories
          found_openssl="no"
          AC_MSG_RESULT(no)
@@ -141,7 +144,7 @@ AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
 
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
-         LIBOPENSSL_ACCEPT_VERSION([$_libopenssl_dir/include/openssl/opensslv.h])
+         LIBOPENSSL_ACCEPT_VERSION([$_libopenssl_dir/include/openssl/opensslv.h], [$mt_required])
        else						# libraries are not found in specified directories
          found_openssl="no"
          AC_MSG_RESULT(no)

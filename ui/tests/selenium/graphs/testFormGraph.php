@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
  * @onBefore prepareGraphsData
  *
  * @onAfter clearData
+ *
+ * @dataSource WebScenarios
  */
 class testFormGraph extends testFormGraphs {
 
@@ -120,7 +122,7 @@ class testFormGraph extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Empty color.'
+						'Empty colour.'
 					]
 				]
 			],
@@ -136,7 +138,7 @@ class testFormGraph extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Graph with name "Duplicated graph" already exists in graphs or graph prototypes.'
+						'Graph "Duplicated graph" already exists on the host "Simple form test host".'
 					]
 				]
 			],
@@ -151,7 +153,7 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' => [
 						[
-							'item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
+							'item' => 'Response code for step "step 2 of clone scenario" of scenario "Scenario for Clone".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -159,7 +161,7 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb2" of scenario "testFormWeb2".',
+							'item' => 'Response time for step "Второй этап вэб сценария" of scenario "Scenario for Delete".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -167,7 +169,7 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Response code for step "step 2 of clone scenario" of scenario "Scenario for Clone".',
 							'color'=> 'FFA001',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -238,8 +240,8 @@ class testFormGraph extends testFormGraphs {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 					],
 					'yaxis_items' => [
-						'min' => 'Failed step of scenario "testFormWeb1".',
-						'max' => 'Download speed for scenario "testFormWeb1".'
+						'min' => 'Failed step of scenario "Scenario for Clone".',
+						'max' => 'Download speed for scenario "Scenario for Clone".'
 					],
 					'items' => [
 						[
@@ -287,7 +289,8 @@ class testFormGraph extends testFormGraphs {
 								'yaxisside' => 'Left'
 							]
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[
@@ -343,7 +346,7 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' => [
 						[
-							'item' => 'Failed step of scenario "testFormWeb1".',
+							'item' => 'Failed step of scenario "Scenario for Clone".',
 							'color'=> 'D2D2D2',
 							'functions' => [
 								'type' => 'Simple',
@@ -351,7 +354,7 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Failed step of scenario "testFormWeb2".',
+							'item' => 'Failed step of scenario "Scenario for Update".',
 							'color'=> 'C0CA33',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -371,7 +374,7 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' => [
 						[
-							'item' => 'Failed step of scenario "testFormWeb3".',
+							'item' => 'Failed step of scenario "Scenario for Update".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -379,7 +382,7 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Failed step of scenario "testFormWeb4".',
+							'item' => 'Failed step of scenario "Scenario for Delete".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -399,7 +402,7 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' => [
 						[
-							'item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
+							'item' => 'Response time for step "!@#$%^&*()_+ōš六書" of scenario "Scenario for Delete".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -407,7 +410,7 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb2" of scenario "testFormWeb2".',
+							'item' => 'Response code for step "step 2 of clone scenario" of scenario "Scenario for Clone".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -427,7 +430,7 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' => [
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Response code for step "step 2 of clone scenario" of scenario "Scenario for Clone".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -435,7 +438,7 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
+							'item' => 'Response time for step "step 2 of clone scenario" of scenario "Scenario for Clone".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',

@@ -533,33 +533,33 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve single item widget description macros.
+	 * Resolve macros in descriptions of item-based widgets.
 	 *
 	 * @param array  $items
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['name']    Field to resolve. Required.
+	 *        string $items[n]['hostid']
+	 *        string $items[n]['itemid']
+	 *        string $items[n]['widget_description']  Field to resolve.
 	 *
-	 * @return array                      Returns array of items with macros resolved.
+	 * @return array  Returns array of items with macros resolved.
 	 */
-	public static function resolveWidgetItemNames(array $items) {
+	public static function resolveItemWidgetDescriptions(array $items): array {
 		self::init();
 
-		return self::$macrosResolver->resolveWidgetItemNames($items);
+		return self::$macrosResolver->resolveItemWidgetDescriptions($items);
 	}
 
 	/**
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
 	 * @param array $columns
-	 * @param array $items
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	public static function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
+	public static function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
 		self::init();
 
-		return self::$macrosResolver->resolveWidgetTopHostsTextColumns($columns, $items);
+		return self::$macrosResolver->resolveWidgetTopHostsTextColumns($columns, $hostids);
 	}
 
 	/**

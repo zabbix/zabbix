@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if (array_key_exists('error', $data)) {
@@ -37,57 +38,61 @@ if (array_key_exists('no_data', $data)) {
 	return;
 }
 
+$this->addJsFile('d3.v7.min.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('class.calendar.js');
+$this->addJsFile('leaflet.js');
+$this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.geomaps.js');
+$this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
+$this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('class.csvggraph.js');
+$this->addJsFile('class.svg.canvas.js');
+$this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');
+
+$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $html_page = (new CHtmlPage())
-	->setTitle($data['dashboard']['name'])
+	->setTitle(_('Host dashboards'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
-	->setControls((new CTag('nav', true,
-		(new CList())
+	->setControls(
+		(new CTag('nav', true))
 			->addItem(
-				(new CForm('get'))
-					->addVar('action', 'host.dashboard.view')
-					->addVar('hostid', $data['host']['hostid'])
-					->addItem((new CLabel(_('Dashboard'), 'label-dashboard'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
-					->addItem(
-						(new CSelect('dashboardid'))
-							->setId('dashboardid')
-							->setFocusableElementId('label-dashboard')
-							->setValue($data['dashboard']['dashboardid'])
-							->addOptions(CSelect::createOptionsFromArray($data['host_dashboards']))
-							->addClass(ZBX_STYLE_HEADER_Z_SELECT)
-					)
+				(new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			)
-			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-	))->setAttribute('aria-label', _('Content controls')))
+			->setAttribute('aria-label', _('Content controls'))
+	)
 	->setKioskModeControls(
 		(count($data['dashboard']['pages']) > 1)
 			? (new CList())
 				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_CHEVRON_LEFT)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_PAUSE)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
@@ -100,34 +105,64 @@ $html_page = (new CHtmlPage())
 						)
 				)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_CHEVRON_RIGHT)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
 						->setTitle(_('Next page'))
 				)
 			: null
-	)
-	->setNavigation((new CList())->addItem(new CBreadcrumbs([
-		(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
-		(new CSpan())->addItem($data['host']['name']),
-		(new CSpan())
-			->addItem(new CLink($data['dashboard']['name'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'host.dashboard.view')
-					->setArgument('hostid', $data['host']['hostid'])
-			))
-			->addClass(ZBX_STYLE_SELECTED)
-	])));
+	);
 
-if ($data['has_time_selector']) {
-	$html_page->addItem(
+$navigation = (new CDiv())
+	->addClass(ZBX_STYLE_HOST_DASHBOARD_HEADER_NAVIGATION)
+	->addItem(
+		(new CList())->addItem(
+			new CBreadcrumbs([
+				(new CSpan())->addItem(
+					new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))
+				),
+				(new CSpan())->addItem($data['dashboard_host']['name'])
+			])
+		)
+	);
+
+if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+	$dashboard_tabs = (new CDiv())
+		->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION)
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
+				->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous dashboard')))
+					->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD)
+				)
+		)
+		->addItem((new CDiv())->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS))
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
+				->addItem([
+					(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Dashboard list')))
+						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_LIST),
+					(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next dashboard')))
+						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD)
+				])
+		);
+
+	$navigation->addItem($dashboard_tabs);
+}
+
+if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requirements'])) {
+	$navigation->addItem(
 		(new CFilter())
-			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
+			->setProfile($data['dashboard_time_period']['profileIdx'], $data['dashboard_time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],
+			->addTimeSelector($data['dashboard_time_period']['from'], $data['dashboard_time_period']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 	);
 }
+
+$html_page->addItem($navigation);
 
 if (count($data['dashboard']['pages']) > 1
 		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets'])) {
@@ -146,20 +181,18 @@ if (count($data['dashboard']['pages']) > 1
 					(new CDiv())
 						->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 						->addItem([
-							(new CSimpleButton())
-								->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-								->addClass('btn-iterator-page-previous')
+							(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
 								->setEnabled(false),
-							(new CSimpleButton())
-								->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-								->addClass('btn-iterator-page-next')
+							(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
 								->setEnabled(false),
 							(new CSimpleButton([
 								(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
 								(new CSpan(_s('Stop slideshow')))->addClass('slideshow-state-started')
 							]))
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW)
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
 								->addClass(
 									($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 										? 'slideshow-state-started'
@@ -170,23 +203,12 @@ if (count($data['dashboard']['pages']) > 1
 		);
 	}
 
-	$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
+	$dashboard->addItem(
+		(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+	);
 
 	$html_page
 		->addItem($dashboard)
-		->show();
-
-	(new CScriptTag('
-		view.init('.json_encode([
-			'host' => $data['host'],
-			'dashboard' => $data['dashboard'],
-			'widget_defaults' => $data['widget_defaults'],
-			'configuration_hash' => $data['configuration_hash'],
-			'time_period' => $data['time_period'],
-			'web_layout_mode' => $web_layout_mode
-		]).');
-	'))
-		->setOnDocumentReady()
 		->show();
 }
 else {
@@ -194,3 +216,18 @@ else {
 		->addItem(new CTableInfo())
 		->show();
 }
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'host_dashboards' => $data['host_dashboards'],
+		'dashboard' => $data['dashboard'],
+		'widget_defaults' => $data['widget_defaults'],
+		'configuration_hash' => $data['configuration_hash'],
+		'broadcast_requirements' => $data['broadcast_requirements'],
+		'dashboard_host' => $data['dashboard_host'],
+		'dashboard_time_period' => $data['dashboard_time_period'],
+		'web_layout_mode' => $web_layout_mode
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

@@ -21,24 +21,21 @@
 
 namespace Widgets\Problems\Includes;
 
-use CTableInfo,
-	CColHeader,
+use CButtonIcon,
 	CCol,
-	CRow,
-	CLinkAction,
-	CLink,
-	CSimpleButton,
-	CButton,
-	CSpan,
-	CUrl,
-	CScreenProblem,
+	CColHeader,
 	CHintBoxHelper,
-	CMenuPopupHelper,
-	CSeverityHelper,
+	CIcon,
+	CLink,
+	CLinkAction,
 	CMacrosResolverHelper,
-	CWebUser;
-
-use Widgets\Problems\Widget;
+	CMenuPopupHelper,
+	CRow,
+	CScreenProblem,
+	CSeverityHelper,
+	CSpan,
+	CTableInfo,
+	CUrl;
 
 class WidgetProblems extends CTableInfo {
 	private array $data;
@@ -67,9 +64,7 @@ class WidgetProblems extends CTableInfo {
 
 		if ($this->data['show_three_columns']) {
 			$header[] = new CColHeader();
-			$header[] = (new CColHeader())
-				->addClass(ZBX_STYLE_CELL_WIDTH)
-				->addClass(ZBX_STYLE_THIRD_COL);
+			$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
 		}
 		elseif ($this->data['show_two_columns']) {
 			$header[] = new CColHeader();
@@ -99,7 +94,7 @@ class WidgetProblems extends CTableInfo {
 				($this->data['sortfield'] === 'name')
 					? [_x('Problem', 'compact table header'), $sort_div]
 					: _x('Problem', 'compact table header'),
-				' &bullet; ',
+				' ', BULLET(), ' ',
 				($this->data['sortfield'] === 'severity')
 					? [_x('Severity', 'compact table header'), $sort_div]
 					: _x('Severity', 'compact table header')
@@ -124,7 +119,7 @@ class WidgetProblems extends CTableInfo {
 			'show_recovery_data' => $show_recovery_data
 		];
 
-		$this->addProblemsToTable($this->data['problems'], $this->data);
+		$this->addProblemsToTable($this->data['problems'], $this->data, false);
 
 		if ($this->data['info'] !== '') {
 			$this->setFooter([
@@ -144,7 +139,7 @@ class WidgetProblems extends CTableInfo {
 	 * @param int        $data['today']                         Timestamp of today's date.
 	 * @param array      $data['tasks']                         List of tasks. Used to determine current problem status.
 	 * @param array      $data['users']                         List of users.
-	 * @param array      $data['correlations']                  List of correlations.
+	 * @param array      $data['correlations']                  List of event correlations.
 	 * @param array      $data['fields']                        Problem widget filter fields.
 	 * @param int        $data['fields']['show']                "Show" filter option.
 	 * @param int        $data['fields']['show_tags']           "Show tags" filter option.
@@ -173,7 +168,7 @@ class WidgetProblems extends CTableInfo {
 	 * @param array      $data['tags']                          List of tags.
 	 * @param bool       $nested                                If true, show the symptom rows with indentation.
 	 */
-	private function addProblemsToTable(array $problems, array $data, $nested = false): void {
+	private function addProblemsToTable(array $problems, array $data, $nested): void {
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -236,7 +231,7 @@ class WidgetProblems extends CTableInfo {
 			$cell_status = new CSpan($value_str);
 
 			if (isEventUpdating($in_closing, $problem)) {
-				$cell_status->addClass('blink');
+				$cell_status->addClass('js-blink');
 			}
 
 			// Add colors and blinking to span depending on configuration and trigger parameters.
@@ -253,10 +248,10 @@ class WidgetProblems extends CTableInfo {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
-							? _s('Resolved by correlation rule "%1$s".',
+							? _s('Resolved by event correlation rule "%1$s".',
 								$data['correlations'][$problem['correlationid']]['name']
 							)
-							: _('Resolved by correlation rule.')
+							: _('Resolved by event correlation rule.')
 					);
 				}
 				elseif ($problem['userid'] != 0) {
@@ -277,9 +272,9 @@ class WidgetProblems extends CTableInfo {
 						? getUserFullname($data['users'][$unsuppression_action['userid']])
 						: _('Inaccessible user');
 
-					$info_icons[] = (new CSimpleButton())
-						->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
-						->addClass('blink')
+					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
+						->addClass(ZBX_STYLE_COLOR_ICON)
+						->addClass('js-blink')
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 				}
 				elseif ($problem['suppression_data']) {
@@ -341,9 +336,14 @@ class WidgetProblems extends CTableInfo {
 
 			$problem_link = [
 				(new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid'],
-						['show_rank_change_cause' => true]
-					))
+					->setMenuPopup(CMenuPopupHelper::getTrigger([
+						'triggerid' => $trigger['triggerid'],
+						'backurl' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->getUrl(),
+						'eventid' => $problem['eventid'],
+						'show_rank_change_cause' => true
+					]))
 					->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 						$problem['name'], CSeverityHelper::getName((int) $problem['severity'])
 					))
@@ -369,18 +369,14 @@ class WidgetProblems extends CTableInfo {
 
 				if ($blink_period != 0 && $duration < $blink_period) {
 					$description
-						->addClass('blink')
+						->addClass('js-blink')
 						->setAttribute('data-time-to-blink', $blink_period - $duration)
 						->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 				}
 			}
 
 			$symptom_col = (new CCol(
-				makeActionIcon([
-					'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
-					'title' => _('Symptom'),
-					'style' => 'margin-right: 0'
-				])
+				new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom'))
 			))->addClass(ZBX_STYLE_RIGHT);
 
 			$empty_col = new CCol();
@@ -397,18 +393,15 @@ class WidgetProblems extends CTableInfo {
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_col = (new CCol(
-						(new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_TAG)
+						(new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_ENTITY_COUNT)
 					))->addClass(ZBX_STYLE_RIGHT);
 
 					$collapse_expand_col = (new CCol(
-						(new CButton(null))
+						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand')))
+							->addClass(ZBX_STYLE_COLLAPSED)
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
-							->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
-							->setTitle(_('Expand'))
-					))
-						->addClass(ZBX_STYLE_RIGHT)
-						->addClass(ZBX_STYLE_THIRD_COL);
+					))->addClass(ZBX_STYLE_RIGHT);
 
 					if ($data['show_timeline']) {
 						$symptom_count_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
@@ -420,15 +413,10 @@ class WidgetProblems extends CTableInfo {
 				else {
 					if ($data['show_three_columns']) {
 						// Show two empty columns.
-						$row->addItem([
-							$empty_col,
-							$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-						]);
+						$row->addItem([$empty_col, $empty_col]);
 					}
 					elseif ($data['show_two_columns']) {
-						$row->addItem(
-							$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-						);
+						$row->addItem($empty_col);
 					}
 				}
 			}
@@ -440,9 +428,7 @@ class WidgetProblems extends CTableInfo {
 						->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
 						->addClass('hidden')
 						->setAttribute('data-cause-eventid', $problem['cause_eventid'])
-						->addItem(
-							$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
-						);
+						->addItem($symptom_col);
 				}
 				else {
 					// First column empty stand-alone symptom event.
@@ -451,15 +437,13 @@ class WidgetProblems extends CTableInfo {
 
 				// If there are causes as well, show additional empty column.
 				if (!$nested && $data['show_three_columns']) {
-					$row->addItem(
-						$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-					);
+					$row->addItem($empty_col);
 				}
 			}
 
 			if ($data['show_timeline']) {
 				if ($data['last_clock'] != 0) {
-					CScreenProblem::addTimelineBreakpoint($this, $data, $problem, $nested);
+					CScreenProblem::addTimelineBreakpoint($this, $data, $problem, $nested, false);
 				}
 				$data['last_clock'] = $problem['clock'];
 

@@ -9,3 +9,5 @@ libzbxrtc_proxy_a_SOURCES = \
 	rtc_proxy.c \
 	rtc_proxy.h
 
+libzbxrtc_proxy_a_CFLAGS = \
+	$(TLS_CFLAGS)

@@ -20,64 +20,6 @@
 
 
 /**
- * Returns the names of supported event sources.
- *
- * If the $source parameter is passed, returns the name of the specific source, otherwise - returns an array of all
- * supported sources.
- *
- * @param int $source
- *
- * @return array|string
- */
-function eventSource($source = null) {
-	$sources = [
-		EVENT_SOURCE_TRIGGERS => _('trigger'),
-		EVENT_SOURCE_DISCOVERY => _('discovery'),
-		EVENT_SOURCE_AUTOREGISTRATION => _('autoregistration'),
-		EVENT_SOURCE_INTERNAL => _x('internal', 'event source'),
-		EVENT_SOURCE_SERVICE => _('service')
-	];
-
-	if ($source === null) {
-		return $sources;
-	}
-
-	return array_key_exists($source, $sources) ?  $sources[$source] : _('Unknown');
-}
-
-/**
- * Returns the names of supported event objects.
- *
- * If the $source parameter is passed, returns the name of the specific object, otherwise - returns an array of all
- * supported objects.
- *
- * @param int $object
- *
- * @return array|string
- */
-function eventObject($object = null) {
-	$objects = [
-		EVENT_OBJECT_TRIGGER => _('trigger'),
-		EVENT_OBJECT_DHOST => _('discovered host'),
-		EVENT_OBJECT_DSERVICE => _('discovered service'),
-		EVENT_OBJECT_AUTOREGHOST => _('autoregistered host'),
-		EVENT_OBJECT_ITEM => _('item'),
-		EVENT_OBJECT_LLDRULE => _('low-level discovery rule'),
-		EVENT_OBJECT_SERVICE => _('service')
-	];
-
-	if ($object === null) {
-		return $objects;
-	}
-	elseif (isset($objects[$object])) {
-		return $objects[$object];
-	}
-	else {
-		return _('Unknown');
-	}
-}
-
-/**
  * Returns all supported event source-object pairs.
  */
 function eventSourceObjects(): array {
@@ -198,7 +140,7 @@ function make_event_details(array $event, array $allowed) {
 				}
 			}
 			else {
-				$correlation_name = _('Correlation rule');
+				$correlation_name = _('Event correlation rule');
 			}
 
 			$table->addRow([_('Resolved by'), $correlation_name]);
@@ -327,14 +269,14 @@ function getEventStatusUpdateIcon(array $event): ?Ctag {
 		// If currently is symptom and there is an active task to convert to cause, set icon style to cause.
 		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 				&& $acknowledge['taskid'] != 0) {
-			$icon_class = ZBX_STYLE_ACTION_ICON_CAUSE;
+			$icon_class = ZBX_ICON_ARROW_RIGHT_TOP;
 			break;
 		}
 
 		// If currently is cause and there is an active task to convert to symptom, set icon style to symptom.
 		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
 				ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM && $acknowledge['taskid'] != 0) {
-			$icon_class = ZBX_STYLE_ACTION_ICON_SYMPTOM;
+			$icon_class = ZBX_ICON_ARROW_TOP_RIGHT;
 			break;
 		}
 	}
@@ -342,7 +284,7 @@ function getEventStatusUpdateIcon(array $event): ?Ctag {
 	if ($icon_class !== '') {
 		$icon = (new CSpan())
 			->addClass($icon_class)
-			->addClass('blink')
+			->addClass('js-blink')
 			->setTitle(_('Updating'));
 	}
 
@@ -404,7 +346,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid',
 			'cause_eventid'
 		],
-		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+		'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 			'suppress_until', 'taskid'
 		],
 		'source' => EVENT_SOURCE_TRIGGERS,
@@ -471,7 +413,6 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		if ($event['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
-			$value_str = _('RESOLVED');
 			$value_clock = $event['r_clock'];
 			$can_be_closed = false;
 		}
@@ -490,7 +431,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		$cell_status = new CSpan($value_str);
 
 		if (isEventUpdating($in_closing, $event)) {
-			$cell_status->addClass('blink');
+			$cell_status->addClass('js-blink');
 		}
 
 		/*
@@ -819,9 +760,8 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					}
 				}
 
-				$tags[$element[$key]][] = (new CButton(null))
-					->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP, true);
+				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
+					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
 			}
 		}
 		else {

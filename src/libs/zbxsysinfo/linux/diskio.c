@@ -23,8 +23,8 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 
-#include "stats.h"
-#include "diskdevices.h"
+#include "../common/stats.h"
+#include "../common/diskdevices.h"
 
 #define ZBX_DEV_PFX		"/dev/"
 #define ZBX_DEV_READ		0
@@ -77,12 +77,11 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	FILE		*f;
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
-	int		i, ret = FAIL, dev_exists = FAIL;
+	int		ret = FAIL, dev_exists = FAIL, found = 0;
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
 	zbx_stat_t	dev_st;
-	int		found = 0;
 
-	for (i = 0; i < ZBX_DSTAT_MAX; i++)
+	for (int i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
 
 	if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
@@ -133,7 +132,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 /******************************************************************************
  *                                                                            *
- * Comments: Translate device name to the one used internally by kernel. The  *
+ * Comments: Translates device name to the one used internally by kernel. The *
  *           translation is done based on minor and major device numbers      *
  *           listed in INFO_FILE_NAME . If the names differ it is usually an  *
  *           LVM device which is listed in kernel device mapper.              *
@@ -175,7 +174,7 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t 
 
 static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA	*device;
+	zbx_single_diskdevice_data	*device;
 	char				*devname, *tmp, kernel_devname[MAX_STRING_LEN];
 	int				type, mode;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
@@ -240,7 +239,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 	{
 		/* CPU statistics collector and (optionally) disk statistics collector is started only when Zabbix */
 		/* agentd is running as a daemon. When Zabbix agent or agentd is started with "-p" or "-t" parameter */
@@ -372,9 +371,11 @@ int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 								if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
 								{
 									char	*p;
+									size_t	l;
 
+									l = strlen(tmp);
 									/* dismiss trailing \n */
-									p = tmp + strlen(tmp) - 1;
+									p = tmp + l - 1;
 									if ('\n' == *p)
 										*p = '\0';
 

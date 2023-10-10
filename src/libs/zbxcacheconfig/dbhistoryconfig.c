@@ -19,9 +19,11 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "actions.h"
 #include "zbx_item_constants.h"
+#include "zbxdbhigh.h"
+#include "zbxtagfilter.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 
@@ -31,7 +33,7 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 	const ZBX_DC_HOST_INVENTORY	*host_inventory;
 
 	dst_host->hostid = src_host->hostid;
-	dst_host->proxy_hostid = src_host->proxy_hostid;
+	dst_host->proxyid = src_host->proxyid;
 	dst_host->status = src_host->status;
 
 	zbx_strscpy(dst_host->host, src_host->host);
@@ -103,12 +105,12 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 	if (NULL != item->trends_period)
 	{
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+				NULL, NULL, &item->trends_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
 
-		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->trends_global)
 			item->trends_sec = config_hk->trends;
 
 		item->trends = (0 != item->trends_sec);
@@ -117,7 +119,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 	if (NULL != item->history_period)
 	{
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+				NULL, NULL, &item->history_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
@@ -133,7 +135,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
  *                                                                            *
  * Purpose: Get item with specified ID                                        *
  *                                                                            *
- * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
+ * Parameters: items    - [OUT] pointer to zbx_dc_item_t structures           *
  *             itemids  - [IN] array of item IDs                              *
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
@@ -237,7 +239,7 @@ void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *item
  *                                                                            *
  * Purpose: Get functions by IDs                                              *
  *                                                                            *
- * Parameters: functions   - [OUT] pointer to DC_FUNCTION structures          *
+ * Parameters: functions   - [OUT] pointer to zbx_dc_function_t structures    *
  *             functionids - [IN] array of function IDs                       *
  *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
  *             num         - [IN] number of elements                          *
@@ -247,7 +249,7 @@ void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *item
  *           blocking each other.                                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids,
+void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *functions, zbx_uint64_t *functionids,
 		int *errcodes, size_t num)
 {
 	size_t			i;
@@ -284,14 +286,13 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functi
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t *functionids,
-		size_t functionids_num, zbx_vector_ptr_t *item_tags)
+		size_t functionids_num, zbx_vector_item_tag_t *item_tags)
 {
 	const ZBX_DC_FUNCTION	*dc_function;
-	size_t			i;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	for (i = 0; i < functionids_num; i++)
+	for (size_t i = 0; i < functionids_num; i++)
 	{
 		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
 				&functionids[i])))
@@ -317,13 +318,13 @@ void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t 
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info,
-		zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
+		zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
 		int itemids_num)
 {
 	int			i, j, found;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_TRIGGER	*dc_trigger;
-	DC_TRIGGER		*trigger;
+	zbx_dc_trigger_t	*trigger;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
@@ -345,13 +346,13 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 				continue;
 
 			/* find trigger by id or create a new record in hashset if not found */
-			trigger = (DC_TRIGGER *)DCfind_id(trigger_info, dc_trigger->triggerid, sizeof(DC_TRIGGER),
+			trigger = (zbx_dc_trigger_t *)DCfind_id(trigger_info, dc_trigger->triggerid, sizeof(zbx_dc_trigger_t),
 					&found);
 
 			if (0 == found)
 			{
 				DCget_trigger(trigger, dc_trigger, ZBX_TRIGGER_GET_ALL);
-				zbx_vector_ptr_append(trigger_order, trigger);
+				zbx_vector_dc_trigger_append(trigger_order, trigger);
 			}
 
 			/* copy latest change timestamp */
@@ -485,7 +486,7 @@ static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZB
 		unsigned int mode)
 {
 	dst_host->hostid = src_host->hostid;
-	dst_host->proxy_hostid = src_host->proxy_hostid;
+	dst_host->proxyid = src_host->proxyid;
 	dst_host->status = src_host->status;
 
 	if (ZBX_ITEM_GET_HOST & mode)
@@ -533,17 +534,12 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
 
-	switch (src_item->value_type)
+	if (ITEM_VALUE_TYPE_LOG == src_item->value_type)
 	{
-		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
-					&src_item->itemid)))
-			{
-				zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
-			}
-			else
-				*dst_item->logtimefmt = '\0';
-			break;
+		if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &src_item->itemid)))
+			zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+		else
+			*dst_item->logtimefmt = '\0';
 	}
 
 	if (ZBX_ITEM_GET_INTERFACE & mode)
@@ -697,7 +693,7 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
  *                                                                            *
  * Purpose: Get item with specified ID                                        *
  *                                                                            *
- * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
+ * Parameters: items    - [OUT] pointer to zbx_dc_item_t structures           *
  *             itemids  - [IN] array of item IDs                              *
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
@@ -881,7 +877,7 @@ static void	substitute_orig_unmasked(const char *orig, char **data)
 
 	*data = zbx_strdup(*data, orig);
 	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			data, MACRO_TYPE_COMMON, NULL, 0);
+			data, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 }
 
 static void	substitute_orig(const char *orig, char **data)
@@ -891,7 +887,7 @@ static void	substitute_orig(const char *orig, char **data)
 
 	*data = zbx_strdup(*data, orig);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, data,
-			MACRO_TYPE_COMMON, NULL, 0);
+			ZBX_MACRO_TYPE_COMMON, NULL, 0);
 }
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,

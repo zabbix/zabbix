@@ -66,18 +66,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = location.href;
-			});
-
-			dialogue.addEventListener('dialogue.delete', (e) => {
 				uncheckTableRows('maintenance');
-
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
 				location.href = location.href;
 			});
 		}

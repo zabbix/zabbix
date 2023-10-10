@@ -11,4 +11,5 @@ libconfigcachemock_a_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/tests
+	-I@top_srcdir@/tests \
+	$(TLS_CFLAGS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS)

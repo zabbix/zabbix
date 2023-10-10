@@ -330,7 +330,12 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function fill($text) {
-		return $this->overwrite($text);
+		if (!is_array($text) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $text) === 1) {
+			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($text).';', [$this]);
+		}
+		else {
+			return $this->overwrite($text);
+		}
 	}
 
 	/**
@@ -504,7 +509,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return boolean
 	 */
 	public function isReady() {
-		return $this->isClickable();
+		return call_user_func($this->getReadyCondition());
 	}
 
 	/**
@@ -570,25 +575,32 @@ class CElement extends CBaseElement implements IWaitable {
 	/**
 	 * Wait until element changes it's state from stalled to normal.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function waitUntilReloaded() {
+	public function waitUntilReloaded($timeout = null) {
 		if ($this->by === null) {
 			throw new Exception('Cannot wait for element reload on element selected in multi-element query.');
 		}
 
 		$element = $this;
-		CElementQuery::wait()->until(function () use ($element) {
+		$wait = forward_static_call_array([CElementQuery::class, 'wait'], $timeout !== null ? [$timeout] : []);
+		$wait->until(function () use ($element) {
+			try {
 				if ($element->isStalled()) {
 					$element->reload();
 
 					return !$element->isStalled();
 				}
-
-				return null;
 			}
-		);
+			catch (Exception $e) {
+				// Code is not missing here.
+			}
+
+			return null;
+		}, 'Failed to wait until element reloaded.');
 
 		return $this;
 	}
@@ -596,10 +608,13 @@ class CElement extends CBaseElement implements IWaitable {
 	/**
 	 * Wait until element is selected.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilSelected() {
-		CElementQuery::wait()->until(WebDriverExpectedCondition::elementToBeSelected($this));
+	public function waitUntilSelected($timeout = null) {
+		$wait = forward_static_call_array([CElementQuery::class, 'wait'], $timeout !== null ? [$timeout] : []);
+		$wait->until(WebDriverExpectedCondition::elementToBeSelected($this));
 
 		return $this;
 	}
@@ -753,13 +768,20 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Scroll the element to the visible position.
+	 */
+	public function scrollIntoView() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});', [$this]);
+	}
+
+	/**
 	 * Check presence of the class(es).
 	 *
 	 * @param string|array $class	class or classes to be present.
 	 *
 	 * @return boolean
 	 */
-	function hasClass($class) {
+	public function hasClass($class) {
 		$attribute = parent::getAttribute('class');
 		$classes = ($attribute !== null) ? explode(' ', $attribute) : [];
 
@@ -768,5 +790,15 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		return (count(array_diff($class, $classes)) === 0);
+	}
+
+	/**
+	 * Hover mouse over the element
+	 */
+	public function hoverMouse() {
+		$mouse = CElementQuery::getDriver()->getMouse();
+		$mouse->mouseMove($this->getCoordinates());
+
+		return $this;
 	}
 }

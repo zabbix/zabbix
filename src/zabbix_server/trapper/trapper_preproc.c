@@ -19,13 +19,14 @@
 
 #include "trapper_preproc.h"
 #include "zbxpreproc.h"
-#include "preproc.h"
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxpreprocbase.h"
+#include "zbxtime.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
-
-extern int	CONFIG_DOUBLE_PRECISION;
 
 /******************************************************************************
  *                                                                            *
@@ -130,10 +131,15 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	}
 
 	size = 0;
-	if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_VALUE, &values[*values_num], &size, NULL))
+	if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_RUNTIME_ERROR, &values[*values_num], &size,
+			NULL))
 	{
-		*error = zbx_strdup(NULL, "Missing value field.");
-		goto out;
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_VALUE, &values[*values_num], &size,
+				NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing value field.");
+			goto out;
+		}
 	}
 	ts[(*values_num)++] = ts_now;
 
@@ -198,7 +204,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		{
 			zbx_free(step_params);
 			zbx_free(error_handler_params);
-			*bypass_first = 1;
+			(*bypass_first)++;
 		}
 
 		step_params = NULL;
@@ -287,8 +293,8 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 			zbx_variant_set_none(&result->value_raw);
 			zbx_vector_pp_result_ptr_append(&results, result);
 		}
-		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], state, &steps, &results, &history,
-				error))
+		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], (unsigned char)state, &steps,
+				&results, &history, error))
 		{
 			goto out;
 		}
@@ -303,7 +309,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 		{
 			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
 			if (ZBX_VARIANT_NONE != result->value.type && FAIL == zbx_variant_to_value_type(&result->value,
-					value_type, CONFIG_DOUBLE_PRECISION, &preproc_error))
+					value_type, &preproc_error))
 			{
 				break;
 			}
@@ -318,10 +324,10 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
 
-	if (1 == bypass_first)
+	for (i = 0; i < bypass_first; i++)
 	{
 		zbx_json_addobject(json, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, ZBX_PROTO_TAG_VALUE, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1], ZBX_JSON_TYPE_STRING);
 		zbx_json_close(json);
 	}
 
@@ -341,7 +347,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
 				{
-					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, preproc_error,
+					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, result->value.data.err,
 							ZBX_JSON_TYPE_STRING);
 				}
 			}

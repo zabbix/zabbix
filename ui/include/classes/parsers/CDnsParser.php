@@ -40,6 +40,11 @@ class CDnsParser extends CParser {
 	private $lld_macro_function_parser;
 
 	/**
+	 * @var CMacroParser
+	 */
+	private $macro_parser;
+
+	/**
 	 * Supported options:
 	 *   'usermacros' => true  Enabled support of user macros;
 	 *   'lldmacros' => true   Enabled support of LLD macros;

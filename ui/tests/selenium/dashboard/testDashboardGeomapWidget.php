@@ -79,37 +79,37 @@ class testDashboardGeomapWidget extends CWebTest {
 							'fields' => [
 								[
 									'type' => '2',
-									'name' => 'groupids',
+									'name' => 'groupids.0',
 									'value' => '4'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.0',
 									'value' => '15001'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.1',
 									'value' => '99136'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.2',
 									'value' => '15003'
 								],
 								[
 									'type' => '1',
-									'name' => 'tags.tag.0',
+									'name' => 'tags.0.tag',
 									'value' => 'tag1'
 								],
 								[
 									'type' => '0',
-									'name' => 'tags.operator.0',
+									'name' => 'tags.0.operator',
 									'value' => '0'
 								],
 								[
 									'type' => '1',
-									'name' => 'tags.value.0',
+									'name' => 'tags.0.value',
 									'value' => 'value1'
 								],
 								[
@@ -145,7 +145,7 @@ class testDashboardGeomapWidget extends CWebTest {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Geomap']);
 		$dialog->waitUntilReady();
-		$this->assertEquals(["Type", "Name", "Refresh interval", "Host groups", "Hosts", "Tags", "Initial view"],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Tags', 'Initial view'],
 				$form->getLabels()->asText()
 		);
 		$form->checkValue(['id:show_header' => true, 'Refresh interval' => 'Default (1 minute)']);
@@ -177,10 +177,10 @@ class testDashboardGeomapWidget extends CWebTest {
 				"\nThe maximum zoom level is \"0\".".
 				"\nInitial view is ignored if the default view is set.";
 
-		$form->query('xpath:.//label[text()="Initial view"]/a')->one()->click();
+		$form->getLabel('Initial view')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
 		$this->assertEquals($hint_text, $hint->one()->getText());
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 	}
 
@@ -422,10 +422,7 @@ class testDashboardGeomapWidget extends CWebTest {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form->fill(['Type' => 'Geomap']);
-
-		// After changing "Source", the overlay is reloaded.
-		$form->invalidate();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Geomap')]);
 		$form->fill($data['fields']);
 
 		if (array_key_exists('show_header', $data)) {

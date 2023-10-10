@@ -38,7 +38,7 @@ class CViewHelper {
 			return null;
 		}
 
-		return [SPACE, new CSup($num)];
+		return [NBSP(), new CSup($num)];
 	}
 
 	/**

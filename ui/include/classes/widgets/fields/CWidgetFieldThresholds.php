@@ -21,25 +21,28 @@
 
 namespace Zabbix\Widgets\Fields;
 
-use CArrayHelper,
-	CNumberParser,
+use CNumberParser,
 	CParser;
 
 use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldThresholds extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldThresholdsView::class;
 	public const DEFAULT_VALUE = [];
+
+	private bool $is_binary_units;
 
 	/**
 	 * Create widget field for Thresholds selection.
 	 */
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, string $label = null, bool $is_binary_units = false) {
 		parent::__construct($name, $label);
+
+		$this->is_binary_units = $is_binary_units;
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
 				'color'		=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'threshold'	=> ['type' => API_NUMERIC, 'flags' => API_REQUIRED]
@@ -61,23 +64,34 @@ class CWidgetFieldThresholds extends CWidgetField {
 	}
 
 	public function validate($strict = false): array {
-		$errors = parent::validate($strict);
-
-		if ($errors) {
+		if ($errors = parent::validate($strict)) {
 			return $errors;
 		}
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => $this->is_binary_units
+		]);
 
 		$thresholds = [];
 
 		foreach ($this->getValue() as $threshold) {
-			if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
+			if ($number_parser->parse($threshold['threshold']) === CParser::PARSE_SUCCESS) {
 				$thresholds[] = $threshold + ['threshold_value' => $number_parser->calcValue()];
 			}
 		}
 
-		CArrayHelper::sort($thresholds, ['threshold_value']);
+		uasort($thresholds,
+			static function (array $threshold_1, array $threshold_2): int {
+				return $threshold_1['threshold_value'] <=> $threshold_2['threshold_value'];
+			}
+		);
+
+		foreach ($thresholds as &$threshold) {
+			unset($threshold['threshold_value']);
+		}
+		unset($threshold);
 
 		$thresholds = array_values($thresholds);
 
@@ -87,18 +101,16 @@ class CWidgetFieldThresholds extends CWidgetField {
 	}
 
 	public function toApi(array &$widget_fields = []): void {
-		$value = $this->getValue();
-
-		foreach ($value as $index => $val) {
+		foreach ($this->getValue() as $index => $value) {
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.color.'.$index,
-				'value' => $val['color']
+				'name' => $this->name.'.'.$index.'.color',
+				'value' => $value['color']
 			];
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.threshold.'.$index,
-				'value' => $val['threshold']
+				'name' => $this->name.'.'.$index.'.threshold',
+				'value' => $value['threshold']
 			];
 		}
 	}

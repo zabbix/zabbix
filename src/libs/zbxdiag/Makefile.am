@@ -3,4 +3,7 @@
 noinst_LIBRARIES = libzbxdiag.a 
 
 libzbxdiag_a_SOURCES = \
-	diag.c 
+	diag.c
+
+libzbxdiag_a_CFLAGS = \
+	$(TLS_CFLAGS)

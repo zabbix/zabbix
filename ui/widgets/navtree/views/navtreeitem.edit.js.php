@@ -21,24 +21,17 @@
 
 
 window.navtreeitem_edit_popup = new class {
+
 	init() {
-		jQuery('#sysmapname').on('change', (e) => {
-			const name_input = document.getElementById('name');
+		const $sysmap = jQuery('#sysmapid');
+		const name_input = document.getElementById('name');
 
+		$sysmap.on('change', () => {
 			if (name_input.value === '') {
-				name_input.value = e.target.value;
-			}
-		});
+				const sysmaps = $sysmap.multiSelect('getData');
 
-		document.getElementById('select').addEventListener('click', () => {
-			return PopUp('popup.generic', {
-				srctbl: 'sysmaps',
-				srcfld1: 'sysmapid',
-				srcfld2: 'name',
-				dstfrm: 'widget_dialogue_form',
-				dstfld1: 'sysmapid',
-				dstfld2: 'sysmapname'
-			}, {dialogue_class: 'modal-popup-generic'});
+				name_input.value = sysmaps.length ? sysmaps[0]['name'] : '';
+			}
 		});
 	}
 };

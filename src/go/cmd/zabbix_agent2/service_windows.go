@@ -39,23 +39,25 @@ import (
 )
 
 var (
-	serviceName = "Zabbix Agent 2"
+    serviceName = "Zabbix Agent 2"
 
-	svcInstallFlag       bool
-	svcUninstallFlag     bool
-	svcStartFlag         bool
-	svcStopFlag          bool
-	svcMultipleAgentFlag bool
+    svcInstallFlag       bool
+    svcUninstallFlag     bool
+    svcStartFlag         bool
+    svcStopFlag          bool
+    svcMultipleAgentFlag bool
 
-	winServiceRun bool
+    winServiceRun bool
 
-	eLog *eventlog.Log
+    eLog *eventlog.Log
 
-	winServiceWg sync.WaitGroup
-	fatalStopWg  sync.WaitGroup
+    winServiceWg sync.WaitGroup
+    fatalStopWg  sync.WaitGroup
 
-	fatalStopChan chan bool
-	startChan     chan bool
+    fatalStopChan chan bool
+    startChan     chan bool
+
+    stopChan = make(chan bool)
 )
 
 func loadOSDependentFlags() {

@@ -41,13 +41,11 @@ if (array_key_exists('problems', $data)) {
 	if ($data['trigger']['url'] !== '') {
 		$trigger_url = CHtmlUrlValidator::validate($data['trigger']['url'], ['allow_user_macro' => false])
 			? $data['trigger']['url']
-			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
-				json_encode($data['trigger']['url'])).
-			'\');';
+			: 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $data['trigger']['url'])).');';
 
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink(CHtml::encode($data['trigger']['url']), $trigger_url))
+				->addItem(new CLink($data['trigger']['url'], $trigger_url))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);
@@ -150,7 +148,7 @@ if (array_key_exists('problems', $data)) {
 		$cell_status = new CSpan($value_str);
 
 		if (isEventUpdating($in_closing, $problem)) {
-			$cell_status->addClass('blink');
+			$cell_status->addClass('js-blink');
 		}
 
 		// Add colors and blinking to span depending on configuration and trigger parameters.
@@ -158,7 +156,7 @@ if (array_key_exists('problems', $data)) {
 
 		if ($data['show_timeline']) {
 			if ($data['last_clock'] != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false);
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, false);
 			}
 			$data['last_clock'] = $problem['clock'];
 

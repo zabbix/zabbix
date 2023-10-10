@@ -20,7 +20,6 @@
 #include "zbxmedia.h"
 
 #include "zbxstr.h"
-#include "log.h"
 
 #include <termios.h>
 

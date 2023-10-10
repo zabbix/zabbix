@@ -62,6 +62,7 @@ int	zbx_is_double_suffix(const char *str, unsigned char flags);
 double	zbx_str2double(const char *str);
 int	zbx_suffixed_number_parse(const char *number, int *len);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op);
 
 /* token START */
 /* tokens used in expressions */
@@ -194,7 +195,7 @@ int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_to
 int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token);
 /* token END */
 

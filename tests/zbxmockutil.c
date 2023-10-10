@@ -131,8 +131,12 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
 	if (0 == strcmp(str, "ITEM_VALUE_TYPE_TEXT"))
 		return ITEM_VALUE_TYPE_TEXT;
 
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_BIN"))
+		return ITEM_VALUE_TYPE_BIN;
+
 	fail_msg("Unknown value type \"%s\"", str);
-	return ITEM_VALUE_TYPE_MAX;
+
+	return ITEM_VALUE_TYPE_NONE;
 }
 
 /******************************************************************************
@@ -325,6 +329,9 @@ int	zbx_mock_str_to_return_code(const char *str)
 
 	if (0 == strcmp(str, "CONFIG_ERROR"))
 		return CONFIG_ERROR;
+
+	if (0 == strcmp(str, "SIG_ERROR"))
+		return SIG_ERROR;
 
 	if (0 == strcmp(str, "SYSINFO_RET_OK"))
 		return SYSINFO_RET_OK;

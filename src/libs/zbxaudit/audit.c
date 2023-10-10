@@ -20,7 +20,6 @@
 #include "audit.h"
 #include "audit/zbxaudit.h"
 
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxnum.h"
@@ -171,12 +170,12 @@ static void	delete_json(struct zbx_json *json, const char *audit_op, const char 
  ******************************************************************************/
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
-		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		zbx_uint64_t proxyid, zbx_uint64_t userid, const char *username, const char *clientip,
 		const char *output, const char *error)
 {
 	int		ret = SUCCEED;
 	char		auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
-			eventid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
+			eventid_s[MAX_ID_LEN + 1], proxyid_s[MAX_ID_LEN + 1];
 	char		*details_esc;
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
@@ -205,10 +204,10 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	zbx_snprintf(hostid_s, sizeof(hostid_s), ZBX_FS_UI64, hostid);
 	append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.hostid", hostid_s);
 
-	if (0 != proxy_hostid)
+	if (0 != proxyid)
 	{
-		zbx_snprintf(proxy_hostid_s, sizeof(proxy_hostid_s), ZBX_FS_UI64, proxy_hostid);
-		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.proxy_hostid", proxy_hostid_s);
+		zbx_snprintf(proxyid_s, sizeof(proxyid_s), ZBX_FS_UI64, proxyid);
+		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.proxyid", proxyid_s);
 	}
 
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script_type)
@@ -328,7 +327,7 @@ void	zbx_audit_flush(void)
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
 
 	zbx_db_insert_prepare(&db_insert_audit, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
-			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", NULL);
+			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", (char *)NULL);
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
@@ -405,9 +404,9 @@ int	zbx_audit_flush_once(void)
 
 static int	audit_field_default(const char *table_name, const char *field_name, const char *value, uint64_t id)
 {
-	static ZBX_THREAD_LOCAL char		cached_table_name[ZBX_TABLENAME_LEN_MAX];
-	static ZBX_THREAD_LOCAL const ZBX_TABLE	*table = NULL;
-	const ZBX_FIELD				*field;
+	static ZBX_THREAD_LOCAL char			cached_table_name[ZBX_TABLENAME_LEN_MAX];
+	static ZBX_THREAD_LOCAL const zbx_db_table_t	*table = NULL;
+	const zbx_db_field_t				*field;
 
 	if (NULL == table_name)
 		return FAIL;
@@ -555,7 +554,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	append_json_no_value(&((*found_audit_entry)->details_json), audit_op, key);
 }
 
@@ -572,7 +571,7 @@ void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const int id_table,
 	}
 	else
 	{
-		PREPARE_UPDATE_JSON_APPEND_OP();
+		PREPARE_UPDATE_JSON_APPEND_OP()
 		append_int_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 	}
 }
@@ -590,7 +589,7 @@ void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const int id_tab
 	}
 	else
 	{
-		PREPARE_UPDATE_JSON_APPEND_OP();
+		PREPARE_UPDATE_JSON_APPEND_OP()
 		append_double_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 	}
 }
@@ -598,34 +597,34 @@ void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const int id_tab
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const int id_table, const char *key,
 		const char *value_old, const char *value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_str_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const int id_table, const char *key,
 		uint64_t value_old, uint64_t value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_uint64_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const int id_table, const char *key, int value_old,
 		int value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const int id_table, const char *key,
 		double value_old, double value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_double_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, const char *audit_op, const char *key)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	delete_json(&((*found_audit_entry)->details_json), audit_op, key);
 }
 
@@ -694,4 +693,54 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 	}
 
 	va_end(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: record history push request results into audit log                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const char *clientip, int processed_num,
+		int failed_num, double time_spent)
+{
+	int		ret = SUCCEED;
+	char		auditid_cuid[CUID_LEN];
+	struct zbx_json	details_json;
+	zbx_config_t	cfg;
+	zbx_db_insert_t	db_insert;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
+
+	if (ZBX_AUDITLOG_ENABLED != cfg.auditlog_enabled)
+		goto out;
+
+	zbx_new_cuid(auditid_cuid);
+
+	zbx_json_init(&details_json, ZBX_JSON_STAT_BUF_LEN);
+
+	append_int_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "history.processed", processed_num);
+	append_int_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "history.failed", failed_num);
+	append_double_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "history.time", time_spent);
+
+	zbx_db_insert_prepare(&db_insert, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
+			"resourcetype", "recordsetid", "details", NULL);
+
+	zbx_db_begin();
+
+	zbx_db_insert_add_values(&db_insert,  auditid_cuid, userid, username, (int)time(NULL), ZBX_AUDIT_ACTION_PUSH,
+			clientip, AUDIT_RESOURCE_HISTORY, auditid_cuid,
+			details_json.buffer);
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_commit();
+
+	zbx_db_insert_clean(&db_insert);
+	zbx_json_free(&details_json);
+out:
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }

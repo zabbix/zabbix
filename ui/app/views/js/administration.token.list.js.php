@@ -69,8 +69,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.tokenDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.tokenSuccess, {once: true});
 		},
 
 		massDeleteToken(target, tokenids) {
@@ -134,20 +133,6 @@
 
 		events: {
 			tokenSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			},
-
-			tokenDelete(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

@@ -19,7 +19,7 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+use Widgets\SvgGraph\Includes\CWidgetFieldDataSet;
 
 /**
  * Class calculates graph data and makes SVG graph.
@@ -30,30 +30,36 @@ class CSvgGraphHelper {
 	 * Calculate graph data and draw SVG graph based on given graph configuration.
 	 *
 	 * @param array  $options                     Options for graph.
-	 * @param array  $options['data_sets']        Graph data set options.
-	 * @param int    $options['data_source']      Data source of graph.
-	 * @param bool   $options['dashboard_time']   True if dashboard time is used.
-	 * @param array  $options['time_period']      Graph time period used.
-	 * @param array  $options['left_y_axis']      Options for graph left Y axis.
-	 * @param array  $options['right_y_axis']     Options for graph right Y axis.
-	 * @param array  $options['x_axis']           Options for graph X axis.
-	 * @param array  $options['legend']           Options for graph legend.
-	 * @param int    $options['legend_lines']     Number of lines in the legend.
-	 * @param array  $options['problems']         Graph problems options.
-	 * @param array  $options['overrides']        Graph override options.
+	 *        array  $options['data_sets']        Graph data set options.
+	 *        int    $options['data_source']      Data source of graph.
+	 *        array  $options['time_period']      Graph time period used.
+	 *        bool   $options['fix_time_period']  Whether to keep time period fixed.
+	 *        array  $options['left_y_axis']      Options for graph left Y axis.
+	 *        array  $options['right_y_axis']     Options for graph right Y axis.
+	 *        array  $options['x_axis']           Options for graph X axis.
+	 *        array  $options['legend']           Options for graph legend.
+	 *        int    $options['legend_lines']     Number of lines in the legend.
+	 *        array  $options['problems']         Graph problems options.
+	 *        array  $options['overrides']        Graph override options.
+	 *
+	 * @param int $width
+	 * @param int $height
 	 *
 	 * @throws Exception
+	 *
+	 * @return array
 	 */
 	public static function get(array $options, int $width, int $height): array {
 		$metrics = [];
 		$errors = [];
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
-		self::getMetricsPattern($metrics, $options['data_sets']);
-		self::getMetricsItems($metrics, $options['data_sets']);
+		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
+		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
-		self::applyOverrides($metrics, $options['overrides']);
+		self::applyOverrides($metrics, $options['templateid'], $options['override_hostid'], $options['overrides']);
+		self::applyUnits($metrics, $options['axes']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
@@ -61,7 +67,8 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width, $options['data_sets']);
+		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'],
+				$options['legend']['show_aggregation']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -79,11 +86,12 @@ class CSvgGraphHelper {
 			->setSize($width, $svg_height)
 			->addMetrics($metrics)
 			->addSimpleTriggers(self::getSimpleTriggers($metrics, $options['displaying']))
-			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period']))
+			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period'],
+				$options['templateid'], $options['override_hostid'])
+			)
 			->draw();
 
-		// SBox available only for graphs without overridden relative time.
-		if ($options['dashboard_time']) {
+		if (!$options['fix_time_period']) {
 			$graph->addSBox();
 		}
 
@@ -107,81 +115,102 @@ class CSvgGraphHelper {
 		];
 	}
 
-	private static function getMetricsPattern(array &$metrics, array $data_sets): void {
+	private static function getMetricsPattern(array &$metrics, array $data_sets, string $templateid,
+			string $override_hostid): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
 
-			if (!$data_set['hosts'] || !$data_set['items']) {
-				continue;
+			if ($templateid === '') {
+				if (!$data_set['hosts'] || !$data_set['items']) {
+					continue;
+				}
+			}
+			else {
+				if (!$data_set['items']) {
+					continue;
+				}
 			}
 
 			if ($max_metrics == 0) {
 				break;
 			}
 
-			// Find hosts.
-			$hosts = API::Host()->get([
-				'output' => [],
+			$options = [
+				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+				'selectHosts' => ['name'],
+				'webitems' => true,
+				'filter' => [
+					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+				],
 				'search' => [
-					'name' => self::processPattern($data_set['hosts'])
+					'name' => self::processPattern($data_set['items'])
 				],
 				'searchWildcardsEnabled' => true,
 				'searchByAny' => true,
-				'preservekeys' => true
-			]);
+				'sortfield' => 'name',
+				'sortorder' => ZBX_SORT_UP,
+				'limit' => $max_metrics
+			];
 
-			if ($hosts) {
-				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
-					'selectHosts' => ['name'],
-					'hostids' => array_keys($hosts),
-					'webitems' => true,
-					'filter' => [
-						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
-					],
+			if ($templateid === '') {
+				// Find hosts.
+				$hosts = API::Host()->get([
+					'output' => [],
 					'search' => [
-						'name' => self::processPattern($data_set['items'])
+						'name' => self::processPattern($data_set['hosts'])
 					],
 					'searchWildcardsEnabled' => true,
 					'searchByAny' => true,
-					'sortfield' => 'name',
-					'sortorder' => ZBX_SORT_UP,
-					'limit' => $max_metrics
+					'preservekeys' => true
 				]);
 
-				if (!$items) {
-					continue;
+				if ($hosts) {
+					$options['hostids'] = array_keys($hosts);
 				}
+			}
+			else {
+				$options['hostids'] = $override_hostid !== '' ? $override_hostid : $templateid;
+			}
 
-				unset($data_set['itemids'], $data_set['items']);
+			$items = null;
 
-				// The bigger transparency level, the less visible the metric is.
-				$data_set['transparency'] = 10 - (int) $data_set['transparency'];
+			if (array_key_exists('hostids', $options) && $options['hostids']) {
+				$items = API::Item()->get($options);
+			}
 
-				$data_set['timeshift'] = ($data_set['timeshift'] !== '')
-					? (int) timeUnitToSeconds($data_set['timeshift'])
-					: 0;
+			if (!$items) {
+				continue;
+			}
 
-				$colors = getColorVariations('#'.$data_set['color'], count($items));
+			unset($data_set['itemids'], $data_set['items']);
 
-				foreach ($items as $item) {
-					$data_set['color'] = array_shift($colors);
-					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
-					$max_metrics--;
-				}
+			// The bigger transparency level, the less visible the metric is.
+			$data_set['transparency'] = 10 - (int)$data_set['transparency'];
+
+			$data_set['timeshift'] = ($data_set['timeshift'] !== '')
+				? (int)timeUnitToSeconds($data_set['timeshift'])
+				: 0;
+
+			$colors = getColorVariations('#' . $data_set['color'], count($items));
+
+			foreach ($items as $item) {
+				$data_set['color'] = array_shift($colors);
+				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+				$max_metrics--;
 			}
 		}
 	}
 
-	private static function getMetricsItems(array &$metrics, array $data_sets): void {
+	private static function getMetricsItems(array &$metrics, array $data_sets, string $templateid,
+			string $override_hostid): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
 
@@ -191,6 +220,26 @@ class CSvgGraphHelper {
 
 			if ($max_metrics == 0) {
 				break;
+			}
+
+			if ($templateid !== '' && $override_hostid !== '') {
+				$tmp_items = API::Item()->get([
+					'output' => ['key_'],
+					'itemids' => $data_set['itemids'],
+					'webitems' => true
+				]);
+
+				if ($tmp_items) {
+					$items = API::Item()->get([
+						'output' => ['itemid'],
+						'hostids' => [$override_hostid],
+						'webitems' => true,
+						'filter' => [
+							'key_' => array_column($tmp_items, 'key_')
+						]
+					]);
+					$data_set['itemids'] = $items ? array_column($items, 'itemid') : null;
+				}
 			}
 
 			$items_db = API::Item()->get([
@@ -243,12 +292,31 @@ class CSvgGraphHelper {
 	}
 
 	/**
-	 * Apply overrides for each pattern matching metric.
+	 * Apply overrides for each metric.
 	 */
-	private static function applyOverrides(array &$metrics, array $overrides = []): void {
+	private static function applyOverrides(array &$metrics, string $templateid, string $override_hostid,
+			array $overrides = []): void {
+		if ($templateid !== '' && $override_hostid !== '') {
+			$override_host = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => [$override_hostid]
+			]);
+		}
+
 		foreach ($overrides as $override) {
-			if ($override['hosts'] === '' || $override['items'] === '') {
-				continue;
+			if ($templateid === '' || $templateid !== '' && $override_hostid === '') {
+				if ($override['hosts'] === '' || $override['items'] === '') {
+					continue;
+				}
+			}
+			else {
+				if ($override['items'] === '') {
+					continue;
+				}
+			}
+
+			if ($templateid !== '' && $override_hostid !== '') {
+				$override['hosts'] = [$override_host[0]['name']];
 			}
 
 			// Convert timeshift to seconds.
@@ -348,6 +416,21 @@ class CSvgGraphHelper {
 	}
 
 	/**
+	 * Apply static units for each metric if selected.
+	 */
+	private static function applyUnits(array &$metrics, array $axis_options): void {
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT && $axis_options['left_y_units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['left_y_units']));
+			}
+			elseif ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT && $axis_options['right_y_units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['right_y_units']));
+			}
+		}
+		unset($metric);
+	}
+
+	/**
 	 * Apply time period for each metric.
 	 */
 	private static function getTimePeriods(array &$metrics, array $options): void {
@@ -383,7 +466,11 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+					if ($metric['history'] != 0) {
+						$metric['history'] = timeUnitToSeconds(
+							CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
+						);
+					}
 				}
 				unset($metric);
 			}
@@ -393,7 +480,9 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					if ($metric['trends'] != 0) {
+						$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					}
 				}
 				unset($metric);
 			}
@@ -529,7 +618,8 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets): void {
+	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets,
+			bool $legend_aggregation_show): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -540,7 +630,13 @@ class CSvgGraphHelper {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
-				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+				if ($legend_aggregation_show) {
+					$name = graph_item_aggr_fnc2str($metric['options']['aggregate_function']).
+						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
+				}
+				else {
+					$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+				}
 			}
 			else {
 				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
@@ -556,7 +652,7 @@ class CSvgGraphHelper {
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
 				$metric = array_merge($metric, [
-					'name' => graph_item_aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')',
+					'name' => $name,
 					'items' => [],
 					'points' => []
 				]);
@@ -753,14 +849,23 @@ class CSvgGraphHelper {
 	/**
 	 * Find problems at given time period that matches specified problem options.
 	 */
-	private static function getProblems(array $metrics, array $problem_options, array $time_period): array {
+	private static function getProblems(array $metrics, array $problem_options, array $time_period, string $templateid,
+			string $override_hostid): array {
 		if ($problem_options['show_problems'] == SVG_GRAPH_PROBLEMS_OFF) {
 			return [];
 		}
 
+		if ($templateid !== '' && $override_hostid !== '') {
+			$override_host = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => [$override_hostid]
+			]);
+			$problem_options['problemhosts'] = [$override_host[0]['name']];
+		}
+
 		$options = [
-			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
-			'select_acknowledges' => ['action'],
+			'output' => ['eventid', 'objectid', 'name', 'severity', 'clock', 'r_eventid'],
+			'selectAcknowledges' => ['action'],
 			'problem_time_from' => $time_period['time_from'],
 			'problem_time_till' => $time_period['time_to'],
 			'symptom' => false,
@@ -785,12 +890,24 @@ class CSvgGraphHelper {
 			}
 		}
 
+		if ($problem_options['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS) {
+			$itemids = [];
+
+			foreach ($metrics as $metric) {
+				$itemids += $metric['options']['aggregate_function'] != AGGREGATE_NONE
+					? array_column($metric['items'], 'itemid', 'itemid')
+					: [$metric['itemid'] => $metric['itemid']];
+			}
+			$itemids = array_values($itemids);
+		}
+		else {
+			$itemids = null;
+		}
+
 		$options['objectids'] = array_keys(API::Trigger()->get([
 			'output' => [],
 			'hostids' => $options['hostids'] ?? null,
-			'itemids' => $problem_options['graph_item_problems']
-				? array_unique(array_column($metrics, 'itemid'))
-				: null,
+			'itemids' => $itemids,
 			'monitored' => true,
 			'preservekeys' => true
 		]));
@@ -803,10 +920,7 @@ class CSvgGraphHelper {
 		}
 
 		// Add severity filter.
-		$filter_severities = implode(',', $problem_options['severities']);
-		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
+		if ($problem_options['severities']) {
 			$options['severities'] = $problem_options['severities'];
 		}
 

@@ -21,21 +21,24 @@
 #define ZABBIX_TRAPPER_H
 
 #include "zbxthreads.h"
+
+#include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxvault.h"
 
-extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_STATS_ALLOWED_IP;
 
 #define ZBX_IPC_SERVICE_TRAPPER	"trapper"
 
 typedef struct
 {
-	zbx_config_comms_args_t	*config_comms;
-	zbx_config_vault_t	*config_vault;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	zbx_socket_t		*listen_sock;
-	int			config_startup_time;
+	zbx_config_comms_args_t		*config_comms;
+	zbx_config_vault_t		*config_vault;
+	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+	const zbx_events_funcs_t	*events_cbs;
+	zbx_socket_t			*listen_sock;
+	int				config_startup_time;
+	int				proxydata_frequency;
 }
 zbx_thread_trapper_args;
 

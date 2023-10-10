@@ -23,9 +23,15 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 
-void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb);
+typedef enum {
+	ZBX_HA_MODE_STANDALONE,
+	ZBX_HA_MODE_CLUSTER
+}
+zbx_ha_mode_t;
 
-int	DBcheck_version(void);
-int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh);
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb,
+		zbx_get_config_int_f get_config_timeout_cb);
+
+int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode);
 
 #endif

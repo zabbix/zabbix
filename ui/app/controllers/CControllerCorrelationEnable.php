@@ -21,7 +21,11 @@
 
 class CControllerCorrelationEnable extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
 			'correlationids' => 'required|array_db correlation.correlationid'
 		];
@@ -29,28 +33,23 @@ class CControllerCorrelationEnable extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)) {
-			return false;
-		}
-
-		$correlations = API::Correlation()->get([
-			'output' => [],
-			'countOutput' => true,
-			'correlationids' => $this->getInput('correlationids'),
-			'editable' => true
-		]);
-
-		return ($correlations == count($this->getInput('correlationids')));
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$correlations = [];
 
 		foreach ($this->getInput('correlationids') as $correlationid) {
@@ -61,21 +60,24 @@ class CControllerCorrelationEnable extends CController {
 		}
 
 		$result = API::Correlation()->update($correlations);
+
+		$output = [];
 		$updated = count($correlations);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'correlation.list')
-			->setArgument('page', CPagerHelper::loadPage('correlation.list', null))
-		);
-
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Correlation enabled', 'Correlations enabled', $updated));
+			$output['success']['title'] = _n('Event correlation enabled', 'Event correlations enabled', $updated);
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot enable correlation', 'Cannot enable correlations', $updated));
+			$output['error'] = [
+				'title' => _n('Cannot enable event correlation', 'Cannot enable event correlations', $updated),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

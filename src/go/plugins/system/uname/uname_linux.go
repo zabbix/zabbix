@@ -22,6 +22,7 @@ package uname
 import (
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"syscall"
 
@@ -73,6 +74,16 @@ func getHostname(params []string) (hostname string, err error) {
 		if idx := strings.Index(hostname, "."); idx > 0 {
 			hostname = hostname[:idx]
 		}
+	case "fqdn":
+		var tmp string
+		hostname = util.UnameArrayToString(&utsname.Nodename)
+
+		tmp, err = net.LookupCNAME(hostname)
+		if err == nil {
+			hostname = tmp
+		}
+
+		hostname = strings.Trim(hostname, " .\n\r")
 	case "netbios":
 		return "", errors.New("NetBIOS is not supported on the current platform.")
 	default:

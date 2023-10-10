@@ -54,7 +54,7 @@ $filter_column_left = (new CFormList())
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -68,7 +68,7 @@ $filter_column_left = (new CFormList())
 	)
 	->addRow(_('Status'),
 		(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 			->setModern(true)
@@ -155,42 +155,21 @@ $http_tests = $data['http_tests'];
 
 $csrf_token = CCsrfTokenHelper::get('httpconf.php');
 
-foreach ($http_tests as $httptestid => $http_test) {
+foreach ($http_tests as $httpTestId => $httpTest) {
 	$name = [];
-
-	if ($http_test['templateid'] != 0) {
-		$parent_httptest = $data['parent_httptests'][$http_test['templateid']];
-
-		if ($parent_httptest['editable']) {
-			$name[] = (new CLink(CHtml::encode($parent_httptest['template_name']),
-				(new CUrl('httpconf.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$parent_httptest['templateid']])
-					->setArgument('context', 'template')
-			))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$name[] = (new CSpan(CHtml::encode($parent_httptest['template_name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		$name[] = NAME_DELIMITER;
-	}
-
-	$name[] = new CLink(CHtml::encode($http_test['name']),
+	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
+	$name[] = new CLink($httpTest['name'],
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
-			->setArgument('hostid', $http_test['hostid'])
-			->setArgument('httptestid', $httptestid)
+			->setArgument('hostid', $httpTest['hostid'])
+			->setArgument('httptestid', $httpTestId)
 			->setArgument('context', $data['context'])
 	);
 
 	if ($data['context'] === 'host') {
 		$info_icons = [];
-		if ($http_test['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httptestid])
-				&& $httpTestsLastData[$httptestid]['lastfailedstep']) {
-			$lastData = $httpTestsLastData[$httptestid];
+		if($httpTest['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
+			$lastData = $httpTestsLastData[$httpTestId];
 
 			$failedStep = $lastData['failedstep'];
 
@@ -199,7 +178,7 @@ foreach ($http_tests as $httptestid => $http_test) {
 					'Step "%1$s" [%2$s of %3$s] failed: %4$s',
 					$failedStep['name'],
 					$failedStep['no'],
-					$http_test['stepscnt'],
+					$httpTest['stepscnt'],
 					($lastData['error'] === null) ? _('Unknown error') : $lastData['error']
 				)
 				: _s('Unknown step failed: %1$s', $lastData['error']);
@@ -209,20 +188,20 @@ foreach ($http_tests as $httptestid => $http_test) {
 	}
 
 	$httpTable->addRow([
-		new CCheckBox('group_httptestid['.$http_test['httptestid'].']', $http_test['httptestid']),
-		($this->data['hostid'] > 0) ? null : $http_test['hostname'],
+		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']),
+		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
-		$http_test['stepscnt'],
-		$http_test['delay'],
-		$http_test['retries'],
-		httptest_authentications($http_test['authentication']),
-		($http_test['http_proxy'] !== '') ? _('Yes') : _('No'),
+		$httpTest['stepscnt'],
+		$httpTest['delay'],
+		$httpTest['retries'],
+		httptest_authentications($httpTest['authentication']),
+		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
 		(new CLink(
-			httptest_status2str($http_test['status']),
+			httptest_status2str($httpTest['status']),
 			(new CUrl('httpconf.php'))
-				->setArgument('group_httptestid[]', $http_test['httptestid'])
-				->setArgument('hostid', $http_test['hostid'])
-				->setArgument('action', ($http_test['status'] == HTTPTEST_STATUS_DISABLED)
+				->setArgument('group_httptestid[]', $httpTest['httptestid'])
+				->setArgument('hostid', $httpTest['hostid'])
+				->setArgument('action', ($httpTest['status'] == HTTPTEST_STATUS_DISABLED)
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
 				)
@@ -231,17 +210,23 @@ foreach ($http_tests as $httptestid => $http_test) {
 		))
 			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(httptest_status2style($http_test['status'])),
-		$data['tags'][$http_test['httptestid']],
+			->addClass(httptest_status2style($httpTest['status'])),
+		$data['tags'][$httpTest['httptestid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 
 $button_list = [
-	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?'),
+	'httptest.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' => _('Enable selected web scenario?'),
+		'confirm_plural' => _('Enable selected web scenarios?'),
 		'csrf_token' => $csrf_token
 	],
-	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?'),
+	'httptest.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' => _('Disable selected web scenario?'),
+		'confirm_plural' => _('Disable selected web scenarios?'),
 		'csrf_token' => $csrf_token
 	]
 ];
@@ -249,16 +234,20 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
-			'name' => _('Clear history'),
-			'confirm' => _('Delete history of selected web scenarios?'),
+			'name' => _('Clear history and trends'),
+			'confirm_singular' => _('Clear history and trends of selected web scenario?'),
+			'confirm_plural' => _('Clear history and trends of selected web scenarios?'),
 			'csrf_token' => $csrf_token
 		]
 	];
 }
 
 $button_list += [
-	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'),
-			'csrf_token' => $csrf_token
+	'httptest.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected web scenario?'),
+		'confirm_plural' => _('Delete selected web scenarios?'),
+		'csrf_token' => $csrf_token
 	]
 ];
 
@@ -271,6 +260,10 @@ $html_page
 	->addItem($httpForm)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['hostid']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

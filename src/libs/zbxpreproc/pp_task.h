@@ -20,14 +20,17 @@
 #ifndef ZABBIX_PP_TASK_H
 #define ZABBIX_PP_TASK_H
 
-#include "pp_item.h"
+#include "zbxpreproc.h"
 #include "pp_cache.h"
 
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
 #include "zbxipcservice.h"
+#include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
+
+#define PP_TASK_DATA(x)		(&x->data)
 
 typedef struct
 {
@@ -46,13 +49,14 @@ zbx_pp_task_test_t;
 
 typedef struct
 {
-	zbx_variant_t		value;
-	zbx_variant_t		result;
-	zbx_timespec_t		ts;
-	zbx_pp_value_opt_t	opt;
+	zbx_variant_t			value;
+	zbx_variant_t			result;
+	zbx_timespec_t			ts;
+	zbx_pp_value_opt_t		opt;
 
-	zbx_pp_item_preproc_t	*preproc;
-	zbx_pp_cache_t		*cache;
+	zbx_pp_item_preproc_t		*preproc;
+	zbx_pp_cache_t			*cache;
+	zbx_dc_um_shared_handle_t	*um_handle;
 }
 zbx_pp_task_value_t;
 
@@ -70,17 +74,17 @@ typedef struct
 }
 zbx_pp_task_sequence_t;
 
-#define PP_TASK_DATA(x)		(&x->data)
-
 void	pp_task_free(zbx_pp_task_t *task);
 
 zbx_pp_task_t	*pp_task_test_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t *value, zbx_timespec_t ts,
 		zbx_ipc_client_t *client);
-zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
-		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache);
+zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc,
+		zbx_dc_um_shared_handle_t *um_handle, zbx_variant_t *value, zbx_timespec_t ts,
+		const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache);
 zbx_pp_task_t	*pp_task_dependent_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc);
-zbx_pp_task_t	*pp_task_value_seq_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
-		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache);
+zbx_pp_task_t	*pp_task_value_seq_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc,
+		zbx_dc_um_shared_handle_t *um_handle, zbx_variant_t *value, zbx_timespec_t ts,
+		const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache);
 zbx_pp_task_t	*pp_task_sequence_create(zbx_uint64_t itemid);
 
 #endif

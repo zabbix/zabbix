@@ -31,7 +31,7 @@ $form = (new CForm('post'))
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Service tab.
 
@@ -69,9 +69,7 @@ $service_tab = (new CFormGrid())
 					)
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))
 					),
 				(new CTemplateTag('problem-tag-row-tmpl'))
@@ -97,9 +95,7 @@ $service_tab = (new CFormGrid())
 								->addClass('js-problem-tag-input')
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						]))->addClass('form_row')
 					)
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -108,7 +104,7 @@ $service_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('sortorder', $data['form']['sortorder'], false, 3))
+			(new CNumericBox('sortorder', $data['form']['sortorder'], 3))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		)
@@ -116,12 +112,11 @@ $service_tab = (new CFormGrid())
 	->addItem([
 		new CLabel([
 			_('Status calculation rule'),
-			(new CSpan([
-				' ',
+			(new CSpan(
 				makeWarningIcon(
 					_('Status calculation rule and additional rules are only applicable if child services exist.')
 				)
-			]))
+			))
 				->setId('algorithm-not-applicable-warning')
 				->addStyle($data['form']['children'] ? 'display: none' : '')
 		], 'algorithm_focusable'),
@@ -152,13 +147,6 @@ $service_tab = (new CFormGrid())
 				)
 			]
 			: null
-	)
-	->addItem(
-		(new CFormField(
-			(new CCheckBox('advanced_configuration'))
-				->setLabel(_('Advanced configuration'))
-				->setChecked($data['form']['advanced_configuration'])
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);
 
 $additional_rules = (new CTable())
@@ -171,46 +159,16 @@ $additional_rules->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-add')
+				(new CButtonLink(_('Add')))->addClass('js-add')
 			))->setColSpan(2)
 		)
 );
-
-$service_tab
-	->addItem([
-		(new CLabel(_('Additional rules')))
-			->setId('additional_rules_label')
-			->addStyle('display: none;'),
-		(new CFormField(
-			(new CDiv($additional_rules))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		))
-			->setId('additional_rules_field')
-			->addStyle('display: none;')
-	])
-	->addItem([
-		(new CLabel(_('Status propagation rule')))
-			->setId('status_propagation_rules_label')
-			->addStyle('display: none;'),
-		(new CFormField(
-			(new CSelect('propagation_rule'))
-				->setId('propagation_rule')
-				->setFocusableElementId('propagation_rule_focusable')
-				->setValue($data['form']['propagation_rule'])
-				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusPropagationNames()))
-		))
-			->setId('status_propagation_rules_field')
-			->addStyle('display: none;')
-	]);
 
 $propagation_value_number = (new CRadioButtonList('propagation_value_number',
 	$data['form']['propagation_value_number'] !== null ? (int) $data['form']['propagation_value_number'] : null
 ))
 	->setId('propagation_value_number')
-	->setModern(true);
+	->setModern();
 
 foreach (range(1, TRIGGER_SEVERITY_COUNT - 1) as $value) {
 	$propagation_value_number->addValue($value, $value, 'propagation_value_number_'.$value);
@@ -220,25 +178,42 @@ $propagation_value_status = (new CSeverity('propagation_value_status',
 	$data['form']['propagation_value_status'] !== null ? (int) $data['form']['propagation_value_status'] : null
 ))->addValue(_('OK'), ZBX_SEVERITY_OK, ZBX_STYLE_NORMAL_BG);
 
-$service_tab
-	->addItem([
-		(new CFormField([
-			$propagation_value_number,
-			$propagation_value_status
-		]))
-			->setId('status_propagation_value_field')
-			->addStyle('display: none;')
-	])
-	->addItem([
-		(new CLabel(_('Weight')))
-			->setId('weight_label')
-			->addStyle('display: none;'),
-		(new CFormField(
-			(new CTextBox('weight', $data['form']['weight'], false, 7))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-		))
-			->setId('weight_field')
-			->addStyle('display: none;')
-	]);
+$service_tab->addItem(
+	(new CFormFieldsetCollapsible(_('Advanced configuration')))
+		->setId('advanced-configuration')
+		->addItem([
+			new CLabel(_('Additional rules')),
+			new CFormField(
+				(new CDiv($additional_rules))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->addStyle('min-width: '.(ZBX_TEXTAREA_BIG_WIDTH - 27).'px;')
+			)
+		])
+		->addItem([
+			new CLabel(_('Status propagation rule'), 'propagation_rule_focusable'),
+			new CFormField(
+				(new CSelect('propagation_rule'))
+					->setId('propagation_rule')
+					->setFocusableElementId('propagation_rule_focusable')
+					->setValue($data['form']['propagation_rule'])
+					->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusPropagationNames()))
+			)
+		])
+		->addItem([
+			(new CFormField([
+				$propagation_value_number,
+				$propagation_value_status
+			]))->setId('status_propagation_value_field')
+		])
+		->addItem([
+			(new CLabel(_('Weight'), 'weight'))->setAsteriskMark(),
+			new CFormField(
+				(new CNumericBox('weight', $data['form']['weight'], 7))
+					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+					->setAriaRequired()
+			)
+		])
+);
 
 // Tags tab.
 
@@ -278,13 +253,10 @@ $child_services = (new CTable())
 					(new CList())
 						->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
 						->addItem(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('js-add')
+							(new CButtonLink(_('Add')))->addClass('js-add')
 						)
 						->addItem(
-							(new CListItem(null))
-								->addClass(ZBX_STYLE_INLINE_FILTER_STATS)
+							(new CListItem(null))->addClass(ZBX_STYLE_INLINE_FILTER_STATS)
 						)
 				))->setColSpan(3)
 			)

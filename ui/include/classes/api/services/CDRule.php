@@ -147,6 +147,7 @@ class CDRule extends CApiService {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
 		while ($drule = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -194,7 +195,7 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$proxy_hostids = [];
+		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
@@ -245,15 +246,23 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('proxy_hostid', $drule)) {
-				if (!zbx_is_int($drule['proxy_hostid'])) {
+			if (array_key_exists('concurrency_max', $drule)
+					&& ($drule['concurrency_max'] < ZBX_DISCOVERY_CHECKS_UNLIMITED
+						|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['concurrency_max'], 'concurrency_max')
+				);
+			}
+
+			if (array_key_exists('proxyid', $drule)) {
+				if (!zbx_is_int($drule['proxyid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxy_hostid'], 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxyid'], 'proxyid')
 					);
 				}
 
-				if ($drule['proxy_hostid'] > 0) {
-					$proxy_hostids[] = $drule['proxy_hostid'];
+				if ($drule['proxyid'] > 0) {
+					$proxyids[] = $drule['proxyid'];
 				}
 			}
 
@@ -267,6 +276,7 @@ class CDRule extends CApiService {
 
 		// Check drule name duplicates in input data.
 		$duplicate = CArrayHelper::findDuplicate($drules, 'name');
+
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Discovery rule "%1$s" already exists.', $duplicate['name'])
@@ -287,16 +297,17 @@ class CDRule extends CApiService {
 		}
 
 		// Check proxy IDs.
-		if ($proxy_hostids) {
-			$db_proxies = API::proxy()->get([
+		if ($proxyids) {
+			$db_proxies = API::Proxy()->get([
 				'output' => ['proxyid'],
-				'proxyids' => $proxy_hostids,
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
-			foreach ($proxy_hostids as $proxy_hostid) {
-				if (!array_key_exists($proxy_hostid, $db_proxies)) {
+
+			foreach ($proxyids as $proxyid) {
+				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $proxyid, 'proxyid')
 					);
 				}
 			}
@@ -334,7 +345,7 @@ class CDRule extends CApiService {
 		]);
 
 		$drule_names_changed = [];
-		$proxy_hostids = [];
+		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
@@ -394,15 +405,23 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('proxy_hostid', $drule)) {
-				if (!zbx_is_int($drule['proxy_hostid'])) {
+			if (array_key_exists('concurrency_max', $drule)
+					&& ($drule['concurrency_max'] < ZBX_DISCOVERY_CHECKS_UNLIMITED
+						|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['concurrency_max'], 'concurrency_max')
+				);
+			}
+
+			if (array_key_exists('proxyid', $drule)) {
+				if (!zbx_is_int($drule['proxyid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxy_hostid'], 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxyid'], 'proxyid')
 					);
 				}
 
-				if ($drule['proxy_hostid'] > 0) {
-					$proxy_hostids[] = $drule['proxy_hostid'];
+				if ($drule['proxyid'] > 0) {
+					$proxyids[] = $drule['proxyid'];
 				}
 			}
 
@@ -419,6 +438,7 @@ class CDRule extends CApiService {
 		if ($drule_names_changed) {
 			// Check drule name duplicates in input data.
 			$duplicate = CArrayHelper::findDuplicate($drule_names_changed, 'name');
+
 			if ($duplicate) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Discovery rule "%1$s" already exists.', $duplicate['name'])
@@ -440,16 +460,17 @@ class CDRule extends CApiService {
 		}
 
 		// Check proxy IDs.
-		if ($proxy_hostids) {
-			$db_proxies = API::proxy()->get([
+		if ($proxyids) {
+			$db_proxies = API::Proxy()->get([
 				'output' => ['proxyid'],
-				'proxyids' => $proxy_hostids,
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
-			foreach ($proxy_hostids as $proxy_hostid) {
-				if (!array_key_exists($proxy_hostid, $db_proxies)) {
+
+			foreach ($proxyids as $proxyid) {
+				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $proxyid, 'proxyid')
 					);
 				}
 			}
@@ -532,6 +553,7 @@ class CDRule extends CApiService {
 					_s('Incorrect value "%1$s" for "%2$s" field.', $dcheck['type'], 'type')
 				);
 			}
+
 			switch ($dcheck['type']) {
 				case SVC_AGENT:
 					if (!array_key_exists('key_', $dcheck)) {
@@ -550,6 +572,7 @@ class CDRule extends CApiService {
 
 					$length = mb_strlen($dcheck['key_']);
 					$max_length = DB::getFieldLength('dchecks', 'key_');
+
 					if ($length > $max_length) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'key_',
@@ -577,6 +600,14 @@ class CDRule extends CApiService {
 					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null || $dcheck['key_'] === false
 							|| $dcheck['key_'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
+					}
+					break;
+				case SVC_ICMPPING:
+					if (array_key_exists('allow_redirect', $dcheck)
+							&& $dcheck['allow_redirect'] != 1 && $dcheck['allow_redirect'] != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value "%1$s" for "%2$s" field.', $dcheck['allow_redirect'], 'allow_redirect')
+						);
 					}
 					break;
 			}
@@ -641,19 +672,21 @@ class CDRule extends CApiService {
 			}
 
 			$dcheck += $default_values;
-			unset($dcheck['uniq']);
+			unset($dcheck['dcheckid'], $dcheck['uniq']);
 		}
 		unset($dcheck);
 
 		while ($current = array_pop($dchecks)) {
 			foreach ($dchecks as $dcheck) {
 				$equal = true;
+
 				foreach ($dcheck as $field => $value) {
 					if (array_key_exists($field, $current) && (strcmp($value, $current[$field]) !== 0)) {
 						$equal = false;
 						break;
 					}
 				}
+
 				if ($equal) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
 				}
@@ -666,10 +699,11 @@ class CDRule extends CApiService {
 	 *
 	 * @param array(
 	 *  name => string,
-	 *  proxy_hostid => int,
+	 *  proxyid => int,
 	 *  iprange => string,
 	 *  delay => string,
 	 *  status => int,
+	 * 	concurrency_max => int,
 	 *  dchecks => array(
 	 *  	array(
 	 *  		type => int,
@@ -681,6 +715,7 @@ class CDRule extends CApiService {
 	 *  		snmpv3_authpassphrase => string,
 	 *  		snmpv3_privpassphrase => string,
 	 *  		uniq => int,
+	 * 			allow_redirect => int,
 	 *  	), ...
 	 *  )
 	 * ) $drules
@@ -700,6 +735,7 @@ class CDRule extends CApiService {
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_DISCOVERY_RULE, $drules);
 
 		$create_dchecks = [];
+
 		foreach ($drules as $dnum => $drule) {
 			foreach ($drule['dchecks'] as $dcheck) {
 				$dcheck['druleid'] = $druleids[$dnum];
@@ -718,10 +754,11 @@ class CDRule extends CApiService {
 	 * @param array(
 	 * 	druleid => int,
 	 *  name => string,
-	 *  proxy_hostid => int,
+	 *  proxyid => int,
 	 *  iprange => string,
 	 *  delay => string,
 	 *  status => int,
+	 *  concurrency_max => int,
 	 *  dchecks => array(
 	 *  	array(
 	 * 			dcheckid => int,
@@ -734,6 +771,7 @@ class CDRule extends CApiService {
 	 *  		snmpv3_authpassphrase => string,
 	 *  		snmpv3_privpassphrase => string,
 	 *  		uniq => int,
+	 * 			allow_redirect => int,
 	 *  	), ...
 	 *  )
 	 * ) $drules
@@ -747,10 +785,10 @@ class CDRule extends CApiService {
 		$this->validateUpdate($drules);
 
 		$db_drules = API::DRule()->get([
-			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status'],
+			'output' => ['druleid', 'proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source'
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source', 'allow_redirect'
 			],
 			'druleids' => $druleids,
 			'editable' => true,
@@ -810,6 +848,7 @@ class CDRule extends CApiService {
 	 */
 	public function delete(array $druleids) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $druleids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -886,6 +925,7 @@ class CDRule extends CApiService {
 				' AND '.dbConditionString('c.value', $dCheckIds).
 			' ORDER BY c.actionid'
 		);
+
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionIds[] = $dbAction['actionid'];
 		}
@@ -937,7 +977,9 @@ class CDRule extends CApiService {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
+
 				$dchecks = zbx_toHash($dchecks, 'druleid');
+
 				foreach ($result as $druleid => $drule) {
 					$result[$druleid]['dchecks'] = array_key_exists($druleid, $dchecks)
 						? $dchecks[$druleid]['rowscount']
@@ -959,6 +1001,7 @@ class CDRule extends CApiService {
 						'dhostids' => $related_ids,
 						'preservekeys' => true
 					]);
+
 					if (!is_null($options['limitSelects'])) {
 						order_result($dhosts, 'dhostid');
 					}
@@ -972,7 +1015,9 @@ class CDRule extends CApiService {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
+
 				$dhosts = zbx_toHash($dhosts, 'druleid');
+
 				foreach ($result as $druleid => $drule) {
 					$result[$druleid]['dhosts'] = array_key_exists($druleid, $dhosts)
 						? $dhosts[$druleid]['rowscount']

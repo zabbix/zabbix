@@ -72,18 +72,20 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				$overlay_colorbox
 					.css({'background': ''})
 					.attr('title', t('Use default'))
-					.addClass('use-default');
+					.addClass('use-default')
+					.removeClass('use-transparent');
 			}
 			else if (/^[0-9A-F]{6}$/i.test(color)) {
 				$overlay_colorbox
 					.css({'background': '#' + color})
 					.attr('title', '#' + color)
-					.removeClass('use-default');
+					.removeClass(['use-default', 'use-transparent']);
 			}
 			else {
 				$overlay_colorbox
 					.css({'background': ''})
 					.attr('title', t('Use default'))
+					.addClass('use-transparent')
 					.removeClass('use-default');
 			}
 		},
@@ -161,7 +163,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				const $close = $('<button>', {
 					type: 'button',
-					class: 'overlay-close-btn',
+					class: 'btn-overlay-close',
 					title: t('S_CLOSE')
 				})
 					.on('click', (e) => {
@@ -297,18 +299,20 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					colorbox
 						.css({'background': ''})
 						.attr('title', t('Use default'))
-						.addClass('use-default');
+						.addClass('use-default')
+						.removeClass('use-transparent');
 				}
 				else if (/^[0-9A-F]{6}$/i.test(color)) {
 					colorbox
 						.css({'background': '#' + color})
 						.attr('title', '#' + color)
-						.removeClass('use-default');
+						.removeClass(['use-default', 'use-transparent']);
 				}
 				else {
 					colorbox
 						.css({'background': ''})
 						.attr('title', t('Use default'))
+						.addClass('use-transparent')
 						.removeClass('use-default');
 				}
 
@@ -361,7 +365,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 		 * @param {callable}  options.onUpdate     Callback function to execute once color has changed.
 		 */
 		return this.each(function (_, element) {
-			const id = $(element).attr('id');
+			const id = element.id;
 
 			if ($('#lbl_' + id).length) {
 				return;
@@ -377,18 +381,18 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				.on('keydown', function (e) {
 					if (e.keyCode == KEY_ENTER || e.keyCode == KEY_SPACE) {
 						e.preventDefault();
-						methods.show(id, e.target);
+						methods.show(element.id, e.target);
 					}
 				})
 				.on('click', function (e) {
-					methods.show(id, e.target);
+					methods.show(element.id, e.target);
 				})
 				.insertAfter(element);
 
 			$(element)
 				.data('use_default', options.use_default)
 				.change(function () {
-					methods.set_color_by_id($(element).attr('id'), this.value);
+					methods.set_color_by_id(element.id, this.value);
 					if (options.onUpdate !== null) {
 						options.onUpdate.call(element, this.value);
 					}

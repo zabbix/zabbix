@@ -26,23 +26,25 @@
  * @var array $data
  */
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
-	$data['captions']['ms']['groups']['groupids']
-);
+$form = (new CWidgetFormView($data));
 
-(new CWidgetFormView($data))
+$groupids = array_key_exists('groupids', $data['fields'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
+	: null;
+
+$form
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['show'])
 	)
 	->addField($groupids)
-	->addField(
-		new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
-			$data['captions']['ms']['groups']['exclude_groupids']
-		)
+	->addField(array_key_exists('exclude_groupids', $data['fields'])
+		? new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'])
+		: null
 	)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+	->addField(array_key_exists('hostids', $data['fields'])
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+		: null
 	)
 	->addField(
 		new CWidgetFieldTextBoxView($data['fields']['problem'])
@@ -74,9 +76,7 @@ $groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['unacknowledged'])
-	)
+	->addItem(getAcknowledgementStatusFieldsViews($form, $data['fields']))
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
 	)
@@ -94,3 +94,19 @@ $groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
 		]
 	], JSON_THROW_ON_ERROR).');')
 	->show();
+
+function getAcknowledgementStatusFieldsViews(CWidgetFormView $form, array $fields): array {
+	$acknowledgement_status_field = $form->registerField(
+		new CWidgetFieldRadioButtonListView($fields['acknowledgement_status'])
+	);
+	$acknowledged_by_me_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']));
+
+	return [
+		new CLabel(_('Acknowledgement status')),
+		new CFormField(new CHorList([
+			$acknowledgement_status_field->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$acknowledged_by_me_field->getView()
+		]))
+	];
+}

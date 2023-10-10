@@ -27,6 +27,7 @@
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.calendar.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
 
 $this->includeJsFile('service.list.js.php');
 
@@ -54,7 +55,9 @@ $filter = (new CFilter())
 if ($data['service'] !== null && !$data['is_filtered']) {
 	$filter
 		->addTab(
-			(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
+			(new CLink(_('Info'), '#tab_info'))
+				->addClass(ZBX_STYLE_BTN)
+				->addClass(ZBX_ICON_CIRCLE_INFO),
 			(new CDiv())
 				->setId('tab_info')
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)

@@ -23,9 +23,8 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
-#include "log.h"
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
@@ -52,7 +51,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 
 	tmp = zbx_strdup(NULL, port_orig);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&tmp, MACRO_TYPE_COMMON, NULL, 0);
+			&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	if (FAIL == zbx_is_ushort(tmp, port) || 0 == *port)
 	{
@@ -78,7 +77,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len)
+int	zbx_ipmi_execute_command(const zbx_dc_host_t *host, const char *command, char *error, size_t max_error_len)
 {
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
@@ -86,7 +85,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	zbx_uint32_t		data_len;
 	unsigned char		*data = NULL;
 	int			ret = FAIL, op;
-	DC_INTERFACE		interface;
+	zbx_dc_interface_t	interface;
 	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:\"%s\" command:%s", __func__, host->host, command);
@@ -102,7 +101,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 
 	zbx_ipc_message_init(&message);
 
-	if (FAIL == DCconfig_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI))
+	if (FAIL == zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI))
 	{
 		zbx_strlcpy(error, "cannot find host IPMI interface", max_error_len);
 		goto cleanup;
@@ -166,7 +165,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ipmi_test_item(const DC_ITEM *item, char **info)
+int	zbx_ipmi_test_item(const zbx_dc_item_t *item, char **info)
 {
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;

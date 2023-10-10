@@ -37,7 +37,7 @@ new CViewSwitcher('type-select', 'change', <?= json_encode([
 	SVC_AGENT => ['row_dcheck_ports', 'row_dcheck_key'],
 	SVC_SNMPv1 => ['row_dcheck_ports', 'row_dcheck_snmp_community', 'row_dcheck_snmp_oid'],
 	SVC_SNMPv2c => ['row_dcheck_ports', 'row_dcheck_snmp_community', 'row_dcheck_snmp_oid'],
-	SVC_ICMPPING => [],
+	SVC_ICMPPING => ['row_dcheck_allow_redirect'],
 	SVC_SNMPv3 => ['row_dcheck_ports', 'row_dcheck_snmp_oid', 'row_dcheck_snmpv3_contextname',
 		'row_dcheck_snmpv3_securityname', 'row_dcheck_snmpv3_securitylevel', 'row_dcheck_snmpv3_authprotocol',
 		'row_dcheck_snmpv3_authpassphrase', 'row_dcheck_snmpv3_privprotocol', 'row_dcheck_snmpv3_privpassphrase'
@@ -96,4 +96,5 @@ function clearDCheckForm() {
 		'#snmpv3_privpassphrase').val('');
 	jQuery('#snmpv3-securitylevel').val(<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>);
 	jQuery('#snmpv3_authprotocol_0, #snmpv3_privprotocol_0').prop('checked', true);
+	document.getElementById('allow_redirect').checked = false;
 }

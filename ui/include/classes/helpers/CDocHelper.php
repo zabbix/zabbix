@@ -34,12 +34,13 @@ class CDocHelper {
 	const ADMINISTRATION_IMAGE_LIST =							'web_interface/frontend_sections/administration/general#images';
 	const ADMINISTRATION_MACROS_EDIT =							'web_interface/frontend_sections/administration/macros';
 	const ADMINISTRATION_MISCCONFIG_EDIT =						'web_interface/frontend_sections/administration/general#other-parameters';
-	const ADMINISTRATION_MODULE_EDIT =							'modules#manifest-preparation';
+	const ADMINISTRATION_MODULE_EDIT =							'extensions/frontendmodules#manifest-preparation';
 	const ADMINISTRATION_MODULE_LIST =							'web_interface/frontend_sections/administration/general#modules';
 	const ADMINISTRATION_PROXY_EDIT =							'distributed_monitoring/proxies#configuration';
 	const ADMINISTRATION_PROXY_LIST =							'web_interface/frontend_sections/administration/proxies';
 	const ADMINISTRATION_REGEX_EDIT =							'regular_expressions#global-regular-expressions';
 	const ADMINISTRATION_REGEX_LIST =							'web_interface/frontend_sections/administration/general#regular-expressions';
+	const ADMINISTRATION_TIMEOUTS =								'web_interface/frontend_sections/administration/general#timeouts';
 	const ADMINISTRATION_TRIGDISPLAY_EDIT =						'web_interface/frontend_sections/administration/general#trigger-displaying-options';
 	const ALERTS_ACTION_EDIT =									'config/notifications/action#configuring-an-action';
 	const ALERTS_ACTION_LIST =									'web_interface/frontend_sections/alerts/actions';
@@ -81,6 +82,8 @@ class CDocHelper {
 	const DATA_COLLECTION_MAINTENANCE_EDIT =					'maintenance#configuration';
 	const DATA_COLLECTION_MAINTENANCE_LIST =					'web_interface/frontend_sections/data_collection/maintenance';
 	const DATA_COLLECTION_PROTOTYPE_GRAPH_EDIT =				'discovery/low_level_discovery/graph_prototypes';
+	const DATA_COLLECTION_TEMPLATE_GROUPS_EDIT =				'config/templates/template#creating-a-template-group';
+	const DATA_COLLECTION_TEMPLATE_GROUPS_LIST =				'web_interface/frontend_sections/data_collection/templategroups';
 	const DATA_COLLECTION_TEMPLATE_GRAPH_LIST =					'web_interface/frontend_sections/data_collection/templates/graphs';
 	const DATA_COLLECTION_TEMPLATES_GRAPH_PROTOTYPE_LIST =		'web_interface/frontend_sections/data_collection/templates/discovery/graph_prototypes';
 	const DATA_COLLECTION_TEMPLATE_ITEM_LIST =					'web_interface/frontend_sections/data_collection/templates/items';
@@ -96,6 +99,13 @@ class CDocHelper {
 	const DATA_COLLECTION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const INVENTORY_HOST_LIST =									'web_interface/frontend_sections/inventory/hosts';
 	const INVENTORY_HOST_OVERVIEW =								'web_interface/frontend_sections/inventory/overview';
+	const ITEM_TYPES_DB_MONITOR =								'config/items/itemtypes/odbc_checks';
+	const ITEM_TYPES_IPMI_AGENT =								'config/items/itemtypes/ipmi';
+	const ITEM_TYPES_JMX_AGENT =								'config/items/itemtypes/jmx_monitoring';
+	const ITEM_TYPES_SIMPLE_CHECK =								'config/items/itemtypes/simple_checks';
+	const ITEM_TYPES_SNMP_TRAP =								'config/items/itemtypes/snmptrap';
+	const ITEM_TYPES_ZABBIX_AGENT =								'config/items/itemtypes/zabbix_agent';
+	const ITEM_TYPES_ZABBIX_INTERNAL =							'config/items/itemtypes/internal';
 	const MONITORING_CHARTS_VIEW =								'web_interface/frontend_sections/monitoring/hosts/graphs';
 	const MONITORING_DISCOVERY_VIEW =							'web_interface/frontend_sections/monitoring/discovery';
 	const MONITORING_HOST_DASHBOARD_VIEW =						'config/visualization/host_screens';
@@ -109,7 +119,7 @@ class CDocHelper {
 	const MONITORING_SYSMAP_CONSTRUCTOR =						'config/visualization/maps/map#overview';
 	const MONITORING_WEB_VIEW =									'web_interface/frontend_sections/monitoring/hosts/web';
 	const POPUP_ACKNOWLEDGMENT_EDIT =							'acknowledgment#updating-problems';
-	const POPUP_CONNECTOR_EDIT =								'config/connectors';
+	const POPUP_CONNECTOR_EDIT =								'config/export/streaming#configuration';
 	const POPUP_HOST_IMPORT =									'xml_export_import/hosts#importing';
 	const POPUP_HTTP_STEP_EDIT =								'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =									'xml_export_import/maps#importing';

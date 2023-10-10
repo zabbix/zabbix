@@ -24,7 +24,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtrends.h"
-#include "log.h"
+#include "zbxlog.h"
 
 static void	parse_period(const char *period, int *multiplier, zbx_time_unit_t *base)
 {

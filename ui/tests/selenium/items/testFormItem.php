@@ -361,13 +361,13 @@ class testFormItem extends CLegacyWebTest {
 		$form = $this->query('id:item-form')->asForm()->waitUntilVisible()->one();
 
 		if (isset($templateid)) {
-			$this->zbxTestTextPresent('Parent item');
+			$this->zbxTestTextPresent('Parent items');
 			if (isset($data['hostTemplate'])) {
 				$this->assertTrue($form->query('link', $data['hostTemplate'])->exists());
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent item');
+			$this->zbxTestTextNotPresent('Parent items');
 		}
 
 		$this->zbxTestTextPresent('Name');
@@ -548,7 +548,7 @@ class testFormItem extends CLegacyWebTest {
 		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check' || $type == 'Database monitor') {
 			$this->zbxTestTextPresent('User name');
 			$this->zbxTestAssertVisibleId('username');
-			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 255);
 
 			if (isset($authtype) && $authtype == 'Public key') {
 				$this->zbxTestTextPresent('Key passphrase');
@@ -557,7 +557,7 @@ class testFormItem extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Password');
 			}
 			$this->zbxTestAssertVisibleId('password');
-			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 255);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);
@@ -587,8 +587,20 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
+				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', 'walk[OID1,OID2,...]');
 			}
+
+			//Check hintbox.
+			$hint_text = "Field requirements:".
+				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
+				"\nget[OID] - to retrieve a single value".
+				"\nOID - (legacy) to retrieve a single value synchronously, optionally combined with other values";
+
+			$form->getLabel('SNMP OID')->query('xpath:./button[@data-hintbox]')->one()->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
+			$this->assertEquals($hint_text, $hint->one()->getText());
+			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+			$hint->waitUntilNotPresent();
 		}
 		else {
 			$this->zbxTestTextNotVisible('SNMP OID');

@@ -22,6 +22,8 @@
 #include "audit/zbxaudit.h"
 #include "audit.h"
 
+#include "zbxalgo.h"
+
 #define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)							\
 	char	audit_key_version[AUDIT_DETAILS_KEY_LEN], audit_key_bulk[AUDIT_DETAILS_KEY_LEN],		\
 		audit_key_community[AUDIT_DETAILS_KEY_LEN], audit_key_securityname[AUDIT_DETAILS_KEY_LEN],	\
@@ -120,14 +122,14 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 PREPARE_AUDIT_SNMP_INTERFACE(host, host)
 PREPARE_AUDIT_SNMP_INTERFACE(host_prototype, hostprototype)
 
-void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(zbx_uint64_t hostid,
-		zbx_uint64_t proxy_hostid, const char *hostname, int inventory_mode)
+void	zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(zbx_uint64_t hostid,
+		zbx_uint64_t proxyid, const char *hostname, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF();
 
 #define	AUDIT_TABLE_NAME	"hosts"
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_hostid",
-			proxy_hostid, AUDIT_TABLE_NAME, "proxy_hostid");
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxyid",
+			proxyid, AUDIT_TABLE_NAME, "proxyid");
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.host", hostname,
 			AUDIT_TABLE_NAME, "host");
 
@@ -303,7 +305,7 @@ void	zbx_audit_host_update_json_update_##resource(zbx_uint64_t hostid, type1 old
 
 PREPARE_AUDIT_HOST_UPDATE(host, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(name, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(proxy_hostid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_HOST_UPDATE(proxyid, zbx_uint64_t, uint64)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_authtype, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_privilege, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_username, const char*, string)
@@ -459,7 +461,7 @@ void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
 	zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_DELETE, hostid, hostname);
 }
 
-void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxy_hostid,
+void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxyid,
 		int ipmi_authtype, int ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
 		int status, int flags, int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
 		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces, int inventory_mode)
@@ -469,8 +471,8 @@ void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *hos
 #define	AUDIT_TABLE_NAME	"hosts"
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.host", host,
 			AUDIT_TABLE_NAME, "host");
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_hostid",
-			proxy_hostid, AUDIT_TABLE_NAME, "proxy_hostid");
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxyid",
+			proxyid, AUDIT_TABLE_NAME, "proxyid");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_authtype",
 			ipmi_authtype, AUDIT_TABLE_NAME, "ipmi_authtype");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_privilege",
@@ -966,11 +968,11 @@ void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, ty
 
 PREPARE_AUDIT_HOST_GROUP_UPDATE(name, const char*, string)
 
-void	zbx_audit_host_update_json_add_proxy_hostid(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid)
+void	zbx_audit_host_update_json_add_proxyid(zbx_uint64_t hostid, zbx_uint64_t proxyid)
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_hostid",
-			proxy_hostid, "hosts", "proxy_hostid");
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxyid",
+			proxyid, "hosts", "proxyid");
 }
 #undef PREPARE_AUDIT_HOST_GROUP_UPDATE

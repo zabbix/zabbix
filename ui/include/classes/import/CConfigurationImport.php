@@ -72,7 +72,6 @@ class CConfigurationImport {
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -80,7 +79,8 @@ class CConfigurationImport {
 			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
-			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false]
+			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
 		$options += $default_options;
@@ -88,25 +88,31 @@ class CConfigurationImport {
 			$options[$entity] += $rules;
 		}
 
-		$options['process_templates'] = !$options['templates']['updateExisting']
-			&& (array_filter($options['valueMaps'])
-				|| array_filter($options['items'])
-				|| array_filter($options['discoveryRules'])
-				|| $options['triggers']['deleteMissing']
-				|| $options['graphs']['deleteMissing']
-				|| array_filter($options['httptests'])
-				|| array_filter($options['templateDashboards'])
-			);
+		$object_options = (
+			$options['templateLinkage']['createMissing']
+			|| $options['templateLinkage']['deleteMissing']
+			|| $options['items']['updateExisting']
+			|| $options['items']['createMissing']
+			|| $options['items']['deleteMissing']
+			|| $options['discoveryRules']['updateExisting']
+			|| $options['discoveryRules']['createMissing']
+			|| $options['discoveryRules']['deleteMissing']
+			|| $options['triggers']['deleteMissing']
+			|| $options['graphs']['deleteMissing']
+			|| $options['httptests']['updateExisting']
+			|| $options['httptests']['createMissing']
+			|| $options['httptests']['deleteMissing']
+		);
 
-		$options['process_hosts'] = !$options['hosts']['updateExisting']
-			&& (array_filter($options['templateLinkage'])
-				|| array_filter($options['valueMaps'])
-				|| array_filter($options['items'])
-				|| array_filter($options['discoveryRules'])
-				|| $options['triggers']['deleteMissing']
-				|| $options['graphs']['deleteMissing']
-				|| array_filter($options['httptests'])
-			);
+		$options['process_templates'] = (
+			!$options['templates']['updateExisting']
+			&& ($object_options
+				|| $options['templateDashboards']['updateExisting']
+				|| $options['templateDashboards']['createMissing']
+				|| $options['templateDashboards']['deleteMissing']
+			)
+		);
+		$options['process_hosts'] = (!$options['hosts']['updateExisting'] && $object_options);
 
 		$this->options = $options;
 		$this->referencer = $referencer;
@@ -140,11 +146,9 @@ class CConfigurationImport {
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
 		$this->deleteMissingItems();
-		$this->deleteMissingValueMaps();
 
 		// Import objects.
 		$this->processHttpTests();
-		$this->processValueMaps();
 		$this->processItems();
 		$this->processTriggers();
 		$this->processDiscoveryRules();
@@ -176,9 +180,15 @@ class CConfigurationImport {
 		$iconmaps_refs = [];
 		$images_refs = [];
 		$maps_refs = [];
+		$services_refs = [];
+		$slas_refs = [];
+		$users_refs = [];
+		$actions_refs = [];
+		$media_types_refs = [];
 		$template_dashboards_refs = [];
 		$template_macros_refs = [];
 		$host_macros_refs = [];
+		$group_prototypes_refs = [];
 		$host_prototype_macros_refs = [];
 		$proxy_refs = [];
 		$host_prototypes_refs = [];
@@ -196,9 +206,13 @@ class CConfigurationImport {
 				$template_groups_refs += [$group['name'] => []];
 			}
 
-			if (array_key_exists('macros', $template)) {
-				foreach ($template['macros'] as $macro) {
-					$template_macros_refs[$template['uuid']][] = $macro['macro'];
+			foreach ($template['macros'] as $macro) {
+				$template_macros_refs[$template['uuid']][] = $macro['macro'];
+			}
+
+			if ($template['templates']) {
+				foreach ($template['templates'] as $linked_template) {
+					$templates_refs += [$linked_template['name'] => []];
 				}
 			}
 		}
@@ -214,10 +228,8 @@ class CConfigurationImport {
 				$host_groups_refs += [$group['name'] => []];
 			}
 
-			if (array_key_exists('macros', $host)) {
-				foreach ($host['macros'] as $macro) {
-					$host_macros_refs[$host['host']][] = $macro['macro'];
-				}
+			foreach ($host['macros'] as $macro) {
+				$host_macros_refs[$host['host']][] = $macro['macro'];
 			}
 
 			if ($host['templates']) {
@@ -231,14 +243,6 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedValueMaps() as $host => $valuemaps) {
-			foreach ($valuemaps as $valuemap) {
-				$valuemaps_refs[$host][$valuemap['name']] = array_key_exists('uuid', $valuemap)
-					? ['uuid' => $valuemap['uuid']]
-					: [];
-			}
-		}
-
 		foreach ($this->getFormattedItems() as $host => $items) {
 			foreach ($items as $item) {
 				$items_refs[$host][$item['key_']] = array_key_exists('uuid', $item)
@@ -246,11 +250,7 @@ class CConfigurationImport {
 					: [];
 
 				if ($item['valuemap']) {
-					if (!array_key_exists($host, $valuemaps_refs)) {
-						$valuemaps_refs[$host] = [];
-					}
-
-					$valuemaps_refs[$host] += [$item['valuemap']['name'] => []];
+					$valuemaps_refs[$host][$item['valuemap']['name']] = [];
 				}
 			}
 		}
@@ -266,12 +266,8 @@ class CConfigurationImport {
 						? ['uuid' => $item_prototype['uuid']]
 						: [];
 
-					if ($item_prototype['valuemap']) {
-						if (!array_key_exists($host, $valuemaps_refs)) {
-							$valuemaps_refs[$host] = [];
-						}
-
-						$valuemaps_refs[$host] += [$item_prototype['valuemap']['name'] => []];
+					if (!empty($item_prototype['valuemap'])) {
+						$valuemaps_refs[$host][$item_prototype['valuemap']['name']] = [];
 					}
 				}
 
@@ -293,7 +289,7 @@ class CConfigurationImport {
 							if (!array_key_exists($name, $triggers_refs)
 									|| !array_key_exists($expression, $triggers_refs[$name])
 									|| !array_key_exists($recovery_expression, $triggers_refs[$name][$expression])) {
-								$triggers_refs[$name][$expression] = [];
+								$triggers_refs[$name][$expression][$recovery_expression] = [];
 							}
 						}
 					}
@@ -351,16 +347,25 @@ class CConfigurationImport {
 						$host_groups_refs += [$group_prototype['group']['name'] => []];
 					}
 
-					if (array_key_exists('macros', $host_prototype)) {
-						foreach ($host_prototype['macros'] as $macro) {
-							if (array_key_exists('uuid', $host_prototype)) {
-								$host_prototype_macros_refs['uuid'][$host][$discovery_rule['key_']]
-									[$host_prototype['uuid']][] = $macro['macro'];
-							}
-							else {
-								$host_prototype_macros_refs['host'][$host][$discovery_rule['key_']]
-									[$host_prototype['host']][] = $macro['macro'];
-							}
+					foreach ($host_prototype['group_prototypes'] as $group_prototype) {
+						if (array_key_exists('uuid', $host_prototype)) {
+							$group_prototypes_refs['uuid'][$host][$discovery_rule['key_']][$host_prototype['uuid']][] =
+								$group_prototype['name'];
+						}
+						else {
+							$group_prototypes_refs['host'][$host][$discovery_rule['key_']][$host_prototype['host']][] =
+								$group_prototype['name'];
+						}
+					}
+
+					foreach ($host_prototype['macros'] as $macro) {
+						if (array_key_exists('uuid', $host_prototype)) {
+							$host_prototype_macros_refs['uuid'][$host][$discovery_rule['key_']]
+								[$host_prototype['uuid']][] = $macro['macro'];
+						}
+						else {
+							$host_prototype_macros_refs['host'][$host][$discovery_rule['key_']]
+								[$host_prototype['host']][] = $macro['macro'];
 						}
 					}
 
@@ -558,6 +563,42 @@ class CConfigurationImport {
 										$graphs_refs[$value['host']][$value['name']] = [];
 									}
 									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_MAP:
+									if (!array_key_exists($value['name'], $maps_refs)) {
+										$maps_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+									if (!array_key_exists($value['name'], $services_refs)) {
+										$services_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_SLA:
+									if (!array_key_exists($value['name'], $slas_refs)) {
+										$slas_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_USER:
+									if (!array_key_exists($value['username'], $users_refs)) {
+										$users_refs[$value['username']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_ACTION:
+									if (!array_key_exists($value['name'], $actions_refs)) {
+										$actions_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+									if (!array_key_exists($value['name'], $media_types_refs)) {
+										$media_types_refs[$value['name']] = [];
+									}
+									break;
 							}
 						}
 					}
@@ -596,9 +637,15 @@ class CConfigurationImport {
 		$this->referencer->addIconmaps($iconmaps_refs);
 		$this->referencer->addImages($images_refs);
 		$this->referencer->addMaps($maps_refs);
+		$this->referencer->addServices($services_refs);
+		$this->referencer->addSlas($slas_refs);
+		$this->referencer->addUsers($users_refs);
+		$this->referencer->addActions($actions_refs);
+		$this->referencer->addMediaTypes($media_types_refs);
 		$this->referencer->addTemplateDashboards($template_dashboards_refs);
 		$this->referencer->addTemplateMacros($template_macros_refs);
 		$this->referencer->addHostMacros($host_macros_refs);
+		$this->referencer->addGroupPrototypes($group_prototypes_refs);
 		$this->referencer->addHostPrototypeMacros($host_prototype_macros_refs);
 		$this->referencer->addProxies($proxy_refs);
 		$this->referencer->addHostPrototypes($host_prototypes_refs);
@@ -699,13 +746,18 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processTemplates(): void {
-		if ($this->options['templates']['createMissing'] || $this->options['templates']['updateExisting']
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']
 				|| $this->options['process_templates']) {
 			$templates = $this->getFormattedTemplates();
 
 			if ($templates) {
-				$templateids = (new CTemplateImporter($this->options, $this->referencer))->import($templates);
+				$template_importer = new CTemplateImporter($this->options, $this->referencer,
+					$this->importedObjectContainer
+				);
+				$template_importer->import($templates);
 
+				// Get list of imported template IDs and add them processed template ID list.
+				$templateids = $template_importer->getProcessedTemplateids();
 				$this->importedObjectContainer->addTemplateIds($templateids);
 			}
 		}
@@ -717,75 +769,17 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processHosts(): void {
-		if ($this->options['hosts']['createMissing'] || $this->options['hosts']['updateExisting']
+		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']
 				|| $this->options['process_hosts']) {
 			$hosts = $this->getFormattedHosts();
 
 			if ($hosts) {
-				$hostids = (new CHostImporter($this->options, $this->referencer))->import($hosts);
+				$host_importer = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
+				$host_importer->import($hosts);
 
+				// Get list of imported host IDs and add them processed host ID list.
+				$hostids = $host_importer->getProcessedHostIds();
 				$this->importedObjectContainer->addHostIds($hostids);
-			}
-		}
-	}
-
-	/**
-	 * Import value maps.
-	 *
-	 * @throws Exception
-	 */
-	protected function processValueMaps(): void {
-		if (!$this->options['valueMaps']['createMissing'] && !$this->options['valueMaps']['updateExisting']) {
-			return;
-		}
-
-		$upd_valuemaps = [];
-		$ins_valuemaps = [];
-
-		foreach ($this->getFormattedValueMaps() as $host => $valuemaps) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null
-					|| (!$this->importedObjectContainer->isHostProcessed($hostid)
-						&& !$this->importedObjectContainer->isTemplateProcessed($hostid))) {
-				continue;
-			}
-
-			foreach ($valuemaps as $valuemap) {
-				$valuemapid = null;
-
-				if (array_key_exists('uuid', $valuemap)) {
-					$valuemapid = $this->referencer->findValuemapidByUuid($valuemap['uuid']);
-				}
-
-				if ($valuemapid === null) {
-					$valuemapid = $this->referencer->findValuemapidByName($hostid, $valuemap['name']);
-				}
-
-				if ($valuemapid !== null) {
-					if ($this->options['valueMaps']['updateExisting']) {
-						$upd_valuemaps[] = ['valuemapid' => $valuemapid] + $valuemap;
-						$this->referencer->setDbValueMap($valuemapid, ['hostid' => $hostid] + $valuemap);
-					}
-				}
-				else {
-					if ($this->options['valueMaps']['createMissing']) {
-						$ins_valuemaps[] = ['hostid' => $hostid] + $valuemap;
-					}
-				}
-			}
-		}
-
-		if ($upd_valuemaps) {
-			API::ValueMap()->update($upd_valuemaps);
-		}
-
-		if ($ins_valuemaps) {
-			$ins_valuemapids = API::ValueMap()->create($ins_valuemaps)['valuemapids'];
-
-			foreach ($ins_valuemaps as $valuemap) {
-				$valuemapid = array_shift($ins_valuemapids);
-				$this->referencer->setDbValueMap($valuemapid, $valuemap);
 			}
 		}
 	}
@@ -1054,6 +1048,52 @@ class CConfigurationImport {
 
 		$discovery_rules_to_create = [];
 		$discovery_rules_to_update = [];
+		$upd_discovery_rule_hostids = [];
+
+		/*
+		 * It's possible that some LLD rules use master items which are web items. They don't reside in item
+		 * references at this point. For items and item prototypes web items are found while processing the order of
+		 * them, but for LLD rules there is no ordering, so this is done independently. So due to the nature of constant
+		 * item refreshing after each entity type is processed, it's safer to collect web items once more here where it
+		 * is necessary. Collect host IDs and master item keys that cannot be resolved and then find web items and add
+		 * references to item list.
+		 */
+		$unresolved_master_items = [];
+		$hostids = [];
+
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+			$hostids[$hostid] = true;
+
+			foreach ($discovery_rules as $discovery_rule) {
+				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
+						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
+					// if key cannot be resolved
+					if ($this->referencer->findItemidByKey($hostid,
+							$discovery_rule[$master_item_key]['key']) === null) {
+						$unresolved_master_items[$discovery_rule[$master_item_key]['key']] = true;
+					}
+				}
+			}
+		}
+
+		if ($unresolved_master_items) {
+			$items = API::Item()->get([
+				'output' => ['hostid', 'itemid', 'key_'],
+				'hostids' => array_keys($hostids),
+				'filter' => ['key_' => array_keys($unresolved_master_items)],
+				'webitems' => true
+			]);
+
+			foreach ($items as $item) {
+				$this->referencer->setDbItem($item['itemid'], $item);
+			}
+		}
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -1075,6 +1115,15 @@ class CConfigurationImport {
 					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
 				);
 
+				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				];
+
+				if (!in_array($discovery_rule['type'], $delay_types)) {
+					unset($discovery_rule['delay']);
+				}
+
 				if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
 
@@ -1086,6 +1135,7 @@ class CConfigurationImport {
 
 					$discovery_rule['interfaceid'] = $interfaceid;
 				}
+				unset($discovery_rule['interface_ref']);
 
 				if ($discovery_rule['type'] == ITEM_TYPE_HTTPAGENT) {
 					$headers = [];
@@ -1155,9 +1205,33 @@ class CConfigurationImport {
 				}
 				unset($preprocessing_step);
 
+				if (array_key_exists('filter', $discovery_rule)) {
+					foreach ($discovery_rule['filter']['conditions'] as &$condition) {
+						if ($discovery_rule['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+							unset($condition['formulaid']);
+						}
+					}
+					unset($condition);
+				}
+
+				foreach ($discovery_rule['overrides'] as &$override) {
+					if (!array_key_exists('filter', $override)) {
+						continue;
+					}
+
+					foreach ($override['filter']['conditions'] as &$condition) {
+						if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+							unset($condition['formulaid']);
+						}
+					}
+					unset($condition);
+				}
+				unset($override);
+
 				if ($itemid !== null) {
 					$discovery_rule['itemid'] = $itemid;
-					$discovery_rules_to_update[] = $discovery_rule;
+					$discovery_rules_to_update[] = array_diff_key($discovery_rule, array_flip(['hostid']));
+					$upd_discovery_rule_hostids[] = $discovery_rule['hostid'];
 				}
 				else {
 					/*
@@ -1187,7 +1261,9 @@ class CConfigurationImport {
 			API::DiscoveryRule()->update($discovery_rules_to_update);
 
 			foreach ($discovery_rules_to_update as $discovery_rule) {
-				$processed_discovery_rules[$discovery_rule['hostid']][$discovery_rule['key_']] = 1;
+				$hostid = array_shift($upd_discovery_rule_hostids);
+
+				$processed_discovery_rules[$hostid][$discovery_rule['key_']] = 1;
 			}
 		}
 
@@ -1405,18 +1481,27 @@ class CConfigurationImport {
 					}
 
 					if ($host_prototypeid !== null) {
-						if (array_key_exists('macros', $host_prototype)) {
-							foreach ($host_prototype['macros'] as &$macro) {
-								$hostmacroid = $this->referencer->findHostPrototypeMacroid($host_prototypeid,
-									$macro['macro']
-								);
+						foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+							$group_prototypeid = $this->referencer->findGroupPrototypeId($host_prototypeid,
+								$group_prototype['name']
+							);
 
-								if ($hostmacroid !== null) {
-									$macro['hostmacroid'] = $hostmacroid;
-								}
+							if ($group_prototypeid !== null) {
+								$group_prototype['group_prototypeid'] = $group_prototypeid;
 							}
-							unset($macro);
 						}
+						unset($group_prototype);
+
+						foreach ($host_prototype['macros'] as &$macro) {
+							$hostmacroid = $this->referencer->findHostPrototypeMacroid($host_prototypeid,
+								$macro['macro']
+							);
+
+							if ($hostmacroid !== null) {
+								$macro['hostmacroid'] = $hostmacroid;
+							}
+						}
+						unset($macro);
 
 						$host_prototype['hostid'] = $host_prototypeid;
 						$host_prototypes_to_update[] = $host_prototype;
@@ -2116,62 +2201,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes value maps from DB that are missing in import file.
-	 */
-	private function deleteMissingValueMaps(): void {
-		if (!$this->options['valueMaps']['deleteMissing']) {
-			return;
-		}
-
-		$processed_hostids = array_merge(
-			$this->importedObjectContainer->getHostids(),
-			$this->importedObjectContainer->getTemplateids()
-		);
-
-		if (!$processed_hostids) {
-			return;
-		}
-
-		$valuemapids = [];
-
-		foreach ($this->getFormattedValueMaps() as $host => $valuemaps) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null) {
-				continue;
-			}
-
-			foreach ($valuemaps as $valuemap) {
-				$valuemapid = null;
-
-				if (array_key_exists('uuid', $valuemap)) {
-					$valuemapid = $this->referencer->findValuemapidByUuid($valuemap['uuid']);
-				}
-
-				if ($valuemapid === null) {
-					$valuemapid = $this->referencer->findValuemapidByName($hostid, $valuemap['name']);
-				}
-
-				if ($valuemapid !== null) {
-					$valuemapids[$valuemapid] = true;
-				}
-			}
-		}
-
-		$db_valuemapids = API::ValueMap()->get([
-			'output' => [],
-			'hostids' => $processed_hostids,
-			'preservekeys' => true
-		]);
-
-		$del_valuemapids = array_diff_key($db_valuemapids, $valuemapids);
-
-		if ($del_valuemapids) {
-			API::ValueMap()->delete(array_keys($del_valuemapids));
-		}
-	}
-
-	/**
 	 * Deletes items from DB that are missing in import file.
 	 */
 	protected function deleteMissingItems(): void {
@@ -2741,19 +2770,6 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['hosts'];
-	}
-
-	/**
-	 * Get formatted value maps.
-	 *
-	 * @return array
-	 */
-	protected function getFormattedValueMaps(): array {
-		if (!array_key_exists('value_maps', $this->formattedData)) {
-			$this->formattedData['value_maps'] = $this->adapter->getValueMaps();
-		}
-
-		return $this->formattedData['value_maps'];
 	}
 
 	/**

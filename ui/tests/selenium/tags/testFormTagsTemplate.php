@@ -29,8 +29,7 @@ class testFormTagsTemplate extends testFormTags {
 	public $update_name = '2 template with tags for updating';
 	public $clone_name = '1 template with tags for cloning';
 	public $remove_name = '1 template for removing tags';
-	public $link = 'templates.php';
-	public $saved_link = 'templates.php?form=update&templateid=';
+	public $link = 'zabbix.php?action=template.list';
 
 	/**
 	 * Test creating of Template with tags
@@ -54,14 +53,7 @@ class testFormTagsTemplate extends testFormTags {
 	 * Test cloning of Template with tags.
 	 */
 	public function testFormTagsTemplate_Clone() {
-		$this->executeCloning('template', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Template with tags.
-	 */
-	public function testFormTagsTemplate_FullClone() {
-		$this->executeCloning('template', 'Full clone');
+		$this->executeCloning('template');
 	}
 
 	/**

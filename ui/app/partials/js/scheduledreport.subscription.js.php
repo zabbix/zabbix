@@ -74,12 +74,12 @@
 			let recipient;
 
 			if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
-				icon.classList.add('<?= ZBX_STYLE_ICON_USER ?>');
+				icon.classList.add('<?= ZBX_STYLE_ICON ?>', '<?= ZBX_ICON_USER_FILLED_SMALL ?>');
 				icon.setAttribute('title', <?= json_encode(_('User')) ?>);
 				userids.add(this.data.recipientid);
 			}
 			else {
-				icon.classList.add('<?= ZBX_STYLE_ICON_USER_GROUP ?>');
+				icon.classList.add('<?= ZBX_STYLE_ICON ?>', '<?= ZBX_ICON_USERS_FILLED_SMALL ?>');
 				icon.setAttribute('title', <?= json_encode(_('User group')) ?>);
 				usrgrpids.add(this.data.recipientid);
 			}

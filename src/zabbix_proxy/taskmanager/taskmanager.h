@@ -31,10 +31,13 @@ typedef struct
 	const zbx_config_comms_args_t	*config_comms;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 	int				config_startup_time;
+	int				config_enable_remote_commands;
+	int				config_log_remote_commands;
+	const char			*config_hostname;
 }
 zbx_thread_taskmanager_args;
 
-void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
 		zbx_proxy_compatibility_t compatibility);
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args);

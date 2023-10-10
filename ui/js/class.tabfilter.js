@@ -69,7 +69,6 @@ class CTabFilter extends CBaseComponent {
 			}
 
 			if (options.selected == index) {
-				item.renderContentTemplate();
 				this.setSelectedItem(item);
 
 				if (options.expanded) {
@@ -204,9 +203,9 @@ class CTabFilter extends CBaseComponent {
 
 		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
 			buttons = {
-				decrement_button: this._target.querySelector('button.btn-time-left'),
-				increment_button: this._target.querySelector('button.btn-time-right'),
-				zoomout_button: this._target.querySelector('button.btn-time-out')
+				decrement_button: this._target.querySelector('button.js-btn-time-left'),
+				increment_button: this._target.querySelector('button.js-btn-time-right'),
+				zoomout_button: this._target.querySelector('button.btn-time-zoomout')
 			};
 
 		this._timeselector.setDisabled(disabled);
@@ -733,6 +732,8 @@ class CTabFilter extends CBaseComponent {
 			stop: (_, ui) => {
 				const $item = ui.item;
 
+				ui.item[0].classList.remove(TABFILTERITEM_STYLE_FOCUSED);
+
 				/**
 				 * Remove inline style position, left and top that stay after sortable.
 				 * This styles broken tabs layout.
@@ -746,7 +747,8 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 			axis: 'x',
-			containment: 'parent'
+			containment: 'parent',
+			helper : 'clone'
 		});
 
 		const container = this._target.querySelector('.ui-sortable-container').parentNode;

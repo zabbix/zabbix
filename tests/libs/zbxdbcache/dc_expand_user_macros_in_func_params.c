@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"

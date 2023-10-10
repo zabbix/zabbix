@@ -58,8 +58,10 @@ $filter = (new CFilter())
 			])
 			->addItem([
 				new CLabel(_('Name'), 'filter_name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				new CFormField(
+					(new CTextBox('filter_name', $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
 			]),
 		(new CFormGrid())->addItem([
 			new CLabel(_('State')),
@@ -134,7 +136,7 @@ if ($data['allowed_edit']) {
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdelete-maintenance')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			]
 		], 'maintenance')
 	);

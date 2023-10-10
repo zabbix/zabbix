@@ -291,10 +291,11 @@ elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updated
 		'discover' => getRequest('discover', DB::getDefault('graphs', 'discover'))
 	]);
 
-	show_messages($result, _('Graph updated'), _('Cannot update graph'));
+	show_messages($result, _('Graph prototype updated'), _('Cannot update graph prototype'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
+	$graphs_count = count($graphIds);
 
 	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
@@ -311,7 +312,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($graphs, 'graphid'));
 		}
-		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
+
+		$messageSuccess = _n('Graph prototype deleted', 'Graph prototypes deleted', $graphs_count);
+		$messageFailed = _n('Cannot delete graph prototype', 'Cannot delete graph prototypes', $graphs_count);
+
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);
@@ -328,7 +333,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 			uncheckTableRows($hostid, zbx_objectValues($graphs, 'graphid'));
 		}
-		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
+
+		$messageSuccess = _n('Graph deleted', 'Graphs deleted', $graphs_count);
+		$messageFailed = _n('Cannot delete graph', 'Cannot delete graphs', $graphs_count);
+
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 }
 
@@ -367,7 +376,7 @@ $filter = [
 	'hosts' => []
 ];
 
-$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {
@@ -406,7 +415,7 @@ if (isset($_REQUEST['form'])) {
 		'hostid' => $hostid,
 		'normal_only' => getRequest('normal_only'),
 		'context' => getRequest('context'),
-		'readonly' => hasRequest('graphid') && getRequest('readonly', 0) == 1
+		'readonly' => getRequest('readonly', 0)
 	];
 
 	if ($data['graphid'] != 0 && ($data['readonly'] || !$data['form_refresh'])) {
@@ -446,16 +455,12 @@ if (isset($_REQUEST['form'])) {
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
-		$data['readonly'] = $graph['templateid'] != 0;
+		$data['templates'] = [];
 
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
 			$data['discoveryRule'] = $graph['discoveryRule'];
 			$data['graphDiscovery'] = $graph['graphDiscovery'];
-
-			if ($graph['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				$data['readonly'] = true;
-			}
 		}
 		else {
 			$data['discover'] = $graph['discover'];
@@ -467,15 +472,11 @@ if (isset($_REQUEST['form'])) {
 			$data['hostid'] = $host['hostid'];
 		}
 
-		if ($graph['templateid'] != 0) {
-			$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-
-			$parent_graphs = $data['parent_discoveryid'] === null
-				? getParentGraphs([$graph], $allowed_ui_conf_templates)
-				: getParentGraphPrototypes([$graph], $allowed_ui_conf_templates);
-
-			$data['parent_graph'] = reset($parent_graphs);
-		}
+		// templates
+		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
+			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 
 		// items
 		$data['items'] = API::GraphItem()->get([
@@ -514,6 +515,7 @@ if (isset($_REQUEST['form'])) {
 		$data['percent_right'] = 0;
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
+		$data['templates'] = [];
 
 		if (isset($data['visible']['percent_left'])) {
 			$data['percent_left'] = getRequest('percent_left', 0);
@@ -741,12 +743,14 @@ else {
 
 	order_result($data['graphs'], $sort_field, $sort_order);
 
-	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
+		? ZBX_FLAG_DISCOVERY_NORMAL
+		: ZBX_FLAG_DISCOVERY_PROTOTYPE
+	);
 
-	$data['parent_graphs'] = $data['parent_discoveryid'] === null
-		? getParentGraphs($data['graphs'], $allowed_ui_conf_templates)
-		: getParentGraphPrototypes($data['graphs'], $allowed_ui_conf_templates);
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
+	// render view
 	echo (new CView('configuration.graph.list', $data))->getOutput();
 }
 

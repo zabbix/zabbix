@@ -21,9 +21,10 @@
 #include "diag_server.h"
 
 #include "zbxcachevalue.h"
-#include "zbxlld.h"
+#include "../lld/lld_protocol.h"
 #include "../alerter/alerter.h"
 #include "zbxtime.h"
+#include "zbxpreproc.h"
 
 #define ZBX_DIAG_LLD_RULES		0x00000001
 #define ZBX_DIAG_LLD_VALUES		0x00000002

@@ -39,7 +39,8 @@ class CControllerDashboardWidgetView extends CController {
 		$this->disableCsrfValidation();
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'array'
+			'fields' => 'array',
+			'templateid' => 'db dashboard.templateid'
 		]);
 	}
 
@@ -62,13 +63,7 @@ class CControllerDashboardWidgetView extends CController {
 	protected function checkInput(): bool {
 		$this->widget = APP::ModuleManager()->getActionModule();
 
-		$validation_rules = $this->validation_rules;
-
-		if ($this->widget->hasTemplateSupport()) {
-			$validation_rules['templateid'] = 'db dashboard.templateid';
-		}
-
-		$ret = $this->validateInput($validation_rules);
+		$ret = $this->validateInput($this->validation_rules);
 
 		if ($ret) {
 			$this->form = $this->widget->getForm($this->getInput('fields', []),
@@ -112,5 +107,9 @@ class CControllerDashboardWidgetView extends CController {
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	protected function isTemplateDashboard(): bool {
+		return $this->hasInput('templateid');
 	}
 }

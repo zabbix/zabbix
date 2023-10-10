@@ -183,6 +183,78 @@ class CTemplateDashboardImporter extends CImporter {
 							));
 						}
 						break;
+
+					case ZBX_WIDGET_FIELD_TYPE_MAP:
+						$name = $field['value']['name'];
+
+						$field['value'] = $this->referencer->findMapidByName($name);
+
+						if ($field['value'] === null) {
+							throw new Exception(_s('Cannot find map "%1$s" used in dashboard "%2$s".',
+								$name, $dashboard_name
+							));
+						}
+						break;
+
+					case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+						$name = $field['value']['name'];
+
+						$field['value'] = $this->referencer->findServiceidByName($name);
+
+						if ($field['value'] === null) {
+							throw new Exception(_s('Cannot find service "%1$s" used in dashboard "%2$s".',
+								$name, $dashboard_name
+							));
+						}
+						break;
+
+					case ZBX_WIDGET_FIELD_TYPE_SLA:
+						$name = $field['value']['name'];
+
+						$field['value'] = $this->referencer->findSlaidByName($name);
+
+						if ($field['value'] === null) {
+							throw new Exception(_s('Cannot find SLA "%1$s" used in dashboard "%2$s".',
+								$name, $dashboard_name
+							));
+						}
+						break;
+
+					case ZBX_WIDGET_FIELD_TYPE_USER:
+						$username = $field['value']['username'];
+
+						$field['value'] = $this->referencer->findUseridByUsername($username);
+
+						if ($field['value'] === null) {
+							throw new Exception(_s('Cannot find user "%1$s" used in dashboard "%2$s".',
+								$username, $dashboard_name
+							));
+						}
+						break;
+
+					case ZBX_WIDGET_FIELD_TYPE_ACTION:
+						$name = $field['value']['name'];
+
+						$field['value'] = $this->referencer->findActionidByName($name);
+
+						if ($field['value'] === null) {
+							throw new Exception(_s('Cannot find action "%1$s" used in dashboard "%2$s".',
+								$name, $dashboard_name
+							));
+						}
+						break;
+
+					case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+						$name = $field['value']['name'];
+
+						$field['value'] = $this->referencer->findMediaTypeidByName($name);
+
+						if ($field['value'] === null) {
+							throw new Exception(_s('Cannot find media type "%1$s" used in dashboard "%2$s".',
+								$name, $dashboard_name
+							));
+						}
+						break;
 				}
 			}
 			unset($field);

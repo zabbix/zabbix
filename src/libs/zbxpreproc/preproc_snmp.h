@@ -25,9 +25,9 @@
 #include "zbxalgo.h"
 
 #ifdef HAVE_NETSNMP
-#define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
-#include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>
+#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
+#	include <net-snmp/net-snmp-config.h>
+#	include <net-snmp/net-snmp-includes.h>
 #endif
 
 typedef struct
@@ -85,6 +85,7 @@ void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache);
 
 int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg);
+int	item_preproc_snmp_get_to_value(zbx_variant_t *value, const char *params, char **errmsg);
 
 void	preproc_init_snmp(void);
 void	preproc_shutdown_snmp(void);

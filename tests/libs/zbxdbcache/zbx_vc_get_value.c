@@ -29,8 +29,6 @@
 
 #include "zbx_vc_common.h"
 
-extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
-
 void	zbx_vc_test_get_value_setup(zbx_mock_handle_t *handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 		zbx_vector_history_record_t *returned)

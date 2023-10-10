@@ -22,7 +22,7 @@
 
 #include "zbxnum.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 
 int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

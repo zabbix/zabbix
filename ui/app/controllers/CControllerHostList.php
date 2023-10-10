@@ -38,7 +38,7 @@ class CControllerHostList extends CController {
 			'filter_port'         => 'string',
 			'filter_status'       => 'in -1,'.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED,
 			'filter_monitored_by' => 'in '.ZBX_MONITORED_BY_ANY.','.ZBX_MONITORED_BY_SERVER.','.ZBX_MONITORED_BY_PROXY,
-			'filter_proxyids'     => 'array_db hosts.proxy_hostid',
+			'filter_proxyids'     => 'array_db hosts.proxyid',
 			'filter_evaltype'     => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags'         => 'array',
 			'sort'                => 'in name,status',
@@ -146,7 +146,6 @@ class CControllerHostList extends CController {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groups'],
-				'editable' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];
@@ -175,7 +174,7 @@ class CControllerHostList extends CController {
 				$proxyids = $filter['proxyids']
 					? $filter['proxyids']
 					: array_keys(API::Proxy()->get([
-						'output' => [],
+						'output' => ['proxyid'],
 						'preservekeys' => true
 					]));
 				break;
@@ -227,7 +226,7 @@ class CControllerHostList extends CController {
 		);
 
 		$hosts = API::Host()->get([
-			'output' => ['name', 'proxy_hostid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
+			'output' => ['name', 'proxyid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
 				'status', 'tls_connect', 'tls_accept', 'active_available'
 			],
 			'selectParentTemplates' => ['templateid', 'name'],
@@ -272,30 +271,39 @@ class CControllerHostList extends CController {
 			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
 		}
 
-		// Get the writable templates among the templates linked to the hosts.
-		$editable_templates = [];
+		// Selecting linked templates to templates linked to hosts.
+		$templateids = [];
 
-		if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
-			$templateids = [];
+		foreach ($hosts as $host) {
+			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
+		}
 
-			foreach ($hosts as $host) {
-				foreach ($host['parentTemplates'] as $template) {
-					$templateids[$template['templateid']] = true;
-				}
+		$templateids = array_keys(array_flip($templateids));
+
+		$templates = API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'selectParentTemplates' => ['templateid', 'name'],
+			'templateids' => $templateids,
+			'preservekeys' => true
+		]);
+
+		$writable_templates = [];
+
+		if ($templateids) {
+			foreach ($templates as $template) {
+				$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
 			}
 
-			if ($templateids) {
-				$editable_templates = API::Template()->get([
-					'output' => [],
-					'templateids' => array_keys($templateids),
-					'editable' => true,
-					'preservekeys' => true
-				]);
-			}
+			$writable_templates = API::Template()->get([
+				'output' => ['templateid'],
+				'templateids' => array_keys(array_flip($templateids)),
+				'editable' => true,
+				'preservekeys' => true
+			]);
 		}
 
 		// Get proxy host IDs that are not 0 and maintenance IDs.
-		$proxy_hostids = [];
+		$proxyids = [];
 		$maintenanceids = [];
 
 		foreach ($hosts as &$host) {
@@ -315,8 +323,8 @@ class CControllerHostList extends CController {
 			}
 			unset($host['active_available']);
 
-			if ($host['proxy_hostid']) {
-				$proxy_hostids[$host['proxy_hostid']] = $host['proxy_hostid'];
+			if ($host['proxyid']) {
+				$proxyids[$host['proxyid']] = $host['proxyid'];
 			}
 
 			if ($host['status'] == HOST_STATUS_MONITORED &&
@@ -328,10 +336,10 @@ class CControllerHostList extends CController {
 
 		$proxies = [];
 
-		if ($proxy_hostids) {
+		if ($proxyids) {
 			$proxies = API::Proxy()->get([
-				'proxyids' => $proxy_hostids,
-				'output' => ['host'],
+				'output' => ['name'],
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
 		}
@@ -341,11 +349,11 @@ class CControllerHostList extends CController {
 
 		if ($filter['proxyids']) {
 			$filter_proxies = API::Proxy()->get([
-				'output' => ['proxyid', 'host'],
+				'output' => ['proxyid', 'name'],
 				'proxyids' => $filter['proxyids']
 			]);
 
-			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id', 'host' => 'name']);
+			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id']);
 		}
 
 		$db_maintenances = [];
@@ -370,8 +378,9 @@ class CControllerHostList extends CController {
 			'filter' => $filter,
 			'sortField' => $sort_field,
 			'sortOrder' => $sort_order,
+			'templates' => $templates,
 			'maintenances' => $db_maintenances,
-			'editable_templates' => $editable_templates,
+			'writable_templates' => $writable_templates,
 			'proxies' => $proxies,
 			'proxies_ms' => $proxies_ms,
 			'profileIdx' => 'web.hosts.filter',
@@ -380,6 +389,7 @@ class CControllerHostList extends CController {
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'uncheck' => ($this->getInput('uncheck', 0) == 1)
 		];
 

@@ -35,32 +35,28 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
+			'use_dashboard_host' => 'in 1'
 		]);
 	}
 
 	protected function doAction(): void {
 		$error = null;
 
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$error = _('No data.');
 		}
 		else {
-			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
+			$use_dashboard_host = $this->isTemplateDashboard() || $this->hasInput('use_dashboard_host');
 
-			$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
-
-			if ($is_dynamic_item && $dynamic_hostid == 0) {
+			if ($use_dashboard_host && !$this->fields_values['override_hostid']) {
 				$error = _('No host selected.');
 			}
 			else {
 				$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
-					'config' => $is_dynamic_item ? 'widgetURL' : 'widgetURLUser',
+					'config' => $use_dashboard_host ? 'widgetURL' : 'widgetURLUser',
 					'url' => $this->fields_values['url'],
-					'hostid' => $is_dynamic_item ? $dynamic_hostid : '0'
+					'hostid' => $use_dashboard_host ? $this->fields_values['override_hostid'][0] : '0'
 				]);
 
 				if ($resolved_url) {

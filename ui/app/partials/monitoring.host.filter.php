@@ -35,6 +35,10 @@ $filter_tags_table = (new CTable())
 		))->setColSpan(4)
 );
 
+if (!$data['tags']) {
+	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
+
 foreach (array_values($data['tags']) as $i => $tag) {
 	$filter_tags_table->addRow([
 		(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
@@ -161,13 +165,12 @@ $template = (new CForm('get'))
 	->setName('zbx_filter')
 	->addItem([
 		$template,
-		(new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE),
+		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
 		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
 		(new CVar('sort', '#{sort}'))->removeId(),
-		(new CVar('sortorder', '#{sortorder}'))->removeId(),
-		(new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tabfilter')))->removeId()
+		(new CVar('sortorder', '#{sortorder}'))->removeId()
 	]);
 
 if (array_key_exists('render_html', $data)) {
@@ -252,7 +255,9 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table
-		if (data.tags.length == 0) {
+		$('#tags_' + data.uniqid, container).find('.form_row').remove();
+
+		if (data.tags.length === 0) {
 			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
 		}
 

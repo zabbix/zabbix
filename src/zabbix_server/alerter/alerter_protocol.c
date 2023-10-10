@@ -20,7 +20,6 @@
 #include "alerter.h"
 
 #include "alerter_protocol.h"
-#include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxstr.h"

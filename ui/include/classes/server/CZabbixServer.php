@@ -65,14 +65,14 @@ class CZabbixServer {
 	/**
 	 * Zabbix server host name.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $host;
 
 	/**
 	 * Zabbix server port number.
 	 *
-	 * @var string
+	 * @var int|null
 	 */
 	protected $port;
 
@@ -167,6 +167,27 @@ class CZabbixServer {
 		}
 
 		return $this->request($params);
+	}
+
+	/**
+	 * @param array  $data
+	 *        string $data['itemid']  (optional) Item ID.
+	 *        string $data['host']    (optional) Technical name of the host.
+	 *        string $data['key']     (optional) Item key.
+	 *        string $data['value']   Item value.
+	 *        string $data['clock']   (optional) Time when the value was received.
+	 *        string $data['ns']      (optional) Nanoseconds when the value was received.
+	 * @param string $sid             User session ID or user API token.
+	 *
+	 * @return array|bool
+	 */
+	public function pushHistory(array $data, string $sid) {
+		return $this->request([
+			'request' => 'history.push',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
+		]);
 	}
 
 	/**
@@ -350,6 +371,9 @@ class CZabbixServer {
 					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
 				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n
+			]],
+			'server stats' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'version' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]]
 		]];
 
@@ -610,7 +634,7 @@ class CZabbixServer {
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
 				}
 
-				$this->error = $dErrorMsg.$errorMsg;
+				$this->error = rtrim($dErrorMsg.$errorMsg);
 			}
 
 			$this->socket = $socket;

@@ -24,7 +24,7 @@
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
 #include "zbxself.h"
-#include "preproc.h"
+#include "zbxproxybuffer.h"
 
 static zbx_get_program_type_f			get_program_type_cb;
 static zbx_vector_stats_ext_func_t		stats_ext_funcs;
@@ -137,7 +137,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 	zbx_process_info_t	process_stats[ZBX_PROCESS_TYPE_COUNT];
 	int			proc_type;
 
-	DCget_count_stats_all(&count_stats);
+	zbx_dc_get_count_stats_all(&count_stats);
 
 	/* zabbix[boottime] */
 	zbx_json_addint64(json, "boottime", config_startup_time);
@@ -164,18 +164,18 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 
 	/* zabbix[rcache,<cache>,<mode>] */
 	zbx_json_addobject(json, "rcache");
-	zbx_json_adduint64(json, "total", *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
-	zbx_json_adduint64(json, "free", *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
-	zbx_json_addfloat(json, "pfree", *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PFREE));
-	zbx_json_adduint64(json, "used", *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_USED));
-	zbx_json_addfloat(json, "pused", *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
+	zbx_json_adduint64(json, "total", *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
+	zbx_json_adduint64(json, "free", *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
+	zbx_json_addfloat(json, "pfree", *(double *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_PFREE));
+	zbx_json_adduint64(json, "used", *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_USED));
+	zbx_json_addfloat(json, "pused", *(double *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
 	zbx_json_close(json);
 
 	/* zabbix[version] */
 	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 	/* zabbix[wcache,<cache>,<mode>] */
-	DCget_stats_all(&wcache_info);
+	zbx_dc_get_stats_all(&wcache_info);
 	zbx_json_addobject(json, "wcache");
 
 	zbx_json_addobject(json, "values");
@@ -185,6 +185,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 	zbx_json_adduint64(json, "str", wcache_info.stats.history_str_counter);
 	zbx_json_adduint64(json, "log", wcache_info.stats.history_log_counter);
 	zbx_json_adduint64(json, "text", wcache_info.stats.history_text_counter);
+	zbx_json_adduint64(json, "bin", wcache_info.stats.history_bin_counter);
 	zbx_json_adduint64(json, "not supported", wcache_info.stats.notsupported_counter);
 	zbx_json_close(json);
 
@@ -215,6 +216,35 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 		zbx_json_adduint64(json, "used", wcache_info.trend_total - wcache_info.trend_free);
 		zbx_json_addfloat(json, "pused", 100 * (double)(wcache_info.trend_total - wcache_info.trend_free) /
 				(double)wcache_info.trend_total);
+		zbx_json_close(json);
+	}
+
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY))
+	{
+		zbx_pb_mem_info_t	mem;
+		zbx_pb_state_info_t	state;
+		char			*error = NULL;
+
+		zbx_json_addobject(json, "proxy buffer");
+
+		if (SUCCEED == zbx_pb_get_mem_info(&mem, &error))
+		{
+			zbx_json_addobject(json, "memory");
+			zbx_json_addfloat(json, "pfree", 100 * (double)(mem.mem_total - mem.mem_used) /
+					(double)mem.mem_total);
+			zbx_json_adduint64(json, "free", mem.mem_total - mem.mem_used);
+			zbx_json_adduint64(json, "total", mem.mem_total);
+			zbx_json_adduint64(json, "used", mem.mem_used);
+			zbx_json_addfloat(json, "pused", 100 * (double)mem.mem_used / (double)mem.mem_total);
+			zbx_json_close(json);
+		}
+		else
+			zbx_free(error);
+
+		zbx_pb_get_state_info(&state);
+		zbx_json_addint64(json, "state", state.state);
+		zbx_json_adduint64(json, "state change", state.changes_num);
+
 		zbx_json_close(json);
 	}
 

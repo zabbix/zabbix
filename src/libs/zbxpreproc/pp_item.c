@@ -17,9 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pp_item.h"
-#include "pp_history.h"
-#include "zbxvariant.h"
+#include "zbxpreprocbase.h"
 
 ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
 
@@ -27,14 +25,16 @@ ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
  *                                                                            *
  * Purpose: create item preprocessing data                                    *
  *                                                                            *
- * Parameters: type       - [IN] the item type                                *
- *             value_type - [IN] the item value type                          *
- *             flags      - [IN] the item flags                               *
+ * Parameters: hostid     - [IN] item host id                                 *
+ *             type       - [IN] item type                                    *
+ *             value_type - [IN] item value type                              *
+ *             flags      - [IN] item flags                                   *
  *                                                                            *
  * Return value: The created item preprocessing data.                         *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned char value_type, unsigned char flags)
+zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char type, unsigned char value_type,
+		unsigned char flags)
 {
 	zbx_pp_item_preproc_t	*preproc = zbx_malloc(NULL, sizeof(zbx_pp_item_preproc_t));
 
@@ -44,6 +44,7 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned c
 	preproc->dep_itemids_num = 0;
 	preproc->dep_itemids = NULL;
 
+	preproc->hostid = hostid;
 	preproc->type = type;
 	preproc->value_type = value_type;
 	preproc->flags = flags;
@@ -67,14 +68,10 @@ void	zbx_pp_step_free(zbx_pp_step_t *step)
  *                                                                            *
  * Purpose: free item preprocessing data                                      *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
- *                                                                            *
  ******************************************************************************/
 static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
 {
-	int	i;
-
-	for (i = 0; i < preproc->steps_num; i++)
+	for (int i = 0; i < preproc->steps_num; i++)
 	{
 		zbx_free(preproc->steps[i].params);
 		zbx_free(preproc->steps[i].error_handler_params);
@@ -84,7 +81,7 @@ static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
 	zbx_free(preproc->dep_itemids);
 
 	if (NULL != preproc->history)
-		pp_history_free(preproc->history);
+		zbx_pp_history_free(preproc->history);
 
 	zbx_free(preproc);
 }
@@ -93,12 +90,12 @@ static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
  *                                                                            *
  * Purpose: copy item preprocessing data                                      *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
+ * Parameters: preproc - [IN] item preprocessing data                         *
  *                                                                            *
  * Return value: The copied preprocessing data.                               *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
+zbx_pp_item_preproc_t	*zbx_pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
 {
 	if (NULL == preproc)
 		return NULL;
@@ -112,7 +109,7 @@ zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
  *                                                                            *
  * Purpose: release item preprocessing data                                   *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
+ * Parameters: preproc - [IN] item preprocessing data                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc)
@@ -127,7 +124,7 @@ void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc)
  *                                                                            *
  * Purpose: check if preprocessing step requires history                      *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
+ * Parameters: preproc - [IN] item preprocessing data                         *
  *                                                                            *
  * Return value: SUCCEED - the step requires history                          *
  *               FAIL    - otherwise                                          *
@@ -149,13 +146,7 @@ int	zbx_pp_preproc_has_history(int type)
 	}
 }
 
-void	pp_item_clear(zbx_pp_item_t *item)
+void	zbx_pp_item_clear(zbx_pp_item_t *item)
 {
 	zbx_pp_item_preproc_release(item->preproc);
-}
-
-void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
-{
-	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
-		zbx_free(opt->source);
 }

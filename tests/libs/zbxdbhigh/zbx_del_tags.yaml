@@ -1,0 +1,148 @@
+---
+test case: "Delete all tags from a host, tags are not in database yet"
+in:
+  host_tags:
+    - tagid: 0
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 0
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+  del_tags:
+    - tag: tag1
+      value: value1
+    - tag: tag2
+      value: value2
+out:
+  host_tags: []
+---
+test case: "Delete all tags from a host, tags are already in database"
+in:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+  del_tags:
+    - tag: tag1
+      value: value1
+    - tag: tag2
+      value: value2
+out:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_REMOVE]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_REMOVE]
+---
+test case: "Delete normal tags from a host while keeping automatic tags"
+in:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tagid: 4
+      tag: tag4
+      value: value4
+      automatic: ZBX_DB_TAG_NORMAL
+  del_tags:
+    - tag: tag1
+      value: value1
+    - tag: tag2
+      value: value2
+    - tag: tag3
+      value: value3
+    - tag: tag4
+      value: value4
+out:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_REMOVE]
+    - tagid: 3
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 4
+      tag: tag4
+      value: value4
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_REMOVE]
+---
+test case: "Tags that are listed for deletion are not present on a host"
+in:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+  del_tags:
+    - tag: tag22
+      value: value22
+    - tag: tag33
+      value: value33
+out:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+      flags: [ZBX_FLAG_DB_TAG_UNSET]
+---
+test case: "Some tags are listed for deletion while no tags are present on
+  a host"
+in:
+  host_tags: []
+  del_tags:
+    - tag: tag22
+      value: value22
+    - tag: tag33
+      value: value33
+out:
+  host_tags: []
+---
+test case: "No tags are listed for deletion and no tags are present on a host"
+in:
+  host_tags: []
+  del_tags: []
+out:
+  host_tags: []
+...

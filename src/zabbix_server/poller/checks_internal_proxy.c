@@ -20,6 +20,7 @@
 #include "zbxcommon.h"
 #include "zbxcachehistory.h"
 #include "checks_internal.h"
+#include "zbxproxybuffer.h"
 
 /******************************************************************************
  *                                                                            *
@@ -47,7 +48,90 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			return NOTSUPPORTED;
 		}
 
-		SET_UI64_RESULT(result, get_proxy_history_count());
+		SET_UI64_RESULT(result, zbx_pb_history_get_unsent_num());
+		return SUCCEED;
+	}
+
+	if (0 == strcmp(param1, "proxy_buffer"))
+	{
+		const char	*param2, *param3;
+		int		params_num;
+		char		*error = NULL;
+
+		params_num = get_rparams_num(request);
+
+		if (params_num < 2 || params_num > 3)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			return NOTSUPPORTED;
+		}
+
+		param2 = get_rparam(request, 1);
+		param3 = get_rparam(request, 2);
+
+		if (0 == strcmp(param2, "buffer"))
+		{
+			zbx_pb_mem_info_t	info;
+
+			if (SUCCEED != zbx_pb_get_mem_info(&info, &error))
+			{
+				SET_MSG_RESULT(result, error);
+				return NOTSUPPORTED;
+			}
+
+			if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "pfree"))
+			{
+				SET_DBL_RESULT(result, (double)(info.mem_total - info.mem_used) /
+						(double)info.mem_total * 100);
+			}
+			else if (0 == strcmp(param3, "free"))
+			{
+				SET_UI64_RESULT(result, info.mem_total - info.mem_used);
+			}
+			else if (0 == strcmp(param3, "total"))
+			{
+				SET_UI64_RESULT(result, info.mem_total);
+			}
+			else if (0 == strcmp(param3, "used"))
+			{
+				SET_UI64_RESULT(result, info.mem_used);
+			}
+			else if (0 == strcmp(param3, "pused"))
+			{
+				SET_DBL_RESULT(result, (double)info.mem_used / (double)info.mem_total * 100);
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+				return NOTSUPPORTED;
+			}
+		}
+		else if (0 == strcmp(param2, "state"))
+		{
+			zbx_pb_state_info_t	info;
+
+			zbx_pb_get_state_info(&info);
+
+			if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "current"))
+			{
+				SET_UI64_RESULT(result, (zbx_uint64_t)info.state);
+			}
+			else if (0 == strcmp(param3, "changes"))
+			{
+				SET_UI64_RESULT(result, (zbx_uint64_t)info.changes_num);
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+				return NOTSUPPORTED;
+			}
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return SUCCEED;
+		}
+
 	}
 	else
 		return FAIL;

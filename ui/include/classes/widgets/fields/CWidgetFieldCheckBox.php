@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldCheckBox extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldCheckBoxView::class;
 	public const DEFAULT_VALUE = 0;
 
 	private ?string $caption;

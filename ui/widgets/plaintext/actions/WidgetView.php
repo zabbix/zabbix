@@ -27,36 +27,26 @@ use API,
 	CControllerResponseData,
 	CJsScript,
 	CPre,
+	CViewHelper,
 	Manager;
 
 use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	protected function init(): void {
-		parent::init();
-
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
-
 	protected function doAction(): void {
 		$error = null;
 
-		$dynamic_widget_name = $this->widget->getDefaultName();
+		$name = $this->widget->getDefaultName();
 		$same_host = true;
 		$items = [];
 		$histories = [];
 
 		// Editing template dashboard?
-		if ($this->hasInput('templateid') && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$error = _('No data.');
 		}
 		else {
-			$is_template_dashboard = $this->hasInput('templateid');
-			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
-
 			if ($this->fields_values['itemids']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
@@ -67,15 +57,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'preservekeys' => true
 				]);
 
-				$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
-
-				if ($items && $is_dynamic_item && $dynamic_hostid) {
+				if ($items && $this->fields_values['override_hostid']) {
 					$items = API::Item()->get([
 						'output' => ['itemid', 'name', 'value_type', 'units', 'valuemapid'],
 						'selectHosts' => ['name'],
 						'selectValueMap' => ['mappings'],
 						'filter' => [
-							'hostid' => $dynamic_hostid,
+							'hostid' => $this->fields_values['override_hostid'],
 							'key_' => array_keys(array_column($items, null, 'key_'))
 						],
 						'webitems' => true,
@@ -94,10 +82,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$histories = array_merge(...$histories);
 
 					foreach ($histories as &$history) {
-						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
-						$history['value'] = $this->fields_values['show_as_html']
-							? new CJsScript($history['value'])
-							: new CPre($history['value']);
+						if ($items[$history['itemid']]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+							$history['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+						}
+						else {
+							$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']],
+								false
+							);
+							$history['value'] = $this->fields_values['show_as_html']
+								? new CJsScript($history['value'])
+								: new CPre($history['value']);
+						}
 					}
 					unset($history);
 				}
@@ -122,12 +117,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($items_count == 1) {
 					$item = reset($items);
-					$dynamic_widget_name = $is_template_dashboard
+					$name = $this->isTemplateDashboard()
 						? $item['name']
 						: $host_name.NAME_DELIMITER.$item['name'];
 				}
 				elseif ($same_host && $items_count > 1) {
-					$dynamic_widget_name = $is_template_dashboard
+					$name = $this->isTemplateDashboard()
 						? _n('%1$s item', '%1$s items', $items_count)
 						: $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
 				}
@@ -135,7 +130,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $dynamic_widget_name),
+			'name' => $this->getInput('name', $name),
 			'items' => $items,
 			'histories' => $histories,
 			'style' => $this->fields_values['style'],

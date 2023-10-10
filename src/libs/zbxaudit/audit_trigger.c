@@ -19,12 +19,13 @@
 
 #include "audit/zbxaudit_trigger.h"
 #include "audit/zbxaudit.h"
+
 #include "audit.h"
 
-#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 static int	trigger_flag_to_resource_type(int flag)
 {
@@ -233,8 +234,8 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
  ******************************************************************************/
 void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select("%s", sql);
 

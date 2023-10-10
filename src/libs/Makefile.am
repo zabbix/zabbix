@@ -2,7 +2,10 @@
 
 DIST_SUBDIRS = \
 	zbxalgo \
+	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcommon \
@@ -17,17 +20,19 @@ DIST_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxdiscovery \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexec \
 	zbxexport \
 	zbxexpr \
+	zbxfile \
 	zbxgetopt \
-	zbxha \
 	zbxhash \
 	zbxhistory \
 	zbxhttp \
@@ -42,14 +47,17 @@ DIST_SUBDIRS = \
 	zbxmutexs \
 	zbxnix \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxregexp \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
-	zbxserver \
+	zbxexpression \
 	zbxservice \
 	zbxshmem \
 	zbxsysinfo \
@@ -69,7 +77,9 @@ DIST_SUBDIRS = \
 
 if SERVER
 SERVER_SUBDIRS = \
+	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcompress \
@@ -79,14 +89,15 @@ SERVER_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexport \
 	zbxexpr \
-	zbxha \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \
@@ -94,13 +105,16 @@ SERVER_SUBDIRS = \
 	zbxkvs \
 	zbxmedia \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
-	zbxserver \
+	zbxexpression \
 	zbxservice \
 	zbxshmem \
 	zbxstats \
@@ -118,6 +132,7 @@ else
 if PROXY
 PROXY_SUBDIRS = \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcompress \
@@ -127,11 +142,13 @@ PROXY_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexport \
 	zbxhistory \
 	zbxhttp \
@@ -139,13 +156,16 @@ PROXY_SUBDIRS = \
 	zbxip \
 	zbxkvs \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxrtc \
 	zbxself \
 	zbxserialize \
-	zbxserver \
+	zbxexpression \
+	zbxscripts \
 	zbxshmem \
 	zbxstats \
 	zbxstr \
@@ -163,6 +183,8 @@ endif
 
 SUBDIRS = \
 	zbxalgo \
+	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -173,6 +195,7 @@ SUBDIRS = \
 	zbxdiscovery \
 	zbxexec \
 	zbxexpr \
+	zbxfile \
 	zbxgetopt \
 	zbxhash \
 	zbxhttp \
@@ -185,8 +208,10 @@ SUBDIRS = \
 	zbxprof \
 	zbxnix \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxregexp \
+	zbxscripts \
 	zbxsysinfo \
 	zbxstr \
 	zbxthreads \
@@ -199,7 +224,6 @@ SUBDIRS = \
 	$(AGENT_SUBDIRS)
 
 EXTRA_DIST = \
-	zbxsymbols \
 	zbxwin32 \
 	zbxwinservice
 

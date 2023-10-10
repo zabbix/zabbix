@@ -27,6 +27,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldCheckBoxList,
 	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList
 };
 
@@ -37,12 +38,14 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
 			->addField(
 				new CWidgetFieldCheckBoxList('interface_type', _('Interface type'), [
-					INTERFACE_TYPE_AGENT => _('Zabbix agent'),
+					INTERFACE_TYPE_AGENT_ACTIVE => _('Zabbix agent (active checks)'),
+					INTERFACE_TYPE_AGENT => _('Zabbix agent (passive checks)'),
 					INTERFACE_TYPE_SNMP => _('SNMP'),
 					INTERFACE_TYPE_JMX => _('JMX'),
 					INTERFACE_TYPE_IPMI => _('IPMI')
@@ -55,7 +58,15 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(STYLE_HORIZONTAL)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance'))
+				new CWidgetFieldCheckBox('maintenance',
+					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Include hosts in maintenance')
+				)
+			)
+			->addField(
+				new CWidgetFieldCheckBox('only_totals', _('Show only totals'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

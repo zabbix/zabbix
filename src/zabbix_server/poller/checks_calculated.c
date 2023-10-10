@@ -18,10 +18,9 @@
 **/
 
 #include "checks_calculated.h"
-#include "zbxserver.h"
-#include "log.h"
+#include "zbxexpression.h"
 
-int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
+int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result)
 {
 	int			ret = NOTSUPPORTED;
 	char			*error = NULL;
@@ -98,6 +97,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	zbx_expression_eval_clear(&eval);
 	zbx_eval_clear(&ctx);
+	zbx_variant_clear(&value);
 out:
 	zbx_dc_close_user_macros(um_handle);
 

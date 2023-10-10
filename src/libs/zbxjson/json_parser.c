@@ -82,7 +82,7 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
 		if ('\\' == *ptr)
 		{
 			const char	*escape_start = ptr;
-			int		i;
+			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
 
 			/* unexpected end of string data, failing */
 			if ('\0' == *(++ptr))
@@ -101,16 +101,13 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
 					break;
 				case 'u':
 					/* check if the \u is followed with 4 hex digits */
-					for (i = 0; i < 4; i++)
+					if (0 == zbx_json_decode_character(&ptr, uc))
 					{
-						if (0 == isxdigit((unsigned char)*(++ptr)))
-						{
-							return json_error("invalid escape sequence in string",
-									escape_start, error);
-						}
+						return json_error("invalid escape sequence in string",
+								escape_start, error);
 					}
 
-					break;
+					continue;
 				default:
 					return json_error("invalid escape sequence in string data",
 							escape_start, error);
@@ -127,7 +124,12 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
 	if (NULL != str)
 	{
 		*str = (char *)zbx_malloc(NULL, (size_t)(ptr - start));
-		json_copy_string(start, *str, (size_t)(ptr - start));
+
+		if (NULL == json_copy_string(start, *str, (size_t)(ptr - start)))
+		{
+			zbx_free(*str);
+			return json_error("invalid string data", start, error);
+		}
 	}
 
 	return ptr - start + 1;
@@ -139,6 +141,7 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
  *             obj   - [IN/OUT] the JSON object (can be NULL)                 *
+ *             depth - [IN]                                                   *
  *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
  * Return value: The number of characters parsed. On error 0 is returned and  *
@@ -146,7 +149,7 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
  *               message.                                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_int64_t	json_parse_array(const char *start, zbx_jsonobj_t *obj, char **error)
+zbx_int64_t	json_parse_array(const char *start, zbx_jsonobj_t *obj, int depth, char **error)
 {
 	const char	*ptr = start;
 	zbx_int64_t	len;
@@ -172,7 +175,7 @@ zbx_int64_t	json_parse_array(const char *start, zbx_jsonobj_t *obj, char **error
 				value = NULL;
 
 			/* json_parse_value strips leading whitespace, so we don't have to do it here */
-			if (0 == (len = json_parse_value(ptr, value, error)))
+			if (0 == (len = json_parse_value(ptr, value, depth, error)))
 			{
 				if (NULL != obj)
 				{
@@ -313,6 +316,8 @@ static zbx_int64_t	json_parse_literal(const char *start, const char *text, char 
  * Purpose: Parses JSON object value                                          *
  *                                                                            *
  * Parameters: start - [IN] the JSON data                                     *
+ *             obj   - [IN/OUT] JSON object (can be NULL)                     *
+ *             depth - [IN]                                                   *
  *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
  * Return value: The number of characters parsed. On error 0 is returned and  *
@@ -320,12 +325,23 @@ static zbx_int64_t	json_parse_literal(const char *start, const char *text, char 
  *               message.                                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, char **error)
+zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, char **error)
 {
+#define ZBX_MAX_JSON_DEPTH	64
 	const char	*ptr = start;
 	zbx_int64_t	len;
 	char		*str = NULL;
 	double		number;
+
+	if (ZBX_MAX_JSON_DEPTH < depth)
+	{
+		char	err_buf[MAX_STRING_LEN];
+
+		zbx_snprintf(err_buf, sizeof(err_buf), "JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH);
+		return json_error(err_buf, ptr, error);
+	}
+
+	depth++;
 
 	SKIP_WHITESPACE(ptr);
 
@@ -341,11 +357,11 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, char **error
 				jsonobj_set_string(obj, str);
 			break;
 		case '{':
-			if (0 == (len = json_parse_object(ptr, obj, error)))
+			if (0 == (len = json_parse_object(ptr, obj, depth, error)))
 				return 0;
 			break;
 		case '[':
-			if (0 == (len = json_parse_array(ptr, obj, error)))
+			if (0 == (len = json_parse_array(ptr, obj, depth, error)))
 				return 0;
 			break;
 		case 't':
@@ -392,6 +408,7 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, char **error
 	}
 
 	return ptr - start + len;
+#undef ZBX_MAX_JSON_DEPTH
 }
 
 /******************************************************************************
@@ -400,6 +417,7 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, char **error
  *                                                                            *
  * Parameters: start - [IN] the JSON data                                     *
  *             obj   - [IN/OUT] the JSON object (can be NULL)                 *
+ *             depth - [IN]                                                   *
  *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
  * Return value: The number of characters parsed. On error 0 is returned and  *
@@ -407,7 +425,7 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, char **error
  *               message.                                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_int64_t	json_parse_object(const char *start, zbx_jsonobj_t *obj, char **error)
+zbx_int64_t	json_parse_object(const char *start, zbx_jsonobj_t *obj, int depth, char **error)
 {
 	const char		*ptr = start;
 	zbx_int64_t		len;
@@ -449,14 +467,27 @@ zbx_int64_t	json_parse_object(const char *start, zbx_jsonobj_t *obj, char **erro
 
 			ptr++;
 
-			if (0 == (len = json_parse_value(ptr, (NULL != obj ? &el.value : NULL), error)))
+			if (0 == (len = json_parse_value(ptr, (NULL != obj ? &el.value : NULL), depth, error)))
 			{
 				jsonobj_el_clear(&el);
 				return 0;
 			}
 
 			if (NULL != obj)
-				zbx_hashset_insert(&obj->data.object, &el, sizeof(el));
+			{
+				zbx_jsonobj_el_t	*pel;
+
+				pel = (zbx_jsonobj_el_t *)zbx_hashset_insert(&obj->data.object, &el, sizeof(el));
+
+				/* check if they element was inserted, if not solve the conflict */
+				/* by overwriting old data                                       */
+				if (pel->name != el.name)
+				{
+					zbx_free(pel->name);
+					zbx_jsonobj_clear(&pel->value);
+					*pel = el;
+				}
+			}
 
 			ptr += len;
 
@@ -501,11 +532,11 @@ zbx_int64_t	zbx_json_validate(const char *start, char **error)
 	switch (*start)
 	{
 		case '{':
-			if (0 == (len = json_parse_object(start, NULL, error)))
+			if (0 == (len = json_parse_object(start, NULL, 0, error)))
 				return 0;
 			break;
 		case '[':
-			if (0 == (len = json_parse_array(start, NULL, error)))
+			if (0 == (len = json_parse_array(start, NULL, 0, error)))
 				return 0;
 			break;
 		default:

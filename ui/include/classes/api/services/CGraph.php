@@ -28,6 +28,8 @@ class CGraph extends CGraphGeneral {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype'];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
+
 	public function __construct() {
 		parent::__construct();
 
@@ -418,112 +420,66 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Validate create.
-	 *
-	 * @param array $graphs
+	 * @inheritdoc
 	 */
-	protected function validateCreate(array &$graphs) {
-		$itemIds = $this->validateItemsCreate($graphs);
-		$this->validateItems($itemIds, $graphs);
+	protected static function checkDuplicates(array $graphs): void {
+		$_graph_indexes = [];
 
-		parent::validateCreate($graphs);
-	}
-
-	/**
-	 * Validate update.
-	 *
-	 * @param array $graphs
-	 * @param array $dbGraphs
-	 */
-	protected function validateUpdate(array $graphs, array $dbGraphs) {
-		// check for "itemid" when updating graph with only "gitemid" passed
-		foreach ($graphs as &$graph) {
-			if (isset($graph['gitems'])) {
-				foreach ($graph['gitems'] as &$gitem) {
-					if (isset($gitem['gitemid']) && !isset($gitem['itemid'])) {
-						$dbGitems = zbx_toHash($dbGraphs[$graph['graphid']]['gitems'], 'gitemid');
-						$gitem['itemid'] = $dbGitems[$gitem['gitemid']]['itemid'];
-					}
-				}
-				unset($gitem);
-			}
-		}
-		unset($graph);
-
-		$itemIds = $this->validateItemsUpdate($graphs, $dbGraphs);
-		$this->validateItems($itemIds, $graphs);
-
-		parent::validateUpdate($graphs, $dbGraphs);
-	}
-
-	/**
-	 * Validates items.
-	 *
-	 * @param array $itemIds
-	 * @param array $graphs
-	 */
-	protected function validateItems(array $itemIds, array $graphs) {
-		$dbItems = API::Item()->get([
-			'output' => ['name', 'value_type'],
-			'itemids' => $itemIds,
-			'webitems' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		// check if items exist and user has permission to access those items
-		foreach ($itemIds as $itemId) {
-			if (!isset($dbItems[$itemId])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		foreach ($graphs as $i => $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				$_graph_indexes[$gitem['itemid']][] = $i;
 			}
 		}
 
-		$allowedValueTypes = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
+		$options = [
+			'output' => ['itemid', 'hostid'],
+			'itemids' => array_keys($_graph_indexes),
+			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
+		];
+		$result = DBselect(DB::makeSql('items', $options));
 
-		// get value type and name for these items
-		foreach ($graphs as $graph) {
-			// graph items
-			foreach ($graph['gitems'] as $graphItem) {
-				$item = $dbItems[$graphItem['itemid']];
+		$graph_indexes = [];
 
-				if (!in_array($item['value_type'], $allowedValueTypes)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-						$item['name'],
-						$graph['name']
+		while ($row = DBfetch($result)) {
+			foreach ($_graph_indexes[$row['itemid']] as $i) {
+				if (array_key_exists($row['hostid'], $graph_indexes)
+						&& array_key_exists($graphs[$i]['name'], $graph_indexes[$row['hostid']])
+						&& $graph_indexes[$row['hostid']][$graphs[$i]['name']] != $i) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+						_s('value %1$s already exists', '(name)=('.$graphs[$i]['name'].')')
 					));
 				}
+
+				$graph_indexes[$row['hostid']][$graphs[$i]['name']] = $i;
 			}
+		}
 
-			// Y axis min
-			if (array_key_exists('ymin_type', $graph) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE
-					&& array_key_exists('ymin_itemid', $graph) && $graph['ymin_itemid'] != 0) {
-				if (array_key_exists($graph['ymin_itemid'], $dbItems)) {
-					$item = $dbItems[$graph['ymin_itemid']];
+		$result = DBselect(
+			'SELECT DISTINCT g.graphid,g.name,i.hostid'.
+			' FROM graphs g,graphs_items gi,items i'.
+			' WHERE g.graphid=gi.graphid'.
+				' AND gi.itemid=i.itemid'.
+				' AND '.dbConditionString('g.name', array_unique(array_column($graphs, 'name'))).
+				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
+				' AND '.dbConditionId('i.hostid', array_keys($graph_indexes))
+		);
 
-					if (!in_array($item['value_type'], $allowedValueTypes)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-							$item['name'],
-							$graph['name']
-						));
-					}
-				}
-			}
+		while ($row = DBfetch($result)) {
+			if (array_key_exists($row['hostid'], $graph_indexes)
+					&& array_key_exists($row['name'], $graph_indexes[$row['hostid']])) {
+				$graph = $graphs[$graph_indexes[$row['hostid']][$row['name']]];
 
-			// Y axis max
-			if (array_key_exists('ymax_type', $graph) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE
-					&& array_key_exists('ymax_itemid', $graph) && $graph['ymax_itemid'] != 0) {
-				if (array_key_exists($graph['ymax_itemid'], $dbItems)) {
-					$item = $dbItems[$graph['ymax_itemid']];
+				if (!array_key_exists('graphid', $graph) || bccomp($row['graphid'], $graph['graphid']) != 0) {
+					$hosts = DB::select('hosts', [
+						'output' => ['host', 'status'],
+						'hostids' => $row['hostid']
+					]);
 
-					if (!in_array($item['value_type'], $allowedValueTypes)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-							$item['name'],
-							$graph['name']
-						));
-					}
+					$error = in_array($hosts[0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+						? _('Graph "%1$s" already exists on the host "%2$s".')
+						: _('Graph "%1$s" already exists on the template "%2$s".');
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $graph['name'], $hosts[0]['host']));
 				}
 			}
 		}

@@ -69,6 +69,7 @@ typedef struct
 	struct event_base	*ev;
 	struct event		*ev_listener;
 	struct event		*ev_timer;
+	struct event		*ev_alert;
 
 	/* the unix socket path */
 	char			*path;
@@ -97,10 +98,12 @@ void	zbx_ipc_service_free_env(void);
 int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
 int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout, zbx_ipc_client_t **client,
 		zbx_ipc_message_t **message);
+void	zbx_ipc_service_alert(zbx_ipc_service_t *service);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 
 int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size);
 void	zbx_ipc_client_close(zbx_ipc_client_t *client);
+int	zbx_ipc_client_get_fd(zbx_ipc_client_t *client);
 
 void			zbx_ipc_client_addref(zbx_ipc_client_t *client);
 void			zbx_ipc_client_release(zbx_ipc_client_t *client);
@@ -132,7 +135,9 @@ void	zbx_ipc_message_free(zbx_ipc_message_t *message);
 void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
 void	zbx_ipc_message_init(zbx_ipc_message_t *message);
 void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data);
+#ifdef HAVE_OPENIPMI
 void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src);
+#endif
 
 void	zbx_init_library_ipcservice(unsigned char program_type);
 

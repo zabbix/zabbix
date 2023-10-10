@@ -36,14 +36,17 @@ window.connector_edit_popup = new class {
 
 		jQuery('#tags').dynamicRows({
 			template: '#tag-row-tmpl',
-			rows: tags
+			rows: tags,
+			allow_empty: true
 		});
 
-		for (const id of ['tags', 'authtype', 'advanced_configuration', 'max_records_mode']) {
+		for (const id of ['tags', 'authtype', 'max_records_mode']) {
 			document.getElementById(id).addEventListener('change', () => this._updateForm());
 		}
 
 		this._updateForm();
+
+		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	_updateForm() {
@@ -67,16 +70,6 @@ window.connector_edit_popup = new class {
 			field.style.display = use_token ? '' : 'none';
 		}
 
-		const advanced_configuration_enabled = document.getElementById('advanced_configuration').checked;
-		const advanced_configuration_fields = ['.js-field-max-records', '.js-field-max-senders',
-			'.js-field-max-attempts', '.js-field-timeout', '.js-field-http-proxy', '.js-field-verify-peer',
-			'.js-field-verify-host', '.js-field-ssl-cert-file', '.js-field-ssl-key-file', '.js-field-ssl-key-password'
-		];
-
-		for (const field of this.form.querySelectorAll(advanced_configuration_fields.join())) {
-			field.style.display = advanced_configuration_enabled ? '' : 'none';
-		}
-
 		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
 		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
 	}
@@ -98,7 +91,7 @@ window.connector_edit_popup = new class {
 		this._post(curl.getUrl(), {connectorids: [this.connectorid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 
@@ -128,7 +121,7 @@ window.connector_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', this.connectorid != null ? 'connector.update' : 'connector.create');
+		curl.setArgument('action', this.connectorid !== null ? 'connector.update' : 'connector.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

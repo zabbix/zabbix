@@ -1,5 +1,5 @@
-z-select,
-.z-select {
+.z-select,
+z-select {
 	display: inline-grid;
 
 	&:focus {
@@ -10,14 +10,15 @@ z-select,
 		font-style: italic;
 	}
 
-	button.focusable {
+	.focusable {
 		position: relative;
 		width: 100%;
 		height: 24px;
-		padding: 3px 18px 3px 4px;
+		padding: 3px 16px 3px 4px;
 		overflow: hidden;
 		font-size: $font-form-size;
 		line-height: initial;
+		vertical-align: baseline;
 		text-align: left;
 		text-overflow: ellipsis;
 		word-break: break-all;
@@ -29,15 +30,13 @@ z-select,
 		@extend %webkit-scrollbar;
 
 		&::after {
-			content: '';
+			@extend %icons-font;
 			position: absolute;
-			top: 6px;
-			right: 5px;
-			width: 5px;
-			height: 5px;
-			border-right: 1.4px solid;
-			border-bottom: 1.4px solid;
-			transform: rotate(45deg);
+			top: 50%;
+			right: 4px;
+			font-size: $icon-smaller-size;
+			content: $zi-chevron-down;
+			transform: translateY(-50%);
 		}
 
 		&:active,
@@ -52,7 +51,7 @@ z-select,
 		&.red {
 			color: $red;
 
-			&:after {
+			&::after {
 				color: $font-color;
 			}
 		}
@@ -127,20 +126,16 @@ z-select,
 	}
 
 	&[disabled] {
-		button {
-			pointer-events: none;
+		.focusable {
 			@extend %form-disabled;
+
+			pointer-events: none;
 		}
 	}
 
 	&[readonly] {
-		button {
-			@extend %form-disabled;
-			color: $font-color !important;
-
-			&:focus {
-				border-color: $form-border-focus-color;
-			}
+		.focusable {
+			@extend %form-readonly;
 		}
 	}
 }

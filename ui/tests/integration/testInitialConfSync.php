@@ -29,7 +29,8 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
  * @backup host_tag, hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
  * @backup item_tag, lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
- * @backup lld_override_opstatus, operations, opgroup, opmessage, opmessage_grp, optemplate
+ * @backup lld_override_opstatus, operations, opgroup, opmessage, opmessage_grp, optemplate, proxy, proxy_rtdata
+ * @backup auditlog, changelog, expressions, ha_node, regexps
  */
 class testInitialConfSync extends CIntegrationTest
 {
@@ -61,7 +62,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'hosts' =>
 			[
-				'insert' => '17',
+				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -101,11 +102,37 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'interfaces' =>
 			[
-				'insert' => '16',
+				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
 			]
 		],
+
+		/* Where the number 95 came from ?
+		Need to go through the confsync_hosts.xml and confsync_tmpl.xml,
+		count number of items, item prototypes and discovery rules for hosts
+		and templates that get imported by those hosts.
+		However, the following needs to be accounted:
+		a) every httpstep in web scenarios have 6 hidden items
+		b) item prototypes in discovery rules are ignored by configuration syncer
+			(ZBX_FLAG_DISCOVERY_PROTOTYPE = 2)
+
+		With that approach we get the following:
+
+		1) HostInventoryAutomatic -> 3 items
+		2) HostMultilevelTmpl -> 9 items, (1 items, also inherits bbbtmpl, which inherits
+					'SampleTemplate', which has 1 item, 1 item prototype (ignored
+					as it is part of the discovery rule), 1 discovery rule,
+					1 httpstep(6 items)))
+		3) HostWithDiscovery -> 1 items (1 item prototype(ignored as it is part of the discovery
+					rule), 1 discovery rule)
+		4) HostWithItems -> 28 items
+		5) HostWithMacros -> 3 items
+		6) HostWithTemplate -> 8 items (inherits 'SampleTemplate')
+		7) HostWithWebScenario -> 7 items (1 item + httpstep(6 items))
+		8) HostWithComprehensiveTemplate -> 36 items (inherits 'Comprehensive Template')
+		3 + 9 + 1 + 28 + 3 + 8 + 7 + 36 = 95 */
+
 		[
 			'items' =>
 			[
@@ -117,7 +144,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'template_items' =>
 			[
-				'insert' => '45',
+				'insert' => '54',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -125,7 +152,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'prototype_items' =>
 			[
-				'insert' => '4',
+				'insert' => '5',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -133,7 +160,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'item_discovery' =>
 			[
-				'insert' => '4',
+				'insert' => '5',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -141,7 +168,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'triggers' =>
 			[
-				'insert' => '25',
+				'insert' => '28',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -149,7 +176,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'trigdeps' =>
 			[
-				'insert' => '6',
+				'insert' => '7',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -157,7 +184,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'trigtags' =>
 			[
-				'insert' => '18',
+				'insert' => '22',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -181,7 +208,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'functions' =>
 			[
-				'insert' => '25',
+				'insert' => '28',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -245,7 +272,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'hgroups' =>
 			[
-				'insert' => '17',
+				'insert' => '16',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -285,7 +312,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'httptests' =>
 			[
-				'insert' => '4',
+				'insert' => '5',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -302,6 +329,14 @@ class testInitialConfSync extends CIntegrationTest
 			'connector_tag' =>
 			[
 				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '2',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -346,7 +381,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"16",
+				"14",
 				"delete" =>
 				"0"
 			]
@@ -401,7 +436,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"10",
+				"9",
 				"delete" =>
 				"0"
 			]
@@ -412,7 +447,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"88",
+				"84",
 				"delete" =>
 				"0"
 			]
@@ -434,7 +469,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"4",
+				"5",
 				"delete" =>
 				"0"
 			]
@@ -454,33 +489,33 @@ class testInitialConfSync extends CIntegrationTest
 			"triggers" =>
 			[
 				"insert" =>
-				"7",
+				"9",
 				"update" =>
 				"10",
 				"delete" =>
-				"7"
+				"9"
 			]
 		],
 		[
 			"trigdeps" =>
 			[
 				"insert" =>
-				"3",
+				"4",
 				"update" =>
 				"0",
 				"delete" =>
-				"3"
+				"4"
 			]
 		],
 		[
 			"trigtags" =>
 			[
 				"insert" =>
-				"9",
+				"12",
 				"update" =>
 				"0",
 				"delete" =>
-				"9"
+				"12"
 			]
 		],
 		[
@@ -509,11 +544,11 @@ class testInitialConfSync extends CIntegrationTest
 			"functions" =>
 			[
 				"insert" =>
-				"13",
+				"15",
 				"update" =>
 				"0",
 				"delete" =>
-				"13"
+				"15"
 			]
 		],
 		[
@@ -654,7 +689,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"4",
+				"5",
 				"delete" =>
 				"0"
 			]
@@ -677,6 +712,17 @@ class testInitialConfSync extends CIntegrationTest
 				'0',
 				'update' =>
 				'0',
+				'delete' =>
+				'0'
+			]
+			],
+		[
+			'proxy' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'2',
 				'delete' =>
 				'0'
 			]
@@ -722,7 +768,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"21"
+				"19"
 			]
 		],
 		[
@@ -777,7 +823,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"16"
+				"15"
 			]
 		],
 		[
@@ -788,7 +834,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"143"
+				"152"
 			]
 		],
 		[
@@ -799,7 +845,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"45"
+				"54"
 			]
 		],
 		[
@@ -810,7 +856,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"143"
+				"152"
 			]
 		],
 		[
@@ -821,7 +867,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"4"
+				"5"
 			]
 		],
 		[
@@ -832,7 +878,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"25"
+				"28"
 			]
 		],
 		[
@@ -843,7 +889,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"6"
+				"7"
 			]
 		],
 		[
@@ -854,7 +900,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"18"
+				"22"
 			]
 		],
 		[
@@ -887,7 +933,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"25"
+				"28"
 			]
 		],
 		[
@@ -1024,7 +1070,7 @@ class testInitialConfSync extends CIntegrationTest
 			[
 				'insert' => '0',
 				'update' => '0',
-				'delete' => '4'
+				'delete' => '5'
 			]
 		],
 		[
@@ -1042,6 +1088,14 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '2'
+			]
 		]
 	];
 
@@ -1054,6 +1108,7 @@ class testInitialConfSync extends CIntegrationTest
 	private static $regexpid;
 	private static $vaultmacroid;
 	private static $secretmacroid;
+	private static $tlshostid;
 
 	/**
 	 * @inheritdoc
@@ -1085,11 +1140,11 @@ class testInitialConfSync extends CIntegrationTest
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
 		$data = explode("\n", $log);
 
-		$sync_lines = preg_grep('/DCsync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
+		$sync_lines = preg_grep('/zbx_dc_sync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ DCsync_configuration\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
 				"/:sql:[0-9]+\.[0-9]+sec/"
@@ -1138,7 +1193,7 @@ class testInitialConfSync extends CIntegrationTest
 
 	private function getStringPoolCount() {
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
-		preg_match('/DCsync_configuration\(\)\s+strings\s+:\s*(\d+)/', $log, $result);
+		preg_match('/zbx_dc_sync_configuration\(\)\s+strings\s+:\s*(\d+)/', $log, $result);
 		return $result[1];
 	}
 
@@ -1343,6 +1398,44 @@ class testInitialConfSync extends CIntegrationTest
 		self::$maintenanceid = $response['result']['maintenanceids'][0];
 	}
 
+	private function setupTlsForHost()
+	{
+		$response = $this->call('host.get', [
+			'output' => 'hostids',
+			'filter' => [
+				'host' => ['Host1']
+			],
+			'preservekeys' => true
+		]);
+		$this->assertArrayHasKey('result', $response);
+		self::$tlshostid = array_key_first($response['result']);
+
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
+	private function updateTlsForHost()
+	{
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
 	private function updateMaintenance()
 	{
 		$response = $this->call('maintenance.update', [
@@ -1429,25 +1522,32 @@ class testInitialConfSync extends CIntegrationTest
 	private function createProxies()
 	{
 		$response = $this->call('proxy.create', [
-			'host' => 'ProxyA',
-			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'name' => 'ProxyA',
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+			'allowed_addresses' => '10.0.2.15,zabbix.test',
+			'tls_connect' => HOST_ENCRYPTION_NONE,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8',
 			'hosts' => []
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 		self::$proxyid_active = $response['result']['proxyids'][0];
 
 		$response = $this->call('proxy.create', [
-			'host' => 'ProxyP',
-			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'name' => 'ProxyP',
+			'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 			'hosts' => [],
-			'interface' => [
-				"ip" => "127.0.0.1",
-				"dns" => "",
-				"useip" => "1",
-				"port" => "10099"
-			]
+			'address' => '127.0.0.1',
+			'port' => '10099',
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_NONE,
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
 		]);
-		$this->assertArrayHasKey("proxyids", $response['result']);
+		$this->assertArrayHasKey('proxyids', $response['result']);
 		self::$proxyid_passive = $response['result']['proxyids'][0];
 	}
 
@@ -1455,21 +1555,17 @@ class testInitialConfSync extends CIntegrationTest
 	{
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid_active,
-			'proxy_address' => "127.9.9.9"
+			'allowed_addresses' => '127.9.9.9'
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid_passive,
-			'host' => "ProxyP1",
-			'interface' => [
-				"ip" => "127.1.30.2",
-				"dns" => "",
-				"useip" => "1",
-				"port" => "10299"
-			]
+			'name' => 'ProxyP1',
+			'address' => '127.1.30.2',
+			'port' => '10299'
 		]);
-		$this->assertArrayHasKey("proxyids", $response['result']);
+		$this->assertArrayHasKey('proxyids', $response['result']);
 	}
 
 	private function createGlobalMacros()
@@ -1577,6 +1673,11 @@ class testInitialConfSync extends CIntegrationTest
 					'createMissing' => true,
 					'deleteMissing' => false
 				],
+				'templateLinkage' =>
+				[
+					'createMissing' => true,
+					'deleteMissing' => false
+				],
 				'items' =>
 				[
 					'updateExisting' => true,
@@ -1643,6 +1744,11 @@ class testInitialConfSync extends CIntegrationTest
 				'templateDashboards' =>
 				[
 					'updateExisting' => true,
+					'createMissing' => false,
+					'deleteMissing' => false
+				],
+				'templateLinkage' =>
+				[
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
@@ -1751,6 +1857,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->createActions();
 		$this->createMaintenance();
+		$this->setupTlsForHost();
 	}
 
 	/**
@@ -1775,7 +1882,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		self::startComponent(self::COMPONENT_SERVER);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
 		$this->assertEquals($this->expected_initial, $got);
@@ -1795,7 +1902,7 @@ class testInitialConfSync extends CIntegrationTest
 		self::clearLog(self::COMPONENT_SERVER);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$stringpool_old = $this->getStringPoolCount();
 
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -1803,7 +1910,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		self::startComponent(self::COMPONENT_SERVER);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$stringpool_new = $this->getStringPoolCount();
 
 		$this->assertEquals($stringpool_old, $stringpool_new);
@@ -1865,10 +1972,11 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->updateGlobalMacro();
 		$this->updateAction();
+		$this->updateTlsForHost();
 
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
 		$this->assertEquals($this->expected_update, $got);
@@ -1890,7 +1998,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
 		$this->assertEquals($this->expected_delete, $got);

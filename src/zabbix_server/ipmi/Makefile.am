@@ -14,4 +14,6 @@ libipmi_a_SOURCES = \
 	ipmi_protocol.c \
 	ipmi_protocol.h
 
-libipmi_a_CFLAGS = $(OPENIPMI_CFLAGS)
+libipmi_a_CFLAGS = \
+	$(OPENIPMI_CFLAGS) \
+	$(TLS_CFLAGS)

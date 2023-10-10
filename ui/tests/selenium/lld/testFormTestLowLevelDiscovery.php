@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
  *
  * @backup items
  */
-class testFormTestLowLevelDiscovery extends testItemTest{
+class testFormTestLowLevelDiscovery extends testItemTest {
 
 	/**
 	 * Check Test LLD Button enabled/disabled state depending on item type for Host.

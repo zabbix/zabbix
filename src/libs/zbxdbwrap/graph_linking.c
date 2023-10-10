@@ -371,8 +371,8 @@ static int	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset = 0;
 	int			res = SUCCEED;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -433,8 +433,8 @@ static int	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t *
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_hashset_t		y_data_map;
 	zbx_vector_uint64_t	y_data_ids;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __func__, hostid);
 
@@ -521,8 +521,8 @@ static int	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *grap
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset = 0;
 	int		res = SUCCEED;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -616,8 +616,8 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
 	int		res = SUCCEED;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __func__, hostid);
 
@@ -1383,10 +1383,10 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 	zbx_db_insert_prepare(&db_insert, "graphs", "graphid", "name", "width", "height", "yaxismin",
 			"yaxismax", "templateid", "show_work_period", "show_triggers", "graphtype", "show_legend",
 			"show_3d", "percent_left", "percent_right", "ymin_type", "ymax_type", "ymin_itemid",
-			"ymax_itemid", "flags", "discover", NULL);
+			"ymax_itemid", "flags", "discover", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_graphs_items, "graphs_items", "gitemid", "graphid", "itemid", "drawtype",
-			"sortorder", "color", "yaxisside", "calc_fnc", "type", NULL);
+			"sortorder", "color", "yaxisside", "calc_fnc", "type", (char *)NULL);
 
 	graphid = zbx_db_get_maxid_num("graphs", graphs_copies_insert->values_num);
 	graphs_itemsid = zbx_db_get_maxid_num("graphs_items", *total_insert_gitems_count);

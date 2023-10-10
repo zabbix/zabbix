@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageTriggerPrototypes extends CLegacyWebTest {
 
@@ -37,11 +38,20 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 	}
 
 	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
+	/**
 	* @dataProvider data
 	*/
 	public function testPageTriggerPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
-		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context=host');
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
@@ -76,19 +86,18 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 	public function testPageTriggerPrototypes_SimpleDelete($data) {
 		$triggerid = $data['triggerid'];
 
-		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context=host');
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
-		$this->zbxTestClickButton('triggerprototype.massdelete');
+		$this->query('button:Delete')->one()->click();
 
 		$this->zbxTestAcceptAlert();
-
+		$this->assertMessage(TEST_GOOD, 'Trigger prototype deleted');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
 		$this->zbxTestTextPresent($data['d_name']);
-		$this->zbxTestTextPresent('Trigger prototypes deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -121,16 +130,16 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 		);
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
-		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$druleid.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('all_triggers');
-		$this->zbxTestClickButton('triggerprototype.massdelete');
+		$this->query('button:Delete')->one()->click();
 
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->zbxTestTextPresent('Trigger prototypes deleted');
+		$this->assertMessage(TEST_GOOD, 'Trigger prototype deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerid', $triggerids);
 		$this->assertEquals(0, CDBHelper::getCount($sql));

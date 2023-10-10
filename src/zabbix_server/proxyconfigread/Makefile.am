@@ -6,4 +6,6 @@ libzbxproxyconfigread_a_SOURCES = \
 	proxyconfig_read.c \
 	proxyconfig_read.h
 
-libzbxproxyconfigread_a_CFLAGS = -I$(top_srcdir)/src
+libzbxproxyconfigread_a_CFLAGS = \
+	-I$(top_srcdir)/src \
+	$(TLS_CFLAGS)

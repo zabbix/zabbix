@@ -28,7 +28,7 @@
 
 $table = new CTableInfo();
 
-if ($data['error'] != null) {
+if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
 }
 else {

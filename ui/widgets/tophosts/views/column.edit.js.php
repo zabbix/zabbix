@@ -29,15 +29,15 @@ window.tophosts_column_edit_form = new class {
 		this._$widget_form = $(`form[name="${form_name}"]`);
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
 
-		$('[name="data"], [name="aggregate_function"], [name="display"]', this._$widget_form).on('change', () => {
-			this._update();
-		});
+		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]', this._$widget_form)
+			.on('change', () => this._update());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this._$thresholds_table.dynamicRows({
 			rows: thresholds,
 			template: '#thresholds-row-tmpl',
+			allow_empty: true,
 			dataCallback: (row_data) => {
 				if (!('color' in row_data)) {
 					const colors = this._$widget_form[0].querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
@@ -81,6 +81,8 @@ window.tophosts_column_edit_form = new class {
 
 	_update() {
 		const display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
+		const history_data_trends = ($('[name="history"]:checked').val() ==
+			<?= CWidgetFieldColumnsList::HISTORY_DATA_TRENDS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
 		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= AGGREGATE_NONE ?>;
@@ -100,6 +102,9 @@ window.tophosts_column_edit_form = new class {
 				? 'none'
 				: '';
 			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
+			document.getElementById('tophosts-column-history-data-warning').style.display = history_data_trends
+				? ''
+				: 'none';
 			document.getElementById('tophosts-column-thresholds-warning').style.display =
 				this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
 		}
@@ -114,10 +119,32 @@ window.tophosts_column_edit_form = new class {
 		});
 	}
 
+	#trimFields(fields) {
+		fields.name = fields.name.trim();
+
+		for (const field of ['text', 'timeshift', 'aggregate_interval', 'min', 'max', 'decimal_places']) {
+			if (field in fields) {
+				fields[field] = fields[field].trim();
+			}
+		}
+
+		if ('thresholds' in fields) {
+			for (const threshold of Object.values(fields.thresholds)) {
+				threshold.threshold = threshold.threshold.trim();
+			}
+		}
+
+		return fields;
+	}
+
 	handleFormSubmit(e, overlay) {
-		fetch(new Curl(e.target.getAttribute('action')).getUrl(), {
+		const curl = new Curl(e.target.getAttribute('action'));
+		const fields = this.#trimFields(getFormFields(e.target));
+
+		fetch(curl.getUrl(), {
 			method: 'POST',
-			body: new URLSearchParams(new FormData(e.target))
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData(fields)
 		})
 			.then(response => response.json())
 			.then(response => {

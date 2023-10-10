@@ -84,7 +84,7 @@ class CValueMapHelper {
 		switch ($mapping['type']) {
 			case VALUEMAP_MAPPING_TYPE_EQUAL:
 				$result = $match_numeric
-					? (floatval($value) == floatval($mapping['value']))
+					? (is_numeric($mapping['value']) && floatval($value) == floatval($mapping['value']))
 					: ($value === $mapping['value']);
 
 				break;

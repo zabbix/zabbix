@@ -33,7 +33,6 @@ window.widget_item_form = new class {
 		this._show_time = document.getElementById(`show_${<?= Widget::SHOW_TIME ?>}`);
 		this._show_change_indicator = document.getElementById(`show_${<?= Widget::SHOW_CHANGE_INDICATOR ?>}`);
 
-		this._advance_configuration = document.getElementById('adv_conf');
 		this._units_show = document.getElementById('units_show');
 
 		jQuery('#itemid').on('change', () => this.updateWarningIcon());
@@ -61,9 +60,7 @@ window.widget_item_form = new class {
 			});
 		}
 
-		for (const checkbox of [this._advance_configuration, this._units_show]) {
-			checkbox.addEventListener('change', () => this.updateForm());
-		}
+		this._units_show.addEventListener('change', () => this.updateForm());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -71,61 +68,39 @@ window.widget_item_form = new class {
 	}
 
 	updateForm() {
-		const show_description_row = this._advance_configuration.checked && this._show_description.checked;
-		const show_value_row = this._advance_configuration.checked && this._show_value.checked;
-		const show_time_row = this._advance_configuration.checked && this._show_time.checked;
-		const show_change_indicator_row = this._advance_configuration.checked && this._show_change_indicator.checked;
-		const show_bg_color_row = this._advance_configuration.checked;
-		const show_thresholds_row = this._advance_configuration.checked;
-
 		for (const element of this._form.querySelectorAll('.fields-group-description')) {
-			element.style.display = show_description_row ? '' : 'none';
+			element.style.display = this._show_description.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input, textarea')) {
-				input.disabled = !show_description_row;
+				input.disabled = !this._show_description.checked;
 			}
 		}
 
 		for (const element of this._form.querySelectorAll('.fields-group-value')) {
-			element.style.display = show_value_row ? '' : 'none';
+			element.style.display = this._show_value.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !show_value_row;
+				input.disabled = !this._show_value.checked;
 			}
 		}
-		for(const element of document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
-			element.disabled = !show_value_row || !this._units_show.checked;
+
+		for (const element of document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
+			element.disabled = !this._show_value.checked || !this._units_show.checked;
 		}
 
 		for (const element of this._form.querySelectorAll('.fields-group-time')) {
-			element.style.display = show_time_row ? '' : 'none';
+			element.style.display = this._show_time.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !show_time_row;
+				input.disabled = !this._show_time.checked;
 			}
 		}
 
 		for (const element of this._form.querySelectorAll('.fields-group-change-indicator')) {
-			element.style.display = show_change_indicator_row ? '' : 'none';
+			element.style.display = this._show_change_indicator.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !show_change_indicator_row;
-			}
-		}
-
-		for (const element of this._form.querySelectorAll('.js-row-bg-color')) {
-			element.style.display = show_bg_color_row ? '' : 'none';
-
-			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !show_bg_color_row;
-			}
-		}
-
-		for (const element of this._form.querySelectorAll('.js-row-thresholds')) {
-			element.style.display = show_thresholds_row ? '' : 'none';
-
-			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !show_thresholds_row;
+				input.disabled = !this._show_change_indicator.checked;
 			}
 		}
 	}

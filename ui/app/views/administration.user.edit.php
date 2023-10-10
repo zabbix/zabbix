@@ -172,8 +172,7 @@ if ($data['change_password']) {
 		$current_password->setAttribute('autofocus', 'autofocus');
 	}
 
-	if ($data['action'] === 'userprofile.edit'
-			|| CWebUser::$data['userid'] == $data['userid'] && CWebUser::$data['roleid'] == USER_TYPE_SUPER_ADMIN) {
+	if (CWebUser::$data['userid'] == $data['userid']) {
 		$user_form_list
 			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(), $current_password);
 	}
@@ -196,12 +195,14 @@ if ($data['change_password']) {
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$change_password_enabled = $data['internal_authentication'] && !$data['readonly']
-		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
+	$change_password_enabled = !$data['readonly'] && $data['internal_auth'];
+
+	if ($change_password_enabled && $data['action'] === 'user.edit') {
+		$change_password_enabled = $data['db_user']['username'] !== ZBX_GUEST_USER;
+	}
 
 	$hint = !$change_password_enabled
-		? $hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
-			->addStyle('margin-left: 5px; margin-top: 4px')
+		? $hint = makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.'))
 		: null;
 
 	$user_form_list->addRow(_('Password'), [
@@ -272,7 +273,7 @@ else {
 	}
 
 	if ($language_error) {
-		$language_error = (makeErrorIcon($language_error))->addStyle('margin-left: 5px;');
+		$language_error = makeErrorIcon($language_error);
 	}
 
 	$timezone_select
@@ -316,9 +317,8 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))
+		(new CTextBox('url', $data['url'], false, DB::getFieldLength('users', 'url')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -348,23 +348,17 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				$status_class = ZBX_STYLE_RED;
 			}
 
-			$status = (new CSimpleButton($status_label))
+			$status = (new CButtonLink($status_label))
 				->onClick(!$data['readonly'] ? $status_action : null)
-				->addClass(ZBX_STYLE_BTN_LINK.($data['readonly'] ? '' : ' '.$status_class))
+				->addClass(!$data['readonly'] ? $status_class : null)
 				->setEnabled(!$data['readonly']);
 		}
 		else {
-			$media_name = new CDiv([
-				$media['name'],
-				(new CSpan([
-					' ',
-					makeWarningIcon(
-						_('Media type disabled by Administration.')
-					)
-				]))
-			]);
-
-			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
+			$media_name = [
+				new CSpan($media['name']),
+				makeWarningIcon(_('Media type disabled by Administration.'))
+			];
+			$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 
 		$parameters = [
@@ -387,7 +381,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
 				->addClass($media_active
 					? CSeverityHelper::getStatusStyle($severity)
-					: ZBX_STYLE_STATUS_DISABLED_BG
+					: ZBX_STYLE_STATUS_DISABLED
 				);
 		}
 
@@ -410,14 +404,12 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				$status,
 				(new CCol(
 					new CHorList([
-						(new CButton(null, _('Edit')))
-							->setEnabled(!$data['readonly'])
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Edit')))
 							->setAttribute('data-parameters', json_encode($parameters))
-							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
-						(new CButton(null, _('Remove')))
 							->setEnabled(!$data['readonly'])
-							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
+						(new CButtonLink(_('Remove')))
+							->setEnabled(!$data['readonly'])
 							->onClick('removeMedia('.$index.');')
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -428,10 +420,9 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 	$media_form_list->addRow(_('Media'),
 		(new CDiv([
 			$media_table_info,
-			(new CButton(null, _('Add')))
-				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Add')))
 				->setEnabled(!$data['readonly'])
+				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -474,7 +465,9 @@ if ($data['action'] === 'user.edit') {
 		);
 	}
 	else {
-		$permissions_form_list->addRow(new CLabel(_('Role'), 'roleid_ms'), $role_multiselect);
+		$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms'))->setAsteriskMark($data['roleid_required']),
+			$role_multiselect
+		);
 	}
 
 	if ($data['roleid']) {
@@ -495,7 +488,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];
@@ -508,7 +501,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];

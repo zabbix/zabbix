@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/include/classes/mvc/CView.php';
 require_once dirname(__FILE__).'/include/classes/html/CObject.php';
 require_once dirname(__FILE__).'/include/classes/html/CTag.php';
 require_once dirname(__FILE__).'/include/classes/html/CLink.php';
+require_once dirname(__FILE__).'/include/classes/html/CHtmlEntity.php';
 require_once dirname(__FILE__).'/include/classes/helpers/CBrandHelper.php';
 
 echo (new CView('general.browserwarning'))->getOutput();

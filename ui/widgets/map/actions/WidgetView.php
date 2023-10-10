@@ -61,11 +61,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->hasInput('current_sysmapid')) {
 			$sysmapid = $this->getInput('current_sysmapid');
 		}
-		elseif (array_key_exists('sysmapid', $this->fields_values)) {
-			$sysmapid =  $this->fields_values['sysmapid'];
+		elseif (array_key_exists('sysmapid', $this->fields_values) && $this->fields_values['sysmapid']) {
+			$sysmapid = $this->fields_values['sysmapid'][0];
 		}
 
-		$sysmap_data = CMapHelper::get($sysmapid == null ? [] : [$sysmapid],
+		$sysmap_data = CMapHelper::get($sysmapid === null ? [] : [$sysmapid],
 			['unique_id' => $this->getInput('unique_id')]
 		);
 
@@ -86,10 +86,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sysmap_data' => $sysmap_data ?: [],
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,
-				'filter_widget_reference' => array_key_exists('filter_widget_reference', $this->fields_values)
-					? $this->fields_values['filter_widget_reference']
-					: null,
-				'source_type' => $this->fields_values['source_type'],
 				'previous_map' => $previous_map,
 				'initial_load' => $this->getInput('initial_load', 1),
 				'error' => $error

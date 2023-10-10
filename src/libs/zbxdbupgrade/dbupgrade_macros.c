@@ -116,10 +116,10 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
  *               FAIL     - database error occurred                           *
  *                                                                            *
  ******************************************************************************/
-int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_field_len_t *fields, int fields_num,
-		const char *oldmacro, const char *newmacro)
+int	db_rename_macro(zbx_db_result_t result, const char *table, const char *pkey, zbx_field_len_t *fields,
+		int fields_num, const char *oldmacro, const char *newmacro)
 {
-	DB_ROW		row;
+	zbx_db_row_t	row;
 	char		*sql = 0, *value = NULL, *value_esc;
 	size_t		sql_alloc = 4096, sql_offset = 0, field_alloc = 0, old_offset;
 	int		i, ret = SUCCEED;

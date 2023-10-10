@@ -8,6 +8,7 @@ tagfilter_match_tags_SOURCES = \
 tagfilter_match_tags_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -22,9 +23,9 @@ tagfilter_match_tags_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-tagfilter_match_tags_LDADD += @SERVER_LIBS@
+tagfilter_match_tags_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 
-tagfilter_match_tags_LDFLAGS = @SERVER_LDFLAGS@
+tagfilter_match_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-tagfilter_match_tags_CFLAGS = -I@top_srcdir@/tests
+tagfilter_match_tags_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 endif

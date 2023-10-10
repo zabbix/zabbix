@@ -74,7 +74,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $hostid)
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		)
 		: _('Latest data');
 
@@ -84,8 +84,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
 				->setArgument('hostids', [$hostid])
+				->setArgument('filter_set', '1')
 		)
 		: _('Problems');
 
@@ -128,7 +128,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$trigger_count = CViewHelper::showNum($host['triggers']);
 	$triggers_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+		? [new CLink(_('Triggers'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'trigger.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 			->setArgument('context', 'host')
@@ -230,7 +231,7 @@ foreach ($data['host_groups'] as $groupid => $group) {
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
 				->setArgument('groupids[]', $groupid)
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		)
 		: _('Latest data');
 
@@ -243,8 +244,8 @@ foreach ($data['host_groups'] as $groupid => $group) {
 			? new CLink(_('Problems'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
 					->setArgument('groupids', [$groupid])
+					->setArgument('filter_set', '1')
 			)
 			: _('Problems'),
 		$data['allowed_ui_hosts']
@@ -286,10 +287,10 @@ if ($data['admin']) {
 		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
 		$template_cell = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink($visible_name, (new CUrl('templates.php'))
-				->setArgument('form', 'update')
-				->setArgument('templateid', $templateid)
-			)]
+			? [(new CLink($visible_name))
+				->setAttribute('data-templateid', $templateid)
+				->onClick('view.editTemplate(event, this.dataset.templateid);')
+			]
 			: [new CSpan($visible_name)];
 
 		$items_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
@@ -303,7 +304,8 @@ if ($data['admin']) {
 		$items_link = (new CCol($items_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 		$triggers_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+			? [new CLink(_('Triggers'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'trigger.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 				->setArgument('context', 'template')
@@ -390,7 +392,8 @@ foreach ($data['template_groups'] as $groupid => $group) {
 
 	if ($data['admin']) {
 		$templates_link = ($group['editable'] && $data['allowed_ui_conf_templates'] && $group['templates'])
-			? [new CLink(_('Templates'), (new CUrl('templates.php'))
+			? [new CLink(_('Templates'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'template.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_groups', [$groupid])
 			), CViewHelper::showNum($group['templates'])]

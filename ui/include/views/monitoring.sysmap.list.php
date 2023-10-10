@@ -87,25 +87,35 @@ foreach ($this->data['maps'] as $map) {
 	$user_type = CWebUser::getType();
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $map['editable']) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
-		$action = $data['allowed_edit']
-			? new CLink(_('Properties'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'])
+		$properties_link = $data['allowed_edit']
+			? new CLink(_('Properties'),
+				(new CUrl('sysmaps.php'))
+					->setArgument('form', 'update')
+					->setArgument('sysmapid', $map['sysmapid'])
+			)
 			: _('Properties');
-		$constructor = $data['allowed_edit']
-			? new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid'])
-			: _('Constructor');
+		$edit_link = $data['allowed_edit']
+			? new CLink(_('Edit'),
+				(new CUrl('sysmap.php'))->setArgument('sysmapid', $map['sysmapid'])
+			)
+			: _('Edit');
 	}
 	else {
 		$checkbox = (new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']))
 			->setAttribute('disabled', 'disabled');
-		$action = '';
-		$constructor = '';
+		$properties_link = '';
+		$edit_link = '';
 	}
 	$sysmapTable->addRow([
 		$checkbox,
-		new CLink($map['name'], 'zabbix.php?action=map.view&sysmapid='.$map['sysmapid']),
+		(new CLink($map['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'map.view')
+				->setArgument('sysmapid', $map['sysmapid'])
+		)),
 		$map['width'],
 		$map['height'],
-		new CHorList([$action, $constructor])
+		new CHorList([$properties_link, $edit_link])
 	]);
 }
 
@@ -121,7 +131,10 @@ $sysmapForm->addItem([
 					->getUrl()
 			)
 		],
-		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?'),
+		'map.massdelete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected map?'),
+			'confirm_plural' => _('Delete selected maps?'),
 			'disabled' => $data['allowed_edit'] ? null : 'disabled',
 			'csrf_token' => CCsrfTokenHelper::get('sysmaps.php')
 		]

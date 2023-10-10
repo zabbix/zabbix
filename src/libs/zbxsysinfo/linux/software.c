@@ -20,23 +20,21 @@
 /* strptime() on newer and older GNU/Linux systems */
 #define _GNU_SOURCE
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 #include "software.h"
 
 #include "zbxalgo.h"
 #include "zbxexec.h"
-#include "cfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
-#       include <sys/utsname.h>
+#	include <sys/utsname.h>
 #endif
 
 #define SW_OS_FULL			"/proc/version"
-#define SW_OS_SHORT 			"/proc/version_signature"
+#define SW_OS_SHORT			"/proc/version_signature"
 #define SW_OS_NAME			"/etc/issue.net"
 #define SW_OS_NAME_RELEASE		"/etc/os-release"
 #define SW_OS_OPTION_PRETTY_NAME	"PRETTY_NAME"
@@ -284,8 +282,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 {
 	static char	fmt[64] = "";
 
-	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF],
-			installtime_value[DETAIL_BUF];
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "",
+			buildtime_value[DETAIL_BUF], installtime_value[DETAIL_BUF];
 	zbx_uint64_t	size;
 	time_t		buildtime_timestamp, installtime_timestamp;
 	int		rv;
@@ -544,30 +542,110 @@ out:
 	zbx_free(out);
 }
 
-static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
+static void	portage_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
 {
-	size_t	offset = 0;
+	int		rv;
+	static char	pkginfo_fmt[128] = "";
+	char		sizeinfo_fmt[128] = "", *pkginfo, *sizeinfo, *saveptr, *l;
+	char		category[DETAIL_BUF] = "", name[DETAIL_BUF] = "", version[DETAIL_BUF] = "",
+			revision[DETAIL_BUF] = "", repo[DETAIL_BUF] = "";
+	size_t		files, nonfiles, size;
+
+	l = zbx_strdup(NULL, line);
+
+	pkginfo = strtok_r(l, ":", &saveptr);
+	sizeinfo = strtok_r(NULL, ":", &saveptr);
+
+	if (NULL == pkginfo || NULL == sizeinfo)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to find package version or size information (%s)",
+				line);
+		goto out;
+	}
+
+	/*
+	 * e.g. "dev-lang,tcl,8.6.12,r1,gentoo: 1104 files, 25 non-files, 10871914 bytes"
+	 *  or  "dev-lang,perl,5.36.0,r1,gentoo: 1920 files (1919 unique), 326 non-files, 58056025 bytes"
+	 */
+	if ('\0' == *pkginfo_fmt)
+	{
+		zbx_snprintf(pkginfo_fmt, sizeof(pkginfo_fmt),
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* category */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* name */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* version */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* revision */
+				"%%" ZBX_FS_SIZE_T "[^ ]"	/* repo */
+				,
+				(zbx_fs_size_t)(sizeof(category) - 1),
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(revision) - 1),
+				(zbx_fs_size_t)(sizeof(repo) - 1));
+	}
+
+	/* NOTE: as sizeinfo may differ in format, we can't make sizeinfo_fmt static */
+	zbx_snprintf(sizeinfo_fmt, sizeof(sizeinfo_fmt),
+			"%" ZBX_FS_UI64 " files%s, "
+			"%" ZBX_FS_UI64 " non-files, "
+			"%" ZBX_FS_SIZE_T " bytes"
+			,
+			(NULL != strchr(sizeinfo, '('))
+				? " (%*lu unique)"
+				: "");
+
+#define PKGINFO_NUM_FIELDS 5
+	if (PKGINFO_NUM_FIELDS != (rv = sscanf(pkginfo, pkginfo_fmt, category, name, version, revision, repo)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				pkginfo, rv, PKGINFO_NUM_FIELDS);
+		goto out;
+	}
+#undef PKGINFO_NUM_FIELDS
+#define SIZEINFO_NUM_FIELDS 3
+	if (SIZEINFO_NUM_FIELDS != (rv = sscanf(sizeinfo, sizeinfo_fmt, &files, &nonfiles, &size)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				sizeinfo, rv, SIZEINFO_NUM_FIELDS);
+		goto out;
+	}
+#undef SIZEINFO_NUM_FIELDS
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		goto out;
+
+	/*
+	 * XXX: due to the rigidity of the add_package_to_json() interface, we can't report file counts.
+	 * We should make it easier to add arbitrary data items to the package object.
+	 */
+
+	add_package_to_json(json, name, manager, version, size, "", 0, "", 0, "");
+out:
+	zbx_free(l);
+}
+
+static void	print_packages(char **buffer, size_t *alloc_len, size_t *offset, zbx_vector_str_t *packages,
+		const char *manager)
+{
 	int	i;
 
 	if (NULL != manager)
-		offset += zbx_snprintf(buffer + offset, size - offset, "[%s]", manager);
+		zbx_snprintf_alloc(buffer, alloc_len, offset, "[%s]", manager);
+
 
 	if (0 < packages->values_num)
 	{
 		if (NULL != manager)
-			offset += zbx_snprintf(buffer + offset, size - offset, " ");
+			zbx_chrcpy_alloc(buffer, alloc_len, offset, ' ');
 
 		zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		for (i = 0; i < packages->values_num; i++)
-			offset += zbx_snprintf(buffer + offset, size - offset, "%s, ", packages->values[i]);
+			zbx_snprintf_alloc(buffer, alloc_len, offset, "%s, ", packages->values[i]);
 
-		offset -= 2;
+		*offset -= 2;
 	}
 
-	buffer[offset] = '\0';
-
-	return offset;
+	if (NULL != *buffer)
+		(*buffer)[*offset] = '\0';
 }
 
 /**
@@ -612,15 +690,23 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		NULL,
 		pacman_details
 	},
+	{
+		"portage",
+		"qsize --version 2> /dev/null",
+		"qlist -C -I -F '%{PN},%{PV},%{PR}'",
+		"qsize -C --bytes -F '%{CATEGORY},%{PN},%{PV},%{PR},%{REPO}'",
+		NULL,
+		portage_details
+	},
 	{NULL}
 };
 
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	size_t			offset = 0;
-	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
-	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
-				*package;
+	size_t			output_alloc = 0, output_offset = 0;
+	int			ret = SYSINFO_RET_FAIL, show_pm, check_regex, check_manager;
+	char			*output = NULL, *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
+				*package, *saveptr;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
 
@@ -647,21 +733,21 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return ret;
 	}
 
-	*buffer = '\0';
 	zbx_vector_str_create(&packages);
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
+		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
@@ -669,7 +755,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			ret = SYSINFO_RET_OK;
 
-			package = strtok(buf, "\n");
+			package = strtok_r(buf, "\n", &saveptr);
 
 			while (NULL != package)
 			{
@@ -686,14 +772,13 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
 next:
-				package = strtok(NULL, "\n");
+				package = strtok_r(NULL, "\n", &saveptr);
 			}
 
 			if (1 == show_pm)
 			{
-				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages,
-						mng->name);
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+				print_packages(&output, &output_alloc, &output_offset, &packages, mng->name);
+				zbx_chrcpy_alloc(&output, &output_alloc, &output_offset, '\n');
 
 				zbx_vector_str_clear_ext(&packages, zbx_str_free);
 			}
@@ -704,19 +789,29 @@ next:
 
 	if (0 == show_pm)
 	{
-		print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
+		print_packages(&output, &output_alloc, &output_offset, &packages, NULL);
 
 		zbx_vector_str_clear_ext(&packages, zbx_str_free);
 	}
-	else if (0 != offset)
-		buffer[--offset] = '\0';
+	else if (0 != output_offset)
+	{
+		output[--output_offset] = '\0';
+	}
 
 	zbx_vector_str_destroy(&packages);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
+	{
+		if (NULL == output)
+			output = zbx_strdup(NULL, "");
+
+		SET_TEXT_RESULT(result, output);
+	}
 	else
+	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+		zbx_free(output);
+	}
 
 	return ret;
 }
@@ -823,10 +918,11 @@ out:
 
 int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
-	char			*regex, *manager, *line, *buf = NULL, error[MAX_STRING_LEN];
+	int			ret = SYSINFO_RET_FAIL, check_regex, check_manager;
+	char			*regex, *manager, *line, *saveptr, *buf = NULL, error[MAX_STRING_LEN];
 	ZBX_PACKAGE_MANAGER	*mng;
 	struct zbx_json		json;
+	int			timeout;
 
 	if (2 < request->nparam)
 	{
@@ -841,33 +937,44 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	check_manager = (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
 
 	zbx_json_initarray(&json, 10 * ZBX_KIBIBYTE);
+	timeout = request->timeout;
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
+		time_t	tm_start;
 		mng = &package_managers[i];
+		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
+		tm_start = time(NULL);
+
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), timeout,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
+			timeout = timeout - (int)(time(NULL) - tm_start);
+
+			tm_start = time(NULL);
+
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), timeout,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
 			}
 
+			timeout = timeout - (int)(time(NULL) - tm_start);
+
 			ret = SYSINFO_RET_OK;
 
-			line = strtok(buf, "\n");
+			line = strtok_r(buf, "\n", &saveptr);
 
 			while (NULL != line)
 			{
 				mng->details_parser(mng->name, line, (1 == check_regex ? regex : NULL), &json);
 
-				line = strtok(NULL, "\n");
+				line = strtok_r(NULL, "\n", &saveptr);
 			}
 		}
 	}

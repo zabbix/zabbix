@@ -17,17 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxmocktest.h"
+
 #include "zbxcommon.h"
 
-/* make sure that __wrap_*() prototypes match unwrapped counterparts */
-#define __zbx_zabbix_log __wrap___zbx_zabbix_log
-#include "log.h"
-#undef __zbx_zabbix_log
-
-void	__wrap___zbx_zabbix_log(int level, const char *fmt, ...)
+void	zbx_mock_log_impl(int level, const char *fmt, va_list args)
 {
-	va_list		args;
-
 	fprintf(stdout, "[ LOG (");
 
 	switch (level)
@@ -57,9 +52,7 @@ void	__wrap___zbx_zabbix_log(int level, const char *fmt, ...)
 
 	fprintf(stdout, ") ] ");
 
-	va_start(args, fmt);
 	vfprintf(stdout, fmt, args);
-	va_end(args);
 
 	fprintf(stdout, "\n");
 	fflush(stdout);

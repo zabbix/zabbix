@@ -47,7 +47,8 @@ $fields = [
 	'agent_other'     => [T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({agent}) && {agent} == '.ZBX_AGENT_OTHER
 	],
-	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'variables'			=> [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'headers'			=> [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'steps'           => [null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,
 								IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
@@ -186,7 +187,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	$result = deleteHistoryByHttpTestIds([getRequest('httptestid')]);
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
@@ -202,42 +203,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
 		$steps = getRequest('steps', []);
-		$field_names = ['headers', 'variables', 'post_fields', 'query_fields'];
-		$i = 1;
 
+		$i = 1;
 		foreach ($steps as &$step) {
 			$step['no'] = $i++;
-			$step['follow_redirects'] = $step['follow_redirects']
-				? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
-				: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
 
-			foreach ($field_names as $field_name) {
-				$step[$field_name] = [];
+			foreach (['query_fields', 'variables', 'headers'] as $field) {
+				$step[$field] = array_key_exists($field, $step) ? $step[$field] : [];
 			}
-
-			if (array_key_exists('pairs', $step)) {
-				foreach ($field_names as $field_name) {
-					foreach ($step['pairs'] as $pair) {
-						if (array_key_exists('type', $pair) && $field_name === $pair['type'] &&
-							((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-							(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
-							$step[$field_name][] = [
-								'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-								'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
-							];
-						}
-					}
-				}
-				unset($step['pairs']);
-			}
-
-			foreach ($step['variables'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-			}
-			unset($variable);
 
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
-				$step['posts'] = $step['post_fields'];
+				$step['posts'] = array_key_exists('post_fields', $step) ? $step['post_fields'] : [];
 			}
 			unset($step['post_fields'], $step['post_type']);
 		}
@@ -250,7 +226,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'delay' => getRequest('delay', DB::getDefault('httptest', 'delay')),
 			'retries' => $_REQUEST['retries'],
 			'status' => hasRequest('status') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED,
-			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
+			'agent' => getRequest('agent') == ZBX_AGENT_OTHER ? getRequest('agent_other') : getRequest('agent'),
 			'variables' => [],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
@@ -265,22 +241,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'tags' => $tags
 		];
 
-		foreach (getRequest('pairs', []) as $pair) {
-			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers']) &&
-				((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-				(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
+		foreach (['variables', 'headers'] as $pair_type) {
+			foreach (getRequest($pair_type, []) as $pair) {
+				if ($pair['name'] === '' && $pair['value'] === '') {
+					continue;
+				}
 
-				$httpTest[$pair['type']][] = [
-					'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-					'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
-				];
+				if ($pair_type === 'variables') {
+					$pair['name'] = trim($pair['name']);
+				}
+
+				$httpTest[$pair_type][] = $pair;
 			}
 		}
-
-		foreach ($httpTest['variables'] as &$variable) {
-			$variable['name'] = trim($variable['name']);
-		}
-		unset($variable);
 
 		if (isset($_REQUEST['httptestid'])) {
 			// unset fields that did not change
@@ -430,7 +403,7 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhist
 		uncheckTableRows(getRequest('hostid'));
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
@@ -439,7 +412,12 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
+
+	$web_scenarios_count = count(getRequest('group_httptestid'));
+	$messageSuccess = _n('Web scenario deleted', 'Web scenarios deleted', $web_scenarios_count);
+	$messageFailed = _n('Cannot delete web scenario', 'Cannot delete web scenarios', $web_scenarios_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {
@@ -461,6 +439,7 @@ if (isset($_REQUEST['form'])) {
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
+		'templates' => [],
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0)
 	];
@@ -475,9 +454,9 @@ if (isset($_REQUEST['form'])) {
 
 	if (hasRequest('httptestid')) {
 		$db_httptests = API::HttpTest()->get([
-			'output' => ['name', 'delay', 'retries', 'status', 'agent', 'authentication',
-				'http_user', 'http_password', 'http_proxy', 'templateid', 'verify_peer', 'verify_host', 'ssl_cert_file',
-				'ssl_key_file', 'ssl_key_password', 'headers', 'variables'
+			'output' => ['httptestid', 'name', 'delay', 'status', 'agent', 'authentication', 'http_user',
+				'http_password', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file', 'ssl_key_file',
+				'ssl_key_password', 'verify_peer', 'verify_host', 'headers', 'variables'
 			],
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
 				'follow_redirects', 'retrieve_mode', 'headers', 'variables', 'query_fields', 'post_type'
@@ -497,6 +476,10 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
+		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
 		$data['agent'] = ZBX_AGENT_OTHER;
 		$data['agent_other'] = $db_httptest['agent'];
 
@@ -505,28 +488,6 @@ if (isset($_REQUEST['form'])) {
 				$data['agent'] = $db_httptest['agent'];
 				$data['agent_other'] = '';
 				break;
-			}
-		}
-
-		// Used for both, Scenario and Steps pairs.
-		$id = 1;
-		$data['pairs'] = [];
-
-		$fields = [
-			'headers' => 'headers',
-			'variables' => 'variables'
-		];
-
-		CArrayHelper::sort($db_httptest['variables'], ['name']);
-
-		foreach ($fields as $type => $field_name) {
-			foreach ($db_httptest[$field_name] as $pair) {
-				$data['pairs'][] = [
-					'id' => $id++,
-					'type' => $type,
-					'name' => $pair['name'],
-					'value' => $pair['value']
-				];
 			}
 		}
 
@@ -541,44 +502,24 @@ if (isset($_REQUEST['form'])) {
 		$data['ssl_cert_file'] = $db_httptest['ssl_cert_file'];
 		$data['ssl_key_file'] = $db_httptest['ssl_key_file'];
 		$data['ssl_key_password'] = $db_httptest['ssl_key_password'];
-		$data['steps'] = $db_httptest['steps'];
-		CArrayHelper::sort($data['steps'], ['no']);
 
-		$fields = [
-			'headers' => 'headers',
-			'variables' => 'variables',
-			'query_fields' => 'query_fields',
-			'post_fields' => 'posts'
-		];
+		$data['variables'] = $db_httptest['variables'];
+		$data['headers'] = $db_httptest['headers'];
+
+		CArrayHelper::sort($db_httptest['steps'], ['no']);
+		$data['steps'] = array_values($db_httptest['steps']);
 
 		foreach ($data['steps'] as &$step) {
-			$step['pairs'] = [];
+			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
+				$step['post_fields'] = $step['posts'];
+				$step['posts'] = '';
+			}
 
 			CArrayHelper::sort($step['variables'], ['name']);
-
-			foreach ($fields as $type => $field_name) {
-				if ($field_name !== 'posts' || $step['post_type'] == ZBX_POSTTYPE_FORM) {
-					foreach ($step[$field_name] as $pair) {
-						$step['pairs'][] = [
-							'id' => $id++,
-							'type' => $type,
-							'name' => $pair['name'],
-							'value' => $pair['value']
-						];
-					}
-
-					if ($field_name === 'posts') {
-						$step['posts'] = '';
-					}
-					else {
-						unset($step[$field_name]);
-					}
-				}
-			}
+			$step['variables'] = array_values($step['variables']);
 		}
 		unset($step);
 
-		$tags = $db_httptest['tags'];
 	}
 	else {
 		if (isset($_REQUEST['form_refresh'])) {
@@ -615,50 +556,61 @@ if (isset($_REQUEST['form'])) {
 		$data['ssl_cert_file'] = getRequest('ssl_cert_file');
 		$data['ssl_key_file'] = getRequest('ssl_key_file');
 		$data['ssl_key_password'] = getRequest('ssl_key_password');
-		$data['pairs'] = array_values(getRequest('pairs', []));
+		$data['variables'] = getRequest('variables', []);
+		$data['headers'] = array_values(getRequest('headers', []));
+		$data['steps'] = array_values(getRequest('steps', []));
 	}
 
-	$i = 1;
-	foreach ($data['steps'] as $stepid => $step) {
-		$pairs_grouped = [
-			'query_fields' => [],
-			'post_fields' => [],
-			'variables' => [],
-			'headers' => []
-		];
+	if ($db_httptest) {
+		$parent_templates = getHttpTestParentTemplates($db_httptests)['templates'];
 
-		if (array_key_exists('pairs', $step)) {
-			foreach ($step['pairs'] as $field) {
-				$pairs_grouped[$field['type']][] = $field;
+		$rw_templates = $data['host']['parentTemplates']
+			? API::Template()->get([
+				'output' => [],
+				'templateids' => array_keys($parent_templates),
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		foreach ($parent_templates as $templateid => &$template) {
+			if (array_key_exists($templateid, $rw_templates)) {
+				$template['permission'] = PERM_READ_WRITE;
 			}
-			$data['steps'][$stepid]['pairs'] = $pairs_grouped;
+			else {
+				$template['name'] = _('Inaccessible template');
+				$template['permission'] = PERM_DENY;
+			}
 		}
-		$data['steps'][$stepid]['no'] = $i++;
+		unset($template);
+
+		$tags = getHttpTestTags([
+			'templates' => $parent_templates,
+			'hostid' => getRequest('hostid'),
+			'tags' => hasRequest('form_refresh') ? $tags : $db_httptest['tags'],
+			'show_inherited_tags' => $data['show_inherited_tags']
+		]);
 	}
 
-	if ($db_httptest && $db_httptest['templateid'] != 0) {
-		$parent_httptests = getParentHttpTests([$db_httptest],
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
-
-		$data['templateid'] = $db_httptest['templateid'];
-		$data['parent_httptest'] = reset($parent_httptests);
-	}
-
-	if ($data['show_inherited_tags']) {
-		CTagHelper::addInheritedTags($tags, $data['context'], [$data['hostid']],
-			array_key_exists('parent_httptest', $data) ? $data['parent_httptest'] : []
-		);
-	}
-
-	if ($tags) {
-		CArrayHelper::sort($tags, ['tag', 'value']);
+	if ($data['variables']) {
+		CArrayHelper::sort($data['variables'], ['name']);
+		$data['variables'] = array_values($data['variables']);
 	}
 	else {
-		$tags = [['tag' => '', 'value' => '']];
+		$data['variables'] = [['name' => '', 'value' => '']];
+	}
+
+	if (!$data['headers']) {
+		$data['headers'] = [['name' => '', 'value' => '']];
 	}
 
 	$data['tags'] = $tags;
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	else {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+	}
 
 	// render view
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
@@ -738,7 +690,7 @@ else {
 	}
 
 	// Get host groups.
-	$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], $data['context']);
+	$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], $data['context']);
 
 	if ($data['context'] === 'host') {
 		$filter['hosts'] = $filter_hostids
@@ -853,11 +805,10 @@ else {
 
 	order_result($http_tests, $sortField, $sortOrder);
 
-	$data['parent_httptests'] = getParentHttpTests($http_tests,
-		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-	);
+	$data['parent_templates'] = getHttpTestParentTemplates($http_tests);
 	$data['http_tests'] = $http_tests;
 	$data['httpTestsLastData'] = $httpTestsLastData;
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['http_tests'], true, 'httptestid', ZBX_TAG_COUNT_DEFAULT);
 

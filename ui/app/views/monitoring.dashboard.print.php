@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if (array_key_exists('error', $data)) {
@@ -37,13 +38,16 @@ $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.geomaps.js');
+$this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.print.js.php');
@@ -65,7 +69,7 @@ $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 	view.init('.json_encode([
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
-		'time_period' => $data['time_period']
+		'dashboard_time_period' => $data['dashboard_time_period']
 	]).');
 '))
 	->setOnDocumentReady()

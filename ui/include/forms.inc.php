@@ -25,16 +25,13 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	$output = [new CTag('h3', true, $label)];
 
 	foreach ($data as $id => $element) {
-		$element['name'] = CHtml::encode($element['name']);
-
 		// is activated
 		if (str_in_array($id, $subfilter)) {
 			$output[] = (new CSpan([
 				(new CLinkAction($element['name']))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.json_encode($subfilterName.'['.$id.']').', null, true);'
-					)),
+					),
 				' ',
 				new CSup($element['count'])
 			]))
@@ -53,14 +50,13 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 			}
 			else {
 				$link = (new CLinkAction($element['name']))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.
 							json_encode($subfilterName.'['.$id.']').', '.
 							json_encode($id).', '.
 							'true'.
 						');'
-					));
+					);
 
 				$output[] = (new CSpan([
 					$link,
@@ -89,7 +85,6 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	$i = 0;
 	foreach ($data as $tag_hash => $tag) {
 		$element_name = ($tag['value'] === '') ? $tag['tag'] : $tag['tag'].': '.$tag['value'];
-		$element_name = CHtml::encode($element_name);
 
 		$tag['tag'] = json_encode($tag['tag']);
 		$tag['value'] = json_encode($tag['value']);
@@ -100,11 +95,10 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 
 			$output[] = (new CSpan([
 				(new CLinkAction($element_name))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][tag]", null, false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][value]", null, true);'
-					)),
+					),
 				' ',
 				new CSup($tag['count'])
 			]))
@@ -123,11 +117,10 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 			}
 			else {
 				$link = (new CLinkAction($element_name))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][tag]", '.$tag['tag'].', false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][value]", '.$tag['value'].', true);'
-					));
+					);
 
 				$output[] = (new CSpan([
 					$link,
@@ -148,7 +141,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	$table_subfilter = (new CTableInfo())
 		->addRow([
 			new CTag('h4', true, [
-				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
+				_('Subfilter'), NBSP(), (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
 		], ZBX_STYLE_HOVER_NOBG);
 
@@ -468,7 +461,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 		if ($filter_data['filter_delay'] === '' && $filter_data['filter_type'] != ITEM_TYPE_TRAPPER
 				&& $item['type'] != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_SNMPTRAP
 				&& $item['type'] != ITEM_TYPE_DEPENDENT
-				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) !== 0)) {
+				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) != 0)) {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 			$value = $delay;
@@ -740,7 +733,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
-		'type' => getRequest('type', 0),
+		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -759,6 +752,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
+		'templates' => [],
 		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT),
 		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 		'url' => getRequest('url'),
@@ -791,6 +785,12 @@ function getItemFormData(array $item = [], array $options = []) {
 		'tags' => getRequest('tags', []),
 		'backurl' => getRequest('backurl')
 	];
+
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
+
+	if (!$data['is_discovery_rule']) {
+		$data['preprocessing'] = sortPreprocessingSteps($data['preprocessing']);
+	}
 
 	// Unset empty and inherited tags.
 	foreach ($data['tags'] as $key => $tag) {
@@ -905,23 +905,22 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['limited'] = ($data['item']['templateid'] != 0);
 		$data['interfaceid'] = $item['interfaceid'];
 
-		if ($item['templateid'] != 0) {
-			if ($data['is_discovery_rule']) {
-				$parent_items = getParentLldRules([$item],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-			}
-			elseif ($data['parent_discoveryid'] != 0) {
-				$parent_items = getParentItemPrototypes([$item],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-			}
-			else {
-				$parent_items = getParentItems([$item], CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES));
-			}
-
-			$data['parent_item'] = reset($parent_items);
+		// discovery rule
+		if ($data['is_discovery_rule']) {
+			$flag = ZBX_FLAG_DISCOVERY_RULE;
 		}
+		// item prototype
+		elseif ($data['parent_discoveryid'] != 0) {
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		}
+		// plain item
+		else {
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
+		}
+
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 	}
 
 	// caption
@@ -1033,7 +1032,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
 							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($data['key'], 'mqtt.get', 8) === 0))) {
+								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}
@@ -1142,30 +1141,92 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	if (!$data['is_discovery_rule']) {
-		if ($data['show_inherited_tags']) {
-			$parent_item = [];
+		// Select inherited tags.
+		if ($data['show_inherited_tags'] && array_key_exists('item', $data)) {
+			if ($data['item']['discoveryRule']) {
+				$items = [$data['item']['discoveryRule']];
+				$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_RULE)['templates'];
+			}
+			else {
+				$items = [[
+					'templateid' => $data['item']['templateid'],
+					'itemid' => $data['itemid']
+				]];
+				$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
+			}
+			unset($parent_templates[0]);
 
-			if ($data['context'] === 'host' && array_key_exists('item', $data)) {
-				if ($data['parent_discoveryid'] == 0 && $data['item']['discoveryRule']) {
-					$parent_items = getParentLldRules([$data['item']['discoveryRule']],
-						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-					);
+			$db_templates = $parent_templates
+				? API::Template()->get([
+					'output' => ['templateid'],
+					'selectTags' => ['tag', 'value'],
+					'templateids' => array_keys($parent_templates),
+					'preservekeys' => true
+				])
+				: [];
 
-					$parent_item = reset($parent_items);
-				}
-				elseif (array_key_exists('parent_item', $data)) {
-					$parent_item = $data['parent_item'];
+			$inherited_tags = [];
+
+			// Make list of template tags.
+			foreach ($parent_templates as $templateid => $template) {
+				if (array_key_exists($templateid, $db_templates)) {
+					foreach ($db_templates[$templateid]['tags'] as $tag) {
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
+							];
+						}
+						else {
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
+							];
+						}
+					}
 				}
 			}
 
-			CTagHelper::addInheritedTags($data['tags'], $data['context'], [$data['hostid']], $parent_item);
+			$db_hosts = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'selectTags' => ['tag', 'value'],
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
+			]);
+
+			// Overwrite and attach host level tags.
+			if ($db_hosts) {
+				foreach ($db_hosts[0]['tags'] as $tag) {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+				}
+			}
+
+			// Overwrite and attach item's own tags.
+			foreach ($data['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				}
+				else {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+			}
+
+			$data['tags'] = [];
+
+			foreach ($inherited_tags as $tag) {
+				foreach ($tag as $value) {
+					$data['tags'][] = $value;
+				}
+			}
 		}
 
-		if ($data['tags']) {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+		if (!$data['tags']) {
+			$data['tags'] = [['tag' => '', 'value' => '']];
 		}
 		else {
-			$data['tags'] = [['tag' => '', 'value' => '']];
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 	}
 
@@ -1205,7 +1266,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
-	$have_validate_not_supported = in_array(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, array_column($preprocessing, 'type'));
 
 	foreach ($preprocessing as $step) {
 		// Create a select with preprocessing types.
@@ -1219,9 +1279,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$enabled = (!$have_validate_not_supported || $type != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
-						|| $type == $step['type']);
-				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(!$enabled));
+				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(
+					$step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED && $type == $step['type']
+				));
 			}
 
 			$preproc_types_select->addOptionGroup($opt_group);
@@ -1379,6 +1439,32 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				];
 				break;
 
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				if ($step_param_0_value == '') {
+					$step_param_0_value = ZBX_PREPROC_MATCH_ERROR_ANY;
+				}
+
+				$params = [
+					(new CSelect('preprocessing['.$i.'][params][0]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
+							ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
+							ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
+						]))
+							->setAttribute('placeholder', _('error-matching'))
+							->addClass('js-preproc-param-error-matching')
+							->setValue($step_param_0_value)
+							->setReadonly($readonly),
+					$step_param_1
+						->setAttribute('placeholder', _('pattern'))
+						->setReadonly($readonly)
+						->addClass(
+							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_VISIBILITY_HIDDEN : null
+						)
+				];
+				break;
+
+
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$params = [
 					$step_param_0->setAttribute('placeholder', _('OID')),
@@ -1427,10 +1513,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 									->setReadonly($readonly)
 							),
 							(new CCol(
-								(new CSimpleButton(_('Remove')))
-									->addClass(ZBX_STYLE_BTN_LINK)
+								(new CButtonLink(_('Remove')))
 									->addClass('js-group-json-action-delete')
-									->setEnabled($count > 3)
+									->setEnabled(!$readonly && $count > 3)
 							))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass('group-json-row')
 					];
@@ -1453,14 +1538,26 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 								(new CTag('tfoot', true))
 									->addItem(
 										(new CCol(
-											(new CSimpleButton(_('Add')))
-												->addClass(ZBX_STYLE_BTN_LINK)
+											(new CButtonLink(_('Add')))
 												->addClass('js-group-json-action-add')
+												->setEnabled(!$readonly)
 										))->setColSpan(4)
 									)
 							)
 							->setAttribute('data-index', $i)
 					])->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+				break;
+
+			case ZBX_PREPROC_SNMP_GET_VALUE:
+				$params = (new CSelect('preprocessing['.$i.'][params][0]'))
+					->setValue($step_param_0_value)
+					->setAdaptiveWidth(202)
+					->addOptions([
+						new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+						new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+						new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+					])
+					->setReadonly($readonly);
 				break;
 		}
 
@@ -1697,372 +1794,6 @@ function getTriggerMassupdateFormData() {
 	if (!$data['tags']) {
 		$data['tags'][] = ['tag' => '', 'value' => ''];
 	}
-
-	return $data;
-}
-
-/**
- * Generate data for the trigger configuration form.
- *
- * @param array       $data                                     Trigger data array.
- * @param string      $data['form']                             Form action.
- * @param string      $data['form_refresh']                     Form refresh.
- * @param null|string $data['parent_discoveryid']               Parent discovery ID.
- * @param array       $data['dependencies']                     Trigger dependencies.
- * @param array       $data['db_dependencies']                  DB trigger dependencies.
- * @param string      $data['triggerid']                        Trigger ID.
- * @param string      $data['expression']                       Trigger expression.
- * @param string      $data['recovery_expression']              Trigger recovery expression.
- * @param string      $data['expr_temp']                        Trigger temporary expression.
- * @param string      $data['recovery_expr_temp']               Trigger temporary recovery expression.
- * @param string      $data['recovery_mode']                    Trigger recovery mode.
- * @param string      $data['description']                      Trigger description.
- * @param string      $data['event_name']                       Trigger event name.
- * @param string      $data['opdata']                           Trigger operational data.
- * @param int         $data['type']                             Trigger problem event generation mode.
- * @param string      $data['priority']                         Trigger severity.
- * @param int         $data['status']                           Trigger status.
- * @param string      $data['comments']                         Trigger description.
- * @param string      $data['url']                              Trigger URL.
- * @param string      $data['expression_constructor']           Trigger expression constructor mode.
- * @param string      $data['recovery_expression_constructor']  Trigger recovery expression constructor mode.
- * @param bool        $data['limited']                          Templated trigger.
- * @param array       $data['template']                         Trigger template.
- * @param string      $data['hostid']                           Host ID.
- * @param string      $data['expression_action']                Trigger expression action.
- * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
- * @param string      $data['tags']                             Trigger tags.
- * @param string      $data['correlation_mode']                 Trigger correlation mode.
- * @param string      $data['correlation_tag']                  Trigger correlation tag.
- * @param string      $data['manual_close']                     Trigger manual close.
- * @param string      $data['context']                          Additional parameter in URL to identify main section.
- *
- * @return array
- */
-function getTriggerFormData(array $data) {
-	if ($data['triggerid'] !== null) {
-		// Get trigger.
-		$options = [
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid'],
-			'triggerids' => $data['triggerid']
-		];
-
-		if (!hasRequest('form_refresh')) {
-			$options['selectTags'] = ['tag', 'value'];
-		}
-
-		if ($data['show_inherited_tags']) {
-			$options['selectItems'] = ['itemid', 'templateid', 'flags'];
-		}
-
-		if ($data['parent_discoveryid'] === null) {
-			$options['selectDiscoveryRule'] = ['itemid', 'name', 'templateid'];
-			$options['selectTriggerDiscovery'] = ['parent_triggerid'];
-			$triggers = API::Trigger()->get($options);
-		}
-		else {
-			$triggers = API::TriggerPrototype()->get($options);
-		}
-
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		$trigger = reset($triggers);
-
-		if (!hasRequest('form_refresh')) {
-			$data['tags'] = $trigger['tags'];
-		}
-
-		if ($trigger['templateid'] != 0) {
-			if ($data['parent_discoveryid']) {
-				$parent_triggers = getParentTriggerPrototypes([$trigger],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-			}
-			else {
-				$parent_triggers = getParentTriggers([$trigger],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-			}
-
-			$data['parent_trigger'] = reset($parent_triggers);
-		}
-
-		$data['limited'] = ($trigger['templateid'] != 0);
-		$data['templateid'] = $trigger['templateid'];
-
-		// Select first host from triggers if no matching value is given.
-		$hosts = $trigger['hosts'];
-		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
-			$host = reset($hosts);
-			$data['hostid'] = $host['hostid'];
-		}
-	}
-
-	if ($data['show_inherited_tags']) {
-		$parent_trigger = [];
-		$hostids = [];
-
-		if ($data['context'] === 'host' && $data['triggerid'] !== null) {
-			if ($data['parent_discoveryid'] === null && $trigger['triggerDiscovery']) {
-				$trigger_prototypes = API::TriggerPrototype()->get([
-					'output' => ['templateid'],
-					'triggerids' => $trigger['triggerDiscovery']['parent_triggerid']
-				]);
-
-				$parent_triggers = getParentTriggerPrototypes($trigger_prototypes,
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-
-				$parent_trigger = reset($parent_triggers);
-			}
-			else {
-				$parent_trigger = array_key_exists('parent_trigger', $data) ? $data['parent_trigger'] : [];
-			}
-
-			if ($parent_trigger || !hasRequest('form_refresh')) {
-				$hostids = array_column($trigger['hosts'], 'hostid');
-			}
-		}
-
-		if (!$hostids) {
-			$hostids = [$data['hostid']];
-
-			if ($data['expression'] !== '' || $data['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-					|| $data['recovery_expression'] !== '') {
-				$expression_parser = new CExpressionParser([
-					'usermacros' => true,
-					'lldmacros' => $data['parent_discoveryid'] ? true : false
-				]);
-
-				$hosts = [];
-
-				if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
-					$hosts = $expression_parser->getResult()->getHosts();
-				}
-
-				if ($data['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-						&& $expression_parser->parse($data['recovery_expression']) == CParser::PARSE_SUCCESS) {
-					$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
-				}
-
-				if ($hosts) {
-					if ($data['context'] === 'template') {
-						$db_templates = API::Template()->get([
-							'output' => ['templateid'],
-							'filter' => ['host' => array_unique($hosts)]
-						]);
-
-						$hostids = array_column($db_templates, 'templateid');
-					}
-					else {
-						$db_hosts = API::Host()->get([
-							'output' => ['hostid'],
-							'filter' => ['host' => array_unique($hosts)]
-						]);
-
-						$hostids = array_column($db_hosts, 'hostid');
-					}
-				}
-			}
-		}
-
-		CTagHelper::addInheritedTags($data['tags'], $data['context'], $hostids, $parent_trigger);
-	}
-
-	// tags
-	if ($data['tags']) {
-		CArrayHelper::sort($data['tags'], ['tag', 'value']);
-	}
-	else {
-		$data['tags'] = [['tag' => '', 'value' => '']];
-	}
-
-	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
-		$data['expression'] = $trigger['expression'];
-		$data['recovery_expression'] = $trigger['recovery_expression'];
-
-		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
-			$data['description'] = $trigger['description'];
-			$data['event_name'] = $trigger['event_name'];
-			$data['opdata'] = $trigger['opdata'];
-			$data['type'] = $trigger['type'];
-			$data['recovery_mode'] = $trigger['recovery_mode'];
-			$data['correlation_mode'] = $trigger['correlation_mode'];
-			$data['correlation_tag'] = $trigger['correlation_tag'];
-			$data['manual_close'] = $trigger['manual_close'];
-			$data['priority'] = $trigger['priority'];
-			$data['status'] = $trigger['status'];
-			$data['comments'] = $trigger['comments'];
-			$data['url_name'] = $trigger['url_name'];
-			$data['url'] = $trigger['url'];
-
-			if ($data['parent_discoveryid'] !== null) {
-				$data['discover'] = $trigger['discover'];
-			}
-
-			$db_triggers = DBselect(
-				'SELECT t.triggerid,t.description'.
-				' FROM triggers t,trigger_depends d'.
-				' WHERE t.triggerid=d.triggerid_up'.
-					' AND d.triggerid_down='.zbx_dbstr($data['triggerid'])
-			);
-			while ($db_trigger = DBfetch($db_triggers)) {
-				if (uint_in_array($db_trigger['triggerid'], $data['dependencies'])) {
-					continue;
-				}
-				array_push($data['dependencies'], $db_trigger['triggerid']);
-			}
-		}
-	}
-
-	$readonly = false;
-	if ($data['triggerid'] !== null) {
-		$data['flags'] = $trigger['flags'];
-
-		if ($data['parent_discoveryid'] === null) {
-			$data['discoveryRule'] = $trigger['discoveryRule'];
-			$data['triggerDiscovery'] = $trigger['triggerDiscovery'];
-		}
-
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $data['limited']) {
-			$readonly = true;
-		}
-	}
-
-	// Trigger expression constructor.
-	if ($data['expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
-
-		if ($analyze !== false) {
-			list($data['expression_formula'], $data['expression_tree']) = $analyze;
-
-			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
-				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
-					$data['expression_action'], $data['expr_temp'], $error
-				);
-
-				if ($new_expr !== false) {
-					$data['expression'] = $new_expr;
-					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
-
-					if ($analyze !== false) {
-						list($data['expression_formula'], $data['expression_tree']) = $analyze;
-					}
-					else {
-						error(_s('Cannot build expression tree: %1$s.', $error));
-						show_messages(false, '', _('Expression syntax error.'));
-					}
-
-					$data['expr_temp'] = '';
-				}
-				else {
-					error(_s('Cannot build expression tree: %1$s.', $error));
-					show_messages(false, '', _('Expression syntax error.'));
-				}
-			}
-
-			$data['expression_field_name'] = 'expr_temp';
-			$data['expression_field_value'] = $data['expr_temp'];
-			$data['expression_field_readonly'] = true;
-		}
-		else {
-			error(_s('Cannot build expression tree: %1$s.', $error));
-			show_messages(false, '', _('Expression syntax error.'));
-			$data['expression_field_name'] = 'expression';
-			$data['expression_field_value'] = $data['expression'];
-			$data['expression_field_readonly'] = $readonly;
-			$data['expression_constructor'] = IM_ESTABLISHED;
-		}
-	}
-	elseif ($data['expression_constructor'] != IM_TREE) {
-		$data['expression_field_name'] = 'expression';
-		$data['expression_field_value'] = $data['expression'];
-		$data['expression_field_readonly'] = $readonly;
-	}
-
-	// Trigger recovery expression constructor.
-	if ($data['recovery_expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
-
-		if ($analyze !== false) {
-			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
-
-			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
-				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
-					$data['recovery_expression_action'], $data['recovery_expr_temp'], $error
-				);
-
-				if ($new_expr !== false) {
-					$data['recovery_expression'] = $new_expr;
-					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
-
-					if ($analyze !== false) {
-						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
-					}
-					else {
-						error(_s('Cannot build expression tree: %1$s.', $error));
-						show_messages(false, '', _('Recovery expression syntax error.'));
-					}
-
-					$data['recovery_expr_temp'] = '';
-				}
-				else {
-					error(_s('Cannot build expression tree: %1$s.', $error));
-					show_messages(false, '', _('Recovery expression syntax error.'));
-				}
-			}
-
-			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
-			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
-			$data['recovery_expression_field_readonly'] = true;
-		}
-		else {
-			error(_s('Cannot build expression tree: %1$s.', $error));
-			show_messages(false, '', _('Recovery expression syntax error.'));
-			$data['recovery_expression_field_name'] = 'recovery_expression';
-			$data['recovery_expression_field_value'] = $data['recovery_expression'];
-			$data['recovery_expression_field_readonly'] = $readonly;
-			$data['recovery_expression_constructor'] = IM_ESTABLISHED;
-		}
-	}
-	elseif ($data['recovery_expression_constructor'] != IM_TREE) {
-		$data['recovery_expression_field_name'] = 'recovery_expression';
-		$data['recovery_expression_field_value'] = $data['recovery_expression'];
-		$data['recovery_expression_field_readonly'] = $readonly;
-	}
-
-	if ($data['dependencies']) {
-		$dependencyTriggers = API::Trigger()->get([
-			'output' => ['triggerid', 'description', 'flags'],
-			'selectHosts' => ['hostid', 'name'],
-			'triggerids' => $data['dependencies'],
-			'preservekeys' => true
-		]);
-
-		if ($data['parent_discoveryid']) {
-			$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
-				'output' => ['triggerid', 'description', 'flags'],
-				'selectHosts' => ['hostid', 'name'],
-				'triggerids' => $data['dependencies'],
-				'preservekeys' => true
-			]);
-
-			$data['db_dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
-		}
-		else {
-			$data['db_dependencies'] = $dependencyTriggers;
-		}
-	}
-
-	foreach ($data['db_dependencies'] as &$dependency) {
-		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
-	}
-	unset($dependency);
-
-	order_result($data['db_dependencies'], 'description');
 
 	return $data;
 }

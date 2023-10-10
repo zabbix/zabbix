@@ -348,7 +348,7 @@ class testFormUserMedia extends CWebTest {
 		// Open the user media tab for user-zabbix user.
 		$user_form = $this->getUserMediaTab('user-zabbix');
 
-		// Check that no medias are configured.
+		// Check that no media are configured.
 		$this->assertTrue($user_form->getField('Media')->getRows()->count() === 0);
 
 		// Add media.
@@ -406,9 +406,10 @@ class testFormUserMedia extends CWebTest {
 		// Check that disabled media types have popup icon in Type column.
 		$discord_row = $mediatype_table->findRow('Type', 'Discord', true);
 		$type_column = $discord_row->getColumn('Type');
-		$this->assertTrue($type_column->query('xpath:.//a['.CXPathHelper::fromClass('icon-info').']')->one()->isValid());
+		$this->assertTrue($type_column->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->isValid());
 
-		$this->assertEquals('Media type disabled by Administration.', $type_column->query('class:hint-box')->one()->getText());
+		$this->assertEquals('Media type disabled by Administration.', $type_column->query('tag:button')->one()
+				->getAttribute('data-hintbox-contents'));
 
 		// Check that status of disabled media types is not cickable.
 		$this->assertFalse($discord_row->getColumn('Status')->query('xpath:.//a')->one(false)->isValid());
@@ -448,13 +449,13 @@ class testFormUserMedia extends CWebTest {
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
 			$table = $this->query('xpath://ul[@id="userMediaFormList"]//table')->asTable()->one();
 
-			// Change status of one of the medias.
+			// Change status of one of the media.
 			$row = $table->findRow('Send to', 'test@zabbix.com');
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Enabled');
 			$row->getColumn('Status')->click();
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Disabled');
 
-			// Remove one of the medias.
+			// Remove one of the media.
 			$row->getColumn('Action')->query('button:Remove')->one()->click();
 			$this->assertFalse($table->findRow('Send to', 'test@zabbix.com')->isValid());
 
@@ -700,7 +701,8 @@ class testFormUserMedia extends CWebTest {
 
 		// Check the value of the "Send to" field.
 		if (array_key_exists('emails', $data)) {
-			$get_send_to = $row->query('xpath:./td[2]/div[@class="hint-box"]')->one()->getText();
+			$row->getColumn('Send to')->hoverMouse();
+			$get_send_to = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one()->getText();
 
 			$media_emails = [];
 			foreach ($data['emails'] as $email) {
@@ -709,7 +711,7 @@ class testFormUserMedia extends CWebTest {
 			$send_to = implode(', ', $media_emails);
 		}
 		else {
-			$this->assertFalse($row->query('xpath:./td[2]/div[@class="hint-box"]')->one(false)->isValid());
+			$this->assertFalse($row->query('xpath:./td[2]/span[@data-hintbox]')->one(false)->isValid());
 			$get_send_to = $row->getColumn('Send to')->getText();
 			$send_to = $data['fields']['Send to'];
 		}
@@ -737,20 +739,22 @@ class testFormUserMedia extends CWebTest {
 		if (array_key_exists('Use if severity', $data['fields'])) {
 			// Check that the passed severities are turned on.
 			foreach ($data['fields']['Use if severity'] as $used_severity) {
-				$actual_severity = $row->query('xpath:./td[4]/div/div['.$reference_severities[$used_severity].']')->one()->getText();
+				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')->one()
+						->getAttribute("data-hintbox-contents");
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
 				unset($reference_severities[$used_severity]);
 			}
 			// Check that other severities are turned off.
 			foreach ($reference_severities as $name => $unused_severity) {
-				$actual_severity = $row->query('xpath:./td[4]/div/div['.$unused_severity.']')->one()->getText();
+				$actual_severity = $row->query('xpath:./td[4]/div/span['.$unused_severity.']')->one()
+						->getAttribute("data-hintbox-contents");
 				$this->assertEquals($name.' (off)', $actual_severity);
 			}
 		}
 		else {
 			// Check that when no severities are passed - they all are turned on by default.
 			for ($i = 1; $i < 7; $i++) {
-				$severity =  $row->query('xpath:./td[4]/div/div['.$i.']')->one()->getText();
+				$severity =  $row->query('xpath:./td[4]/div/span['.$i.']')->one()->getAttribute("data-hintbox-contents");
 				$this->assertStringContainsString('(on)', $severity);
 			}
 		}

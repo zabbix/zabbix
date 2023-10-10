@@ -22,14 +22,9 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxshmem.h"
-#include "zbxpreproc.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
-
-extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
 
 typedef struct
 {
@@ -39,14 +34,15 @@ typedef struct
 	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
 	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
 	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
+	zbx_uint64_t	history_bin_counter;	/* the number of processed bin values */
 	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
 }
-ZBX_DC_STATS;
+zbx_dc_stats_t;
 
 /* the write cache statistics */
 typedef struct
 {
-	ZBX_DC_STATS	stats;
+	zbx_dc_stats_t	stats;
 	zbx_uint64_t	history_free;
 	zbx_uint64_t	history_total;
 	zbx_uint64_t	index_free;
@@ -56,18 +52,21 @@ typedef struct
 }
 zbx_wcache_info_t;
 
-void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int *values_num, int *triggers_num, int *more);
 void	zbx_log_sync_history_cache_progress(void);
 
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1
 
-int	init_database_cache(char **error);
-void	free_database_cache(int);
+typedef void (*zbx_history_sync_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
 
-void	change_proxy_history_count(int change_count);
-void	reset_proxy_history_count(int reset);
-int	get_proxy_history_count(void);
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history_sync_f sync_history,
+		zbx_uint64_t history_cache_size, zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size,
+		char **error);
+
+void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
+
+void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
@@ -91,12 +90,35 @@ int	get_proxy_history_count(void);
 #define ZBX_STATS_HISTORY_INDEX_FREE	19
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
-void	*DCget_stats(int request);
-void	DCget_stats_all(zbx_wcache_info_t *wcache_info);
+#define ZBX_STATS_HISTORY_BIN_COUNTER	22
 
-zbx_uint64_t	DCget_nextid(const char *table_name, int num);
+/* 'zbx_pp_value_opt_t' element 'flags' values */
+#define ZBX_PP_VALUE_OPT_NONE		0x0000	/* 'zbx_pp_value_opt_t' has no data */
+#define ZBX_PP_VALUE_OPT_META		0x0001	/* 'zbx_pp_value_opt_t' has log metadata ('mtime' and 'lastlogsize') */
+#define ZBX_PP_VALUE_OPT_LOG		0x0002	/* 'zbx_pp_value_opt_t' has 'timestamp', 'severity', 'logeventid' and */
+						/* 'source' data */
 
-void	DCupdate_interfaces_availability(void);
+/* This structure is complementary data if value comes from preprocessing. */
+typedef struct
+{
+	zbx_uint32_t	flags;
+	int		mtime;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	zbx_uint64_t	lastlogsize;
+	char		*source;
+}
+zbx_pp_value_opt_t;
+
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
+
+void	*zbx_dc_get_stats(int request);
+void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);
+
+zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num);
+
+void	zbx_dc_update_interfaces_availability(void);
 
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
@@ -107,10 +129,10 @@ void	zbx_db_trigger_queue_unlock(void);
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
-void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
+void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
-void	dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
+void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
 		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
-void	dc_flush_history(void);
+void	zbx_dc_flush_history(void);
 
 #endif

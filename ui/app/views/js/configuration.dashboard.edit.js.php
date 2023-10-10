@@ -29,7 +29,7 @@
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, widget_defaults, widget_last_type, time_period, page}) {
+		init({dashboard, widget_defaults, widget_last_type, dashboard_time_period, page}) {
 			this.dashboard = dashboard;
 			this.page = page;
 
@@ -40,8 +40,8 @@
 					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
 				},
 				buttons: {
-					previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE ?>'),
-					next_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NEXT_PAGE ?>')
+					previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE ?>'),
+					next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE ?>')
 				},
 				data: {
 					dashboardid: dashboard.dashboardid,
@@ -64,17 +64,29 @@
 				is_edit_mode: true,
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
-				time_period,
-				dynamic_hostid: null
+				broadcast_options: {
+					_hostid: {rebroadcast: false},
+					_timeperiod: {rebroadcast: true}
+				}
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
+
+			ZABBIX.Dashboard.broadcast({
+				_hostid: null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
 
 			ZABBIX.Dashboard.activate();
 
@@ -142,7 +154,6 @@
 						postMessageDetails('success', response.success.messages);
 					}
 
-					this.disableNavigationWarning();
 					this.cancelEditing();
 				})
 				.catch((exception) => {
@@ -176,6 +187,8 @@
 		},
 
 		cancelEditing() {
+			this.disableNavigationWarning();
+
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.list');
@@ -194,6 +207,23 @@
 
 		disableNavigationWarning() {
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
+		},
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
 		},
 
 		events: {
@@ -257,6 +287,31 @@
 			idle() {
 				view.is_busy = false;
 				view.updateBusy();
+			},
+
+			templateSuccess(e) {
+				const data = e.detail;
+				let curl = null;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('zabbix.php');
+						curl.setArgument('action', 'template.list');
+					}
+				}
+
+				if (curl == null) {
+					location.href = location.href;
+				}
+				else {
+					location.href = curl.getUrl();
+				}
 			}
 		}
 	}

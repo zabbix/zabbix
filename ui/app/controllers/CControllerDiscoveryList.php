@@ -21,20 +21,20 @@
 
 class CControllerDiscoveryList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'sort'          => 'in name',
-			'sortorder'     => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck'       => 'in 1',
-			'filter_set'    => 'in 1',
-			'filter_rst'    => 'in 1',
-			'filter_name'   => 'string',
-			'filter_status' => 'in -1,'.DRULE_STATUS_ACTIVE.','.DRULE_STATUS_DISABLED,
-			'page'          => 'ge 1'
+			'sort' =>			'in name',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_status' =>	'in -1,'.DRULE_STATUS_ACTIVE.','.DRULE_STATUS_DISABLED,
+			'page' =>			'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,11 +46,11 @@ class CControllerDiscoveryList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$sort_field = $this->getInput('sort', CProfile::get('web.discoveryconf.php.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.discoveryconf.php.sortorder', ZBX_SORT_UP));
 		CProfile::update('web.discoveryconf.php.sort', $sort_field, PROFILE_TYPE_STR);
@@ -83,7 +83,7 @@ class CControllerDiscoveryList extends CController {
 		// Get discovery rules.
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['drules'] = API::DRule()->get([
-			'output' => ['proxy_hostid', 'name', 'status', 'iprange', 'delay'],
+			'output' => ['proxyid', 'name', 'status', 'iprange', 'delay'],
 			'selectDChecks' => ['type'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
@@ -92,13 +92,31 @@ class CControllerDiscoveryList extends CController {
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
 			'editable' => true,
-			'sortfield' => $sort_field,
-			'sortorder' => $sort_order,
 			'limit' => $limit
 		]);
 
 		if ($data['drules']) {
-			foreach ($data['drules'] as $key => $drule) {
+			$proxyids = [];
+
+			foreach ($data['drules'] as $drule) {
+				if ($drule['proxyid'] != 0) {
+					$proxyids[$drule['proxyid']] = true;
+				}
+			}
+
+			$proxies = $proxyids
+				? API::Proxy()->get([
+					'output' => ['name'],
+					'proxyids' => array_keys($proxyids),
+					'preservekeys' => true
+				])
+				: [];
+
+			foreach ($data['drules'] as &$drule) {
+				$drule['proxy'] = array_key_exists($drule['proxyid'], $proxies)
+					? $drule['proxy'] = $proxies[$drule['proxyid']]['name']
+					: '';
+
 				$checks = [];
 
 				foreach ($drule['dchecks'] as $check) {
@@ -107,12 +125,9 @@ class CControllerDiscoveryList extends CController {
 
 				order_result($checks);
 
-				$data['drules'][$key]['checks'] = $checks;
-
-				$data['drules'][$key]['proxy'] = ($drule['proxy_hostid'] != 0)
-					? get_host_by_hostid($drule['proxy_hostid'])['host']
-					: '';
+				$drule['checks'] = $checks;
 			}
+			unset($drule);
 
 			CArrayHelper::sort($data['drules'], [['field' => $sort_field, 'order' => $sort_order]]);
 		}

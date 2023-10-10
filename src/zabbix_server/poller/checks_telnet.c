@@ -22,10 +22,10 @@
 
 #include "zbxsysinfo.h"
 
-int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
-	int		ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	const char	*port, *encoding, *dns;
 
 	zbx_init_agent_request(&request);
@@ -76,7 +76,14 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 
 	encoding = get_rparam(&request, 3);
 
-	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
+		/* failures are handled there */
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding), timeout_sec, config_source_ip);
 out:
 	zbx_free_agent_request(&request);
 

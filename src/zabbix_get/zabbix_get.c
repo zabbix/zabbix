@@ -22,7 +22,6 @@
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
-#include "cfg.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
@@ -258,10 +257,11 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 			return FAIL;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, CONFIG_GET_TIMEOUT,
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, CONFIG_GET_TIMEOUT + 1,
 			zbx_config_tls->connect_mode, tls_arg1, tls_arg2)))
 	{
-		if (SUCCEED == (ret = zbx_tcp_send(&s, key)))
+		if (SUCCEED == (ret = zbx_tcp_send_ext(&s, key, strlen(key), (zbx_uint32_t)CONFIG_GET_TIMEOUT,
+				ZBX_TCP_PROTOCOL, 0)))
 		{
 			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0, 0)))
 			{
@@ -312,8 +312,6 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
-	zbx_init_library_cfg(program_type);
-
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
@@ -359,9 +357,8 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
-				break;
 			case 'V':
 				zbx_version();
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -369,7 +366,6 @@ int	main(int argc, char **argv)
 				zbx_tls_version();
 #endif
 				exit(EXIT_SUCCESS);
-				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
 				zbx_config_tls->connect = zbx_strdup(zbx_config_tls->connect,
@@ -441,7 +437,6 @@ int	main(int argc, char **argv)
 			default:
 				zbx_usage();
 				exit(EXIT_FAILURE);
-				break;
 		}
 	}
 
@@ -533,9 +528,7 @@ out:
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		zbx_tls_free();
-#if defined(_WINDOWS)
-		zbx_tls_library_deinit();
-#endif
+		zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);

@@ -81,21 +81,40 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Get hosts and their properties to show on the map as markers.
 	 */
 	private function getHosts(): array {
-		$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+		if ($this->isTemplateDashboard()) {
+			if ($this->fields_values['override_hostid']) {
+				$hosts = API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'selectInventory' => ['location_lat', 'location_lon'],
+					'hostids' => $this->fields_values['override_hostid'],
+					'filter' => [
+						'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
+					],
+					'monitored_hosts' => true,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				return [];
+			}
+		}
+		else {
+			$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 
-		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'selectInventory' => ['location_lat', 'location_lon'],
-			'groupids' => $filter_groupids,
-			'hostids' => $this->fields_values['hostids'] ?: null,
-			'evaltype' => $this->fields_values['evaltype'],
-			'tags' => $this->fields_values['tags'],
-			'filter' => [
-				'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
-			],
-			'monitored_hosts' => true,
-			'preservekeys' => true
-		]);
+			$hosts = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'selectInventory' => ['location_lat', 'location_lon'],
+				'groupids' => $filter_groupids,
+				'hostids' => $this->fields_values['hostids'] ?: null,
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags'],
+				'filter' => [
+					'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
+				],
+				'monitored_hosts' => true,
+				'preservekeys' => true
+			]);
+		}
 
 		$hosts = array_filter($hosts, static function ($host) {
 			$lat = $host['inventory']['location_lat'];
@@ -120,9 +139,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Get problems.
 		$problems = API::Problem()->get([
 			'output' => ['objectid', 'severity'],
-			'symptom' => false,
-			'selectHosts' => ['hostid'],
-			'objectids' => array_keys($triggers)
+			'objectids' => array_keys($triggers),
+			'symptom' => false
 		]);
 
 		// Group problems by hosts.
@@ -234,7 +252,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [
 				'tile_url' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_URL),
 				'max_zoom' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM),
-				'attribution' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION)
+				'attribution' => htmlspecialchars(CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION),
+					ENT_NOQUOTES, 'UTF-8'
+				)
 			];
 		}
 

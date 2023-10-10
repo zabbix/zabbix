@@ -21,9 +21,11 @@
 #include "report_protocol.h"
 
 #include "../alerter/alerter.h"
+
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxserialize.h"
+#include "zbxnum.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
@@ -55,7 +57,6 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 		const zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	data_len = 0, *len, name_len;
-	int		i;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_str(data_len, name);
@@ -68,7 +69,7 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 
 	len = (zbx_uint32_t *)zbx_malloc(NULL, params->values_num * 2 * sizeof(zbx_uint32_t));
 
-	for (i = 0; i < params->values_num; i++)
+	for (int i = 0; i < params->values_num; i++)
 	{
 		zbx_serialize_prepare_str_len(data_len, params->values[i].first, len[i * 2]);
 		zbx_serialize_prepare_str_len(data_len, params->values[i].second, len[i * 2 + 1]);
@@ -85,7 +86,7 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 	ptr += zbx_serialize_value(ptr, period);
 	ptr += zbx_serialize_value(ptr, params->values_num);
 
-	for (i = 0; i < params->values_num; i++)
+	for (int i = 0; i < params->values_num; i++)
 	{
 		ptr += zbx_serialize_str(ptr, params->values[i].first, len[i * 2]);
 		ptr += zbx_serialize_str(ptr, params->values[i].second, len[i * 2 + 1]);
@@ -100,7 +101,7 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 		zbx_uint64_t *userid, zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period,
 		zbx_vector_ptr_pair_t *params)
 {
-	int		params_num, i;
+	int		params_num;
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_str(data, name, len);
@@ -112,7 +113,7 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 	data += zbx_deserialize_value(data, &params_num);
 
 	zbx_vector_ptr_pair_reserve(params, (size_t)params_num);
-	for (i = 0; i < params_num; i++)
+	for (int i = 0; i < params_num; i++)
 	{
 		zbx_ptr_pair_t	pair;
 
@@ -197,7 +198,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 
 	if (SUCCEED == *status && NULL != results)
 	{
-		int				i, results_num;
+		int				results_num;
 		zbx_alerter_dispatch_result_t	*result;
 
 		data += zbx_deserialize_value(data, &results_num);
@@ -206,7 +207,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 		{
 			zbx_vector_alerter_dispatch_result_reserve(results, (size_t)results_num);
 
-			for (i = 0; i < results_num; i++)
+			for (int i = 0; i < results_num; i++)
 			{
 				result = zbx_malloc(NULL, sizeof(zbx_alerter_dispatch_result_t));
 				data += zbx_deserialize_value(data, &result->status);
@@ -229,7 +230,6 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 {
 	zbx_uint32_t	data_len = 0, *params_len, url_len, cookie_len, name_len;
 	unsigned char	*ptr;
-	int		i;
 
 	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_str(data_len, url);
@@ -239,7 +239,7 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 	zbx_serialize_prepare_value(data_len, params->values_num);
 
 	params_len = (zbx_uint32_t *)zbx_malloc(NULL, params->values_num * 2 * sizeof(zbx_uint32_t));
-	for (i = 0; i < params->values_num; i++)
+	for (int i = 0; i < params->values_num; i++)
 	{
 		zbx_serialize_prepare_str_len(data_len, params->values[i].first, params_len[i * 2]);
 		zbx_serialize_prepare_str_len(data_len, params->values[i].second, params_len[i * 2 + 1]);
@@ -256,7 +256,7 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 
 	ptr += zbx_serialize_value(ptr, params->values_num);
 
-	for (i = 0; i < params->values_num; i++)
+	for (int i = 0; i < params->values_num; i++)
 	{
 		ptr += zbx_serialize_str(ptr, params->values[i].first, params_len[i * 2]);
 		ptr += zbx_serialize_str(ptr, params->values[i].second, params_len[i * 2 + 1]);
@@ -271,7 +271,7 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
 		int *width, int *height, zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	len;
-	int		i, params_num;
+	int		params_num;
 
 	data += zbx_deserialize_str(data, name, len);
 	data += zbx_deserialize_str(data, url, len);
@@ -281,7 +281,8 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
 
 	data += zbx_deserialize_value(data, &params_num);
 	zbx_vector_ptr_pair_reserve(params, (size_t)params_num);
-	for (i = 0; i < params_num; i++)
+
+	for (int i = 0; i < params_num; i++)
 	{
 		zbx_ptr_pair_t	pair;
 
@@ -300,19 +301,17 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
 zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_mediatype *mt,
 		const zbx_vector_str_t *emails)
 {
-	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, *params_len;
+	zbx_uint32_t	*params_len, data_len = 0, data_alloc = 1024, data_offset = 0;
 	unsigned char	*ptr;
-	int		i;
 
 	*data = zbx_malloc(NULL, data_alloc);
 	zbx_serialize_mediatype(data, &data_alloc, &data_offset, mt);
 
 	zbx_serialize_prepare_value(data_len, emails->values_num);
 	params_len = (zbx_uint32_t *)zbx_malloc(NULL, emails->values_num * sizeof(zbx_uint32_t));
-	for (i = 0; i < emails->values_num; i++)
-	{
+
+	for (int i = 0; i < emails->values_num; i++)
 		zbx_serialize_prepare_str_len(data_len, emails->values[i], params_len[i]);
-	}
 
 	if (data_alloc - data_offset < data_len)
 	{
@@ -322,10 +321,9 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_med
 
 	ptr = *data + data_offset;
 	ptr += zbx_serialize_value(ptr, emails->values_num);
-	for (i = 0; i < emails->values_num; i++)
-	{
+
+	for (int i = 0; i < emails->values_num; i++)
 		ptr += zbx_serialize_str(ptr, emails->values[i], params_len[i]);
-	}
 
 	zbx_free(params_len);
 
@@ -335,13 +333,13 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_med
 void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t *sendtos)
 {
 	zbx_uint32_t	len;
-	int		i, sendto_num;
+	int		sendto_num;
 
 	data += zbx_deserialize_mediatype(data, mt);
 
 	data += zbx_deserialize_value(data, &sendto_num);
 	zbx_vector_str_reserve(sendtos, (size_t)sendto_num);
-	for (i = 0; i < sendto_num; i++)
+	for (int i = 0; i < sendto_num; i++)
 	{
 		char	*sendto;
 
@@ -352,9 +350,7 @@ void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype 
 
 static void	report_clear_ptr_pairs(zbx_vector_ptr_pair_t *params)
 {
-	int	i;
-
-	for (i = 0; i < params->values_num; i++)
+	for (int i = 0; i < params->values_num; i++)
 	{
 		zbx_free(params->values[i].first);
 		zbx_free(params->values[i].second);
@@ -376,7 +372,7 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
 void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j)
 {
 	zbx_uint64_t				dashboardid, viewer_userid, ui64;
-	int					ret = FAIL, period, report_time;
+	int					period, report_time, ret = FAIL;
 	struct zbx_json_parse			jp_params;
 	zbx_vector_ptr_pair_t			params;
 	zbx_vector_alerter_dispatch_result_t	results;
@@ -402,10 +398,12 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 
 	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_PERIOD, &ui64, &error))
 		goto out;
+
 	period = (int)ui64;
 
 	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_NOW, &ui64, &error))
 		goto out;
+
 	report_time = (int)ui64;
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PARAMS, &jp_params))
@@ -419,7 +417,9 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 			size_t		value_alloc = 0;
 			zbx_ptr_pair_t	pair;
 
-			zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, NULL);
+			if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, NULL))
+				continue;
+
 			pair.first = zbx_strdup(NULL, key);
 			pair.second = value;
 			zbx_vector_ptr_pair_append(&params, pair);
@@ -441,14 +441,13 @@ out:
 
 	if (SUCCEED == ret)
 	{
-		int				i;
 		zbx_alerter_dispatch_result_t	*result;
 
 		zbx_json_addstring(j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addobject(j, ZBX_PROTO_TAG_DATA);
 		zbx_json_addarray(j, ZBX_PROTO_TAG_RECIPIENTS);
 
-		for (i = 0; i < results.values_num; i++)
+		for (int i = 0; i < results.values_num; i++)
 		{
 			zbx_json_addobject(j, NULL);
 

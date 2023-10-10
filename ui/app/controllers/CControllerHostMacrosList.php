@@ -87,7 +87,6 @@ class CControllerHostMacrosList extends CController {
 		$macros = $this->getInput('macros', []);
 		$show_inherited_macros = (bool) $this->getInput('show_inherited_macros', 0);
 		$readonly = (bool) $this->getInput('readonly', 0);
-		$templateids = $this->hasInput('templateids') ? $this->getInput('templateids') : null;
 		$parent_hostid = $this->hasInput('parent_hostid') ? $this->getInput('parent_hostid') : null;
 
 		if ($macros) {
@@ -102,7 +101,9 @@ class CControllerHostMacrosList extends CController {
 		}
 
 		if ($show_inherited_macros) {
-			addInheritedMacros($macros, $templateids, $parent_hostid);
+			$macros = mergeInheritedMacros($macros,
+				getInheritedMacros($this->getInput('templateids', []), $parent_hostid)
+			);
 		}
 
 		$macros = array_values(order_macros($macros, 'macro'));
@@ -133,16 +134,8 @@ class CControllerHostMacrosList extends CController {
 			]
 		];
 
-		if ($show_inherited_macros) {
-			if ($parent_hostid !== null) {
-				$data['source'] = 'host_prototype';
-			}
-			elseif ($templateids === null) {
-				$data['source'] = 'template';
-			}
-			else {
-				$data['source'] = 'host';
-			}
+		if ($parent_hostid !== null) {
+			$data['parent_hostid'] = $parent_hostid;
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

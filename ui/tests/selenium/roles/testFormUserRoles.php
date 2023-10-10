@@ -858,8 +858,8 @@ class testFormUserRoles extends CWebTest {
 						'action.get', 'alert.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
 						'correlation.get', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
 						'dcheck.get', 'dhost.get', 'discoveryrule.get', 'drule.get', 'dservice.get', 'event.acknowledge',
-						'event.get', 'graph.get', 'graphitem.get', 'graphprototype.get', 'hanode.get', 'history.get', 'host.get',
-						'hostgroup.get', 'hostinterface.get', 'hostprototype.get', 'housekeeping.get', 'httptest.get',
+						'event.get', 'graph.get', 'graphitem.get', 'graphprototype.get', 'hanode.get', 'history.get', 'history.push',
+						'host.get', 'hostgroup.get', 'hostinterface.get', 'hostprototype.get', 'housekeeping.get', 'httptest.get',
 						'iconmap.get', 'image.get', 'item.get', 'itemprototype.get', 'maintenance.get', 'map.create',
 						'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
@@ -885,15 +885,16 @@ class testFormUserRoles extends CWebTest {
 						'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update', 'drule.create', 'drule.delete', 'drule.get',
 						'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create', 'graph.delete', 'graph.get',
 						'graph.update', 'graphitem.get', 'graphprototype.create', 'graphprototype.delete', 'graphprototype.get',
-						'graphprototype.update', 'hanode.get', 'history.clear', 'history.get', 'host.create', 'host.delete', 'host.get', 'host.massadd',
-						'host.massremove', 'host.massupdate', 'host.update', 'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
-						'hostgroup.massupdate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete', 'hostinterface.get',
-						'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.replacehostinterfaces', 'hostinterface.update',
-						'hostprototype.create', 'hostprototype.delete', 'hostprototype.get', 'hostprototype.update', 'housekeeping.get',
-						'httptest.create', 'httptest.delete', 'httptest.get', 'httptest.update', 'iconmap.get', 'image.get', 'item.create',
-						'item.delete', 'item.get', 'item.update', 'itemprototype.create', 'itemprototype.delete', 'itemprototype.get',
-						'itemprototype.update', 'maintenance.create', 'maintenance.delete', 'maintenance.get', 'maintenance.update',
-						'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
+						'graphprototype.update', 'hanode.get', 'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete',
+						'host.get', 'host.massadd',	'host.massremove', 'host.massupdate', 'host.update', 'hostgroup.delete', 'hostgroup.get',
+						'hostgroup.massadd', 'hostgroup.massremove', 'hostgroup.massupdate', 'hostgroup.update', 'hostinterface.create',
+						'hostinterface.delete', 'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove',
+						'hostinterface.replacehostinterfaces', 'hostinterface.update', 'hostprototype.create', 'hostprototype.delete',
+						'hostprototype.get', 'hostprototype.update', 'housekeeping.get', 'httptest.create', 'httptest.delete',
+						'httptest.get', 'httptest.update', 'iconmap.get', 'image.get', 'item.create', 'item.delete', 'item.get',
+						'item.update', 'itemprototype.create', 'itemprototype.delete', 'itemprototype.get',	'itemprototype.update',
+						'maintenance.create', 'maintenance.delete', 'maintenance.get', 'maintenance.update', 'map.create',
+						'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'report.create', 'report.delete', 'report.get', 'report.update', 'role.get', 'script.execute', 'script.get',
 						'script.getscriptsbyevents', 'script.getscriptsbyhosts', 'service.create', 'service.delete',
 						'service.get', 'service.update', 'settings.get', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli',
@@ -927,8 +928,8 @@ class testFormUserRoles extends CWebTest {
 						'drule.create', 'drule.delete', 'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge',
 						'event.get', 'graph.create', 'graph.delete', 'graph.get', 'graph.update', 'graphitem.get',
 						'graphprototype.create', 'graphprototype.delete', 'graphprototype.get', 'graphprototype.update',
-						'hanode.get', 'history.clear', 'history.get', 'host.create', 'host.delete', 'host.get', 'host.massadd',
-						'host.massremove', 'host.massupdate', 'host.update', 'hostgroup.create', 'hostgroup.delete',
+						'hanode.get', 'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete', 'host.get',
+						'host.massadd',	'host.massremove', 'host.massupdate', 'host.update', 'hostgroup.create', 'hostgroup.delete',
 						'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove', 'hostgroup.massupdate', 'hostgroup.propagate',
 						'hostgroup.update', 'hostinterface.create', 'hostinterface.delete', 'hostinterface.get', 'hostinterface.massadd',
 						'hostinterface.massremove', 'hostinterface.replacehostinterfaces', 'hostinterface.update',
@@ -1366,6 +1367,8 @@ class testFormUserRoles extends CWebTest {
 				$this->query('button:Enable')->one()->click();
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();
+
+				$this->assertMessage(TEST_GOOD, 'Modules enabled');
 			}
 			else {
 				foreach ($modules as $module) {
@@ -1427,14 +1430,14 @@ class testFormUserRoles extends CWebTest {
 					if (is_array($tags)) {
 						if (count($tags) > 3) {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
-									->query('class:icon-wizard-action')->one()->click();
+									->query('class:zi-more')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
-								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
+								$this->assertTrue($popup->query("xpath:.//span[text()=".CXPathHelper::escapeQuotes($tag)."]")
 										->one(false)->isValid()
 								);
 							}
-							$popup->query('class:overlay-close-btn')->one()->click();
+							$popup->query('class:btn-overlay-close')->one()->click();
 
 							// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
 							array_splice($tags, 3);

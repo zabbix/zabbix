@@ -39,6 +39,10 @@ class CHostGroup extends CApiService {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['groupid', 'name'];
 
+	public const OUTPUT_FIELDS = ['groupid', 'name', 'flags', 'uuid'];
+
+	private const GROUP_DISCOVERY_FIELDS = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete'];
+
 	/**
 	 * Get host groups.
 	 *
@@ -49,13 +53,11 @@ class CHostGroup extends CApiService {
 	public function get(array $options) {
 		$result = [];
 
-		$output_fields = ['groupid', 'name', 'flags', 'uuid'];
-		$host_fields = ['hostid', 'host', 'name', 'description', 'proxy_hostid', 'status', 'ipmi_authtype',
+		$host_fields = ['hostid', 'host', 'name', 'description', 'proxyid', 'status', 'ipmi_authtype',
 			'ipmi_privilege', 'ipmi_password', 'ipmi_username', 'inventory_mode', 'tls_connect', 'tls_accept',
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
 			'maintenance_from', 'maintenance_status', 'flags'
 		];
-		$group_discovery_fields = ['groupid', 'lastcheck', 'name', 'parent_group_prototypeid', 'ts_delete'];
 		$discovery_rule_fields = ['itemid', 'hostid', 'name', 'type', 'key_', 'url', 'query_fields', 'request_method',
 			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
 			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
@@ -96,11 +98,11 @@ class CHostGroup extends CApiService {
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
-			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
-			'selectHostPrototype' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
+			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
+			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -125,7 +127,7 @@ class CHostGroup extends CApiService {
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $output_fields;
+			$options['output'] = self::OUTPUT_FIELDS;
 		}
 
 		// editable + PERMISSION CHECK
@@ -558,8 +560,10 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::addUuid($groups);
+
+		self::checkUuidDuplicates($groups);
 		self::checkDuplicates($groups);
-		self::checkAndAddUuid($groups);
 	}
 
 	/**
@@ -571,7 +575,7 @@ class CHostGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['groupid'], ['name']], 'fields' => [
 			'uuid' => 		['type' => API_UUID],
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
@@ -582,7 +586,7 @@ class CHostGroup extends CApiService {
 		}
 
 		$db_groups = $this->get([
-			'output' => ['groupid', 'name', 'flags'],
+			'output' => ['uuid', 'groupid', 'name', 'flags'],
 			'groupids' => array_column($groups, 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -593,6 +597,7 @@ class CHostGroup extends CApiService {
 		}
 
 		self::checkGroupsNotDiscovered($db_groups);
+		self::checkUuidDuplicates($groups, $db_groups);
 		self::checkDuplicates($groups, $db_groups);
 	}
 
@@ -739,31 +744,58 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Check that new UUIDs are not already used and generate UUIDs where missing.
+	 * Add the UUID to those of the given host groups that don't have the 'uuid' parameter set.
 	 *
-	 * @static
-	 *
-	 * @param array $groups_to_create
-	 *
-	 * @throws APIException
+	 * @param array $groups
 	 */
-	private static function checkAndAddUuid(array &$groups_to_create): void {
-		foreach ($groups_to_create as &$group) {
+	private static function addUuid(array &$groups): void {
+		foreach ($groups as &$group) {
 			if (!array_key_exists('uuid', $group)) {
 				$group['uuid'] = generateUuidV4();
 			}
 		}
 		unset($group);
+	}
 
-		$db_uuid = DB::select('hstgrp', [
+	/**
+	 * Verify host group UUIDs are not repeated.
+	 *
+	 * @param array      $groups
+	 * @param array|null $db_groups
+	 *
+	 * @throws APIException
+	 */
+	private static function checkUuidDuplicates(array $groups, array $db_groups = null): void {
+		$group_indexes = [];
+
+		foreach ($groups as $i => $group) {
+			if (!array_key_exists('uuid', $group)) {
+				continue;
+			}
+
+			if ($db_groups === null || $group['uuid'] !== $db_groups[$group['groupid']]['uuid']) {
+				$group_indexes[$group['uuid']] = $i;
+			}
+		}
+
+		if (!$group_indexes) {
+			return;
+		}
+
+		$duplicates = DB::select('hstgrp', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($groups_to_create, 'uuid'), 'type' => HOST_GROUP_TYPE_HOST_GROUP],
+			'filter' => [
+				'type' => HOST_GROUP_TYPE_HOST_GROUP,
+				'uuid' => array_keys($group_indexes)
+			],
 			'limit' => 1
 		]);
 
-		if ($db_uuid) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				_s('Invalid parameter "%1$s": %2$s.', '/'.($group_indexes[$duplicates[0]['uuid']] + 1),
+					_('host group with the same UUID already exists')
+				)
 			);
 		}
 	}
@@ -1464,8 +1496,8 @@ class CHostGroup extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$groupIds = array_keys($result);
-		sort($groupIds);
+		$groupids = array_keys($result);
+		sort($groupids);
 
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
@@ -1489,7 +1521,7 @@ class CHostGroup extends CApiService {
 			}
 			else {
 				$hosts = API::Host()->get([
-					'groupids' => $groupIds,
+					'groupids' => $groupids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
@@ -1503,65 +1535,69 @@ class CHostGroup extends CApiService {
 		}
 
 		// adding discovery rule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+		if ($options['selectDiscoveryRules'] !== null) {
 			// discovered items
-			$discoveryRules = DBFetchArray(DBselect(
+			$discovery_rules = DBFetchArray(DBselect(
 				'SELECT gd.groupid,hd.parent_itemid'.
 					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' WHERE '.dbConditionInt('gd.groupid', $groupids).
 					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
 					' AND gp.hostid=hd.hostid'
 			));
-			$relationMap = $this->createRelationMap($discoveryRules, 'groupid', 'parent_itemid');
+			$relation_map = $this->createRelationMap($discovery_rules, 'groupid', 'parent_itemid');
 
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
+			$discovery_rules = API::DiscoveryRule()->get([
+				'output' => $options['selectDiscoveryRules'],
+				'itemids' => $relation_map->getRelatedIds(),
 				'preservekeys' => true
 			]);
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+
+			$result = $relation_map->mapMany($result, $discovery_rules, 'discoveryRules');
 		}
 
 		// adding host prototype
-		if ($options['selectHostPrototype'] !== null) {
+		if ($options['selectHostPrototypes'] !== null) {
 			$db_links = DBFetchArray(DBselect(
 				'SELECT gd.groupid,gp.hostid'.
 					' FROM group_discovery gd,group_prototype gp'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' WHERE '.dbConditionInt('gd.groupid', $groupids).
 					' AND gd.parent_group_prototypeid=gp.group_prototypeid'
 			));
 
 			$host_prototypes = API::HostPrototype()->get([
-				'output' => $options['selectHostPrototype'],
+				'output' => $options['selectHostPrototypes'],
 				'hostids' => array_column($db_links, 'hostid'),
 				'preservekeys' => true
 			]);
 
 			foreach ($result as &$row) {
-				$row['hostPrototype'] = [];
+				$row['hostPrototypes'] = [];
 			}
 			unset($row);
 
 			foreach ($db_links as $row) {
 				if (array_key_exists($row['hostid'], $host_prototypes)) {
-					$result[$row['groupid']]['hostPrototype'] = $host_prototypes[$row['hostid']];
+					$result[$row['groupid']]['hostPrototypes'][] = $host_prototypes[$row['hostid']];
 				}
 			}
 		}
 
 		// adding group discovery
-		if ($options['selectGroupDiscovery'] !== null) {
-			$groupDiscoveries = API::getApiService()->select('group_discovery', [
-				'output' => $this->outputExtend($options['selectGroupDiscovery'], ['groupid']),
-				'filter' => ['groupid' => $groupIds],
+		if ($options['selectGroupDiscoveries'] !== null) {
+			$output = $options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND
+				? self::GROUP_DISCOVERY_FIELDS
+				: $options['selectGroupDiscoveries'];
+
+			$group_discoveries = API::getApiService()->select('group_discovery', [
+				'output' => $this->outputExtend($output, ['groupid', 'groupdiscoveryid']),
+				'filter' => ['groupid' => $groupids],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
+			$relation_map = $this->createRelationMap($group_discoveries, 'groupid', 'groupdiscoveryid');
 
-			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, ['groupid'],
-				$options['selectGroupDiscovery']
-			);
-			$result = $relationMap->mapOne($result, $groupDiscoveries, 'groupDiscovery');
+			$group_discoveries = $this->unsetExtraFields($group_discoveries, ['groupid', 'groupdiscoveryid'], $output);
+
+			$result = $relation_map->mapMany($result, $group_discoveries, 'groupDiscoveries');
 		}
 
 		return $result;

@@ -1,0 +1,194 @@
+%icon-medium {
+	&::before {
+		font-size: $icon-medium-size;
+	}
+}
+
+%icon-small {
+	&::before {
+		font-size: $icon-small-size;
+	}
+}
+
+%icon-smaller {
+	&::before {
+		font-size: $icon-smaller-size;
+	}
+}
+
+%icon-with-content {
+	&::after {
+		content: attr(data-content);
+		position: absolute;
+		top: 50%;
+		font-size: 9px;
+		line-height: 1;
+		letter-spacing: -.25px;
+		transform: translateY(calc(-50% - 2px));
+	}
+}
+
+.icon {
+	@extend %icon-position;
+
+	color: $icon-color;
+}
+
+.icon-empty-small {
+	display: inline-block;
+	width: $icon-small-size;
+}
+
+.zi-alert-with-content {
+	@extend .zi-alert;
+	@extend %icon-with-content;
+
+	&::after {
+		color: $icon-content-color;
+	}
+
+	&.btn-icon {
+		color: $icon-color;
+	}
+}
+
+.zi-arrow-down-small {
+	@extend .zi-arrow-down;
+	@extend %icon-small;
+}
+
+.zi-arrow-up-small {
+	@extend .zi-arrow-up;
+	@extend %icon-small;
+}
+
+.zi-bullet-right-with-content {
+	@extend .zi-bullet-right;
+	@extend %icon-with-content;
+
+	&::before {
+		position: absolute;
+		bottom: 0;
+		line-height: 6px;
+	}
+
+	&::after {
+		color: $font-color;
+	}
+
+	&.btn-icon {
+		color: $icon-color;
+	}
+}
+
+.zi-chevron-down,
+.zi-chevron-left,
+.zi-chevron-right,
+.zi-chevron-up {
+	@extend %icon-medium;
+}
+
+.zi-chevron-down-small {
+	@extend .zi-chevron-down;
+	@extend %icon-small;
+}
+
+.zi-help-small {
+	@extend .zi-help;
+	@extend %icon-small;
+}
+
+.zi-help-filled-small {
+	@extend .zi-help;
+	@extend %icon-small;
+
+	&::before {
+		padding: 1px;
+		border-radius: 50%;
+	}
+
+	&,
+	&.btn-icon {
+		color: $icon-content-color;
+		background-color: $icon-color;
+		border-radius: 50%;
+	}
+}
+
+.zi-i-negative {
+	@extend .zi-i;
+	@extend %icon-small;
+
+	&,
+	&.btn-icon {
+		color: $icon-content-color;
+		background-color: $negative-color;
+	}
+}
+
+.zi-i-positive {
+	@extend .zi-i;
+	@extend %icon-small;
+
+	&,
+	&.btn-icon {
+		color: $icon-content-color;
+		background-color: $positive-color;
+	}
+}
+
+.zi-i-warning {
+	@extend .zi-i;
+	@extend %icon-small;
+
+	&,
+	&.btn-icon {
+		color: $icon-content-color;
+		background-color: $warning-color;
+	}
+}
+
+.zi-plus-small {
+	@extend .zi-plus;
+	@extend %icon-small;
+}
+
+.zi-remove-small {
+	@extend .zi-remove;
+	@extend %icon-small;
+}
+
+.zi-remove-smaller {
+	@extend .zi-remove;
+	@extend %icon-smaller;
+}
+
+.zi-tree-top-bottom-small {
+	@extend .zi-tree-top-bottom;
+	@extend %icon-small;
+}
+
+.zi-tree-top-right-small {
+	@extend .zi-tree-top-right;
+	@extend %icon-small;
+}
+
+.zi-tree-top-right-bottom-small {
+	@extend .zi-tree-top-right-bottom;
+	@extend %icon-small;
+}
+
+.zi-user-filled-small {
+	@extend .zi-user-filled;
+	@extend %icon-small;
+}
+
+.zi-users-filled-small {
+	@extend .zi-users-filled;
+	@extend %icon-medium;
+}
+
+.zi-wrench-alt-small {
+	@extend .zi-wrench-alt;
+	@extend %icon-small;
+}

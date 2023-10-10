@@ -20,7 +20,7 @@
 #include "zbxthreads.h"
 #include "zbxcommshigh.h"
 #include "cfg.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 #include "zbxmutexs.h"
@@ -28,6 +28,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxfile.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
@@ -132,10 +133,12 @@ const char	*usage_message[] = {
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
+#endif
 
 static int	config_timeout = 3;
 
@@ -323,7 +326,7 @@ static int	WITH_TIMESTAMPS = 0;
 static int	WITH_NS = 0;
 static int	REAL_TIME = 0;
 
-char		*CONFIG_SOURCE_IP = NULL;
+char		*config_source_ip = NULL;
 static char	*ZABBIX_SERVER = NULL;
 static char	*ZABBIX_SERVER_PORT = NULL;
 static char	*ZABBIX_HOSTNAME = NULL;
@@ -334,7 +337,7 @@ static char	*config_file = NULL;
 
 typedef struct
 {
-	zbx_vector_ptr_t	addrs;
+	zbx_vector_addr_ptr_t	addrs;
 	ZBX_THREAD_HANDLE	*thread;
 }
 zbx_send_destinations_t;
@@ -390,7 +393,7 @@ static void	main_signal_handler(int sig)
 
 typedef struct
 {
-	zbx_vector_ptr_t		*addrs;
+	zbx_vector_addr_ptr_t		*addrs;
 	struct zbx_json			json;
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
@@ -400,7 +403,6 @@ typedef struct
 	int				fds[2];
 #endif
 	zbx_config_tls_t		*zbx_config_tls;
-	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 }
 zbx_thread_sendval_args;
 
@@ -430,8 +432,8 @@ static void	zbx_thread_handle_pipe_response(zbx_thread_sendval_args *sendval_arg
 	{
 		zbx_addr_t	*addr = sendval_args->addrs->values[0];
 
-		zbx_vector_ptr_remove(sendval_args->addrs, 0);
-		zbx_vector_ptr_append(sendval_args->addrs, addr);
+		zbx_vector_addr_ptr_remove(sendval_args->addrs, 0);
+		zbx_vector_addr_ptr_append(sendval_args->addrs, addr);
 	}
 }
 #endif
@@ -485,9 +487,8 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 			{
 				if (destinations[j].thread == &threads[i])
 				{
-					zbx_vector_ptr_clear_ext(&destinations[j].addrs,
-							(zbx_clean_func_t)zbx_addr_free);
-					zbx_vector_ptr_destroy(&destinations[j].addrs);
+					zbx_vector_addr_ptr_clear_ext(&destinations[j].addrs, zbx_addr_free);
+					zbx_vector_addr_ptr_destroy(&destinations[j].addrs);
 					destinations[j] = destinations[--destinations_count];
 					break;
 				}
@@ -541,7 +542,7 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 			case 0:
 				if (' ' == *p || '\t' == *p)
 				{
-					/* skipping the leading spaces */;
+					/* skipping the leading spaces */
 				}
 				else if ('"' == *p)
 				{
@@ -700,7 +701,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
+	if (SUCCEED == zbx_connect_to_server(&sock, config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
 			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
 	{
 		if (1 == sendval_args->sync_timestamp)
@@ -810,6 +811,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
 #endif
 			sendval_args[i].sync_timestamp = sendval_args[0].sync_timestamp;
+			sendval_args[i].zbx_config_tls = sendval_args[0].zbx_config_tls;
 		}
 
 		destinations[i].thread = &threads[i];
@@ -817,7 +819,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 		if (-1 == pipe(sendval_args[i].fds))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot create data pipe: %s",
-					strerror_from_system((unsigned long)errno));
+					zbx_strerror_from_system((unsigned long)errno));
 			threads[i] = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 			continue;
 		}
@@ -845,7 +847,8 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+		void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
@@ -862,7 +865,7 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_ve
 	destinations = (zbx_send_destinations_t *)zbx_realloc(destinations,
 			sizeof(zbx_send_destinations_t) * destinations_count);
 
-	zbx_vector_ptr_create(&destinations[destinations_count - 1].addrs);
+	zbx_vector_addr_ptr_create(&destinations[destinations_count - 1].addrs);
 
 	zbx_addr_copy(&destinations[destinations_count - 1].addrs, addrs);
 
@@ -950,7 +953,7 @@ static void	zbx_load_config(const char *config_file_in)
 		zbx_free(cfg_hostname);
 	}
 
-	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
+	zbx_fill_from_config_file(&config_source_ip, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
@@ -1016,9 +1019,8 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
-				break;
 			case 'V':
 				zbx_version();
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1026,10 +1028,9 @@ static void	parse_commandline(int argc, char **argv)
 				zbx_tls_version();
 #endif
 				exit(EXIT_SUCCESS);
-				break;
 			case 'I':
-				if (NULL == CONFIG_SOURCE_IP)
-					CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
+				if (NULL == config_source_ip)
+					config_source_ip = zbx_strdup(config_source_ip, zbx_optarg);
 				break;
 			case 'z':
 				if (NULL == ZABBIX_SERVER)
@@ -1142,7 +1143,6 @@ static void	parse_commandline(int argc, char **argv)
 			default:
 				zbx_usage();
 				exit(EXIT_FAILURE);
-				break;
 		}
 	}
 
@@ -1496,18 +1496,21 @@ int	main(int argc, char **argv)
 	char			*error = NULL;
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	zbx_thread_sendval_args	*sendval_args = NULL;
-	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
 
+	zbx_init_library_common(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 
 	progname = get_program_name(argv[0]);
 
-	zbx_init_library_cfg(program_type);
-
 	parse_commandline(argc, argv);
 
 	if (NULL != config_file)
+	{
+		zbx_init_library_cfg(program_type, config_file);
 		zbx_load_config(config_file);
+	}
+
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{
@@ -1516,7 +1519,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1594,7 +1597,6 @@ int	main(int argc, char **argv)
 	}
 #endif
 	sendval_args->zbx_config_tls = zbx_config_tls;
-	sendval_args->zbx_get_program_type_cb_arg = get_program_type;
 	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
@@ -1868,13 +1870,11 @@ exit:
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		zbx_tls_free();
-#if defined(_WINDOWS)
-		zbx_tls_library_deinit();
-#endif
+		zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);
-	zabbix_close_log();
+	zbx_close_log();
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif

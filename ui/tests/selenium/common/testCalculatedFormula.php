@@ -1472,11 +1472,48 @@ class testCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap,#7,eg))".'
 				]
 			],
+			// Unsupported operator.
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),1)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "count".'
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),"x","2")',
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count".'
+				]
+			],
+			// Pattern not provided with operator.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),"like", )',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),"like", )".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),,)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),,)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h), ,)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h), ,)".'
 				]
 			],
 			[
@@ -2719,6 +2756,11 @@ class testCalculatedFormula extends CWebTest {
 			// foreach() aggregated functions.
 			[
 				[
+					'formula' => 'mad(last_foreach(/*/trap))'
+				]
+			],
+			[
+				[
 					'formula' => 'sum(last_foreach(/*/trap))'
 				]
 			],
@@ -2919,7 +2961,7 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'mad()',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "mad".'
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "mad".'
 				]
 			],
 			[
@@ -3435,6 +3477,76 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],6))+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-bitrshift(last(//trap),1)".
 							"/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)=>trendsum(/host/item,60m:now/h)",
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from ">trendsum(/host/item,60m:now/h)".'
+				]
+			],
+			// jsonpath() function
+			[
+				[
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#10:now),"$.[0].last_name","LastName")'
+				]
+			],
+			[
+				[
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4),"$.last_name")'
+				]
+			],
+			[
+				[
+					'formula' => 'jsonpath(avg(/Simple form test host/test-item-form4,#1:now-5m),"$.[0].last_name","last_name")'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#1:now-5m))',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "jsonpath".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,20),"$.[0].last_name")',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")".'
+				]
+			],
+			// xmlxpath() function
+			[
+				[
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()",5.0)'
+				]
+			],
+			[
+				[
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4),"/zabbix_export/version")'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'xmlxpath(min(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from '.
+							'"xmlxpath(min(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#1:now-5m))',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "xmlxpath".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,4),5.0)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
 				]
 			]
 		];

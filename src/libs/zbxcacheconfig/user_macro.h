@@ -21,6 +21,7 @@
 #define ZBX_USER_MACRO_H
 
 #include "zbxalgo.h"
+#include "zbxcacheconfig.h"
 
 #define ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID	0
 
@@ -52,13 +53,12 @@ zbx_um_host_t;
 
 ZBX_PTR_VECTOR_DECL(um_host, zbx_um_host_t *)
 
-typedef struct
+struct zbx_um_cache
 {
 	zbx_hashset_t	hosts;
 	zbx_uint32_t	refcount;
 	zbx_uint64_t	revision;
-}
-zbx_um_cache_t;
+};
 
 zbx_hash_t	um_macro_hash(const void *d);
 int	um_macro_compare(const void *d1, const void *d2);

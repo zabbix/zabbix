@@ -28,6 +28,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxlib"
 )
@@ -35,6 +36,7 @@ import (
 // task priority within the same second is done by setting nanosecond component
 const (
 	priorityConfiguratorTaskNs = iota
+	priorityCommandTaskNs      = iota
 	priorityStarterTaskNs
 	priorityCollectorTaskNs
 	priorityWatcherTaskNs
@@ -163,9 +165,21 @@ func (t *exporterTask) perform(s Scheduler) {
 
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
-			if ret, err = exporter.Export(key, params, t); err == nil {
+			tc := make(chan bool)
+
+			go func() {
+				ret, err = exporter.Export(key, params, t)
+				tc <- true
+			}()
+
+			select {
+			case <-tc:
+			case <-time.After(time.Second * time.Duration(t.item.timeout)):
+				err = fmt.Errorf("Timeout occurred while gathering data.")
+			}
+
+			if err == nil {
 				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
@@ -242,6 +256,10 @@ func (t *exporterTask) Meta() (meta *plugin.Meta) {
 
 func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *exporterTask) Timeout() int {
+	return t.item.timeout
 }
 
 // directExporterTask provides access to plugin Exporter interaface.
@@ -343,6 +361,10 @@ func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+func (t *directExporterTask) Timeout() int {
+	return t.item.timeout
+}
+
 // starterTask provides access to plugin Exporter interaface Start() method.
 type starterTask struct {
 	taskBase
@@ -400,15 +422,15 @@ func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 // stopperTask provides access to plugin Watcher interaface.
 type watcherTask struct {
 	taskBase
-	requests []*plugin.Request
-	client   ClientAccessor
+	items  []*plugin.Item
+	client ClientAccessor
 }
 
 func (t *watcherTask) perform(s Scheduler) {
 	log.Debugf("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
-		watcher.Watch(t.requests, t)
+		watcher.Watch(t.items, t)
 		s.FinishTask(t)
 	}()
 }
@@ -448,6 +470,10 @@ func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+func (t *watcherTask) Timeout() int {
+	return 0
+}
+
 // configuratorTask provides access to plugin Configurator interaface.
 type configuratorTask struct {
 	taskBase
@@ -474,4 +500,52 @@ func (t *configuratorTask) getWeight() int {
 
 func (t *configuratorTask) isItemKeyEqual(itemkey string) bool {
 	return false
+}
+
+// commandTask executes remote commands received with active requestes
+type commandTask struct {
+	taskBase
+	id     uint64
+	params []string
+	output resultcache.Writer
+}
+
+func (t *commandTask) isRecurring() bool {
+	return false
+}
+func (t *commandTask) perform(s Scheduler) {
+	// execute remote command
+	go func() {
+		e := t.plugin.impl.(plugin.Exporter)
+
+		var cr *resultcache.CommandResult
+
+		if ret, err := e.Export("system.run", t.params, nil); err == nil {
+			if ret != nil {
+				cr = &resultcache.CommandResult{
+					ID:     t.id,
+					Result: itemutil.ValueToString(ret),
+				}
+			}
+		} else {
+			log.Debugf("failed to execute remote command '%s' error: '%s'",
+				t.params[0], err.Error())
+
+			cr = &resultcache.CommandResult{
+				ID:    t.id,
+				Error: err,
+			}
+		}
+
+		t.output.WriteCommand(cr)
+		t.output.Flush()
+
+		s.FinishTask(t)
+	}()
+}
+
+func (t *commandTask) reschedule(now time.Time) (err error) {
+	t.scheduled = time.Unix(now.Unix(), priorityCommandTaskNs)
+
+	return
 }

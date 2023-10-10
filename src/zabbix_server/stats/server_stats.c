@@ -21,11 +21,10 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxcachevalue.h"
-#include "zbxlld.h"
-#include "log.h"
+#include "../lld/lld_protocol.h"
 #include "zbxtrends.h"
-#include "zbxha.h"
 #include "zbxconnector.h"
+#include "../ha/ha.h"
 
 /******************************************************************************
  *                                                                            *
@@ -69,9 +68,8 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zbx_free(error);
 	}
 
-
 	/* zabbix[triggers] */
-	zbx_json_adduint64(json, "triggers", DCget_trigger_count());
+	zbx_json_adduint64(json, "triggers", zbx_dc_get_trigger_count());
 
 	/* zabbix[vcache,...] */
 	if (SUCCEED == zbx_vc_get_statistics(&vc_stats))

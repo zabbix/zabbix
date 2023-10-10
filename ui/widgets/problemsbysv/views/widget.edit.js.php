@@ -27,9 +27,10 @@ window.widget_problemsbysv_form = new class {
 
 	init() {
 		this._show_type = document.getElementById('show_type');
-		this._show_type.addEventListener('change', () => this.updateForm());
-
-		this.updateForm();
+		if (this._show_type !== null) {
+			this._show_type.addEventListener('change', () => this.updateForm());
+			this.updateForm();
+		}
 	}
 
 	updateForm() {

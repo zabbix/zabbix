@@ -144,12 +144,6 @@ static void	zbx_json_setempty(struct zbx_json *j)
 	*j->buffer = '\0';
 }
 
-void	zbx_json_cleanarray(struct zbx_json *j)
-{
-	zbx_json_setempty(j);
-	zbx_json_addarray(j, NULL);
-}
-
 void	zbx_json_clean(struct zbx_json *j)
 {
 	zbx_json_setempty(j);
@@ -462,7 +456,7 @@ void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value)
 
 void	zbx_json_adddouble(struct zbx_json *j, const char *name, double value)
 {
-	char	buffer[MAX_ID_LEN];
+	char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
 	zbx_print_double(buffer, sizeof(buffer), value);
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
@@ -731,7 +725,7 @@ static unsigned int	zbx_hex2num(char c)
  *               0 on error (invalid escape sequence)                         *
  *                                                                            *
  ******************************************************************************/
-static unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
+unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
 {
 	bytes[0] = '\0';
 
@@ -928,7 +922,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
 				return NULL;
 	}
 
@@ -962,7 +956,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
 				return NULL;
 	}
 
@@ -1227,7 +1221,7 @@ int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct
 		object.start = p;
 
 		if (NULL == (object.end = __zbx_json_rbracket(p)))
-			object.end = p + json_parse_value(p, NULL, NULL) - 1;
+			object.end = p + json_parse_value(p, NULL, 0, NULL) - 1;
 	}
 
 	*out = object;

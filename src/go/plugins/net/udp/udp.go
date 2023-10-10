@@ -55,7 +55,6 @@ const (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 }
 
 // Plugin -
@@ -134,17 +133,17 @@ func (p *Plugin) validateResponse(rsp []byte, ln int, req []byte) int {
 	return 1
 }
 
-func (p *Plugin) udpExpect(service string, address string) (result int) {
+func (p *Plugin) udpExpect(service string, address string, timeout int) (result int) {
 	var conn net.Conn
 	var err error
 
-	if conn, err = net.DialTimeout("udp", address, time.Second*time.Duration(p.options.Timeout)); err != nil {
+	if conn, err = net.DialTimeout("udp", address, time.Second*time.Duration(timeout)); err != nil {
 		log.Debugf("UDP expect network error: cannot connect to [%s]: %s", address, err.Error())
 		return
 	}
 	defer conn.Close()
 
-	if err = conn.SetDeadline(time.Now().Add(time.Second * time.Duration(p.options.Timeout))); err != nil {
+	if err = conn.SetDeadline(time.Now().Add(time.Second * time.Duration(timeout))); err != nil {
 		return
 	}
 
@@ -167,7 +166,7 @@ func (p *Plugin) udpExpect(service string, address string) (result int) {
 	return p.validateResponse(rsp, ln, req)
 }
 
-func (p *Plugin) exportNetService(params []string) int {
+func (p *Plugin) exportNetService(params []string, timeout int) int {
 	var ip, port string
 	service := params[0]
 
@@ -183,7 +182,13 @@ func (p *Plugin) exportNetService(params []string) int {
 		port = service
 	}
 
-	return p.udpExpect(service, net.JoinHostPort(ip, port))
+	udpTimeout := timeout
+
+	if timeout >= 2 {
+		udpTimeout--
+	}
+
+	return p.udpExpect(service, net.JoinHostPort(ip, port), udpTimeout)
 }
 
 func toFixed(num float64, precision int) float64 {
@@ -191,11 +196,11 @@ func toFixed(num float64, precision int) float64 {
 	return math.Round(num*output) / output
 }
 
-func (p *Plugin) exportNetServicePerf(params []string) float64 {
+func (p *Plugin) exportNetServicePerf(params []string, timeout int) float64 {
 	const floatPrecision = 0.0001
 
 	start := time.Now()
-	ret := p.exportNetService(params)
+	ret := p.exportNetService(params, timeout)
 
 	if ret == 1 {
 		elapsedTime := toFixed(time.Since(start).Seconds(), 6)
@@ -233,9 +238,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		if key == "net.udp.service" {
-			return p.exportNetService(params), nil
+			return p.exportNetService(params, ctx.Timeout()), nil
 		} else if key == "net.udp.service.perf" {
-			return p.exportNetServicePerf(params), nil
+			return p.exportNetServicePerf(params, ctx.Timeout()), nil
 		}
 	case "net.udp.socket.count":
 		return p.exportNetUdpSocketCount(params)
@@ -248,9 +253,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
 	}
 }
 

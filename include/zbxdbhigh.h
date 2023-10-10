@@ -26,6 +26,9 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxversion.h"
+#include "zbxtime.h"
+
+#include "zbxtagfilter.h"
 
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
@@ -73,9 +76,9 @@
 #define ZBX_ITEM_LOGTIMEFMT_LEN_MAX		(ZBX_ITEM_LOGTIMEFMT_LEN + 1)
 #define ZBX_ITEM_IPMI_SENSOR_LEN		128
 #define ZBX_ITEM_IPMI_SENSOR_LEN_MAX		(ZBX_ITEM_IPMI_SENSOR_LEN + 1)
-#define ZBX_ITEM_USERNAME_LEN			64
+#define ZBX_ITEM_USERNAME_LEN			255
 #define ZBX_ITEM_USERNAME_LEN_MAX		(ZBX_ITEM_USERNAME_LEN + 1)
-#define ZBX_ITEM_PASSWORD_LEN			64
+#define ZBX_ITEM_PASSWORD_LEN			255
 #define ZBX_ITEM_PASSWORD_LEN_MAX		(ZBX_ITEM_PASSWORD_LEN + 1)
 #define ZBX_ITEM_PUBLICKEY_LEN			64
 #define ZBX_ITEM_PUBLICKEY_LEN_MAX		(ZBX_ITEM_PUBLICKEY_LEN + 1)
@@ -124,6 +127,9 @@
 #define ZBX_HISTORY_STR_VALUE_LEN		255
 #define ZBX_HISTORY_TEXT_VALUE_LEN		65535
 #define ZBX_HISTORY_LOG_VALUE_LEN		65535
+
+/* Binary item type can only be as a dependent item. */
+#define ZBX_HISTORY_BIN_VALUE_LEN		MAX(ZBX_HISTORY_TEXT_VALUE_LEN, ZBX_HISTORY_LOG_VALUE_LEN)
 
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
@@ -233,18 +239,6 @@ typedef struct
 }
 zbx_db_trigger;
 
-/* temporary cache of trigger related data */
-typedef struct
-{
-	zbx_uint64_t		serviceid;
-	char			*name;
-	char			*description;
-	zbx_vector_uint64_t	eventids;
-	zbx_vector_ptr_t	events;
-	zbx_vector_tags_t	service_tags;
-}
-zbx_db_service;
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -273,6 +267,20 @@ typedef struct
 	zbx_uint64_t		flags;
 }
 zbx_db_event;
+
+ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
+
+/* temporary cache of trigger related data */
+typedef struct
+{
+	zbx_uint64_t		serviceid;
+	char			*name;
+	char			*description;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_db_event_t	events;
+	zbx_vector_tags_t	service_tags;
+}
+zbx_db_service;
 
 /* media types */
 typedef enum
@@ -473,7 +481,7 @@ zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void);
 void			zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh);
 
 void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh);
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error);
 void	zbx_db_deinit(void);
 
 void	zbx_db_init_autoincrement_options(void);
@@ -481,36 +489,38 @@ void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
 
-int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhig);
+int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhigh);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 #endif
 
 #ifdef HAVE_ORACLE
 void	zbx_db_statement_prepare(const char *sql);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
+int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_name, int expected_type);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select_n(const char *query, int n);
-DB_ROW		zbx_db_fetch(DB_RESULT result);
+zbx_db_result_t	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+zbx_db_result_t	zbx_db_select_n(const char *query, int n);
+zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);
 int		zbx_db_is_null(const char *field);
 void		zbx_db_begin(void);
 int		zbx_db_commit(void);
 void		zbx_db_rollback(void);
 int		zbx_db_end(int ret);
 
-const ZBX_TABLE	*zbx_db_get_table(const char *tablename);
-const ZBX_FIELD	*zbx_db_get_field(const ZBX_TABLE *table, const char *fieldname);
+const zbx_db_table_t	*zbx_db_get_table(const char *tablename);
+const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname);
+int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str);
+
 #define zbx_db_get_maxid(table)	zbx_db_get_maxid_num(table, 1)
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
-void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info);
+int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsupported);
 void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
-int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
@@ -573,26 +583,53 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src);
 void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char **values, const int num);
+		const char * const *values, const int num);
 
 int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
+
+typedef struct
+{
+	zbx_uint64_t		connectorid;
+	int			tags_evaltype;
+	zbx_vector_match_tags_t	connector_tags;
+}
+zbx_connector_filter_t;
+
+ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
+
+/* events callbacks */
+typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, const char *trigger_description,
+		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
+		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
+
+typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+typedef void	(*zbx_clean_events_func_t)(void);
+typedef void	(*zbx_reset_event_recovery_func_t)(void);
+typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
+		unsigned char **data, size_t *data_alloc, size_t *data_offset);
+typedef void	(*zbx_events_update_itservices_func_t)(void);
+
+typedef struct
+{
+	zbx_add_event_func_t			add_event_cb;
+	zbx_process_events_func_t		process_events_cb;
+	zbx_clean_events_func_t			clean_events_cb;
+	zbx_reset_event_recovery_func_t		reset_event_recovery_cb;
+	zbx_export_events_func_t		export_events_cb;
+	zbx_events_update_itservices_func_t	events_update_itservices_cb;
+} zbx_events_funcs_t;
+
+/* events callbacks end */
+
 int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
-void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
-void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid);
-void	zbx_db_register_host_clean(zbx_vector_ptr_t *autoreg_hosts);
-
-void	zbx_db_proxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, unsigned short flag, int now);
 int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
@@ -644,24 +681,28 @@ void	zbx_db_check_character_set(void);
 typedef struct
 {
 	/* the target table */
-	const ZBX_TABLE		*table;
-	/* the fields to insert (pointers to the ZBX_FIELD structures from database schema) */
+	const zbx_db_table_t	*table;
+	/* the fields to insert (pointers to the zbx_db_field_t structures from database schema) */
 	zbx_vector_ptr_t	fields;
 	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
 	zbx_vector_ptr_t	rows;
 	/* index of autoincrement field */
 	int			autoincrement;
+	/* the last id assigned by autoincrement */
+	zbx_uint64_t		lastid;
 }
 zbx_db_insert_t;
 
-void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields,
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num);
 void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
+zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
+
 int	zbx_db_get_database_type(void);
 
 typedef struct
@@ -708,14 +749,13 @@ typedef struct
 	char				*version_str;
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
-	int				lastaccess;
-	int				last_version_error_time;
+	time_t				lastaccess;
+	time_t				last_version_error_time;
 	int				proxy_delay;
 	int				more_data;
 	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
@@ -723,7 +763,6 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
-		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
 	zbx_uint64_t			flags;
@@ -796,6 +835,8 @@ void	zbx_item_param_free(zbx_item_param_t *param);
 
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
 int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, char **error);
+void	zbx_add_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *addtags);
+void	zbx_del_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *deltags);
 
 typedef enum
 {
@@ -825,10 +866,12 @@ typedef struct
 }
 zbx_lld_override_operation_t;
 
+ZBX_PTR_VECTOR_DECL(lld_override_operation, zbx_lld_override_operation_t*)
+
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation);
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
-		zbx_vector_ptr_t *ops);
+		zbx_vector_lld_override_operation_t *ops);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
@@ -898,4 +941,7 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#endif /* ZABBIX_DBHIGH_H */
+#define PROXY_OPERATING_MODE_ACTIVE	0
+#define PROXY_OPERATING_MODE_PASSIVE	1
+
+#endif

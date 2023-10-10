@@ -131,7 +131,7 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	this.btn_close = document.createElement('button');
 	this.btn_close.setAttribute('title', locale['S_CLOSE']);
 	this.btn_close.setAttribute('type', 'button');
-	this.btn_close.className = 'overlay-close-btn';
+	this.btn_close.className = 'btn-overlay-close';
 
 	header.className = 'dashboard-widget-head cursor-move';
 	this.node.appendChild(header);
@@ -139,16 +139,19 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	header.appendChild(controls);
 	header.appendChild(this.btn_close);
 
-	this.btn_mute = this.makeToggleBtn(
-		{class: 'btn-sound-on', title: locale['S_MUTE']},
-		{class: 'btn-sound-off', title: locale['S_UNMUTE']}
+	this.btn_snooze = this.makeToggleBtn(
+		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL]},
+		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL_OFF]}
 	);
-
-	this.btn_snooze = this.makeToggleBtn({class: 'btn-alarm-on'}, {class: 'btn-alarm-off'});
 	this.btn_snooze.setAttribute('title', locale['S_SNOOZE']);
 
 	const li_btn_snooze = document.createElement('li');
 	li_btn_snooze.appendChild(this.btn_snooze);
+
+	this.btn_mute = this.makeToggleBtn(
+		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER, title: locale['S_MUTE']},
+		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER_OFF, title: locale['S_UNMUTE']}
+	);
 
 	const li_btn_mute = document.createElement('li');
 	li_btn_mute.appendChild(this.btn_mute);

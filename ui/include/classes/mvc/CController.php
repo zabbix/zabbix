@@ -181,6 +181,8 @@ abstract class CController {
 	}
 
 	/**
+	 * @throws Exception
+	 *
 	 * @return array
 	 */
 	private static function getFormInput(): array {
@@ -190,6 +192,11 @@ abstract class CController {
 			$input = $_REQUEST;
 
 			if (hasRequest('formdata')) {
+				if (!hasRequest('data') || !is_string(getRequest('data'))
+						|| !hasRequest('sign') || !is_string(getRequest('sign'))) {
+					throw new Exception(_('Operation cannot be performed due to unauthorized request.'));
+				}
+
 				$data = base64_decode(getRequest('data'));
 				$sign = base64_decode(getRequest('sign'));
 				$request_sign = CEncryptHelper::sign($data);
@@ -271,47 +278,45 @@ abstract class CController {
 	/**
 	 * Validate "from" and "to" parameters for allowed period.
 	 *
+	 * @throws CAccessDeniedException
+	 *
 	 * @return bool
 	 */
-	protected function validateTimeSelectorPeriod() {
+	protected function validateTimeSelectorPeriod(): bool {
 		if (!$this->hasInput('from') || !$this->hasInput('to')) {
 			return true;
 		}
 
 		try {
-			$max_period = 'now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD);
+			$min_period = CTimePeriodHelper::getMinPeriod();
+			$max_period = CTimePeriodHelper::getMaxPeriod();
 		}
 		catch (Exception $x) {
-			access_deny(ACCESS_DENY_PAGE);
-
-			return false;
+			throw new CAccessDeniedException();
 		}
 
-		$ts = [];
-		$ts['now'] = time();
 		$range_time_parser = new CRangeTimeParser();
 
-		foreach (['from', 'to'] as $field) {
-			$range_time_parser->parse($this->getInput($field));
-			$ts[$field] = $range_time_parser
-				->getDateTime($field === 'from')
-				->getTimestamp();
+		$time_period = [
+			'from' => $this->getInput('from'),
+			'to' => $this->getInput('to')
+		];
+
+		foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
+			$range_time_parser->parse($time_period[$field]);
+			$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
 		}
 
-		$period = $ts['to'] - $ts['from'] + 1;
-		$range_time_parser->parse($max_period);
-		$max_period = 1 + $ts['now'] - $range_time_parser
-			->getDateTime(true)
-			->getTimestamp();
+		$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;
 
-		if ($period < ZBX_MIN_PERIOD) {
+		if ($period < $min_period) {
 			info(_n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
+				'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
 			));
 
 			return false;
 		}
-		elseif ($period > $max_period) {
+		elseif ($period > $max_period + 1) {
 			info(_n('Maximum time period to display is %1$s day.',
 				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 			));
@@ -406,7 +411,8 @@ abstract class CController {
 	 * @return bool
 	 */
 	private function checkCsrfToken(): bool {
-		if (!is_array($this->raw_input) || !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
+		if (!isRequestMethod('post') || !is_array($this->raw_input)
+				|| !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 

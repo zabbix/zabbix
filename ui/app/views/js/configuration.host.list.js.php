@@ -36,6 +36,35 @@
 			this.applied_filter_groupids = applied_filter_groupids;
 
 			this.initFilter();
+
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-template')) {
+					this.editTemplate({templateid: e.target.dataset.templateid})
+				}
+			});
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('hosts');
+				postMessageOk(e.detail.title);
+
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			});
 		},
 
 		initFilter() {
@@ -86,16 +115,17 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},
 
 		massDeleteHosts(button) {
-			const confirm_text = button.getAttribute('confirm');
+			const confirm_text = Object.keys(chkbxRange.getSelectedIds()).length > 1
+				? <?= json_encode(_('Delete selected hosts?')) ?>
+				: <?= json_encode(_('Delete selected host?')) ?>;
+
 			if (!confirm(confirm_text)) {
 				return;
 			}
@@ -149,21 +179,7 @@
 		},
 
 		events: {
-			hostSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			},
-
-			hostDelete(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

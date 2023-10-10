@@ -351,6 +351,7 @@ class ZBase {
 			$this->root_dir.'/include/classes/html',
 			$this->root_dir.'/include/classes/html/svg',
 			$this->root_dir.'/include/classes/html/widgets',
+			$this->root_dir.'/include/classes/html/widgets/fields',
 			$this->root_dir.'/include/classes/html/interfaces',
 			$this->root_dir.'/include/classes/parsers',
 			$this->root_dir.'/include/classes/parsers/results',
@@ -921,7 +922,9 @@ class ZBase {
 	private function setServerAddress(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
+		if ($ZBX_SERVER !== null) {
+			$ZBX_SERVER_PORT = $ZBX_SERVER_PORT !== null ? (int) $ZBX_SERVER_PORT : ZBX_SERVER_PORT_DEFAULT;
+
 			return;
 		}
 
@@ -948,6 +951,10 @@ class ZBase {
 		if ($active_node !== null) {
 			$ZBX_SERVER = $active_node['address'];
 			$ZBX_SERVER_PORT = $active_node['port'];
+		}
+
+		if ($ZBX_SERVER_PORT !== null) {
+			$ZBX_SERVER_PORT = (int) $ZBX_SERVER_PORT;
 		}
 	}
 }

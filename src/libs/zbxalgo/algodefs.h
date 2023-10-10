@@ -21,4 +21,5 @@
 #define ZABBIX_ALGO_H
 
 int	next_prime(int n);
+
 #endif /* ZABBIX_ALGO_H */

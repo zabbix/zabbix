@@ -305,13 +305,19 @@ class CScreenHistory extends CScreenBase {
 				);
 
 				foreach ($history_data as $data) {
-					$data['value'] = rtrim($data['value'], " \t\r\n");
+					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+						$data['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+					}
+					else {
+						$data['value'] = rtrim($data['value'], " \t\r\n");
+						$data['value'] = zbx_nl2br($data['value']);
+					}
 
 					$item = $items[$data['itemid']];
 					$host = reset($item['hosts']);
 					$color = null;
 
-					if ($this->filter !== '') {
+					if ($this->filter !== '' && $value_type != ITEM_VALUE_TYPE_BINARY) {
 						$haystack = mb_strtolower($data['value']);
 						$needle = mb_strtolower($this->filter);
 						$pos = mb_strpos($haystack, $needle);
@@ -374,7 +380,7 @@ class CScreenHistory extends CScreenBase {
 						}
 					}
 
-					$row[] = (new CCol(new CPre(zbx_nl2br($data['value']))))->addClass($color);
+					$row[] = (new CCol(new CPre($data['value'])))->addClass($color);
 
 					$history_table->addRow($row);
 				}
@@ -422,12 +428,14 @@ class CScreenHistory extends CScreenBase {
 						$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 					}
 
-					$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
+					$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+						: zbx_nl2br(CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']));
 
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
 							->addClass(ZBX_STYLE_NOWRAP),
-						new CPre(zbx_nl2br($value))
+						new CPre($value)
 					]);
 				}
 
@@ -506,7 +514,9 @@ class CScreenHistory extends CScreenBase {
 							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 						}
 
-						$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
+						$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+							? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+							: CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 
 						$row[] = ($value === '') ? '' : new CPre($value);
 					}

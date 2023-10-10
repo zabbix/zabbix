@@ -50,9 +50,9 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_High',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
+						'Trigger' => '',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
@@ -67,9 +67,9 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
+						'Trigger' => '',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
@@ -107,10 +107,9 @@ class testPageTriggerUrl extends CWebTest {
 	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
-		// Add 'Acknowledge' menu link to data provider.
-		$array = $data['links'];
-		array_shift($array);
-		$data['links'] = ['Problems' => $data['links']['Problems'],	'Update problem' => ''] + $array;
+		// Add 'Update problem' menu link to data provider.
+		$data['links'] = array_slice($data['links'], 0, 2, true) + ['Update problem' => ''] +
+				array_slice($data['links'], 2, count($data['links']) - 2, true);
 
 		// Remove 'cause and symptoms' from data provider.
 		unset($data['links']['Mark as cause']);
@@ -125,7 +124,7 @@ class testPageTriggerUrl extends CWebTest {
 
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
-		$this->checkTriggerUrl($data, ['VIEW', 'CONFIGURATION', 'LINKS']);
+		$this->checkTriggerUrl($data, ['VIEW', 'ACTIONS', 'CONFIGURATION', 'LINKS']);
 	}
 
 	/**

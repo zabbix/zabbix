@@ -87,22 +87,19 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[post_type]', 'post_type_container', _('Original')))
 			->setLabel(_('Request body type')),
-		(new CDiv(
-			(new CRadioButtonList('post_type', (int) DB::getDefault('items', 'post_type')))
-				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
-				->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
-				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
-				->setModern(true)
-		))->setId('post_type_container')
-	)
-	->addRow(
-		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))->setLabel(_('Timeout')),
-		(new CTextBox('timeout', DB::getDefault('items', 'timeout')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CRadioButtonList('post_type', (int) DB::getDefault('items', 'post_type')))
+			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
+			->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
+			->addValue(_('XML data'), ZBX_POSTTYPE_XML)
+			->setId('post_type_container')
+			->setModern(true)
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request body.
 	->addRow(
 		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))->setLabel(_('Request body')),
-		(new CTextArea('posts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('posts', ''))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append ITEM_TYPE_HTTPAGENT Headers fields.
@@ -119,9 +116,7 @@ $item_form_list
 				->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 				->setFooter(new CRow(
 					(new CCol(
-						(new CButton(null, _('Add')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->setAttribute('data-row-action', 'add_row')
+						(new CButtonLink(_('Add')))->setAttribute('data-row-action', 'add_row')
 					))->setColSpan(5)
 				)),
 			(new CTag('script', true))
@@ -129,12 +124,10 @@ $item_form_list
 				->addItem(new CRow([
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-					(new CButton(null, _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-row-action', 'remove_row')
+					(new CButtonLink(_('Remove')))->setAttribute('data-row-action', 'remove_row')
 				])),
 			$headers
 		]))
@@ -155,7 +148,8 @@ $item_form_list
 				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 				ITEM_VALUE_TYPE_STR => _('Character'),
 				ITEM_VALUE_TYPE_LOG => _('Log'),
-				ITEM_VALUE_TYPE_TEXT => _('Text')
+				ITEM_VALUE_TYPE_TEXT => _('Text'),
+				ITEM_VALUE_TYPE_BINARY => _('Binary')
 			]))
 	)
 	// Append units to form list.
@@ -179,7 +173,7 @@ $item_form_list
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setLabel(_('User name')),
 		(new CTextBox('username', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	)
 	// Append publickey to form list.
@@ -196,7 +190,7 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))->setLabel(_('Password')),
 		(new CTextBox('password', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	);
 
@@ -205,17 +199,16 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
-			->setLabel(_('Preprocessing steps')),
-		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))
-			->setId('preprocessing_div')
+			->setLabel([
+				_('Preprocessing steps'),
+				makeHelpIcon([
+					_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
+					BR(), BR(),
+					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
+				])
+			]),
+		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))->setId('preprocessing_div')
 	);
-
-// Prepare Update interval for form list.
-$update_interval = (new CTable())
-	->setId('update_interval')
-	->addRow([_('Delay'),
-		(new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
-	]);
 
 $custom_intervals = (new CTable())
 	->setId('custom_intervals')
@@ -269,19 +262,42 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$update_interval->addRow(
-	(new CRow([
-		(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
-		new CCol($custom_intervals)
-	]))
-);
+// Prepare Update interval for form list.
+$update_interval = (new CTable())
+	->setId('update_interval')
+	->addRow([
+		_('Delay'),
+		new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
+	])
+	->addRow(
+		(new CRow([
+			(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
+			new CCol($custom_intervals)
+		]))
+	);
 
 // Append update interval to form list.
 $item_form_list
 	// Append delay to form list.
 	->addRow(
-		(new CVisibilityBox('visible[delay]', 'update_interval_div', _('Original')))->setLabel(_('Update interval')),
-		(new CDiv($update_interval))->setId('update_interval_div')
+		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
+		$update_interval
+	)
+	// Append timeout to form list.
+	->addRow(
+		(new CVisibilityBox('visible[timeout]', 'timeout-field', _('Original')))->setLabel(_('Timeout')),
+		(new CDiv([
+			(new CRadioButtonList('custom_timeout', ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED))
+				->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+				->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('timeout', DB::getDefault('items', 'timeout')))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))
+			->setId('timeout-field')
+			->addClass('wrap-multiple-controls')
 	)
 	// Append history to form list.
 	->addRow(

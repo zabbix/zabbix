@@ -12,6 +12,11 @@
             <uuid>17ecce4a1f2b4d739586ad1d6e717812</uuid>
             <template>bbbtmpl</template>
             <name>bbbtmpl</name>
+            <templates>
+                <template>
+                    <name>SampleTemplate</name>
+                </template>
+            </templates>
             <groups>
                 <group>
                     <name>TmplTests</name>

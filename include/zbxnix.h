@@ -119,6 +119,8 @@ void	zbx_unblock_signals(const sigset_t *orig_mask);
 
 void	zbx_set_exit_on_terminate(void);
 void	zbx_unset_exit_on_terminate(void);
+
+void	zbx_log_exit_signal(void);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);

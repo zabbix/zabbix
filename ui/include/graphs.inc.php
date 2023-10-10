@@ -156,135 +156,220 @@ function getGraphByGraphId($graphId) {
 }
 
 /**
- * Get data for displaying parent graph of given graphs.
+ * Get parent templates for each given graph.
  *
- * @param array $graphs
- * @param bool  $allowed_ui_conf_templates
+ * @param $array $graphs                  An array of graphs.
+ * @param string $graphs[]['graphid']     ID of a graph.
+ * @param string $graphs[]['templateid']  ID of parent template graph.
+ * @param int    $flag                    Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or
+ *                                        ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return array
  */
-function getParentGraphs(array $graphs, bool $allowed_ui_conf_templates): array {
-	$parent_graphs = [];
+function getGraphParentTemplates(array $graphs, $flag) {
+	$parent_graphids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
 
 	foreach ($graphs as $graph) {
 		if ($graph['templateid'] != 0) {
-			$parent_graphs[$graph['templateid']] = true;
+			$parent_graphids[$graph['templateid']] = true;
+			$data['links'][$graph['graphid']] = ['graphid' => $graph['templateid']];
 		}
 	}
 
-	if (!$parent_graphs) {
-		return [];
+	if (!$parent_graphids) {
+		return $data;
 	}
 
-	$db_graphs = API::Graph()->get([
-		'output' => [],
-		'selectHosts' => ['hostid', 'name'],
-		'graphids' => array_keys($parent_graphs),
-		'preservekeys' => true
-	]);
-
-	if ($allowed_ui_conf_templates && $db_graphs) {
-		$editable_graphs = API::Graph()->get([
-			'output' => [],
-			'graphids' => array_keys($parent_graphs),
-			'editable' => true,
-			'preservekeys' => true
-		]);
+	$all_parent_graphids = [];
+	$hostids = [];
+	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$lld_ruleids = [];
 	}
 
-	foreach ($parent_graphs as $graphid => &$parent_graph) {
-		if (array_key_exists($graphid, $db_graphs)) {
-			if ($allowed_ui_conf_templates && array_key_exists($graphid, $editable_graphs)) {
-				$parent_graph = [
-					'editable' => true,
-					'template_name' => $db_graphs[$graphid]['hosts'][0]['name'],
-					'templateid' => $db_graphs[$graphid]['hosts'][0]['hostid']
-				];
-			}
-			else {
-				$parent_graph = [
-					'editable' => false,
-					'template_name' => $db_graphs[$graphid]['hosts'][0]['name']
-				];
-			}
+	do {
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$db_graphs = API::GraphPrototype()->get([
+				'output' => ['graphid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'graphids' => array_keys($parent_graphids)
+			]);
 		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$parent_graph = [
-				'editable' => false,
-				'template_name' => _('Inaccessible template')
-			];
+			$db_graphs = API::Graph()->get([
+				'output' => ['graphid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'graphids' => array_keys($parent_graphids)
+			]);
+		}
+
+		$all_parent_graphids += $parent_graphids;
+		$parent_graphids = [];
+
+		foreach ($db_graphs as $db_graph) {
+			$data['templates'][$db_graph['hosts'][0]['hostid']] = [];
+			$hostids[$db_graph['graphid']] = $db_graph['hosts'][0]['hostid'];
+
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']['itemid'];
+			}
+
+			if ($db_graph['templateid'] != 0) {
+				if (!array_key_exists($db_graph['templateid'], $all_parent_graphids)) {
+					$parent_graphids[$db_graph['templateid']] = true;
+				}
+
+				$data['links'][$db_graph['graphid']] = ['graphid' => $db_graph['templateid']];
+			}
+		}
+	}
+	while ($parent_graphids);
+
+	foreach ($data['links'] as &$parent_graph) {
+		$parent_graph['hostid'] = array_key_exists($parent_graph['graphid'], $hostids)
+			? $hostids[$parent_graph['graphid']]
+			: 0;
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$parent_graph['lld_ruleid'] = array_key_exists($parent_graph['graphid'], $lld_ruleids)
+				? $lld_ruleids[$parent_graph['graphid']]
+				: 0;
 		}
 	}
 	unset($parent_graph);
 
-	return $parent_graphs;
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
 }
 
 /**
- * Get data for displaying parent graph prototypes of given graph prototypes.
+ * Returns a template prefix for selected graph.
  *
- * @param array $graphs
- * @param bool  $allowed_ui_conf_templates
+ * @param string $graphid
+ * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
+ * @param int    $flag              Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ *
+ * @return array|null
+ */
+function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool $provide_links) {
+	if (!array_key_exists($graphid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$graphid]['graphid'], $parent_templates['links'])) {
+		$graphid = $parent_templates['links'][$graphid]['graphid'];
+	}
+
+	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
+
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+		$url = (new CUrl('graphs.php'))->setArgument('context', 'template');
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$url
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$template['hostid']]);
+		}
+
+		$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
+	}
+	else {
+		$name = new CSpan($template['name']);
+	}
+
+	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+}
+
+/**
+ * Returns a list of graph templates.
+ *
+ * @param string $graphid
+ * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
+ * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function getParentGraphPrototypes(array $graphs, bool $allowed_ui_conf_templates): array {
-	$parent_graphs = [];
+function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $provide_links) {
+	$list = [];
 
-	foreach ($graphs as $graph) {
-		if ($graph['templateid'] != 0) {
-			$parent_graphs[$graph['templateid']] = [];
-		}
-	}
+	while (array_key_exists($graphid, $parent_templates['links'])) {
+		$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
-	if (!$parent_graphs) {
-		return [];
-	}
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+			$url = (new CUrl('graphs.php'))
+				->setArgument('form', 'update')
+				->setArgument('context', 'template');
 
-	$db_graphs = API::GraphPrototype()->get([
-		'output' => [],
-		'selectHosts' => ['hostid', 'name'],
-		'graphids' => array_keys($parent_graphs),
-		'preservekeys' => true
-	]);
-
-	if ($allowed_ui_conf_templates && $db_graphs) {
-		$editable_graphs = API::GraphPrototype()->get([
-			'output' => [],
-			'selectDiscoveryRule' => ['itemid'],
-			'editable' => true,
-			'graphids' => array_keys($parent_graphs),
-			'preservekeys' => true
-		]);
-	}
-
-	foreach ($parent_graphs as $graphid => &$parent_graph) {
-		if (array_key_exists($graphid, $db_graphs)) {
-			if ($allowed_ui_conf_templates && array_key_exists($graphid, $editable_graphs)) {
-				$parent_graph = [
-					'editable' => true,
-					'template_name' => $db_graphs[$graphid]['hosts'][0]['name'],
-					'templateid' => $db_graphs[$graphid]['hosts'][0]['hostid'],
-					'ruleid' => $editable_graphs[$graphid]['discoveryRule']['itemid']
-				];
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
 			}
-			else {
-				$parent_graph = [
-					'editable' => false,
-					'template_name' => $db_graphs[$graphid]['hosts'][0]['name']
-				];
+
+			$url->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
+
+			if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
+				$url->setArgument('hostid', $template['hostid']);
 			}
+
+			$name = new CLink($template['name'], $url);
 		}
 		else {
-			$parent_graph = [
-				'editable' => false,
-				'template_name' => _('Inaccessible template')
-			];
+			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
-	}
-	unset($parent_graph);
 
-	return $parent_graphs;
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
+
+		$graphid = $parent_templates['links'][$graphid]['graphid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 /**
@@ -341,60 +426,6 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 	}
 
 	return $result;
-}
-
-/**
- * Copy specified graph to specified host.
- *
- * @param string $graphid
- * @param string $hostid
- *
- * @return array
- */
-function copyGraphToHost($graphid, $hostid) {
-	$graphs = API::Graph()->get([
-		'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period', 'show_triggers',
-			'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type', 'ymax_type',
-			'ymin_itemid', 'ymax_itemid'
-		],
-		'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-		'selectHosts' => ['hostid', 'name'],
-		'graphids' => $graphid
-	]);
-	$graph = reset($graphs);
-	$host = reset($graph['hosts']);
-
-	if ($host['hostid'] == $hostid) {
-		error(_s('Graph "%1$s" already exists on "%2$s".', $graph['name'], $host['name']));
-
-		return false;
-	}
-
-	$graph['gitems'] = getSameGraphItemsForHost(
-		$graph['gitems'],
-		$hostid,
-		true,
-		[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-	);
-
-	if (!$graph['gitems']) {
-		$host = get_host_by_hostid($hostid);
-
-		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
-
-		return false;
-	}
-
-	// retrieve actual ymax_itemid and ymin_itemid
-	if ($graph['ymax_itemid'] && $itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
-		$graph['ymax_itemid'] = $itemid;
-	}
-
-	if ($graph['ymin_itemid'] && $itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
-		$graph['ymin_itemid'] = $itemid;
-	}
-
-	return API::Graph()->create($graph);
 }
 
 function get_next_color($palettetype = 0) {
@@ -464,6 +495,7 @@ function get_next_color($palettetype = 0) {
 function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 	$x = (int) $x;
 	$y = (int) $y;
+	$string = strtr($string, ['&' => '&#38;']);
 
 	if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
@@ -505,6 +537,8 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
  * @return array
  */
 function imageTextSize($fontsize, $angle, $string) {
+	$string = strtr($string, ['&' => '&#38;']);
+
 	if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 	}
@@ -736,8 +770,8 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 	];
 
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
-		$clearance_min = $rows * 0.05;
-		$clearance_max = $rows * 0.1;
+		$clearance_min = min(0.5, $rows * 0.05);
+		$clearance_max = min(1, $rows * 0.1);
 
 		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
 			if ($interval == INF) {
@@ -766,6 +800,10 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 			$min = truncateFloat($min);
 			$max = truncateFloat($max);
 
+			if (is_infinite($min) || is_infinite($max)) {
+				break;
+			}
+
 			if ($min > $scale_min || $max < $scale_max) {
 				continue;
 			}
@@ -786,6 +824,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 				'power' => $power
 			];
 
+			// Expression optimized to avoid overflow.
 			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
 
 			if ($best_result_value === null || $result_value < $best_result_value) {

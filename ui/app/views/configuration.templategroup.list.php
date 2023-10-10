@@ -28,6 +28,7 @@ $this->includeJsFile('configuration.templategroup.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Template groups'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATE_GROUPS_LIST))
 	->setControls((new CTag('nav', true, (new CList())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
 			? (new CSimpleButton(_('Create template group')))
@@ -82,7 +83,7 @@ foreach ($data['groups'] as $group) {
 		$n++;
 
 		if ($n > $data['config']['max_in_table']) {
-			$templates_output[] = ' &hellip;';
+			$templates_output[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -92,9 +93,9 @@ foreach ($data['groups'] as $group) {
 		}
 
 		if ($data['allowed_ui_conf_templates']) {
-			$templates_output[] = (new CLink($template['name'], (new CUrl('templates.php'))
-				->setArgument('form', 'update')
-				->setArgument('templateid', $template['templateid'])))
+			$templates_output[] = (new CLink($template['name']))
+				->addClass('js-edit-template')
+				->setAttribute('data-templateid', $template['templateid'])
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
@@ -105,7 +106,7 @@ foreach ($data['groups'] as $group) {
 
 	$template_count = $data['groupCounts'][$group['groupid']]['templates'];
 
-	$name = (new CLink(CHtml::encode($group['name']),
+	$name = (new CLink($group['name'],
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'templategroup.edit')
 			->setArgument('groupid', $group['groupid'])
@@ -116,7 +117,8 @@ foreach ($data['groups'] as $group) {
 	$count = '';
 	if ($template_count > 0) {
 		if ($data['allowed_ui_conf_templates']) {
-			$count = new CLink($template_count, (new CUrl('templates.php'))
+			$count = new CLink($template_count, (new CUrl('zabbix.php'))
+				->setArgument('action', 'template.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_groups', [$group['groupid']]));
 		}
@@ -124,7 +126,7 @@ foreach ($data['groups'] as $group) {
 			$count = new CSpan($template_count);
 		}
 
-		$count->addClass(ZBX_STYLE_ICON_COUNT);
+		$count->addClass(ZBX_STYLE_ENTITY_COUNT);
 	}
 
 	$table->addRow([
@@ -143,7 +145,7 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-templategroup')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'templategroup')
 ]);

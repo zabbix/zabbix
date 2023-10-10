@@ -26,60 +26,49 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\{
-	CWidgetFieldColumnsList,
-	CWidgetFieldSelect
-};
+$form = new CWidgetFormView($data);
 
-$form = (new CWidgetFormView($data));
+$groupids = array_key_exists('groupids', $data['fields'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
+	: null;
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
-	$data['captions']['ms']['groups']['groupids']
-);
+$column = $form->registerField(new CWidgetFieldSelectView($data['fields']['column']));
 
 $form
 	->addField($groupids)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+	->addField(array_key_exists('hostids', $data['fields'])
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+		: null
+	)
+	->addField(array_key_exists('evaltype', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+		: null
+	)
+	->addField(array_key_exists('tags', $data['fields'])
+		? new CWidgetFieldTagsView($data['fields']['tags'])
+		: null
 	)
 	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
 	)
 	->addField(
-		new CWidgetFieldTagsView($data['fields']['tags'])
-	)
-	->addItem(
-		getColumnsField($form, $data['fields']['columns'])
+		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['order'])
 	)
-	->addItem(
-		getColumnField($form, $data['fields']['column'])
-	)
-	->addField(
-		new CWidgetFieldIntegerBoxView($data['fields']['count'])
+	->addItem([
+		$column->getLabel(),
+		(new CFormField($data['fields']['column']->getValues() ? $column->getView() : _('Add a column')))
+			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
+	])
+	->addField(array_key_exists('show_lines', $data['fields'])
+		? new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
+		: null
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_tophosts_form.init();')
+	->addJavaScript('widget_tophosts_form.init('.json_encode([
+		'templateid' => $data['templateid']
+	], JSON_THROW_ON_ERROR).');')
 	->show();
-
-function getColumnsField(CWidgetFormView $form, CWidgetFieldColumnsList $field): array {
-	$columns = new CWidgetFieldColumnsListView($field);
-
-	return $form->makeCustomField($columns, [
-		$columns->getLabel(),
-		(new CFormField($columns->getView()))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	]);
-}
-
-function getColumnField(CWidgetFormView $form, CWidgetFieldSelect $field): array {
-	$column = new CWidgetFieldSelectView($field);
-
-	return $form->makeCustomField($column, [
-		$column->getLabel(),
-		(new CFormField($field->getValues() ? $column->getView() : _('Add item column')))
-			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
-	]);
-}

@@ -18,8 +18,6 @@
 **/
 
 var CDate = function () {
-	this.tmpDate = new Date();
-
 	this.clientDate = (arguments.length > 0)
 		? new Date(arguments[0])
 		: new Date();
@@ -32,26 +30,21 @@ CDate.prototype = {
 	tzDiff:		0,			// server and client TZ diff
 	clientDate:	null,	// clients(JS, Browser) date object
 	serverDate:	null,	// servers(PHP, Unix) date object
-	tmpDate:	null,		// inner usage
 
 	calcTZdiff: function(time) {
-		var ddTZOffset;
-
-		if (typeof(time) != 'undefined') {
-			this.tmpDate.setTime(time);
-			ddTZOffset = this.tmpDate.getTimezoneOffset() * -60;
-		}
-		else {
-			ddTZOffset = this.serverDate.getTimezoneOffset() * -60;
+		if (time === undefined) {
+			time = new Date().getTime();
 		}
 
-		this.tzDiff = ddTZOffset - PHP_TZ_OFFSET;
+		const timestamp = Object.keys(PHP_TZ_OFFSETS).reverse().find((ts) => ts * 1000 <= time);
+
+		this.tzDiff = this.clientDate.getTimezoneOffset() * -60 - PHP_TZ_OFFSETS[timestamp];
 	},
 
 	/**
 	* Formats date according given format. Uses server timezone.
-	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d', 'H:i:s', 'H:i',
-	*						'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i' and 'd m Y H i'
+	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d h:i:s A',
+	*						'Y-m-d','H:i:s', 'H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i' and 'd m Y H i'
 	*						Format 'd m Y H i' is also accepted but used internally for date input fields.
 	*
 	* @param format PHP style date format limited to supported formats
@@ -59,14 +52,16 @@ CDate.prototype = {
 	* @return string|bool human readable date or false if unsupported format given
 	*/
 	format: function(format) {
-		var shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		const shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-		var dt = this.getDate(),
-			mnth = this.getMonth(),
-			yr = this.getFullYear(),
-			hrs = this.getHours(),
-			mnts = this.getMinutes(),
-			sec = this.getSeconds();
+		const dt = this.getDate();
+		const mnth = this.getMonth();
+		const yr = this.getFullYear();
+		const hrs = this.getHours();
+		const mnts = this.getMinutes();
+		const sec = this.getSeconds();
+		const ampm = (hrs < 12) ? 'AM' : 'PM';
+		const ampmhrs = appendZero((hrs + 11) % 12 + 1);
 
 		/**
 		 * Append date suffix according to English rules e.g., 3 becomes 3rd.
@@ -75,7 +70,7 @@ CDate.prototype = {
 		 *
 		 * @return string
 		 */
-		var appSfx = function(date) {
+		const appSfx = function(date) {
 			if (date % 10 == 1 && date != 11) {
 				return date + 'st';
 			}
@@ -106,9 +101,8 @@ CDate.prototype = {
 			case 'H:i':
 				return  appendZero(hrs) + ':' + appendZero(mnts);
 			case 'M jS, Y h:i A':
-				var ampm = (hrs < 12) ? 'AM' : 'PM';
-				hrs = appendZero((hrs + 11) % 12 + 1);
-				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + hrs + ':' + appendZero(mnts) + ' ' + ampm;
+				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + ampmhrs + ':' + appendZero(mnts) + ' ' +
+					ampm;
 			case 'Y M d H:i':
 				return  yr + ' ' + shortMn[mnth] + ' ' +appendZero(dt) + ' ' + appendZero(hrs) + ':' + appendZero(mnts);
 			case 'd.m.Y H:i':
@@ -121,6 +115,9 @@ CDate.prototype = {
 			case 'd m Y H i':
 				return appendZero(dt) + ' ' + appendZero(mnth + 1) + ' ' + yr + ' ' + appendZero(hrs) + ' ' +
 					appendZero(mnts);
+			case 'Y-m-d h:i:s A':
+				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + ampmhrs + ':' +
+					appendZero(mnts) + ':' + appendZero(sec) + ' ' + ampm;
 			default:
 				// defaults to Y-m-d H:i:s
 				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + appendZero(hrs) + ':' +
@@ -159,14 +156,6 @@ CDate.prototype = {
 		return this.getTime();
 	},
 
-	getFormattedDate: function() {
-		var fDate = this.getFullYear() + '-' + (this.getMonth() + 1) + '-' + this.getDate();
-		fDate += ' ' + this.getHours() + ':' + this.getMinutes() + ':' + this.getSeconds();
-		fDate += ' ' + tzOffsetHours + ':' + this.tzOffset / 3600;
-
-		return fDate;
-	},
-
 	toString: function() {
 		return this.serverDate.toString();
 	},
@@ -177,10 +166,6 @@ CDate.prototype = {
 		this.calcTZdiff();
 
 		return this.getTime();
-	},
-
-	getTimezoneOffset: function() {
-		return parseInt(-PHP_TZ_OFFSET / 60);
 	},
 
 	getMilliseconds: function() {
@@ -295,10 +280,9 @@ CDate.prototype = {
 
 	setTime: function(arg) {
 		arg = parseInt(arg, 10);
-
 		this.server = 0;
+		this.clientDate.setTime(arg);
 		this.calcTZdiff(arg);
 		this.serverDate.setTime(arg - this.tzDiff * 1000);
-		this.clientDate.setTime(arg);
 	}
 };
