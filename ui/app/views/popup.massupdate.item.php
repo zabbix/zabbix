@@ -343,11 +343,11 @@ $item_form_list->addRow(
 // Append value map select when only one host or template is selected.
 if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data['discovered_host'])) {
 	$item_form_list->addRow(
-		(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
+		(new CVisibilityBox('visible[valuemapid]', 'valuemapid-field', _('Original')))->setLabel(_('Value mapping')),
 		(new CMultiSelect([
 			'name' => 'valuemapid',
 			'object_name' => 'valuemaps',
-			'container_id' => 'valuemapid_div',
+			'id' => 'valuemapid-field',
 			'multiple' => false,
 			'data' => [],
 			'popup' => [
@@ -381,11 +381,12 @@ $item_form_list->addRow(
 if ($data['single_host_selected']) {
 	if (!$data['prototype']) {
 		$item_form_list->addRow(
-			(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
+			(new CVisibilityBox('visible[master_itemid]', 'master-item-field', _('Original')))
+				->setLabel(_('Master item')),
 			(new CMultiSelect([
 				'name' => 'master_itemid',
 				'object_name' => 'items',
-				'container_id' => 'master_item',
+				'id' => 'master-item-field',
 				'multiple' => false,
 				'data' => [],
 				'popup' => [
@@ -401,57 +402,54 @@ if ($data['single_host_selected']) {
 				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(true)
+				->setAriaRequired()
 		);
 	}
 	else {
-		$master_item = [
-			(new CTextBox('master_itemname', '', true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(),
-			(new CVar('master_itemid', '', 'master_itemid'))
-		];
-
-		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$master_item[] = (new CButton('button', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->removeId()
-			->onClick(
-				'return PopUp("popup.generic", '.json_encode([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'only_hostid' => $data['hostid'],
-					'with_webitems' => 1,
-					'normal_only' => 1
-				]).', {dialogue_class: "modal-popup-generic"});'
-			);
-
-		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$master_item[] = (new CButton('button', _('Select prototype')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->removeId()
-			->onClick(
-				'return PopUp("popup.generic", '.json_encode([
-					'srctbl' => 'item_prototypes',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'parent_discoveryid' => $data['parent_discoveryid']
-				]).', {dialogue_class: "modal-popup-generic"});'
-			);
-
 		$item_form_list->addRow(
-			(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
+			(new CVisibilityBox('visible[master_itemid]', 'master-item-field', _('Original')))
+				->setLabel(_('Master item')),
 			(new CDiv([
 				(new CVar('master_itemname')),
-				$master_item
-			]))->setId('master_item')
+				[
+					(new CTextBox('master_itemname', '', true))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired(),
+					(new CVar('master_itemid', '', 'master_itemid')),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('button', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->removeId()
+						->onClick(
+							'return PopUp("popup.generic", '.json_encode([
+								'srctbl' => 'items',
+								'srcfld1' => 'itemid',
+								'srcfld2' => 'name',
+								'dstfrm' => $form->getName(),
+								'dstfld1' => 'master_itemid',
+								'dstfld2' => 'master_itemname',
+								'only_hostid' => $data['hostid'],
+								'with_webitems' => 1,
+								'normal_only' => 1
+							]).', {dialogue_class: "modal-popup-generic"});'
+						),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('button', _('Select prototype')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->removeId()
+						->onClick(
+							'return PopUp("popup.generic", '.json_encode([
+								'srctbl' => 'item_prototypes',
+								'srcfld1' => 'itemid',
+								'srcfld2' => 'name',
+								'dstfrm' => $form->getName(),
+								'dstfld1' => 'master_itemid',
+								'dstfld2' => 'master_itemname',
+								'parent_discoveryid' => $data['parent_discoveryid']
+							]).', {dialogue_class: "modal-popup-generic"});'
+						)
+				]
+			]))->setId('master-item-field')
 		);
 	}
 }

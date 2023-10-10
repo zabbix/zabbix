@@ -232,27 +232,26 @@ $operations_popup_form_list
 		'opseverity_row'
 	)
 	->addRow(
-		(new CVisibilityBox('visible[optemplate]', 'optemplate_div', _('Original')))
+		(new CVisibilityBox('visible[optemplate]', 'optemplate-field', _('Original')))
 			->setLabel(_('Link templates'))
 			->setChecked(array_key_exists('optemplate', $options))
 			->setReadonly($options['templated']),
-		(new CDiv([
-			(new CMultiSelect([
-				'name' => 'optemplate[]',
-				'object_name' => 'templates',
-				'data' => $field_values['optemplate'],
-				'disabled' => (bool) $options['templated'],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'templates',
-						'srcfld1' => 'hostid',
-						'srcfld2' => 'host',
-						'dstfrm' => 'lldoperation_form',
-						'dstfld1' => 'optemplate_'
-					]
+		(new CMultiSelect([
+			'name' => 'optemplate[]',
+			'object_name' => 'templates',
+			'id' => 'optemplate-field',
+			'data' => $field_values['optemplate'],
+			'disabled' => (bool) $options['templated'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'srcfld2' => 'host',
+					'dstfrm' => 'lldoperation_form',
+					'dstfld1' => 'optemplate_'
 				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('optemplate_div'),
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'optemplate_row'
 	)
 	->addRow(
