@@ -21,6 +21,11 @@
 
 class Actions {
 
+	/**
+	 * Create data for all Actions related tests (also used in Media types, Reports and Services tests, etc).
+	 *
+	 * @return array
+	 */
 	public static function load() {
 		CDataHelper::call('action.create', [
 			// Service action.
