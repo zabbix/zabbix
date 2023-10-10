@@ -32,6 +32,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'context'				=> 'required|in host,template',
 			'parent_discoveryid'	=> 'id',
 			'itemid'				=> 'id',
+			'master_itemid'			=> 'id',
 			'clone'					=> 'in 1'
 		];
 		$ret = $this->validateInput($fields);
@@ -224,6 +225,20 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		if (!$item) {
 			$item = CItemPrototypeHelper::getDefaults();
 			$item['parent_discoveryid'] = $this->getInput('parent_discoveryid');
+
+			if ($this->hasInput('master_itemid')) {
+				$item['type'] = ITEM_TYPE_DEPENDENT;
+				$master_item = API::ItemPrototype()->get([
+					'output' => ['itemid', 'name'],
+					'itemids' => [$this->getInput('master_itemid')],
+					'discoveryids' => [$this->getInput('parent_discoveryid')]
+				]);
+
+				if ($master_item) {
+					$item['master_itemid'] = $this->getInput('master_itemid');
+					$item['master_item'] =  reset($master_item);
+				}
+			}
 		}
 
 		$item['context'] = $this->getInput('context');

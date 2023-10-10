@@ -29,10 +29,11 @@ class CControllerItemEdit extends CControllerItem {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context'	=> 'required|in host,template',
-			'hostid'	=> 'id',
-			'itemid'	=> 'id',
-			'clone'		=> 'in 1'
+			'context'		=> 'required|in host,template',
+			'hostid'		=> 'id',
+			'itemid'		=> 'id',
+			'master_itemid'	=> 'id',
+			'clone'			=> 'in 1'
 		];
 		$ret = $this->validateInput($fields);
 
@@ -234,6 +235,21 @@ class CControllerItemEdit extends CControllerItem {
 
 		if (!$item) {
 			$item = CItemHelper::getDefaults();
+			$item['hostid'] = $this->getInput('hostid');
+
+			if ($this->hasInput('master_itemid')) {
+				$item['type'] = ITEM_TYPE_DEPENDENT;
+				$master_item = API::Item()->get([
+					'output' => ['itemid', 'name'],
+					'itemids' => [$this->getInput('master_itemid')],
+					'hostids' => [$this->getInput('hostid')]
+				]);
+
+				if ($master_item) {
+					$item['master_itemid'] = $this->getInput('master_itemid');
+					$item['master_item'] =  reset($master_item);
+				}
+			}
 		}
 
 		$item['context'] = $this->getInput('context');
