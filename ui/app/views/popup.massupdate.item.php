@@ -198,7 +198,7 @@ $item_form_list
 $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
-		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-div', _('Original')))
 			->setLabel([
 				_('Preprocessing steps'),
 				makeHelpIcon([
@@ -212,9 +212,9 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 				->addValue(_('Replace'), 0)
 				->addValue(_('Remove all'), 1)
 				->setModern(true)
-				->addStyle('margin-bottom: 10px;'),
-			getItemPreprocessing([], false, $data['preprocessing_types'], true)
-		]))->setId('preprocessing_div')
+				->addClass('before-table'),
+			getItemPreprocessing([], false, $data['preprocessing_types'])
+		]))->setId('preprocessing-div')
 	);
 
 $custom_intervals = (new CTable())
@@ -501,7 +501,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
 				->setModern(true)
-				->addStyle('margin-bottom: 10px;'),
+				->addClass('before-table'),
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass('tags-table')

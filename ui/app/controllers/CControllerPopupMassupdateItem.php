@@ -195,7 +195,7 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 
 			if (array_key_exists('preprocessing', $input)) {
-				$input['preprocessing'] = $this->getInput('mass_update_preprocessing', 0)
+				$input['preprocessing'] = $this->getInput('mass_update_preprocessing', 0) == 1
 					? []
 					: normalizeItemPreprocessingSteps($input['preprocessing']);
 			}

@@ -168,11 +168,20 @@
 	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
 })();
 
-document.getElementById('mass_update_preprocessing_1').addEventListener('click', (event) => {
+document.getElementById('mass_update_preprocessing_1').addEventListener('click', () => {
 	document.getElementById('preprocessing').style.display = "none";
 })
 
-document.getElementById('mass_update_preprocessing_0').addEventListener('click', (event) => {
+document.getElementById('mass_update_preprocessing_0').addEventListener('click', () => {
 	document.getElementById('preprocessing').style.display = "";
 })
+
+document.querySelector('#visible_preprocessing').addEventListener('change', () => {
+	const preprocessing = $('#preprocessing');
+	const preprocessing_step_count = preprocessing.find('li.sortable').length;
+
+	if (preprocessing_step_count == 0) {
+		preprocessing.find('.element-table-add').click();
+	}
+});
 </script>

@@ -419,7 +419,7 @@
 		var $preprocessing = $('#preprocessing');
 
 		if ($preprocessing.length === 0) {
-			const prep_elem = document.querySelector('#preprocessing_div');
+			const prep_elem = document.querySelector('#preprocessing-div');
 
 			if (!prep_elem) {
 				return false;
@@ -464,6 +464,7 @@
 					sortorder: sortable_count++
 				}));
 				const type = $('z-select[name*="type"]', $row).val();
+				const massupdate_form = document.getElementById('massupdate-form');
 
 				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
@@ -476,9 +477,13 @@
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>')
 						.addClass('<?= ZBX_STYLE_DISABLED ?>');
+
+					if (massupdate_form !== null) {
+						$preprocessing.find('button.btn-link.element-table-remove').attr('disabled', 'disabled');
+					}
 				}
 				else if (sortable_count > 1) {
-					if (document.getElementById('massupdate-form') !== null) {
+					if (massupdate_form !== null) {
 						$preprocessing.find('li.sortable').each(function() {
 							$(this).find('button.btn-link.element-table-remove').removeAttr('disabled');
 						})
