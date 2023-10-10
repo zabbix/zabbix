@@ -77,7 +77,9 @@ Set filters with macros if you want to override default filter parameters.
 |{$MERAKI.TOKEN}|<p>Cisco Meraki dashboard API token.</p>||
 |{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
 |{$MERAKI.LICENSE.EXPIRE}|<p>Time in seconds for license to expire.</p>|`86400`|
-|{$MERAKI.CONFIG.CHANGE.TIMESPAN}|<p>Timespan for gathering configuration change log. Used in the metric configuration and in the URL query.</p>|`1200`|
+|{$MERAKI.VPN.LOSS.PERCENTIL}|<p>Average VPN connection loss percentage. Used in the trigger expression</p>|`90`|
+|{$MERAKI.CONFIG.CHANGE.TIMESPAN}|<p>Timespan in seconds for gathering configuration change log. Used in the metric configuration and in the URL query.</p>|`1200`|
+|{$MERAKI.VPN.STATS.TIMESPAN}|<p>Timespan in seconds for get organization appliance VPN stats. Used in the metric configuration and in the JavaScript api query. Must be between 1 and 86400 seconds.</p>|`180`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p>||
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
@@ -163,6 +165,12 @@ Set filters with macros if you want to override default filter parameters.
 |VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: mos min|<p>VPN connection mos min.</p>|Dependent item|meraki.vpn.stat.mos.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.minMos`</p></li></ul>|
 |VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: mos max|<p>VPN connection mos max.</p>|Dependent item|meraki.vpn.stat.mos.max[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxMos`</p></li></ul>|
 
+### Trigger prototypes for VPN stats discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: High average VPN connection loss (over >= {$MERAKI.VPN.LOSS.PERCENTIL%)||`count(/Cisco Meraki organization by HTTP/meraki.vpn.stat.loss.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}],#3,,"{$MERAKI.VPN.LOSS.PERCENTIL}")>=3`|Average||
+
 # Cisco Meraki device by HTTP
 
 ### Macros used
@@ -174,6 +182,7 @@ Set filters with macros if you want to override default filter parameters.
 |{$MERAKI.DEVICE.LOSS}|<p>Devices uplink loss threshold, in percents.</p>|`15`|
 |{$MERAKI.DEVICE.LATENCY}|<p>Devices uplink latency threshold, in seconds.</p>|`0.15`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p>||
+|{$MERAKI.UPLINK.LL.TIMESPAN}|<p>Timespan in seconds for get device uplinks loss and quality stats. Used in the metric configuration and in the JavaScript api query. Must be between 1 and 86400 seconds.</p>|`180`|
 |{$MERAKI.DEVICE.UPLINK.MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`^null$`|
 |{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`^((25[0-5]\|(2[0-4]\|1\d\|[1-9]\|)\d)\.?\b){4}$`|

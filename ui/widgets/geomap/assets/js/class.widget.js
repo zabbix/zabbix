@@ -111,7 +111,7 @@ class CWidgetGeoMap extends CWidget {
 			position: 'topright',
 			checked: config.filter.severity,
 			severity_levels: this._severity_levels,
-			disabled: !this._widgetid
+			disabled: this.isEditMode()
 		}).addTo(this._map);
 
 		// Navigate home btn.
@@ -529,5 +529,10 @@ class CWidgetGeoMap extends CWidget {
 				shadowAnchor: [13, 40]
 			});
 		}
+	}
+
+	onEdit() {
+		this._map.severityFilterControl.close();
+		this._map.severityFilterControl.disable();
 	}
 }

@@ -65,11 +65,9 @@ class CControllerTriggerCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if ($this->getInput('hostid') && !isWritableHostTemplates([$this->getInput('hostid')])) {
-			return false;
-		}
-
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	protected function doAction(): void {
@@ -87,8 +85,6 @@ class CControllerTriggerCreate extends CController {
 				unset($tags[$key]['type']);
 			}
 		}
-
-		CArrayHelper::sort($tags, ['tag', 'value']);
 
 		$trigger = [
 			'description' => $this->getInput('name'),

@@ -389,7 +389,7 @@ zabbix_export:
           name: 'Meraki: Get device data'
           type: SCRIPT
           key: meraki.get.device
-          delay: 3m
+          delay: '{$MERAKI.UPLINK.LL.TIMESPAN}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -405,6 +405,18 @@ zabbix_export:
                 error_msg = '',
                 device = [],
                 uplinksLL = [];
+            
+            function isFloat(n) {
+                n = parseFloat(n);
+                return Number(n) === n && n % 1 !== 0;
+            };
+            
+            function checkNumber(string) {
+                if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
+                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
+                }
+                return string;
+            };
             
             function getHttpData(url) {
                 response = request.get(url);
@@ -448,15 +460,21 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
+                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
                     request.setProxy(params.httpproxy);
                 }
             
+                timespan = checkNumber('{$MERAKI.UPLINK.LL.TIMESPAN}');
+            
+                if (timespan > 86400 || timespan < 1) {
+                    throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
+                }
+            
                 device = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses?serials[]=' + encodeURIComponent(params.serial));
-                uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
+                uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=' + timespan);
             
                 if (uplinksLL.length > 0) {
-                    uplinksLL = uplinksLL.filter(function(device) {
+                    uplinksLL = uplinksLL.filter(function (device) {
                         return device.serial == params.serial;
                     });
                 }
@@ -683,6 +701,9 @@ zabbix_export:
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
           description: 'Cisco Meraki dashboard API token.'
+        - macro: '{$MERAKI.UPLINK.LL.TIMESPAN}'
+          value: '180'
+          description: 'Timespan in seconds for get device uplinks loss and quality stats. Used in the metric configuration and in the JavaScript api query. Must be between 1 and 86400 seconds.'
       dashboards:
         - uuid: 76c4525eacc64f268572fefd76accc2f
           name: 'Meraki: General'
@@ -972,7 +993,7 @@ zabbix_export:
           name: 'Meraki: Get list of the VPN stats'
           type: SCRIPT
           key: meraki.get.vpn.stats
-          delay: 3m
+          delay: '{$MERAKI.VPN.STATS.TIMESPAN}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -988,6 +1009,18 @@ zabbix_export:
                 error_msg = '',
                 vpnStats = [],
                 result = [];
+            
+            function isFloat(n) {
+                n = parseFloat(n);
+                return Number(n) === n && n % 1 !== 0;
+            };
+            
+            function checkNumber(string) {
+                if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
+                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
+                }
+                return string;
+            };
             
             function getHttpData(url) {
                 response = request.get(url);
@@ -1035,7 +1068,13 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                vpnStats = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats');
+                timespan = checkNumber('{$MERAKI.VPN.STATS.TIMESPAN}');
+            
+                if (timespan > 86400 || timespan < 1) {
+                    throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
+                }
+            
+                vpnStats = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats?timespan=' + timespan);
             
                 for (i in vpnStats) {
                     if (typeof vpnStats[i].merakiVpnPeers !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers)) {
@@ -1421,6 +1460,7 @@ zabbix_export:
               key: 'meraki.vpn.stat.jitter.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               delay: '0'
               history: 7d
+              value_type: FLOAT
               description: 'VPN connection jitter avg.'
               preprocessing:
                 - type: JSONPATH
@@ -1437,6 +1477,7 @@ zabbix_export:
               key: 'meraki.vpn.stat.jitter.max[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               delay: '0'
               history: 7d
+              value_type: FLOAT
               description: 'VPN connection jitter max.'
               preprocessing:
                 - type: JSONPATH
@@ -1453,6 +1494,7 @@ zabbix_export:
               key: 'meraki.vpn.stat.jitter.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               delay: '0'
               history: 7d
+              value_type: FLOAT
               description: 'VPN connection jitter min.'
               preprocessing:
                 - type: JSONPATH
@@ -1469,6 +1511,7 @@ zabbix_export:
               key: 'meraki.vpn.stat.latency.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               delay: '0'
               history: 7d
+              value_type: FLOAT
               units: ms
               description: 'VPN connection avg latency.'
               preprocessing:
@@ -1486,6 +1529,7 @@ zabbix_export:
               key: 'meraki.vpn.stat.latency.max[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               delay: '0'
               history: 7d
+              value_type: FLOAT
               units: ms
               description: 'VPN connection max latency.'
               preprocessing:
@@ -1503,6 +1547,7 @@ zabbix_export:
               key: 'meraki.vpn.stat.latency.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               delay: '0'
               history: 7d
+              value_type: FLOAT
               units: ms
               description: 'VPN connection min latency.'
               preprocessing:
@@ -1532,6 +1577,16 @@ zabbix_export:
               tags:
                 - tag: component
                   value: vpn
+              trigger_prototypes:
+                - uuid: 3e3b9cdada9d451ea4be287bafd03cf4
+                  expression: 'count(/Cisco Meraki organization by HTTP/meraki.vpn.stat.loss.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}],#3,,"{$MERAKI.VPN.LOSS.PERCENTIL}")>=3'
+                  name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: High average VPN connection loss (over >= {$MERAKI.VPN.LOSS.PERCENTIL%)'
+                  event_name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: High average VPN connection loss (over >= {$MERAKI.VPN.LOSS.PERCENTIL%)'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  tags:
+                    - tag: scope
+                      value: availability
             - uuid: 7dccf9e43d944c37934a1dded9999756
               name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: loss max, %'
               type: DEPENDENT
@@ -1722,7 +1777,7 @@ zabbix_export:
           description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
         - macro: '{$MERAKI.CONFIG.CHANGE.TIMESPAN}'
           value: '1200'
-          description: 'Timespan for gathering configuration change log. Used in the metric configuration and in the URL query.'
+          description: 'Timespan in seconds for gathering configuration change log. Used in the metric configuration and in the URL query.'
         - macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.LICENSE.EXPIRE}'
@@ -1767,6 +1822,12 @@ zabbix_export:
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
           description: 'Cisco Meraki dashboard API token.'
+        - macro: '{$MERAKI.VPN.LOSS.PERCENTIL}'
+          value: '90'
+          description: 'Average VPN connection loss percentage. Used in the trigger expression'
+        - macro: '{$MERAKI.VPN.STATS.TIMESPAN}'
+          value: '180'
+          description: 'Timespan in seconds for get organization appliance VPN stats. Used in the metric configuration and in the JavaScript api query. Must be between 1 and 86400 seconds.'
       dashboards:
         - uuid: 2d10effbfff447f6937877f25d12646a
           name: 'Meraki: General'

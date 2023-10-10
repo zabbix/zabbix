@@ -30,6 +30,8 @@ use API,
 	CUrl,
 	Manager;
 
+use Widgets\Gauge\Widget;
+
 use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerDashboardWidgetView {
@@ -166,9 +168,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$number_parser->parse($this->fields_values['max']);
 		$config['max'] = $number_parser->calcValue();
 
-		$scale_show = $this->fields_values['scale_show'] == 1;
+		$show = array_flip($this->fields_values['show']);
 
-		if ($scale_show) {
+		if (array_key_exists(Widget::SHOW_SCALE, $show)) {
 			$config['scale'] = [
 				'show' => true,
 				'size' => $this->fields_values['scale_size']
@@ -193,52 +195,66 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$config['scale']['show'] = false;
 		}
 
-		$widget_description = $this->fields_values['description'];
+		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
+			$widget_description = $this->fields_values['description'];
 
-		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-			[[
-				'widget_description' => $widget_description
-			]] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item + [
-				'widget_description' => $widget_description
-			]]);
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				[[
+					'widget_description' => $widget_description
+				]] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item + [
+					'widget_description' => $widget_description
+				]]);
+			}
+
+			$config['description'] = [
+				'show' => true,
+				'text' => $widget_description,
+				'position' => $this->fields_values['desc_v_pos'],
+				'size' => $this->fields_values['desc_size'],
+				'is_bold' => $this->fields_values['desc_bold'] == 1,
+				'color' => $this->fields_values['desc_color']
+			];
+		}
+		else {
+			$config['description']['show'] = false;
 		}
 
-		$config['description'] = [
-			'text' => $widget_description,
-			'position' => $this->fields_values['desc_v_pos'],
-			'size' => $this->fields_values['desc_size'],
-			'is_bold' => $this->fields_values['desc_bold'] == 1,
-			'color' => $this->fields_values['desc_color']
-		];
+		if (array_key_exists(Widget::SHOW_VALUE, $show)) {
+			$config['value'] = [
+				'show' => true,
+				'size' => $this->fields_values['value_size'],
+				'is_bold' => $this->fields_values['value_bold'] == 1,
+				'color' => $this->fields_values['value_color']
+			];
 
-		$config['value'] = [
-			'size' => $this->fields_values['value_size'],
-			'is_bold' => $this->fields_values['value_bold'] == 1,
-			'color' => $this->fields_values['value_color'],
-			'arc' => $this->fields_values['value_arc'] == 1
+			$config['units'] = $this->fields_values['units_show'] == 1
 				? [
 					'show' => true,
-					'size' => $this->fields_values['value_arc_size'],
-					'color' => $this->fields_values['value_arc_color']
+					'position' => $this->fields_values['units_pos'],
+					'size' => $this->fields_values['units_size'],
+					'is_bold' => $this->fields_values['units_bold'] == 1,
+					'color' => $this->fields_values['units_color']
 				]
 				: [
 					'show' => false
-				]
-		];
+				];
+		}
+		else {
+			$config['value']['show'] = false;
+			$config['units']['show'] = false;
+		}
 
-		$config['units'] = $this->fields_values['units_show'] == 1
+		$config['value_arc'] = array_key_exists(Widget::SHOW_VALUE_ARC, $show)
 			? [
 				'show' => true,
-				'position' => $this->fields_values['units_pos'],
-				'size' => $this->fields_values['units_size'],
-				'is_bold' => $this->fields_values['units_bold'] == 1,
-				'color' => $this->fields_values['units_color']
+				'size' => $this->fields_values['value_arc_size'],
+				'color' => $this->fields_values['value_arc_color']
 			]
 			: [
 				'show' => false
 			];
 
-		$config['needle'] = $this->fields_values['needle_show'] == 1
+		$config['needle'] = array_key_exists(Widget::SHOW_NEEDLE, $show)
 			? [
 				'show' => true,
 				'color' => $this->fields_values['needle_color']
@@ -265,7 +281,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$threshold_value = $number_parser->calcValue();
 
-			if ($scale_show) {
+			if (array_key_exists(Widget::SHOW_SCALE, $show)) {
 				$labels = self::makeValueLabels(['units' => $scale_units] + $item, $threshold_value,
 					$scale_decimal_places
 				);
@@ -288,9 +304,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private function getValueData(array $item): array {
 		$no_data = [
-			'value' => null,
-			'value_text' => _('No data'),
-			'units_text' => ''
+			'value' => null
 		];
 
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
@@ -305,6 +319,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$value = $history[$item['itemid']][0]['value'];
+
+		if (!in_array(Widget::SHOW_VALUE, $this->fields_values['show'])) {
+			return [
+				'value' => (float) $value
+			];
+		}
 
 		if ($this->fields_values['units_show'] == 1) {
 			if ($this->fields_values['units'] !== '') {
