@@ -1631,20 +1631,24 @@ static int	DBpatch_6050138(void)
 	return SUCCEED;
 }
 
+#define BACKSLASH_MATCH_PATTERN	"\\\\"
+
 static int	DBpatch_6050139(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
-	char		*sql = NULL, *buf = NULL;
+	char		*sql = NULL, *buf = NULL, *like_condition;
 	size_t		sql_alloc = 0, sql_offset = 0, buf_alloc;
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* functions table contains history functions used in trigger expressions */
+	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 	if (NULL == (result = zbx_db_select("select functionid,parameter,triggerid"
 			" from functions"
-			" where " ZBX_DB_CHAR_LENGTH(parameter) ">1")))
+			" where " ZBX_DB_CHAR_LENGTH(parameter) ">1 and"
+				" parameter like '%%%s%%'", like_condition)))
 	{
 		goto clean;
 	}
@@ -1656,12 +1660,19 @@ static int	DBpatch_6050139(void)
 		int		quoted;
 		size_t		param_pos, param_len, sep_pos, buf_offset = 0;
 
+		zbx_error("\n\nKDEBUG :: upgrading trigger params [%s]\n", row[1]);
 		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
 		{
 			zbx_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 			if (param_pos < sep_pos)
 			{
+				{
+				char *str = NULL;
+				size_t str_alloc, str_offset = 0;
+				zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ptr + param_pos, sep_pos - param_pos + 1);
+				zbx_error("  KDEBUG :: found param [%s]", str);
+				}
 				if ('"' != ptr[param_pos])
 				{
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos,
@@ -1672,17 +1683,9 @@ static int	DBpatch_6050139(void)
 					param = zbx_function_param_unquote_dyn(
 							ptr + param_pos, sep_pos - param_pos, &quoted, 0);
 
-					if (SUCCEED == zbx_function_param_quote(&param, quoted, 1))
-					{
-						zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
-					}
-					else
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "Failed to escape parameter \"%s\" for"
-							" trigger with id %s", param, row[3]);
-						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-								ptr + param_pos, sep_pos - param_pos);
-					}
+					/* zbx_function_param_quote() should always succeed with esc_bs set to 1 */
+					zbx_function_param_quote(&param, quoted, 1);
+					zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 				}
 			}
 
@@ -1694,6 +1697,7 @@ static int	DBpatch_6050139(void)
 		if (0 == buf_offset)
 			continue;
 
+		zbx_error("KDEBUG :: result is [%s]\n", buf);
 		tmp = zbx_db_dyn_escape_string(buf);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
@@ -1712,16 +1716,20 @@ static int	DBpatch_6050139(void)
 			ret = FAIL;
 	}
 clean:
+	zbx_free(like_condition);
 	zbx_free(buf);
 	zbx_free(sql);
 
-	return ret;
+	return FAIL;
 }
 
 static int	update_escaping_in_expression(const char *expression, char **substitute, char **error)
 {
 	zbx_eval_context_t	ctx;
 	int			ret = SUCCEED;
+	int			token_num;
+	const zbx_eval_token_t	*token;
+	zbx_vector_ptr_t	hist_param_tokens;
 
 	ret = zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_CALC_EXPRESSION |
 			ZBX_EVAL_PARSE_STR_V64_COMPAT | ZBX_EVAL_PARSE_LLDMACRO, error);
@@ -1729,8 +1737,45 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 	if (FAIL == ret)
 		return FAIL;
 
+	zbx_vector_ptr_create(&hist_param_tokens);
+
+	/* finding string parameters of history functions */
+	for (token_num = ctx.stack.values_num - 1; token_num >= 0; token_num--)
+	{
+		token = &ctx.stack.values[token_num];
+
+		if (token->type  == ZBX_EVAL_TOKEN_HIST_FUNCTION)
+		{
+			for (int i = 0; i < token->opt; i++)
+				zbx_vector_ptr_append(&hist_param_tokens, &ctx.stack.values[--token_num]);
+		}
+	}
+
+	for (token_num = hist_param_tokens.values_num - 1; token_num >= 0; token_num--)
+	{
+		char			*str = NULL, *substitute;
+		int			quoted, str_len;
+		size_t			str_alloc = 0, str_offset = 0;
+		zbx_eval_token_t	*token;
+
+		token = (zbx_eval_token_t *)hist_param_tokens.values[token_num];
+
+		if (ctx.expression[token->loc.l] != '\"')
+			continue;
+
+		str_len = (int)(token->loc.r - token->loc.l) + 1;
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ctx.expression + token->loc.l, str_len);
+
+		substitute = zbx_function_param_unquote_dyn(str, str_len, &quoted, 0);
+		zbx_variant_set_str(&(token->value), substitute);
+
+		zbx_free(str);
+	}
+
 	ctx.rules ^= ZBX_EVAL_PARSE_STR_V64_COMPAT;
 	zbx_eval_compose_expression(&ctx, substitute);
+
+	zbx_vector_ptr_destroy(&hist_param_tokens);
 	zbx_eval_clear(&ctx);
 
 	return SUCCEED;
@@ -1741,17 +1786,23 @@ static int	DBpatch_6050140(void)
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	char			*sql = NULL, *error = NULL;
+	char			*sql = NULL, *error = NULL, *like_condition;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (NULL == (result = zbx_db_select("select itemid,params from items where type=15")))
+	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
+
+	if (NULL == (result = zbx_db_select("select itemid,params from items "
+			"where type=15 and params like '%%%s%%'", like_condition)))
+	{
 		goto clean;
+	}
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char	*substitute = NULL, *tmp = NULL;
+
 		if (SUCCEED == update_escaping_in_expression(row[1], &substitute, &error))
 		{
 			tmp = zbx_db_dyn_escape_string(substitute);
@@ -1780,6 +1831,7 @@ static int	DBpatch_6050140(void)
 			ret = FAIL;
 	}
 clean:
+	zbx_free(like_condition);
 	zbx_free(error);
 	zbx_free(sql);
 
@@ -1791,12 +1843,14 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	char			*sql = NULL;
+	char			*sql = NULL, *like_condition;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (NULL == (result = zbx_db_select("%s", select)))
+	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
+
+	if (NULL == (result = zbx_db_select("%s like '%%%s%%'", select, like_condition)))
 		goto clean;
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1872,6 +1926,7 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 			ret = FAIL;
 	}
 clean:
+	zbx_free(like_condition);
 	zbx_free(sql);
 
 	return ret;
@@ -1879,31 +1934,47 @@ clean:
 
 static int	DBpatch_6050141(void)
 {
-	return fix_expression_macro_escaping("select scriptid,command from scripts",
+	return fix_expression_macro_escaping("select scriptid,command from scripts where command",
 			"update scripts set command='%s' where scriptid=%s;\n",
 			"Failed to parse expression macro \"%s\" in script with id %s, error: %s");
 }
 
 static int	DBpatch_6050142(void)
 {
-	return fix_expression_macro_escaping("select mediatype_messageid,message from media_type_message",
+	return fix_expression_macro_escaping("select mediatype_messageid,message from media_type_message where message",
 			"update media_type_message set message='%s' where mediatype_messageid=%s;\n",
 			"Failed to parse expression macro \"%s\" in media type message with id %s, error: %s");
 }
 
 static int	DBpatch_6050143(void)
 {
-	return fix_expression_macro_escaping("select operationid,message from opmessage",
-			"update opmessage set message='%s' where operationid=%s;\n",
-			"Failed to parse expression macro \"%s\" in action operation message with id %s, error: %s");
+	return fix_expression_macro_escaping("select mediatype_messageid,subject from media_type_message where subject",
+			"update media_type_message set subject='%s' where mediatype_messageid=%s;\n",
+			"Failed to parse expression macro \"%s\" in media type subject with id %s, error: %s");
 }
 
 static int	DBpatch_6050144(void)
 {
-	return fix_expression_macro_escaping("select triggerid,event_name from triggers",
+	return fix_expression_macro_escaping("select operationid,message from opmessage where message",
+			"update opmessage set message='%s' where operationid=%s;\n",
+			"Failed to parse expression macro \"%s\" in action operation message with id %s, error: %s");
+}
+
+static int	DBpatch_6050145(void)
+{
+	return fix_expression_macro_escaping("select operationid,subject from opmessage where subject",
+			"update opmessage set subject='%s' where operationid=%s;\n",
+			"Failed to parse expression macro \"%s\" in action operation subject with id %s, error: %s");
+}
+
+static int	DBpatch_6050146(void)
+{
+	return fix_expression_macro_escaping("select triggerid,event_name from triggers where event_name",
 			"update triggers set event_name='%s' where triggerid=%s;\n",
 			"Failed to parse expression macro \"%s\" in event name of the trigger with id %s, error: %s");
 }
+
+#undef BACKSLASH_MATCH_PATTERN
 
 #endif
 

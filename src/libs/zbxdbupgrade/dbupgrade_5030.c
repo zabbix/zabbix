@@ -5933,7 +5933,8 @@ static int	compose_trigger_expression(zbx_db_row_t row, zbx_uint64_t rules, char
 			continue;
 		}
 
-		if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, rules, &error))
+		if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, rules | ZBX_EVAL_PARSE_STR_V64_COMPAT,
+				&error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 					__func__, row[0], error);

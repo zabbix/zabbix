@@ -1032,70 +1032,17 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 {
 	if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
 	{
-		int			i, params = 0, is_hist_function;
+		int			i, params = 0;
 		zbx_vector_ptr_t	hist_func_params;
-
-		is_hist_function = ZBX_EVAL_TOKEN_HIST_FUNCTION == (token->type & ZBX_EVAL_TOKEN_HIST_FUNCTION) &&
-			0 != (ZBX_EVAL_PARSE_STR_V64_COMPAT & ctx->rules);
-
-		if (is_hist_function)
-			zbx_vector_ptr_create(&hist_func_params);
 
 		for (i = (int)token->opt; i < ctx->stack.values_num; i++)
 		{
 			if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_FUNCTION))
-			{
 				params -= (int)ctx->stack.values[i].opt - 1;
-				if (is_hist_function)
-				{
-					for (int j = (int)ctx->stack.values[i].opt; j > 0; j--)
-						zbx_vector_ptr_remove_noorder(&hist_func_params,
-								hist_func_params.values_num - 1);
-				}
-			}
 			else if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_OPERAND))
-			{
 				params++;
-			}
 			else if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_OPERATOR2))
-			{
 				params--;
-				if (is_hist_function)
-					zbx_vector_ptr_remove_noorder(&hist_func_params,
-							hist_func_params.values_num - 1);
-			}
-
-			if (is_hist_function)
-				zbx_vector_ptr_append(&hist_func_params, &(ctx->stack.values[i]));
-		}
-
-		if (is_hist_function)
-		{
-			for (i = 0; i < hist_func_params.values_num; i++)
-			{
-				if (ZBX_EVAL_TOKEN_VAR_STR != ((zbx_eval_token_t *)hist_func_params.values[i])->type)
-					zbx_vector_ptr_remove_noorder(&hist_func_params, i--);
-			}
-
-			for (i = 0; i < hist_func_params.values_num; i++)
-			{
-				char			*str = NULL, *substitute;
-				int			quoted, str_len;
-				size_t			str_alloc = 0, str_offset = 0;
-				zbx_eval_token_t	*hist_param;
-
-				hist_param = (zbx_eval_token_t *)hist_func_params.values[i];
-				str_len = (int)(hist_param->loc.r - hist_param->loc.l) + 1;
-				zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ctx->expression + hist_param->loc.l,
-						str_len);
-
-				substitute = zbx_function_param_unquote_dyn(str, str_len, &quoted, 0);
-				zbx_variant_set_str(&(hist_param->value), substitute);
-
-				zbx_free(str);
-			}
-
-			zbx_vector_ptr_destroy(&hist_func_params);
 		}
 
 		token->opt = params;
