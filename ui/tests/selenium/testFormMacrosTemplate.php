@@ -18,26 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/common/testFormMacros.php';
-require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/common/testFormMacros.php';
 
 /**
  * @backup hosts
  */
 class testFormMacrosTemplate extends testFormMacros {
-
-	/**
-	 * Attach MacrosBehavior and MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMacrosBehavior::class,
-			CMessageBehavior::class
-		];
-	}
 
 	/**
 	 * The name of the template for updating macros, id=40000.

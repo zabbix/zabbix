@@ -63,7 +63,7 @@ class CTableBehavior extends CBehavior {
 
 		$this->test->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
 		$this->test->assertEquals(array_keys($data), array_keys($rows->asArray()),
-			'Row indices don\'t not match indices in data provider.'
+				'Row indices don\'t not match indices in data provider.'
 		);
 
 		foreach ($this->normalizeData($data) as $i => $values) {
@@ -118,7 +118,7 @@ class CTableBehavior extends CBehavior {
 
 			if (!$found) {
 				throw new \Exception('Expected row data "'.implode(', ', $data_row).'" does not match row data in table "'.
-					implode(', ', $table_row).'".');
+						implode(', ', $table_row).'".');
 			}
 		}
 	}
@@ -184,7 +184,7 @@ class CTableBehavior extends CBehavior {
 			$total = $count;
 		}
 		$this->test->assertEquals('Displaying '.$count.' of '.$count.' found',
-			$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
+				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
 	}
 

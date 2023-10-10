@@ -111,7 +111,7 @@ class CPreprocessingBehavior extends CBehavior {
 		foreach ($steps as $options) {
 			$add->click();
 			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
-				->waitUntilPresent()->one();
+					->waitUntilPresent()->one();
 
 			foreach ($fields as $field) {
 				if (array_key_exists($field['name'], $options)) {
@@ -178,7 +178,7 @@ class CPreprocessingBehavior extends CBehavior {
 				}
 
 				$value = call_user_func_array([$control['element'], $field['value'][0]],
-					array_key_exists('params', $field['value']) ? $field['value']['params'] : []
+						array_key_exists('params', $field['value']) ? $field['value']['params'] : []
 				);
 
 				$this->test->assertEquals($options[$field['name']], $value);
@@ -214,7 +214,7 @@ class CPreprocessingBehavior extends CBehavior {
 				}
 
 				$value = call_user_func_array([$control['element'], $field['value'][0]],
-					array_key_exists('params', $field['value']) ? $field['value']['params'] : []
+						array_key_exists('params', $field['value']) ? $field['value']['params'] : []
 				);
 
 				$values[$field['name']] = $value;

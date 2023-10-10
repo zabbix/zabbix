@@ -162,6 +162,6 @@ class CMacrosBehavior extends CBehavior {
 	 */
 	public function getValueField($macro) {
 		return $this->test->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
-			']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
+				']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
 	}
 }

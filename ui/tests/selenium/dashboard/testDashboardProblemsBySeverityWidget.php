@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CFilterBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -29,12 +29,17 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	/**
-	 * Attach FilterBehavior to the test.
+	 * Attach TagBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CFilterBehavior::class];
+		return [
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
 	}
 
 	/**
@@ -1498,7 +1503,6 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		if (CTestArrayHelper::get($data,'tags',false)) {
-			$this->setFilterSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 		$form->submit();

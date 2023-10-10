@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CFilterBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup widget
@@ -30,12 +30,17 @@ require_once dirname(__FILE__).'/../behaviors/CFilterBehavior.php';
 class testDashboardGraphWidget extends CWebTest {
 
 	/**
-	 * Attach FilterBehavior to the test.
+	 * Attach TagBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CFilterBehavior::class];
+		return [
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
 	}
 
 	/*
@@ -1896,7 +1901,6 @@ class testDashboardGraphWidget extends CWebTest {
 				case 'Problems':
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
 					if (array_key_exists('tags', $data['Problems'])) {
-						$this->setFilterSelector('id:tags_table_tags');
 						$this->setTags($data['Problems']['tags']);
 					}
 					break;

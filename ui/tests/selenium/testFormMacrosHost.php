@@ -19,25 +19,11 @@
 **/
 
 require_once dirname(__FILE__).'/common/testFormMacros.php';
-require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts
  */
 class testFormMacrosHost extends testFormMacros {
-
-	/**
-	 * Attach MacrosBehavior and MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMacrosBehavior::class,
-			CMessageBehavior::class
-		];
-	}
 
 	/**
 	 * The name of the host for updating macros, id=20006.

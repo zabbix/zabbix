@@ -19,25 +19,11 @@
 **/
 
 require_once dirname(__FILE__).'/common/testFormMacros.php';
-require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts
  */
 class testFormMacrosHostPrototype extends testFormMacros {
-
-	/**
-	 * Attach MacrosBehavior and MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMacrosBehavior::class,
-			CMessageBehavior::class
-		];
-	}
 
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
 	const LLD_ID		= 90001;

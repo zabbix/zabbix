@@ -35,9 +35,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			CTableBehavior::class
-		];
+		return [CTableBehavior::class];
 	}
 
 	protected static $host_id;

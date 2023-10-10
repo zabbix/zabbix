@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CFilterBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
@@ -28,13 +28,13 @@ require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 class testPageHosts extends CLegacyWebTest {
 
 	/**
-	 * Attach FilterBehavior and TableBehavior to the test.
+	 * Attach TagBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			CFilterBehavior::class,
+			CTagBehavior::class,
 			CTableBehavior::class
 		];
 	}
