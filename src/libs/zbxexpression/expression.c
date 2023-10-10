@@ -636,7 +636,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		const char *tz, zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error,
 		int maxerrlen)
 {
-	char				c, *replace_to = NULL, sql[64];
+	char				c, *replace_to = NULL, sql[64], *m_ptr;
 	const char			*m;
 	int				N_functionid, indexed_macro, require_address, ret, res = SUCCEED,
 					pos = 0, found, user_names_found = 0, raw_value;
@@ -2804,8 +2804,9 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			zbx_free(replace_to);
 		}
 
+		m_ptr = (char *)m;
 		if (ZBX_TOKEN_FUNC_MACRO == token.type)
-			zbx_free(m);
+			zbx_free(m_ptr);
 
 		pos++;
 	}

@@ -16,14 +16,13 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
+#define _GNU_SOURCE
 #include "macrofunc.h"
 
 #include "zbxregexp.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbx_expression_constants.h"
 
 typedef struct
 {
@@ -117,6 +116,13 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 
 	time_new = time(&time_new);
 	localtime_r(&time_new, &local_time);
+
+	if (NULL == strptime(*out, "%H:%M:%S", &local_time) &&
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S%z", &local_time) &&
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S", &local_time))
+	{
+		return FAIL;
+	}
 
 	if (2 == nparam)
 	{
@@ -236,7 +242,8 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  ******************************************************************************/
 const char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
 {
-	char	*ptr_l = (char *)str + fm->macro.l, *ptr_r;
+	const char	*ptr_l = str + fm->macro.l, *ptr_r;
+	char		*ptr;
 
 	if (NULL != (ptr_r = strchr(ptr_l, '}')))
 	{
@@ -244,10 +251,10 @@ const char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm
 
 		zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid, sizeof(*N_functionid), 1,
 				9);
-		ptr_l = zbx_strdup(NULL, ptr_l);
-		ptr_l[len + 1] = '\0';
+		ptr = zbx_strdup(NULL, ptr_l);
+		ptr[len + 1] = '\0';
 
-		return ptr_l;
+		return ptr;
 	}
 
 	return NULL;

@@ -445,6 +445,7 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 	{
 		const char	*value = NULL;
 		char		*out = NULL;
+		int		ret;
 
 		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_FUNC_MACRO != token.type )
 			continue;
@@ -460,7 +461,8 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 				if (NULL != value)
 					out = zbx_strdup(NULL, value);
 
-				zbx_calculate_macro_function(text + token.loc.l, &token.data.func_macro, &out);
+				ret = zbx_calculate_macro_function(text + token.loc.l, &token.data.func_macro, &out);
+				ZBX_UNUSED(ret);
 				value = out;
 				break;
 			case ZBX_TOKEN_USER_MACRO:
