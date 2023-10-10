@@ -1,5 +1,6 @@
 PATCHES = \
-	  history_pk_prepare.sql
+	  history_pk_prepare.sql \
+	  items_nvarchar_prepare.sql
 
 all: $(PATCHES)
 
