@@ -795,8 +795,10 @@ header {
     white-space: nowrap; }
     header .header-controls label {
       line-height: 24px; }
-    header .header-controls .radio-list-control label {
-      line-height: 1.2; }
+    header .header-controls .radio-list-control {
+      vertical-align: top; }
+      header .header-controls .radio-list-control label {
+        line-height: 1.2; }
     header .header-controls .zi-star,
     header .header-controls .zi-star-filled {
       padding: 0;
