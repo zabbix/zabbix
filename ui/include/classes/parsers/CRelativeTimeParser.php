@@ -215,12 +215,15 @@ class CRelativeTimeParser extends CParser {
 	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime($is_start, DateTimeZone $timezone = null): ?DateTime {
+	public function getDateTime($is_start, DateTimeZone $timezone = null, ?int $timestamp = null): ?DateTime {
 		if ($this->match === '') {
 			return null;
 		}
 
-		$date = new DateTime('now', $timezone);
+		$date = new DateTime($timestamp !== null ? '@'.$timestamp : 'now');
+		if ($timezone !== null) {
+			$date->setTimezone($timezone);
+		}
 
 		foreach ($this->getTokens() as $token) {
 			switch ($token['type']) {
@@ -228,17 +231,17 @@ class CRelativeTimeParser extends CParser {
 					if ($token['suffix'] === 'm' || $token['suffix'] === 'h' || $token['suffix'] === 'd') {
 						$formats = $is_start
 							? [
-								'd' => 'Y-m-d 00:00:00',
-								'm' => 'Y-m-d H:i:00',
-								'h' => 'Y-m-d H:00:00'
+								'd' => 'Y-m-dT00:00:00O',
+								'm' => 'Y-m-dTH:i:00O',
+								'h' => 'Y-m-dTH:00:00O'
 							]
 							: [
-								'd' => 'Y-m-d 23:59:59',
-								'm' => 'Y-m-d H:i:59',
-								'h' => 'Y-m-d H:59:59'
+								'd' => 'Y-m-dT23:59:59O',
+								'm' => 'Y-m-dTH:i:59O',
+								'h' => 'Y-m-dTH:59:59O'
 							];
 
-						$date = new DateTime($date->format($formats[$token['suffix']]), $timezone);
+						$date = new DateTime($date->format($formats[$token['suffix']]));
 					}
 					else {
 						$modifiers = $is_start

@@ -129,7 +129,6 @@ class CMacrosResolverGeneral {
 	 * @param bool   $types['references']
 	 * @param bool   $types['lldmacros']
 	 * @param bool   $types['functionids']
-	 * @param bool   $types['replacements']
 	 *
 	 * @return array
 	 */
@@ -166,10 +165,6 @@ class CMacrosResolverGeneral {
 
 		if (array_key_exists('functionids', $types)) {
 			$macro_parsers[] = new CFunctionIdParser();
-		}
-
-		if (array_key_exists('replacements', $types)) {
-			$macro_parsers[] = new CReplacementParser();
 		}
 
 		for ($pos = 0; isset($text[$pos]); $pos++) {
@@ -847,7 +842,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$interface['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -948,7 +943,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -993,7 +988,7 @@ class CMacrosResolverGeneral {
 
 					foreach ($tokens as $token) {
 						$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
-							? self::calcMacrofunc($value, $token['macrofunc'])
+							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 							: formatHistoryValue($value, $db_items[$itemid]);
 					}
 				}
@@ -1030,7 +1025,7 @@ class CMacrosResolverGeneral {
 
 					foreach ($tokens as $token) {
 						$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
-							? self::calcMacrofunc($value, $token['macrofunc'])
+							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 							: $value;
 					}
 				}
@@ -1087,100 +1082,13 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
 		}
 
 		return $macro_values;
-	}
-
-	/**
-	 * Calculates regular expression substitution. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
-	 * parameters or regular expression.
-	 *
-	 * @param string $value        [IN] The input value.
-	 * @param array  $parameters   [IN] The function parameters.
-	 * @param bool   $insensitive  [IN] Case insensitive match.
-	 *
-	 * @return string
-	 */
-	private static function macrofuncRegsub(string $value, array $parameters, bool $insensitive): string {
-		if (count($parameters) != 2) {
-			return UNRESOLVED_MACRO_STRING;
-		}
-
-		set_error_handler(function ($errno, $errstr) {});
-		$rc = preg_match('/'.$parameters[0].'/'.($insensitive ? 'i' : ''), $value, $matches);
-		restore_error_handler();
-
-		if ($rc === false) {
-			return UNRESOLVED_MACRO_STRING;
-		}
-
-		$macro_values = [];
-		foreach (self::getMacroPositions($parameters[1], ['replacements' => true]) as $macro) {
-			$macro_values[$macro] = array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '';
-		}
-
-		return strtr($parameters[1], $macro_values);
-	}
-
-	/**
-	 * Calculates number formatting macro function. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
-	 * parameters or value. Formatting is not applied to integer values.
-	 *
-	 * @param string $value        [IN] The input value.
-	 * @param array  $parameters   [IN] The function parameters.
-	 *
-	 * @return string
-	 */
-	private static function macrofuncFmtnum(string $value, array $parameters): string {
-		if (count($parameters) != 1 || $parameters[0] == '') {
-			return UNRESOLVED_MACRO_STRING;
-		}
-
-		$parser = new CNumberParser(['with_float' => false]);
-
-		if ($parser->parse($value) == CParser::PARSE_SUCCESS) {
-			return $value;
-		}
-
-		$parser = new CNumberParser();
-
-		if ($parser->parse($value) != CParser::PARSE_SUCCESS) {
-			return UNRESOLVED_MACRO_STRING;
-		}
-
-		if (!ctype_digit($parameters[0]) || (int) $parameters[0] > 20) {
-			return UNRESOLVED_MACRO_STRING;
-		}
-
-		return sprintf('%.'.$parameters[0].'f', (float) $value);
-	}
-
-	/**
-	 * Calculates macro function. Returns UNRESOLVED_MACRO_STRING in case of unsupported function.
-	 *
-	 * @param string $value                    [IN] The input value.
-	 * @param array  $macrofunc                [IN]
-	 * @param string $macrofunc['function']    [IN] The function name.
-	 * @param array  $macrofunc['parameters']  [IN] The function parameters.
-	 *
-	 * @return string
-	 */
-	protected static function calcMacrofunc(string $value, array $macrofunc) {
-		switch ($macrofunc['function']) {
-			case 'regsub':
-			case 'iregsub':
-				return self::macrofuncRegsub($value, $macrofunc['parameters'], $macrofunc['function'] === 'iregsub');
-
-			case 'fmtnum':
-				return self::macrofuncFmtnum($value, $macrofunc['parameters']);
-		}
-
-		return UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -1261,7 +1169,7 @@ class CMacrosResolverGeneral {
 				foreach ($tokens as $token) {
 					if ($value !== null) {
 						$macro_value = array_key_exists('macrofunc', $token)
-							? self::calcMacrofunc($value, $token['macrofunc'])
+							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 							: formatHistoryValue($value, $function);
 					}
 					else {
@@ -1369,7 +1277,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$function['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1440,7 +1348,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$row['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1504,7 +1412,7 @@ class CMacrosResolverGeneral {
 						foreach ($keys[$db_item['key_']] as $macro_data) {
 							if ($db_item['lastclock'] && $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 								$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-									? self::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
+									? CMacroFunction::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
 									: formatHistoryValue($db_item['lastvalue'], $db_item);
 							}
 							else {
@@ -1531,7 +1439,7 @@ class CMacrosResolverGeneral {
 								foreach ($_macros as $macro_data) {
 									if ($value !== null) {
 										$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-											? self::calcMacrofunc($value, $macro_data['macrofunc'])
+											? CMacroFunction::calcMacrofunc($value, $macro_data['macrofunc'])
 											: convertUnits(['value' => $value, 'units' => $db_item['units']]);
 									}
 									else {
@@ -1579,7 +1487,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$token['key']][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1653,7 +1561,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$key][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1696,7 +1604,7 @@ class CMacrosResolverGeneral {
 				foreach ($tokens as $token) {
 					$key = array_key_exists('key', $token) ? $token['key'] : $hostid;
 					$macro_values[$key][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1739,7 +1647,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1866,7 +1774,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1929,7 +1837,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$hostid][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -1995,7 +1903,7 @@ class CMacrosResolverGeneral {
 				foreach ($tokens as $token) {
 					$key = array_key_exists('key', $token) ? $token['key'] : $hostid;
 					$macro_values[$key][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -2132,7 +2040,7 @@ class CMacrosResolverGeneral {
 				foreach ($tokens as $token) {
 					$key = array_key_exists('key', $token) ? $token['key'] : $hostid;
 					$macro_values[$key][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
@@ -2256,7 +2164,7 @@ class CMacrosResolverGeneral {
 
 						foreach ($tokens as $token) {
 							$macro_values[$token['key']][$token['token']] = array_key_exists('macrofunc', $token)
-								? self::calcMacrofunc($value, $token['macrofunc'])
+								? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 								: $value;
 						}
 					}
@@ -2343,7 +2251,7 @@ class CMacrosResolverGeneral {
 
 						foreach ($tokens as $token) {
 							$macro_values[$token['key']][$token['token']] = array_key_exists('macrofunc', $token)
-								? self::calcMacrofunc($value, $token['macrofunc'])
+								? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 								: $value;
 						}
 					}
@@ -2413,7 +2321,7 @@ class CMacrosResolverGeneral {
 
 						foreach ($tokens as $token) {
 							$macro_values[$token['key']][$token['token']] = array_key_exists('macrofunc', $token)
-								? self::calcMacrofunc($value, $token['macrofunc'])
+								? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 								: $value;
 						}
 					}
@@ -2746,12 +2654,12 @@ class CMacrosResolverGeneral {
 			foreach ($usermacros_data['macros'] as $usermacro => $data) {
 				if ($data['value']['value'] !== null) {
 					$usermacros[$key]['macros'][$usermacro] = array_key_exists('macrofunc', $data)
-						? self::calcMacrofunc($data['value']['value'], $data['macrofunc'])
+						? CMacroFunction::calcMacrofunc($data['value']['value'], $data['macrofunc'])
 						: $data['value']['value'];
 				}
 				elseif ($data['value']['value_default'] !== null) {
 					$usermacros[$key]['macros'][$usermacro] = array_key_exists('macrofunc', $data)
-						? self::calcMacrofunc($data['value']['value_default'], $data['macrofunc'])
+						? CMacroFunction::calcMacrofunc($data['value']['value_default'], $data['macrofunc'])
 						: $data['value']['value_default'];
 				}
 				// Unresolved macro.
@@ -2921,7 +2829,7 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					$macro_values[$n][$token['token']] = array_key_exists('macrofunc', $token)
-						? self::calcMacrofunc($value, $token['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 						: $value;
 				}
 			}
