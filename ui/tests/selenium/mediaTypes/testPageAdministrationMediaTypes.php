@@ -737,7 +737,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// #3 Used in action update operation by -All-.
+			// #3 Used in action update operation directly.
 			[
 				[
 					'name' => 'Line',
@@ -765,7 +765,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// #5 Used in two actions operation directly.
+			// #5 Used in two actions update operations directly.
 			[
 				[
 					'name' => 'OTRS',
@@ -818,7 +818,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				]
 			],
 			// #8 Used in action operation by -All-.
-			// !Important: cases #8, #9 and #10 should be run only in this order and be placed in the end of data provider.
+			// !Important: last three cases should be run only in this order and always be placed in the end of data provider.
 			[
 				[
 					'name' => 'MantisBT',
