@@ -1287,7 +1287,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, boo
 			(new CListItem([
 				(new CDiv([
 					(new CDiv(new CVar('preprocessing[0][sortorder]', 0)))
-						->addClass(ZBX_STYLE_DRAG_ICON),
+						->addClass(ZBX_STYLE_DRAG_ICON)
+						->addClass(ZBX_STYLE_DISABLED),
 					(new CDiv($first_preproc_types_select))
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
