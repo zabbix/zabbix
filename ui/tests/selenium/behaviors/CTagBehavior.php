@@ -25,14 +25,14 @@ require_once dirname(__FILE__).'/../../include/CBehavior.php';
  */
 class CTagBehavior extends CBehavior {
 
-	public $tag_selector = 'id:filter-tags';
+	protected $tag_selector = 'id:filter-tags';
 
 	/**
 	 * Set custom selector for tag table.
 	 *
 	 * @param string $selector    tag table selector
 	 */
-	protected function setTagSelector($selector) {
+	public function setTagSelector($selector) {
 		$this->tag_selector = $selector;
 	}
 

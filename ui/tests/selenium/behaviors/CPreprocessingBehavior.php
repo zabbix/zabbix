@@ -30,7 +30,7 @@ class CPreprocessingBehavior extends CBehavior {
 	 *
 	 * @return array
 	 */
-	public static function getPreprocessingFieldDescriptors() {
+	protected static function getPreprocessingFieldDescriptors() {
 		return [
 			[
 				'name'		=> 'type',
