@@ -29,6 +29,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 class testDashboardPieChartWidget extends CWebTest
 {
 	protected static $dashboardid;
+	protected const TYPE_ITEM_PATTERN = 'Item pattern';
+	protected const TYPE_ITEM_LIST = 'Item list';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -59,6 +61,24 @@ class testDashboardPieChartWidget extends CWebTest
 
 	public function getCreateData() {
 		return [
+			// Mandatory fields only.
+			[
+				[
+					'fields' => []
+				]
+			],
+			// Mandatory fields only - Data set type Item list.
+			[
+				[
+					'fields' => [
+						'Data set' => [
+							'type' => self::TYPE_ITEM_LIST,
+							'Host' => 'Test',
+							'Item' => 'Test'
+						]
+					]
+				]
+			],
 			// Missing Host pattern.
 			[
 				[
@@ -77,12 +97,6 @@ class testDashboardPieChartWidget extends CWebTest
 					],
 					'result' => TEST_BAD,
 					'error' => 'Invalid parameter "Data set/1/items": cannot be empty.'
-				]
-			],
-			// Mandatory fields only.
-			[
-				[
-					'fields' => []
 				]
 			],
 			// Largest number of fields possible.
@@ -420,43 +434,72 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @param CFormElement $form    CFormElement to be filled
 	 */
 	protected function fillDatasets($data_sets, $form) {
-		$last = count($data_sets) - 1;
-		// Count of data sets that already exist.
+		// Count of data sets that already exist (needed for updating).
 		$count_sets = $form->query('xpath://li[contains(@class, "list-accordion-item")]')->all()->count();
 
 		foreach ($data_sets as $i => $data_set) {
-			$mapping = [
-				'host' => 'xpath://div[@id="ds_'.$i.'_hosts_"]/..',
-				'item' => 'xpath://div[@id="ds_'.$i.'_items_"]/..'
-			];
+			$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
+			unset($data_set['type']);
 
-			// Exchange 'host' and 'item' keys for the actual selector the fields have.
-			foreach ($mapping as $field => $selector) {
-				if (array_key_exists($field, $data_set)) {
-					$data_set = [$selector => $data_set[$field]] + $data_set;
-					unset($data_set[$field]);
+			// Remove the first Data set and create a new one if the type is different.
+			if ($count_sets === 1 && $type === self::TYPE_ITEM_LIST) {
+				$form->query('xpath://button[@title="Delete"]')->one()->click();
+				$need_data_set = true;
+			}
+
+			// Open the Data set or create a new one.
+			if ($i + 1 < $count_sets) {
+				$form->query('xpath://li[contains(@class, "list-accordion-item")][' .
+						($i + 1) . ']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
+			}
+			else if ($i !== 0 || $need_data_set) {
+				// Only add a new Data set if it is not the first one or the first one was deleted.
+
+				$this->addNewDataSet($type, $form);
+			}
+
+			$form->invalidate();
+
+			// Prepare data and fill the form.
+			if ($type === self::TYPE_ITEM_PATTERN) {
+				// Field selector mapping.
+				$mapping = [
+					'host' => 'xpath://div[@id="ds_' . $i . '_hosts_"]/..',
+					'item' => 'xpath://div[@id="ds_' . $i . '_items_"]/..'
+				];
+
+				// Exchange 'host' and 'item' keys for the actual selector the fields have.
+				foreach ($mapping as $field => $selector) {
+					if (array_key_exists($field, $data_set)) {
+						$data_set = [$selector => $data_set[$field]] + $data_set;
+						unset($data_set[$field]);
+					}
 				}
+			}
+			else {
+				// When type is Item list.
+
+				// ToDo: Select Host and Item.
+				throw new Exception('ToDo: select Host and Item.');
 			}
 
 			$form->fill($data_set);
+		}
+	}
 
-			// Open next dataset if needed. Either create a new one or open an existing one.
-			if ($i !== $last) {
-				if ($i + 1 < $count_sets) {
-					$i += 2;
-					$form->query('xpath:(//li[contains(@class, "list-accordion-item")])['.$i.']//button')->one()->click();
-				}
-				else {
-					$form->query('button:Add new data set')->one()->click();
-				}
-
-				$form->invalidate();
-			}
+	protected function addNewDataSet($type, $form) {
+		if ($type === self::TYPE_ITEM_PATTERN) {
+			$form->query('button:Add new data set')->one()->click();
+		}
+		else {
+			$dropdown_button = $form->query('id:dataset-menu')->one();
+			$dropdown_button->click();
+			$dropdown_button->asPopupButton()->getMenu()->select(self::TYPE_ITEM_LIST);
 		}
 	}
 
 	/**
-	 * Takes field data from data provider and returns uniform Data set array with default values set.
+	 * Takes field data from a data provider and sets the defaults for Data sets.
 	 *
 	 * @param $fields    field data from data provider
 	 * @returns array    normalised
