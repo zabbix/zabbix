@@ -20,8 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -32,8 +32,17 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testPageReportsTopTriggers extends CWebTest {
 
-	use TableTrait;
-	use TagTrait;
+	/**
+	 * Attach TableBehavior and TagBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
+	}
 
 	protected static $groupids;
 	protected static $time;
