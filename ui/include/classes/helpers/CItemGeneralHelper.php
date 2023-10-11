@@ -440,7 +440,7 @@ class CItemGeneralHelper {
 					continue;
 				}
 
-				if ($tag['tag'] !== '' && $tag['value'] !== '') {
+				if ($tag['tag'] !== '' || $tag['value'] !== '') {
 					$tags[] = [
 						'tag' => $tag['tag'],
 						'value' => $tag['value']
