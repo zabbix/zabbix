@@ -4031,6 +4031,11 @@ z-select {
 	&.disabled {
 		background-color: $white;
 		opacity: 1;
+
+		.geomap-filter-button {
+			cursor: default;
+			opacity: .4;
+		}
 	}
 }
 
