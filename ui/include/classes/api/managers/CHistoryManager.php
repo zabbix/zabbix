@@ -1278,29 +1278,23 @@ class CHistoryManager {
 			$time_from = max($time_from, time() - $hk_history);
 		}
 
-		if (($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-				|| $aggregation === 'count') {
-			$select = $aggregation === 'count' ? 'SELECT COUNT(*) value' : 'SELECT '.$aggregation.' (value) AS value';
-			$sql = $select.
-				' FROM '.self::getTableName($item['value_type']).
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-				' AND clock>='.zbx_dbstr($time_from).
-				' AND clock<='.zbx_dbstr($time_to).
-				' HAVING COUNT(*)>0'; // Necessary because DBselect() return 0 if empty data set, for graph templates.
+		$query = ' FROM '.self::getTableName($item['value_type']).
+			' WHERE itemid='.zbx_dbstr($item['itemid']).
+			' AND clock>='.zbx_dbstr($time_from).
+			' AND clock<='.zbx_dbstr($time_to);
+
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$sql = 'SELECT '.$aggregation.'(value) AS value' .
+				$query.
+				' HAVING COUNT(*)>0;';// Necessary because DBselect() return 0 if empty data set, for graph templates.
+		}
+		else if ($aggregation === 'count') {
+			$sql = 'SELECT COUNT(*) AS value'. $query. ' HAVING COUNT(*)>0;';
 		}
 		else {
-			$sql = 'SELECT value'.
-				' FROM '.self::getTableName($item['value_type']).
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-				' AND clock>='.zbx_dbstr($time_from).
-				' AND clock<='.zbx_dbstr($time_to);
+			$sorting = $aggregation === 'last' ? 'DESC' : 'ASC';
 
-			if ($aggregation == 'last') {
-				$sql .= ' ORDER BY clock DESC LIMIT 1';
-			}
-			elseif ($aggregation == 'first') {
-				$sql .= ' ORDER BY clock ASC LIMIT 1';
-			}
+			$sql = 'SELECT value'. $query.' ORDER BY clock '.$sorting.' LIMIT 1';
 		}
 
 		$result = DBselect($sql);
