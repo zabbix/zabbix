@@ -25,6 +25,8 @@ use Widgets\Item\Widget;
 
 window.widget_item_form = new class {
 
+	#is_item_numeric = false;
+
 	init({thresholds_colors}) {
 		this._form = document.getElementById('widget-dialogue-form');
 
@@ -33,11 +35,15 @@ window.widget_item_form = new class {
 		this._show_time = document.getElementById(`show_${<?= Widget::SHOW_TIME ?>}`);
 		this._show_change_indicator = document.getElementById(`show_${<?= Widget::SHOW_CHANGE_INDICATOR ?>}`);
 
-		this.item_is_numeric = false;
-
 		this._units_show = document.getElementById('units_show');
 
-		jQuery('#itemid').on('change', () => this.updateWarningIcon());
+		jQuery('#itemid').on('change', () => {
+			this.promiseGetItemType()
+				.then((type) => {
+					this.#is_item_numeric = this.isItemNumeric(type);
+					this.updateForm();
+				});
+		});
 
 		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
@@ -67,8 +73,13 @@ window.widget_item_form = new class {
 
 		colorPalette.setThemeColors(thresholds_colors);
 
-		this.updateWarningIcon()
 		this.updateForm();
+
+		this.promiseGetItemType()
+			.then((type) => {
+				this.#is_item_numeric = this.isItemNumeric(type);
+				this.updateForm();
+			});
 	}
 
 	updateForm() {
@@ -117,48 +128,37 @@ window.widget_item_form = new class {
 		];
 
 		document.getElementById('item_value_aggregate_warning').style.display =
-				aggregate_warning_functions.includes(parseInt(aggregate_function.value)) && !this.item_is_numeric
+				aggregate_warning_functions.includes(parseInt(aggregate_function.value)) && !this.#is_item_numeric
 			? ''
 			: 'none';
+
+		document.getElementById('item-value-thresholds-warning').style.display = this.#is_item_numeric ? 'none' : '';
 	}
 
-	updateWarningIcon() {
-		const thresholds_warning = document.getElementById('item-value-thresholds-warning');
+	promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
 
-		thresholds_warning.style.display = 'none';
-
-		if (ms_item_data.length > 0) {
-			const curl = new Curl('jsrpc.php');
-			curl.setArgument('method', 'item_value_type.get');
-			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-			curl.setArgument('itemid', ms_item_data[0].id);
-
-			fetch(curl.getUrl())
-				.then((response) => response.json())
-				.then((response) => {
-					switch (response.result) {
-						case '<?= ITEM_VALUE_TYPE_FLOAT ?>':
-						case '<?= ITEM_VALUE_TYPE_UINT64 ?>':
-							thresholds_warning.style.display = 'none';
-							this.item_is_numeric = true;
-
-							break;
-
-						default:
-							thresholds_warning.style.display = '';
-							this.item_is_numeric = false;
-					}
-
-					this.updateForm();
-				})
-				.catch((exception) => {
-					console.log('Could not get value data type of the item:', exception);
-				});
+		if (ms_item_data.length == 0) {
+			return Promise.resolve(false);
 		}
-		else {
-			thresholds_warning.style.display = '';
-		}
+
+		const curl = new Curl('jsrpc.php');
+		curl.setArgument('method', 'item_value_type.get');
+		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+		curl.setArgument('itemid', ms_item_data[0].id);
+
+		return fetch(curl.getUrl())
+			.then((response) => response.json())
+			.then((response) => {
+				return parseInt(response.result);
+			})
+			.catch((exception) => {
+				console.log('Could not get value data type of the item:', exception);
+			});
+	}
+
+	isItemNumeric(type) {
+		return type === <?= ITEM_VALUE_TYPE_FLOAT ?> || type === <?= ITEM_VALUE_TYPE_UINT64 ?>;
 	}
 
 	setIndicatorColor(name, color) {
