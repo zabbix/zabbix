@@ -287,13 +287,6 @@ class CItemGeneralHelper {
 			$item['master_item'] = $master_item ? reset($master_item) : [];
 		}
 
-		$item['parent_items'] = makeItemTemplatesHtml(
-			$item['itemid'],
-			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
-			ZBX_FLAG_DISCOVERY_NORMAL,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
-
 		return $item;
 	}
 
