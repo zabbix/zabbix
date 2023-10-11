@@ -424,7 +424,7 @@ class CItemGeneralHelper {
 			$input['params'] = $input[$field];
 		}
 
-		if ($input['type'] == ITEM_TYPE_SSH && $input['auth_type'] == ITEM_AUTHTYPE_PUBLICKEY) {
+		if ($input['type'] == ITEM_TYPE_SSH && $input['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
 			$field_map['passphrase'] = 'password';
 		}
 
