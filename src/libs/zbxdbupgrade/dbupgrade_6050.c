@@ -1694,9 +1694,11 @@ static int	DBpatch_6050140(void)
 		const char	*ptr;
 		char		*tmp, *param = NULL;
 		int		quoted;
-		size_t		param_pos, param_len, sep_pos, buf_offset = 0;
+		size_t		param_pos, param_len, sep_pos, buf_offset = 0, param_len;
 
-		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
+		param_len = strlen(row[1]);
+
+		for (ptr = row[1]; ptr < row[1] + param_len; ptr += sep_pos + 1)
 		{
 			zbx_lld_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
