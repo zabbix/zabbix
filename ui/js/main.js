@@ -945,7 +945,7 @@ function getConditionFormula(conditions, evalType) {
 				counter: (options.counter !== null) ? options.counter : $(options.row, table).length,
 				addRows: (rows) => {
 					const local_options = $.extend({}, options, {
-						dataCallback: (data) => options.dataCallback($.extend(data, rows.pop()))
+						dataCallback: (data) => options.dataCallback($.extend(data, rows.shift()))
 					});
 					const beforeRow = (options['beforeRow'] !== null)
 						? $(options['beforeRow'], table)
