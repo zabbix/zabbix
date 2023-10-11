@@ -24,9 +24,6 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	public const SHOW_PRIMARY = 1;
-	public const SHOW_SECONDARY = 2;
-
 	public function getDefaultName(): string {
 		return _('Honeycomb');
 	}

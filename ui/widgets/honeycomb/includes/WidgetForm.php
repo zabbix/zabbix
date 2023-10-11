@@ -37,12 +37,14 @@ use Zabbix\Widgets\{
 };
 
 use CWidgetsData;
-use Widgets\Honeycomb\Widget;
 
 /**
  * Honeycomb widget form.
  */
 class WidgetForm extends CWidgetForm {
+
+	public const SHOW_PRIMARY = 1;
+	public const SHOW_SECONDARY = 2;
 
 	private const SIZE_PERCENT_MIN = 1;
 	private const SIZE_PERCENT_MAX = 100;
@@ -103,10 +105,10 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldCheckBoxList('show', _('Show'), [
-					Widget::SHOW_PRIMARY => _('Primary label'),
-					Widget::SHOW_SECONDARY => _('Secondary label')
+					WidgetForm::SHOW_PRIMARY => _('Primary label'),
+					WidgetForm::SHOW_SECONDARY => _('Secondary label')
 				]))
-					->setDefault([Widget::SHOW_PRIMARY])
+					->setDefault([WidgetForm::SHOW_PRIMARY])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(

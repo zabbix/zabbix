@@ -19,7 +19,6 @@
 **/
 
 use Widgets\Honeycomb\Includes\WidgetForm;
-use Widgets\Honeycomb\Widget;
 
 ?>
 
@@ -58,8 +57,8 @@ window.widget_honeycomb_form = new class {
 	}
 
 	#updateForm(trigger = null) {
-		const primary_show = document.getElementById(`show_${<?= Widget::SHOW_PRIMARY ?>}`);
-		const secondary_show = document.getElementById(`show_${<?= Widget::SHOW_SECONDARY ?>}`);
+		const primary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY ?>}`);
+		const secondary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY ?>}`);
 
 		if ([primary_show, secondary_show].filter((checkbox) =>
 			checkbox.checked && !checkbox.disabled).length === 0) {
