@@ -74,26 +74,22 @@ $header_title_tag = (new CTag('h1', true, $data['dashboard']['name']));
 if ($page_count > 1) {
 	foreach ($data['dashboard']['pages'] as $index => $dashboard_page) {
 		$page_number = $index + 1;
-		$page_name = 'page_' . $page_number;
+		$page_name = 'page_'.$page_number;
 		$page_height = $data['page_sizes'][$index] + PAGE_TITLE_HEIGHT + PAGE_MARGIN;
 
 		if ($index === 0) {
 			$page_height += HEADER_TITLE_HEIGHT;
 		}
 
-		$page_styles .= '@page '.$page_name.' { size: '.(PAGE_WIDTH).'px '.$page_height.'px; } ';
+		$page_styles .= '@page '.$page_name.' { size: '.PAGE_WIDTH.'px '.$page_height.'px; } ';
 		$page_styles .= '.'.$page_name.' { page: '.$page_name.'; } ';
 
 		(new CDiv())
 			->addClass('dashboard-page page_'.$page_number)
-			->addItem(
-				new CTag('h1', true,
-					$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
-				)
-			)
-			->addItem(
-				(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
-			)
+			->addItem(new CTag('h1', true,
+				$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
+			))
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
 			->show();
 	}
 }
@@ -102,13 +98,11 @@ else {
 	$page_height = $data['page_sizes'][0] + HEADER_TITLE_HEIGHT + PAGE_MARGIN;
 
 	$page_styles .= '@page '.$page_name.' { size: '.PAGE_WIDTH.'px '.$page_height.'px; } ';
-	$page_styles .= '.'.$page_name.' { page: ' . $page_name.'; } ';
+	$page_styles .= '.'.$page_name.' { page: '.$page_name.'; } ';
 
 	(new CDiv())
 		->addClass('dashboard-page page_1')
-		->addItem(
-			(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
-		)
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
 		->show();
 }
 
