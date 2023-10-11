@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup services
@@ -33,7 +33,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormServicesServices extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const UPDATE = true;
 	const EDIT_BUTTON_PATH = 'xpath:.//button[@title="Edit"]';
@@ -42,15 +52,6 @@ class testFormServicesServices extends CWebTest {
 	private static $update_service = 'Update service';
 	private static $delete_service = 'Service for delete';
 	private static $serviceids;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public static function prepareServicesData() {
 		self::$serviceids = CDataHelper::get('Services.serviceids');
