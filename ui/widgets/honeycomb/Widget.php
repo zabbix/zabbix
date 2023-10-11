@@ -27,4 +27,13 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Honeycomb');
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Actions' => _('Actions'),
+				'Download image' => _('Download image')
+			]
+		];
+	}
 }
