@@ -20,7 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -31,7 +31,14 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testPageReportsTriggerTop extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	protected static $groupids;
 	protected static $time;
@@ -279,7 +286,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
 		// Check time selector fields layout.
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form = $filter->asForm();
 		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
 
 		$buttons = [
