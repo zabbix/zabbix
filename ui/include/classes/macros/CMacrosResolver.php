@@ -359,7 +359,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 				$value = $data['macro'] === 'EVENT.ID' ? $trigger['eventid'] : $trigger['triggerid'];
 				$macro_values[$triggerid][$token] = array_key_exists('macrofunc', $data)
-					? self::calcMacrofunc($value, $data['macrofunc'])
+					? CMacroFunction::calcMacrofunc($value, $data['macrofunc'])
 					: $value;
 			}
 		}
@@ -1242,7 +1242,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($matched_macros['macros']['map'] as $token => $data) {
 				$macro_values[$token] = array_key_exists('macrofunc', $data)
-					? self::calcMacrofunc($map_name, $data['macrofunc'])
+					? CMacroFunction::calcMacrofunc($map_name, $data['macrofunc'])
 					: $map_name;
 			}
 
@@ -1417,7 +1417,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					if (array_key_exists('hostgroup', $matched_macros['macros'])) {
 						foreach ($matched_macros['macros']['hostgroup'] as $token => $data) {
 							$macro_values[$key][$token] = array_key_exists('macrofunc', $data)
-								? self::calcMacrofunc($selement['elements'][0]['groupid'], $data['macrofunc'])
+								? CMacroFunction::calcMacrofunc($selement['elements'][0]['groupid'], $data['macrofunc'])
 								: $selement['elements'][0]['groupid'];
 						}
 					}
@@ -1438,7 +1438,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					if (array_key_exists('trigger', $matched_macros['macros'])) {
 						foreach ($matched_macros['macros']['trigger'] as $token => $data) {
 							$macro_values[$key][$token] = array_key_exists('macrofunc', $data)
-								? self::calcMacrofunc($selement['elements'][0]['triggerid'], $data['macrofunc'])
+								? CMacroFunction::calcMacrofunc($selement['elements'][0]['triggerid'], $data['macrofunc'])
 								: $selement['elements'][0]['triggerid'];
 						}
 					}
@@ -1767,7 +1767,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				if (array_key_exists($f_num, $tag_value)) {
 					foreach ($tokens as $token) {
 						$macro_values[$eventid][$token['token']] = array_key_exists('macrofunc', $token)
-							? self::calcMacrofunc($tag_value[$f_num], $token['macrofunc'])
+							? CMacroFunction::calcMacrofunc($tag_value[$f_num], $token['macrofunc'])
 							: $tag_value[$f_num];
 					}
 				}
@@ -2039,7 +2039,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				if ($value !== null) {
 					$macro_values[$eventid][$token] = array_key_exists('macrofunc', $_data)
-						? self::calcMacrofunc($value, $_data['macrofunc'])
+						? CMacroFunction::calcMacrofunc($value, $_data['macrofunc'])
 						: $value;
 				}
 				else {
