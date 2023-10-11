@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-20T10:46:09Z'
+  date: '2023-09-29T12:12:17Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -511,6 +511,34 @@ zabbix_export:
               event_name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: AVERAGE
               description: 'PostgreSQL uptime is less than 10 minutes.'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 4bfb0c1697f043d9acf640b84cc8d945
+          name: 'PostgreSQL: Version'
+          type: ODBC
+          key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          params: 'SELECT version()'
+          username: '{$PG.USER}'
+          password: '{$PG.PASSWORD}'
+          description: 'PostgreSQL version.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: application
+          triggers:
+            - uuid: fd409b64f83943edaf43845a12bf8ace
+              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0'
+              name: 'PostgreSQL: Version has changed'
+              event_name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              priority: INFO
               tags:
                 - tag: scope
                   value: notice

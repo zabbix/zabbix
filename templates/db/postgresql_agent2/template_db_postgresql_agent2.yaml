@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-20T10:46:07Z'
+  date: '2023-09-29T15:06:03Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1082,6 +1082,30 @@ zabbix_export:
               event_name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: AVERAGE
               description: 'PostgreSQL uptime is less than 10 minutes.'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 523528aad175455fbd1daba161365651
+          name: 'PostgreSQL: Version'
+          key: 'pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'PostgreSQL version.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: application
+          triggers:
+            - uuid: 6b3ac2a19e114e1390e6e0793728f576
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]))>0'
+              name: 'PostgreSQL: Version has changed'
+              event_name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              priority: INFO
               tags:
                 - tag: scope
                   value: notice
