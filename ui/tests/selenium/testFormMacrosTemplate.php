@@ -35,7 +35,7 @@ class testFormMacrosTemplate extends testFormMacros {
 	public function getBehaviors() {
 		return [
 			CMacrosBehavior::class,
-			CMessageBehavior::class,
+			CMessageBehavior::class
 		];
 	}
 
