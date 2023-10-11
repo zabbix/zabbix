@@ -19,17 +19,26 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 class testPageTriggers extends CLegacyWebTest {
 
-	public $hostid = 99050;
+	/**
+	 * Attach TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTagBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
-	use FilterTrait;
-	use TableTrait;
+	public $hostid = 99050;
 
 	public static function data() {
 		return CDBHelper::getDataProvider(

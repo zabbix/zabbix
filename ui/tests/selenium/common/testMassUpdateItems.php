@@ -21,7 +21,7 @@
 require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
@@ -31,7 +31,17 @@ use Facebook\WebDriver\Exception\ElementClickInterceptedException;
  */
 class testMassUpdateItems extends CWebTest{
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
+	}
 
 	const HOSTID = 40001;	// Simple form test host.
 	const RULEID = 43700;	// testFormDiscoveryRule1 on Simple form test host.
@@ -60,15 +70,6 @@ class testMassUpdateItems extends CWebTest{
 					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		]
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * Add interface to host.

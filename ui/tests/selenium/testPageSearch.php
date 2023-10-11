@@ -22,7 +22,7 @@
 use Facebook\WebDriver\Exception\TimeoutException;
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup hstgrp
@@ -31,7 +31,14 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  */
 class testPageSearch extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	protected $search_string = 'Test object';
 

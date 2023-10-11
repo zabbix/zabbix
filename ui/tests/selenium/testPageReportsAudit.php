@@ -19,11 +19,18 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 
 class testPageReportsAudit extends CLegacyWebTest {
 
-	use MacrosTrait;
+	/**
+	 * Attach Behavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMacrosBehavior::class];
+	}
 
 	private $actions = [
 		-1 => 'All',

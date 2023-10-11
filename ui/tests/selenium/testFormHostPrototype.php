@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -28,7 +28,14 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormHostPrototype extends CLegacyWebTest {
 
-	use MacrosTrait;
+	/**
+	 * Attach MacrosBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMacrosBehavior::class];
+	}
 
 	/**
 	 * Discovery rule id used in test.

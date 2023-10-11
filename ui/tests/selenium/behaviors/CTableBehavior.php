@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CBehavior.php';
 
 /**
- * Trait for filter related tests.
+ * Behavior for filter related tests.
  */
-trait TableTrait {
+class CTableBehavior extends CBehavior {
 
 	/**
 	 * Perform data array normalization.
@@ -53,16 +53,16 @@ trait TableTrait {
 	 * @param string  $selector    table selector
 	 */
 	public function assertTableData($data = [], $selector = 'class:list-table') {
-		$rows = $this->query($selector)->asTable()->one()->getRows();
+		$rows = $this->test->query($selector)->asTable()->one()->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $rows->asText());
+			$this->test->assertEquals(['No data found.'], $rows->asText());
 
 			return;
 		}
 
-		$this->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
-		$this->assertEquals(array_keys($data), array_keys($rows->asArray()),
+		$this->test->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
+		$this->test->assertEquals(array_keys($data), array_keys($rows->asArray()),
 				'Row indices don\'t not match indices in data provider.'
 		);
 
@@ -74,7 +74,7 @@ trait TableTrait {
 					continue;
 				}
 
-				$this->assertEquals($value['text'], $text);
+				$this->test->assertEquals($value['text'], $text);
 			}
 		}
 	}
@@ -88,11 +88,11 @@ trait TableTrait {
 	 * @throws Exception
 	 */
 	public function assertTableHasData($data = [], $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+		$table = $this->test->query($selector)->asTable()->one();
 
 		if (!$data) {
 			// Check that table contains one row with text "No data found."
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
+			$this->test->assertEquals(['No data found.'], $table->getRows()->asText());
 
 			return;
 		}
@@ -161,7 +161,7 @@ trait TableTrait {
 	 * @param string $selector		table selector
 	 */
 	public function selectTableRows($data = [], $column = 'Name', $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+		$table = $this->test->query($selector)->asTable()->one();
 
 		if (!$data) {
 			// Select all rows in table.
@@ -183,8 +183,8 @@ trait TableTrait {
 		if ($total === null) {
 			$total = $count;
 		}
-		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
-				$this->query('xpath://div[@class="table-stats"]')->one()->getText()
+		$this->test->assertEquals('Displaying '.$count.' of '.$count.' found',
+				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
 	}
 
@@ -194,8 +194,8 @@ trait TableTrait {
 	 * @param string $column		Column name, where value should be checked
 	 * @param string $selector		Table selector
 	 */
-	private function getTableColumnData($column, $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+	public function getTableColumnData($column, $selector = 'class:list-table') {
+		$table = $this->test->query($selector)->asTable()->one();
 		$result = [];
 		foreach ($table->getRows() as $row) {
 			$result[] = $row->getColumn($column)->getText();
@@ -209,6 +209,6 @@ trait TableTrait {
 	 * @param integer $count	selected rows count
 	 */
 	public function assertSelectedCount($count) {
-		$this->assertEquals($count.' selected', $this->query('id:selected_count')->one()->getText());
+		$this->test->assertEquals($count.' selected', $this->test->query('id:selected_count')->one()->getText());
 	}
 }

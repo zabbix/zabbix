@@ -29,8 +29,6 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	const LLD_ID		= 90001;
 	const IS_PROTOTYPE	= true;
 
-	use MacrosTrait;
-
 	/**
 	 * The name of the host for updating macros, id=99200.
 	 *

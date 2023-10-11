@@ -19,20 +19,30 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @dataSource TagFilter
  */
 class testPageHosts extends CLegacyWebTest {
+
+	/**
+	 * Attach TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTagBehavior::class,
+			CTableBehavior::class
+		];
+	}
+
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
-
-	use FilterTrait;
-	use TableTrait;
 
 	public static function allHosts() {
 		return CDBHelper::getDataProvider(

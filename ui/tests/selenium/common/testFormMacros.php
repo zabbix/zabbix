@@ -19,18 +19,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * Base class for Macros tests.
  */
 abstract class testFormMacros extends CWebTest {
-
-	use MacrosTrait;
-
-	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
 	/**
 	 * Attach Behaviors to the test.
@@ -38,8 +34,13 @@ abstract class testFormMacros extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
 	}
+
+	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
