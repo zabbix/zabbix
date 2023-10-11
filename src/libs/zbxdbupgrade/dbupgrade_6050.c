@@ -1696,10 +1696,9 @@ static int	DBpatch_6050140(void)
 		int		quoted;
 		size_t		param_pos, param_len, sep_pos, buf_offset = 0;
 
-		zbx_error("\n\nKDEBUG :: upgrading trigger params [%s]\n", row[1]);
 		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
 		{
-			zbx_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+			zbx_lld_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 			if (param_pos < sep_pos)
 			{
@@ -1707,7 +1706,6 @@ static int	DBpatch_6050140(void)
 				char *str = NULL;
 				size_t str_alloc, str_offset = 0;
 				zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ptr + param_pos, sep_pos - param_pos + 1);
-				zbx_error("  KDEBUG :: found param [%s]", str);
 				}
 				if ('"' != ptr[param_pos])
 				{
@@ -1733,7 +1731,6 @@ static int	DBpatch_6050140(void)
 		if (0 == buf_offset)
 			continue;
 
-		zbx_error("KDEBUG :: result is [%s]\n", buf);
 		tmp = zbx_db_dyn_escape_string(buf);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
@@ -1756,7 +1753,7 @@ clean:
 	zbx_free(buf);
 	zbx_free(sql);
 
-	return FAIL;
+	return ret;
 }
 
 static int	update_escaping_in_expression(const char *expression, char **substitute, char **error)
