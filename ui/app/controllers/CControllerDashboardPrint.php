@@ -46,7 +46,7 @@ class CControllerDashboardPrint extends CController {
 	}
 
 	protected function doAction() {
-		[$dashboard, $page_sizes, $error] = $this->getDashboard();
+		[$dashboard, $error] = $this->getDashboard();
 
 		if ($error !== null) {
 			$this->setResponse(new CControllerResponseData(['error' => $error]));
@@ -63,7 +63,6 @@ class CControllerDashboardPrint extends CController {
 
 		$data = [
 			'dashboard' => $dashboard,
-			'page_sizes' => $page_sizes,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
 			'dashboard_time_period' => getTimeSelectorPeriod($time_selector_options)
 		];
@@ -81,7 +80,6 @@ class CControllerDashboardPrint extends CController {
 	private function getDashboard(): array {
 		$dashboard = null;
 		$error = null;
-		$page_sizes = [];
 
 		$db_dashboards = API::Dashboard()->get([
 			'output' => ['dashboardid', 'name', 'display_period'],
@@ -92,25 +90,13 @@ class CControllerDashboardPrint extends CController {
 		if ($db_dashboards) {
 			$dashboard = $db_dashboards[0];
 			$dashboard['pages'] = CDashboardHelper::preparePages(
-				CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null),
-				$dashboard['pages'],
-				true
+				CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null), $dashboard['pages'], false
 			);
-
-			foreach($dashboard['pages'] as $index => $page) {
-				$max = 0;
-
-				foreach($page['widgets'] as $widget) {
-					$max = max($max, $widget['pos']['y'] + $widget['pos']['height']);
-				}
-
-				$page_sizes[$index] = $max * DASHBOARD_ROW_HEIGHT + 12;
-			}
 		}
 		else {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
-		return [$dashboard, $page_sizes, $error];
+		return [$dashboard, $error];
 	}
 }

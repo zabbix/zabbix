@@ -50,7 +50,7 @@
 				},
 				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
 				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-				cell_height: 70,
+				cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
@@ -59,24 +59,17 @@
 				is_editable: false,
 				is_edit_mode: false,
 				can_edit_dashboards: false,
-				is_kiosk_mode: true,
-				broadcast_options: {
-					_hostid: {rebroadcast: false},
-					_timeperiod: {rebroadcast: true}
-				}
+				is_kiosk_mode: true
 			});
 
 			const dashboard_page_containers = document.querySelectorAll('.<?= ZBX_STYLE_DASHBOARD_GRID ?>');
-			let page_number = 0;
 
-			for (const page of dashboard.pages) {
+			for (const [page_number, page] of dashboard.pages.entries()) {
 				for (const widget of page.widgets) {
 					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page, dashboard_page_containers[page_number]);
-
-				page_number++;
 			}
 
 			ZABBIX.Dashboard.broadcast({

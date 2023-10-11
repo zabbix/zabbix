@@ -27,8 +27,8 @@
 const HEADER_TITLE_HEIGHT = 60;
 const PAGE_TITLE_HEIGHT = 50;
 const PAGE_WIDTH = 1940;
-const PAGE_MARGIN = 10;
-
+const PAGE_MARGIN_TOP = 10;
+const PAGE_MARGIN_BOTTOM = 12;
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
@@ -71,37 +71,40 @@ $header_title_tag = (new CTag('h1', true, $data['dashboard']['name']));
 	->addClass('header-title page_1')
 	->show();
 
-if ($page_count > 1) {
-	foreach ($data['dashboard']['pages'] as $index => $dashboard_page) {
-		$page_number = $index + 1;
-		$page_name = 'page_'.$page_number;
-		$page_height = $data['page_sizes'][$index] + PAGE_TITLE_HEIGHT + PAGE_MARGIN;
+foreach ($data['dashboard']['pages'] as $index => $dashboard_page) {
+	$page_number = $index + 1;
+	$page_name = 'page_'.$page_number;
 
-		if ($index === 0) {
-			$page_height += HEADER_TITLE_HEIGHT;
-		}
+	$page_height = PAGE_MARGIN_TOP;
 
-		$page_styles .= '@page '.$page_name.' { size: '.PAGE_WIDTH.'px '.$page_height.'px; } ';
-		$page_styles .= '.'.$page_name.' { page: '.$page_name.'; } ';
-
-		(new CDiv())
-			->addClass('dashboard-page page_'.$page_number)
-			->addItem(new CTag('h1', true,
-				$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
-			))
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
-			->show();
+	if ($index === 0) {
+		$page_height += HEADER_TITLE_HEIGHT;
 	}
-}
-else {
-	$page_name = 'page_1';
-	$page_height = $data['page_sizes'][0] + HEADER_TITLE_HEIGHT + PAGE_MARGIN;
+
+	if ($page_count > 1) {
+		$page_height += PAGE_TITLE_HEIGHT;
+	}
+
+	$num_rows = 0;
+
+	foreach ($dashboard_page['widgets'] as $widget) {
+		$num_rows = max($num_rows, $widget['pos']['y'] + $widget['pos']['height']);
+	}
+
+	$page_height += $num_rows * DASHBOARD_ROW_HEIGHT + PAGE_MARGIN_BOTTOM;
 
 	$page_styles .= '@page '.$page_name.' { size: '.PAGE_WIDTH.'px '.$page_height.'px; } ';
 	$page_styles .= '.'.$page_name.' { page: '.$page_name.'; } ';
 
-	(new CDiv())
-		->addClass('dashboard-page page_1')
+	$page_container = (new CDiv())->addClass('dashboard-page page_'.$page_number);
+
+	if ($page_count > 1) {
+		$page_container->addItem(new CTag('h1', true,
+			$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
+		));
+	}
+
+	$page_container
 		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
 		->show();
 }
