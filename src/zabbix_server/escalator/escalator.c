@@ -434,7 +434,8 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 		zbx_free(tag_esc);
 	}
 
-	result = DBselect("%s) limit 1", sql);
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+	result = DBselectN(sql, 1);
 
 	if (NULL != DBfetch(result))
 	{
