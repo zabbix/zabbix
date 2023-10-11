@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-04T19:05:22Z'
+  date: '2023-10-12T08:05:59Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -325,7 +325,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             Device public IP
-            Network: {$NETWORK.ID} 
+            Network: {$NETWORK.ID}
             MAC: {$MAC}
           preprocessing:
             - type: JSONPATH
@@ -521,7 +521,7 @@ zabbix_export:
           triggers:
             - uuid: c8f8af6c92f14dc0bcdf426b124c7344
               expression: 'length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0'
-              name: 'Meraki: There are errors in ''Get Device data'' metric'
+              name: 'Meraki: There are errors in ''Get device data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -678,7 +678,7 @@ zabbix_export:
           description: 'Devices uplink latency threshold, in seconds.'
         - macro: '{$MERAKI.DEVICE.LOSS}'
           value: '15'
-          description: 'Devices uplink loss threshold, in percents.'
+          description: 'Devices uplink loss threshold, in percent.'
         - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
           value: '^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$'
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
@@ -698,7 +698,7 @@ zabbix_export:
           description: 'Cisco Meraki dashboard API token.'
         - macro: '{$MERAKI.UPLINK.LL.TIMESPAN}'
           value: '180'
-          description: 'Timespan in seconds for get device uplinks loss and quality stats. Used in the metric configuration and in the JavaScript api query. Must be between 1 and 86400 seconds.'
+          description: 'Timespan in seconds for getting device uplinks loss and quality stats. Used in the metric configuration and in the JavaScript API query. Must be between 1 and 86400 seconds.'
       dashboards:
         - uuid: 76c4525eacc64f268572fefd76accc2f
           name: 'Meraki: General'
@@ -782,7 +782,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Item for adaptive policy aggregate statistics for an organization.'
+          description: 'Item for adaptive policy aggregate statistics for the organization.'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/adaptivePolicy/overview'
           http_proxy: '{$MERAKI.HTTP_PROXY}'
@@ -802,7 +802,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get list the dashboard administrators in this organization.'
+          description: 'Get list of the dashboard administrators in this organization.'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/admins'
           http_proxy: '{$MERAKI.HTTP_PROXY}'
@@ -852,7 +852,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Return an overview of the license state for an organization.'
+          description: 'Return overview of the license state for the organization.'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/licenses/overview'
           http_proxy: '{$MERAKI.HTTP_PROXY}'
@@ -976,7 +976,7 @@ zabbix_export:
                 'licenses': licenses,
                 'error': error_msg.toString()
             });
-          description: 'Return an list the licenses for an organization.'
+          description: 'Return list of the licenses for the organization.'
           timeout: 30s
           parameters:
             - name: httpproxy
@@ -998,7 +998,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns The Login Security Settings For An Organization.'
+          description: 'Return the login security settings for the organization.'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/loginSecurity'
           http_proxy: '{$MERAKI.HTTP_PROXY}'
@@ -1165,9 +1165,7 @@ zabbix_export:
           key: meraki.get.saml
           delay: 12h
           history: 7d
-          trends: '0'
-          value_type: TEXT
-          description: 'Returns The SAML SSO Enabled Settings For An Organization.'
+          description: 'Return the enabled SAML SSO settings for the organization.'
           valuemap:
             name: 'Boolean format'
           preprocessing:
@@ -1194,7 +1192,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get list the SAML roles for this organization.'
+          description: 'Get list of the SAML roles for this organization.'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/samlRoles'
           http_proxy: '{$MERAKI.HTTP_PROXY}'
@@ -1485,7 +1483,7 @@ zabbix_export:
           key: meraki.login.enforce.account.lockout
           delay: '0'
           history: 7d
-          description: 'Boolean indicating whether users'' Dashboard accounts will be locked out after a specified number of consecutive failed login attempts.'
+          description: 'Boolean indicating whether users'' dashboard accounts will be locked out after a specified number of consecutive failed login attempts.'
           valuemap:
             name: 'Boolean format'
           preprocessing:
@@ -1543,12 +1541,12 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: f7b88a64223c4b2992f15d0b6807f55f
-          name: 'Meraki: Enforce login ip ranges'
+          name: 'Meraki: Enforce login IP ranges'
           type: DEPENDENT
           key: meraki.login.enforce.login.ip.ranges
           delay: '0'
           history: 7d
-          description: 'Boolean indicating whether organization will restrict access to Dashboard (including the API) from certain IP addresses.'
+          description: 'Boolean indicating whether organization will restrict access to the dashboard (including the API) from certain IP addresses.'
           valuemap:
             name: 'Boolean format'
           preprocessing:
@@ -1569,7 +1567,7 @@ zabbix_export:
           key: meraki.login.enforce.password.expiration
           delay: '0'
           history: 7d
-          description: 'Boolean indicating whether users are forced to change their password every X number of days.'
+          description: 'Boolean indicating whether users are forced to change their password every X days.'
           valuemap:
             name: 'Boolean format'
           preprocessing:
@@ -1590,7 +1588,7 @@ zabbix_export:
           key: meraki.login.enforce.two.factor.auth
           delay: '0'
           history: 7d
-          description: 'Boolean indicating whether users in this organization will be required to use an extra verification code when logging in to Dashboard. This code will be sent to their mobile phone via SMS, or can be generated by the authenticator application.'
+          description: 'Boolean indicating whether users in this organization will be required to use an extra verification code when logging in to the dashboard. This code will be sent to their mobile phones via SMS or can be generated by the authenticator application.'
           valuemap:
             name: 'Boolean format'
           preprocessing:
@@ -1606,12 +1604,12 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 903cca42650f489f80ae5ace3adecb69
-          name: 'Meraki: Number different passwords'
+          name: 'Meraki: Number of different passwords'
           type: DEPENDENT
           key: meraki.login.num.different.passwords
           delay: '0'
           history: 7d
-          description: 'Number of minutes users can remain idle before being logged out of their accounts.'
+          description: 'Number of recent passwords that new password must be distinct from.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1807,8 +1805,6 @@ zabbix_export:
               key: 'meraki.admin.account.two.factor.auth[{#ADMIN.ID}]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
               description: 'Indicates whether two-factor authentication is enabled.'
               valuemap:
                 name: 'Boolean format'
@@ -1834,7 +1830,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Raw data for a admin in this organization.'
+              description: 'Raw data for admin in this organization.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2018,7 +2014,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The state of the license. All queued licenses have a status of recentlyQueued.'
+              description: 'The state of the license. All queued licenses have a status of ''recently queued''.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2152,7 +2148,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Raw data for a SAML roles.'
+              description: 'Raw data for SAML roles.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2170,7 +2166,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'The privilege of the SAML administrator on the organization.'
+              description: 'The privilege of the SAML administrator in the organization.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2239,14 +2235,14 @@ zabbix_export:
                 - tag: serial-number
                   value: '{#UPLINK.DEVICE.SERIAL}'
             - uuid: a4026ab15ff34c43a23605b27146376d
-              name: 'Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: public ip'
+              name: 'Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: public IP'
               type: DEPENDENT
               key: 'meraki.uplink.public.ip[{#NETWORK.NAME}, {#INTERFACE}, {#UPLINK.ROLE}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Network uplink public ip.'
+              description: 'Network uplink public IP.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2733,7 +2729,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'VPN network Mode.'
+              description: 'VPN network mode.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2744,14 +2740,14 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: baf0b63913564499a81065ea62cc8d53
-              name: 'VPN [{#NETWORK.NAME}]: peers network id'
+              name: 'VPN [{#NETWORK.NAME}]: peers network ID'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'VPN network Id.'
+              description: 'VPN network ID.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2769,7 +2765,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'VPN network name Meraki Vpn Peers.'
+              description: 'VPN network name Meraki VPN peers.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2787,7 +2783,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'VPN network Meraki Vpn Peers reachability.'
+              description: 'VPN network Meraki VPN peers reachability.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2805,7 +2801,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'VPN Statuses raw.'
+              description: 'VPN statuses raw.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2816,14 +2812,14 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 2efc18211e414114a0301c6e8b8beda9
-              name: 'VPN [{#NETWORK.NAME}]: third party peers network id'
+              name: 'VPN [{#NETWORK.NAME}]: third-party peers network ID'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.third.party.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Return network Id the third party VPN peers for an organization.'
+              description: 'Return network ID of the third-party VPN peers for the organization.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2835,14 +2831,14 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: 0b5fd0a0419e4a38bb27a0b5b3b73301
-              name: 'VPN [{#NETWORK.NAME}]: third party peers network name'
+              name: 'VPN [{#NETWORK.NAME}]: third-party peers network name'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.third.party.peers.network.name[{#NETWORK.ID},  {#NETWORK.NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Return network name the third party VPN peers for an organization.'
+              description: 'Return network name of the third-party VPN peers for the organization.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2854,14 +2850,14 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: 45e79c2918094fa5860d425d99e82201
-              name: 'VPN [{#NETWORK.NAME}]: third party peers network reachability'
+              name: 'VPN [{#NETWORK.NAME}]: third-party peers network reachability'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.third.party.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Return network reachability the third party VPN peers for an organization.'
+              description: 'Return network reachability of the third-party VPN peers for the organization.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2892,16 +2888,16 @@ zabbix_export:
       macros:
         - macro: '{$MERAKI.ADMIN.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable admin''s in organization.'
+          description: 'Filter of discoverable admins in organization.'
         - macro: '{$MERAKI.ADMIN.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered admin''s in organization.'
+          description: 'Filter to exclude discovered admins in organization.'
         - macro: '{$MERAKI.ADMIN.ORG.ACCESS.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable admin''s in organization.'
+          description: 'Filter of discoverable admins in organization.'
         - macro: '{$MERAKI.ADMIN.ORG.ACCESS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered admin''s in organization.'
+          description: 'Filter to exclude discovered admins in organization.'
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
@@ -2981,7 +2977,7 @@ zabbix_export:
           description: 'Average VPN connection loss percentage. Used in the trigger expression'
         - macro: '{$MERAKI.VPN.STATS.TIMESPAN}'
           value: '180'
-          description: 'Timespan in seconds for get organization appliance VPN stats. Used in the metric configuration and in the JavaScript api query. Must be between 1 and 86400 seconds.'
+          description: 'Timespan in seconds for getting organization appliance VPN stats. Used in the metric configuration and in the JavaScript API query. Must be between 1 and 86400 seconds.'
       dashboards:
         - uuid: 2d10effbfff447f6937877f25d12646a
           name: 'Meraki: General'
