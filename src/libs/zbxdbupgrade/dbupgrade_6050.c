@@ -1694,11 +1694,11 @@ static int	DBpatch_6050140(void)
 		const char	*ptr;
 		char		*tmp, *param = NULL;
 		int		quoted;
-		size_t		param_pos, param_len, sep_pos, buf_offset = 0, param_len;
+		size_t		param_pos, param_len, sep_pos, buf_offset = 0, params_len;
 
-		param_len = strlen(row[1]);
+		params_len = strlen(row[1]);
 
-		for (ptr = row[1]; ptr < row[1] + param_len; ptr += sep_pos + 1)
+		for (ptr = row[1]; ptr < row[1] + params_len; ptr += sep_pos + 1)
 		{
 			zbx_lld_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
@@ -1914,7 +1914,7 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 				{
 					replaced = 1;
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-						command + pos, token.loc.l + 2);
+						command + pos, token.loc.l - pos + 2);
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
 						substitute, strlen(substitute));
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, "}", 1);
@@ -1924,13 +1924,13 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 					zabbix_log(LOG_LEVEL_WARNING, error_msg, expression, row[0], error);
 					zbx_free(error);
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-						command + pos, token.loc.r + 1);
+						command + pos, token.loc.r - pos + 1);
 				}
 
 				zbx_free(expression);
 			}
 			else
-				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, token.loc.r + 1);
+				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, token.loc.r - pos + 1);
 
 			pos = token.loc.r + 1;
 		}
