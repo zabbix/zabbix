@@ -382,7 +382,7 @@ class CItemGeneralHelper {
 					$name = $input['headers']['name'][$index];
 					$value = $input['headers']['value'][$index];
 
-					if ($name !== '' && $value !== '') {
+					if ($name !== '' || $value !== '') {
 						$headers[$name] = $value;
 					}
 				}
@@ -400,11 +400,9 @@ class CItemGeneralHelper {
 			$parameters = [];
 
 			foreach ($input['parameters'] as $parameter) {
-				if ($parameter['name'] === '' || $parameter['value'] === '') {
-					continue;
+				if ($parameter['name'] !== '' || $parameter['value'] !== '') {
+					$parameters[] = $parameter;
 				}
-
-				$parameters[] = $parameter;
 			}
 
 			$input['parameters'] = $parameters;
