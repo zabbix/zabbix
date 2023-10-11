@@ -27,10 +27,9 @@ use Zabbix\Widgets\{
 	Fields\CWidgetFieldCheckBoxList,
 	Fields\CWidgetFieldColor,
 	Fields\CWidgetFieldIntegerBox,
+	Fields\CWidgetFieldItemPatternSelect,
 	Fields\CWidgetFieldMultiSelectGroup,
 	Fields\CWidgetFieldMultiSelectHost,
-	Fields\CWidgetFieldMultiSelectItem,
-	Fields\CWidgetFieldMultiSelectOverrideHost,
 	Fields\CWidgetFieldRadioButtonList,
 	Fields\CWidgetFieldTags,
 	Fields\CWidgetFieldTextArea,
@@ -83,7 +82,7 @@ class WidgetForm extends CWidgetForm {
 				: new CWidgetFieldTags('host_tags')
 			)
 			->addField(
-				(new CWidgetFieldMultiSelectItem('itemids', _('Item pattern')))
+				(new CWidgetFieldItemPatternSelect('items', _('Item pattern')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(

@@ -50,7 +50,7 @@ $form
 		: null
 	)
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids'],))
+		(new CWidgetFieldItemPatternSelectView($data['fields']['items']))->setPlaceholder(_('item pattern'))
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['evaltype_item'])
