@@ -3022,7 +3022,6 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:value_size' => 50,
 						'id:value_bold' => true,
 						'xpath:.//input[@id="value_color"]/..' => '283593',
-						'id:value_arc' => true,
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
