@@ -20,8 +20,9 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup dashboard
@@ -30,17 +31,17 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
  */
 class testDashboardTopTriggersWidget extends CWebTest {
 
-	use TableTrait;
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
 		];
 	}
 
@@ -695,7 +696,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data,'tags')) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
