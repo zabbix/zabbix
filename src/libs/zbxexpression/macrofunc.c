@@ -118,10 +118,13 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 	localtime_r(&time_new, &local_time);
 
 	if (NULL == strptime(*out, "%H:%M:%S", &local_time) &&
-			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S%z", &local_time) &&
-			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S", &local_time))
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S", &local_time) &&
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S%z", &local_time))
 	{
-		return FAIL;
+		if (0 == (time_new = atoi(*out)))
+			return FAIL;
+
+		localtime_r(&time_new, &local_time);
 	}
 
 	if (2 == nparam)
