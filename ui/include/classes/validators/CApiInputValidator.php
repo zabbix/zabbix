@@ -4153,6 +4153,16 @@ class CApiInputValidator {
 				]];
 				break;
 
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX]), 'flags' => API_REQUIRED],
+					'2' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => '1', 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+								['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]];
+				break;
+
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
@@ -4172,6 +4182,12 @@ class CApiInputValidator {
 						$index =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
 					];
 				}
+				break;
+
+			case ZBX_PREPROC_SNMP_GET_VALUE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
+				]];
 				break;
 		}
 

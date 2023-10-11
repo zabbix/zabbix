@@ -18,10 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role, users, usrgrp, module
@@ -29,7 +30,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormUserPermissions extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Id of role that created for future role rule change.
@@ -44,13 +55,6 @@ class testFormUserPermissions extends CWebTest {
 	 * @var integer
 	 */
 	protected static $admin_user;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
 
 	/**
 	 * Function used to create roles.
@@ -420,14 +424,20 @@ class testFormUserPermissions extends CWebTest {
 
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid=8')->waitUntilReady();
 		$this->query('link:Host permissions')->one()->click();
-		$permission_table = $this->query('xpath:.//table[@id="new-group-right-table"]')->asTable()->one();
-		$groups = ['Empty group' => 'Deny', 'Discovered hosts' => 'Read', 'Group to check Overview' => 'Read-write'];
-		foreach ($groups as $group => $level) {
-			$permission_table->query('class:multiselect-control')->asMultiselect()->one()->fill($group);
-			$this->query('id:new_group_right_permission')->asSegmentedRadio()->one()->select($level);
-			$permission_table->query('button:Add')->one()->click();
-			$this->page->waitUntilReady();
-		}
+		$this->query('id:hostgroup-right-table')->asMultifieldTable()->one()->fill([
+			[
+				'Host groups' => 'Empty group',
+				'Permissions' => 'Deny'
+			],
+			[
+				'Host groups' => 'Discovered hosts',
+				'Permissions' => 'Read'
+			],
+			[
+				'Host groups' => 'Group to check Overview',
+				'Permissions' => 'Read-write'
+			]
+		]);
 		$this->query('button:Update')->one()->click();
 
 		$this->page->open('zabbix.php?action=user.edit&userid=2')->waitUntilReady();
@@ -468,7 +478,7 @@ class testFormUserPermissions extends CWebTest {
 	public function testFormUserPermissions_Module() {
 		$widget_modules = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs', 'Favorite maps',
 			'Gauge', 'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
-			'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+			'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
 			'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 		];
 

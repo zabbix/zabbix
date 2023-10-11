@@ -129,7 +129,7 @@ class CDateSelector extends CTag {
 	/**
 	 * Add placeholder to date textbox field.
 	 *
-	 * @param string $text  Placeholder text for date textbox field.
+	 * @param string|null $text  Placeholder text for date textbox field.
 	 *
 	 * @return CDateSelector
 	 */
@@ -189,7 +189,7 @@ class CDateSelector extends CTag {
 		$this
 			->addItem(
 				(new CTextBox($this->name, $this->value))
-					->setId($this->name)
+					->setId(zbx_formatDomId($this->name))
 					->setAttribute('placeholder', $this->placeholder)
 					->setAttribute('maxlength', $this->maxlength ?? strlen(date($this->date_format)))
 					->setAriaRequired($this->is_required)
@@ -200,7 +200,7 @@ class CDateSelector extends CTag {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CALENDAR)
 				->setEnabled($this->enabled && !$this->readonly)
-				->onClick('toggleCalendar(this, "'.$this->name.'", "'.$this->date_format.'");'));
+				->onClick('toggleCalendar(this, "'.zbx_formatDomId($this->name).'", "'.$this->date_format.'");'));
 
 		return parent::toString($destroy);
 	}

@@ -162,14 +162,14 @@ zabbix_export:
             
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
+            - name: http_proxy
+              value: '{$SDWAN.HTTP_PROXY}'
+            - name: password
+              value: '{$SDWAN.API.PASSWORD}'
             - name: url
               value: '{$SDWAN.API.URL}'
             - name: username
               value: '{$SDWAN.API.USERNAME}'
-            - name: password
-              value: '{$SDWAN.API.PASSWORD}'
-            - name: http_proxy
-              value: '{$SDWAN.HTTP_PROXY}'
           tags:
             - tag: component
               value: raw
@@ -545,32 +545,60 @@ zabbix_export:
             - name: Main
               widgets:
                 - type: item
+                  name: 'Total devices'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Cisco SD-WAN by HTTP'
+                        key: sd_wan.total.devices
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'vManage devices'
+                  'y': '4'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Cisco SD-WAN by HTTP'
+                        key: sd_wan.vmanage.devices
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'vSmart devices'
+                  'y': '8'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Cisco SD-WAN by HTTP'
+                        key: sd_wan.vsmart.devices
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
                   name: 'Invalid certificates'
                   x: '12'
                   width: '12'
                   height: '4'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN by HTTP'
                         key: sd_wan.invalid_certificates
-                - type: item
-                  name: 'Total devices'
-                  width: '12'
-                  height: '4'
-                  fields:
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Cisco SD-WAN by HTTP'
-                        key: sd_wan.total.devices
                 - type: item
                   name: 'vBond devices'
                   x: '12'
@@ -578,14 +606,14 @@ zabbix_export:
                   width: '12'
                   height: '4'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN by HTTP'
                         key: sd_wan.vbond.devices
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
                 - type: item
                   name: 'vEdge devices'
                   x: '12'
@@ -593,42 +621,14 @@ zabbix_export:
                   width: '12'
                   height: '4'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN by HTTP'
                         key: sd_wan.vedge.devices
-                - type: item
-                  name: 'vManage devices'
-                  'y': '4'
-                  width: '12'
-                  height: '4'
-                  fields:
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Cisco SD-WAN by HTTP'
-                        key: sd_wan.vmanage.devices
-                - type: item
-                  name: 'vSmart devices'
-                  'y': '8'
-                  width: '12'
-                  height: '4'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Cisco SD-WAN by HTTP'
-                        key: sd_wan.vsmart.devices
     - uuid: e1e25df663204b099f2597caf89a0678
       template: 'Cisco SD-WAN device by HTTP'
       name: 'Cisco SD-WAN device by HTTP'
@@ -1410,16 +1410,16 @@ zabbix_export:
           description: 'Item for gathering device data from Cisco SD-WAN API.'
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
-            - name: url
-              value: '{$SDWAN.API.URL}'
-            - name: token
-              value: '{$SDWAN.AUTH.TOKEN}'
             - name: cookie
               value: '{$SDWAN.AUTH.SESSION}'
             - name: device_id
               value: '{$SDWAN.DEVICE_ID}'
             - name: http_proxy
               value: '{$SDWAN.HTTP_PROXY}'
+            - name: token
+              value: '{$SDWAN.AUTH.TOKEN}'
+            - name: url
+              value: '{$SDWAN.API.URL}'
           tags:
             - tag: component
               value: raw
@@ -1561,16 +1561,16 @@ zabbix_export:
           description: 'Item for gathering device interfaces from Cisco SD-WAN API.'
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
-            - name: url
-              value: '{$SDWAN.API.URL}'
-            - name: token
-              value: '{$SDWAN.AUTH.TOKEN}'
             - name: cookie
               value: '{$SDWAN.AUTH.SESSION}'
             - name: device_id
               value: '{$SDWAN.DEVICE_ID}'
             - name: http_proxy
               value: '{$SDWAN.HTTP_PROXY}'
+            - name: token
+              value: '{$SDWAN.AUTH.TOKEN}'
+            - name: url
+              value: '{$SDWAN.API.URL}'
           tags:
             - tag: component
               value: raw
@@ -1762,10 +1762,6 @@ zabbix_export:
           description: 'Item for gathering device routes from Cisco SD-WAN API.'
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
-            - name: url
-              value: '{$SDWAN.API.URL}'
-            - name: token
-              value: '{$SDWAN.AUTH.TOKEN}'
             - name: cookie
               value: '{$SDWAN.AUTH.SESSION}'
             - name: device_id
@@ -1774,6 +1770,10 @@ zabbix_export:
               value: '{$SDWAN.HTTP_PROXY}'
             - name: interval
               value: '{$SDWAN.ROUTES.FREQUENCY}'
+            - name: token
+              value: '{$SDWAN.AUTH.TOKEN}'
+            - name: url
+              value: '{$SDWAN.API.URL}'
           tags:
             - tag: component
               value: raw
@@ -2788,65 +2788,49 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: item
-                  name: Certificate
-                  x: '12'
-                  'y': '6'
-                  width: '6'
-                  height: '3'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Cisco SD-WAN device by HTTP'
-                        key: sd_wan.device.certificate_validity
-                - type: item
-                  name: 'Control connections'
-                  'y': '6'
-                  width: '6'
-                  height: '3'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Cisco SD-WAN device by HTTP'
-                        key: sd_wan.device.control_conn
-                - type: item
-                  name: Model
-                  x: '8'
+                  name: State
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
-                        key: sd_wan.device.model
+                        key: sd_wan.device.state
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
                 - type: item
                   name: Name
                   'y': '3'
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         key: sd_wan.device.hostname
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Control connections'
+                  'y': '6'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Cisco SD-WAN device by HTTP'
+                        key: sd_wan.device.control_conn
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: item
                   name: Reachability
                   x: '6'
@@ -2854,56 +2838,28 @@ zabbix_export:
                   width: '6'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         key: sd_wan.device.reachability
-                - type: item
-                  name: Role
-                  x: '18'
-                  'y': '6'
-                  width: '6'
-                  height: '3'
-                  fields:
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Cisco SD-WAN device by HTTP'
-                        key: sd_wan.device.role
                 - type: item
-                  name: 'Serial Number'
-                  x: '16'
+                  name: Model
+                  x: '8'
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
-                        key: sd_wan.device.serialnumber
-                - type: item
-                  name: State
-                  width: '8'
-                  height: '3'
-                  fields:
+                        key: sd_wan.device.model
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Cisco SD-WAN device by HTTP'
-                        key: sd_wan.device.state
                 - type: item
                   name: Uptime
                   x: '8'
@@ -2911,17 +2867,46 @@ zabbix_export:
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         key: sd_wan.device.uptime
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                - type: item
+                  name: Certificate
+                  x: '12'
+                  'y': '6'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Cisco SD-WAN device by HTTP'
+                        key: sd_wan.device.certificate_validity
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Serial Number'
+                  x: '16'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Cisco SD-WAN device by HTTP'
+                        key: sd_wan.device.serialnumber
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
                 - type: item
                   name: Version
                   x: '16'
@@ -2929,14 +2914,29 @@ zabbix_export:
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         key: sd_wan.device.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: Role
+                  x: '18'
+                  'y': '6'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Cisco SD-WAN device by HTTP'
+                        key: sd_wan.device.role
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
             - name: 'System performance'
               widgets:
                 - type: graph
@@ -2944,41 +2944,26 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         name: 'SD-WAN: System load'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Cisco SD-WAN device by HTTP'
-                        name: 'SD-WAN: CPU usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         name: 'SD-WAN: Memory usage'
-                - type: graph
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Cisco SD-WAN device by HTTP'
-                        name: 'SD-WAN: Processes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -2987,14 +2972,41 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         name: '["{#FSNAME}"]: Disk space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Cisco SD-WAN device by HTTP'
+                        name: 'SD-WAN: CPU usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                - type: graph
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Cisco SD-WAN device by HTTP'
+                        name: 'SD-WAN: Processes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
             - name: 'Network interfaces'
               widgets:
                 - type: graphprototype
@@ -3004,31 +3016,31 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         name: 'Interface ["{#IFNAME}"]: Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
             - name: Routes
               widgets:
                 - type: graphprototype
                   width: '24'
                   height: '8'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         name: 'Route [{#LOCAL} => {#REMOTE}]: Route statistic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
+                    - type: INTEGER
+                      name: rows
+                      value: '2'
       valuemaps:
         - uuid: ac1ad6688715425b8d6d0ac3c7e72b14
           name: 'Admin status'

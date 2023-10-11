@@ -87,6 +87,14 @@ class CMediatype extends CApiService {
 
 		$options = zbx_array_merge($defOptions, $options);
 
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectActions' =>  ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		// permission check
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 		}
@@ -885,6 +893,8 @@ class CMediatype extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedActions($options, $result);
+
 		// adding message templates
 		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
 			$message_templates = [];
@@ -1011,6 +1021,55 @@ class CMediatype extends CApiService {
 			while ($db_message = DBfetch($db_messages)) {
 				$db_mediatypes[$db_message['mediatypeid']]['message_templates'][$db_message['mediatype_messageid']] =
 					array_diff_key($db_message, array_flip(['mediatypeid']));
+			}
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private static function addRelatedActions(array $options, array &$result): void {
+		if ($options['selectActions'] === null) {
+			return;
+		}
+
+		$db_action_mediatypes = DBselect(
+			'SELECT DISTINCT om.mediatypeid,o.actionid'.
+			' FROM opmessage om,operations o'.
+			' WHERE om.operationid=o.operationid'.
+			' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
+		);
+
+		$action_mediatypeids = [];
+
+		while ($row = DBfetch($db_action_mediatypes)) {
+			if ($row['mediatypeid'] == 0) {
+				foreach ($result as $mediatype) {
+					$action_mediatypeids[$row['actionid']][$mediatype['mediatypeid']] = $mediatype['mediatypeid'];
+				}
+			}
+			else {
+				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = $row['mediatypeid'];
+			}
+		}
+
+		$action_options = [
+			'output' => $options['selectActions'],
+			'actionids' => array_keys($action_mediatypeids)
+		];
+
+		$db_actions = DBselect(DB::makeSql('actions', $action_options));
+
+		foreach ($result as $mediatype) {
+			$result[$mediatype['mediatypeid']]['actions'] = [];
+		}
+
+		while ($action = DBfetch($db_actions)) {
+			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid) {
+				$result[$mediatypeid]['actions'][] = $action;
+
+				CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
 			}
 		}
 	}

@@ -21,7 +21,7 @@
 require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
@@ -31,7 +31,17 @@ use Facebook\WebDriver\Exception\ElementClickInterceptedException;
  */
 class testMassUpdateItems extends CWebTest{
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
+	}
 
 	const HOSTID = 40001;	// Simple form test host.
 	const RULEID = 133800;	// testFormDiscoveryRule1 on Simple form test host.
@@ -60,15 +70,6 @@ class testMassUpdateItems extends CWebTest{
 					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		]
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * Add interface to host.
@@ -701,7 +702,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Timeout' => ['id' => 'timeout', 'value' => '0']
 					],
-					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
 			// #33.
@@ -713,9 +714,9 @@ class testMassUpdateItems extends CWebTest{
 						'18_Script'
 					],
 					'change' => [
-						'Timeout' => ['id' => 'timeout', 'value' => '61']
+						'Timeout' => ['id' => 'timeout', 'value' => '601']
 					],
-					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
 			// #34.
@@ -729,7 +730,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Timeout' => ['id' => 'timeout', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1/timeout": cannot be empty.'
+					// TODO: change details error message after ZBX-23467 fix (if necessary).
+					'details' => 'Incorrect value for field "timeout": cannot be empty.'
 				]
 			],
 			// #35.
@@ -1346,9 +1348,20 @@ class testMassUpdateItems extends CWebTest{
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, ($prototypes ? 'Cannot update item prototypes' : 'Cannot update items'),
+			/**
+			 * TODO: after ZBX-23467 remove if/else and leave only
+			 * $this->assertMessage(TEST_BAD, ($prototypes ? 'Cannot update item prototypes' : 'Cannot update items'),
+			 *      $data['details']);
+			 */
+			if ($field === 'Timeout') {
+				$this->assertMessage(TEST_BAD, null, $data['details']);
+			}
+			else {
+				$this->assertMessage(TEST_BAD, ($prototypes ? 'Cannot update item prototypes' : 'Cannot update items'),
 					$data['details']
-			);
+				);
+			}
+
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
 		}
 		else {

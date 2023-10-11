@@ -309,7 +309,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: MULTIPLIER
@@ -528,20 +528,26 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar SureSine by SNMP'
                         name: 'Current: A/C Load'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '4'
                   width: '24'
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar SureSine by SNMP'
                         name: 'Temperature: Heatsink'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: 1d6f60ea7d414cb8a26ddad70fc352b2
           name: 'SureSine load state'

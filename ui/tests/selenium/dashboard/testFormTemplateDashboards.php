@@ -27,7 +27,7 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 /**
  * @backup dashboard, hosts
  *
- * @dataSource Services, Sla
+ * @dataSource Services, Sla, Proxies
  *
  * @onBefore prepareTemplateDashboardsData
  */
@@ -190,12 +190,12 @@ class testFormTemplateDashboards extends CWebTest {
 									],
 									[
 										'type' => 1,
-										'name' => 'ds.items.0.0',
+										'name' => 'ds.0.items.0',
 										'value' => self::TEMPLATE_ITEM
 									],
 									[
 										'type' => 1,
-										'name' => 'ds.color.0',
+										'name' => 'ds.0.color',
 										'value' => 'FF465C'
 									]
 								]
@@ -322,7 +322,7 @@ class testFormTemplateDashboards extends CWebTest {
 									],
 									[
 										'type' => 1,
-										'name' => 'date_from',
+										'name' => 'date_period.from',
 										'value' => '2023-09-01'
 									]
 								]
@@ -360,47 +360,47 @@ class testFormTemplateDashboards extends CWebTest {
 								'fields' => [
 									[
 										'type' => 0,
-										'name' => 'columns.decimal_places.0',
+										'name' => 'columns.0.decimal_places',
 										'value' => 2
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
+										'name' => 'columns.0.name',
+										'value' => 'Column 1'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.item.0',
+										'name' => 'columns.0.item',
 										'value' => self::TEMPLATE_ITEM
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.timeshift.0',
+										'name' => 'columns.0.timeshift',
 										'value' => ''
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.display.0',
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.history.0',
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.0',
+										'name' => 'columns.0.data',
 										'value' => 1
 									]
 								]
@@ -553,9 +553,13 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
 		$this->checkDialogue('Dashboard properties');
+		// TODO: added updateViewport due to unstable test on Jenkins, scroll appears for 0.5 seconds
+		// after closing the overlay dialog and incorrect click location of $control_buttons occurs.
+		$this->page->updateViewport();
 
 		// Check the default new dashboard state (title, empty, editable).
-		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilReady();
+
 		$this->assertEquals('Dashboards', $dashboard->getTitle());
 		$this->assertTrue($dashboard->isEditable());
 		$this->assertTrue($dashboard->isEmpty());
@@ -717,7 +721,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'mandatory' => true
 						],
 						[
-							'field' => 'Background color',
+							'field' => 'Background colour',
 							'type' => 'color_picker'
 						],
 						[
@@ -740,7 +744,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -767,7 +771,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								],
 								[
@@ -806,7 +810,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -882,7 +886,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'mandatory' => true
 						],
 						[
-							'field' => 'Colors',
+							'field' => 'Colours',
 							'contents' => [
 								[
 									'field' => 'Value arc',
@@ -942,7 +946,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -976,7 +980,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_value_color',
 									'type' => 'color_picker'
 								],
@@ -1035,7 +1039,7 @@ class testFormTemplateDashboards extends CWebTest {
 								],
 
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_units_color',
 									'type' => 'color_picker'
 								]
@@ -1126,7 +1130,7 @@ class testFormTemplateDashboards extends CWebTest {
 					 */
 					'disabled' => [
 						[
-							'field' => 'Color',
+							'field' => 'Colour',
 							'fieldid' => 'lbl_needle_color',
 							'disabled_locator' => 'id:needle_color',
 							'type' => 'color_picker'
@@ -1303,7 +1307,12 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Interface type',
 							'type' => 'checkbox_list',
-							'checkboxes' => ['Zabbix agent' => false, 'SNMP' => false, 'JMX' => false, 'IPMI' => false]
+							'checkboxes' => [
+								'Zabbix agent (active checks)' => false,
+								'Zabbix agent (passive checks)' => false,
+								'SNMP' => false,
+								'JMX' => false,
+								'IPMI' => false]
 						],
 						[
 							'field' => 'Layout',
@@ -1313,6 +1322,11 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'Show data in maintenance',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show only totals',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -1379,7 +1393,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -1434,7 +1448,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => true
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_value_color',
 									'type' => 'color_picker'
 								],
@@ -1477,7 +1491,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => true
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_units_color',
 									'type' => 'color_picker'
 								]
@@ -1515,7 +1529,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -1552,7 +1566,7 @@ class testFormTemplateDashboards extends CWebTest {
 							]
 						],
 						[
-							'field' => 'Background color',
+							'field' => 'Background colour',
 							'type' => 'color_picker'
 						],
 						[
@@ -1593,29 +1607,11 @@ class testFormTemplateDashboards extends CWebTest {
 					'refresh_interval' => 'Default (15 minutes)',
 					'fields' => [
 						[
-							'field' => 'Source type',
-							'type' => 'radio_button',
-							'possible_values' => ['Map', 'Map navigation tree'],
-							'value' => 'Map'
-						],
-						[
 							'field' => 'Map',
 							'type' => 'multiselect',
-							'mandatory' => true
-						]
-					],
-					'hidden' => [
-						[
-							'field' => 'Filter',
-							'type' => 'dropdown',
 							'mandatory' => true,
-							'possible_values' => ['Select widget'],
-							'value' => 'Select widget',
-							'replaces' => 'Map'
+							'popup_menu_items' => ['Map', 'Widget']
 						]
-					],
-					'fill_for_hidden' => [
-						'Source type' => 'Map navigation tree'
 					]
 				]
 			],
@@ -1771,8 +1767,8 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Acknowledgement status',
 							'type' => 'radio_button',
-							'possible_values' => ['all', 'Unacknowledged', 'Acknowledged'],
-							'value' => 'all'
+							'possible_values' => ['All', 'Unacknowledged', 'Acknowledged'],
+							'value' => 'All'
 						],
 						[
 							'field' => 'Sort entries by',
@@ -2291,6 +2287,13 @@ class testFormTemplateDashboards extends CWebTest {
 				$default_value = '';
 				$this->assertEquals($default_value, $field->getValue());
 				$this->assertEquals('type here to search', $field->query('xpath:.//input')->one()->getAttribute('placeholder'));
+
+				if (array_key_exists('popup_menu_items', $field_details)) {
+					$field->query('class:multiselect-optional-select-button')->one()->click();
+					$popup_menu = CPopupMenuElement::find()->one()->waitUntilVisible();
+					$this->assertEquals($field_details['popup_menu_items'], $popup_menu->getItems()->asText());
+					$popup_menu->close();
+				}
 				break;
 
 			case 'dropdown':
@@ -2326,7 +2329,9 @@ class testFormTemplateDashboards extends CWebTest {
 					}
 				}
 
-				$this->assertTrue($field->query('name:date_'.lcfirst($field_details['field']).'_calendar')->one()->isClickable());
+				$this->assertTrue($field->query('id:date_period_'.lcfirst($field_details['field']).'_calendar')->one()
+						->isClickable()
+				);
 				break;
 
 			case 'color_picker':
@@ -3017,7 +3022,6 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:value_size' => 50,
 						'id:value_bold' => true,
 						'xpath:.//input[@id="value_color"]/..' => '283593',
-						'id:value_arc' => true,
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
@@ -3296,9 +3300,16 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Host availability'),
 						'Name' => 'Host availability with all possible parameters',
 						'Refresh interval' => '10 minutes',
-						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
+						'Interface type' => [
+							'Zabbix agent (active checks)',
+							'Zabbix agent (passive checks)',
+							'SNMP',
+							'JMX',
+							'IPMI'
+						],
 						'Layout' => 'Vertical',
-						'Show data in maintenance' => true
+						'Show data in maintenance' => true,
+						'Show only totals' => true
 					]
 				]
 			],
@@ -3492,20 +3503,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Map": cannot be empty.'
 				]
 			],
-			// #53 Map widget with not defined filter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Map'),
-						'Name' => 'Map widget with not defined filter',
-						'Source type' => 'Map navigation tree'
-					],
-					'form_reload' => true,
-					'error_message' => 'Invalid parameter "Filter": cannot be empty.'
-				]
-			],
-			// #54 Map widget with map.
+			// #53 Map widget with map.
 			[
 				[
 					'fields' => [
@@ -3515,24 +3513,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #55 Map widget with defined filter.
-			[
-				[
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Map'),
-						'Name' => 'Map widget with defined filter',
-						'Refresh interval' => '2 minutes',
-						'Source type' => 'Map navigation tree'
-					],
-					'form_reload' => true,
-					'actions' => [
-						'fill' => [
-							'Filter' => 'Empty navtree widget'
-						]
-					]
-				]
-			],
-			// #56 Map navigation tree widget.
+			// #54 Map navigation tree widget.
 			[
 				[
 					'fields' => [
@@ -3543,7 +3524,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #57 Plain text widget with empty Items parameter.
+			// #55 Plain text widget with empty Items parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3559,7 +3540,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #58 Plain text widget with too high value of Show lines parameter.
+			// #56 Plain text widget with too high value of Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3575,7 +3556,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #59 Plain text widget with negative Show lines parameter.
+			// #57 Plain text widget with negative Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3591,7 +3572,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #60 Plain text widget with Items location = top and text shown as HTML.
+			// #58 Plain text widget with Items location = top and text shown as HTML.
 			[
 				[
 					'fields' => [
@@ -3607,7 +3588,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #61 Plain text widget with Items location = left and text shown as plain text.
+			// #59 Plain text widget with Items location = left and text shown as plain text.
 			[
 				[
 					'fields' => [
@@ -3623,7 +3604,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #62 Problem hosts widget with default parameters.
+			// #60 Problem hosts widget with default parameters.
 			[
 				[
 
@@ -3633,7 +3614,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #63 Problem hosts widget with all possible parameters.
+			// #61 Problem hosts widget with all possible parameters.
 			[
 				[
 
@@ -3652,7 +3633,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #64 Problems widget with empty Show lines parameter (reset to 0).
+			// #62 Problems widget with empty Show lines parameter (reset to 0).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3664,7 +3645,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #65 Problems widget with too high value of Show lines parameter.
+			// #63 Problems widget with too high value of Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3676,7 +3657,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #66 Problems widget with negative Show lines parameter.
+			// #64 Problems widget with negative Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3688,7 +3669,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #67 Problems widget with default parameters.
+			// #65 Problems widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -3697,7 +3678,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #68 Problems widget with all possible parameters.
+			// #66 Problems widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3725,7 +3706,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #69 Problems by severity widget with default parameters.
+			// #67 Problems by severity widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -3734,7 +3715,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #70 Problems by severity widget with all possible parameters.
+			// #68 Problems by severity widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3755,7 +3736,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #71 SLA report widget with missing SLA.
+			// #69 SLA report widget with missing SLA.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3766,7 +3747,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "SLA": cannot be empty.'
 				]
 			],
-			// #72 SLA widget with non-numeric show periods.
+			// #70 SLA widget with non-numeric show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3782,7 +3763,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #73 SLA widget with too large value in show periods.
+			// #71 SLA widget with too large value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3795,7 +3776,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #74 SLA widget with floating point value in show periods.
+			// #72 SLA widget with floating point value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3811,7 +3792,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #75 SLA widget with negative value in show periods.
+			// #73 SLA widget with negative value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3824,7 +3805,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #76 SLA widget with string type From and To dates.
+			// #74 SLA widget with string type From and To dates.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3841,7 +3822,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #77 SLA widget with wrong From date and To date format.
+			// #75 SLA widget with wrong From date and To date format.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3858,7 +3839,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// #78 SLA widget with From date and To date too far in the past.
+			// #76 SLA widget with From date and To date too far in the past.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3870,12 +3851,12 @@ class testFormTemplateDashboards extends CWebTest {
 						'To' => '1969-10-10'
 					],
 					'error_message' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
-			// #79 SLA widget with From date and To date too far in the future.
+			// #77 SLA widget with From date and To date too far in the future.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3887,12 +3868,12 @@ class testFormTemplateDashboards extends CWebTest {
 						'To' => '2050-10-10'
 					],
 					'error_message' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
-			// #80 SLA widget with minimal set of parameters.
+			// #78 SLA widget with minimal set of parameters.
 			[
 				[
 					'fields' => [
@@ -3903,7 +3884,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #81 SLA widget with all possible parameters set.
+			// #79 SLA widget with all possible parameters set.
 			[
 				[
 					'fields' => [
@@ -3919,7 +3900,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #82 SLA widget with dynamic From and To.
+			// #80 SLA widget with dynamic From and To.
 			[
 				[
 					'fields' => [
@@ -3932,7 +3913,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #83 System information widget with default parameters.
+			// #81 System information widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -3942,7 +3923,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #84 System information widget with all parameters specified.
+			// #82 System information widget with all parameters specified.
 			[
 				[
 					'fields' => [
@@ -3954,7 +3935,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #85 Top triggers widget with empty Trigger count.
+			// #83 Top triggers widget with empty Trigger count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3967,7 +3948,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
 				]
 			],
-			// #86 Top triggers widget with non-numeric Trigger count.
+			// #84 Top triggers widget with non-numeric Trigger count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3983,7 +3964,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
 				]
 			],
-			// #87 Top triggers widget with zero Trigger count.
+			// #85 Top triggers widget with zero Trigger count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3996,7 +3977,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
 				]
 			],
-			// #88 Top triggers widget with out of range Trigger count.
+			// #86 Top triggers widget with out of range Trigger count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4009,7 +3990,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
 				]
 			],
-			// #89 Top triggers widget with default parameters.
+			// #87 Top triggers widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4019,7 +4000,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #90 Top triggers widget with all possible parameters.
+			// #88 Top triggers widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4037,7 +4018,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #91 Trigger overview widget with default parameters.
+			// #89 Trigger overview widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4047,7 +4028,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #92 Trigger overview widget with all possible parameters.
+			// #90 Trigger overview widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4065,7 +4046,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #93 URL widget with special symbols in URL.
+			// #91 URL widget with special symbols in URL.
 			[
 				[
 					'fields' => [
@@ -4077,7 +4058,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #94 URL widget with trailing and leading spaces in URL.
+			// #92 URL widget with trailing and leading spaces in URL.
 			[
 				[
 					'fields' => [
@@ -4089,7 +4070,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #95 URL widget with empty URL (after trimming).
+			// #93 URL widget with empty URL (after trimming).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4103,7 +4084,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "URL": cannot be empty.'
 				]
 			],
-			// #96 Web monitoring widget with default parameters.
+			// #94 Web monitoring widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4113,7 +4094,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #97 Web monitoring widget with all possible parameters.
+			// #95 Web monitoring widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4129,7 +4110,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #98 Data overview widget with default parameters.
+			// #96 Data overview widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4139,7 +4120,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #99 Data overview widget with all possible parameters.
+			// #97 Data overview widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4344,8 +4325,8 @@ class testFormTemplateDashboards extends CWebTest {
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
-					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
-					'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
+					'Pie chart', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
 					'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());

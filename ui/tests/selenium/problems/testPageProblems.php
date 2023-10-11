@@ -28,8 +28,20 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
  */
 class testPageProblems extends CWebTest {
 
-	use TagTrait;
-	use TableTrait;
+	/**
+	 * Attach TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:filter-tags_0'
+			]
+		];
+	}
 
 	public function testPageProblems_Layout() {
 		$this->page->login()->open('zabbix.php?action=problem.view&show_timeline=0&filter_reset=1');
@@ -572,7 +584,6 @@ class testPageProblems extends CWebTest {
 		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
-		$this->setTagSelector('id:filter-tags_0');
 		$this->setTags($data['tags']);
 		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 		$this->query('name:filter_apply')->one()->click();

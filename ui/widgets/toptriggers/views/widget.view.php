@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+$view = new CWidgetView($data);
+
 $table = (new CTableInfo())
 	->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of problems')])
 	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
@@ -63,6 +65,10 @@ else {
 	}
 }
 
-(new CWidgetView($data))
+if ($data['info']) {
+	$view->setVar('info', $data['info']);
+}
+
+$view
 	->addItem($table)
 	->show();

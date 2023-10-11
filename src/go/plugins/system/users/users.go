@@ -28,18 +28,11 @@ import (
 
 type Plugin struct {
 	plugin.Base
-	options Options
-}
-
-type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 }
 
 var impl Plugin
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	p.options.Timeout = global.Timeout
 }
 
 func (p *Plugin) Validate(options interface{}) error {
@@ -52,7 +45,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("Too many parameters.")
 	}
 
-	result, err = p.getUsersNum()
+	result, err = p.getUsersNum(ctx.Timeout())
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get logged in user count: %s.", err.Error())
 	}
