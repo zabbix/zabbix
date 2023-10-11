@@ -24,8 +24,11 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 /**
  * @backup users
  * @dataSource LoginUsers
+ * @onBefore prepareData
  */
 class testFormUser extends CWebTest {
+
+const SQL = 'SELECT * FROM users';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -34,6 +37,52 @@ class testFormUser extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
+	}
+
+	public function prepareData() {
+		// Create LDAP server.
+		CDataHelper::call('userdirectory.create', [
+			[
+				'idp_type' => IDP_TYPE_LDAP,
+				'name' => 'LDAP server #1',
+				'host' => 'LDAP host',
+				'port' => '389',
+				'base_dn' => 'ou=Users,dc=example,dc=org',
+				'bind_dn' => 'cn=ldap_search,dc=example,dc=org',
+				'bind_password' => 'ldapsecretpassword',
+				'search_attribute' => 'uid'
+			]
+		]);
+		$userdirectoryids = CDataHelper::getIds('name');
+
+		// Create group with frontend access -> LDAP and previously created LDAP server.
+		CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'Zabbix LDAP',
+				'gui_access' => GROUP_GUI_ACCESS_LDAP,
+				'userdirectoryid' => $userdirectoryids['LDAP server #1']
+			]
+		]);
+		$usergrpids = CDataHelper::getIds('name');
+
+		// Create user with frontent access -> LDAP.
+		CDataHelper::call('user.create', [
+			[
+				'username' => 'John Smith',
+				'passwd' => 'test5678',
+				'roleid' => '3'
+			],
+			[
+				'username' => 'LDAP change password button check',
+				'passwd' => 'test5678',
+				'roleid' => '2',
+				'usrgrps' => [
+					[
+						'usrgrpid' =>  $usergrpids['Zabbix LDAP']
+					]
+				]
+			]
+		]);
 	}
 
 	public function getCreateData() {
@@ -560,8 +609,7 @@ class testFormUser extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormUser_Create($data) {
-		$sql = 'SELECT * FROM users';
-		$old_hash = CDBHelper::getHash($sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
@@ -582,7 +630,7 @@ class testFormUser extends CWebTest {
 		// Verify that the user was created.
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User added');
@@ -598,7 +646,7 @@ class testFormUser extends CWebTest {
 		}
 	}
 
-	/*
+	/**
 	 * Check the field values after creating or updating user.
 	 */
 	private function assertFormFields($data) {
@@ -629,7 +677,7 @@ class testFormUser extends CWebTest {
 		}
 	}
 
-	/*
+	/**
 	 * Login as user and check user profile parameters in UI.
 	 */
 	private function assertUserParameters($data) {
@@ -673,6 +721,61 @@ class testFormUser extends CWebTest {
 
 	public function getUpdateData() {
 		return [
+			// Incorrect current password.
+			[
+				[
+					'expected' => TEST_BAD,
+					'user_to_update' => 'Admin',
+					'fields' => [
+						'Current password' => 'azazabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
+					],
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Incorrect current password.'
+				]
+			],
+			// Current password with spaces.
+			[
+				[
+					'expected' => TEST_BAD,
+					'user_to_update' => 'Admin',
+					'fields' => [
+						'Current password' => ' zabbix ',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
+					],
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Incorrect current password.'
+				]
+			],
+			// Empty current password.
+			[
+				[
+					'expected' => TEST_BAD,
+					'user_to_update' => 'Admin',
+					'fields' => [
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
+					],
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Incorrect value for field "Current password": cannot be empty'
+				]
+			],
+			// Empty password fields for user without user group.
+			// TODO: Uncomment data provider when ZBX-23497 will be fixed.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'user_to_update' => 'John Smith',
+//					'fields' => [
+//						'Password' => '',
+//						'Password (once again)' => ''
+//					],
+//					'error_title' => 'Cannot update user',
+//					'error_details' => 'Incorrect value for field "Password": cannot be empty'
+//				]
+//			],
 			// Username is already taken by another user.
 			[
 				[
@@ -710,6 +813,30 @@ class testFormUser extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'fields' => [
+						'Password (once again)' => 'test5678'
+					],
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Both passwords must be equal.'
+				]
+			],
+			// LDAP user with empty repeated password.
+			[
+				[
+					'expected' => TEST_BAD,
+					'user_to_update' => 'LDAP user',
+					'fields' => [
+						'Password' => 'test5678'
+					],
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Both passwords must be equal.'
+				]
+			],
+			// Updating user from "No access to the frontend" group without filling in password.
+			[
+				[
+					'expected' => TEST_BAD,
+					'user_to_update' => 'no-access-to-the-frontend',
 					'fields' => [
 						'Password (once again)' => 'test5678'
 					],
@@ -919,6 +1046,40 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
+			// Updating LDAP user with empty password fields.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_to_update' => 'LDAP user',
+					'fields' => [
+						'Username' => 'LDAP user updated',
+						'Password' => '',
+						'Password (once again)' => ''
+					]
+				]
+			],
+			// Updating user from "No access to the frontend" group using empty password fields.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_to_update' => 'no-access-to-the-frontend',
+					'fields' => [
+						'Username' => 'no-access-to-the-frontend-updated',
+						'Password' => '',
+						'Password (once again)' => ''
+					]
+				]
+			],
+			// Updating user from "LDAP" group.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_to_update' => 'LDAP change password button check',
+					'fields' => [
+						'Username' => 'LDAP change password button check - updated'
+					]
+				]
+			],
 			// Updating all fields (except password) of an existing user.
 			[
 				[
@@ -972,9 +1133,7 @@ class testFormUser extends CWebTest {
 	 */
 	public function testFormUser_Update($data) {
 		$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
-		$sql = 'SELECT * FROM users';
-		$old_hash = CDBHelper::getHash($sql);
-
+		$old_hash = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $update_user)->waitUntilVisible()->one()->click();
 
@@ -984,6 +1143,22 @@ class testFormUser extends CWebTest {
 		if (array_key_exists('Password', $data['fields']) || array_key_exists('Password (once again)', $data['fields'])) {
 			$form->query('button:Change password')->one()->click();
 		}
+
+		if ($update_user === 'LDAP change password button check') {
+			$this->assertFalse($form->query('button:Change password')->one()->isClickable());
+			$hintbox = 'Password can only be changed for users using the internal Zabbix authentication.';
+			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-contents, "'.$hintbox.'")]')
+					->one()->getAttribute('data-hintbox-contents')
+			);
+		}
+
+		if ($update_user === 'Admin') {
+			$this->assertTrue($form->query('id:current_password')->one()->isVisible());
+		}
+		else {
+			$this->assertFalse($form->query('id:current_password')->one(false)->isValid());
+		}
+
 		$form->fill($data['fields']);
 
 		if (array_key_exists('auto_logout', $data)) {
@@ -993,11 +1168,16 @@ class testFormUser extends CWebTest {
 		$form->submit();
 
 		if (array_key_exists('Password', $data['fields']) && array_key_exists('Password (once again)', $data['fields'])) {
-			$this->assertTrue($this->page->isAlertPresent());
-			$this->assertEquals('In case of successful password change user will be logged out of all active sessions. Continue?',
+			if ($update_user === 'LDAP user' || $update_user === 'no-access-to-the-frontend') {
+				$this->assertFalse($this->page->isAlertPresent());
+			}
+			else {
+				$this->assertTrue($this->page->isAlertPresent());
+				$this->assertEquals('In case of successful password change user will be logged out of all active sessions. Continue?',
 					$this->page->getAlertText()
-			);
-			$this->page->acceptAlert();
+				);
+				$this->page->acceptAlert();
+			}
 		}
 
 		$this->page->waitUntilReady();
@@ -1005,7 +1185,7 @@ class testFormUser extends CWebTest {
 		// Verify if the user was updated.
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User updated');
@@ -1041,23 +1221,46 @@ class testFormUser extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
+	public function getPasswordUpdateData() {
+		return [
+			[
+				[
+					'username' => 'user-zabbix',
+					'old_password' => 'test5678',
+					'new_password' => 'test5678_new',
+					'error_message' => 'Incorrect user name or password or account is temporarily blocked.',
+					'attempt_message' => '1 failed login attempt logged. Last failed attempt was from'
+				]
+			],
+			[
+				[
+					'username' => 'Admin',
+					'old_password' => 'zabbix',
+					'new_password' => 'test6789_new',
+					'error_message' => 'Incorrect user name or password or account is temporarily blocked.',
+					'attempt_message' => '1 failed login attempt logged. Last failed attempt was from'
+				]
+			]
+		];
+	}
+
 	/**
+	 * @dataProvider getPasswordUpdateData
+	 *
 	 * Test user password change and sign in with new password.
 	 */
-	public function testFormUser_PasswordUpdate() {
-		$data = [
-			'username' => 'user-zabbix',
-			'old_password' => 'test5678',
-			'new_password' => 'test5678_new',
-			'error_message' => 'Incorrect user name or password or account is temporarily blocked.',
-			'attempt_message' => '1 failed login attempt logged. Last failed attempt was from'
-		];
+	public function testFormUser_PasswordUpdate($data) {
+		$update_user = CTestArrayHelper::get($data, 'username', 'Admin');
 		$this->page->login()->open('zabbix.php?action=user.list');
-		$this->query('link', $data['username'])->waitUntilVisible()->one()->click();
+		$this->query('link', $update_user)->waitUntilVisible()->one()->click();
 		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form_update->query('button:Change password')->one()->click();
 
 		// Change user password and log out.
+		if ($update_user === 'Admin') {
+			$form_update->fill(['Current password' => $data['old_password']]);
+		}
+
 		$form_update->fill([
 			'Password' => $data['new_password'],
 			'Password (once again)' => $data['new_password']
@@ -1097,7 +1300,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Username' => 'no-access-to-the-frontend'
+						'Username' => 'John Smith'
 					]
 				]
 			],
