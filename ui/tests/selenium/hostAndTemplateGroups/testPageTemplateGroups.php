@@ -20,6 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../common/testPageGroups.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup hosts
@@ -29,6 +31,21 @@ require_once dirname(__FILE__).'/../common/testPageGroups.php';
  * @dataSource HostTemplateGroups
  */
 class testPageTemplateGroups extends testPageGroups {
+
+	/**
+	 * Attach TableBehavior to set column names and MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			[
+				'class' => CTableBehavior::class,
+				'column_names' => ['' , 'Name', 'Count', 'Templates']
+			]
+		];
+	}
 
 	protected $link = 'zabbix.php?action=templategroup.list';
 	protected $object = 'template';
