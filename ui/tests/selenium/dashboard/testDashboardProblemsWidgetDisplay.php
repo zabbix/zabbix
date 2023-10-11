@@ -792,7 +792,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							$row->assertValues($hint_rows[$i]);
 						}
 
-						$hint->close();
+						// TODO: remove 'if' statement after fix ZBX-23472
+						if ($class !== 'zi-bullet-right-with-content') {
+							$hint->close();
+						}
 					}
 				}
 			}
