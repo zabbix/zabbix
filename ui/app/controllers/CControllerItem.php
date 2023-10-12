@@ -32,17 +32,15 @@ abstract class CControllerItem extends CController {
 	}
 
 	/**
-	 * Validate form input.
+	 * Common item field validation rules.
 	 *
-	 * @param array $required_fields  Array of fields to be set as required when validating.
-	 *
-	 * @return bool  is form input valid.
+	 * @return array
 	 */
-	protected function validateFormInput(array $required_fields): bool {
-		$fields = [
-			'name'					=> 'db items.name',
+	protected static function getValidationFields(): array {
+		return [
+			'name'					=> 'db items.name|not_empty',
 			'type'					=> 'in '.implode(',', array_keys(item_type2str())),
-			'key'					=> 'db items.key_',
+			'key'					=> 'db items.key_|not_empty',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
 			'url'					=> 'db items.url',
 			'query_fields'			=> 'array',
@@ -102,54 +100,48 @@ abstract class CControllerItem extends CController {
 			'itemid'				=> 'id',
 			'templateid'			=> 'id'
 		];
+	}
 
-		foreach ($required_fields as $field) {
-			$fields[$field] = 'required|'.$fields[$field];
+	/**
+	 * Additional validation for update and create actions.
+	 *
+	 * @return bool
+	 */
+	protected function validateInputEx(): bool {
+		$ret = true;
+
+		if ($this->hasInput('type') && $this->hasInput('key')) {
+			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
 		}
 
-		$field = '';
-		$ret = $this->validateInput($fields);
-		$tags = $this->getInput('tags', []);
+		$delay_flex = $this->getInput('delay_flex', []);
 
-		if ($ret && $tags) {
-			$ret = count(array_column($tags, 'tag')) == count(array_column($tags, 'value'));
-			$field = 'tags';
+		if ($ret && $delay_flex) {
+			$ret = isValidCustomIntervals($delay_flex);
 		}
 
-		$query_fields = $this->getInput('query_fields', []);
+		if ($ret && $this->getInput('custom_timeout', -1) == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			$support_custom_timeout = [
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
+				ITEM_TYPE_SCRIPT
+			];
 
-		if ($ret && $query_fields) {
-			$ret = array_key_exists('sortorder', $query_fields)
-				&& array_key_exists('name', $query_fields)
-				&& array_key_exists('value', $query_fields);
-			$field = 'query_fields';
+			if (in_array($this->getInput('type', -1), $support_custom_timeout)) {
+				$ret = $this->validateCustomTimeout(['timeout' => $this->getInput('timeout')]);
+			}
 		}
 
-		$headers = $this->getInput('headers', []);
+		return $ret && $this->validateRefferedObjects();
+	}
 
-		if ($ret && $headers) {
-			$ret = array_key_exists('sortorder', $headers)
-				&& array_key_exists('name', $headers)
-				&& array_key_exists('value', $headers);
-			$field = 'headers';
-		}
-
-		if ($ret) {
-			$ret = $this->hasInput('itemid') || $this->hasInput('hostid');
-			$field = $this->hasInput('hostid') ? 'itemid' : 'hostid';
-		}
-
-		if ($ret && $this->hasInput('custom_timeout')
-				&& $this->getInput('custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
-			$field = 'timeout';
-			$ret = trim($this->getInput('timeout', '')) !== '';
-		}
-
-		if (!$ret && $field !== '') {
-			error(_s('Incorrect value for "%1$s" field.', $field));
-
-			return false;
-		}
+	/**
+	 * Validate for reffered objects exists and user have access.
+	 *
+	 * @return bool
+	 */
+	protected function validateRefferedObjects(): bool {
+		$ret = true;
 
 		if ($this->hasInput('itemid')) {
 			$ret = (bool) API::Item()->get([
@@ -175,6 +167,27 @@ abstract class CControllerItem extends CController {
 
 		if (!$ret) {
 			error(_('No permissions to referred object or it does not exist!'));
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Validates custom timeout field.
+	 *
+	 * @param array $input
+	 *
+	 * @return bool
+	 */
+	protected function validateCustomTimeout(array $input): bool {
+		$fields = [
+			'timeout' => 'time_unit|not_empty'
+		];
+		$validator = new CNewValidator($input, $fields);
+		$ret = !$validator->isError();
+
+		if (!$ret) {
+			array_map('info', $validator->getAllErrors());
 		}
 
 		return $ret;
