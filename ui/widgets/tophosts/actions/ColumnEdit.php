@@ -168,7 +168,12 @@ class ColumnEdit extends CController {
 		);
 	}
 
-	private static function getColumnDefaults() {
+	/**
+	 * Retrieve the default configuration values for column in Top hosts widget.
+	 *
+	 * @return array
+	 */
+	private static function getColumnDefaults(): array {
 		static $column_defaults;
 
 		if ($column_defaults === null) {
