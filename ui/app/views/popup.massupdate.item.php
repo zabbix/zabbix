@@ -208,9 +208,9 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 				])
 			]),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_preprocessing', 0))
-				->addValue(_('Replace'), 0)
-				->addValue(_('Remove all'), 1)
+			(new CRadioButtonList('mass_update_preprocessing_action', ZBX_ACTION_REPLACE))
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
 				->setModern(true)
 				->addClass('before-table'),
 			getItemPreprocessing([], false, $data['preprocessing_types'])

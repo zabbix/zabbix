@@ -168,20 +168,17 @@
 	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
 })();
 
-document.getElementById('mass_update_preprocessing_1').addEventListener('click', () => {
-	document.getElementById('preprocessing').style.display = "none";
-})
+const preprocessing_action_buttons = document.querySelectorAll('[name="mass_update_preprocessing_action"]');
 
-document.getElementById('mass_update_preprocessing_0').addEventListener('click', () => {
-	document.getElementById('preprocessing').style.display = "";
-})
+preprocessing_action_buttons.forEach((button) => button.addEventListener('click', () =>
+	document.getElementById('preprocessing').style.display = button.value == <?= ZBX_ACTION_REPLACE ?> ? '' : 'none')
+);
 
 document.querySelector('#visible_preprocessing').addEventListener('change', () => {
-	const preprocessing = $('#preprocessing');
-	const preprocessing_step_count = preprocessing.find('li.sortable').length;
+	const preprocessing = document.querySelector('#preprocessing');
 
-	if (preprocessing_step_count == 0) {
-		preprocessing.find('.element-table-add').click();
+	if (preprocessing?.querySelectorAll('li.sortable').length == 0) {
+		preprocessing.querySelector('.element-table-add')?.click();
 	}
 });
 </script>
