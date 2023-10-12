@@ -63,16 +63,12 @@ class CControllerItemEdit extends CControllerItem {
 
 	public function doAction() {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
-		$inherited_timeouts = [];
 		$item = $this->getItem();
+		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
+		$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
 
-		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-			$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
-			$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
-
-			if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
-				$item['timeout'] = $item['inherited_timeout'];
-			}
+		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
+			$item['timeout'] = $item['inherited_timeout'];
 		}
 
 		$set_inventory = array_column(API::Item()->get([
@@ -213,7 +209,7 @@ class CControllerItemEdit extends CControllerItem {
 		$item = [];
 
 		if ($this->hasInput('itemid')) {
-			$item = API::Item()->get([
+			[$item] = API::Item()->get([
 				'output' => [
 					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
@@ -230,7 +226,7 @@ class CControllerItemEdit extends CControllerItem {
 				'selectTags' => ['tag', 'value'],
 				'itemids' => [$this->getInput('itemid')]
 			]);
-			$item = $item ? CItemHelper::convertApiInputForForm(reset($item)) : [];
+			$item = CItemHelper::convertApiInputForForm($item);
 		}
 
 		if (!$item) {

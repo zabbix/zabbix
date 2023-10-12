@@ -64,16 +64,12 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	public function doAction() {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
-		$inherited_timeouts = [];
 		$item = $this->getItemPrototype();
+		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
+		$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
 
-		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-			$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
-			$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
-
-			if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
-				$item['timeout'] = $item['inherited_timeout'];
-			}
+		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
+			$item['timeout'] = $item['inherited_timeout'];
 		}
 
 		$set_inventory = array_column(API::Item()->get([
