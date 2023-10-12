@@ -240,12 +240,59 @@ class testPageProblems extends CWebTest {
 
 		// Check Problems table layout.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-				'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
-		);
-
 		$this->assertEquals(['Time', 'Severity', 'Host', 'Problem'], $table->getSortableHeaders()->asText());
-		$this->assertEquals(false, $this->query('button:Mass update')->one()->isClickable());
+
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
+
+		$dependant_headers = [
+			['label' => 'Show', 'value' => 'Recent problems', 'headers' => ['Recovery time', 'Status', 'Info', 'Host',
+					'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			['label' => 'Show', 'value' => 'History', 'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem',
+				'Duration', 'Update', 'Actions', 'Tags']
+			],
+			['label' => 'Show', 'value' => 'Problems', 'headers' => ['Info', 'Host', 'Problem', 'Duration',
+					'Update', 'Actions', 'Tags']
+			],
+			['label' => 'Show tags', 'value' => 'None', 'headers' => ['Info', 'Host', 'Problem', 'Duration',
+					'Update', 'Actions']
+			],
+			['label' => 'Show tags', 'value' => 1, 'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update',
+					'Actions', 'Tags']
+			],
+			['label' => 'Show tags', 'value' => 2, 'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update',
+					'Actions', 'Tags']
+			],
+			['label' => 'Show tags', 'value' => 3, 'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update',
+					'Actions', 'Tags']
+			],
+			['label' =>'Show operational data', 'value' => 'None', 'headers' => ['Info', 'Host', 'Problem',  'Duration',
+					'Update', 'Actions', 'Tags']
+			],
+			['label' =>'Show operational data', 'value' => 'Separately', 'headers' => ['Info', 'Host', 'Problem',
+					'Operational data', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			['label' =>'Show operational data', 'value' => 'With problem name', 'headers' => ['Info', 'Host',
+					'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			['label' =>'id:show_timeline_0', 'value' => false, 'headers' => [ 'Info', 'Host', 'Problem', 'Duration',
+					'Update', 'Actions', 'Tags']
+			],
+			['label' =>'id:show_timeline_0', 'value' => true, 'headers' => ['Info', 'Host', 'Problem', 'Duration',
+					'Update', 'Actions', 'Tags']
+			]
+		];
+
+		foreach ($dependant_headers as $field) {
+			$filter_form->fill([$field['label'] => $field['value']]);
+			$filter_form->submit();
+			$table->waitUntilReloaded();
+			$start_headers = ($field['label'] === 'id:show_timeline_0' && !$field['value'])
+				? ['', 'Time', 'Severity']
+				: ['', 'Time', '', '', 'Severity'];
+			$this->assertEquals(array_merge($start_headers, $field['headers']), $table->getHeadersText());
+		}
 
 		// Check that some unfiltered data is displayed in the table.
 		$this->assertTableStats(CDBHelper::getCount(
@@ -253,6 +300,12 @@ class testPageProblems extends CWebTest {
 				' WHERE eventid'.
 					' NOT IN (SELECT eventid FROM event_suppress)'
 		));
+
+		// Check Mass update button.
+		$button_state = $this->query('button:Mass update')->one()->isClickable();
+		$this->assertEquals(false, $button_state);
+		$table->getRow(0)->select();
+		$this->assertEquals(false, $button_state);
 	}
 
 	public static function getFilterData() {
