@@ -400,7 +400,7 @@ window.item_edit_form = new class {
 		const fields = getFormFields(this.form);
 
 		for (let key in fields) {
-			if (typeof fields[key] === 'string') {
+			if (typeof fields[key] === 'string' && key !== 'ipmi_sensor') {
 				fields[key] = fields[key].trim();
 			}
 		}
