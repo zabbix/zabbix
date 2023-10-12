@@ -136,9 +136,10 @@ window.widget_item_form = new class {
 	}
 
 	/**
-	 * Fetches data type of selected item using AJAX request.
+	 * Fetch type of currently selected item.
 	 *
-	 * @return {int|bool}  Returns false, if no item provided or error occurs in request.
+	 * @returns {Promise<any>}  Resolved promise will contain item type, or false in case of error or if no item is
+	 *                          currently selected.
 	 */
 	#promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
@@ -156,17 +157,21 @@ window.widget_item_form = new class {
 		return fetch(curl.getUrl())
 			.then((response) => response.json())
 			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
 				return parseInt(response.result);
 			})
 			.catch((exception) => {
-				console.error('Could not get value data type of the item:', exception);
+				console.log('Could not get item type', exception);
 
-				return Promise.resolve(false);
+				return false;
 			});
 	}
 
 	/**
-	 * Checks if provided item type is numeric.
+	 * Check if provided item type is numeric.
 	 *
 	 * @param {int|bool} type  Item type.
 	 */
@@ -175,7 +180,7 @@ window.widget_item_form = new class {
 	}
 
 	/**
-	 * Sets color to specified indicator.
+	 * Set color of the specified indicator.
 	 *
 	 * @param {string} name   Indicator name.
 	 * @param {string} color  Color number.
