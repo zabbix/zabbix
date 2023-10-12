@@ -113,14 +113,14 @@ foreach ($data['items'] as $item) {
 		(new CLink(($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('Yes')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($item['status']))
-			->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
+			->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
 			->setAttribute('data-itemid', $item['itemid'])
 			->setAttribute('data-field', 'status')
 			->setAttribute('data-context', $data['context']),
 		(new CLink(($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER) ? _('No') : _('Yes')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
-			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? 'js-enable-item' : 'js-disable-item')
+			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? 'js-enable-itemprototype' : 'js-disable-itemprototype')
 			->setAttribute('data-itemid', $item['itemid'])
 			->setAttribute('data-field', 'discover')
 			->setAttribute('data-context', $data['context']),
