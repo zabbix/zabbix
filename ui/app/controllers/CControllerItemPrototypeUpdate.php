@@ -32,16 +32,6 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 
 		$ret = $this->validateInput($fields) && $this->validateInputEx();
 
-		if ($ret && $this->hasInput('type') && $this->hasInput('key')) {
-			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
-		}
-
-		$delay_flex = $this->getInput('delay_flex', []);
-
-		if ($ret && $delay_flex) {
-			$ret = isValidCustomIntervals($delay_flex);
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
@@ -83,14 +73,11 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 		$input = parent::getInputForApi();
 
 		[$db_item] = API::ItemPrototype()->get([
-			'output' => ['itemid', 'templateid', 'flags'],
+			'output' => ['templateid', 'flags'],
 			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('itemid')
 		]);
-		$input += $db_item;
 
-		$item = ['itemid' => $db_item['itemid']] + getSanitizedItemFields($input);
-
-		return $item;
+		return ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($input + $db_item);
 	}
 }

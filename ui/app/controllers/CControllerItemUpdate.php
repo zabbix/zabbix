@@ -72,14 +72,12 @@ class CControllerItemUpdate extends CControllerItem {
 	protected function getInputForApi(): array {
 		$input = parent::getInputForApi();
 
-		$item = API::Item()->get([
+		[$db_item] = API::Item()->get([
 			'output' => ['templateid', 'flags', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
 			'selectHosts' => ['status'],
 			'itemids' => [$this->getInput('itemid')]
 		]);
-		$item = $item ? reset($item) : ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
-		$item = ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($input + $item);
 
-		return $item;
+		return ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($input + $db_item);
 	}
 }

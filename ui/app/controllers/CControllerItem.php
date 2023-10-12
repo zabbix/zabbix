@@ -120,18 +120,6 @@ abstract class CControllerItem extends CController {
 			$ret = isValidCustomIntervals($delay_flex);
 		}
 
-		if ($ret && $this->getInput('custom_timeout', -1) == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
-			$support_custom_timeout = [
-				ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
-				ITEM_TYPE_SCRIPT
-			];
-
-			if (in_array($this->getInput('type', -1), $support_custom_timeout)) {
-				$ret = $this->validateCustomTimeout(['timeout' => $this->getInput('timeout')]);
-			}
-		}
-
 		return $ret && $this->validateRefferedObjects();
 	}
 
@@ -167,27 +155,6 @@ abstract class CControllerItem extends CController {
 
 		if (!$ret) {
 			error(_('No permissions to referred object or it does not exist!'));
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Validates custom timeout field.
-	 *
-	 * @param array $input
-	 *
-	 * @return bool
-	 */
-	protected function validateCustomTimeout(array $input): bool {
-		$fields = [
-			'timeout' => 'time_unit|not_empty'
-		];
-		$validator = new CNewValidator($input, $fields);
-		$ret = !$validator->isError();
-
-		if (!$ret) {
-			array_map('info', $validator->getAllErrors());
 		}
 
 		return $ret;

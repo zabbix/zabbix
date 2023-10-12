@@ -79,17 +79,12 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'editable' => true
 		]);
 
-		$item = [
-			'hostid' => $lld_rule['hostid'],
-			'ruleid' => $lld_rule['itemid']
-		];
-
-		$item += getSanitizedItemFields($input + [
+		$input += [
 			'templateid' => '0',
 			'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			'hosts' => $lld_rule['hosts']
-		]);
+		];
 
-		return $item;
+		return ['hostid' => $lld_rule['hostid'], 'ruleid' => $lld_rule['itemid']] + getSanitizedItemFields($input);
 	}
 }

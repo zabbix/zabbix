@@ -70,9 +70,7 @@ class CControllerItemCreate extends CControllerItem {
 	}
 
 	protected function getInputForApi(): array {
-		$input = parent::getInputForApi();
-
-		$item = [
+		$input = parent::getInputForApi() + [
 			'templateid' => '0',
 			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
 			'hosts' => API::Host()->get([
@@ -82,8 +80,7 @@ class CControllerItemCreate extends CControllerItem {
 				'editable' => true
 			])
 		];
-		$item = ['hostid' => $this->getInput('hostid')] + getSanitizedItemFields($input + $item);
 
-		return $item;
+		return ['hostid' => $this->getInput('hostid')] + getSanitizedItemFields($input);
 	}
 }
