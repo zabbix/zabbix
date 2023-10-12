@@ -26,17 +26,11 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateFormInput(['parent_discoveryid']);
+		$fields = [
+			'parent_discoveryid' => 'required|id'
+		] + static::getValidationFields();
 
-		if ($ret && $this->hasInput('type') && $this->hasInput('key')) {
-			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
-		}
-
-		$delay_flex = $this->getInput('delay_flex', []);
-
-		if ($ret && $delay_flex) {
-			$ret = isValidCustomIntervals($delay_flex);
-		}
+		$ret = $this->validateInput($fields) && $this->validateInputEx();
 
 		if (!$ret) {
 			$this->setResponse(

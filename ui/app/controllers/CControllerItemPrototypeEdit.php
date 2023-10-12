@@ -35,7 +35,8 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'master_itemid'			=> 'id',
 			'clone'					=> 'in 1'
 		];
-		$ret = $this->validateInput($fields);
+
+		$ret = $this->validateInput($fields) && $this->validateRefferedObjects();
 
 		if ($ret) {
 			if ($this->hasInput('clone') && !$this->hasInput('itemid')) {

@@ -50,8 +50,7 @@ $form = (new CForm('post'))
 	->addVar('context', $item['context'])
 	->addVar('hostid', $data['host']['hostid'])
 	->addVar('itemid', $item['itemid'] ? $item['itemid'] : null)
-	->addVar('templateid', $item['itemid'] ? $item['templateid'] : null)
-	->addVar('form_refresh', 1);
+	->addVar('templateid', $item['itemid'] ? $item['templateid'] : null);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

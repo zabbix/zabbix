@@ -27,7 +27,7 @@ class CControllerItemCreate extends CControllerItem {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'hostid'	=> 'required|id',
+			'hostid'	=> 'required|id'
 		] + static::getValidationFields();
 
 		$ret = $this->validateInput($fields) && $this->validateInputEx();

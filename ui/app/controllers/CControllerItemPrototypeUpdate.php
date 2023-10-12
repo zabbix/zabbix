@@ -26,7 +26,11 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateFormInput(['itemid']);
+		$fields = [
+			'itemid'	=> 'required|id'
+		] + static::getValidationFields();
+
+		$ret = $this->validateInput($fields) && $this->validateInputEx();
 
 		if ($ret && $this->hasInput('type') && $this->hasInput('key')) {
 			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
