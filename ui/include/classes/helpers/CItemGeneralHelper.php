@@ -358,10 +358,7 @@ class CItemGeneralHelper {
 					$value = $input['query_fields']['value'][$index];
 
 					if ($name !== '' || $value !== '') {
-						$query_fields[] = [
-							'name' => $name,
-							'value' => $value
-						];
+						$query_fields[] = [$name => $value];
 					}
 				}
 
