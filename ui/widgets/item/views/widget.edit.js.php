@@ -135,6 +135,11 @@ window.widget_item_form = new class {
 		document.getElementById('item-value-thresholds-warning').style.display = this.#is_item_numeric ? 'none' : '';
 	}
 
+	/**
+	 * Fetches data type of selected item using AJAX request.
+	 *
+	 * @return {int|bool}  Returns false, if no item provided or error occurs in request.
+	 */
 	#promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
 
@@ -154,14 +159,16 @@ window.widget_item_form = new class {
 				return parseInt(response.result);
 			})
 			.catch((exception) => {
-				console.log('Could not get value data type of the item:', exception);
+				console.error('Could not get value data type of the item:', exception);
+
+				return Promise.resolve(false);
 			});
 	}
 
 	/**
 	 * Checks if provided item type is numeric.
 	 *
-	 * @param {int|null} type  Item type.
+	 * @param {int|bool} type  Item type.
 	 */
 	#isItemTypeNumeric(type) {
 		return type === <?= ITEM_VALUE_TYPE_FLOAT ?> || type === <?= ITEM_VALUE_TYPE_UINT64 ?>;

@@ -2625,8 +2625,7 @@ function sortPreprocessingSteps(array $steps): array {
  *
  * @return string The string representation of aggregation function.
  */
-function item_aggr_fnc2desc(int $calc_fnc): string
-{
+function item_aggr_fnc2desc(int $calc_fnc): string {
 	switch ($calc_fnc) {
 		case AGGREGATE_NONE:
 			return _('not used');
@@ -2650,18 +2649,18 @@ function item_aggr_fnc2desc(int $calc_fnc): string
 /**
  * Retrieve the string representation of aggregation function constant.
  *
- * @param int $aggregation_function The numeric value of aggregation function constant. Value must be one of:
- *                                  AGGREGATE_COUNT, AGGREGATE_FIRST, AGGREGATE_LAST.
+ * @param int $calc_fnc  The numeric value of aggregation function constant. Value must be one of:
+ *                       AGGREGATE_COUNT, AGGREGATE_FIRST, AGGREGATE_LAST.
  *
  * @return string The string representation of aggregation function.
  */
-	function item_aggr_fnc2str(int $aggregation_function): string {
-		switch ($aggregation_function) {
-			case AGGREGATE_COUNT:
-				return 'count';
-			case AGGREGATE_FIRST:
-				return 'first';
-			case AGGREGATE_LAST:
-				return 'last';
-		}
+function item_aggr_fnc2str(int $calc_fnc): string {
+	switch ($calc_fnc) {
+		case AGGREGATE_COUNT:
+			return 'count';
+		case AGGREGATE_FIRST:
+			return 'first';
+		case AGGREGATE_LAST:
+			return 'last';
+	}
 }
