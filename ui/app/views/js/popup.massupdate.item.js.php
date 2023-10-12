@@ -168,9 +168,9 @@
 	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
 })();
 
-const preprocessing_action_buttons = document.querySelectorAll('[name="mass_update_preprocessing_action"]');
+const mass_update_preprocessing_action_buttons = document.querySelectorAll('[name="mass_update_preprocessing_action"]');
 
-preprocessing_action_buttons.forEach((button) => button.addEventListener('click', () =>
+mass_update_preprocessing_action_buttons.forEach((button) => button.addEventListener('click', () =>
 	document.getElementById('preprocessing').style.display = button.value == <?= ZBX_ACTION_REPLACE ?> ? '' : 'none')
 );
 
