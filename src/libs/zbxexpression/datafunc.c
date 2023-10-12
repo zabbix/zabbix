@@ -168,26 +168,25 @@ int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct h.name"
-			" from hosts h,items i,functions f"
-			" where h.hostid=i.hostid"
+			" from host_hgset hgh,items i,functions f"
+			" where hgh.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
+
 	if (NULL != userid && USER_TYPE_SUPER_ADMIN != user_type)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from hosts_groups hg,rights r,users_groups ug"
-					" where h.hostid=hg.hostid"
-						" and hg.groupid=r.id"
-						" and r.groupid=ug.usrgrpid"
-						" and ug.userid=" ZBX_FS_UI64
-					" group by hg.hostid"
-					" having min(r.permission)>=%d"
+					" from permission p,user_ugset ugu"
+					" where hgh.hgsetid=p.hgsetid"
+						" and p.ugsetid=ugu.ugsetid"
+						" and ugu.userid=" ZBX_FS_UI64
 				")",
-				*userid, PERM_READ);
+				*userid);
 	}
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.name");
 
 	result = zbx_db_select("%s", sql);
@@ -262,14 +261,13 @@ int	expr_db_get_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64_
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from rights r,users_groups ug"
-					" where g.groupid=r.id"
-						" and r.groupid=ug.usrgrpid"
-						" and ug.userid=" ZBX_FS_UI64
-					" group by r.id"
-					" having min(r.permission)>=%d"
+					" from host_hgset hgh,permission p,user_ugset ugu"
+					" where i.hostid=hgh.hostid"
+						" and hgh.hgsetid=p.hgsetid"
+						" and p.ugsetid=ugu.ugsetid"
+						" and ugu.userid=" ZBX_FS_UI64
 				")",
-				*userid, PERM_READ);
+				*userid);
 	}
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by g.name");
 

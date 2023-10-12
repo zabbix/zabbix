@@ -118,12 +118,9 @@ int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **use
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	int			perm = PERM_DENY;
-	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		hostgroupid, roleid;
+	zbx_uint64_t		roleid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&hostgroupids);
 
 	if (USER_TYPE_SUPER_ADMIN == zbx_get_user_info(userid, &roleid, user_timezone))
 	{
@@ -132,24 +129,19 @@ int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **use
 	}
 
 	result = zbx_db_select(
-			"select hg.groupid from items i"
-			" join hosts_groups hg on hg.hostid=i.hostid"
-			" where i.itemid=" ZBX_FS_UI64,
-			itemid);
+			"select p.permission from items i"
+			" join host_hgset hgh on i.hostid=hgh.hostid"
+			" join permission p on hgh.hgsetid=p.hgsetid"
+			" join user_ugset ugu on p.ugsetid=ugu.ugsetid"
+			" where i.itemid=" ZBX_FS_UI64
+				" and ugu.userid=" ZBX_FS_UI64,
+			itemid, userid);
 
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		ZBX_STR2UINT64(hostgroupid, row[0]);
-		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
-	}
+	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]))
+		perm = atoi(row[0]);
+
 	zbx_db_free_result(result);
-
-	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	perm = zbx_get_hostgroups_permission(userid, &hostgroupids);
 out:
-	zbx_vector_uint64_destroy(&hostgroupids);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
 
 	return perm;
@@ -167,12 +159,8 @@ int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid)
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	int			perm = PERM_DENY;
-	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		hostgroupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&hostgroupids);
 
 	if (USER_TYPE_SUPER_ADMIN == user->type)
 	{
@@ -180,21 +168,19 @@ int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid)
 		goto out;
 	}
 
-	result = zbx_db_select("select groupid from hosts_groups where hostid=" ZBX_FS_UI64, hostid);
+	result = zbx_db_select(
+			"select p.permission from host_hgset hgh"
+			" join permission p on hgh.hgsetid=p.hgsetid"
+			" join user_ugset ugu on p.ugsetid=ugu.ugsetid"
+			" where hgh.hostid=" ZBX_FS_UI64
+				" and ugu.userid=" ZBX_FS_UI64,
+			hostid, user->userid);
 
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		ZBX_STR2UINT64(hostgroupid, row[0]);
-		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
-	}
+	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]))
+		perm = atoi(row[0]);
+
 	zbx_db_free_result(result);
-
-	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	perm = zbx_get_hostgroups_permission(user->userid, &hostgroupids);
 out:
-	zbx_vector_uint64_destroy(&hostgroupids);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
 
 	return perm;

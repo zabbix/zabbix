@@ -126,7 +126,7 @@ FIELD		|hgsetid	|t_id		|	|NOT NULL	|0	|1|hgset
 FIELD		|groupid	|t_id		|	|NOT NULL	|0	|2|hstgrp	|		|RESTRICT
 INDEX		|1		|groupid
 
-TABLE|hgset_host|hostid,hgsetid|ZBX_TEMPLATE
+TABLE|host_hgset|hostid,hgsetid|ZBX_TEMPLATE
 FIELD		|hostid	|t_id		|	|NOT NULL	|0	|1|hosts
 FIELD		|hgsetid	|t_id		|	|NOT NULL	|0	|2|hgset	|		|RESTRICT
 INDEX		|1		|hgsetid
@@ -401,7 +401,7 @@ FIELD		|ugsetid	|t_id		|	|NOT NULL	|0	|1|ugset
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0	|2|usrgrp	|		|RESTRICT
 INDEX		|1		|usrgrpid
 
-TABLE|ugset_user|userid,ugsetid|ZBX_DATA
+TABLE|user_ugset|userid,ugsetid|ZBX_DATA
 FIELD		|userid	|t_id		|	|NOT NULL	|0	|1|users
 FIELD		|ugsetid	|t_id		|	|NOT NULL	|0	|2|ugset	|		|RESTRICT
 INDEX		|1		|ugsetid
@@ -825,13 +825,11 @@ FIELD		|id		|t_id		|	|NOT NULL	|0			|2|hstgrp	|groupid
 INDEX		|1		|groupid
 INDEX		|2		|id
 
-TABLE|permission|permissionid|ZBX_DATA
-FIELD		|permissionid	|t_id		|	|NOT NULL	|0
+TABLE|permission|ugsetid,hgsetid|ZBX_DATA
 FIELD		|ugsetid	|t_id		|	|NOT NULL	|0	|1|ugset
 FIELD		|hgsetid	|t_id		|	|NOT NULL	|0	|2|hgset
 FIELD		|permission		|t_integer	|'2'	|NOT NULL	|0
-UNIQUE		|1		|ugsetid,hgsetid
-INDEX		|2		|hgsetid
+INDEX		|1		|hgsetid
 
 TABLE|services|serviceid|ZBX_DATA
 FIELD		|serviceid	|t_id		|	|NOT NULL	|0
@@ -2228,4 +2226,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050148	|6050148
+ROW		|1		|6050149	|6050149

@@ -1281,7 +1281,7 @@ static int	DBpatch_6050128(void)
 static int	DBpatch_6050129(void)
 {
 	const zbx_db_table_t table =
-			{"ugset_user", "userid", 0,
+			{"user_ugset", "userid", 0,
 				{
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1295,7 +1295,7 @@ static int	DBpatch_6050129(void)
 
 static int	DBpatch_6050130(void)
 {
-	return DBcreate_index("ugset_user", "ugset_user_1", "ugsetid", 0);
+	return DBcreate_index("user_ugset", "user_ugset_1", "ugsetid", 0);
 }
 
 static int	DBpatch_6050131(void)
@@ -1303,14 +1303,14 @@ static int	DBpatch_6050131(void)
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("ugset_user", 1, &field);
+	return DBadd_foreign_key("user_ugset", 1, &field);
 }
 
 static int	DBpatch_6050132(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0, 0};
 
-	return DBadd_foreign_key("ugset_user", 2, &field);
+	return DBadd_foreign_key("user_ugset", 2, &field);
 }
 
 static int	DBpatch_6050133(void)
@@ -1371,7 +1371,7 @@ static int	DBpatch_6050138(void)
 static int	DBpatch_6050139(void)
 {
 	const zbx_db_table_t table =
-			{"hgset_host", "hostid,hgsetid", 0,
+			{"host_hgset", "hostid,hgsetid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1385,7 +1385,7 @@ static int	DBpatch_6050139(void)
 
 static int	DBpatch_6050140(void)
 {
-	return DBcreate_index("hgset_host", "hgset_host_1", "hgsetid", 0);
+	return DBcreate_index("host_hgset", "host_hgset_1", "hgsetid", 0);
 }
 
 static int	DBpatch_6050141(void)
@@ -1393,22 +1393,21 @@ static int	DBpatch_6050141(void)
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("hgset_host", 1, &field);
+	return DBadd_foreign_key("host_hgset", 1, &field);
 }
 
 static int	DBpatch_6050142(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0, 0};
 
-	return DBadd_foreign_key("hgset_host", 2, &field);
+	return DBadd_foreign_key("host_hgset", 2, &field);
 }
 
 static int	DBpatch_6050143(void)
 {
 	const zbx_db_table_t table =
-			{"permission", "permissionid", 0,
+			{"permission", "ugsetid,hgsetid", 0,
 				{
-					{"permissionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -1422,15 +1421,10 @@ static int	DBpatch_6050143(void)
 
 static int	DBpatch_6050144(void)
 {
-	return DBcreate_index("permission", "permission_1", "ugsetid,hgsetid", 1);
+	return DBcreate_index("permission", "permission_1", "hgsetid", 0);
 }
 
 static int	DBpatch_6050145(void)
-{
-	return DBcreate_index("permission", "permission_2", "hgsetid", 0);
-}
-
-static int	DBpatch_6050146(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1438,7 +1432,7 @@ static int	DBpatch_6050146(void)
 	return DBadd_foreign_key("permission", 1, &field);
 }
 
-static int	DBpatch_6050147(void)
+static int	DBpatch_6050146(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1592,7 +1586,7 @@ static void	dbupgrade_groupsets_destroy(zbx_hashset_t *group_sets)
 	zbx_hashset_destroy(group_sets);
 }
 
-static int	DBpatch_6050148(void)
+static int	DBpatch_6050147(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -1605,7 +1599,7 @@ static int	DBpatch_6050148(void)
 	zbx_hashset_create(&group_sets, 1, dbupgrade_group_set_hash, dbupgrade_group_set_compare);
 	zbx_db_insert_prepare(&db_insert, "hgset", "hgsetid", "hash", (char*)NULL);
 	zbx_db_insert_prepare(&db_insert_groups, "hgset_group", "hgsetid", "groupid", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_hosts, "hgset_host", "hostid", "hgsetid", (char*)NULL);
+	zbx_db_insert_prepare(&db_insert_hosts, "host_hgset", "hostid", "hgsetid", (char*)NULL);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_db_select_uint64("select hostid from hosts where flags<>2", &ids);
@@ -1623,7 +1617,7 @@ static int	DBpatch_6050148(void)
 	return ret;
 }
 
-static int	DBpatch_6050149(void)
+static int	DBpatch_6050148(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -1636,10 +1630,10 @@ static int	DBpatch_6050149(void)
 	zbx_hashset_create(&group_sets, 1, dbupgrade_group_set_hash, dbupgrade_group_set_compare);
 	zbx_db_insert_prepare(&db_insert, "ugset", "ugsetid", "hash", (char*)NULL);
 	zbx_db_insert_prepare(&db_insert_groups, "ugset_group", "ugsetid", "usrgrpid", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_hosts, "ugset_user", "userid", "ugsetid", (char*)NULL);
+	zbx_db_insert_prepare(&db_insert_hosts, "user_ugset", "userid", "ugsetid", (char*)NULL);
 
 	zbx_vector_uint64_create(&ids);
-	zbx_db_select_uint64("select userid from users", &ids);
+	zbx_db_select_uint64("select u.userid from users u join role r on u.roleid=r.roleid where r.type<>3", &ids);
 
 	if (SUCCEED == (ret = dbupgrade_groupsets_generate(&ids, "userid", "usrgrpid", "users_groups", &group_sets, 1)))
 		ret = dbupgrade_groupsets_insert("ugset", &group_sets, &db_insert, &db_insert_groups, &db_insert_hosts);
@@ -1654,7 +1648,7 @@ static int	DBpatch_6050149(void)
 	return ret;
 }
 
-static int	DBpatch_6050150(void)
+static int	DBpatch_6050149(void)
 {
 	int		ret;
 	zbx_db_result_t	result;
@@ -1852,6 +1846,5 @@ DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
 DBPATCH_ADD(6050148, 0, 1)
 DBPATCH_ADD(6050149, 0, 1)
-DBPATCH_ADD(6050150, 0, 1)
 
 DBPATCH_END()

@@ -452,7 +452,7 @@ return [
 			]
 		]
 	],
-	'hgset_host' => [
+	'host_hgset' => [
 		'key' => 'hostid,hgsetid',
 		'fields' => [
 			'hostid' => [

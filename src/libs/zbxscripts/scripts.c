@@ -643,17 +643,14 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 
 	result = zbx_db_select(
 		"select null"
-			" from hosts_groups hg,rights r,users_groups ug"
-		" where hg.groupid=r.id"
-			" and r.groupid=ug.usrgrpid"
-			" and hg.hostid=" ZBX_FS_UI64
-			" and ug.userid=" ZBX_FS_UI64
-		" group by hg.hostid"
-		" having min(r.permission)>%d"
-			" and max(r.permission)>=%d",
+			" from host_hgset hgh,permission p,user_ugset ugu"
+		" where ugu.ugsetid=p.ugsetid"
+			" and p.hgsetid=hgh.hgsetid"
+			" and hgh.hostid=" ZBX_FS_UI64
+			" and ugu.userid=" ZBX_FS_UI64
+			" and p.permission>=%d",
 		hostid,
 		userid,
-		PERM_DENY,
 		script->host_access);
 
 	if (NULL == zbx_db_fetch(result))

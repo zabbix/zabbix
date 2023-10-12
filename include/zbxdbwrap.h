@@ -91,6 +91,9 @@ void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode);
 
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 
+void	hostgroups_with_permissions_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
+int	hostgroups_with_permissions_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
+
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags);
 void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,

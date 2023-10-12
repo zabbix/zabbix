@@ -142,12 +142,11 @@ exit:
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	zbx_uint64_t	groupid;
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	int		i;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_uint64_t		groupid;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -167,6 +166,8 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
+		int	i;
+
 		ZBX_STR2UINT64(groupid, row[0]);
 
 		if (FAIL == (i = zbx_vector_uint64_search(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -179,27 +180,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	}
 	zbx_db_free_result(result);
 
-	if (0 != groupids->values_num)
-	{
-		zbx_uint64_t	hostgroupid;
-		zbx_db_insert_t	db_insert;
-
-		hostgroupid = zbx_db_get_maxid_num("hosts_groups", groupids->values_num);
-
-		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", (char *)NULL);
-
-		zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		for (i = 0; i < groupids->values_num; i++)
-		{
-			zbx_db_insert_add_values(&db_insert, hostgroupid, hostid, groupids->values[i]);
-			zbx_audit_hostgroup_update_json_add_group(hostid, hostgroupid, groupids->values[i]);
-			hostgroupid++;
-		}
-
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
+	hostgroups_with_permissions_add(hostid, groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1115,19 +1096,9 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 
 		zbx_db_free_result(result2);
 
-		if (0 != hostgroupids.values_num)
+		if (0 != hostgroupids.values_num &&
+				SUCCEED == hostgroups_with_permissions_remove(hostid, groupids))
 		{
-			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"delete from hosts_groups"
-					" where hostid=" ZBX_FS_UI64
-						" and",
-					hostid);
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
-					groupids->values_num);
-
-			zbx_db_execute("%s", sql);
-
 			zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, &found_groupids);
 		}
 
