@@ -73,8 +73,10 @@ class testDashboardPieChartWidget extends CWebTest
 					'fields' => [
 						'Data set' => [
 							'type' => self::TYPE_ITEM_LIST,
-							'Host' => 'Test',
-							'Item' => 'Test'
+							'host' => 'ЗАББИКС Сервер',
+							'items' => [
+								['name' =>'Linux: Available memory']
+							]
 						]
 					]
 				]
@@ -99,7 +101,7 @@ class testDashboardPieChartWidget extends CWebTest
 					'error' => 'Invalid parameter "Data set/1/items": cannot be empty.'
 				]
 			],
-			// Largest number of fields possible.
+			// Largest number of fields possible. Data set aggregation has to be none because of Total type item.
 			[
 				[
 					'fields' => [
@@ -112,16 +114,27 @@ class testDashboardPieChartWidget extends CWebTest
 							[
 								'host' => ['Host*', 'one', 'two'],
 								'item' => ['Item*', 'one', 'two'],
+								'color' => '00BCD4',
 								'Aggregation function' => 'min',
-								'Data set aggregation' => 'max',
+								'Data set aggregation' => 'none',
 								'Data set label' => 'Label 1'
 							],
 							[
-								'host' => 'test host 2',
-								'item' => 'test item 2',
-								'Aggregation function' => 'first',
-								'Data set aggregation' => 'count',
-								'Data set label' => 'Label 2'
+								'type' => self::TYPE_ITEM_LIST,
+								'host' => 'ЗАББИКС Сервер',
+								'Aggregation function' => 'max',
+								'Data set aggregation' => 'none',
+								'Data set label' => 'Label 2',
+								'items' => [
+									[
+										'name' => 'Linux: Available memory',
+										'il_color' => '000000',
+										'il_type' => 'Total'
+									],
+									[
+										'name' => 'Linux: CPU idle time'
+									]
+								]
 							]
 						],
 						'Displaying options' => [
@@ -366,25 +379,30 @@ class testDashboardPieChartWidget extends CWebTest
 		$last = count($data_sets) - 1;
 
 		foreach ($data_sets as $i => $data_set) {
-			// Prepare host and item fields.
-			$mapping = [
-				'host' => 'xpath://div[@id="ds_'.$i.'_hosts_"]/..',
-				'item' => 'xpath://div[@id="ds_'.$i.'_items_"]/..'
-			];
+			$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
+			unset($data_set['type']);
 
-			// Change 'host' and 'item' keys to the actual selectors these fields have.
-			foreach ($mapping as $field => $selector) {
-				$data_set = [$selector => $data_set[$field]] + $data_set;
-				unset($data_set[$field]);
+			// Check the fields depending on the type of the Data set.
+			if ($type === self::TYPE_ITEM_PATTERN) {
+				$data_set = $this->remapDataSet($data_set, $i);
 			}
+			else {
+				// When Data set type is Item list.
 
-			// Check fields value.
+				// Check all items.
+				foreach ($data_set['items'] as $item) {
+					$this->assertTrue($form->query('link', $data_set['host'].': '.$item['name'])->exists());
+				}
+
+				unset($data_set['host']);
+				$data_set = $this->remapDataSet($data_set, $i);
+			}
 			$form->checkValue($data_set);
 
-			// Open next data set, if exists.
+			// Open the next data set, if it exists.
 			if ($i !== $last) {
-				$i += 2;
-				$form->query('xpath:(//li[contains(@class, "list-accordion-item")])['.$i.']//button')->one()->click();
+				$form->query('xpath://li[contains(@class, "list-accordion-item")]['.
+						($i + 2).']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
 				$form->invalidate();
 			}
 		}
@@ -441,52 +459,54 @@ class testDashboardPieChartWidget extends CWebTest
 			$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
 			unset($data_set['type']);
 
-			// Remove the first Data set and create a new one if the type is different.
-			if ($count_sets === 1 && $type === self::TYPE_ITEM_LIST) {
+			// Special case: the first Data set is of type Item list.
+			$deleted_first_set = false;
+			if ($i === 0 && $type === self::TYPE_ITEM_LIST && $count_sets === 1) {
 				$form->query('xpath://button[@title="Delete"]')->one()->click();
-				$need_data_set = true;
+				$deleted_first_set = true;
 			}
 
 			// Open the Data set or create a new one.
 			if ($i + 1 < $count_sets) {
-				$form->query('xpath://li[contains(@class, "list-accordion-item")][' .
-						($i + 1) . ']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
+				$form->query('xpath://li[contains(@class, "list-accordion-item")]['.
+						($i + 1).']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
 			}
-			else if ($i !== 0 || $need_data_set) {
+			else if ($i !== 0 || $deleted_first_set) {
 				// Only add a new Data set if it is not the first one or the first one was deleted.
-
 				$this->addNewDataSet($type, $form);
 			}
 
 			$form->invalidate();
 
-			// Prepare data and fill the form.
-			if ($type === self::TYPE_ITEM_PATTERN) {
-				// Field selector mapping.
-				$mapping = [
-					'host' => 'xpath://div[@id="ds_' . $i . '_hosts_"]/..',
-					'item' => 'xpath://div[@id="ds_' . $i . '_items_"]/..'
-				];
+			// Need additional steps when Data set type is Item list.
+			if ($type === self::TYPE_ITEM_LIST) {
+				// Select Host.
+				$form->query('button:Add')->one()->click();
+				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$select = $dialog->query('class:multiselect-control')->asMultiselect()->one();
+				$select->fill($data_set['host']);
+				unset($data_set['host']);
 
-				// Exchange 'host' and 'item' keys for the actual selector the fields have.
-				foreach ($mapping as $field => $selector) {
-					if (array_key_exists($field, $data_set)) {
-						$data_set = [$selector => $data_set[$field]] + $data_set;
-						unset($data_set[$field]);
-					}
+				// Select Items.
+				$table = $dialog->query('class:list-table')->asTable()->waitUntilReady()->one();
+				foreach ($data_set['items'] as $item) {
+					$table->findRow('Name', $item['name'])->select();
 				}
-			}
-			else {
-				// When type is Item list.
-
-				// ToDo: Select Host and Item.
-				throw new Exception('ToDo: select Host and Item.');
+				$dialog->query('xpath://div[@class="overlay-dialogue-footer"]//button[text()="Select"]')->one()->click();
+				$dialog->waitUntilNotVisible();
 			}
 
+			$data_set = $this->remapDataSet($data_set, $i);
 			$form->fill($data_set);
 		}
 	}
 
+	/**
+	 * Adds a new Data set of the correct type.
+	 *
+	 * @param $type    type of the data set
+	 * @param $form    widget edit form element
+	 */
 	protected function addNewDataSet($type, $form) {
 		if ($type === self::TYPE_ITEM_PATTERN) {
 			$form->query('button:Add new data set')->one()->click();
@@ -496,6 +516,55 @@ class testDashboardPieChartWidget extends CWebTest
 			$dropdown_button->click();
 			$dropdown_button->asPopupButton()->getMenu()->select(self::TYPE_ITEM_LIST);
 		}
+	}
+
+	/**
+	 * Exchanges generic field names for the actual field selectors in a Data set form.
+	 *
+	 * @param $data_set    Data set data
+	 * @param $number      the position of this data set in UI
+	 * @return array       remapped Data set
+	 */
+	protected function remapDataSet($data_set, $number) {
+		// Key - selector mapping.
+		$mapping = [
+			'host' => 'xpath://div[@id="ds_'.$number.'_hosts_"]/..',
+			'item' => 'xpath://div[@id="ds_'.$number.'_items_"]/..',
+			'color' => 'xpath://input[@id="ds_'.$number.'_color"]/..',
+			'il_color' => 'xpath://input[@id="items_'.$number.'_{id}_color"]/..',
+			'il_type' => 'xpath://z-select[@id="items_'.$number.'_{id}_type"]'
+		];
+
+		// Exchange the keys for the actual selectors and clear the old key.
+		foreach ($data_set as $data_set_key => $data_set_value) {
+			if (!array_key_exists($data_set_key, $mapping)) {
+				// Only change mapped keys.
+				continue;
+			}
+
+			$data_set += [$mapping[$data_set_key] => $data_set_value];
+			unset($data_set[$data_set_key]);
+		}
+
+		// Also map item fields for Item list.
+		if (array_key_exists('items', $data_set)) {
+			// An Item list can have several items.
+			foreach ($data_set['items'] as $item_id => $item) {
+
+				// An item can have several fields.
+				foreach ($item as $field_key => $field_value) {
+					if (array_key_exists($field_key, $mapping)) {
+						// Set the item ID in selector, it starts at 1.
+						$mapped_value = str_replace('{id}', $item_id + 1, $mapping[$field_key]);
+						$data_set += [$mapped_value => $field_value];
+					}
+				}
+			}
+
+			unset($data_set['items']);
+		}
+
+		return $data_set;
 	}
 
 	/**
