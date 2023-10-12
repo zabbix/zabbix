@@ -423,7 +423,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE) {
 				if ($legend_aggregation_show) {
-					$name = self::aggr_fnc2str($metric['options']['aggregate_function']).
+					$name = item_aggr_fnc2desc($metric['options']['aggregate_function']).
 						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
 				}
 				else {
@@ -648,27 +648,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	private static function processPattern(array $patterns): ?array {
 		return in_array('*', $patterns, true) ? null : $patterns;
-	}
-
-	private static function aggr_fnc2str($calc_fnc) {
-		switch ($calc_fnc) {
-			case AGGREGATE_NONE:
-				return _('none');
-			case AGGREGATE_MIN:
-				return _('min');
-			case AGGREGATE_MAX:
-				return _('max');
-			case AGGREGATE_AVG:
-				return _('avg');
-			case AGGREGATE_COUNT:
-				return _('count');
-			case AGGREGATE_SUM:
-				return _('sum');
-			case AGGREGATE_FIRST:
-				return _('first');
-			case AGGREGATE_LAST:
-				return _('last');
-		}
 	}
 
 	private function getConfig(): array {

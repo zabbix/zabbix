@@ -158,10 +158,21 @@ window.widget_item_form = new class {
 			});
 	}
 
+	/**
+	 * Checks if provided item type is numeric.
+	 *
+	 * @param {int|null} type  Item type.
+	 */
 	#isItemTypeNumeric(type) {
 		return type === <?= ITEM_VALUE_TYPE_FLOAT ?> || type === <?= ITEM_VALUE_TYPE_UINT64 ?>;
 	}
 
+	/**
+	 * Sets color to specified indicator.
+	 *
+	 * @param {string} name   Indicator name.
+	 * @param {string} color  Color number.
+	 */
 	setIndicatorColor(name, color) {
 		const indicator_ids = {
 			up_color: 'change-indicator-up',

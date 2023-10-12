@@ -2650,24 +2650,15 @@ function item_aggr_fnc2desc(int $calc_fnc): string
 /**
  * Retrieve the string representation of aggregation function constant.
  *
- * @param int $aggregation_function The numeric value of aggregation function constant.
+ * @param int $aggregation_function The numeric value of aggregation function constant. Value must be one of:
+ *                                  AGGREGATE_COUNT, AGGREGATE_FIRST, AGGREGATE_LAST.
  *
  * @return string The string representation of aggregation function.
  */
 	function item_aggr_fnc2str(int $aggregation_function): string {
 		switch ($aggregation_function) {
-			case AGGREGATE_NONE:
-				return 'not used';
-			case AGGREGATE_MIN:
-				return 'min';
-			case AGGREGATE_MAX:
-				return 'max';
-			case AGGREGATE_AVG:
-				return 'avg';
 			case AGGREGATE_COUNT:
 				return 'count';
-			case AGGREGATE_SUM:
-				return 'sum';
 			case AGGREGATE_FIRST:
 				return 'first';
 			case AGGREGATE_LAST:

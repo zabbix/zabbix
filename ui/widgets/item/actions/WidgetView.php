@@ -28,9 +28,9 @@ use API,
 	CNumberParser,
 	CSettingsHelper,
 	CUrl,
-	Manager;
+	Manager,
+	CHousekeepingHelper;
 
-use CHousekeepingHelper;
 use Widgets\Item\Widget;
 
 class WidgetView extends CControllerDashboardWidgetView {
@@ -220,7 +220,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if (in_array($aggregate_function, [AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT])) {
 					$non_numeric_history = Manager::History()->getAggregatedValue($item,
-						item_aggr_fnc2str($aggregate_function), $time_from, $time_to);
+						item_aggr_fnc2str($aggregate_function), $time_from, $time_to
+					);
 
 					if ($non_numeric_history) {
 						$history = [
@@ -240,7 +241,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$previous_time_from = $previous_time_to - $interval;
 
 						$prev_value = Manager::History()->getAggregatedValue($item,
-							item_aggr_fnc2str($aggregate_function), $previous_time_from, $previous_time_to);
+							item_aggr_fnc2str($aggregate_function), $previous_time_from, $previous_time_to
+						);
 
 						if ($non_numeric_history && $prev_value) {
 							$history[$item['itemid']] += [
@@ -612,20 +614,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 	/**
 	 * Calculate the data source for item based on widget configuration and global housekeeping settings.
 	 *
-	 * @param array $items       Array of items to get source for.
-	 * @param int   $time_from   Timestamp indicating start of time period (seconds).
-	 * @param int   $time_now    Timestamp for current point in time (seconds).
-	 * @param int   $data_source Data source specified in widget form.
-	 *
-	 * @return void
+	 * @param array $items        [IN/OUT] Array of items to get source for.
+	 * @param int   $time_from    [IN] Timestamp indicating start of time period (seconds).
+	 * @param int   $time_now     [IN] Timestamp for current point in time (seconds).
+	 * @param int   $data_source  [IN] Data source specified in widget form.
 	 */
 	private static function addDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
 		if ($data_source == Widget::HISTORY_DATA_HISTORY || $data_source == Widget::HISTORY_DATA_TRENDS) {
 			foreach ($items as &$item) {
 				$item['source'] = $data_source == Widget::HISTORY_DATA_TRENDS
-				&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-					? 'trends'
-					: 'history';
+					&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+						? 'trends'
+						: 'history';
 			}
 			unset($item);
 

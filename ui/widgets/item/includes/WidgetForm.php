@@ -275,14 +275,14 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [
-					AGGREGATE_NONE => _('not used'),
-					AGGREGATE_MIN => _('min'),
-					AGGREGATE_MAX => _('max'),
-					AGGREGATE_AVG => _('avg'),
-					AGGREGATE_COUNT => _('count'),
-					AGGREGATE_SUM => _('sum'),
-					AGGREGATE_FIRST => _('first'),
-					AGGREGATE_LAST => _('last')
+					AGGREGATE_NONE => item_aggr_fnc2desc(AGGREGATE_NONE),
+					AGGREGATE_MIN => item_aggr_fnc2desc(AGGREGATE_MIN),
+					AGGREGATE_MAX => item_aggr_fnc2desc(AGGREGATE_MAX),
+					AGGREGATE_AVG => item_aggr_fnc2desc(AGGREGATE_AVG),
+					AGGREGATE_COUNT => item_aggr_fnc2desc(AGGREGATE_COUNT),
+					AGGREGATE_SUM => item_aggr_fnc2desc(AGGREGATE_SUM),
+					AGGREGATE_FIRST => item_aggr_fnc2desc(AGGREGATE_FIRST),
+					AGGREGATE_LAST => item_aggr_fnc2desc(AGGREGATE_LAST)
 				]))->setDefault(AGGREGATE_NONE)
 			)
 			->addField(
