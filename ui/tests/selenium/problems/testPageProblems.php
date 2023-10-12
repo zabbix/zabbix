@@ -81,7 +81,7 @@ class testPageProblems extends CWebTest {
 			'name:age' => ['value' => 14, 'enabled' => false],
 			'Show symptoms' => ['value' => false, 'enabled' => true],
 			'Show suppressed problems' => ['value' => false, 'enabled' => true],
-			'Acknowledgement status' => ['value' => 'all', 'enabled' => true],
+			'Acknowledgement status' => ['value' => 'All', 'enabled' => true],
 			'id:acknowledged_by_me_0' => ['value' => false, 'enabled' => false],
 			'name:inventory[0][field]' => ['value' => 'Type', 'enabled' => true],
 			'name:inventory[0][value]' => ['value' => '', 'enabled' => true, 'maxlength' => 255],
@@ -116,7 +116,7 @@ class testPageProblems extends CWebTest {
 
 		$segmented_radios = [
 			'Show' => ['Recent problems', 'Problems', 'History'],
-			'Acknowledgement status' => ['all', 'Unacknowledged', 'Acknowledged'],
+			'Acknowledgement status' => ['All', 'Unacknowledged', 'Acknowledged'],
 			'Tags' => ['And/Or', 'Or'],
 			'Show tags' => ['None', 1, 2, 3],
 			'id:tag_name_format_0' => ['Full', 'Shortened', 'None'],
@@ -210,7 +210,7 @@ class testPageProblems extends CWebTest {
 		}
 
 		// Acknowledgement status field editability.
-		foreach (['all' => false, 'Unacknowledged' => false, 'Acknowledged' => true] as $label => $status) {
+		foreach (['All' => false, 'Unacknowledged' => false, 'Acknowledged' => true] as $label => $status) {
 			$filter_form->fill(['Acknowledgement status' => $label]);
 			$this->assertTrue($filter_form->getField('id:acknowledged_by_me_0')->isEnabled($status));
 		}
@@ -229,7 +229,7 @@ class testPageProblems extends CWebTest {
 			$filter_form->fill(['Compact view' => $state]);
 
 			foreach (['Show operational data', 'Show details', 'id:show_timeline_0'] as $field) {
-					$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
+				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
 			}
 			$this->assertTrue($filter_form->getField('id:highlight_row_0')->isEnabled($state));
 		}
@@ -255,26 +255,141 @@ class testPageProblems extends CWebTest {
 		));
 	}
 
-	public function testPageProblems_History_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
+	public static function getFilterData() {
+		return [
+			// #0.
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Empty group'
+					],
+					'result' => []
+				]
+			],
+			// #1.
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Another group to check Overview'
+					],
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => '4_Host_to_check_Monitoring_Overview',
+							'Problem' => '4_trigger_Average',
+							'Update' => 'Update',
+							'Tags' => ''
+						]
+					]
+				]
+			],
+			// #2.
+			[
+				[
+					'fields' => [
+						'Host' => '3_Host_to_check_Monitoring_Overview'
+					],
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => '3_Host_to_check_Monitoring_Overview',
+							'Problem' => '3_trigger_Average',
+							'Update' => 'Update',
+							'Tags' => ''
+						]
+					],
+					'check_trigger_description' => [true],
+					'caheck_actions' => [true]
+				]
+			],
+			// #3.
+			[
+				[
+					'fields' => [
+						'Triggers' => ['Trigger_for_suppression', '2_trigger_Information'],
+						'Show suppressed problems' => true
+					],
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => '3_Host_to_check_Monitoring_Overview',
+							'Problem' => '3_trigger_Average',
+							'Update' => 'Update',
+							'Tags' => 'SupTag: A'
+						],
+						[
+							'Severity' => 'Information',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => '1_Host_to_check_Monitoring_Overview',
+							'Problem' => '2_trigger_Information',
+							'Update' => 'Update',
+							'Tags' => ''
+						]
+					],
+					'check_trigger_description' => [
+						false,
+						'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact'
+					],
+					'check_actions' => [
+						false,
+						[
+							[
+								'Time' => '2018-08-07 08:05:35 AM',
+								'User/Recipient' => 'Admin (Zabbix Administrator)',
+								'Action' => '',
+								'Message/Command' => '',
+								'Status' => '',
+								'Info' => ''
+							],
+							[
+								'Time' => '2018-08-06 11:42:06 AM',
+								'User/Recipient' => '',
+								'Action' => '',
+								'Message/Command' => '',
+								'Status' => '',
+								'Info' => ''
+							]
+						]
+					]
+				]
+			]
+		];
+	}
 
-		$this->zbxTestClickXpathWait("//label[text()='History']");
-		$this->query('name:filter_apply')->one()->click();
-		$this->assertTrue($this->zbxTestCheckboxSelected('show_20'));
-		$this->zbxTestAssertNotVisibleId('age_state_0');
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
-			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Host inventory', 'Tags', 'Show suppressed problems',
-			'Acknowledgement status', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
-			'Ack', 'Actions', 'Tags']);
+	/**
+	 * @dataProvider getFilterData
+	 */
+	public function testPageProblems_Filter($data) {
+		$this->page->login()->open('zabbix.php?action=problem.view&show_timeline=0&filter_reset=1');
+		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->query('class:list-table')->waitUntilPresent()->one();
 
-		$this->zbxTestCheckNoRealHostnames();
+		if (CTestArrayHelper::get($data, 'Tags')) {
+			$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
+			$this->setTags($data['tag_options']['tags']);
+		}
+
+		if (CTestArrayHelper::get($data, 'fields')) {
+			$form->fill($data['fields']);
+		}
+
+		$form->submit();
+		$table->waitUntilReloaded();
+
+		$this->assertTableData($data['result']);
 	}
 
 	/**
 	 * Search problems by "AND" or "OR" tag options
 	 */
-	public function testPageProblems_FilterByTagsOptionAndOr() {
+	public function testPageProblems_1FilterByTagsOptionAndOr() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 
@@ -307,7 +422,7 @@ class testPageProblems extends CWebTest {
 	/**
 	 * Search problems by partial or exact tag value match
 	 */
-	public function testPageProblems_FilterByTagsOptionContainsEquals() {
+	public function testPageProblems_2FilterByTagsOptionContainsEquals() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
@@ -334,7 +449,7 @@ class testPageProblems extends CWebTest {
 	/**
 	 * Search problems by partial and exact tag value match and then remove one
 	 */
-	public function testPageProblems_FilterByTagsOptionContainsEqualsAndRemoveOne() {
+	public function testPageProblems_3FilterByTagsOptionContainsEqualsAndRemoveOne() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
@@ -580,7 +695,7 @@ class testPageProblems extends CWebTest {
 	/**
 	 * @dataProvider getFilterByTagsExceptContainsEqualsData
 	 */
-	public function testPageProblems_FilterByTagsExceptContainsEquals($data) {
+	public function testPageProblems_4FilterByTagsExceptContainsEquals($data) {
 		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
@@ -611,7 +726,7 @@ class testPageProblems extends CWebTest {
 	/**
 	 * Search by all options in filter
 	 */
-	public function testPageProblems_FilterByAllOptions() {
+	public function testPageProblems_5FilterByAllOptions() {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
