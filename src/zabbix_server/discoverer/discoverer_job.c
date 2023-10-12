@@ -118,7 +118,6 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc
 	zbx_list_create(&job->tasks);
 	job->dchecks_common = dchecks_common;
 	job->ipranges = ipranges;
-	job->start_time = (int)time(NULL);
 
 	return job;
 }
