@@ -64,7 +64,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	public function doAction() {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
-		$item = $this->getItemPrototype();
+		$item = $this->getItemPrototype($host);
 		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
 		$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
 
@@ -158,6 +158,8 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	/**
 	 * Get host data.
+	 *
+	 * @return array
 	 */
 	protected function getHost(): array {
 		[$host] = API::Host()->get([
@@ -178,6 +180,8 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	/**
 	 * Get template data.
+	 *
+	 * @return array
 	 */
 	protected function getTemplate(): array {
 		[$template] = API::Template()->get([
@@ -196,8 +200,12 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	/**
 	 * Get item prototype data.
+	 *
+	 * @param array $host
+	 *
+	 * @return array
 	 */
-	protected function getItemPrototype(): array {
+	protected function getItemPrototype(array $host): array {
 		$item = [];
 
 		if ($this->hasInput('itemid')) {
@@ -221,6 +229,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 		if (!$item) {
 			$item = CItemPrototypeHelper::getDefaults();
+			$item['hostid'] = $host['hostid'];
 			$item['parent_discoveryid'] = $this->getInput('parent_discoveryid');
 
 			if ($this->hasInput('master_itemid')) {

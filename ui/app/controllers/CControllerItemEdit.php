@@ -63,7 +63,7 @@ class CControllerItemEdit extends CControllerItem {
 
 	public function doAction() {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
-		$item = $this->getItem();
+		$item = $this->getItem($host);
 		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
 		$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
 
@@ -180,8 +180,6 @@ class CControllerItemEdit extends CControllerItem {
 	/**
 	 * Get template data.
 	 *
-	 * @param string $templateid
-	 *
 	 * @return array
 	 */
 	protected function getTemplate(): array {
@@ -203,9 +201,11 @@ class CControllerItemEdit extends CControllerItem {
 	/**
 	 * Get form data for item from database.
 	 *
+	 * @param array $host
+	 *
 	 * @return array
 	 */
-	protected function getItem(): array {
+	protected function getItem(array $host): array {
 		$item = [];
 
 		if ($this->hasInput('itemid')) {
@@ -231,14 +231,14 @@ class CControllerItemEdit extends CControllerItem {
 
 		if (!$item) {
 			$item = CItemHelper::getDefaults();
-			$item['hostid'] = $this->getInput('hostid');
+			$item['hostid'] = $host['hostid'];
 
 			if ($this->hasInput('master_itemid')) {
 				$item['type'] = ITEM_TYPE_DEPENDENT;
 				$master_item = API::Item()->get([
 					'output' => ['itemid', 'name'],
 					'itemids' => [$this->getInput('master_itemid')],
-					'hostids' => [$this->getInput('hostid')]
+					'hostids' => [$host['hostid']]
 				]);
 
 				if ($master_item) {
