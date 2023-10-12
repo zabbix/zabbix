@@ -249,12 +249,12 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				'name' => 'Problem Disaster',
-				'time' => self::$time - 90000, // now - 25 hours.
+				'time' => strtotime('yesterday'),
 				'problem_count' => '1'
 			],
 			[
 				'name' => 'Problem Warning',
-				'time' => self::$time - 180000, // now - 50 hours.
+				'time' => strtotime('-2 days'),
 				'problem_count' => '1'
 			],
 			[
