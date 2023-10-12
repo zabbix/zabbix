@@ -208,7 +208,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 				])
 			]),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_preprocessing_action', ZBX_ACTION_REPLACE))
+			(new CRadioButtonList('preprocessing_action', ZBX_ACTION_REPLACE))
 				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
 				->setModern(true)
