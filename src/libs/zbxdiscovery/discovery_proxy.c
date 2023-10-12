@@ -41,22 +41,29 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
 
 void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
-		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
+		int status, const char *value, time_t now, zbx_vector_uint64_t *dserviceids,
+		zbx_add_event_func_t add_event_cb)
 {
 	ZBX_UNUSED(unique_dcheckid);
 	ZBX_UNUSED(dhost);
+	ZBX_UNUSED(dserviceids);
 	ZBX_UNUSED(add_event_cb);
 
 	zbx_pb_discovery_write_service((zbx_pb_discovery_data_t *)handle, druleid, dcheckid, ip, dns, port, status,
 			value, (int)now);
 }
 
-void	zbx_discovery_eoj_down_update(void *handle, zbx_uint64_t druleid, int job_time_start, int job_time_end)
+void	zbx_discovery_find_host(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost)
 {
-	char	buf[16];
-
-	zbx_snprintf(buf, sizeof(buf), "%d", job_time_start);
-	zbx_pb_discovery_write_service((zbx_pb_discovery_data_t *)handle, druleid, 0, "", "", 0,
-			DOBJECT_STATUS_ENDOFJOB, buf, job_time_end);
+	ZBX_UNUSED(druleid);
+	ZBX_UNUSED(ip);
+	ZBX_UNUSED(dhost);
 }
 
+void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t now,
+		zbx_vector_uint64_t *dserviceids)
+{
+	ZBX_UNUSED(dhostid);
+	ZBX_UNUSED(now);
+	ZBX_UNUSED(dserviceids);
+}

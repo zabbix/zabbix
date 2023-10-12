@@ -674,9 +674,9 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 		stats_calc(linebuf_p, host, args);
 	}
 
-	if (0 != args->rdns)
+	if (0 != args->rdns && (NULL == host->dnsname || ('\0' == *host->dnsname && 0 != dnsname_len)))
 	{
-		host->dnsname = zbx_dsprintf(NULL, "%.*s", (int)dnsname_len, resp->linebuf);
+		host->dnsname = zbx_dsprintf(host->dnsname, "%.*s", (int)dnsname_len, resp->linebuf);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

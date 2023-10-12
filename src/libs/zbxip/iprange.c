@@ -341,6 +341,39 @@ check_fill:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: concert IP address (v4 or v6) into IP string                      *
+ *                                                                            *
+ * Parameters: type    - [IN] type of IP                                      *
+ *             address - [IN] IP address as number array                      *
+ *             ip      - [IN/OUT] string with current address from IP range   *
+ *             len     - [IN] size of string buffer for ip address            *
+ *                                                                            *
+ * Return value: IP as string                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)
+{
+#ifdef HAVE_IPV6
+	if (ZBX_IPRANGE_V6 == type)
+	{
+		zbx_snprintf(ip, len, "%x:%x:%x:%x:%x:%x:%x:%x", (unsigned int)ipaddress[0],
+				(unsigned int)ipaddress[1], (unsigned int)ipaddress[2],
+				(unsigned int)ipaddress[3], (unsigned int)ipaddress[4],
+				(unsigned int)ipaddress[5], (unsigned int)ipaddress[6],
+				(unsigned int)ipaddress[7]);
+	}
+	else
+	{
+#endif
+		zbx_snprintf(ip, len, "%u.%u.%u.%u", (unsigned int)ipaddress[0], (unsigned int)ipaddress[1],
+				(unsigned int)ipaddress[2], (unsigned int)ipaddress[3]);
+#ifdef HAVE_IPV6
+	}
+#endif
+	return SUCCEED;
+}
+/******************************************************************************
+ *                                                                            *
  * Purpose: parses IP address (v4 or v6) into IP range structure              *
  *                                                                            *
  * Parameters: iprange - [OUT]                                                *
@@ -438,6 +471,57 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets next unique IP address from specified range                  *
+ *                                                                            *
+ * Parameters: ipranges - [IN] array of ipranges                              *
+ *             num      - [IN] size of ipranges array                         *
+ *             ip       - [IN/OUT] string with current address from IP range  *
+ *             len      - [IN] size of string buffer for ip address           *
+ *                                                                            *
+ * Return value: string with next IP address was returned successfully        *
+ *               NULL    - no more addresses in specified ranges              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len)
+{
+	static ZBX_THREAD_LOCAL int	idx, ipaddress[8];
+	int				i;
+
+	if (0 == num)
+		return FAIL;
+
+	if ('\0' == *ip)
+	{
+		idx = 0;
+		zbx_iprange_first(&ipranges[idx], ipaddress);
+		return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+	}
+
+	if (num == idx)
+		return FAIL;
+
+	do
+	{
+		if (FAIL == zbx_iprange_next(&ipranges[idx], ipaddress))
+		{
+			if (++idx == num)
+				return FAIL;
+
+			zbx_iprange_first(&ipranges[idx], ipaddress);
+		}
+
+		for (i = 0; i < idx; i++)
+		{
+			if (SUCCEED == zbx_iprange_validate(&ipranges[i], ipaddress))
+				break;
+		}
+	}
+	while (i != idx);	/* skipping ip from overlapping ipranges */
+
+	return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if IP address is in specified range                        *
