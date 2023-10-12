@@ -160,14 +160,12 @@ class CControllerDashboardView extends CController {
 	private function getDashboard(array $widget_defaults): array {
 		// The dashboard property shall only contain data used by the JavaScript framework.
 		$dashboard = null;
-
+		$error = null;
 		$stats = [
 			'has_related_reports' => false,
 			'broadcast_requirements' => [],
 			'configuration_hash' => null
 		];
-
-		$error = null;
 
 		if ($this->hasInput('new')) {
 			$dashboard = [

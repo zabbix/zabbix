@@ -69,9 +69,9 @@ window.tophosts_column_edit_form = new class {
 			})
 			.on('afterremove.dynamicRows', () => this._update());
 
-		this._$widget_form[0].addEventListener('change', (e) => {
-			e.target.value = e.target.value.trim();
-		}, {capture: true});
+		this._$widget_form[0].addEventListener('change', (e) => e.target.value = e.target.value.trim(),
+			{capture: true}
+		);
 
 		// Initialize form elements accessibility.
 		this._update();

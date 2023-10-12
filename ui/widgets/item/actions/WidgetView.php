@@ -30,8 +30,8 @@ use API,
 	CUrl,
 	Manager;
 
+use CHousekeepingHelper;
 use Widgets\Item\Widget;
-use Widgets\Item\Includes\WidgetForm;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -61,7 +61,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$time_to = 0;
 
 		$options = [
-			'output' => ['value_type'],
+			'output' => ['value_type', 'history', 'trends'],
 			'selectValueMap' => ['mappings'],
 			'itemids' => $this->fields_values['itemid'],
 			'webitems' => true,
@@ -84,7 +84,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($tmp_items) {
 				$options = [
-					'output' => ['value_type'],
+					'output' => ['value_type', 'history', 'trends'],
 					'selectValueMap' => ['mappings'],
 					'hostids' => $this->fields_values['override_hostid'],
 					'webitems' => true,
@@ -145,11 +145,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($items) {
 			$item = $items[$itemid];
 
-			$items[$itemid] += [
-				'source' => ($this->fields_values['history'] != WidgetForm::ITEM_VALUE_DATA_SOURCE_TRENDS)
-					? 'history'
-					: 'trends'
-			];
+			self::addDataSource($items,  $time_from, $time_to, $this->fields_values['history']);
 
 			$history = [];
 			$value_type = $item['value_type'];
@@ -170,8 +166,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
 				}
 				else {
-					$history = Manager::History()->getAggregationByInterval(
-						$items, $time_from, $time_to, $aggregate_function, $time_to
+					$history = Manager::History()->getAggregationByInterval($items, $time_from, $time_to,
+						$aggregate_function, $time_to
 					);
 				}
 
@@ -179,8 +175,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$last_results = [];
 				}
 				else {
-					$last_results = Manager::History()->getAggregationByInterval(
-						$items, $time_from, $time_to, $aggregate_function, $time_from
+					$last_results = Manager::History()->getAggregationByInterval($items, $time_from, $time_to,
+						$aggregate_function, $time_from
 					);
 				}
 
@@ -189,8 +185,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$previous_time_to = $time_to - 1 - $history_period;
 					$previous_time_from = $previous_time_to - $history_period;
 
-					$prev_results = Manager::History()->getAggregationByInterval(
-						$items, $previous_time_from, $previous_time_to, $aggregate_function, $history_period
+					$prev_results = Manager::History()->getAggregationByInterval($items, $previous_time_from,
+						$previous_time_to, $aggregate_function, $history_period
 					);
 
 					if ($prev_results) {
@@ -204,7 +200,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$history[$items[$itemid]['itemid']] = $aggregate_data;
 					$history[$itemid][0]['clock'] = $time_to;
 				}
-
 
 				if ($aggregate_function == AGGREGATE_COUNT && $history) {
 					foreach ($history as &$item_data) {
@@ -356,7 +351,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 									$change_indicator = Widget::CHANGE_INDICATOR_DOWN;
 								}
 							}
-							else if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
+							elseif (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
 									&& $last_value !== $prev_value) {
 								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
 							}
@@ -612,5 +607,105 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $info;
+	}
+
+	/**
+	 * Calculate the data source for item based on widget configuration and global housekeeping settings.
+	 *
+	 * @param array $items       Array of items to get source for.
+	 * @param int   $time_from   Timestamp indicating start of time period (seconds).
+	 * @param int   $time_now    Timestamp for current point in time (seconds).
+	 * @param int   $data_source Data source specified in widget form.
+	 *
+	 * @return void
+	 */
+	private static function addDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
+		if ($data_source == Widget::HISTORY_DATA_HISTORY || $data_source == Widget::HISTORY_DATA_TRENDS) {
+			foreach ($items as &$item) {
+				$item['source'] = $data_source == Widget::HISTORY_DATA_TRENDS
+				&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+					? 'trends'
+					: 'history';
+			}
+			unset($item);
+
+			return;
+		}
+
+		static $hk_history_global, $global_history_time, $hk_trends_global, $global_trends_time;
+
+		if ($hk_history_global === null) {
+			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
+
+			if ($hk_history_global) {
+				$global_history_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+			}
+		}
+
+		if ($hk_trends_global === null) {
+			$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
+
+			if ($hk_history_global) {
+				$global_trends_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+			}
+		}
+
+		if ($hk_history_global) {
+			foreach ($items as &$item) {
+				$item['history'] = $global_history_time;
+			}
+			unset($item);
+		}
+
+		if ($hk_trends_global) {
+			foreach ($items as &$item) {
+				$item['trends'] = $global_trends_time;
+			}
+			unset($item);
+		}
+
+		if (!$hk_history_global || !$hk_trends_global) {
+			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items,
+				array_merge($hk_history_global ? [] : ['history'], $hk_trends_global ? [] : ['trends'])
+			);
+
+			$processed_items = [];
+
+			foreach ($items as $itemid => $item) {
+				if (!$global_trends_time) {
+					$item['history'] = timeUnitToSeconds($item['history']);
+
+					if ($item['history'] === null) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'history',
+							_('invalid history storage period')
+						));
+
+						continue;
+					}
+				}
+
+				if (!$hk_trends_global) {
+					$item['trends'] = timeUnitToSeconds($item['trends']);
+
+					if ($item['trends'] === null) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
+							_('invalid trend storage period')
+						));
+
+						continue;
+					}
+				}
+
+				$processed_items[$itemid] = $item;
+			}
+
+			$items = $processed_items;
+		}
+
+		foreach ($items as &$item) {
+			$item['source'] = $item['trends'] == 0 || $time_now - $item['history'] <= $time_from ? 'history' : 'trends';
+		}
+
+		unset($item);
 	}
 }

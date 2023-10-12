@@ -38,9 +38,9 @@ window.widget_item_form = new class {
 		this._units_show = document.getElementById('units_show');
 
 		jQuery('#itemid').on('change', () => {
-			this.promiseGetItemType()
+			this.#promiseGetItemType()
 				.then((type) => {
-					this.#is_item_numeric = this.isItemNumeric(type);
+					this.#is_item_numeric = this.#isItemTypeNumeric(type);
 					this.updateForm();
 				});
 		});
@@ -75,9 +75,9 @@ window.widget_item_form = new class {
 
 		this.updateForm();
 
-		this.promiseGetItemType()
+		this.#promiseGetItemType()
 			.then((type) => {
-				this.#is_item_numeric = this.isItemNumeric(type);
+				this.#is_item_numeric = this.#isItemTypeNumeric(type);
 				this.updateForm();
 			});
 	}
@@ -135,7 +135,7 @@ window.widget_item_form = new class {
 		document.getElementById('item-value-thresholds-warning').style.display = this.#is_item_numeric ? 'none' : '';
 	}
 
-	promiseGetItemType() {
+	#promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
 
 		if (ms_item_data.length == 0) {
@@ -143,6 +143,7 @@ window.widget_item_form = new class {
 		}
 
 		const curl = new Curl('jsrpc.php');
+
 		curl.setArgument('method', 'item_value_type.get');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 		curl.setArgument('itemid', ms_item_data[0].id);
@@ -157,7 +158,7 @@ window.widget_item_form = new class {
 			});
 	}
 
-	isItemNumeric(type) {
+	#isItemTypeNumeric(type) {
 		return type === <?= ITEM_VALUE_TYPE_FLOAT ?> || type === <?= ITEM_VALUE_TYPE_UINT64 ?>;
 	}
 

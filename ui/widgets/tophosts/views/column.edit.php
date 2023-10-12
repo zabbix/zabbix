@@ -232,14 +232,14 @@ $form_grid->addItem([
 		(new CSelect('aggregate_function'))->setId('aggregate_function')
 			->setValue($data['aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
-				AGGREGATE_NONE => item_aggr_fnc2str(AGGREGATE_NONE),
-				AGGREGATE_MIN => item_aggr_fnc2str(AGGREGATE_MIN),
-				AGGREGATE_MAX => item_aggr_fnc2str(AGGREGATE_MAX),
-				AGGREGATE_AVG => item_aggr_fnc2str(AGGREGATE_AVG),
-				AGGREGATE_COUNT => item_aggr_fnc2str(AGGREGATE_COUNT),
-				AGGREGATE_SUM => item_aggr_fnc2str(AGGREGATE_SUM),
-				AGGREGATE_FIRST => item_aggr_fnc2str(AGGREGATE_FIRST),
-				AGGREGATE_LAST => item_aggr_fnc2str(AGGREGATE_LAST)
+				AGGREGATE_NONE => item_aggr_fnc2desc(AGGREGATE_NONE),
+				AGGREGATE_MIN => item_aggr_fnc2desc(AGGREGATE_MIN),
+				AGGREGATE_MAX => item_aggr_fnc2desc(AGGREGATE_MAX),
+				AGGREGATE_AVG => item_aggr_fnc2desc(AGGREGATE_AVG),
+				AGGREGATE_COUNT => item_aggr_fnc2desc(AGGREGATE_COUNT),
+				AGGREGATE_SUM => item_aggr_fnc2desc(AGGREGATE_SUM),
+				AGGREGATE_FIRST => item_aggr_fnc2desc(AGGREGATE_FIRST),
+				AGGREGATE_LAST => item_aggr_fnc2desc(AGGREGATE_LAST)
 			]))
 	)
 ]);
