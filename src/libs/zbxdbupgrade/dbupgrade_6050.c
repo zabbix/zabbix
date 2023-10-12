@@ -1978,33 +1978,40 @@ static int	DBpatch_6050142(void)
 
 static int	DBpatch_6050143(void)
 {
+	return fix_expression_macro_escaping("select script_paramid,value from script_param where value",
+			"update script_param set value='%s' where script_paramid=%s;\n",
+			"Failed to parse expression macro \"%s\" in script parameter with id %s, error: %s");
+}
+
+static int	DBpatch_6050144(void)
+{
 	return fix_expression_macro_escaping("select mediatype_messageid,message from media_type_message where message",
 			"update media_type_message set message='%s' where mediatype_messageid=%s;\n",
 			"Failed to parse expression macro \"%s\" in media type message with id %s, error: %s");
 }
 
-static int	DBpatch_6050144(void)
+static int	DBpatch_6050145(void)
 {
 	return fix_expression_macro_escaping("select mediatype_messageid,subject from media_type_message where subject",
 			"update media_type_message set subject='%s' where mediatype_messageid=%s;\n",
 			"Failed to parse expression macro \"%s\" in media type subject with id %s, error: %s");
 }
 
-static int	DBpatch_6050145(void)
+static int	DBpatch_6050146(void)
 {
 	return fix_expression_macro_escaping("select operationid,message from opmessage where message",
 			"update opmessage set message='%s' where operationid=%s;\n",
 			"Failed to parse expression macro \"%s\" in action operation message with id %s, error: %s");
 }
 
-static int	DBpatch_6050146(void)
+static int	DBpatch_6050147(void)
 {
 	return fix_expression_macro_escaping("select operationid,subject from opmessage where subject",
 			"update opmessage set subject='%s' where operationid=%s;\n",
 			"Failed to parse expression macro \"%s\" in action operation subject with id %s, error: %s");
 }
 
-static int	DBpatch_6050147(void)
+static int	DBpatch_6050148(void)
 {
 	return fix_expression_macro_escaping("select triggerid,event_name from triggers where event_name",
 			"update triggers set event_name='%s' where triggerid=%s;\n",
@@ -2163,5 +2170,6 @@ DBPATCH_ADD(6050144, 0, 1)
 DBPATCH_ADD(6050145, 0, 1)
 DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
+DBPATCH_ADD(6050148, 0, 1)
 
 DBPATCH_END()
