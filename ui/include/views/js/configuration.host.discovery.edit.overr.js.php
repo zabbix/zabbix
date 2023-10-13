@@ -1060,28 +1060,6 @@
 
 		$custom_intervals.dynamicRows({template: '#lldoverride-custom-intervals-row', allow_empty: true});
 
-		jQuery('#ophistory_history_mode', this.$form)
-			.change(function() {
-				if (jQuery('[name="ophistory[history_mode]"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
-					jQuery('#ophistory_history', that.$form).prop('disabled', true).hide();
-				}
-				else {
-					jQuery('#ophistory_history', that.$form).prop('disabled', false).show();
-				}
-			})
-			.trigger('change');
-
-		jQuery('#optrends_trends_mode', this.$form)
-			.change(function() {
-				if (jQuery('[name="optrends[trends_mode]"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
-					jQuery('#optrends_trends', that.$form).prop('disabled', true).hide();
-				}
-				else {
-					jQuery('#optrends_trends', that.$form).prop('disabled', false).show();
-				}
-			})
-			.trigger('change');
-
 		jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 		jQuery('.tags-table', this.$form)
 			.dynamicRows({template: '#lldoverride-tag-row', allow_empty: true})
