@@ -1063,7 +1063,7 @@ class testItemTest extends CWebTest {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['error']);
-				$overlay->close();
+				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				break;
 		}
 	}
