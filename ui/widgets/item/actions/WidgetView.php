@@ -358,7 +358,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
 							}
 						}
-
 						break;
 				}
 			}
