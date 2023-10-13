@@ -420,6 +420,11 @@ class CTriggerGeneralHelper {
 			$data['hostid'] = $trigger['hosts'][0]['hostid'];
 		}
 
+		if ($trigger['tags']) {
+			CArrayHelper::sort($trigger['tags'], ['tag', 'value']);
+			$trigger['tags'] = array_values($trigger['tags']);
+		}
+
 		$data = [
 			'description' => $trigger['comments'],
 			'name' => $trigger['description']

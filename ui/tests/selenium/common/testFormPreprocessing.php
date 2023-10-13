@@ -20,15 +20,25 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * Base class for Preprocessing tests.
  */
 abstract class testFormPreprocessing extends CWebTest {
 
-	use PreprocessingTrait;
+	/**
+	 * Attach MessageBehavior and PreprocessingBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
+	}
 
 	public $link;
 	public $ready_link;
@@ -170,15 +180,6 @@ abstract class testFormPreprocessing extends CWebTest {
 			'error_handler_params' => ''
 		]
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/*
 	 * Preprocessing validation data for Item and Item prototype.

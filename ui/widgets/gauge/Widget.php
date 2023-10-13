@@ -25,6 +25,13 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	// Form blocks.
+	public const SHOW_DESCRIPTION = 1;
+	public const SHOW_VALUE = 2;
+	public const SHOW_NEEDLE = 3;
+	public const SHOW_SCALE = 4;
+	public const SHOW_VALUE_ARC = 5;
+
 	// Description vertical position.
 	public const DESC_V_POSITION_TOP = 0;
 	public const DESC_V_POSITION_BOTTOM = 1;

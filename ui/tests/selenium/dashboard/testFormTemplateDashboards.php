@@ -1307,7 +1307,12 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Interface type',
 							'type' => 'checkbox_list',
-							'checkboxes' => ['Zabbix agent' => false, 'SNMP' => false, 'JMX' => false, 'IPMI' => false]
+							'checkboxes' => [
+								'Zabbix agent (active checks)' => false,
+								'Zabbix agent (passive checks)' => false,
+								'SNMP' => false,
+								'JMX' => false,
+								'IPMI' => false]
 						],
 						[
 							'field' => 'Layout',
@@ -1317,6 +1322,11 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'Show data in maintenance',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show only totals',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -3012,7 +3022,6 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:value_size' => 50,
 						'id:value_bold' => true,
 						'xpath:.//input[@id="value_color"]/..' => '283593',
-						'id:value_arc' => true,
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
@@ -3291,9 +3300,16 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Host availability'),
 						'Name' => 'Host availability with all possible parameters',
 						'Refresh interval' => '10 minutes',
-						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
+						'Interface type' => [
+							'Zabbix agent (active checks)',
+							'Zabbix agent (passive checks)',
+							'SNMP',
+							'JMX',
+							'IPMI'
+						],
 						'Layout' => 'Vertical',
-						'Show data in maintenance' => true
+						'Show data in maintenance' => true,
+						'Show only totals' => true
 					]
 				]
 			],

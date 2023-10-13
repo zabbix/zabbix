@@ -516,6 +516,34 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 4bfb0c1697f043d9acf640b84cc8d945
+          name: 'PostgreSQL: Version'
+          type: ODBC
+          key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          params: 'SELECT version()'
+          username: '{$PG.USER}'
+          password: '{$PG.PASSWORD}'
+          description: 'PostgreSQL version.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: application
+          triggers:
+            - uuid: fd409b64f83943edaf43845a12bf8ace
+              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0'
+              name: 'PostgreSQL: Version has changed'
+              event_name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              priority: INFO
+              tags:
+                - tag: scope
+                  value: notice
         - uuid: 8af13c6154744e9596a0f96dfbf09d8b
           name: 'PostgreSQL: Get WAL'
           type: ODBC
