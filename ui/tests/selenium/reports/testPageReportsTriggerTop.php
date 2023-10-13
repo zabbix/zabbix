@@ -244,7 +244,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				'name' => 'Severity status: High',
-				'time' => self::$time - 5400, // now - 90 minutes.
+				'time' => self::$time - 1500, // now - 25 minutes.
 				'problem_count' => '1'
 			],
 			[
@@ -397,22 +397,22 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '5'
 						],
 						[
-							'Host' => 'Host for Reports - TOP 100 triggers filter checks',
-							'Trigger' => 'Problem Warning',
-							'Severity' => 'Warning',
-							'Number of status changes' => '1'
-						],
-						[
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
+							'Number of status changes' => '2'
+						],
+						[
+							'Host' => 'Host for Reports - TOP 100 triggers filter checks',
+							'Trigger' => 'Problem Warning',
+							'Severity' => 'Warning',
 							'Number of status changes' => '1'
 						]
 					],
 					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg',
-						'Problem Warning' => 'warning-bg',
-						'Severity status: High' => 'high-bg'
+						'Severity status: High' => 'high-bg',
+						'Problem Warning' => 'warning-bg'
 					]
 				]
 			],
@@ -427,7 +427,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
-							'Number of status changes' => '1'
+							'Number of status changes' => '2'
 						]
 					],
 					'background_colors' => [
@@ -456,7 +456,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
-							'Number of status changes' => '1'
+							'Number of status changes' => '2'
 						]
 					],
 					'background_colors' => [
@@ -495,7 +495,7 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
-							'Number of status changes' => '1'
+							'Number of status changes' => '2'
 						]
 					],
 					'background_colors' => [
@@ -563,6 +563,12 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '5'
 						],
 						[
+							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
+							'Trigger' => 'Severity status: High',
+							'Severity' => 'High',
+							'Number of status changes' => '2'
+						],
+						[
 							'Host' => 'Host with triggers that contains special characters or macro',
 							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
 							'Severity' => 'Information',
@@ -581,12 +587,6 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Number of status changes' => '1'
 						],
 						[
-							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
-							'Trigger' => 'Severity status: High',
-							'Severity' => 'High',
-							'Number of status changes' => '1'
-						],
-						[
 							'Host' => 'Host with triggers that contains special characters or macro',
 							'Trigger' => 'Severity status Average: Host with triggers that contains special characters or macro',
 							'Severity' => 'Average',
@@ -595,10 +595,10 @@ class testPageReportsTriggerTop extends CWebTest {
 					],
 					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg',
+						'Severity status: High' => 'high-bg',
 						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
 						'Not classified ❌' => 'na-bg',
 						'Problem Warning' => 'warning-bg',
-						'Severity status: High' => 'high-bg',
 						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg'
 					]
 				]
@@ -644,8 +644,8 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'date' => [
-						'from' => 'now-2h',
-						'to' => 'now-1h'
+						'from' => 'now-60m',
+						'to' => 'now-20m'
 					],
 					'expected' => [
 						[
