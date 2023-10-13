@@ -1183,13 +1183,14 @@ class CHistoryManager {
 	 * The $item parameter must have the value_type and itemid properties set.
 	 *
 	 * @param array    $item         Item to get aggregated value for.
-	 * @param string   $aggregation  Aggregation to be applied (min / max / avg).
+	 * @param string   $aggregation  Aggregation to be applied (min, max, avg, and other functions).
 	 * @param int      $time_from    Timestamp indicating start of time period (seconds).
 	 * @param int|null $time_to      Timestamp indicating end of time period (seconds) or null.
 	 *
 	 * @return string  Aggregated history value.
 	 */
-	public function getAggregatedValue(array $item, string $aggregation, int $time_from, ?int $time_to = null): string {
+	public function getAggregatedValue(array $item, string $aggregation, int $time_from,
+			?int $time_to = null): ?string {
 		switch (self::getDataSourceType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getAggregatedValueFromElasticsearch($item, $aggregation, $time_from, $time_to);
@@ -1202,14 +1203,12 @@ class CHistoryManager {
 	/**
 	 * Elasticsearch specific implementation of getAggregatedValue.
 	 *
-	 * The $item parameter must have the value_type and itemid properties set.
-	 *
 	 * @param array    $item         Item to get aggregated value for.
-	 * @param string   $aggregation  Aggregation to be applied (min / max / avg).
+	 * @param string   $aggregation  Aggregation to be applied (min, max, avg, and other functions).
 	 * @param int      $time_from    Timestamp indicating start of time period (seconds).
 	 * @param int|null $time_to      Timestamp indicating end of time period (seconds) or null.
 	 *
-	 * @see CHistoryManager::getAggregatedValue
+	 * @return mixed Aggregated value based on selected aggregation function or null, if no data is found.
 	 */
 	private function getAggregatedValueFromElasticsearch(array $item, string $aggregation, int $time_from,
 			?int $time_to) {
@@ -1278,14 +1277,12 @@ class CHistoryManager {
 	/**
 	 * SQL specific implementation of getAggregatedValue.
 	 *
-	 * The $item parameter must have the value_type and itemid properties set.
-	 *
 	 * @param array    $item         Item to get aggregated value for.
-	 * @param string   $aggregation  Aggregation to be applied (min / max / avg).
+	 * @param string   $aggregation  Aggregation to be applied (min, max, avg, and other functions).
 	 * @param int      $time_from    Timestamp indicating start of time period (seconds).
 	 * @param int|null $time_to      Timestamp indicating end of time period (seconds) or null.
 	 *
-	 * @see CHistoryManager::getAggregatedValue
+	 * @return mixed Aggregated value based on selected aggregation function or null, if no data is found.
 	 */
 	private function getAggregatedValueFromSql(array $item, string $aggregation, int $time_from, ?int $time_to) {
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
@@ -1310,7 +1307,7 @@ class CHistoryManager {
 		else {
 			$sql = 'SELECT value'.
 				$sql_part.
-				' ORDER BY clock '.$aggregation === 'last' ? 'DESC' : 'ASC'.
+				' ORDER BY clock '.($aggregation === 'last' ? 'DESC' : 'ASC').
 				' LIMIT 1';
 		}
 

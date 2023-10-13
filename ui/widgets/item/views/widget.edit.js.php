@@ -138,7 +138,7 @@ window.widget_item_form = new class {
 	/**
 	 * Fetch type of currently selected item.
 	 *
-	 * @returns {Promise<any>}  Resolved promise will contain item type, or false in case of error or if no item is
+	 * @return {Promise<any>}  Resolved promise will contain item type, or false in case of error or if no item is
 	 *                          currently selected.
 	 */
 	#promiseGetItemType() {
