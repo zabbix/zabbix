@@ -99,9 +99,9 @@ class testDashboardPieChartWidget extends CWebTest
 					'fields' => [
 						'Data set' => [
 							'type' => self::TYPE_ITEM_LIST,
-							'host' => 'ЗАББИКС Сервер',
+							'host' => self::HOST_NAME,
 							'items' => [
-								['name' =>'Linux: Available memory']
+								['name' =>'item-1']
 							]
 						]
 					]
@@ -201,6 +201,18 @@ class testDashboardPieChartWidget extends CWebTest
 					],
 					'result' => TEST_BAD,
 					'error' => 'Invalid parameter "Data set/1/items": cannot be empty.'
+				]
+			],
+			// Missing Item list.
+			[
+				[
+					'fields' => [
+						'Data set' => [
+							'type' => self::TYPE_ITEM_LIST
+							]
+					],
+					'result' => TEST_BAD,
+					'error' => 'Invalid parameter "Data set/1/itemids": cannot be empty.'
 				]
 			],
 			// Unicode values.
@@ -341,39 +353,93 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->fillForm($data['fields'], $form);
 		$form->submit();
 
-		$test_good_expected = (CTestArrayHelper::get($data, 'result', TEST_GOOD) === TEST_GOOD);
-
-		if ($test_good_expected) {
-			COverlayDialogElement::ensureNotPresent();
-
-			// Save Dashboard.
-			$widget = $dashboard->getWidget($this->calculateWidgetName($data['fields']));
-			$this->waitForWidgetToLoad($widget);
-			$dashboard->save();
-
-			// Assert successful save.
-			$message = CMessageElement::find()->waitUntilPresent()->one();
-			$this->assertTrue($message->isGood());
-			$this->assertEquals('Dashboard updated', $message->getTitle());
-
-			// Assert data in edit form.
-			$form = $widget->edit();
-			$this->checkForm($data['fields'], $form);
-		}
-		else {
-			// Assert error message.
-			$message = CMessageElement::find()->waitUntilPresent()->one();
-			$this->assertTrue($message->isBad());
-
-			$errors = is_array($data['error']) ? $data['error'] : [$data['error']];
-
-			foreach ($errors as $i => $error) {
-				$this->assertEquals($error, $message->getLines()->get($i)->getText());
-			}
-		}
+		$this->assertEditFormAfterSave($data);
 
 		// Check total Widget count.
-		$this->assertEquals($old_widget_count + ($test_good_expected ? 1 : 0), $dashboard->getWidgets()->count());
+		$this->assertEquals(
+			$old_widget_count + (int) $this->isTestGood($data),
+			$dashboard->getWidgets()->count()
+		);
+	}
+
+	public function getUpdateData()
+	{
+		return [
+			// Mandatory fields only.
+			[
+				[
+					'fields' => []
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test updating of Pie chart.
+	 *
+	 * @dataProvider getUpdateData
+	 */
+	public function testDashboardPieChartWidget_Update($data){
+		// Create a Pie chart widget for editing.
+		$widget_name = 'Edit widget';
+		CDataHelper::call('dashboard.update',
+			[
+				'dashboardid' => self::$dashboardid,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'name' => $widget_name,
+								'type' => 'piechart',
+								'fields' => [
+									[
+										'type' => '1',
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Test Host'
+									],
+									[
+										'type' => '1',
+										'name' => 'ds.0.items.0',
+										'value' => 'Test Items'
+									],
+									[
+										'type' => '1',
+										'name' => 'ds.0.color',
+										'value' => 'FF465C'
+									],
+								]
+							]
+						]
+					]
+				]
+			]
+		);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$form = $dashboard->edit()->getWidget($widget_name)->edit();
+
+		// Fill data and submit.
+		$this->fillForm($data['fields'], $form);
+		$form->submit();
+
+		// Assert result.
+		$this->assertEditFormAfterSave($data);
+
+		// Check total Widget count.
+		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+	}
+
+	/**
+	 * Calculates if the expected test result is TEST_GOOD.
+	 *
+	 * @param $data    data from data provider
+	 * @return bool    TRUE if TEST_GOOD expected, else FALSE
+	 */
+	protected function isTestGood($data) {
+		return CTestArrayHelper::get($data, 'result', TEST_GOOD) === TEST_GOOD;
 	}
 
 	/**
@@ -399,56 +465,80 @@ class testDashboardPieChartWidget extends CWebTest
 	}
 
 	/**
-	 * Check Pie chart widget edit form contains the provided data.
+	 * Asserts that the data is saved and displayed as expected in the Edit form.
 	 *
-	 * @param array $fields         field data to check
-	 * @param CFormElement $form    form to be checked
+	 * @param $data    data from data provider
 	 */
-	protected function checkForm($fields, $form) {
-		// Check main fields
-		$main_fields = CTestArrayHelper::get($fields, 'main_fields', []);
-		$main_fields['Name'] = $this->calculateWidgetName($fields);
-		$form->checkValue($main_fields);
+	protected function assertEditFormAfterSave($data) {
+		$dashboard = CDashboardElement::find()->one();
 
-		// Check Data set tab.
-		$data_sets = $this->extractDataSets($fields);
-		$last = count($data_sets) - 1;
+		if ($this->isTestGood($data)) {
+			COverlayDialogElement::ensureNotPresent();
 
-		foreach ($data_sets as $i => $data_set) {
-			$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
-			unset($data_set['type']);
+			// Save Dashboard.
+			$widget = $dashboard->getWidget($this->calculateWidgetName($data['fields']));
+			$this->waitForWidgetToLoad($widget);
+			$dashboard->save();
 
-			// Check the fields depending on the type of the Data set.
-			if ($type === self::TYPE_ITEM_PATTERN) {
-				$data_set = $this->remapDataSet($data_set, $i);
-			}
-			else {
-				// When Data set type is Item list.
+			// Assert successful save.
+			$message = CMessageElement::find()->waitUntilPresent()->one();
+			$this->assertTrue($message->isGood());
+			$this->assertEquals('Dashboard updated', $message->getTitle());
 
-				// Check all items.
-				foreach ($data_set['items'] as $item) {
-					$this->assertTrue($form->query('link', $data_set['host'].': '.$item['name'])->exists());
+			// Assert data in edit form.
+			$form = $widget->edit();
+
+			// Check main fields
+			$main_fields = CTestArrayHelper::get($data['fields'], 'main_fields', []);
+			$main_fields['Name'] = $this->calculateWidgetName($data['fields']);
+			$form->checkValue($main_fields);
+
+			$data_sets = $this->extractDataSets($data['fields']);
+			$last = count($data_sets) - 1;
+
+			// Check Data set tab.
+			foreach ($data_sets as $i => $data_set) {
+				$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
+				unset($data_set['type']);
+
+				// Additional steps for Item list.
+				if ($type === self::TYPE_ITEM_LIST) {
+					// Check Host and all Items.
+					foreach ($data_set['items'] as $item) {
+						$this->assertTrue($form->query('link', $data_set['host'].': '.$item['name'])->exists());
+					}
+
+					unset($data_set['host']);
 				}
-
-				unset($data_set['host']);
 				$data_set = $this->remapDataSet($data_set, $i);
-			}
-			$form->checkValue($data_set);
+				$form->checkValue($data_set);
 
-			// Open the next data set, if it exists.
-			if ($i !== $last) {
-				$form->query('xpath://li[contains(@class, "list-accordion-item")]['.
+				// Open the next data set, if it exists.
+				if ($i !== $last) {
+					$form->query('xpath://li[contains(@class, "list-accordion-item")]['.
 						($i + 2).']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
-				$form->invalidate();
+					$form->invalidate();
+				}
+			}
+
+			// Check values in other tabs
+			$tabs = ['Displaying options', 'Time period', 'Legend'];
+			foreach ($tabs as $tab) {
+				if (array_key_exists($tab, $data['fields'])) {
+					$form->selectTab($tab);
+					$form->checkValue($data['fields'][$tab]);
+				}
 			}
 		}
+		else {
+			// Assert error message.
+			$message = CMessageElement::find()->waitUntilPresent()->one();
+			$this->assertTrue($message->isBad());
 
-		// Check values in other tabs
-		$tabs = ['Displaying options', 'Time period', 'Legend'];
-		foreach ($tabs as $tab) {
-			if (array_key_exists($tab, $fields)) {
-				$form->selectTab($tab);
-				$form->checkValue($fields[$tab]);
+			$errors = is_array($data['error']) ? $data['error'] : [$data['error']];
+
+			foreach ($errors as $i => $error) {
+				$this->assertEquals($error, $message->getLines()->get($i)->getText());
 			}
 		}
 	}
@@ -519,8 +609,8 @@ class testDashboardPieChartWidget extends CWebTest
 
 			$form->invalidate();
 
-			// Need additional steps when Data set type is Item list.
-			if ($type === self::TYPE_ITEM_LIST) {
+			// Need additional steps when Data set type is Item list, but only if Host is set at all.
+			if ($type === self::TYPE_ITEM_LIST && array_key_exists('host', $data_set)) {
 				// Select Host.
 				$form->query('button:Add')->one()->click();
 				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
