@@ -315,12 +315,24 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.8rc1
 
 New features:
+.........T [ZBXNEXT-7097] added item and trigger for monitoring PostgreSQL version into PostgreSQL by ODBC and PostgreSQL by Zabbix agent 2 templates (akotsegubov)
 .........T [ZBXNEXT-8283] implemented role based authentication for AWS monitoring (abakaldin)
 .........T [ZBXNEXT-8575] added Nextcloud template (abakaldin)
 .......PS. [ZBXNEXT-8469] increased PostgreSQL maximum supported version to 16 (mprihodko)
 .......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-23528] fixed inability to resize trigger expression field horizontally (agriscenko)
+..F....... [ZBX-23259] fixed field focus on label click in user group mapping form for user authentication (epulke)
+..F....... [ZBX-22977] fixed positioning of hidden checkbox inputs and fixed autofocus in massupdate templates/hosts (dfofanovs)
+.......PS. [ZBX-23475] fixed memory leak when SNMP walk to JSON preprocessing step fails due to parsing error (dgoloscapov)
+.........T [ZBX-23494] added SNMP fallback item to TrueNAS by SNMP template, updated uptime item and template descriptions, added preprocessing to free swap percentage calculation (drasikhov)
+..F....... [ZBX-23101] added asterisk to Item value widget's Description field label (ddauksa)
+...G...PS. [ZBX-23404] fixed Zabbix agent crashes on HP-UX 11.23 (Andris)
+..F....... [ZBX-22666] disabled severity filter for Geomap widget in dashboard edit mode (dpetra)
+.......PS. [ZBX-23200] fixed parsing NULL values, multiline strings and quoted strings in SNMP walk output (asitals)
+...G...... [ZBX-22735] fixed confusing error message on user parameter reload in Zabbix agent 2 (rzvejs)
+........S. [ZBX-23393] fixed unquoted macro parsing in trigger function parameters (wiper)
 ........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
 A......... [ZBX-23373] fixed result for script.get API call with selectActions option (epulke)
 ...G...... [ZBX-23014] fixed Zabbix agent build on HP-UX (arimdjonoks)
