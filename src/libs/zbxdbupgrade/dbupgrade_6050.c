@@ -1787,7 +1787,7 @@ static int	DBpatch_6050140_load(zbx_vector_wiget_field_t *time_from, zbx_vector_
 	{
 		zbx_wiget_field_t	*val;
 		const char		*name;
-		int			l;
+		size_t			l;
 
 		val = (zbx_wiget_field_t *) zbx_malloc(NULL, sizeof(zbx_wiget_field_t));
 
