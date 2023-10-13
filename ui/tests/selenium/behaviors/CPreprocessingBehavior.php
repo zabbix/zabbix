@@ -105,13 +105,16 @@ class CPreprocessingBehavior extends CBehavior {
 	 *
 	 * @param array $steps    preprocessing step values
 	 */
-	public function addPreprocessingSteps($steps) {
-		$rows = $this->test->query('class:preprocessing-list-item')->count() + 1;
+	public function addPreprocessingSteps($steps, $mass_update = false) {
+		$rows = $this->test->query('class:preprocessing-list-item')->count() + ($mass_update ? null : 1);
 		$add = $this->test->query('id:param_add')->one();
 		$fields = self::getPreprocessingFieldDescriptors();
 
-		foreach ($steps as $options) {
-			$add->click();
+		foreach ($steps as $i => $options) {
+			if (!$mass_update || $i !== 0)  {
+				$add->click();
+			}
+
 			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
 					->waitUntilPresent()->one();
 
