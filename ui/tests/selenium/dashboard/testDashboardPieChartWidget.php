@@ -31,6 +31,7 @@ class testDashboardPieChartWidget extends CWebTest
 	protected static $dashboardid;
 	protected const TYPE_ITEM_PATTERN = 'Item pattern';
 	protected const TYPE_ITEM_LIST = 'Item list';
+	protected const HOST_NAME = 'Host for Pie charts';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -48,7 +49,7 @@ class testDashboardPieChartWidget extends CWebTest
 		// Set Pie chart as the default widget type.
 		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashboard.last_widget_type\' AND userid=\'1\'');
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
-			' VALUES (99999,1,\'web.dashboard.last_widget_type\',\'piechart\',3)');
+				' VALUES (99999,1,\'web.dashboard.last_widget_type\',\'piechart\',3)');
 
 		// Create a dashboard for creating widgets.
 		$dashboards = CDataHelper::call('dashboard.create', [
@@ -57,6 +58,31 @@ class testDashboardPieChartWidget extends CWebTest
 			'pages' => [['name' => 'Pie chart test page']]
 		]);
 		self::$dashboardid = $dashboards['dashboardids'][0];
+
+		// Create a host for Pie chart testing.
+		$response = CDataHelper::createHosts([
+			[
+				'host' => self::HOST_NAME,
+				'groups' => [['groupid' => '6']]
+			]
+		]);
+		$host_id = $response['hostids'][self::HOST_NAME];
+		CDataHelper::call('item.create', [
+			[
+				'hostid' => $host_id,
+				'name' => 'item-1',
+				'key_' => 'key-1',
+				'type' => 2, // Zabbix trapper.
+				'value_type' => 3 // Unint.
+			],
+			[
+				'hostid' => $host_id,
+				'name' => 'item-2',
+				'key_' => 'key-2',
+				'type' => 2, // Zabbix trapper.
+				'value_type' => 3 // Unint.
+			]
+		]);
 	}
 
 	public function getCreateData() {
@@ -81,27 +107,7 @@ class testDashboardPieChartWidget extends CWebTest
 					]
 				]
 			],
-			// Missing Host pattern.
-			[
-				[
-					'fields' => [
-						'Data set' => ['item' => '*']
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Data set/1/hosts": cannot be empty.'
-				]
-			],
-			// Missing Item pattern.
-			[
-				[
-					'fields' => [
-						'Data set' => ['host' => '*']
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Data set/1/items": cannot be empty.'
-				]
-			],
-			// Largest number of fields possible. Data set aggregation has to be none because of Total type item.
+			// Largest number of fields possible. Data set aggregation has to be 'none' because of Total type item.
 			[
 				[
 					'fields' => [
@@ -121,18 +127,18 @@ class testDashboardPieChartWidget extends CWebTest
 							],
 							[
 								'type' => self::TYPE_ITEM_LIST,
-								'host' => 'ЗАББИКС Сервер',
+								'host' => self::HOST_NAME,
 								'Aggregation function' => 'max',
 								'Data set aggregation' => 'none',
 								'Data set label' => 'Label 2',
 								'items' => [
 									[
-										'name' => 'Linux: Available memory',
+										'name' => 'item-1',
 										'il_color' => '000000',
 										'il_type' => 'Total'
 									],
 									[
-										'name' => 'Linux: CPU idle time'
+										'name' => 'item-2'
 									]
 								]
 							]
@@ -165,6 +171,36 @@ class testDashboardPieChartWidget extends CWebTest
 							'Number of columns' => 3
 						]
 					]
+				]
+			],
+			// Missing Data set.
+			[
+				[
+					'fields' => [
+						'delete_data_set' => true
+					],
+					'result' => TEST_BAD,
+					'error' => 'Invalid parameter "Data set": cannot be empty.'
+				]
+			],
+			// Missing Host pattern.
+			[
+				[
+					'fields' => [
+						'Data set' => ['item' => '*']
+					],
+					'result' => TEST_BAD,
+					'error' => 'Invalid parameter "Data set/1/hosts": cannot be empty.'
+				]
+			],
+			// Missing Item pattern.
+			[
+				[
+					'fields' => [
+						'Data set' => ['host' => '*']
+					],
+					'result' => TEST_BAD,
+					'error' => 'Invalid parameter "Data set/1/items": cannot be empty.'
 				]
 			],
 			// Unicode values.
@@ -430,7 +466,12 @@ class testDashboardPieChartWidget extends CWebTest
 		$form->fill($main_fields);
 
 		// Fill datasets.
-		$this->fillDatasets($this->extractDataSets($fields), $form);
+		if (CTestArrayHelper::get($fields, 'delete_data_set')) {
+			$form->query('xpath://button[@title="Delete"]')->one()->click();
+		}
+		else {
+			$this->fillDatasets($this->extractDataSets($fields), $form);
+		}
 
 		// Fill the other tabs.
 		$tabs = ['Displaying options', 'Time period', 'Legend'];
