@@ -70,7 +70,7 @@ class CControllerPopupScriptExec extends CController {
 		$scriptid = $this->getInput('scriptid');
 		$hostid = $this->getInput('hostid', '');
 		$eventid = $this->getInput('eventid', '');
-		$manualinput = $this->getInput('manualinput', '');
+		$manualinput = $this->getInput('manualinput');
 
 		$data = [
 			'title' => _('Scripts'),
@@ -103,7 +103,7 @@ class CControllerPopupScriptExec extends CController {
 				$execution_params['eventid'] = $eventid;
 			}
 
-			if ($manualinput) {
+			if ($manualinput !== null) {
 				$execution_params['manualinput'] = $manualinput;
 			}
 
