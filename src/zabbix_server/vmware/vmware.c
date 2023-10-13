@@ -1739,24 +1739,13 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 {
 	char	**props;
-	xmlChar	*attr_value;
 
 	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
 
 	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node, ZBX_XNN("macAddress"));
 	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("connectable") ZBX_XPATH_LN("connected"));
-
-	if (NULL != (attr_value = xmlGetProp(node, (const xmlChar *)"type")))
-	{
-		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (const char *)attr_value);
-		xmlFree(attr_value);
-	}
-	else
-	{
-		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = NULL;
-	}
-
+	props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_xml_node_read_prop(node, "type");
 	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
 	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID] = zbx_xml_node_read_value(details, node,
@@ -5079,33 +5068,20 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 #	define ZBX_POST_VMWARE_EVENT_FILTER_SPEC_CATEGORY			\
 		"<ns0:category>%s</ns0:category>"
 
-	static unsigned char	levels_mask[] = {
-		ZBX_VMWARE_EVTLOG_SEVERITY_ERR,
-		ZBX_VMWARE_EVTLOG_SEVERITY_INFO,
-		ZBX_VMWARE_EVTLOG_SEVERITY_USER,
-		ZBX_VMWARE_EVTLOG_SEVERITY_WARN
-	};
-
-	static const char	*levels_str[] = {
-		ZBX_VMWARE_EVTLOG_SEVERITY_ERR_STR,
-		ZBX_VMWARE_EVTLOG_SEVERITY_INFO_STR,
-		ZBX_VMWARE_EVTLOG_SEVERITY_USER_STR,
-		ZBX_VMWARE_EVTLOG_SEVERITY_WARN_STR
-	};
-
-	char	tmp[MAX_STRING_LEN], *filter = NULL;
-	size_t	alloc_len = 0, offset = 0;
-	int	ret = FAIL;
-	xmlDoc	*doc = NULL;
+	static const char	*levels[] = {ZBX_VMWARE_EVTLOG_SEVERITIES};
+	char			tmp[MAX_STRING_LEN], *filter = NULL;
+	size_t			alloc_len = 0, offset = 0;
+	int			ret = FAIL;
+	xmlDoc			*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (size_t i = 0; i < ARRSIZE(levels_mask); i++)
+	for (size_t i = 0; i < ARRSIZE(levels); i++)
 	{
-		if (0 != (levels_mask[i] & service->eventlog.severity))
+		if (0 != (UC(1 << i) & service->eventlog.severity))
 		{
 			zbx_snprintf_alloc(&filter, &alloc_len, &offset, ZBX_POST_VMWARE_EVENT_FILTER_SPEC_CATEGORY,
-					levels_str[i]);
+					levels[i]);
 		}
 	}
 
@@ -5371,20 +5347,11 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	}
 
 	if (NULL == (type = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("eventTypeId"))))
-	{
-		xmlChar	*attr_value;
-
-		if (NULL != (attr_value = xmlGetProp(xml_event.xml_node, (const xmlChar *)"type")))
-		{
-			type = zbx_strdup(NULL, (const char *)attr_value);
-			xmlFree(attr_value);
-		}
-	}
+		type = zbx_xml_node_read_prop(xml_event.xml_node, "type");
 
 	if (NULL != type)
 	{
 		message = zbx_dsprintf(message, "%s\n\ntype: %s", message, type);
-		zbx_free(type);
 	}
 
 	for (i = 0; i < ARRSIZE(host_nodes); i++)
@@ -5392,25 +5359,36 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 		if (0 == (nodes_det & host_nodes[i].flag) && NULL != (host_nodes[i].name =
 				zbx_xml_node_read_value(xdoc, xml_event.xml_node, host_nodes[i].node_name)))
 		{
-			nodes_det |= host_nodes[i].flag;
-
-			if (ZBX_HOSTINFO_NODES_MASK_ALL == (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
+			switch(host_nodes[i].flag)
+			{
+			case ZBX_HOSTINFO_NODES_DS:
+				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " ds:%s", host_nodes[i].name);
 				break;
+			case ZBX_HOSTINFO_NODES_NET:
+				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " net:%s", host_nodes[i].name);
+				break;
+			case ZBX_HOSTINFO_NODES_DVS:
+				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " dvs:%s", host_nodes[i].name);
+				break;
+			default:
+				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, "%s%s",
+						0 != nodes_det ? "/" : ": ", host_nodes[i].name);
+			}
+
+			nodes_det |= host_nodes[i].flag;
 		}
 	}
 
 	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
 	{
-		int	n = 0;
-
-		message = zbx_strdcat(message, "\n\nsource: ");
+		message = zbx_dsprintf(message, "%s%s\nsource", message, NULL == type ? "\n" : "");
 
 		for (i = 0; i < ARRSIZE(host_nodes); i++)
 		{
 			if (NULL == host_nodes[i].name)
 				continue;
 
-			message = zbx_dsprintf(message, "%s%s%s", message, n++ > 0 ? "/" : "", host_nodes[i].name);
+			message = zbx_dsprintf(message, "%s%s", message, host_nodes[i].name);
 			zbx_free(host_nodes[i].name);
 		}
 	}
@@ -5421,11 +5399,12 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 
 		if (NULL != (ip = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("ipAddress"))))
 		{
-			message = zbx_dsprintf(message, "%s\n\nsource: %s", message, ip);
+			message = zbx_dsprintf(message, "%s%s\nsource: %s", message, NULL == type ? "\n" : "", ip);
 			zbx_free(ip);
 		}
 	}
 
+	zbx_free(type);
 	zbx_replace_invalid_utf8(message);
 
 	if (NULL == (time_str = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("createdTime"))))

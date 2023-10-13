@@ -1065,19 +1065,14 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
  * Return value: result of conversion                                         *
  *                                                                            *
  ******************************************************************************/
-static unsigned char	level_str_to_mask(const char *level_str)
+static unsigned char	severity_to_mask(const char *level)
 {
 	size_t			i;
-	static const char	*levels_str[] = {
-		ZBX_VMWARE_EVTLOG_SEVERITY_ERR_STR,
-		ZBX_VMWARE_EVTLOG_SEVERITY_INFO_STR,
-		ZBX_VMWARE_EVTLOG_SEVERITY_USER_STR,
-		ZBX_VMWARE_EVTLOG_SEVERITY_WARN_STR
-	};
+	static const char	*levels[] = {ZBX_VMWARE_EVTLOG_SEVERITIES};
 
-	for (i = 0; i < ARRSIZE(levels_str); i++)
+	for (i = 0; i < ARRSIZE(levels); i++)
 	{
-		if (0 == strcmp(level_str, levels_str[i]))
+		if (0 == strcmp(level, levels[i]))
 			break;
 	}
 
@@ -1097,27 +1092,29 @@ static unsigned char	level_str_to_mask(const char *level_str)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	evt_severity_to_mask(const char *severity, unsigned char *mask, char **error)
+static int	evt_severities_to_mask(const char *severity, unsigned char *mask, char **error)
 {
+	int	i;
+
 	*mask = 0;
 
-	for (int n = 1; n <= zbx_num_param(severity); n++)
+	for (i = 1; i <= zbx_num_param(severity); i++)
 	{
 		unsigned char	level_mask;
-		char		*level_str;
+		char		*level;
 
-		if (NULL == (level_str = zbx_get_param_dyn(severity, n, NULL)))
+		if (NULL == (level = zbx_get_param_dyn(severity, i, NULL)))
 			continue;
 
-		if (ZBX_VMWARE_EVTLOG_SEVERITY_OVERFLOW & (level_mask = level_str_to_mask(level_str)))
+		if (ZBX_VMWARE_EVTLOG_SEVERITY_UNKNOWN == (level_mask = severity_to_mask(level)))
 		{
-			*error = zbx_dsprintf(*error, "Invalid event severity level \"%s\".", level_str);
-			zbx_free(level_str);
+			*error = zbx_dsprintf(*error, "Invalid event severity level \"%s\".", level);
+			zbx_free(level);
 			return FAIL;
 		}
 
 		*mask |= level_mask;
-		zbx_free(level_str);
+		zbx_free(level);
 	}
 
 	return SUCCEED;
@@ -1126,8 +1123,8 @@ static int	evt_severity_to_mask(const char *severity, unsigned char *mask, char 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_vector_ptr_t *add_results)
 {
-	const char		*url, *skip;
-	unsigned char		skip_old, severity_mask;
+	const char		*url, *skip, *severity_str;
+	unsigned char		skip_old, severity = 0;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -1155,36 +1152,25 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		goto out;
 	}
 
-	if (3 == request->nparam)
+	if (3 == request->nparam && NULL != (severity_str = get_rparam(request, 2)) && '\0' != *severity_str)
 	{
-		const char	*severity_str;
+		char	*error = NULL;
 
-		if (NULL == (severity_str = get_rparam(request, 2)) || '\0' == *severity_str)
+		if (FAIL == evt_severities_to_mask(severity_str, &severity, &error))
 		{
-			severity_mask = 0;
-		}
-		else
-		{
-			char	*error = NULL;
-
-			if (FAIL == evt_severity_to_mask(severity_str, &severity_mask, &error))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid third parameter. %s", error));
-				zbx_free(error);
-				goto out;
-			}
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid third parameter. %s", error));
+			zbx_free(error);
+			goto out;
 		}
 	}
-	else
-		severity_mask = 0;
 
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	if (severity_mask != service->eventlog.severity)
-		service->eventlog.severity = severity_mask;
+	if (severity != service->eventlog.severity)
+		service->eventlog.severity = severity;
 
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
 			(0 != skip_old && 0 != service->eventlog.last_key ))

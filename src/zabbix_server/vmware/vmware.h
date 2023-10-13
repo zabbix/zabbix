@@ -345,21 +345,20 @@ typedef struct
 {
 	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
 	unsigned char	skip_old;	/* skip old event log records */
-#define ZBX_VMWARE_EVTLOG_SEVERITY_ERR		0x001
-#define ZBX_VMWARE_EVTLOG_SEVERITY_INFO		0x002
-#define ZBX_VMWARE_EVTLOG_SEVERITY_USER		0x004
-#define ZBX_VMWARE_EVTLOG_SEVERITY_WARN		0x008
-#define ZBX_VMWARE_EVTLOG_SEVERITY_OVERFLOW	0x010
+#define ZBX_VMWARE_EVTLOG_SEVERITY_ERR		"error"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_WARN		"warning"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_INFO		"info"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_USER		"user"
 	unsigned char	severity;	/* bitmask for the event query filter */
 	unsigned char	oom;		/* no enough memory to store new events */
 	zbx_uint64_t	req_sz;		/* memory size required to store events */
 }
 zbx_vmware_eventlog_state_t;
 
-#define ZBX_VMWARE_EVTLOG_SEVERITY_ERR_STR	"error"
-#define ZBX_VMWARE_EVTLOG_SEVERITY_INFO_STR	"info"
-#define ZBX_VMWARE_EVTLOG_SEVERITY_USER_STR	"user"
-#define ZBX_VMWARE_EVTLOG_SEVERITY_WARN_STR	"warning"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_UNKNOWN	0x10
+#define ZBX_VMWARE_EVTLOG_SEVERITIES								\
+		ZBX_VMWARE_EVTLOG_SEVERITY_ERR, ZBX_VMWARE_EVTLOG_SEVERITY_WARN,		\
+		ZBX_VMWARE_EVTLOG_SEVERITY_INFO, ZBX_VMWARE_EVTLOG_SEVERITY_USER
 
 /* the vmware event data */
 typedef struct
