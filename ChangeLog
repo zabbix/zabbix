@@ -1,8 +1,19 @@
 Changes for 7.0.0alpha7
 
 New features:
+.........T [ZBXNEXT-7097] added item and trigger for monitoring PostgreSQL version into PostgreSQL by ODBC and PostgreSQL by Zabbix agent 2 templates (akotsegubov)
 
 Bug fixes:
+..F....... [ZBX-23259] fixed field focus on label click in user group mapping form for user authentication (epulke)
+..F....... [ZBX-22977] fixed positioning of hidden checkbox inputs and fixed autofocus in massupdate templates/hosts (dfofanovs)
+.......PS. [ZBX-23475] fixed memory leak when SNMP walk to JSON preprocessing step fails due to parsing error (dgoloscapov)
+..F....... [ZBX-23527] fixed radio-list-controls position in the top header of services (dfofanovs)
+.........T [ZBX-23494] added SNMP fallback item to TrueNAS by SNMP template, updated uptime item and template descriptions, added preprocessing to free swap percentage calculation (drasikhov)
+..F....... [ZBX-23101] added asterisk to Item value widget's Description field label (ddauksa)
+..F....... [ZBX-22666] disabled severity filter for Geomap widget in dashboard edit mode (dpetra)
+.......PS. [ZBX-23200] fixed parsing NULL values, multiline strings and quoted strings in SNMP walk output (asitals)
+...G...... [ZBX-22532] update Zabbix agent 2 command line flags to use zbxflag package (rzvejs)
+........S. [ZBX-23393] fixed unquoted macro parsing in trigger function parameters (wiper)
 ........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
 
 --------------------------------------------------------------------------------
