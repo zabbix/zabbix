@@ -139,7 +139,7 @@ window.widget_item_form = new class {
 	 * Fetch type of currently selected item.
 	 *
 	 * @return {Promise<any>}  Resolved promise will contain item type, or false in case of error or if no item is
-	 *                          currently selected.
+	 *                         currently selected.
 	 */
 	#promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
