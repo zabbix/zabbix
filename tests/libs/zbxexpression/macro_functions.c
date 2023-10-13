@@ -98,7 +98,7 @@ void	zbx_mock_test_entry(void **state)
 
 	returned_ret = zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			"", &expression, ZBX_MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-	
+
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
 	zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);
 
