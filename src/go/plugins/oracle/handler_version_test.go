@@ -114,7 +114,6 @@ func Test_versionHandler(t *testing.T) {
 				t.Fatalf(
 					"versionHandler() error = %v, wantErr %v", err, tt.wantErr,
 				)
-				return
 			}
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {

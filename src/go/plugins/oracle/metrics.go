@@ -317,7 +317,6 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
 		false,
 	),
-
 }
 
 func init() {
