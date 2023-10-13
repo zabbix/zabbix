@@ -92,11 +92,11 @@ class CControllerScriptEdit extends CController {
 			'enable_confirmation' => false,
 			'hgstype' => 0,
 			'actions' => [],
-			'enable_user_input' => false,
-			'input_prompt' => '',
-			'input_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
-			'input_validator' => '',
-			'input_default_value' => ''
+			'manualinput' => false,
+			'manualinput_prompt' => '',
+			'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+			'manualinput_validator' => '',
+			'manualinput_default_value' => ''
 		];
 
 		// Get values from the database.
@@ -147,11 +147,11 @@ class CControllerScriptEdit extends CController {
 				$data['menu_path'] = $script['menu_path'];
 				$data['parameters'] = $script['parameters'];
 				$data['actions'] = $script['actions'];
-				$data['enable_user_input'] = $script['manualinput'];
-				$data['input_prompt'] = $script['manualinput_prompt'];
-				$data['input_validator'] = $script['manualinput_validator'];
-				$data['input_type'] = $script['manualinput_validator_type'];
-				$data['input_default_value'] = $script['manualinput_default_value'];
+				$data['manualinput'] = $script['manualinput'];
+				$data['manualinput_prompt'] = $script['manualinput_prompt'];
+				$data['manualinput_validator'] = $script['manualinput_validator'];
+				$data['manualinput_validator_type'] = $script['manualinput_validator_type'];
+				$data['manualinput_default_value'] = $script['manualinput_default_value'];
 
 				if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 					CArrayHelper::sort($data['parameters'], ['name']);

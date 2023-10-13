@@ -28,11 +28,10 @@ class CControllerScriptUserInputCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'manual_input' =>		'required|string',
-			'default_input' =>		'db scripts.manualinput_default_value|string',
-			'input_type' =>			'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
-			'input_validation' =>	'db scripts.manualinput_validator|required|string',
-			'test' =>				'in 1'
+			'manualinput' =>				'required|string',
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
+			'input_validator' =>			'db scripts.manualinput_validator|required|string',
+			'test' =>						'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,39 +54,39 @@ class CControllerScriptUserInputCheck extends CController {
 	}
 
 	protected function doAction(): void {
-		$manual_input = $this->getInput('manual_input');
+		$manualinput = $this->getInput('manualinput');
 		$output = [];
 		$result = false;
 		$test = $this->hasInput('test');
 
-		if ($this->getInput('input_type') == SCRIPT_MANUALINPUT_TYPE_LIST) {
-			$dropdown_values = explode(",", $this->getInput('input_validation'));
+		if ($this->getInput('manualinput_validator_type') == SCRIPT_MANUALINPUT_TYPE_LIST) {
+			$dropdown_values = explode(",", $this->getInput('input_validator'));
 
-			if (in_array($manual_input, $dropdown_values)) {
+			if (in_array($manualinput, $dropdown_values)) {
 				$result = true;
 			}
 			else {
 				error(
-					_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
+					_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
 						_s('value must be one of: %1$s', implode(', ', $dropdown_values))
 					)
 				);
 			}
 		}
 		else{
-			$input_validation = $this->getInput('input_validation');
-			$regular_expression = '/'.str_replace('/', '\/', $input_validation).'/';
+			$input_validator = $this->getInput('input_validator');
+			$regular_expression = '/'.str_replace('/', '\/', $input_validator).'/';
 
 			if (@preg_match($regular_expression, '') === false) {
 				error(
-					_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'),
+					_s('Incorrect value for field "%1$s": %2$s.', _('input_validator'),
 						_('invalid regular expression')
 					));
 			}
-			elseif (!preg_match($regular_expression, $manual_input)) {
+			elseif (!preg_match($regular_expression, $manualinput)) {
 				error(
-					_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
-						_s('input does not match the provided pattern: %1$s', $input_validation)
+					_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
+						_s('input does not match the provided pattern: %1$s', $input_validator)
 					)
 				);
 			}
@@ -102,7 +101,7 @@ class CControllerScriptUserInputCheck extends CController {
 				$output['success']['test'] = true;
 			}
 			else {
-				$output = ['data' => ['manualinput' => $manual_input]];
+				$output = ['data' => ['manualinput' => $manualinput]];
 			}
 		}
 		elseif ($messages = get_and_clear_messages()) {

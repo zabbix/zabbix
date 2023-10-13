@@ -27,12 +27,12 @@ class CControllerScriptUserInputEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'input_prompt' =>		'db scripts.manualinput_prompt|required|not_empty',
-			'default_input' =>		'db scripts.manualinput_default_value|string',
-			'input_type' =>			'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
-			'input_validation' =>	'db scripts.manualinput_validator',
-			'test' =>				'in 1',
-			'confirmation' =>		'db scripts.confirmation'
+			'manualinput_prompt' =>			'db scripts.manualinput_prompt|required|not_empty',
+			'manualinput_default_value' =>	'db scripts.manualinput_default_value|string',
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
+			'manualinput_validator' =>		'db scripts.manualinput_validator',
+			'test' =>						'in 1',
+			'confirmation' =>				'db scripts.confirmation'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,17 +56,17 @@ class CControllerScriptUserInputEdit extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'input_prompt' => $this->getInput('input_prompt', ''),
-			'default_input' => $this->getInput('default_input', ''),
-			'input_validation' => $this->getInput('input_validation', ''),
+			'manualinput_prompt' => $this->getInput('manualinput_prompt', ''),
+			'manualinput_default_value' => $this->getInput('manualinput_default_value', ''),
+			'manualinput_validator' => $this->getInput('manualinput_validator', ''),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'test' => $this->hasInput('test'),
-			'input_type' => $this->getInput('input_type'),
+			'manualinput_validator_type' => $this->getInput('manualinput_validator_type'),
 			'confirmation' => $this->hasInput('confirmation') && strlen($this->getInput('confirmation')) > 0
 		];
 
-		if ($data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
-			$dropdown_values = explode(",", $this->getInput('input_validation'));
+		if ($data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+			$dropdown_values = explode(",", $this->getInput('manualinput_validator'));
 
 			foreach ($dropdown_values as $value) {
 				$data['dropdown_options'][$value] = $value;

@@ -27,60 +27,61 @@ class CControllerScriptUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'scriptid' =>				'fatal|required|db scripts.scriptid',
-			'name' =>					'required|db scripts.name|not_empty',
-			'scope' =>					'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
-			'type' =>					'required|db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]),
-			'execute_on' =>				'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
-			'menu_path' =>				'db scripts.menu_path',
-			'authtype' =>				'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
-			'username' =>				'db scripts.username',
-			'password' =>				'db scripts.password',
-			'publickey' =>				'db scripts.publickey',
-			'privatekey' =>				'db scripts.privatekey',
-			'passphrase' =>				'db scripts.password',
-			'port' =>					'db scripts.port',
-			'command' =>				'db scripts.command|flags '.P_CRLF,
-			'commandipmi' =>			'db scripts.command|flags '.P_CRLF,
-			'parameters' =>				'array',
-			'script' => 				'db scripts.command|flags '.P_CRLF,
-			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, SEC_PER_MIN]),
-			'url' => 					'db scripts.url',
-			'new_window' => 			'db scripts.new_window|in '.ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-			'description' =>			'db scripts.description',
-			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
-			'groupid' =>				'db scripts.groupid',
-			'usrgrpid' =>				'db scripts.usrgrpid',
-			'hgstype' =>				'in 0,1',
-			'enable_user_input' =>		'db scripts.manualinput|in '.SCRIPT_MANUALINPUT_ENABLED,
-			'input_prompt' =>			'db scripts.manualinput_prompt',
-			'input_type' =>				'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_STRING, SCRIPT_MANUALINPUT_TYPE_LIST]),
-			'default_input' =>			'db scripts.manualinput_default_value|string',
-			'input_validation' =>		'db scripts.manualinput_validator',
-			'dropdown_options' =>		'db scripts.manualinput_validator',
-			'enable_confirmation' =>	'in 1',
-			'confirmation' =>			'db scripts.confirmation|not_empty'
+			'scriptid' =>					'fatal|required|db scripts.scriptid',
+			'name' =>						'required|db scripts.name|not_empty',
+			'scope' =>						'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
+			'type' =>						'required|db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]),
+			'execute_on' =>					'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
+			'menu_path' =>					'db scripts.menu_path',
+			'authtype' =>					'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'username' =>					'db scripts.username',
+			'password' =>					'db scripts.password',
+			'publickey' =>					'db scripts.publickey',
+			'privatekey' =>					'db scripts.privatekey',
+			'passphrase' =>					'db scripts.password',
+			'port' =>						'db scripts.port',
+			'command' =>					'db scripts.command|flags '.P_CRLF,
+			'commandipmi' =>				'db scripts.command|flags '.P_CRLF,
+			'parameters' =>					'array',
+			'script' => 					'db scripts.command|flags '.P_CRLF,
+			'timeout' => 					'db scripts.timeout|time_unit '.implode(':', [1, SEC_PER_MIN]),
+			'url' => 						'db scripts.url',
+			'new_window' => 				'db scripts.new_window|in '.ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+			'description' =>				'db scripts.description',
+			'host_access' =>				'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
+			'groupid' =>					'db scripts.groupid',
+			'usrgrpid' =>					'db scripts.usrgrpid',
+			'hgstype' =>					'in 0,1',
+			'manualinput' =>				'db scripts.manualinput|in '.SCRIPT_MANUALINPUT_ENABLED,
+			'manualinput_prompt' =>			'db scripts.manualinput_prompt',
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_STRING, SCRIPT_MANUALINPUT_TYPE_LIST]),
+			'manualinput_default_value' =>	'db scripts.manualinput_default_value|string',
+			'manualinput_validator' =>		'db scripts.manualinput_validator',
+			'dropdown_options' =>			'db scripts.manualinput_validator',
+			'enable_confirmation' =>		'in 1',
+			'confirmation' =>				'db scripts.confirmation|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			if ($this->getInput('scope') != ZBX_SCRIPT_SCOPE_ACTION && $this->hasInput('enable_user_input')) {
-				if ($this->getInput('input_prompt', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', _('input_prompt'), _('cannot be empty')));
+			if ($this->getInput('scope') != ZBX_SCRIPT_SCOPE_ACTION && $this->hasInput('manualinput')) {
+				if ($this->getInput('manualinput_prompt', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_prompt', _('cannot be empty')));
 
 					$ret = false;
 				}
 
-				if ($this->getInput('input_type') == SCRIPT_MANUALINPUT_TYPE_LIST
+				if ($this->getInput('manualinput_validator_type') == SCRIPT_MANUALINPUT_TYPE_LIST
 						&& $this->getInput('dropdown_options', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', _('dropdown_options'), _('cannot be empty')));
+					info(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
 
 					$ret = false;
 				}
-				else if ($this->getInput('input_type') == SCRIPT_MANUALINPUT_TYPE_STRING
-						&& $this->getInput('input_validation', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'), _('cannot be empty')));
+				elseif ($this->getInput('manualinput_validator_type') == SCRIPT_MANUALINPUT_TYPE_STRING
+						&& $this->getInput('manualinput_validator', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
+
 
 					$ret = false;
 				}
@@ -121,12 +122,12 @@ class CControllerScriptUpdate extends CController {
 			$script['confirmation'] = $this->getInput('confirmation', '');
 			$script['usrgrpid'] = $this->getInput('usrgrpid', 0);
 
-			$script['manualinput'] = $this->hasInput('enable_user_input')
+			$script['manualinput'] = $this->hasInput('manualinput')
 				? SCRIPT_MANUALINPUT_ENABLED
 				: SCRIPT_MANUALINPUT_DISABLED;
 
 			if ($script['manualinput']) {
-				$script['manualinput_validator_type'] = $this->getInput('input_type');
+				$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
 
 				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 					// Check if values are unique.
@@ -139,19 +140,19 @@ class CControllerScriptUpdate extends CController {
 					$script['manualinput_validator'] = implode(',', $user_input_values);
 				}
 				else {
-					$default_input = trim($this->getInput('default_input', ''));
-					$input_validation = $this->getInput('input_validation');
+					$default_input = trim($this->getInput('manualinput_default_value', ''));
+					$input_validation = $this->getInput('manualinput_validator');
 					$regular_expression = '/'.str_replace('/', '\/', $input_validation).'/';
 
 					if (@preg_match($regular_expression, '') === false) {
 						error(
-							_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'),
+							_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
 								_('invalid regular expression')
 							));
 					}
 					elseif (!preg_match($regular_expression, $default_input)) {
 						error(
-							_s('Incorrect value for field "%1$s": %2$s.', 'default_input',
+							_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
 								_s('input does not match the provided pattern: %1$s', $input_validation)
 							)
 						);
@@ -160,7 +161,7 @@ class CControllerScriptUpdate extends CController {
 					$script['manualinput_default_value'] = trim($default_input);
 					$script['manualinput_validator'] = $input_validation;
 				}
-				$script['manualinput_prompt'] = $this->getInput('input_prompt');
+				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');
 			}
 		}
 

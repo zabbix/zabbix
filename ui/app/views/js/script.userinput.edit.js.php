@@ -26,13 +26,13 @@
 
 window.script_userinput_popup = new class {
 
-	init({test, input_type, default_input, input_validation}) {
+	init({test, input_type, default_input, input_validator}) {
 		this.overlay = overlays_stack.getById('script-userinput-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.is_test = test;
 		this.input_type = input_type;
-		this.input_validation = input_validation;
+		this.input_validator = input_validator;
 		this.default_input = default_input;
 
 		if (input_type == <?= SCRIPT_MANUALINPUT_TYPE_LIST ?> && test) {
@@ -43,9 +43,9 @@ window.script_userinput_popup = new class {
 	test() {
 		const curl = new Curl('zabbix.php');
 		const fields = getFormFields(this.form);
-		fields.input_type = this.input_type;
-		fields.input_validation = this.input_validation;
-		fields.default_input = this.default_input;
+		fields.manualinput_validator_type = this.input_type;
+		fields.input_validator = this.input_validator;
+		fields.manualinput_default_value = this.default_input;
 
 		if (this.is_test) {
 			fields.test = 1;
@@ -59,14 +59,15 @@ window.script_userinput_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
-		fields.input_type = this.input_type;
-		fields.input_validation = this.input_validation;
-		fields.default_input = this.default_input;
+		fields.manualinput_validator_type = this.input_type;
+		fields.input_validator = this.input_validator;
+		fields.manualinput_default_value = this.default_input;
 
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'script.userinput.check');
 		this.#post(curl.getUrl(), fields);
+		this.overlay.recoverFocus();
 	}
 
 	#post(url, data) {

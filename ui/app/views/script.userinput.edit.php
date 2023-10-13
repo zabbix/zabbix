@@ -28,15 +28,15 @@ $form = (new CForm())
 	->setId('script-userinput-form')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if ($data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+if ($data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 	$form
 		->addItem(
-			(new CSpan($data['input_prompt']))
+			(new CSpan($data['manualinput_prompt']))
 				->addClass(ZBX_STYLE_WORDBREAK)
 				->addClass(ZBX_STYLE_FLOAT_LEFT)
 		)
 		->addItem(
-			(new CSelect('manual_input'))
+			(new CSelect('manualinput'))
 				->addStyle('margin-top: 8px;')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->addOptions(CSelect::createOptionsFromArray($data['dropdown_options']))
@@ -46,10 +46,10 @@ if ($data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 }
 else {
 	$form
-		->addItem((new CSpan($data['input_prompt']))->addClass(ZBX_STYLE_WORDBREAK))
+		->addItem((new CSpan($data['manualinput_prompt']))->addClass(ZBX_STYLE_WORDBREAK))
 		->addItem(
 			new CFormField(
-				(new CTextBox('manual_input', $data['default_input'], false,
+				(new CTextBox('manualinput', $data['manualinput_default_value'], false,
 					DB::getFieldLength('scripts', 'manualinput_default_value'))
 				)
 					->addStyle('margin-top: 8px;')
@@ -84,9 +84,9 @@ $form
 	->addItem(
 		(new CScriptTag('script_userinput_popup.init('.json_encode([
 			'test' => $data['test'],
-			'input_type' => $data['input_type'],
-			'default_input' => $data['default_input'],
-			'input_validation' => $data['input_validation']
+			'input_type' => $data['manualinput_validator_type'],
+			'default_input' => $data['manualinput_default_value'],
+			'input_validator' => $data['manualinput_validator']
 		]).');'))->setOnDocumentReady()
 	);
 

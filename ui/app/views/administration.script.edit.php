@@ -282,8 +282,13 @@ $select_hgstype = (new CSelect('hgstype'))
 	->addOption(new CSelectOption(0, _('All')))
 	->addOption(new CSelectOption(1, _('Selected')));
 
-$validation_rule = $data['input_type'] == SCRIPT_MANUALINPUT_TYPE_STRING ? $data['input_validator'] : '';
-$dropdown_options = $data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST ? $data['input_validator'] : '';
+$validation_rule = $data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_STRING
+	? $data['manualinput_validator']
+	: '';
+
+$dropdown_options = $data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST
+	? $data['manualinput_validator']
+	: '';
 
 $form_grid
 	->addItem([
@@ -305,8 +310,7 @@ $form_grid
 						'dstfld1' => 'groupid'
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('host-group-selection')
 	)
 	->addItem([
@@ -326,47 +330,36 @@ $form_grid
 	->addItem((new CFormFieldsetCollapsible(_('Advanced configuration')))
 		->setId('advanced-configuration')
 		->addItem([
-			(new CLabel(_('Enable user input'), 'enable-user-input')),
+			(new CLabel(_('Enable user input'), 'manualinput')),
 			new CFormField(
-				(new CCheckBox('enable_user_input'))
-					->setChecked($data['enable_user_input'])
-					->setId('enable-user-input')
+				(new CCheckBox('manualinput'))->setChecked($data['manualinput'])
 			)
 		])
 		->addItem([
-			(new CLabel(_('Input prompt'), 'input_prompt')),
+			(new CLabel(_('Input prompt'), 'manualinput_prompt')),
 			new CFormField([
-				(new CTextBox('input_prompt', $data['input_prompt'], false,
+				(new CTextBox('manualinput_prompt', $data['manualinput_prompt'], false,
 					DB::getFieldLength('scripts', 'manualinput_prompt'))
-				)
-					->setAttribute('disabled', !$data['enable_user_input'])
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
-				(new CButton('test-prompt', _('Test user input')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->setAttribute('disabled', !$data['enable_user_input'])
-					->setId('test-user-input')
+				(new CButton('test_user_input', _('Test user input')))->addClass(ZBX_STYLE_BTN_GREY)
 			])
 		])
 		->addItem([
-			(new CLabel(_('Input type'), 'input_type')),
+			(new CLabel(_('Input type'), 'manualinput_validator_type')),
 			new CFormField(
-				(new CRadioButtonList('input_type', (int) $data['input_type']))
-					->setReadonly(!$data['enable_user_input'])
+				(new CRadioButtonList('manualinput_validator_type', (int) $data['manualinput_validator_type']))
 					->addValue(_('String'), SCRIPT_MANUALINPUT_TYPE_STRING)
 					->addValue(_('Dropdown'), SCRIPT_MANUALINPUT_TYPE_LIST)
 					->setModern()
-					->setId('input_type')
 			)
 		])
 		->addItem([
-			(new CLabel(_('Default input string'), 'default_input'))->setId('default-input-label'),
+			(new CLabel(_('Default input string'), 'manualinput_default_value'))->setId('default-input-label'),
 			(new CFormField([
-				(new CTextBox('default_input', $data['input_default_value'], false,
+				(new CTextBox('manualinput_default_value', $data['manualinput_default_value'], false,
 					DB::getFieldLength('scripts', 'manualinput_default_value'))
-				)
-					->setAttribute('disabled', $data['enable_user_input'])
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			]))->setId('default-input-field')
 		])
 		->addItem([
@@ -375,27 +368,22 @@ $form_grid
 				(new CTextBox('dropdown_options', $dropdown_options, false,
 					DB::getFieldLength('scripts', 'manualinput_validator'))
 				)
-					->setAttribute('disabled', $data['enable_user_input'])
 					->setAttribute('placeholder', 'comma-separated list')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			]))->setId('dropdown-options-field')
 		])
 		->addItem([
-			(new CLabel(_('Input validation rule'), 'input_validation'))->setId('input-validation-label'),
+			(new CLabel(_('Input validation rule'), 'manualinput_validator'))->setId('input-validation-label'),
 			(new CFormField([
-				(new CTextBox('input_validation', $validation_rule, false,
+				(new CTextBox('manualinput_validator', $validation_rule, false,
 					DB::getFieldLength('scripts', 'manualinput_validator'))
-				)
-					->setAttribute('placeholder', 'regular expression')
-					->setAttribute('disabled', true)
+				)->setAttribute('placeholder', 'regular expression')
 			]))->setId('input-validation-field')
 		])
 		->addItem([
 			(new CLabel(_('Enable confirmation'), 'enable_confirmation')),
 			new CFormField(
-				(new CCheckBox('enable_confirmation'))
-					->setChecked($data['enable_confirmation'])
-					->setId('enable_confirmation')
+				(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'])
 			)
 		])
 		->addItem([
@@ -403,13 +391,9 @@ $form_grid
 			new CFormField([
 				(new CTextBox('confirmation', $data['confirmation'], false,
 					DB::getFieldLength('scripts', 'confirmation'))
-				)
-					->setAttribute('disabled', $data['enable_confirmation'])
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
-				(new CButton('test-confirmation', _('Test confirmation')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->setAttribute('disabled', $data['enable_confirmation'])
+				(new CButton('test-confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 			])
 		])
 	);

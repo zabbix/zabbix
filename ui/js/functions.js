@@ -536,10 +536,10 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 
 	if (manualinput == 1) {
 		const parameters = {
-			input_prompt: manualinput_prompt,
-			default_input: manualinput_default_value,
-			input_type: manualinput_validator_type,
-			input_validation: manualinput_validator,
+			manualinput_prompt: manualinput_prompt,
+			manualinput_default_value: manualinput_default_value,
+			manualinput_validator_type: manualinput_validator_type,
+			manualinput_validator: manualinput_validator,
 			confirmation: confirmation
 		};
 
