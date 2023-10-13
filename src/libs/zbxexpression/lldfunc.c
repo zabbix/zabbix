@@ -643,7 +643,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		/* prepare the parameter (macro substitutions and quoting) */
 
 		zbx_free(param);
-		param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted, 0);
+		param = zbx_function_param_unquote_dyn_compat(p + param_pos, param_len, &quoted);
 
 		if (1 == key_in_param && p == e)
 		{

@@ -1350,7 +1350,8 @@ static int	DBpatch_3050122(void)
 		/* copy leading whitespace (if any) or empty string */
 		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param, param_pos);
 
-		unquoted_parameter = zbx_function_param_unquote_dyn(orig_param + param_pos, param_len, &was_quoted, 0);
+		unquoted_parameter = zbx_function_param_unquote_dyn_compat(orig_param + param_pos, param_len,
+				&was_quoted);
 
 		zbx_regexp_escape(&unquoted_parameter);
 

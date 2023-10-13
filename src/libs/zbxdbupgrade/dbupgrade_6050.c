@@ -1704,11 +1704,6 @@ static int	DBpatch_6050140(void)
 
 			if (param_pos < sep_pos)
 			{
-				{
-				char *str = NULL;
-				size_t str_alloc, str_offset = 0;
-				zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ptr + param_pos, sep_pos - param_pos + 1);
-				}
 				if ('"' != ptr[param_pos])
 				{
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos,
@@ -1716,11 +1711,11 @@ static int	DBpatch_6050140(void)
 				}
 				else
 				{
-					param = zbx_function_param_unquote_dyn(
-							ptr + param_pos, sep_pos - param_pos, &quoted, 0);
+					param = zbx_function_param_unquote_dyn_compat(ptr + param_pos,
+							sep_pos - param_pos, &quoted);
 
 					/* zbx_function_param_quote() should always succeed with esc_bs set to 1 */
-					zbx_function_param_quote(&param, quoted, 1);
+					zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON);
 					zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 				}
 			}
@@ -1758,13 +1753,16 @@ clean:
 	return ret;
 }
 
+ZBX_PTR_VECTOR_DECL(eval_token_ptr, zbx_eval_token_t *)
+ZBX_PTR_VECTOR_IMPL(eval_token_ptr, zbx_eval_token_t *)
+
 static int	update_escaping_in_expression(const char *expression, char **substitute, char **error)
 {
-	zbx_eval_context_t	ctx;
-	int			ret = SUCCEED;
-	int			token_num;
-	const zbx_eval_token_t	*token;
-	zbx_vector_ptr_t	hist_param_tokens;
+	zbx_eval_context_t		ctx;
+	int				ret = SUCCEED;
+	int				token_num;
+	zbx_eval_token_t		*token;
+	zbx_vector_eval_token_ptr_t	hist_param_tokens;
 
 	ret = zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_CALC_EXPRESSION |
 			ZBX_EVAL_PARSE_STR_V64_COMPAT | ZBX_EVAL_PARSE_LLDMACRO, error);
@@ -1772,7 +1770,7 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 	if (FAIL == ret)
 		return FAIL;
 
-	zbx_vector_ptr_create(&hist_param_tokens);
+	zbx_vector_eval_token_ptr_create(&hist_param_tokens);
 
 	/* finding string parameters of history functions */
 	for (token_num = ctx.stack.values_num - 1; token_num >= 0; token_num--)
@@ -1781,28 +1779,33 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 
 		if (token->type  == ZBX_EVAL_TOKEN_HIST_FUNCTION)
 		{
-			for (int i = 0; i < token->opt; i++)
-				zbx_vector_ptr_append(&hist_param_tokens, &ctx.stack.values[--token_num]);
+			for (zbx_uint32_t i = 0; i < token->opt; i++)
+			{
+				if (0 == token_num--)
+					break;
+
+				if (ZBX_EVAL_TOKEN_VAR_STR == ctx.stack.values[token_num].type)
+				{
+					zbx_vector_eval_token_ptr_append(&hist_param_tokens,
+							&ctx.stack.values[--token_num]);
+				}
+			}
 		}
 	}
 
 	for (token_num = hist_param_tokens.values_num - 1; token_num >= 0; token_num--)
 	{
-		char			*str = NULL, *substitute;
-		int			quoted, str_len;
-		size_t			str_alloc = 0, str_offset = 0;
-		zbx_eval_token_t	*token;
+		char	*str = NULL, *subst;
+		int	quoted, str_len;
+		size_t	str_alloc = 0, str_offset = 0;
 
-		token = (zbx_eval_token_t *)hist_param_tokens.values[token_num];
-
-		if (ctx.expression[token->loc.l] != '\"')
-			continue;
+		token = hist_param_tokens.values[token_num];
 
 		str_len = (int)(token->loc.r - token->loc.l) + 1;
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ctx.expression + token->loc.l, str_len);
 
-		substitute = zbx_function_param_unquote_dyn(str, str_len, &quoted, 0);
-		zbx_variant_set_str(&(token->value), substitute);
+		subst = zbx_function_param_unquote_dyn_compat(str, str_len, &quoted);
+		zbx_variant_set_str(&(token->value), subst);
 
 		zbx_free(str);
 	}
@@ -1810,7 +1813,7 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 	ctx.rules ^= ZBX_EVAL_PARSE_STR_V64_COMPAT;
 	zbx_eval_compose_expression(&ctx, substitute);
 
-	zbx_vector_ptr_destroy(&hist_param_tokens);
+	zbx_vector_eval_token_ptr_destroy(&hist_param_tokens);
 	zbx_eval_clear(&ctx);
 
 	return SUCCEED;

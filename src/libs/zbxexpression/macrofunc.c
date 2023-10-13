@@ -331,7 +331,7 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		}
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-		params[nparam++] = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted, 0);
+		params[nparam++] = zbx_function_param_unquote_dyn_compat(ptr + param_pos, param_len, &quoted);
 	}
 
 	ret = macrofunc(params, nparam, out);

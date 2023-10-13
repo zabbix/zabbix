@@ -42,7 +42,8 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
 		int max_error_len);
-char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted, int esc_bs);
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
+char	*zbx_function_param_unquote_dyn_compat(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced, int esc_bs);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 

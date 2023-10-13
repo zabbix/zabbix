@@ -508,7 +508,7 @@ void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, s
  *               caller.                                                      *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted, int esc_bs)
+static char	*function_param_unquote_dyn(const char *param, size_t len, int *quoted, int esc_bs)
 {
 	char	*out;
 
@@ -528,7 +528,7 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted,
 
 		for (pin = param + 1; (size_t)(pin - param) < len - 1; pin++)
 		{
-			if ('\\' == pin[0] && ('"' == pin[1] || (1 == esc_bs && '\\' == pin[1])))
+			if ('\\' == pin[0] && ('"' == pin[1] || (ZBX_BACKSLASH_ESC_ON == esc_bs && '\\' == pin[1])))
 				pin++;
 
 			*pout++ = *pin;
@@ -538,6 +538,40 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted,
 	}
 
 	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: param  - [IN] parameter to unquote                             *
+ *             len    - [IN] parameter length                                 *
+ *             quoted - [OUT] flag that specifies whether parameter was       *
+ *                            quoted before extraction                        *
+ *                                                                            *
+ * Return value: The unquoted parameter. This value must be freed by the      *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
+{
+	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_ON);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unquote history function parameter for versions <= 6.4            *
+ *                                                                            *
+ * Parameters: param  - [IN] parameter to unquote                             *
+ *             len    - [IN] parameter length                                 *
+ *             quoted - [OUT] flag that specifies whether parameter was       *
+ *                            quoted before extraction                        *
+ *                                                                            *
+ * Return value: The unquoted parameter. This value must be freed by the      *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_param_unquote_dyn_compat(const char *param, size_t len, int *quoted)
+{
+	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_OFF);
 }
 
 /******************************************************************************
@@ -617,7 +651,7 @@ char	*zbx_function_get_param_dyn(const char *params, int Nparam)
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		if (idx == Nparam)
-			out = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted, 1);
+			out = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
 	}
 
 	return out;
