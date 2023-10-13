@@ -918,9 +918,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		if ($object === 'item'
-				|| $object === 'item prototype'
-				|| $object === 'web scenario'
+		if ($object === 'item' || $object === 'item prototype' || $object === 'web scenario'
 				|| $object === 'host prototype') {
 			$form = $this->query($form_selector)->asForm()->waitUntilPresent()->one();
 		}
@@ -997,8 +995,8 @@ class testFormTags extends CWebTest {
 		}
 
 		$new_form = ($object === 'trigger' || $object === 'trigger prototype')
-				? COverlayDialogElement::find()->one()->waitUntilReady()->asForm()
-				: $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
+			? COverlayDialogElement::find()->one()->waitUntilReady()->asForm()
+			: $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
 
 		$new_form->selectTab('Tags');
 		$element->invalidate();
@@ -1048,8 +1046,8 @@ class testFormTags extends CWebTest {
 		// Open host group, host or template and check object tags.
 		if ($target_type !== 'Host group') {
 			$this->page->open(($target_type === 'Host')
-					? self::HOST_LIST_PAGE
-					: 'zabbix.php?action=template.list')->waitUntilReady();
+				? self::HOST_LIST_PAGE
+				: 'zabbix.php?action=template.list')->waitUntilReady();
 
 			$this->query('button:Reset')->one()->click();
 			$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
@@ -1069,7 +1067,7 @@ class testFormTags extends CWebTest {
 		}
 		else {
 			$filter_form = CFilterElement::find()->one()->getForm();
-			$filter_form->fill(['Host groups' => $parent , 'Hosts' => '']);
+			$filter_form->fill(['Host groups' => $parent, 'Hosts' => '']);
 			$result_form = $this->query('xpath://form[@name='.CXPathHelper::escapeQuotes($table_name).']')->one();
 			$this->query('button:Apply')->one()->click();
 			$this->page->waitUntilReady();

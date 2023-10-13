@@ -1628,6 +1628,42 @@ static int	DBpatch_6050138(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050139(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select wf.widgetid from widget_field wf,widget w"
+			" where wf.name='interface_type' and w.type='hostavail' and w.widgetid=wf.widgetid"
+			" group by wf.widgetid having count(wf.name)=1");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "name", "type", "value_int",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, "only_totals", 0, 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 typedef struct
 {
 	char		*name;
@@ -1658,7 +1694,7 @@ static int	zbx_wiget_field_compare(const void *d1, const void *d2)
 	return strcmp(f1->name, f2->name);
 }
 
-static void	DBpatch_6050139_transform(zbx_vector_wiget_field_t *timeshift, zbx_vector_wiget_field_t *interval,
+static void	DBpatch_6050140_transform(zbx_vector_wiget_field_t *timeshift, zbx_vector_wiget_field_t *interval,
 		zbx_vector_wiget_field_t *aggr_func, zbx_vector_wiget_field_t *time_from,
 		zbx_vector_wiget_field_t *time_to, zbx_vector_uint64_t *nofunc_ids)
 {
@@ -1727,7 +1763,7 @@ static void	DBpatch_6050139_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 	}
 }
 
-static int	DBpatch_6050139_load(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to,
+static int	DBpatch_6050140_load(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to,
 		zbx_vector_uint64_t *nofunc_ids)
 {
 	zbx_db_result_t			result;
@@ -1785,7 +1821,7 @@ static int	DBpatch_6050139_load(zbx_vector_wiget_field_t *time_from, zbx_vector_
 	}
 	zbx_db_free_result(result);
 
-	DBpatch_6050139_transform(&timeshift, &interval, &aggr_func, time_from, time_to, nofunc_ids);
+	DBpatch_6050140_transform(&timeshift, &interval, &aggr_func, time_from, time_to, nofunc_ids);
 
 	zbx_vector_wiget_field_clear_ext(&timeshift, zbx_wiget_field_free);
 	zbx_vector_wiget_field_clear_ext(&interval, zbx_wiget_field_free);
@@ -1797,7 +1833,7 @@ static int	DBpatch_6050139_load(zbx_vector_wiget_field_t *time_from, zbx_vector_
 	return SUCCEED;
 }
 
-static int	DBpatch_6050139_remove(zbx_vector_uint64_t *nofuncs)
+static int	DBpatch_6050140_remove(zbx_vector_uint64_t *nofuncs)
 {
 	if (0 == nofuncs->values_num)
 		return SUCCEED;
@@ -1807,7 +1843,7 @@ static int	DBpatch_6050139_remove(zbx_vector_uint64_t *nofuncs)
 	return zbx_db_execute_multiple_query("delete from widget_field where", "widget_fieldid", nofuncs);
 }
 
-static int	DBpatch_6050139_update(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to)
+static int	DBpatch_6050140_update(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -1856,7 +1892,7 @@ static int	DBpatch_6050139_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 	return ret;
 }
 
-static int	DBpatch_6050139(void)
+static int	DBpatch_6050140(void)
 {
 	zbx_vector_wiget_field_t	time_from, time_to;
 	zbx_vector_uint64_t		nofuncs_ids;
@@ -1869,9 +1905,9 @@ static int	DBpatch_6050139(void)
 	zbx_vector_wiget_field_create(&time_to);
 	zbx_vector_uint64_create(&nofuncs_ids);
 
-	if (SUCCEED == DBpatch_6050139_load(&time_from, &time_to, &nofuncs_ids)
-			&& SUCCEED == DBpatch_6050139_remove(&nofuncs_ids)
-			&& SUCCEED == DBpatch_6050139_update(&time_from, &time_to))
+	if (SUCCEED == DBpatch_6050140_load(&time_from, &time_to, &nofuncs_ids)
+			&& SUCCEED == DBpatch_6050140_remove(&nofuncs_ids)
+			&& SUCCEED == DBpatch_6050140_update(&time_from, &time_to))
 	{
 		ret = SUCCEED;
 	}
@@ -2029,5 +2065,6 @@ DBPATCH_ADD(6050136, 0, 1)
 DBPATCH_ADD(6050137, 0, 1)
 DBPATCH_ADD(6050138, 0, 1)
 DBPATCH_ADD(6050139, 0, 1)
+DBPATCH_ADD(6050140, 0, 1)
 
 DBPATCH_END()

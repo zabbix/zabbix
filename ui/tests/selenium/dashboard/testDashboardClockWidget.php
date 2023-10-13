@@ -21,8 +21,8 @@
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup widget, profiles
@@ -32,7 +32,17 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 class testDashboardClockWidget extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Id of the dashboard with widgets.
@@ -40,15 +50,6 @@ class testDashboardClockWidget extends CWebTest {
 	 * @var integer
 	 */
 	protected static $dashboardid;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
