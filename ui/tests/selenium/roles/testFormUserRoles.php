@@ -20,8 +20,8 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @dataSource EntitiesTags, Services
@@ -32,16 +32,19 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormUserRoles extends CWebTest {
 
-	use TableTrait;
-
-	const ROLE_SQL = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid ORDER BY r.roleid, rr.role_ruleid';
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
+
+	const ROLE_SQL = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid ORDER BY r.roleid, rr.role_ruleid';
 
 	/**
 	 * Id of role that created for future update.
@@ -1433,7 +1436,7 @@ class testFormUserRoles extends CWebTest {
 									->query('class:zi-more')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
-								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
+								$this->assertTrue($popup->query("xpath:.//span[text()=".CXPathHelper::escapeQuotes($tag)."]")
 										->one(false)->isValid()
 								);
 							}

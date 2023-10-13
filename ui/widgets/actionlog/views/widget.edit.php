@@ -28,23 +28,25 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldMultiSelectUserView($data['fields']['userids'], $data['captions']['users']['userids'])
+		new CWidgetFieldMultiSelectUserView($data['fields']['userids'])
 	)
 	->addField(
-		new CWidgetFieldMultiSelectActionView($data['fields']['actionids'],
-			$data['captions']['actions']['actionids']
-		)
+		new CWidgetFieldMultiSelectActionView($data['fields']['actionids'])
 	)
 	->addField(
-		new CWidgetFieldMultiSelectMediaTypeView($data['fields']['mediatypeids'],
-			$data['captions']['media_types']['mediatypeids']
-		)
+		new CWidgetFieldMultiSelectMediaTypeView($data['fields']['mediatypeids'])
 	)
 	->addField(
 		(new CWidgetFieldCheckBoxListView($data['fields']['statuses']))->setColumns(3)
 	)
 	->addField(
 		(new CWidgetFieldTextBoxView($data['fields']['message']))->setPlaceholder(_('subject or body text'))
+	)
+	->addField(
+		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	)
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])

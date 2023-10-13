@@ -32,7 +32,7 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,
@@ -65,8 +65,8 @@ $form
 				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
 			)
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')
@@ -79,6 +79,7 @@ function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CW
 	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
 	return (new CWidgetFieldsGroupView(_('Description')))
+		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 		->setFieldHint(
 			makeHelpIcon([
 				_('Supported macros:'),

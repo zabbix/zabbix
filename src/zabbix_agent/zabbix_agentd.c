@@ -615,7 +615,8 @@ static void	set_defaults(void)
 		zbx_init_agent_result(&result);
 
 		if (SUCCEED == zbx_execute_agent_check(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND |
-				ZBX_PROCESS_WITH_ALIAS, &result) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
+				ZBX_PROCESS_WITH_ALIAS, &result, ZBX_CHECK_TIMEOUT_UNDEFINED) &&
+				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 			zbx_trim_str_list(*value, ',');

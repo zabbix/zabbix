@@ -68,7 +68,7 @@ $filter_column_left = (new CFormList())
 	)
 	->addRow(_('Status'),
 		(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 			->setModern(true)
@@ -234,9 +234,9 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
-			'name' => _('Clear history'),
-			'confirm_singular' => _('Delete history of selected web scenario?'),
-			'confirm_plural' => _('Delete history of selected web scenarios?'),
+			'name' => _('Clear history and trends'),
+			'confirm_singular' => _('Clear history and trends of selected web scenario?'),
+			'confirm_plural' => _('Clear history and trends of selected web scenarios?'),
 			'csrf_token' => $csrf_token
 		]
 	];

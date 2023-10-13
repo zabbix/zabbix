@@ -81,7 +81,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				->setArgument('hostid', $hostid)
 				->getUrl() => $host_name,
 			'items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Items',
-			'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
+			'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
 			'graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Graphs',
 			'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Discovery rules',
 			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Web scenarios'

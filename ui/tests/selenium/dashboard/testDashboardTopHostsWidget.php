@@ -19,7 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -31,7 +32,18 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
-	use TagTrait;
+	/**
+	 * Attach MessageBehavior and TagBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
+	}
 
 	/**
 	 * Widget name for update.
@@ -49,17 +61,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -134,7 +135,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		$this->assertEquals('New column', $column_dialog->getTitle());
 		$this->assertEquals(['Name', 'Data', 'Text', 'Item', 'Time shift', 'Aggregation function', 'Aggregation interval',
-				'Display', 'History data', 'Base color', 'Min', 'Max', 'Decimal places', 'Thresholds'],
+				'Display', 'History data', 'Base colour', 'Min', 'Max', 'Decimal places', 'Thresholds'],
 				$column_form->getLabels()->asText()
 		);
 		$form->getRequiredLabels(['Name', 'Item', 'Aggregation interval']);
@@ -466,7 +467,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'Column name',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => '039BE5'
+							'Base colour' => '039BE5'
 						]
 					]
 				]
@@ -560,7 +561,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Host name',
 							'Name' => 'This is host name',
-							'Base color' => '039BE5'
+							'Base colour' => '039BE5'
 						],
 						[
 							'Name' => 'Host name column 2',
@@ -595,7 +596,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Data' => 'Text',
 							'Text' => 'Here is some text 3',
 							'Name' => 'Text column name 3',
-							'Base color' => '039BE5'
+							'Base colour' => '039BE5'
 						],
 						[
 							'Name' => 'Text column name 4',
@@ -613,7 +614,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						'Name' => 'Widget without columns'
 					],
 					'main_error' => [
-						'Invalid parameter "Columns": an array is expected.',
+						'Invalid parameter "Columns": cannot be empty.',
 						'Invalid parameter "Order column": an integer is expected.'
 					]
 				]
@@ -685,11 +686,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => 'test name',
 							'Data' => 'Host name',
-							'Base color' => '!@#$%^'
+							'Base colour' => '!@#$%^'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -723,11 +724,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'test name',
 							'Data' => 'Text',
 							'Text' => 'Here is some text',
-							'Base color' => '!@#$%^'
+							'Base colour' => '!@#$%^'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -905,11 +906,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'test name',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => '!@#$%^'
+							'Base colour' => '!@#$%^'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -934,7 +935,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "/1/thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -963,7 +964,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/thresholds/2/color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "/1/thresholds/2/color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -1012,7 +1013,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => '     Text column name with spaces 2     ',
 							'Data' => 'Host name',
-							'Base color' => '0040FF'
+							'Base colour' => '0040FF'
 						],
 						[
 							'Name' => '     Text column name with spaces 3     ',
@@ -1053,7 +1054,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => '{$USERMACRO2}',
 							'Data' => 'Host name',
-							'Base color' => '0040DD'
+							'Base colour' => '0040DD'
 						],
 						[
 							'Name' => '{$USERMACRO3}',
@@ -1081,7 +1082,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							[
 								'Name' => '{INVENTORY.ALIAS}',
 								'Data' => 'Host name',
-								'Base color' => '0040DD'
+								'Base colour' => '0040DD'
 							],
 							[
 								'Name' => '{HOST.IP}',
@@ -1116,7 +1117,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('tags', $data)) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
@@ -1205,7 +1205,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "/1/thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -1357,11 +1357,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => '#$%$@@'
+							'Base colour' => '#$%$@@'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -1392,7 +1392,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'Text column changed',
 							'Data' => 'Text',
 							'Text' => 'some text 😅',
-							'Base color' => '039BE5'
+							'Base colour' => '039BE5'
 						]
 					]
 				]
@@ -1407,7 +1407,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => 'Host name column update',
 							'Data' => 'Host name',
-							'Base color' => 'FF8F00'
+							'Base colour' => 'FF8F00'
 						]
 					]
 				]
@@ -1583,7 +1583,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 								'Max' => '100',
 								'Aggregation function' => 'avg',
 								'Aggregation interval' => '20h',
-								'Base color' => '039BE5',
+								'Base colour' => '039BE5',
 								'Thresholds' => [
 									[
 										'action' => USER_ACTION_UPDATE,
@@ -1637,7 +1637,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('tags', $data)) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
