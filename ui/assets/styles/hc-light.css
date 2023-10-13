@@ -5325,8 +5325,6 @@ z-select .list, input[type="text"], input[type="password"], input[type="search"]
     max-width: 110px;
     text-overflow: ellipsis;
     overflow: hidden; }
-.radio-list-control.before-table {
-  margin-bottom: 10px; }
 
 .table-forms .radio-list-control.severity {
   vertical-align: middle; }

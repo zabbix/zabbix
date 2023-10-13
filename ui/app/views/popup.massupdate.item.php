@@ -212,7 +212,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
 				->setModern(true)
-				->addClass('before-table'),
+				->addStyle('margin-bottom: 10px;'),
 			getItemPreprocessing([], false, $data['preprocessing_types'])
 		]))->setId('preprocessing-div')
 	);
@@ -501,7 +501,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
 				->setModern(true)
-				->addClass('before-table'),
+				->addStyle('margin-bottom: 10px;'),
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass('tags-table')
