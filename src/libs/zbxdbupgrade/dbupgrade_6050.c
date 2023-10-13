@@ -1787,7 +1787,7 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 				if (ZBX_EVAL_TOKEN_VAR_STR == ctx.stack.values[token_num].type)
 				{
 					zbx_vector_eval_token_ptr_append(&hist_param_tokens,
-							&ctx.stack.values[--token_num]);
+							&ctx.stack.values[token_num]);
 				}
 			}
 		}
