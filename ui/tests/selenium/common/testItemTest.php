@@ -86,16 +86,15 @@ class testItemTest extends CWebTest {
 	 * @param string	$items			pointer to form in URL
 	 */
 	public function checkTestButtonState($data, $item_name, $item_type, $success_text, $check_now, $is_host, $id, $items = null) {
+		$context = ($is_host === true) ? 'host' : 'template';
 		$create_link = ($items === null)
-			? 'disc_prototypes.php?form=create&context=host&parent_discoveryid='.$id
-			: $items.'.php?form=create&context=host&hostid='.$id;
-
-		$saved_link = ($items === null)
-			? 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.$id.'&itemid='
-			: $items.'.php?form=update&context=host&hostid='.$id.'&itemid=';
+			? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
+			: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
 
 		$this->page->login()->open($create_link);
-		$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
+		$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
 
 		// Create item.
 		$item_form->fill([
@@ -110,7 +109,9 @@ class testItemTest extends CWebTest {
 
 		// Open created item and change type.
 		foreach ($data as $update) {
-			$this->page->open($saved_link.$itemid);
+			$this->page->open($create_link);
+			$this->query('link:'.$item_name)->one()->click();
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$item_form->invalidate();
 			$type = $item_form->getField('Type')->getValue();
 
@@ -130,7 +131,7 @@ class testItemTest extends CWebTest {
 						if ($type === 'Dependent item') {
 							$enabled = true;
 						}
-						$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
+						$execute_button = $dialog->getFooter()->query('button:Execute now')->waitUntilVisible()->one();
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
@@ -682,16 +683,19 @@ class testItemTest extends CWebTest {
 	 * @param boolean   $lld            true if lld, false if item or item prototype
 	 */
 	public function checkTestItem($data, $is_host, $id, $items = null, $lld = false) {
+		$context = ($is_host === true) ? 'host' : 'template';
 		$create_link = ($items === null)
-			? 'disc_prototypes.php?form=create&context=host&parent_discoveryid='.$id
-			: $items.'.php?form=create&context=host&hostid='.$id;
+			? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
+			: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
 
 		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
 			return;
 		}
 
 		$this->page->login()->open($create_link);
-		$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
+		$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
 		$item_form->fill($data['fields']);
 
 		if ($is_host) {
@@ -715,8 +719,8 @@ class testItemTest extends CWebTest {
 		}
 
 		// Open Test item dialog form.
-		$this->query('id:test_item')->waitUntilVisible()->one()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->getFooter()->query('button:Test')->one()->click();
+		$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -1117,8 +1121,9 @@ class testItemTest extends CWebTest {
 	 * @param int		$i			index number of preprocessing step
 	 */
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
-		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
+		$test_button = $dialog->getFooter()->query('button:Test')->one();
 
 		$this->assertTrue($test_button->isEnabled($enabled));
 		$item_form->selectTab('Preprocessing');
@@ -1130,7 +1135,7 @@ class testItemTest extends CWebTest {
 	}
 
 	private function saveFormAndCheckMessage($message) {
-		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$item_form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		$item_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $message);
