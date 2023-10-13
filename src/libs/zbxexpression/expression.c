@@ -299,7 +299,7 @@ static int	get_expression_macro_result(const zbx_db_event *event, char *data, zb
 	}
 
 	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, hostids->values, hostids->values_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_macros, um_handle, NULL))
+			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, NULL))
 	{
 		goto out;
 	}
@@ -710,7 +710,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
 				indexed_macro = is_indexed_macro(*data, &token);
-				if (NULL == (m = func_get_macro_from_func(*data, &token.data.func_macro, &N_functionid))
+				if (NULL == (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro, &N_functionid))
 						|| SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
 						&inner_token, token_search))
 				{
@@ -719,6 +719,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					pos++;
 					continue;
 				}
+				m = m_ptr;
 				break;
 			case ZBX_TOKEN_USER_MACRO:
 				/* To avoid *data modification user macro resolver should be replaced with a function */
@@ -2804,12 +2805,12 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			zbx_free(replace_to);
 		}
 
-		m_ptr = (char *)m;
 		if (ZBX_TOKEN_FUNC_MACRO == token.type)
 			zbx_free(m_ptr);
 
 		pos++;
 	}
+
 
 	zbx_vc_flush_stats();
 

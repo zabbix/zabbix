@@ -22,6 +22,6 @@
 
 #include "zbxexpr.h"
 
-const char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
 
 #endif

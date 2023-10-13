@@ -16,6 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+/* strptime() on newer and older GNU/Linux systems */
 #define _GNU_SOURCE
 #include "macrofunc.h"
 
@@ -240,27 +241,33 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  *             fm           - [IN] function macro to check                    *
  *             N_functionid - [OUT] index of the macro in string (if valid)   *
  *                                                                            *
- * Return value: unindexed macro from the allowed list or NULL.               *
+ * Return value: unindexed macro  or NULL.                                    *
  *                                                                            *
  ******************************************************************************/
-const char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
 {
 	const char	*ptr_l = str + fm->macro.l, *ptr_r;
-	char		*ptr;
+	char		*ptr = NULL;
 
 	if (NULL != (ptr_r = strchr(ptr_l, '}')))
 	{
 		size_t	len = (size_t)(ptr_r - ptr_l), fm_len = fm->macro.r - fm->macro.l + 1;
 
-		zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid, sizeof(*N_functionid), 1,
-				9);
-		ptr = zbx_strdup(NULL, ptr_l);
-		ptr[len + 1] = '\0';
+		ptr = zbx_strdup(ptr, ptr_l);
 
-		return ptr;
+		if ('?' != ptr_l[1] && len != fm_len)
+		{
+			if (SUCCEED == zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
+					sizeof(*N_functionid), 1, 9))
+			{
+				len--;
+				ptr[len] = '}';
+			}
+		}
+		ptr[len + 1] = '\0';
 	}
 
-	return NULL;
+	return ptr;
 }
 
 /******************************************************************************

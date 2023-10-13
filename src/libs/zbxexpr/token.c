@@ -818,9 +818,10 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
  *                         macro                                              *
  *                                                                            *
  * Comments: This function parses token with a macro inside it. There are     *
- *           three types of nested macros - low-level discovery function      *
- *           macros, function macros and a specific case of simple macros     *
- *           where {HOST.HOSTn} macro is used as host name.                   *
+ *           four types of nested macros - low-level discovery function       *
+ *           macros, built-in function macros, user macros  and a specific    *
+ *           case of simple macros where {HOST.HOSTn} macro is used as host   *
+ *           name.                                                            *
  *                                                                            *
  *           If the macro points at valid macro in the expression then        *
  *           the generic token fields are set and either the                  *
