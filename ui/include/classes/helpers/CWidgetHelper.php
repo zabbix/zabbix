@@ -105,7 +105,6 @@ class CWidgetHelper {
 		foreach ($items as &$item) {
 			$item['source'] = $item['trends'] == 0 || $time_now - $item['history'] <= $time_from ? 'history' : 'trends';
 		}
-
 		unset($item);
 	}
 }
