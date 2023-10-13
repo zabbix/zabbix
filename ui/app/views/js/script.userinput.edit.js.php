@@ -54,6 +54,7 @@ window.script_userinput_popup = new class {
 		curl.setArgument('action', 'script.userinput.check');
 
 		this.#post(curl.getUrl(), fields);
+		this.overlay.recoverFocus();
 	}
 
 	submit() {
