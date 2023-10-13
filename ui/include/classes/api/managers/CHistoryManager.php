@@ -1187,7 +1187,7 @@ class CHistoryManager {
 	 * @param int      $time_from    Timestamp indicating start of time period (seconds).
 	 * @param int|null $time_to      Timestamp indicating end of time period (seconds) or null.
 	 *
-	 * @return string  Aggregated history value.
+	 * @return string|null Aggregated history value.
 	 */
 	public function getAggregatedValue(array $item, string $aggregation, int $time_from,
 			?int $time_to = null): ?string {
@@ -1203,15 +1203,10 @@ class CHistoryManager {
 	/**
 	 * Elasticsearch specific implementation of getAggregatedValue.
 	 *
-	 * @param array    $item         Item to get aggregated value for.
-	 * @param string   $aggregation  Aggregation to be applied (min, max, avg, and other functions).
-	 * @param int      $time_from    Timestamp indicating start of time period (seconds).
-	 * @param int|null $time_to      Timestamp indicating end of time period (seconds) or null.
-	 *
-	 * @return mixed Aggregated value based on selected aggregation function or null, if no data is found.
+	 * @see CHistoryManager::getAggregatedValue
 	 */
 	private function getAggregatedValueFromElasticsearch(array $item, string $aggregation, int $time_from,
-			?int $time_to) {
+			?int $time_to): ?string {
 		$query = [
 			'query' => [
 				'bool' => [
@@ -1277,14 +1272,10 @@ class CHistoryManager {
 	/**
 	 * SQL specific implementation of getAggregatedValue.
 	 *
-	 * @param array    $item         Item to get aggregated value for.
-	 * @param string   $aggregation  Aggregation to be applied (min, max, avg, and other functions).
-	 * @param int      $time_from    Timestamp indicating start of time period (seconds).
-	 * @param int|null $time_to      Timestamp indicating end of time period (seconds) or null.
-	 *
-	 * @return mixed Aggregated value based on selected aggregation function or null, if no data is found.
+	 * @see CHistoryManager::getAggregatedValue
 	 */
-	private function getAggregatedValueFromSql(array $item, string $aggregation, int $time_from, ?int $time_to) {
+	private function getAggregatedValueFromSql(array $item, string $aggregation, int $time_from,
+			?int $time_to): ?string {
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
 			$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 			$time_from = max($time_from, time() - $hk_history);

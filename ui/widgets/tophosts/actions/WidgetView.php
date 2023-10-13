@@ -25,11 +25,11 @@ use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CHousekeepingHelper,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CSettingsHelper,
-	Manager;
+	Manager,
+	CWidgetHelper;
 
 use Widgets\TopHosts\Widget;
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
@@ -448,7 +448,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$time_to = $time_now;
 			$time_from = $time_to - $history_period;
 
-			self::addDataSource($items, $time_from, $time_now, $column['history']);
+			self::addItemDataSource($items, $time_from, $time_now, $column['history']);
 
 			$history = [];
 
@@ -468,7 +468,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$time_from = $column['time_period']['from_ts'];
 			$time_to = $column['time_period']['to_ts'];
 
-			self::addDataSource($items, $from, $time_now, $column['history']);
+			self::addItemDataSource($items, $from, $time_now, $column['history']);
 		}
 
 		foreach ($items as $item) {
@@ -520,7 +520,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $result;
 	}
 
-	private static function addDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
+	private static function addItemDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
 		if ($data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
 				|| $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS) {
 			foreach ($items as &$item) {
@@ -534,79 +534,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
-		static $hk_history_global, $global_history_time, $hk_trends_global, $global_trends_time;
-
-		if ($hk_history_global === null) {
-			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
-
-			if ($hk_history_global) {
-				$global_history_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-			}
-		}
-
-		if ($hk_trends_global === null) {
-			$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
-
-			if ($hk_history_global) {
-				$global_trends_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-			}
-		}
-
-		if ($hk_history_global) {
-			foreach ($items as &$item) {
-				$item['history'] = $global_history_time;
-			}
-			unset($item);
-		}
-
-		if ($hk_trends_global) {
-			foreach ($items as &$item) {
-				$item['trends'] = $global_trends_time;
-			}
-			unset($item);
-		}
-
-		if (!$hk_history_global || !$hk_trends_global) {
-			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items,
-				array_merge($hk_history_global ? [] : ['history'], $hk_trends_global ? [] : ['trends'])
-			);
-
-			$processed_items = [];
-
-			foreach ($items as $itemid => $item) {
-				if (!$global_trends_time) {
-					$item['history'] = timeUnitToSeconds($item['history']);
-
-					if ($item['history'] === null) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'history',
-							_('invalid history storage period')
-						));
-
-						continue;
-					}
-				}
-
-				if (!$hk_trends_global) {
-					$item['trends'] = timeUnitToSeconds($item['trends']);
-
-					if ($item['trends'] === null) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
-							_('invalid trend storage period')
-						));
-
-						continue;
-					}
-				}
-
-				$processed_items[$itemid] = $item;
-			}
-
-			$items = $processed_items;
-		}
-
-		foreach ($items as &$item) {
-			$item['source'] = $item['trends'] == 0 || $time_now - $item['history'] <= $time_from ? 'history' : 'trends';
-		}
-		unset($item);
+		CWidgetHelper::addDataSource($items, $time_from, $time_now);
 	}
 }

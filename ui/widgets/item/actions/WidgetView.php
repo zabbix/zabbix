@@ -29,7 +29,7 @@ use API,
 	CSettingsHelper,
 	CUrl,
 	Manager,
-	CHousekeepingHelper;
+	CWidgetHelper;
 
 use Widgets\Item\Widget;
 
@@ -145,7 +145,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($items) {
 			$item = $items[$itemid];
 
-			self::addDataSource($items,  $time_from, $time_to, $this->fields_values['history']);
+			self::addItemDataSource($items, $time_from, $time_to, $this->fields_values['history']);
 
 			$history = [];
 			$value_type = $item['value_type'];
@@ -619,7 +619,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * @param int   $time_now     [IN] Timestamp for current point in time (seconds).
 	 * @param int   $data_source  [IN] Data source specified in widget form.
 	 */
-	private static function addDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
+	private static function addItemDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
 		if ($data_source == Widget::HISTORY_DATA_HISTORY || $data_source == Widget::HISTORY_DATA_TRENDS) {
 			foreach ($items as &$item) {
 				$item['source'] = $data_source == Widget::HISTORY_DATA_TRENDS
@@ -632,80 +632,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
-		static $hk_history_global, $global_history_time, $hk_trends_global, $global_trends_time;
-
-		if ($hk_history_global === null) {
-			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
-
-			if ($hk_history_global) {
-				$global_history_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-			}
-		}
-
-		if ($hk_trends_global === null) {
-			$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
-
-			if ($hk_history_global) {
-				$global_trends_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-			}
-		}
-
-		if ($hk_history_global) {
-			foreach ($items as &$item) {
-				$item['history'] = $global_history_time;
-			}
-			unset($item);
-		}
-
-		if ($hk_trends_global) {
-			foreach ($items as &$item) {
-				$item['trends'] = $global_trends_time;
-			}
-			unset($item);
-		}
-
-		if (!$hk_history_global || !$hk_trends_global) {
-			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items,
-				array_merge($hk_history_global ? [] : ['history'], $hk_trends_global ? [] : ['trends'])
-			);
-
-			$processed_items = [];
-
-			foreach ($items as $itemid => $item) {
-				if (!$global_trends_time) {
-					$item['history'] = timeUnitToSeconds($item['history']);
-
-					if ($item['history'] === null) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'history',
-							_('invalid history storage period')
-						));
-
-						continue;
-					}
-				}
-
-				if (!$hk_trends_global) {
-					$item['trends'] = timeUnitToSeconds($item['trends']);
-
-					if ($item['trends'] === null) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
-							_('invalid trend storage period')
-						));
-
-						continue;
-					}
-				}
-
-				$processed_items[$itemid] = $item;
-			}
-
-			$items = $processed_items;
-		}
-
-		foreach ($items as &$item) {
-			$item['source'] = $item['trends'] == 0 || $time_now - $item['history'] <= $time_from ? 'history' : 'trends';
-		}
-
-		unset($item);
+		CWidgetHelper::addDataSource($items, $time_from, $time_now);
 	}
 }
