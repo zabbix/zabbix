@@ -209,7 +209,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		$item = [];
 
 		if ($this->hasInput('itemid')) {
-			$item = API::ItemPrototype()->get([
+			[$item] = API::ItemPrototype()->get([
 				'output' => [
 					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
@@ -224,7 +224,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 				'selectTags' => ['tag', 'value'],
 				'itemids' => $this->getInput('itemid')
 			]);
-			$item = $item ? CItemPrototypeHelper::convertApiInputForForm(reset($item)) : [];
+			$item = CItemPrototypeHelper::convertApiInputForForm($item);
 		}
 
 		if (!$item) {
