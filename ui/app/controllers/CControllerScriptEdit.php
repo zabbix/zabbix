@@ -93,7 +93,10 @@ class CControllerScriptEdit extends CController {
 			'hgstype' => 0,
 			'actions' => [],
 			'enable_user_input' => false,
-			'input_type' => SCRIPT_MANUALINPUT_TYPE_STRING
+			'input_prompt' => '',
+			'input_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+			'input_validator' => '',
+			'input_default_value' => ''
 		];
 
 		// Get values from the database.
