@@ -451,7 +451,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct itemid"
+				"select itemid"
 				" from %s"
 				" where clock>=%d and",
 				table_name, clocks[j]);

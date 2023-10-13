@@ -907,7 +907,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 
 	$result = !hasErrorMessages();
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massenable', 'item.massdisable']) && hasRequest('group_itemid')) {
 	$itemids = getRequest('group_itemid');
@@ -988,7 +988,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
 	$group_itemid = getRequest('group_itemid');
