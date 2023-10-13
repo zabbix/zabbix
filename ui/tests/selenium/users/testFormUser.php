@@ -85,6 +85,263 @@ const SQL = 'SELECT * FROM users';
 		]);
 	}
 
+	public function getLayoutData() {
+		return [
+			[
+				[
+					'required' => ['Username', 'Password', 'Password (once again)', 'Refresh', 'Rows per page'],
+					'default' => [
+						'Username' => '',
+						'Name' => '',
+						'Last name' => '',
+						'Groups' => '',
+						'Password' => '',
+						'Password (once again)' => '',
+						'Language' => 'System default',
+						'Time zone' => 'System default: (UTC+00:00) UTC',
+						'Theme' => 'System default',
+						'Auto-login' => false,
+						'id:autologout_visible' => false,
+						'id:autologout' => '15m',
+						'Refresh' => '30s',
+						'Rows per page' => '50',
+						'URL (after login)' => ''
+					],
+					'disabled' => ['id:autologout'],
+					'buttons' => ['Add', 'Cancel', 'Select'],
+					'count' => 3
+				]
+			],
+			[
+				[
+					'user' => 'guest',
+					'required' => ['Username', 'Refresh', 'Rows per page'],
+					'default' => [
+						'Username' => 'guest',
+						'Name' => '',
+						'Last name' => '',
+						'Groups' => ['Disabled', 'Guests', 'Internal'],
+						'Refresh' => '30s',
+						'Rows per page' => '50',
+						'URL (after login)' => ''
+					],
+					'disabled' => ['Change password', 'id:label-lang', 'id:label-timezone', 'id:label-theme'],
+					'buttons' => ['Update', 'Delete', 'Cancel', 'Select'],
+					'count' => 4
+				]
+			],
+			[
+				[
+					'action' => 'edit',
+					'user' => 'Admin',
+					'required' => ['Username', 'Current password', 'Password',  'Password (once again)', 'Refresh', 'Rows per page'],
+					'default' => [
+						'Username' => 'Admin',
+						'Name' => 'Zabbix',
+						'Last name' => 'Administrator',
+						'Groups' => ['Internal', 'Zabbix administrators'],
+						'Current password' => '',
+						'Password' => '',
+						'Password (once again)' => '',
+						'Language' => 'System default',
+						'Time zone' => 'System default: (UTC+00:00) UTC',
+						'Theme' => 'System default',
+						'Auto-login' => true,
+						'id:autologout_visible' => false,
+						'id:autologout' => '15m',
+						'Refresh' => '30s',
+						'Rows per page' => '100',
+						'URL (after login)' => ''
+					],
+					'disabled' => ['id:autologout', 'button:Delete'],
+					'buttons' => ['Update', 'Cancel', 'Select'],
+					'count' => 3
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLayoutData
+	 */
+	public function testFormUser_Layout($data) {
+		$this->page->login()->open('zabbix.php?action=user.list');
+		$user = CTestArrayHelper::get($data, 'user', 'Admin');
+
+		if (array_key_exists('user', $data)) {
+			$this->query('link', $user)->waitUntilVisible()->one()->click();
+		}
+		else {
+			$this->query('button:Create user')->one()->click();
+		}
+
+		$this->page->assertTitle('Configuration of users');
+		$this->page->assertHeader('Users');
+
+		// Check tabs available in the form.
+		$form = $this->query('name:user_form')->asForm()->one();
+		$tabs = ['User', 'Media', 'Permissions'];
+		$this->assertEquals($tabs, $form->getTabs());
+
+		// Check default values.
+		if (array_key_exists('user', $data) && $user === 'Admin') {
+			$form->query('button:Change password')->one()->click();
+		}
+
+		$form->checkValue($data['default']);
+
+		if (array_key_exists('user', $data) && $user === 'guest') {
+			$this->assertEquals(0, $form->query('button', $data['disabled'])
+					->all()->filter(CElementFilter::CLICKABLE)->count()
+			);
+			$this->assertEquals(0, $form->query('id:username')->all()->filter(CElementFilter::CLICKABLE)->count());
+			$info_password = 'Password can only be changed for users using the internal Zabbix authentication.';
+			$this->assertEquals($info_password, $this->query('xpath://button[contains(@data-hintbox-contents, "'.$info_password.'")]')
+					->one()->getAttribute('data-hintbox-contents')
+			);
+		}
+		else {
+			$inputs = [
+				'Username' => [
+					'maxlength' => '100'
+				],
+				'Name' => [
+					'maxlength' => '100'
+				],
+				'Last name' => [
+					'maxlength' => '100'
+				],
+				'id:user_groups__ms' => [
+					'placeholder' => 'type here to search'
+				],
+				'Password' => [
+					'maxlength' => '255'
+				],
+				'Password (once again)' => [
+					'maxlength' => '255'
+				],
+				'Refresh' => [
+					'maxlength' => '255'
+				],
+				'Rows per page' => [
+					'maxlength' => '6'
+				],
+				'URL (after login)' => [
+					'maxlength' => '2048'
+				]
+			];
+			foreach ($inputs as $field => $attributes) {
+				$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
+			}
+
+			if (array_key_exists('user', $data) && $user === 'Admin') {
+				$this->assertTrue($form->getField('Current password')->isAttributePresent(['maxlength' => '255']));
+			}
+
+			foreach ($data['disabled'] as $field) {
+				$this->assertTrue($form->getField($field)->isEnabled(false));
+			}
+
+			$form->getLabel('Password')->query('xpath:./button[@data-hintbox]')->one()->click();
+			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilReady();
+			$help_message = "Password requirements:".
+				"\nmust be at least 8 characters long".
+				"\nmust not contain user's name, surname or username".
+				"\nmust not be one of common or context-specific passwords";
+			$this->assertEquals($help_message, $hint->one()->getText());
+			$hint->query('class:btn-overlay-close')->one()->click();
+
+			$info_message = 'Password is not mandatory for non internal authentication type.';
+			$this->assertEquals($info_message, $form->query('xpath://div[contains(text(), "'.$info_message.'")]')->one()->getText());
+
+			$hintbox = 'You are not able to choose some of the languages, because locales for them are not installed on the web server.';
+			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-contents, "'.$hintbox.'")]')
+					->one()->getAttribute('data-hintbox-contents')
+			);
+		}
+
+		// Check required fields.
+		$this->assertEquals($data['required'], $form->getRequiredLabels());
+
+		// Check that buttons are present and clickable.
+		$this->assertEquals($data['count'], $form->query('button', $data['buttons'])->all()
+				->filter(CElementFilter::CLICKABLE)->count()
+		);
+
+		// Check Media tab layout.
+		$form->selectTab('Media');
+		$this->assertEqualsCanonicalizing(['Media'], $form->getLabels(CElementFilter::VISIBLE)->asText());
+		$media_table = $form->query('id:mediaTab')->asTable()->one();
+
+		$this->assertEquals(['Type', 'Send to', 'When active', 'Use if severity', 'Status', 'Action'],
+				$media_table->getHeadersText()
+		);
+
+		// Check that media tab buttons are present.
+		if (array_key_exists('user', $data)) {
+			if ($user === 'Admin') {
+				$this->assertEquals(3, $form->query('button', ['Add', 'Update', 'Cancel'])->all()
+						->filter(CElementFilter::CLICKABLE)->count()
+				);
+			}
+			else {
+				$this->assertEquals(4, $form->query('button', ['Add', 'Update', 'Delete', 'Cancel'])->all()
+						->filter(CElementFilter::CLICKABLE)->count()
+				);
+			}
+		}
+		else {
+			$this->assertEquals(3, $form->query('button', ['Add', 'Cancel'])->all()
+					->filter(CElementFilter::CLICKABLE)->count()
+			);
+		}
+
+		$this->query('xpath://button[contains(@class, "btn-link") and contains(text(), "Add")]')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->assertEquals('Media', $dialog->getTitle());
+		$dialog_form = $dialog->asForm();
+
+		$modal_form = [
+			'fields' => ['Type', 'Send to', 'When active', 'Use if severity', 'Enabled'],
+			'default' => [
+				'Type' => 'Reference webhook',
+				'Send to' => '',
+				'When active' => '1-7,00:00-24:00',
+				'id:severity_0' => true,
+				'id:severity_1' => true,
+				'id:severity_2' => true,
+				'id:severity_3' => true,
+				'id:severity_4' => true,
+				'id:severity_5' => true,
+				'Enabled' => true
+			],
+			'buttons' => ['Add', 'Cancel']
+		];
+		$this->assertEqualsCanonicalizing($modal_form['fields'], $dialog_form->getLabels(CElementFilter::VISIBLE)->asText());
+		$dialog_form->checkValue($modal_form['default']);
+		$this->assertEquals(2, $dialog->getFooter()->query('button', $modal_form['buttons'])->all()
+				->filter(CElementFilter::CLICKABLE)->count()
+		);
+		$dialog->close();
+
+		// Check Permissions tab layout.
+		$form->selectTab('Permissions');
+
+		if (array_key_exists('user', $data)) {
+			if ($user === 'Admin') {
+				$this->assertFalse($form->isRequired('Role'));
+				$form->checkValue(['Role' => 'Super admin role']);
+			}
+			else {
+				$form->checkValue(['Role' => 'Guest role']);
+			}
+		}
+		else {
+			$this->assertTrue($form->isRequired('Role'));
+			$this->assertTrue($form->getField('id:roleid_ms')->isAttributePresent(['placeholder' => 'type here to search']));
+		}
+	}
+
 	public function getCreateData() {
 		return [
 			// Username is already taken by another user.
