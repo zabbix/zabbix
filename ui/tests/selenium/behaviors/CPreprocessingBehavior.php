@@ -103,7 +103,8 @@ class CPreprocessingBehavior extends CBehavior {
 	/**
 	 * Add new preprocessing, select preprocessing type and parameters if exist.
 	 *
-	 * @param array $steps    preprocessing step values
+	 * @param array $steps            preprocessing step values
+	 * @param boolean $mass_update    true if editing mass update preprocessing form, false if not
 	 */
 	public function addPreprocessingSteps($steps, $mass_update = false) {
 		$rows = $this->test->query('class:preprocessing-list-item')->count() + ($mass_update ? null : 1);
