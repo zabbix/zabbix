@@ -29,6 +29,7 @@ import (
 	"strings"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/unix"
 )
 
@@ -177,10 +178,14 @@ func getFsInode(path string) (stats *FsStats, err error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "VfsFs",
+	err := plugin.RegisterMetrics(
+		&impl, "VfsFs",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
 		"vfs.fs.get", "List of mounted filesystems with statistics.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

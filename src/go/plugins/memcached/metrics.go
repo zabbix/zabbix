@@ -23,6 +23,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
@@ -48,8 +49,10 @@ const (
 )
 
 // https://github.com/memcached/memcached/blob/master/sasl_defs.c#L26
-var maxEntryLen = 252
-var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "11211"}
+var (
+	maxEntryLen = 252
+	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "11211"}
+)
 
 // Common params: [URI|Session][,User][,Password]
 var (
@@ -64,17 +67,33 @@ var metrics = metric.MetricSet{
 	keyPing: metric.New("Test if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUser, paramPassword}, false),
 
-	keyStats: metric.New("Returns output of stats command.",
-		[]*metric.Param{paramURI, paramUser, paramPassword,
-			metric.NewParam("Type", "One of supported stat types: items, sizes, slabs and settings. "+
-				"Empty by default (returns general statistics).").WithDefault(statsTypeGeneral).
+	keyStats: metric.New(
+		"Returns output of stats command.",
+		[]*metric.Param{
+			paramURI, paramUser, paramPassword,
+			metric.NewParam(
+				"Type",
+				"One of supported stat types: items, sizes, slabs and settings. "+
+					"Empty by default (returns general statistics).",
+			).WithDefault(statsTypeGeneral).
 				WithValidator(metric.SetValidator{
-					Set:             []string{statsTypeGeneral, statsTypeItems, statsTypeSizes, statsTypeSlabs, statsTypeSettings},
+					Set: []string{
+						statsTypeGeneral,
+						statsTypeItems,
+						statsTypeSizes,
+						statsTypeSlabs,
+						statsTypeSettings,
+					},
 					CaseInsensitive: true,
 				}),
-		}, false),
+		},
+		false,
+	),
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

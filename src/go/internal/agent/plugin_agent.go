@@ -27,6 +27,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/version"
 )
 
@@ -35,9 +36,11 @@ type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
-var hostnames = map[uint64]string{}
-var FirstHostname string
+var (
+	impl          Plugin
+	hostnames     = map[uint64]string{}
+	FirstHostname string
+)
 
 type PerformTask func(key string, timeout time.Duration, clientID uint64) (result string, err error)
 
@@ -118,10 +121,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Agent",
+	err := plugin.RegisterMetrics(
+		&impl, "Agent",
 		"agent.hostname", "Returns Hostname from agent configuration.",
 		"agent.hostmetadata", "Returns string with agent host metadata.",
 		"agent.ping", "Returns agent availability check result.",
 		"agent.variant", "Returns agent variant.",
-		"agent.version", "Version of Zabbix agent.")
+		"agent.version", "Version of Zabbix agent.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

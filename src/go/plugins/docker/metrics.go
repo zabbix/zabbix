@@ -22,6 +22,7 @@ package docker
 import (
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type metricMeta struct {
@@ -84,5 +85,8 @@ var metrics = metric.MetricSet{
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

@@ -25,6 +25,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/zbxcmd"
 )
@@ -84,7 +85,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return stdoutStderr, nil
 	} else if params[1] == "nowait" {
 		err := zbxcmd.ExecuteBackground(params[0])
-
 		if err != nil {
 			return nil, err
 		}
@@ -96,5 +96,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
+	err := plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

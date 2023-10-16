@@ -23,6 +23,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type Options struct {
@@ -87,7 +88,9 @@ var stdOs std.Os
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetrics(&impl, "File",
+
+	err := plugin.RegisterMetrics(
+		&impl, "File",
 		"vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.",
 		"vfs.file.contents", "Retrieves contents of the file.",
 		"vfs.file.exists", "Returns if file exists or not.",
@@ -98,5 +101,9 @@ func init() {
 		"vfs.file.md5sum", "Returns MD5 checksum of file.",
 		"vfs.file.owner", "Returns the ownership of a file.",
 		"vfs.file.permissions", "Returns 4-digit string containing octal number with Unix permissions.",
-		"vfs.file.get", "Return json object with information about a file.")
+		"vfs.file.get", "Return json object with information about a file.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

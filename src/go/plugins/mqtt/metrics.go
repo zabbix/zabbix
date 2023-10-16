@@ -23,6 +23,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/watch"
 )
 
@@ -58,5 +59,8 @@ func init() {
 	impl.manager = watch.NewManager(&impl)
 	impl.mqttClients = make(map[broker]*mqttClient)
 
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

@@ -21,6 +21,7 @@ package main
 
 import (
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -37,5 +38,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.external.test", "Returns test string.")
+	err := plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.external.test", "Returns test string.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

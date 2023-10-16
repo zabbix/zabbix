@@ -24,6 +24,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -31,8 +32,10 @@ type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
-var stdOs std.Os
+var (
+	impl  Plugin
+	stdOs std.Os
+)
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -44,5 +47,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetrics(&impl, "Uptime", "system.uptime", "Returns system uptime in seconds.")
+
+	err := plugin.RegisterMetrics(&impl, "Uptime", "system.uptime", "Returns system uptime in seconds.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

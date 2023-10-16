@@ -216,7 +216,11 @@ func parseDpkg(in []string, regex string) (out []string, err error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Sw",
+	err := plugin.RegisterMetrics(
+		&impl, "Sw",
 		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

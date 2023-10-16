@@ -23,6 +23,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
@@ -55,8 +56,10 @@ const (
 	keySlowlog = "redis.slowlog.count"
 )
 
-var maxAuthPassLen = 512
-var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "6379"}
+var (
+	maxAuthPassLen = 512
+	uriDefaults    = &uri.Defaults{Scheme: "tcp", Port: "6379"}
+)
 
 // Common params: [URI|Session][,User][,Password]
 var (
@@ -69,13 +72,15 @@ var (
 
 var metrics = metric.MetricSet{
 	keyConfig: metric.New("Returns configuration parameters of Redis server.",
-		[]*metric.Param{paramURI, paramPassword,
+		[]*metric.Param{
+			paramURI, paramPassword,
 			metric.NewParam("Pattern", "Glob-style pattern to filter configuration parameters.").
 				WithDefault("*"),
 		}, false),
 
 	keyInfo: metric.New("Returns output of INFO command.",
-		[]*metric.Param{paramURI, paramPassword,
+		[]*metric.Param{
+			paramURI, paramPassword,
 			metric.NewParam("Section", "Section of information to return.").WithDefault("default"),
 		}, false),
 
@@ -87,5 +92,8 @@ var metrics = metric.MetricSet{
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

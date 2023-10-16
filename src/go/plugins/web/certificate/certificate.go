@@ -304,5 +304,8 @@ func getCertificatesPEM(address, domain string, timeout int) ([]*x509.Certificat
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "WebCertificate", "web.certificate.get", "Get TLS/SSL website certificate.")
+	err := plugin.RegisterMetrics(&impl, "WebCertificate", "web.certificate.get", "Get TLS/SSL website certificate.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

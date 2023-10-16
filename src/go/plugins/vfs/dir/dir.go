@@ -41,7 +41,7 @@ type common struct {
 	files         []fs.FileInfo
 }
 
-//Export -
+// Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
 	case "vfs.dir.count":
@@ -114,8 +114,12 @@ func parseReg(in string) (*regexp.Regexp, error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "VFSDir",
+	err := plugin.RegisterMetrics(
+		&impl, "VFSDir",
 		"vfs.dir.count", "Directory entry count.",
 		"vfs.dir.size", "All directory entry size.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

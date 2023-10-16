@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -58,7 +59,8 @@ run:
 						Value:       &value,
 						LastLogsize: &lastlogsize,
 						Ts:          now,
-						Mtime:       &mtime})
+						Mtime:       &mtime,
+					})
 				}
 			}
 		case wr := <-p.input:
@@ -98,5 +100,8 @@ func (p *Plugin) Validate(private interface{}) (err error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "DebugLog", "debug.log", "Returns timestamp each second.")
+	err := plugin.RegisterMetrics(&impl, "DebugLog", "debug.log", "Returns timestamp each second.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

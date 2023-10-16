@@ -25,10 +25,14 @@ import (
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }
 
 const (
@@ -60,39 +64,55 @@ var (
 
 	metrics = metric.MetricSet{
 		keyCustomQuery: metric.New("Returns result of a custom query.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword,
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword,
 				metric.NewParam("QueryName", "Name of a custom query "+
 					"(must be equal to a name of an SQL file without an extension).").SetRequired(),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, true),
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			}, true),
 
 		keyDatabasesDiscovery: metric.New("Returns list of databases in LLD format.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyDatabaseSize: metric.New("Returns size of given database in bytes.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword,
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword,
 				metric.NewParam("Database", "Database name.").SetRequired(),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			}, false),
 
 		keyPing: metric.New("Tests if connection is alive or not.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyReplicationDiscovery: metric.New("Returns replication information in LLD format.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyReplicationSlaveStatus: metric.New("Returns replication status.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam(masterHostParam, "Master host."),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, metric.NewParam(masterHostParam, "Master host."),
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			}, false),
 
 		keyStatusVars: metric.New("Returns values of global status variables.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyVersion: metric.New("Returns MySQL version.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 	}
 )
 

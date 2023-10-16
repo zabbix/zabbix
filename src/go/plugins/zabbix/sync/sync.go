@@ -21,6 +21,7 @@ package zabbixsync
 
 import (
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxlib"
 )
 
@@ -36,6 +37,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "ZabbixSync", getMetrics()...)
+	err := plugin.RegisterMetrics(&impl, "ZabbixSync", getMetrics()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+
 	impl.SetCapacity(1)
 }

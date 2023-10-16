@@ -23,6 +23,7 @@ import (
 	"errors"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -44,9 +45,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(
+	err := plugin.RegisterMetrics(
 		&impl, "DebugMultikey",
 		"debug.external.multikeyOne", "Returns first test value.",
 		"debug.external.multikeyTwo", "Returns second test value.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

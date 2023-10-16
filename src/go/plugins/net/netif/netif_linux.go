@@ -29,6 +29,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (
@@ -69,7 +70,7 @@ func (p *Plugin) addStatNum(statName string, mapNetStat map[string]uint, statNum
 	return nil
 }
 
-func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
+func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (result uint64, err error) {
 	var statNums []uint
 
 	if dir&dirIn != 0 {
@@ -193,11 +194,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	stdOs = std.NewOs()
 
-	plugin.RegisterMetrics(&impl, "NetIf",
+	err := plugin.RegisterMetrics(
+		&impl, "NetIf",
 		"net.if.collisions", "Returns number of out-of-window collisions.",
 		"net.if.in", "Returns incoming traffic statistics on network interface.",
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
 		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
-		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.")
-
+		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

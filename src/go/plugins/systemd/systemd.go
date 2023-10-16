@@ -28,7 +28,7 @@ import (
 	"sync"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
-
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -168,7 +168,10 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 		unitType = params[1]
 	}
 
-	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
+	obj := conn.Object(
+		"org.freedesktop.systemd1",
+		dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])),
+	)
 	err := obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1."+unitType).Store(&values)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
@@ -239,7 +242,8 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
-		array = append(array, unitJson{u.Name, u.Description, u.LoadState, u.ActiveState,
+		array = append(array, unitJson{
+			u.Name, u.Description, u.LoadState, u.ActiveState,
 			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state,
 		})
 	}
@@ -298,8 +302,12 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 		unitType = params[2]
 	}
 
-	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
-	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
+	obj := conn.Object(
+		"org.freedesktop.systemd1",
+		dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])),
+	)
+	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).
+		Store(&value)
 	if nil != err {
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
 	}
@@ -344,7 +352,20 @@ func (p *Plugin) setUnitStates(v map[string]interface{}) {
 	mappings := []stateMapping{
 		{"LoadState", []string{"loaded", "error", "masked"}},
 		{"ActiveState", []string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}},
-		{"UnitFileState", []string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}},
+		{
+			"UnitFileState",
+			[]string{
+				"enabled",
+				"enabled-runtime",
+				"linked",
+				"linked-runtime",
+				"masked",
+				"masked-runtime",
+				"static",
+				"disabled",
+				"invalid",
+			},
+		},
 	}
 
 	for _, mapping := range mappings {
@@ -365,7 +386,6 @@ func (p *Plugin) createStateMapping(v map[string]interface{}, key string, names 
 	} else {
 		p.Debugf("cannot create mapping for '%s' unit state: unit state with information type string not found", key)
 	}
-
 }
 
 func isEnabledUnit(units []unitJson, p string) bool {
@@ -378,9 +398,13 @@ func isEnabledUnit(units []unitJson, p string) bool {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Systemd",
+	err := plugin.RegisterMetrics(
+		&impl, "Systemd",
 		"systemd.unit.get", "Returns the bulked info, usage: systemd.unit.get[unit,<interface>].",
 		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
 		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

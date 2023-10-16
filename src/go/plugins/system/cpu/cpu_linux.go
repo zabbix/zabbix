@@ -31,8 +31,9 @@ import (
 	"strconv"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -168,8 +169,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName,
+	err := plugin.RegisterMetrics(
+		&impl, pluginName,
 		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
 		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilisation percentage.")
+		"system.cpu.util", "CPU utilisation percentage.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

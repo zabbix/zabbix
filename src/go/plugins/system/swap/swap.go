@@ -24,6 +24,7 @@ import (
 	"fmt"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -83,7 +84,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Swap",
+	err := plugin.RegisterMetrics(
+		&impl, "Swap",
 		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

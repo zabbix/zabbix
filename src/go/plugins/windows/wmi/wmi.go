@@ -24,6 +24,7 @@ import (
 	"errors"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/wmi"
 )
 
@@ -58,8 +59,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Wmi",
+	err := plugin.RegisterMetrics(
+		&impl, "Wmi",
 		"wmi.get", "Execute WMI query and return the first selected object.",
 		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

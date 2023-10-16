@@ -29,6 +29,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/web"
 	"zabbix.com/pkg/zbxregexp"
@@ -154,12 +155,16 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		return web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, true)
 	}
-
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "WebPage",
+	err := plugin.RegisterMetrics(
+		&impl, "WebPage",
 		"web.page.get", "Get content of a web page.",
 		"web.page.perf", "Loading time of full web page (in seconds).",
-		"web.page.regexp", "Find string on a web page.")
+		"web.page.regexp", "Find string on a web page.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

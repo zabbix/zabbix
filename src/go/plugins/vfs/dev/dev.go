@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -243,8 +244,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	impl.devices = make(map[string]*devUnit)
-	plugin.RegisterMetrics(&impl, "VFSDev",
+
+	err := plugin.RegisterMetrics(
+		&impl, "VFSDev",
 		"vfs.dev.read", "Disk read statistics.",
 		"vfs.dev.write", "Disk write statistics.",
-		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.")
+		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

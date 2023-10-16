@@ -24,10 +24,10 @@ import (
 	"io/ioutil"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"github.com/fsnotify/fsnotify"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"
-
-	"github.com/fsnotify/fsnotify"
 )
 
 type watchRequest struct {
@@ -103,8 +103,7 @@ type fileWatcher struct {
 	fsnotify fsNotify
 }
 
-type eventFilter struct {
-}
+type eventFilter struct{}
 
 func (w *eventFilter) Process(v interface{}) (value *string, err error) {
 	if b, ok := v.([]byte); !ok {
@@ -156,5 +155,8 @@ func init() {
 	impl.eventSources = make(map[string]*fileWatcher)
 	impl.manager = watch.NewManager(&impl)
 
-	plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
+	err := plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

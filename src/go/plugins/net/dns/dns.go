@@ -260,7 +260,6 @@ func getNULLString(in *dns.NULL) string {
 
 func getHINFOString(in *dns.HINFO) string {
 	return parseTXT(in.Cpu, in.Os)
-
 }
 
 func getMINFOString(in *dns.MINFO) string {
@@ -500,8 +499,12 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "DNS",
+	err := plugin.RegisterMetrics(
+		&impl, "DNS",
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.record", "Performs a DNS query.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metric").Wrap(err))
+	}
 }

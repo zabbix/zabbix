@@ -23,6 +23,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type command string
@@ -99,9 +100,7 @@ var metricsMeta = map[string]metricMeta{
 	},
 }
 
-var (
-	uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"}
-)
+var uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"}
 
 // Common params: [URI|Session][,User][,ApiKey]
 var (
@@ -136,5 +135,8 @@ var metrics = metric.MetricSet{
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

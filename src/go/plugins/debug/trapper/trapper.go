@@ -22,13 +22,13 @@ package trapper
 import (
 	"fmt"
 	"io/ioutil"
-
 	"net"
 	"regexp"
 	"strconv"
 
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"
 )
@@ -140,5 +140,8 @@ func init() {
 	impl.manager = watch.NewManager(&impl)
 	impl.listeners = make(map[int]*trapListener)
 
-	plugin.RegisterMetrics(&impl, "DebugTrapper", "debug.trap", "Listen on port for incoming TCP data.")
+	err := plugin.RegisterMetrics(&impl, "DebugTrapper", "debug.trap", "Listen on port for incoming TCP data.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

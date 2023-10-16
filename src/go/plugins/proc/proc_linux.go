@@ -39,6 +39,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/procfs"
 )
 
@@ -417,6 +418,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	return
 }
+
 func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags int, err error) {
 	regxp, err := regexp.Compile(q.cmdline)
 	if err != nil {
@@ -777,9 +779,17 @@ func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx 
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
-	plugin.RegisterMetrics(&implExport, "ProcExporter",
+	err := plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+
+	err = plugin.RegisterMetrics(
+		&implExport, "ProcExporter",
 		"proc.mem", "Process memory utilization values.",
 		"proc.num", "The number of processes.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

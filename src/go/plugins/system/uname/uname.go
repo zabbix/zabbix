@@ -21,6 +21,7 @@ package uname
 
 import (
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -42,12 +43,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Uname",
+	err := plugin.RegisterMetrics(
+		&impl, "Uname",
 		"system.uname", "Returns system uname.",
 		"system.hostname", "Returns system host name.",
 		"system.sw.arch", "Software architecture information.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

@@ -23,6 +23,7 @@ import (
 	"syscall"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
 )
 
@@ -71,7 +72,7 @@ func getMountPaths() (paths []string, err error) {
 	return result, nil
 }
 
-func getFsInfo(path string) (fsname, fstype, drivetype string, drivelabel string, err error) {
+func getFsInfo(path string) (fsname, fstype, drivetype, drivelabel string, err error) {
 	fsname = path
 	if len(fsname) > 0 && fsname[len(fsname)-1] == '\\' {
 		fsname = fsname[:len(fsname)-1]
@@ -191,9 +192,13 @@ func getFsInode(string) (*FsStats, error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "VfsFs",
+	err := plugin.RegisterMetrics(
+		&impl, "VfsFs",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
 		"vfs.fs.get", "List of mounted filesystems with statistics.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

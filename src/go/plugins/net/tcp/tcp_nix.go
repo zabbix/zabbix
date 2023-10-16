@@ -26,6 +26,7 @@ import (
 	"errors"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {
@@ -33,9 +34,14 @@ func exportSystemTcpListen(port uint16) (result interface{}, err error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "TCP",
+	err := plugin.RegisterMetrics(
+		&impl, "TCP",
 		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.",
 		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
 		"net.tcp.service.perf", "Checks performance of TCP service.",
-		"net.tcp.socket.count", "Returns number of TCP sockets that match parameters.")
+		"net.tcp.socket.count", "Returns number of TCP sockets that match parameters.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

@@ -428,9 +428,13 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Smart",
+	err := plugin.RegisterMetrics(
+		&impl, "Smart",
 		"smart.disk.discovery", "Returns JSON array of smart devices.",
 		"smart.disk.get", "Returns JSON data of smart device.",
 		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

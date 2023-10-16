@@ -26,6 +26,7 @@ import (
 	"unsafe"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/win32"
 )
@@ -339,8 +340,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Proc",
+	err := plugin.RegisterMetrics(
+		&impl, "Proc",
 		"proc.num", "The number of processes.",
 		"proc_info", "Various information about specific process(es).",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

@@ -163,8 +163,8 @@ func updateStartCounter(content []byte, start int) int {
 func getChassisValues(content []byte, flags, start int) (string, int) {
 	var value string
 
-	var positionNumbers = []int{4, 5, 7}
-	var types = []int{chassisVendor, chassisModel, chassisSerial}
+	positionNumbers := []int{4, 5, 7}
+	types := []int{chassisVendor, chassisModel, chassisSerial}
 
 	if content[start] == 1 {
 		for i, nr := range positionNumbers {
@@ -293,8 +293,12 @@ func getDeviceCmd(params []string) (string, error) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Hw",
+	err := plugin.RegisterMetrics(
+		&impl, "Hw",
 		"system.hw.chassis", "Chassis information.",
 		"system.hw.devices", "Listing of PCI or USB devices.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

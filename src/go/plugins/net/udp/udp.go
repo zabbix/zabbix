@@ -30,6 +30,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (
@@ -134,7 +135,7 @@ func (p *Plugin) validateResponse(rsp []byte, ln int, req []byte) int {
 	return 1
 }
 
-func (p *Plugin) udpExpect(service string, address string) (result int) {
+func (p *Plugin) udpExpect(service, address string) (result int) {
 	var conn net.Conn
 	var err error
 
@@ -260,8 +261,13 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "UDP",
+	err := plugin.RegisterMetrics(
+		&impl, "UDP",
 		"net.udp.service", "Checks if service is running and responding to UDP requests.",
 		"net.udp.service.perf", "Checks performance of UDP service.",
-		"net.udp.socket.count", "Returns number of TCP sockets that match parameters.")
+		"net.udp.socket.count", "Returns number of TCP sockets that match parameters.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

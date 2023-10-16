@@ -170,9 +170,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	impl.collector = newPdhCollector(&impl)
-	plugin.RegisterMetrics(&impl, pluginName,
+
+	err := plugin.RegisterMetrics(
+		&impl, pluginName,
 		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
 		"system.cpu.load", "CPU load.",
 		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilization percentage.")
+		"system.cpu.util", "CPU utilization percentage.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

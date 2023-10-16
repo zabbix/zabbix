@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/pdh"
 	"zabbix.com/pkg/win32"
 )
@@ -86,7 +87,7 @@ func (h historyIndex) dec(interval int) historyIndex {
 	return h
 }
 
-func (h historyIndex) sub(value int, interval int) historyIndex {
+func (h historyIndex) sub(value, interval int) historyIndex {
 	h -= historyIndex(value)
 	for int(h) < 0 {
 		h += historyIndex(interval)
@@ -268,8 +269,12 @@ func (p *Plugin) Stop() {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "WindowsPerfMon",
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsPerfMon",
 		"perf_counter", "Value of any Windows performance counter.",
 		"perf_counter_en", "Value of any Windows performance counter in English.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

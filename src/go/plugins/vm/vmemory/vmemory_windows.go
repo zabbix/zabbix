@@ -54,9 +54,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "VMemory",
+	err := plugin.RegisterMetrics(
+		&impl, "VMemory",
 		"vm.vmemory.size", "Returns virtual memory size in bytes or in percentage.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }
 
 func (p *Plugin) exportVMVMemorySize(mode string) (result interface{}, err error) {

@@ -51,7 +51,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Memory",
+	err := plugin.RegisterMetrics(&impl, "Memory",
 		"vm.memory.size", "Returns memory size in bytes or in percentage from total.",
 	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

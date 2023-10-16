@@ -25,6 +25,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (
@@ -127,25 +128,32 @@ var (
 
 var metrics = metric.MetricSet{
 	keyASMDiskGroups: metric.New("Returns ASM disk groups statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Diskgroup", "Diskgroup name.")}, false),
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Diskgroup", "Diskgroup name."),
+		}, false),
 
 	keyASMDiskGroupsDiscovery: metric.New("Returns list of ASM disk groups in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyArchive: metric.New("Returns archive logs statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Destination", "Destination name.")}, false),
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Destination", "Destination name."),
+		}, false),
 
 	keyArchiveDiscovery: metric.New("Returns list of archive logs in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyCDB: metric.New("Returns CDBs info.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Database", "Database name.")}, false),
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Database", "Database name."),
+		}, false),
 
 	keyCustomQuery: metric.New("Returns result of a custom query.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
 			metric.NewParam("QueryName", "Name of a custom query "+
 				"(must be equal to a name of an SQL file without an extension).").SetRequired(),
 		}, true),
@@ -163,8 +171,10 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyPDB: metric.New("Returns PDBs info.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Database", "Database name.")}, false),
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Database", "Database name."),
+		}, false),
 
 	keyPDBDiscovery: metric.New("Returns list of PDBs in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
@@ -185,13 +195,15 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keySessions: metric.New("Returns sessions statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
 			metric.NewParam("LockMaxTime", "Maximum session lock duration in seconds to count "+
 				"the session as a prolongedly locked.").WithDefault("600").WithValidator(metric.NumberValidator{}),
 		}, false),
 
 	keySysMetrics: metric.New("Returns a set of system metric values.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
 			metric.NewParam("Duration", "Capturing interval in seconds of system metric values.").
 				WithDefault("60").WithValidator(metric.SetValidator{Set: []string{"15", "60"}}),
 		}, false),
@@ -209,11 +221,15 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyUser: metric.New("Returns user information.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
 			metric.NewParam("Username", "Username for which the information is needed."),
 		}, false),
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

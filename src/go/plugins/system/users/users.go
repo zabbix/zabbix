@@ -24,6 +24,7 @@ import (
 	"fmt"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type Plugin struct {
@@ -61,5 +62,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
+	err := plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }

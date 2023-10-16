@@ -9,6 +9,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxcomms"
 )
 
@@ -48,7 +49,13 @@ var impl Plugin
 func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	var parse response
 
-	resp, errs := zbxcomms.Exchange(&[]string{addr}, &p.localAddr, time.Duration(p.options.Timeout)*time.Second, time.Duration(p.options.Timeout)*time.Second, req)
+	resp, errs := zbxcomms.Exchange(
+		&[]string{addr},
+		&p.localAddr,
+		time.Duration(p.options.Timeout)*time.Second,
+		time.Duration(p.options.Timeout)*time.Second,
+		req,
+	)
 
 	if errs != nil {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", errs[0])
@@ -59,7 +66,6 @@ func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	}
 
 	err := json.Unmarshal(resp, &parse)
-
 	if err != nil {
 		return nil, fmt.Errorf("Value should be a JSON object.")
 	}
@@ -91,7 +97,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		addr = params[0]
 		if len(params) > 1 && params[1] != "" {
 			port, err := strconv.ParseUint(params[1], 10, 16)
-
 			if err != nil {
 				return nil, fmt.Errorf("Invalid second parameter.")
 			}
@@ -121,13 +126,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	m.Request = "zabbix.stats"
 	req, err := json.Marshal(m)
-
 	if err != nil {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", err)
 	}
 
 	resp, err := p.getRemoteZabbixStats(addr, req)
-
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +158,12 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "ZabbixStats", "zabbix.stats", "Return a set of Zabbix server or proxy internal "+
-		"metrics or return number of monitored items in the queue which are delayed on Zabbix server or proxy.")
+	err := plugin.RegisterMetrics(
+		&impl, "ZabbixStats",
+		"zabbix.stats", "Return a set of Zabbix server or proxy internal "+
+			"metrics or return number of monitored items in the queue which are delayed on Zabbix server or proxy.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }
