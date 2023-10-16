@@ -282,6 +282,8 @@ FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|name_upper	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|name_resolved	|t_varchar(2048)	|''	|NOT NULL	|0
+FIELD		|name_resolved_upper|t_varchar(2048)	|''	|NOT NULL	|0
 INDEX		|1		|hostid,key_(764)
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -290,6 +292,7 @@ INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 INDEX		|8		|key_(768)
 INDEX		|9		|hostid,name_upper
+INDEX		|10		|hostid,name_resolved_upper(764)
 CHANGELOG	|3
 UPD_TRIG_FUNC	|name		|name_upper	|itemid	|upper
 
