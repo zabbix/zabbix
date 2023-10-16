@@ -203,7 +203,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 // Encryption.
 (() => {
-	const encryption = document.querySelector('#encryption_div');
+	const encryption = document.querySelector('#encryption-field');
 	if (!encryption) {
 		return false;
 	}
