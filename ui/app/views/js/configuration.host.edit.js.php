@@ -34,12 +34,41 @@
 			this.form_name = form_name;
 
 			host_edit.init({form_name, host_interfaces, host_is_discovered});
+			this.initEvents();
+		},
 
+		initEvents() {
 			this.form.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-linked-template')) {
+				const target = e.target;
+
+				if (target.classList.contains('js-edit-linked-template')) {
 					this.editTemplate({templateid: e.target.dataset.templateid});
 				}
+				else if (target.classList.contains('js-update-item')) {
+					this.editItem(target, target.dataset);
+				}
 			});
+		},
+
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', target.dataset, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+					const data = e.detail;
+
+					if ('success' in data) {
+						postMessageOk(data.success.title);
+
+						if ('messages' in data.success) {
+							postMessageDetails('success', data.success.messages);
+						}
+					}
+				}, {once: true}
+			);
 		},
 
 		editTemplate(parameters) {

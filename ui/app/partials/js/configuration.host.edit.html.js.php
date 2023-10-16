@@ -124,10 +124,9 @@
 		/**
 		 * Host form setup.
 		 */
-		init({form_name, host_interfaces, host_is_discovered, source_overlay}) {
+		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form_name = form_name;
 			this.form = document.getElementById(form_name);
-			this.source_overlay = source_overlay;
 
 			this.initHostTab(host_interfaces, host_is_discovered);
 			this.initMacrosTab();
@@ -327,48 +326,6 @@
 							break;
 					}
 				})
-			});
-			this.form.addEventListener('click', e => {
-				const target = e.target;
-
-				if (!target.matches('.js-update-item')) {
-					return;
-				}
-
-				if (this.source_overlay) {
-					overlayDialogueDestroy(this.source_overlay.dialogueid);
-				}
-
-				const overlay = PopUp('item.edit', target.dataset, {
-					dialogueid: 'item-edit',
-					dialogue_class: 'modal-popup-large',
-					trigger_element: target
-				});
-
-				if (this.source_overlay) {
-					overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-							this.source_overlay.$dialogue[0].dispatchEvent(
-								new CustomEvent('dialogue.submit', {detail: e.detail})
-							);
-						}, {once: true}
-					);
-				}
-				else {
-					overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-							const data = e.detail;
-
-							if ('success' in data) {
-								postMessageOk(data.success.title);
-
-								if ('messages' in data.success) {
-									postMessageDetails('success', data.success.messages);
-								}
-							}
-
-							location.href = location.href;
-						}, {once: true}
-					);
-				}
 			});
 		},
 
