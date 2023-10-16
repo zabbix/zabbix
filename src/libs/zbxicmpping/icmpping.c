@@ -60,6 +60,8 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -h 2>&1", fping);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
+
 	if (NULL == (f = popen(tmp, "r")))
 		return;
 
@@ -84,6 +86,84 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 	pclose(f);
 
 	*checked = 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute external program and return stdout and stderr values      *
+ *                                                                            *
+ * Parameters: fping         - [IN] location of fping program                 *
+ *             out           - [OUT] stdout and stderr values                 *
+ *             error         - [OUT] error string if function fails           *
+ *             max_error_len - [IN] length of error buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED if processed successfully or FAIL otherwise          *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_fping_out(const char *fping, const char *address, char **out, char *error, size_t max_error_len)
+{
+	FILE		*f;
+	size_t		buf_size = 0, offset = 0, len;
+	ssize_t		n;
+	char		tmp[MAX_STRING_LEN], *buffer = NULL;
+	int		ret = FAIL, fd;
+	sigset_t	mask, orig_mask;
+	char		filename[MAX_STRING_LEN];
+
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", CONFIG_TMPDIR, progname);
+	if (-1 == (fd = mkstemp(filename)))
+		return FAIL;
+
+	len = strlen(address);
+	n = write(fd, address, len);
+	close(fd);
+	if (n != (ssize_t)len)
+		goto out;
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1 < %s", fping, filename);
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set sigprocmask to block the user signal");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
+
+	if (NULL == (f = popen(tmp, "r")))
+	{
+		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
+		goto out;
+	}
+
+	while (NULL != zbx_fgets(tmp, sizeof(tmp), f))
+	{
+		len = strlen(tmp);
+
+		if (MAX_EXECUTE_OUTPUT_LEN < offset + len)
+			break;
+
+		zbx_strncpy_alloc(&buffer, &buf_size, &offset, tmp, len);
+	}
+
+	pclose(f);
+
+	if (NULL == buffer)
+	{
+		zbx_strlcpy(error, "Can't obtain the program output", max_error_len);
+		goto out;
+	}
+
+	*out = buffer;
+	ret = SUCCEED;
+out:
+	unlink(filename);
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore sigprocmask");
+
+	return ret;
 }
 
 /******************************************************************************
@@ -136,19 +216,12 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 
 			zabbix_log(LOG_LEVEL_DEBUG, "testing fping interval %u ms", intervals[j]);
 
-			zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i%u %s", fping, intervals[j], dst);
+			zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i%u", fping, intervals[j]);
 
 			zbx_free(out);
 
 			/* call fping, ignore its exit code but mind execution failures */
-			if (TIMEOUT_ERROR == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1,
-					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
-			{
-				zbx_snprintf(error, max_error_len, "Timeout while executing \"%s\"", tmp);
-				goto out;
-			}
-
-			if (SUCCEED != ret_exec)
+			if (SUCCEED != (ret_exec = get_fping_out(tmp, dst, &out, err, sizeof(err))))
 			{
 				zbx_snprintf(error, max_error_len, "Cannot execute \"%s\": %s", tmp, err);
 				goto out;
@@ -248,10 +321,10 @@ static int	get_ipv6_support(const char * fping, const char *dst)
 	int	ret;
 	char	tmp[MAX_STRING_LEN], error[255], *out = NULL;
 
-	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50 %s", fping, dst);
+	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50", fping);
 
-	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)) &&
-				ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst)) || TIMEOUT_ERROR == ret)
+	if (SUCCEED == (ret = get_fping_out(tmp, dst, &out, error, sizeof(error)) &&
+				ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst)))
 	{
 		ret = SUCCEED;
 	}
@@ -535,7 +608,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	fclose(f);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", tmp);
+	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGINT);
