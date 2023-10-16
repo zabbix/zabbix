@@ -37,15 +37,16 @@ $form = (new CForm())
  */
 $template_tab = new CFormList('template-form-list');
 
-$link_templates = (new CTable())
-	->addRow(
+$template_tab->addRow(
+	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-field', _('Original')))
+		->setLabel(_('Link templates')),
+	(new CDiv([
 		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
 			->addValue(_('Link'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
 			->setModern(true)
-	)
-	->addRow([
+			->addStyle('margin-bottom: 5px;'),
 		(new CMultiSelect([
 			'name' => 'linked_templates[]',
 			'object_name' => 'templates',
@@ -59,27 +60,20 @@ $link_templates = (new CTable())
 					'dstfld1' => 'linked_templates_'
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addRow([
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->addStyle('margin-bottom: 5px;'),
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('mass_clear_tpls'))
-				->setLabel(_('Clear when unlinking'))
+			->addItem(
+				(new CCheckBox('mass_clear_tpls'))->setLabel(_('Clear when unlinking'))
 			)
-	]);
-
-$template_tab->addRow(
-	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Link templates')),
-	(new CDiv($link_templates))
-		->setId('linked-templates-div')
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	]))->setId('linked-templates-field')
 );
 
 $template_tab
 	->addRow(
-		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
+		(new CVisibilityBox('visible[groups]', 'groups-field', _('Original')))
 			->setLabel(_('Host groups'))
 			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv([
@@ -104,7 +98,7 @@ $template_tab
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('groups-div')
+		]))->setId('groups-field')
 	)
 	->addRow(
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))->setLabel(_('Description')),

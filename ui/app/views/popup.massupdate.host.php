@@ -66,15 +66,15 @@ $link_templates = (new CTable())
 	]);
 
 $host_tab->addRow(
-	(new CVisibilityBox('visible[templates]', 'linked-templates-div', _('Original')))
+	(new CVisibilityBox('visible[templates]', 'linked-templates-field', _('Original')))
 		->setLabel(_('Link templates')),
 	(new CDiv($link_templates))
-		->setId('linked-templates-div')
+		->setId('linked-templates-field')
 		->addStyle('margin-top: -5px;')
 );
 
 $host_tab->addRow(
-	(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
+	(new CVisibilityBox('visible[groups]', 'groups-field', _('Original')))
 		->setLabel(_('Host groups'))
 		->setAttribute('autofocus', 'autofocus'),
 	(new CDiv([
@@ -99,7 +99,7 @@ $host_tab->addRow(
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]))->setId('groups-div')
+	]))->setId('groups-field')
 );
 
 // append description to form list
