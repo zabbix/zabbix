@@ -29,47 +29,53 @@ class CEscapedStringParserTest extends TestCase {
 	public static function dataProvider() {
 		return [
 			// CParser::PARSE_SUCCESS
-			['', 0, ['characters' => '\\nrts'], [
+			['', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '',
 				'error' => ''
 			]],
-			['Simple text', 0, ['characters' => '\\nrts'], [
+			['Simple text', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => 'Simple text',
 				'error' => ''
 			]],
-			['\n\nZabbix', 0, ['characters' => '\\nrts'], [
+			['\n\nZabbix', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\n\nZabbix',
 				'error' => ''
 			]],
+			['\\\n', 0, ['characters' => 'nrts'], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '\\\n',
+				'error' => ''
+			]],
+			// The backslash must always be escaped, it can optionally be set in the parameters.
 			['\\\n', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\\\n',
 				'error' => ''
 			]],
-			['\s', 0, ['characters' => '\\nrts'], [
+			['\s', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\s',
 				'error' => ''
 			]],
-			['\\\t', 0, ['characters' => '\\nrts'], [
+			['\\\t', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\\\t',
 				'error' => ''
 			]],
-			['\Here is another\n', 1, ['characters' => '\\nrts'], [
+			['\Here is another\n', 1, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => 'Here is another\n',
 				'error' => ''
 			]],
-			['\\\\', 0, ['characters' => '\\'], [
+			['\\\\', 0, ['characters' => ''], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\\\\',
 				'error' => ''
 			]],
-			['\n\n\\\\', 4, ['characters' => '\\'], [
+			['\n\n\\\\', 4, ['characters' => ''], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\\\\',
 				'error' => ''
@@ -81,29 +87,29 @@ class CEscapedStringParserTest extends TestCase {
 			]],
 
 			// CParser::PARSE_SUCCESS_CONT
-			['\\\\\n', 0, ['characters' => '\\'], [
+			['\\\\\n', 0, ['characters' => ''], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '\\\\',
 				'error' => 'value contains unescaped character at position 3'
 			]],
-			['\\\\valid\n\\\\till\\\\position 29\ and then failed', 0, ['characters' => '\\nrts'], [
+			['\\\\valid\n\\\\till\\\\position 29\ and then failed', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '\\\\valid\n\\\\till\\\\position 29',
 				'error' => 'value contains unescaped character at position 29'
 			]],
-			['\\\\valid\n\\\\in the middle\ ', 9, ['characters' => '\\nrts'], [
+			['\\\\valid\n\\\\in the middle\ ', 9, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '\\\\in the middle',
 				'error' => 'value contains unescaped character at position 16'
 			]],
 
 			// CParser::PARSE_FAIL
-			['\ ', 0, ['characters' => '\\nrts'], [
+			['\ ', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'error' => 'value contains unescaped character at position 1'
 			]],
-			['\n\\', 0, ['characters' => '\\'], [
+			['\n\\', 0, ['characters' => ''], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'error' => 'value contains unescaped character at position 1'
