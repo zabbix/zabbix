@@ -110,10 +110,16 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	sigset_t	mask, orig_mask;
 	char		filename[MAX_STRING_LEN];
 
+	if (FAIL == zbx_validate_hostname(address) && FAIL == is_supported_ip(address))
+	{
+		zbx_strlcpy(error, "Invalid host name or IP address", max_error_len);
+		return FAIL;
+	}
+
 	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", CONFIG_TMPDIR, progname);
 	if (-1 == (fd = mkstemp(filename)))
 	{
-		zbx_snprintf(error, max_error_len, "Cannot create temporary file \"%s\"", filename,
+		zbx_snprintf(error, max_error_len, "Cannot create temporary file \"%s\": %s", filename,
 				zbx_strerror(errno));
 
 		return FAIL;
@@ -123,14 +129,14 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	if (-1 == (n = write(fd, address, len)))
 	{
 		zbx_snprintf(error, max_error_len, "Cannot write address into temporary file: %s", zbx_strerror(errno));
-		close(fd);
+		(void)close(fd);
 		goto out;
 	}
 
 	if (n != (ssize_t)len)
 	{
 		zbx_strlcpy(error, "Cannot write full address into temporary file", max_error_len);
-		close(fd);
+		(void)close(fd);
 		goto out;
 	}
 
