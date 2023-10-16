@@ -95,13 +95,8 @@ class testDashboardItemValueWidget extends CWebTest {
 								'fields' => [
 									[
 										'type' => 4,
-										'name' => 'itemid',
+										'name' => 'itemid.0',
 										'value' => 42230
-									],
-									[
-										'type' => 0,
-										'name' => 'adv_conf',
-										'value' => 1
 									],
 									[
 										'type' => 1,
@@ -160,7 +155,7 @@ class testDashboardItemValueWidget extends CWebTest {
 								'fields' => [
 									[
 										'type' => 4,
-										'name' => 'itemid',
+										'name' => 'itemid.0',
 										'value' => 42230
 									],
 									[
@@ -195,7 +190,7 @@ class testDashboardItemValueWidget extends CWebTest {
 								'fields' => [
 									[
 										'type' => 4,
-										'name' => 'itemid',
+										'name' => 'itemid.0',
 										'value' => 42230
 									]
 								]
@@ -1154,7 +1149,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if (!$create) {
-			$values = $form->getFields()->asValues();
+			$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		}
 		else {
 			$form->fill(['Type' => 'Item value']);
@@ -1192,7 +1187,7 @@ class testDashboardItemValueWidget extends CWebTest {
 
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
-			$this->assertEquals($values, $dashboard->getWidget(self::$old_name)->edit()->getFields()->asValues());
+			$this->assertEquals($values, $dashboard->getWidget(self::$old_name)->edit()->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 		}
 
 		// Check that DB hash is not changed.
