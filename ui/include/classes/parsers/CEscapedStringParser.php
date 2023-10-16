@@ -76,7 +76,7 @@ class CEscapedStringParser extends CParser {
 		}
 
 		if ($result != self::PARSE_FAIL) {
-			$this->length = $result == self::PARSE_SUCCESS ? strlen($source) - $offset :  $pos - $offset;
+			$this->length = $result == self::PARSE_SUCCESS ? strlen($source) - $offset : $pos - $offset;
 			$this->match = substr($source, $offset, $this->length);
 		}
 
