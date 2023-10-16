@@ -70,16 +70,14 @@ class CControllerItemCreate extends CControllerItem {
 	}
 
 	protected function getInputForApi(): array {
-		$input = parent::getInputForApi() + [
-			'templateid' => '0',
-			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-			'hosts' => API::Host()->get([
-				'output' => ['hostid', 'status'],
-				'hostids' => [$this->getInput('hostid')],
-				'templated_hosts' => true,
-				'editable' => true
-			])
-		];
+		$input = parent::getInputForApi();
+
+		$input['hosts'] = API::Host()->get([
+			'output' => ['hostid', 'status'],
+			'hostids' => [$this->getInput('hostid')],
+			'templated_hosts' => true,
+			'editable' => true
+		]);
 
 		return ['hostid' => $this->getInput('hostid')] + getSanitizedItemFields($input);
 	}

@@ -78,12 +78,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
-
-		$input += [
-			'templateid' => '0',
-			'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			'hosts' => $lld_rule['hosts']
-		];
+		$input['hosts'] = $lld_rule['hosts'];
 
 		return ['hostid' => $lld_rule['hostid'], 'ruleid' => $lld_rule['itemid']] + getSanitizedItemFields($input);
 	}
