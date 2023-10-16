@@ -40,8 +40,10 @@ window.widget_item_form = new class {
 		jQuery('#itemid').on('change', () => {
 			this.#promiseGetItemType()
 				.then((type) => {
-					this.#is_item_numeric = this.#isItemTypeNumeric(type);
-					this.updateForm();
+					if (this._form.isConnected) {
+						this.#is_item_numeric = this.#isItemTypeNumeric(type);
+						this.updateForm();
+					}
 				});
 		});
 
@@ -77,8 +79,10 @@ window.widget_item_form = new class {
 
 		this.#promiseGetItemType()
 			.then((type) => {
-				this.#is_item_numeric = this.#isItemTypeNumeric(type);
-				this.updateForm();
+				if (this._form.isConnected) {
+					this.#is_item_numeric = this.#isItemTypeNumeric(type);
+					this.updateForm();
+				}
 			});
 	}
 
