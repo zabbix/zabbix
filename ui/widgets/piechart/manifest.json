@@ -1,0 +1,31 @@
+{
+	"manifest_version": 2.0,
+	"id": "piechart",
+	"type": "widget",
+	"name": "Pie chart",
+	"namespace": "PieChart",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays item values as a pie or doughnut chart.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart",
+	"widget": {
+		"size": {
+			"width": 8,
+			"height": 5
+		},
+		"js_class": "CWidgetPieChart",
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		}
+	},
+	"actions": {
+		"widget.piechart.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.svgpie.js", "class.widget.js"]
+	}
+}

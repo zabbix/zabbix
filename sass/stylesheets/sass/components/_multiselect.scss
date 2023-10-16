@@ -1,0 +1,207 @@
+.multiselect-control {
+	display: flex;
+	position: relative;
+	vertical-align: top;
+	white-space: nowrap;
+
+	.btn-split {
+		margin-right: 0;
+
+		li:first-child {
+			margin-left: 0;
+		}
+	}
+}
+
+.multiselect {
+	@extend %form-input-style;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	margin-right: 3px;
+	min-height: 24px;
+	white-space: normal;
+
+	&.active {
+		border-color: $form-focus-border-color;
+	}
+
+	&[aria-disabled] {
+		@extend %form-disabled;
+	}
+
+	input[type="text"] {
+		border: 0;
+		background: none;
+		box-sizing: border-box;
+		width: 100%;
+		padding-bottom: 2px;
+		min-height: 20px;
+	}
+
+	&.search-disabled {
+		input[type="text"] {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 0;
+			padding: 0;
+			margin: 0;
+		}
+	}
+
+	.multiselect-list {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		padding-left: 2px;
+		padding-bottom: 2px;
+		line-height: 18px;
+
+		li {
+			display: block; // Override ".table-forms li".
+			padding-left: 0 !important;
+			margin: 2px 2px 0 0;
+			overflow: hidden;
+			white-space: nowrap;
+			cursor: default;
+
+			&.selected {
+				.subfilter-enabled {
+					background-color: $multiselect-selected-bg-color;
+				}
+			}
+		}
+
+		.subfilter-enabled {
+			padding-right: 0;
+			display: flex;
+			flex-direction: row;
+			line-height: 18px;
+
+			> span:first-child {
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.btn-icon {
+				@extend %button-size-medium;
+
+				flex-shrink: 0;
+				margin-left: 0;
+				color: $ui-selected-color;
+
+				&:hover,
+				&:focus {
+					color: $ui-selected-hover-color;
+				}
+
+				&:active,
+				&:focus {
+					box-shadow: none;
+				}
+			}
+		}
+
+		.reference {
+			span::before {
+				font-size: $icon-medium-size;
+				color: $link-color;
+			}
+		}
+	}
+
+	.disabled {
+		background-color: $multiselect-disabled-bg-color;
+		opacity: 1;
+
+		.subfilter-enabled {
+			background-color: $multiselect-item-disabled-bg-color;
+			color: $multiselect-item-disabled-color;
+			-webkit-text-fill-color: $multiselect-item-disabled-color;
+
+			.btn-icon {
+				pointer-events: none;
+				color: $multiselect-item-disabled-color;
+				-webkit-text-fill-color: $multiselect-item-disabled-color;
+			}
+		}
+	}
+
+	div[aria-live] {
+		overflow: hidden;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: -1;
+	}
+}
+
+.multiselect-suggest {
+	padding: 0 5px;
+	white-space: normal;
+	color: $font-alt-color;
+	background-color: $form-bg-color;
+
+	li {
+		display: block;
+		height: inherit;
+		line-height: normal;
+		color: $font-color;
+		padding: .4em 5px;
+		margin: 0 -5px;
+		cursor: pointer;
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+		@if $ui-transitions {
+			transition: background-color $ui-controls-transition-duration ease-out;
+		}
+	}
+
+	&.multiselect-suggest-grouped {
+		li {
+			padding-left: 25px;
+
+			&.suggest-group {
+				padding-left: 5px;
+				font-weight: bold;
+			}
+		}
+	}
+
+	.suggest-hover {
+		background-color: $action-hover-color;
+	}
+
+	.suggest-new {
+		border-top: 1px solid $form-border-color;
+
+		span:first-child {
+			font-weight: bold;
+		}
+	}
+}
+
+.multiselect-matches {
+	padding: .4em 5px;
+	color: $font-color;
+	font-weight: bold;
+	@extend .multiselect-suggest;
+}
+
+.multiselect-available {
+	position: absolute;
+	z-index: 20000;
+	border: 1px solid $action-border-color;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
+	box-shadow: 0 6px 10px 0 $action-shadow-color;
+}
+
+.suggest-found {
+	font-weight: bold;
+	color: $dark-yellow;
+}

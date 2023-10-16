@@ -180,8 +180,6 @@ void	zbx_autoreg_flush_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_db_begin();
-
 	autoreg_process_hosts(autoreg_hosts, proxyid);
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
@@ -281,8 +279,6 @@ void	zbx_autoreg_flush_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy
 	if (NULL != events_cbs->clean_events_cb)
 		events_cbs->clean_events_cb();
 
-	zbx_db_commit();
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -328,7 +324,9 @@ void	zbx_autoreg_update_host(zbx_uint64_t proxyid, const char *host, const char 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
 	zbx_autoreg_prepare_host(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags, clock);
+	zbx_db_begin();
 	zbx_autoreg_flush_hosts(&autoreg_hosts, proxyid, events_cbs);
+	zbx_db_commit();
 
 	zbx_vector_ptr_clear_ext(&autoreg_hosts, (zbx_mem_free_func_t)zbx_autoreg_host_free);
 	zbx_vector_ptr_destroy(&autoreg_hosts);

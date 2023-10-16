@@ -244,7 +244,7 @@ void	zbx_usage(void)
 	const char	**p = usage_message;
 
 	if (NULL != *p)
-		printf("usage:\n");
+		printf("Usage:\n");
 
 	while (NULL != *p)
 	{
@@ -289,7 +289,7 @@ static const char	copyright_message[] =
 
 static const char	help_message_footer[] =
 	"Report bugs to: <https://support.zabbix.com>\n"
-	"Zabbix home page: <http://www.zabbix.com>\n"
+	"Zabbix home page: <https://www.zabbix.com>\n"
 	"Documentation: <https://www.zabbix.com/documentation>";
 
 /******************************************************************************

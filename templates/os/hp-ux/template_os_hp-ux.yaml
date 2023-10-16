@@ -576,21 +576,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HP-UX by Zabbix agent'
                         name: 'HP-UX: CPU load'
-                - type: graph
-                  name: 'CPU utilization'
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'HP-UX by Zabbix agent'
-                        name: 'HP-UX: CPU utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   name: 'Memory usage'
                   'y': '5'
@@ -598,10 +590,27 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HP-UX by Zabbix agent'
                         name: 'HP-UX: Memory usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graph
+                  name: 'CPU utilization'
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'HP-UX by Zabbix agent'
+                        name: 'HP-UX: CPU utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: 663bea44626447b5a72a71238dfda919
           name: zabbix.host.available

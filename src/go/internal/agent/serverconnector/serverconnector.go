@@ -33,7 +33,6 @@ import (
 	"unicode/utf8"
 
 	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/agent/scheduler"
@@ -79,7 +78,7 @@ type activeChecksResponse struct {
 	Response       string                 `json:"response"`
 	Info           string                 `json:"info"`
 	ConfigRevision uint64                 `json:"config_revision,omitempty"`
-	Data           []*plugin.Request      `json:"data"`
+	Data           []*scheduler.Request   `json:"data"`
 	Commands       []*agent.RemoteCommand `json:"commands"`
 	Expressions    []*glexpr.Expression   `json:"regexp"`
 }
@@ -236,7 +235,7 @@ func (c *Connector) refreshActiveChecks() {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.addresses[0])
 		}
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
-			[]*glexpr.Expression{}, []*plugin.Request{}, now)
+			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
 		return
 	}

@@ -208,10 +208,10 @@ zabbix_export:
           parameters:
             - name: base_url
               value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            - name: username
-              value: '{$HPE.MSA.API.USERNAME}'
             - name: password
               value: '{$HPE.MSA.API.PASSWORD}'
+            - name: username
+              value: '{$HPE.MSA.API.USERNAME}'
           tags:
             - tag: component
               value: raw
@@ -2976,14 +2976,14 @@ zabbix_export:
           master_item:
             key: hpe.msa.get.fru
           lld_macro_paths:
-            - lld_macro: '{#TYPE}'
-              path: '$.[''name'']'
+            - lld_macro: '{#DESCRIPTION}'
+              path: '$.[''description'']'
             - lld_macro: '{#ENCLOSURE.ID}'
               path: '$.[''enclosure-id'']'
             - lld_macro: '{#LOCATION}'
               path: '$.[''fru-location'']'
-            - lld_macro: '{#DESCRIPTION}'
-              path: '$.[''description'']'
+            - lld_macro: '{#TYPE}'
+              path: '$.[''name'']'
         - uuid: 178b94ddcab947ffb1614622c2b7e08e
           name: 'Pools discovery'
           type: DEPENDENT
@@ -4045,14 +4045,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Cache: Write utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   'y': '5'
                   width: '24'
@@ -4061,14 +4061,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Cache usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -4077,14 +4077,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Controller CPU utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graphprototype
                   'y': '15'
                   width: '24'
@@ -4093,14 +4093,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Data transfer rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graphprototype
                   'y': '20'
                   width: '24'
@@ -4109,14 +4109,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Disk operations rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
             - name: 'Disk groups'
               widgets:
                 - type: graphprototype
@@ -4126,14 +4126,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Average response time'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
                 - type: graphprototype
                   'y': '5'
                   width: '24'
@@ -4142,14 +4142,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Data transfer rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -4158,14 +4158,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Disk operations rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
                 - type: graphprototype
                   'y': '15'
                   width: '24'
@@ -4174,14 +4174,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Space utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
             - name: Fans
               widgets:
                 - type: graphprototype
@@ -4191,14 +4191,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Fan [{#DURABLE.ID}]: Speed'
+                    - type: STRING
+                      name: reference
+                      value: AAAAJ
             - name: Pools
               widgets:
                 - type: graphprototype
@@ -4208,14 +4208,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Pool [{#NAME}]: Space utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAK
             - name: Volumes
               widgets:
                 - type: graphprototype
@@ -4225,14 +4225,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Cache usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAL
                 - type: graphprototype
                   'y': '5'
                   width: '24'
@@ -4241,14 +4241,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Data transfer rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAM
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -4257,14 +4257,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Disk operations rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAN
                 - type: graphprototype
                   'y': '15'
                   width: '24'
@@ -4273,14 +4273,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Space utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAO
       valuemaps:
         - uuid: f7af1259f3c54a5faa040c743d386d1d
           name: 'Controller status'

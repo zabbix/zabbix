@@ -22,9 +22,10 @@
 require_once __DIR__.'/../include/CAPITest.php';
 
 /**
- * @onBefore prepareTestData
+ * @backup   ids
  *
- * @onAfter clearData
+ * @onBefore prepareTestData
+ * @onAfter  clearData
  */
 class testProxy extends CAPITest {
 
@@ -72,6 +73,20 @@ class testProxy extends CAPITest {
 				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 				'address' => '127.0.0.1',
 				'port' => '10050'
+			],
+			'get_custom_timeouts' => [
+				'name' => 'API test proxy.get - custom timeouts',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+				'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+				'timeout_zabbix_agent' => '10s',
+				'timeout_simple_check' => '10s',
+				'timeout_snmp_agent' => '10s',
+				'timeout_external_check' => '10s',
+				'timeout_db_monitor' => '10s',
+				'timeout_http_agent' => '10s',
+				'timeout_ssh_agent' => '10s',
+				'timeout_telnet_agent' => '10s',
+				'timeout_script' => '10s'
 			],
 			'get_version_undefined' => [
 				'name' => 'API test proxy.get for filter - version undefined',
@@ -144,6 +159,28 @@ class testProxy extends CAPITest {
 				'port' => '10050',
 				'tls_connect' => HOST_ENCRYPTION_CERTIFICATE
 			],
+			'update_version_current_custom_timeouts' => [
+				'name' => 'API test proxy.update - version current and custom timeouts enabled',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+				'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+				'timeout_zabbix_agent' => '10s',
+				'timeout_simple_check' => '10s',
+				'timeout_snmp_agent' => '10s',
+				'timeout_external_check' => '10s',
+				'timeout_db_monitor' => '10s',
+				'timeout_http_agent' => '10s',
+				'timeout_ssh_agent' => '10s',
+				'timeout_telnet_agent' => '10s',
+				'timeout_script' => '10s'
+			],
+			'update_version_outdated' => [
+				'name' => 'API test proxy.update - version outdated',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
+			'update_version_unsupported' => [
+				'name' => 'API test proxy.update - version unsupported',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
 			'update_hosts' => [
 				'name' => 'API test proxy.update - hosts',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
@@ -185,18 +222,33 @@ class testProxy extends CAPITest {
 		// Manually update "proxy_rtdata" table.
 		$proxy_rtdata = [
 			'get_version_current' => [
-				'lastaccess' => 1662034530,
-				'version' => 60400,
+				'lastaccess' => 1693391880,
+				'version' => 70000,
 				'compatibility' => ZBX_PROXY_VERSION_CURRENT
 			],
 			'get_version_outdated' => [
-				'lastaccess' => 1662034225,
-				'version' => 60200,
+				'lastaccess' => 1693391875,
+				'version' => 60400,
 				'compatibility' => ZBX_PROXY_VERSION_OUTDATED
 			],
 			'get_version_unsupported' => [
-				'lastaccess' => 1651407015,
-				'version' => 50401,
+				'lastaccess' => 1693391870,
+				'version' => 60201,
+				'compatibility' => ZBX_PROXY_VERSION_UNSUPPORTED
+			],
+			'update_version_current_custom_timeouts' => [
+				'lastaccess' => 1693391895,
+				'version' => 70000,
+				'compatibility' => ZBX_PROXY_VERSION_CURRENT
+			],
+			'update_version_outdated' => [
+				'lastaccess' => 1693391890,
+				'version' => 60400,
+				'compatibility' => ZBX_PROXY_VERSION_OUTDATED
+			],
+			'update_version_unsupported' => [
+				'lastaccess' => 1693391885,
+				'version' => 60201,
 				'compatibility' => ZBX_PROXY_VERSION_UNSUPPORTED
 			]
 		];
@@ -359,37 +411,49 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "name".
-			'Test proxy.create: missing "host"' => [
+			'Test proxy.create: missing "name"' => [
 				'proxy' => [
 					'description' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
-			'Test proxy.create: invalid "host" (empty string)' => [
+			'Test proxy.create: invalid "name" (null)' => [
+				'proxy' => [
+					'name' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/name": a character string is expected.'
+			],
+			'Test proxy.create: invalid "name" (boolean)' => [
+				'proxy' => [
+					'name' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/name": a character string is expected.'
+			],
+			'Test proxy.create: invalid "name" (empty string)' => [
 				'proxy' => [
 					'name' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test proxy.create: invalid "host" (UTF-8 string)' => [
+			'Test proxy.create: invalid "name" (UTF-8 string)' => [
 				'proxy' => [
 					'name' => 'АПИ прокси УТФ-8'
 				],
 				'expected_error' => 'Invalid parameter "/1/name": invalid host name.'
 			],
-			'Test proxy.create: invalid "host" (does not match naming pattern)' => [
+			'Test proxy.create: invalid "name" (does not match naming pattern)' => [
 				'proxy' => [
 					'name' => 'API create proxy?'
 				],
 				'expected_error' => 'Invalid parameter "/1/name": invalid host name.'
 			],
-			'Test proxy.create: invalid "host" (too long)' => [
+			'Test proxy.create: invalid "name" (too long)' => [
 				'proxy' => [
-					'name' => str_repeat('h', DB::getFieldLength('proxy', 'name') + 1)
+					'name' => str_repeat('a', DB::getFieldLength('proxy', 'name') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
-			'Test proxy.create: multiple proxies with the same "host"' => [
+			'Test proxy.create: multiple proxies with the same "name"' => [
 				'proxy' => [
 					[
 						'name' => 'API create proxy',
@@ -404,7 +468,7 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(API create proxy) already exists.'
 			],
-			'Test proxy.create: invalid "host" (duplicate)' => [
+			'Test proxy.create: invalid "name" (duplicate)' => [
 				'proxy' => [
 					'name' => 'API test proxy.get - active',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
@@ -418,6 +482,20 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "operating_mode" is missing.'
+			],
+			'Test proxy.create: invalid "operating_mode" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/operating_mode": an integer is expected.'
+			],
+			'Test proxy.create: invalid "operating_mode" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/operating_mode": an integer is expected.'
 			],
 			'Test proxy.create: invalid "operating_mode" (string)' => [
 				'proxy' => [
@@ -436,7 +514,15 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "description".
-			'Test proxy.create: invalid "description" (bool)' => [
+			'Test proxy.create: invalid "description" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'description' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/description": a character string is expected.'
+			],
+			'Test proxy.create: invalid "description" (boolean)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -448,13 +534,21 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'description' => str_repeat('d', DB::getFieldLength('proxy', 'description') + 1)
+					'description' => str_repeat('a', DB::getFieldLength('proxy', 'description') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/description": value is too long.'
 			],
 
 			// Check "allowed_addresses".
-			'Test proxy.create: invalid "allowed_addresses" (bool)' => [
+			'Test proxy.create: invalid "allowed_addresses" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'allowed_addresses' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/allowed_addresses": a character string is expected.'
+			],
+			'Test proxy.create: invalid "allowed_addresses" (boolean)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -493,75 +587,6 @@ class testProxy extends CAPITest {
 					'allowed_addresses' => str_repeat('a', DB::getFieldLength('proxy', 'allowed_addresses') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/allowed_addresses": value is too long.'
-			],
-
-			// Check "hosts".
-			'Test proxy.create: invalid "hosts" (string)' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'hosts' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/hosts": an array is expected.'
-			],
-			'Test proxy.create: invalid "hosts" (array with string)' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'hosts' => ['abc']
-				],
-				'expected_error' => 'Invalid parameter "/1/hosts/1": an array is expected.'
-			],
-			'Test proxy.create: missing "hostid" for "hosts"' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'hosts' => [
-						[]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/hosts/1": the parameter "hostid" is missing.'
-			],
-			'Test proxy.create: unexpected parameter for "hosts"' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'hosts' => [
-						['abc' => '']
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/hosts/1": unexpected parameter "abc".'
-			],
-			'Test proxy.create: invalid "hostid" (empty string) for "hosts"' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'hosts' => [
-						['hostid' => '']
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/hosts/1/hostid": a number is expected.'
-			],
-			'Test proxy.create: invalid "hostid" (non-existent) for "hosts"' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'hosts' => [
-						['hostid' => self::INVALID_NUMBER]
-					]
-				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			'Test proxy.create: invalid "hostid" (duplicate) for "hosts"' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'hosts' => [
-						['hostid' => 0],
-						['hostid' => 0]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/hosts/2": value (hostid)=(0) already exists.'
 			],
 
 			// Check "interface".
@@ -617,11 +642,11 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
-					'address' => str_repeat('i', DB::getFieldLength('proxy', 'address') + 1)
+					'address' => str_repeat('a', DB::getFieldLength('proxy', 'address') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/address": value is too long.'
 			],
-			'Test proxy.create: invalid "address" (bool) for passive proxy' => [
+			'Test proxy.create: invalid "address" (boolean) for passive proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
@@ -731,7 +756,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "tls_psk_identity".
-			'Test proxy.create: invalid "tls_psk_identity" (bool)' => [
+			'Test proxy.create: invalid "tls_psk_identity" (boolean)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -822,7 +847,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
-					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
+					'tls_psk_identity' => str_repeat('a', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
 			],
@@ -833,13 +858,13 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
-					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
+					'tls_psk_identity' => str_repeat('a', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
 			],
 
 			// Check "tls_psk".
-			'Test proxy.create: invalid "tls_psk" (bool) for active proxy' => [
+			'Test proxy.create: invalid "tls_psk" (boolean) for active proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -942,7 +967,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "tls_issuer".
-			'Test proxy.create: invalid "tls_issuer" (bool) for active proxy' => [
+			'Test proxy.create: invalid "tls_issuer" (boolean) for active proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -995,7 +1020,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
-					'tls_issuer' => str_repeat('i', DB::getFieldLength('proxy', 'tls_issuer') + 1)
+					'tls_issuer' => str_repeat('a', DB::getFieldLength('proxy', 'tls_issuer') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_issuer": value is too long.'
 			],
@@ -1006,7 +1031,7 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
-					'tls_issuer' => str_repeat('i', DB::getFieldLength('proxy', 'tls_issuer') + 1)
+					'tls_issuer' => str_repeat('a', DB::getFieldLength('proxy', 'tls_issuer') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_issuer": value is too long.'
 			],
@@ -1057,7 +1082,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
-					'tls_subject' => str_repeat('i', DB::getFieldLength('proxy', 'tls_subject') + 1)
+					'tls_subject' => str_repeat('a', DB::getFieldLength('proxy', 'tls_subject') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_subject": value is too long.'
 			],
@@ -1068,9 +1093,1174 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
-					'tls_subject' => str_repeat('i', DB::getFieldLength('proxy', 'tls_subject') + 1)
+					'tls_subject' => str_repeat('a', DB::getFieldLength('proxy', 'tls_subject') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_subject": value is too long.'
+			],
+
+			// Check "custom_timeouts".
+			'Test proxy.create: invalid "custom_timeouts" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": an integer is expected.'
+			],
+			'Test proxy.create: invalid "custom_timeouts" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": an integer is expected.'
+			],
+			'Test proxy.create: invalid "custom_timeouts" (string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": an integer is expected.'
+			],
+			'Test proxy.create: invalid "custom_timeouts" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": value must be one of '.
+					implode(', ', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]).'.'
+			],
+			'Test proxy.create: invalid "custom_timeouts" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": value must be one of '.
+					implode(', ', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]).'.'
+			],
+
+			// Check "timeout_zabbix_agent".
+			'Test proxy.create: invalid "timeout_zabbix_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_zabbix_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_zabbix_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_zabbix_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": value must be empty.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_zabbix_agent" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_simple_check".
+			'Test proxy.create: invalid "timeout_simple_check" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_simple_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_simple_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_simple_check' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": value must be empty.'
+			],
+			'Test proxy.create: "timeout_simple_check" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_simple_check" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_simple_check" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+			],
+
+			// Check "timeout_snmp_agent".
+			'Test proxy.create: invalid "timeout_snmp_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_snmp_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_snmp_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_snmp_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": value must be empty.'
+			],
+			'Test proxy.create: "timeout_snmp_agent" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_snmp_agent" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_snmp_agent" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_external_check".
+			'Test proxy.create: invalid "timeout_external_check" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_external_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_external_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_external_check' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": value must be empty.'
+			],
+			'Test proxy.create: "timeout_external_check" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_external_check" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_external_check" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+			],
+
+			// Check "timeout_db_monitor".
+			'Test proxy.create: invalid "timeout_db_monitor" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_db_monitor' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_db_monitor' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_db_monitor' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": value must be empty.'
+			],
+			'Test proxy.create: "timeout_db_monitor" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_db_monitor" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_db_monitor" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+			],
+
+			// Check "timeout_http_agent".
+			'Test proxy.create: invalid "timeout_http_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_http_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_http_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_http_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": value must be empty.'
+			],
+			'Test proxy.create: "timeout_http_agent" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_http_agent" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_http_agent" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_ssh_agent".
+			'Test proxy.create: invalid "timeout_ssh_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_ssh_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_ssh_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_ssh_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": value must be empty.'
+			],
+			'Test proxy.create: "timeout_ssh_agent" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_ssh_agent" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_ssh_agent" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_telnet_agent".
+			'Test proxy.create: invalid "timeout_telnet_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_telnet_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_telnet_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_telnet_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": value must be empty.'
+			],
+			'Test proxy.create: "timeout_telnet_agent" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_telnet_agent" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_telnet_agent" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_script".
+			'Test proxy.create: invalid "timeout_script" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_script' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_script" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_script' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_script" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'timeout_script' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": value must be empty.'
+			],
+			'Test proxy.create: "timeout_script" is missing' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "timeout_script" is missing.'
+			],
+			'Test proxy.create: invalid "timeout_script" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_script" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.create: invalid "timeout_script" (empty string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": cannot be empty.'
+			],
+			'Test proxy.create: invalid "timeout_script" (not a time unit)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a time unit is expected.'
+			],
+			'Test proxy.create: invalid "timeout_script" (too small)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
+			],
+			'Test proxy.create: invalid "timeout_script" (too large)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
+			],
+
+			// Check "hosts".
+			'Test proxy.create: invalid "hosts" (null)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts": an array is expected.'
+			],
+			'Test proxy.create: invalid "hosts" (boolean)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts": an array is expected.'
+			],
+			'Test proxy.create: invalid "hosts" (string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts": an array is expected.'
+			],
+			'Test proxy.create: invalid "hosts" (array with string)' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => ['abc']
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1": an array is expected.'
+			],
+			'Test proxy.create: missing "hostid" for "hosts"' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => [
+						[]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1": the parameter "hostid" is missing.'
+			],
+			'Test proxy.create: unexpected parameter for "hosts"' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => [
+						['abc' => '']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1": unexpected parameter "abc".'
+			],
+			'Test proxy.create: invalid "hostid" (empty string) for "hosts"' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => [
+						['hostid' => '']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1/hostid": a number is expected.'
+			],
+			'Test proxy.create: invalid "hostid" (non-existent) for "hosts"' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => [
+						['hostid' => self::INVALID_NUMBER]
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test proxy.create: invalid "hostid" (duplicate) for "hosts"' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'hosts' => [
+						['hostid' => 0],
+						['hostid' => 0]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/2": value (hostid)=(0) already exists.'
 			]
 		];
 	}
@@ -1099,6 +2289,33 @@ class testProxy extends CAPITest {
 						'name' => 'API create second proxy',
 						'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 					]
+				],
+				'expected_error' => null
+			],
+
+			// Check "custom_timeouts".
+			'Test proxy.create: with "custom_timeouts" disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy with custom timeouts disabled',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED
+				],
+				'expected_error' => null
+			],
+			'Test proxy.create: with "custom_timeouts" enabled (user macros)' => [
+				'proxy' => [
+					'name' => 'API create proxy with custom timeouts enabled',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '{$TIMEOUT.ZABBIX.AGENT}',
+					'timeout_simple_check' => '{$TIMEOUT.SIMPLE.CHECK}',
+					'timeout_snmp_agent' => '{$TIMEOUT.SNMP.AGENT}',
+					'timeout_external_check' => '{$TIMEOUT.EXTERNAL.CHECK}',
+					'timeout_db_monitor' => '{$TIMEOUT.DB.MONITOR}',
+					'timeout_http_agent' => '{$TIMEOUT.HTTP.AGENT}',
+					'timeout_ssh_agent' => '{$TIMEOUT.SSH.AGENT}',
+					'timeout_telnet_agent' => '{$TIMEOUT.TELNET.AGENT}',
+					'timeout_script' => '{$TIMEOUT.SCRIPT}'
 				],
 				'expected_error' => null
 			]
@@ -1130,88 +2347,123 @@ class testProxy extends CAPITest {
 			// Add proxy IDs to create array, so they can be deleted after tests are complete.
 			self::$data['created'] = array_merge(self::$data['created'], $result['result']['proxyids']);
 
+			$db_defaults = DB::getDefaults('proxy');
+			$timeout_fields = ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+				'timeout_telnet_agent', 'timeout_script'
+			];
+
 			// Check individual fields according to each proxy operating_mode.
 			foreach ($result['result']['proxyids'] as $num => $proxyid) {
+				$proxy = $proxies[$num];
 				$db_proxies = $this->getProxies([$proxyid]);
 				$db_proxy = $db_proxies[$proxyid];
 
 				// Required fields.
 				$this->assertNotEmpty($db_proxy['name']);
-				$this->assertSame($proxies[$num]['name'], $db_proxy['name']);
-				$this->assertEquals($proxies[$num]['operating_mode'], $db_proxy['operating_mode']);
+				$this->assertSame($proxy['name'], $db_proxy['name']);
+				$this->assertEquals($proxy['operating_mode'], $db_proxy['operating_mode']);
 
-				if (array_key_exists('description', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['description'], $db_proxy['description']);
+				foreach (['description', 'allowed_addresses'] as $field) {
+					if (array_key_exists($field, $proxy)) {
+						$this->assertSame($proxy[$field], $db_proxy[$field]);
+					}
+					else {
+						$this->assertSame($db_defaults[$field], $db_proxy[$field]);
+					}
+				}
+
+				foreach (['tls_connect', 'tls_accept'] as $field) {
+					if (array_key_exists($field, $proxy)) {
+						$this->assertEquals($proxy[$field], $db_proxy[$field]);
+					}
+					else {
+						$this->assertEquals($db_defaults[$field], $db_proxy[$field]);
+					}
+				}
+
+				if ($db_proxy['operating_mode'] == PROXY_OPERATING_MODE_ACTIVE) {
+					foreach (['address', 'port'] as $field) {
+						if (array_key_exists($field, $proxy)) {
+							$this->assertSame($proxy[$field], $db_proxy[$field]);
+						}
+						else {
+							$this->assertSame($db_defaults[$field], $db_proxy[$field]);
+						}
+					}
+
+					foreach (['tls_issuer', 'tls_subject'] as $field) {
+						if ($db_proxy['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE && array_key_exists($field, $proxy)) {
+							$this->assertSame($proxy[$field], $db_proxy[$field]);
+						}
+						else {
+							$this->assertSame($db_defaults[$field], $db_proxy[$field]);
+						}
+					}
+
+					foreach (['tls_psk_identity', 'tls_psk'] as $field) {
+						if ($db_proxy['tls_accept'] & HOST_ENCRYPTION_PSK && array_key_exists($field, $proxy)) {
+							$this->assertNotEmpty($db_proxy[$field]);
+							$this->assertSame($proxy[$field], $db_proxy[$field]);
+						}
+						else {
+							$this->assertSame($db_defaults[$field], $db_proxy[$field]);
+						}
+					}
+				}
+				elseif ($db_proxy['operating_mode'] == PROXY_OPERATING_MODE_PASSIVE) {
+					foreach (['address', 'port'] as $field) {
+						$this->assertNotEmpty($db_proxy[$field]);
+						$this->assertSame($proxy[$field], $db_proxy[$field]);
+					}
+
+					foreach (['tls_issuer', 'tls_subject'] as $field) {
+						if ($db_proxy['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
+								&& array_key_exists($field, $proxy)) {
+							$this->assertSame($proxy[$field], $db_proxy[$field]);
+						}
+						else {
+							$this->assertSame($db_defaults[$field], $db_proxy[$field]);
+						}
+					}
+
+					foreach (['tls_psk_identity', 'tls_psk'] as $field) {
+						if ($db_proxy['tls_connect'] == HOST_ENCRYPTION_PSK && array_key_exists($field, $proxy)) {
+							$this->assertNotEmpty($db_proxy[$field]);
+							$this->assertSame($proxy[$field], $db_proxy[$field]);
+						}
+						else {
+							$this->assertSame($db_defaults[$field], $db_proxy[$field]);
+						}
+					}
+				}
+
+				if (array_key_exists('custom_timeouts', $proxy)) {
+					$this->assertEquals($proxy['custom_timeouts'], $db_proxy['custom_timeouts']);
 				}
 				else {
-					$this->assertEmpty($db_proxy['description']);
+					$this->assertEquals($db_defaults['custom_timeouts'], $db_proxy['custom_timeouts']);
 				}
 
-				if (array_key_exists('allowed_addresses', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['allowed_addresses'], $db_proxy['allowed_addresses']);
+				if ($db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
+					foreach ($timeout_fields as $field) {
+						if (array_key_exists($field, $proxy)) {
+							$this->assertSame($proxy[$field], $db_proxy[$field]);
+						}
+						else {
+							$this->assertSame($db_defaults[$field], $db_proxy[$field]);
+						}
+					}
 				}
-				else {
-					$this->assertSame($db_proxy['allowed_addresses'], DB::getDefault('proxy', 'allowed_addresses'));
-				}
-
-				if (array_key_exists('address', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['address'], $db_proxy['address']);
-				}
-				else {
-					$this->assertSame($db_proxy['address'], DB::getDefault('proxy', 'address'));
-				}
-
-				if (array_key_exists('port', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['port'], $db_proxy['port'], 'port should match request');
-				}
-				else {
-					$this->assertSame($db_proxy['port'], DB::getDefault('proxy', 'port'), 'port should match db');
+				elseif ($db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+					foreach ($timeout_fields as $field) {
+						$this->assertNotEmpty($db_proxy[$field]);
+						$this->assertSame($proxy[$field], $db_proxy[$field]);
+					}
 				}
 
-				if (array_key_exists('tls_accept', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['tls_accept'], $db_proxy['tls_accept']);
-				}
-				else {
-					$this->assertSame($db_proxy['tls_accept'], DB::getDefault('proxy', 'tls_accept'));
-				}
-
-				if (array_key_exists('tls_connect', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['tls_connect'], $db_proxy['tls_connect']);
-				}
-				else {
-					$this->assertSame($db_proxy['tls_connect'], DB::getDefault('proxy', 'tls_connect'));
-				}
-
-				if (array_key_exists('tls_issuer', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['tls_issuer'], $db_proxy['tls_issuer']);
-				}
-				else {
-					$this->assertSame($db_proxy['tls_issuer'], DB::getDefault('proxy', 'tls_issuer'));
-				}
-
-				if (array_key_exists('tls_subject', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['tls_subject'], $db_proxy['tls_subject']);
-				}
-				else {
-					$this->assertSame($db_proxy['tls_subject'], DB::getDefault('proxy', 'tls_subject'));
-				}
-
-				if (array_key_exists('tls_psk_identity', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['tls_psk_identity'], $db_proxy['tls_psk_identity']);
-				}
-				else {
-					$this->assertSame($db_proxy['tls_psk_identity'], DB::getDefault('proxy', 'tls_psk_identity'));
-				}
-
-				if (array_key_exists('tls_psk', $proxies[$num])) {
-					$this->assertSame($proxies[$num]['tls_psk'], $db_proxy['tls_psk']);
-				}
-				else {
-					$this->assertSame($db_proxy['tls_psk'], DB::getDefault('proxy', 'tls_psk'));
-				}
-
-				if (array_key_exists('hosts', $proxies[$num])) {
-					$this->assertEqualsCanonicalizing($proxies[$num]['hosts'], $db_proxy['hosts']);
+				if (array_key_exists('hosts', $proxy)) {
+					$this->assertEqualsCanonicalizing($proxy['hosts'], $db_proxy['hosts']);
 				}
 				else {
 					$this->assertEmpty($db_proxy['hosts']);
@@ -1268,11 +2520,11 @@ class testProxy extends CAPITest {
 			'Test proxy.get: unexpected parameter in "filter"' => [
 				'request' => [
 					'filter' => [
-						'proxy_address' => 'proxy_address'
+						'address' => 'address'
 					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "proxy_address".'
+				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "address".'
 			],
 
 			// Check "search" option.
@@ -1308,7 +2560,7 @@ class testProxy extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "operating_mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "lastaccess", "version", "compatibility".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "operating_mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility".'
 			],
 
 			// Check write-only fields are not returned.
@@ -1317,14 +2569,14 @@ class testProxy extends CAPITest {
 					'output' => ['tls_psk_identity']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "operating_mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "lastaccess", "version", "compatibility".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "operating_mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility".'
 			],
 			'Test proxy.get: write-only field "tls_psk"' => [
 				'request' => [
 					'output' => ['tls_psk']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "operating_mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "lastaccess", "version", "compatibility".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "operating_mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility".'
 			],
 
 			// Check "selectHosts" option.
@@ -1358,7 +2610,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/searchWildcardsEnabled": a boolean is expected.'
 			],
-			'Test proxy.get: invalid parameter "sortfield" (bool)' => [
+			'Test proxy.get: invalid parameter "sortfield" (boolean)' => [
 				'request' => [
 					'sortfield' => false
 				],
@@ -1372,7 +2624,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/sortfield/1": value must be one of "proxyid", "name", "operating_mode".'
 			],
-			'Test proxy.get: invalid parameter "sortorder" (bool)' => [
+			'Test proxy.get: invalid parameter "sortorder" (boolean)' => [
 				'request' => [
 					'sortorder' => false
 				],
@@ -1387,7 +2639,7 @@ class testProxy extends CAPITest {
 				'expected_error' =>
 					'Invalid parameter "/sortorder": value must be one of "'.ZBX_SORT_UP.'", "'.ZBX_SORT_DOWN.'".'
 			],
-			'Test proxy.get: invalid parameter "limit" (bool)' => [
+			'Test proxy.get: invalid parameter "limit" (boolean)' => [
 				'request' => [
 					'limit' => false
 				],
@@ -1448,25 +2700,42 @@ class testProxy extends CAPITest {
 				],
 				'expected_result' => [
 					[
-						'lastaccess' => '1662034530',
-						'version' => '60400',
+						'lastaccess' => '1693391880',
+						'version' => '70000',
 						'compatibility' => '1'
 					],
 					[
-						'lastaccess' => '1662034225',
-						'version' => '60200',
+						'lastaccess' => '1693391875',
+						'version' => '60400',
 						'compatibility' => '2'
 					],
 					[
-						'lastaccess' => '1651407015',
-						'version' => '50401',
+						'lastaccess' => '1693391870',
+						'version' => '60201',
 						'compatibility' => '3'
 					]
 				],
 				'expected_error' => null
 			],
 
-			// Filter by proxy operating_mode.
+			// Filter by "proxyid".
+			'Test proxy.get: filter by "proxyid"' => [
+				'request' => [
+					'output' => ['name'],
+					'proxyids' => ['get_active_defaults', 'get_passive_defaults'],
+					'filter' => [
+						'proxyid' => 'get_active_defaults'
+					]
+				],
+				'expected_result' => [
+					[
+						'name' => 'API test proxy.get - active'
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Filter by proxy operating mode.
 			'Test proxy.get: filter by "operating_mode"' => [
 				'request' => [
 					'output' => ['name', 'operating_mode'],
@@ -1484,23 +2753,60 @@ class testProxy extends CAPITest {
 				'expected_error' => null
 			],
 
+			// Filter by "custom_timeouts".
+			'Test proxy.get: filter by "get_custom_timeouts"' => [
+				'request' => [
+					'output' => ['name', 'custom_timeouts', 'timeout_zabbix_agent'],
+					'proxyids' => ['get_active_defaults', 'get_passive_defaults', 'get_custom_timeouts'],
+					'filter' => [
+						'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED
+					]
+				],
+				'expected_result' => [
+					[
+						'name' => 'API test proxy.get - custom timeouts',
+						'custom_timeouts' => (string) ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+						'timeout_zabbix_agent' => '10s'
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Filter by "timeout_zabbix_agent".
+			'Test proxy.get: filter by "timeout_zabbix_agent"' => [
+				'request' => [
+					'output' => ['name', 'timeout_zabbix_agent'],
+					'proxyids' => ['get_active_defaults', 'get_passive_defaults', 'get_custom_timeouts'],
+					'filter' => [
+						'timeout_zabbix_agent' => '10s'
+					]
+				],
+				'expected_result' => [
+					[
+						'name' => 'API test proxy.get - custom timeouts',
+						'timeout_zabbix_agent' => '10s'
+					]
+				],
+				'expected_error' => null
+			],
+
 			// Filter by Zabbix version.
 			'Test proxy.get: filter by "version"' => [
 				'request' => [
 					'output' => ['name', 'version'],
 					'proxyids' => ['get_version_current', 'get_version_outdated', 'get_version_unsupported'],
 					'filter' => [
-						'version' => ['60000', '60200', '60400']
+						'version' => ['60200', '60400', '70000']
 					]
 				],
 				'expected_result' => [
 					[
 						'name' => 'API test proxy.get for filter - version current',
-						'version' => '60400'
+						'version' => '70000'
 					],
 					[
 						'name' => 'API test proxy.get for filter - version outdated',
-						'version' => '60200'
+						'version' => '60400'
 					]
 				],
 				'expected_error' => null
@@ -1728,8 +3034,8 @@ class testProxy extends CAPITest {
 					implode(', ', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]).'.'
 			],
 
-			// Check "host".
-			'Test proxy.update: invalid "name" (bool)' => [
+			// Check "name".
+			'Test proxy.update: invalid "name" (boolean)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'name' => false
@@ -1746,13 +3052,13 @@ class testProxy extends CAPITest {
 			'Test proxy.update: invalid "name" (too long)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
-					'name' => str_repeat('h', DB::getFieldLength('proxy', 'name') + 1)
+					'name' => str_repeat('a', DB::getFieldLength('proxy', 'name') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 
 			// Check "description".
-			'Test proxy.update: invalid "description" (bool)' => [
+			'Test proxy.update: invalid "description" (boolean)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'description' => false
@@ -1762,13 +3068,13 @@ class testProxy extends CAPITest {
 			'Test proxy.update: invalid "description" (too long)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
-					'description' => str_repeat('d', DB::getFieldLength('proxy', 'description') + 1)
+					'description' => str_repeat('a', DB::getFieldLength('proxy', 'description') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/description": value is too long.'
 			],
 
 			// Check "allowed_address".
-			'Test proxy.update: invalid "allowed_addresses" (bool)' => [
+			'Test proxy.update: invalid "allowed_addresses" (boolean)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'allowed_addresses' => false
@@ -1802,6 +3108,1123 @@ class testProxy extends CAPITest {
 					'allowed_addresses' => str_repeat('a', DB::getFieldLength('proxy', 'allowed_addresses') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/allowed_addresses": value is too long.'
+			],
+
+			// Check "address".
+			'Test proxy.update: invalid "address" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'address' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/address": a character string is expected.'
+			],
+			'Test proxy.update: invalid "address" (string) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'address' => 'http://'
+				],
+				'expected_error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			'Test proxy.update: invalid "address" (too long) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'address' => str_repeat('a', DB::getFieldLength('proxy', 'address') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/address": value is too long.'
+			],
+			'Test proxy.update: invalid "address" (not empty for active proxy)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'address' => 'localhost'
+				],
+				'expected_error' => 'Invalid parameter "/1/address": value must be "127.0.0.1".'
+			],
+
+			// Check "port".
+			'Test proxy.update: invalid "port" (not in range)' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'port' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-'.ZBX_MAX_PORT_NUMBER.'.'
+			],
+			'Test proxy.update: invalid "port" (boolean) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'port' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/port": a number is expected.'
+			],
+			'Test proxy.update: invalid "port" (too long) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'port' => str_repeat('a', DB::getFieldLength('proxy', 'port') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/port": value is too long.'
+			],
+			'Test proxy.update: invalid "port" (string) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'port' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+			],
+			'Test proxy.update: invalid "port" (not empty int for active proxy)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'port' => 12345
+				],
+				'expected_error' =>	'Invalid parameter "/1/port": a character string is expected.'
+			],
+			'Test proxy.update: invalid "port" (not empty string for active proxy)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'port' => '12345'
+				],
+				'expected_error' =>	'Invalid parameter "/1/port": value must be "10051".'
+			],
+
+			// Check "tls_connect".
+			'Test proxy.update: invalid "tls_connect" (string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'tls_connect' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_connect": an integer is expected.'
+			],
+			'Test proxy.update: invalid "tls_connect" (not in range) for active proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'tls_connect' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be '.HOST_ENCRYPTION_NONE.'.'
+			],
+			'Test proxy.update: invalid "tls_connect" (not in range) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'tls_connect' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be one of '.
+					implode(', ', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]).'.'
+			],
+
+			// Check "tls_accept".
+			'Test proxy.update: invalid "tls_accept" (string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'tls_accept' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_accept": an integer is expected.'
+			],
+			'Test proxy.update: invalid "tls_accept" (not in range) for active proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'tls_accept' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be one of '.HOST_ENCRYPTION_NONE.'-'.
+					(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).'.'
+			],
+			'Test proxy.update: invalid "tls_accept" (not in range) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'tls_accept' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be '.HOST_ENCRYPTION_NONE.'.'
+			],
+
+			// Check "tls_psk_identity".
+			'Test proxy.update: invalid "tls_psk_identity" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'tls_psk_identity' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": a character string is expected.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (string) for active proxy #1' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'tls_psk_identity' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (string) for active proxy #2' => [
+				'proxy' => [
+					'proxyid' => 'update_active_cert',
+					'tls_psk_identity' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (empty string) for active proxy #1' => [
+				'proxy' => [
+					'proxyid' => 'update_active_psk',
+					'tls_psk_identity' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (empty string) for active proxy #2' => [
+				'proxy' => [
+					'proxyid' => 'update_active_any',
+					'tls_psk_identity' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (too long) for active proxy #1' => [
+				'proxy' => [
+					'proxyid' => 'update_active_psk',
+					'tls_psk_identity' => str_repeat('a', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (too long) for active proxy #2' => [
+				'proxy' => [
+					'proxyid' => 'update_active_any',
+					'tls_psk_identity' => str_repeat('a', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (string) for passive proxy #1' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_defaults',
+					'tls_psk_identity' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (string) for passive proxy #2' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_cert',
+					'tls_psk_identity' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (empty string) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_psk',
+					'tls_psk_identity' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
+			],
+			'Test proxy.update: invalid "tls_psk_identity" (too long) for passive proxy' => [
+				'proxy' => [
+					'proxyid' => 'update_passive_psk',
+					'tls_psk_identity' => str_repeat('a', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
+			],
+
+			// Check "custom_timeouts".
+			'Test proxy.update: invalid "custom_timeouts" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": an integer is expected.'
+			],
+			'Test proxy.update: invalid "custom_timeouts" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": an integer is expected.'
+			],
+			'Test proxy.update: invalid "custom_timeouts" (string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": an integer is expected.'
+			],
+			'Test proxy.update: invalid "custom_timeouts" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": value must be one of '.
+					implode(', ', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]).'.'
+			],
+			'Test proxy.update: invalid "custom_timeouts" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": value must be one of '.
+					implode(', ', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]).'.'
+			],
+			'Test proxy.update: invalid "custom_timeouts" (proxy version is outdated)' => [
+				'proxy' => [
+					'proxyid' => 'update_version_outdated',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": timeouts are disabled because the proxy and server versions do not match.'
+			],
+			'Test proxy.update: invalid "custom_timeouts" (proxy version is unsupported)' => [
+				'proxy' => [
+					'proxyid' => 'update_version_unsupported',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED
+				],
+				'expected_error' => 'Invalid parameter "/1/custom_timeouts": timeouts are disabled because the proxy and server versions do not match.'
+			],
+
+			// Check "timeout_zabbix_agent".
+			'Test proxy.update: invalid "timeout_zabbix_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_zabbix_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_zabbix_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_zabbix_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_zabbix_agent" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_simple_check".
+			'Test proxy.update: invalid "timeout_simple_check" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_simple_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_simple_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_simple_check' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (cannot be empty)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_simple_check" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+			],
+
+			// Check "timeout_snmp_agent".
+			'Test proxy.update: invalid "timeout_snmp_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_snmp_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_snmp_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_snmp_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_snmp_agent" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_external_check".
+			'Test proxy.update: invalid "timeout_external_check" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_external_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_external_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_external_check' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_external_check" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+			],
+
+			// Check "timeout_db_monitor".
+			'Test proxy.update: invalid "timeout_db_monitor" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_db_monitor' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_db_monitor' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_db_monitor' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_db_monitor" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+			],
+
+			// Check "timeout_http_agent".
+			'Test proxy.update: invalid "timeout_http_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_http_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_http_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_http_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_http_agent" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_ssh_agent".
+			'Test proxy.update: invalid "timeout_ssh_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_ssh_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_ssh_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_ssh_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_ssh_agent" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_telnet_agent".
+			'Test proxy.update: invalid "timeout_telnet_agent" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_telnet_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_telnet_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_telnet_agent' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_telnet_agent" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+			],
+
+			// Check "timeout_script".
+			'Test proxy.update: invalid "timeout_script" (null) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_script' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_script" (boolean) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_script' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_script" (not empty) if custom timeouts are disabled' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'timeout_script' => '5s'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": value must be empty.'
+			],
+			'Test proxy.update: invalid "timeout_script" (null)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_script" (boolean)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a character string is expected.'
+			],
+			'Test proxy.update: invalid "timeout_script" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": cannot be empty.'
+			],
+			'Test proxy.update: invalid "timeout_script" (not a time unit)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": a time unit is expected.'
+			],
+			'Test proxy.update: invalid "timeout_script" (too small)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
+			],
+			'Test proxy.update: invalid "timeout_script" (too large)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '5s',
+					'timeout_simple_check' => '5s',
+					'timeout_snmp_agent' => '5s',
+					'timeout_external_check' => '5s',
+					'timeout_db_monitor' => '5s',
+					'timeout_http_agent' => '5s',
+					'timeout_ssh_agent' => '5s',
+					'timeout_telnet_agent' => '5s',
+					'timeout_script' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
 			],
 
 			// Check "hosts".
@@ -1864,212 +4287,6 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/hosts/2": value (hostid)=(0) already exists.'
-			],
-
-			// Check "interface".
-			'Test proxy.update: unexpected parameter "interface"' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'interface' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "interface".'
-			],
-			'Test proxy.update: invalid "address" (bool) for "interface"' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'address' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/address": a character string is expected.'
-			],
-			'Test proxy.update: invalid "port" (not in range) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'port' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-'.ZBX_MAX_PORT_NUMBER.'.'
-			],
-			'Test proxy.update: invalid "address" (string) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'address' => 'http://'
-				],
-				'expected_error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
-			],
-			'Test proxy.update: invalid "address" (too long) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'address' => str_repeat('a', DB::getFieldLength('proxy', 'address') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/address": value is too long.'
-			],
-			'Test proxy.update: invalid "port" (bool) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'port' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/port": a number is expected.'
-			],
-			'Test proxy.update: invalid "port" (too long) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'port' => str_repeat('d', DB::getFieldLength('proxy', 'port') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/port": value is too long.'
-			],
-			'Test proxy.update: invalid "port" (string) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'port' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
-			],
-			'Test proxy.update: invalid "port" (not empty int for active proxy)' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'port' => 12345
-				],
-				'expected_error' =>	'Invalid parameter "/1/port": a character string is expected.'
-			],
-			'Test proxy.update: invalid "address" (not empty for active proxy)' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'address' => 'localhost'
-				],
-				'expected_error' => 'Invalid parameter "/1/address": value must be "127.0.0.1".'
-			],
-			'Test proxy.update: invalid "port" (not empty string for active proxy)' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'port' => '12345'
-				],
-				'expected_error' =>	'Invalid parameter "/1/port": value must be "10051".'
-			],
-
-			// Check "tls_connect".
-			'Test proxy.update: invalid "tls_connect" (string)' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'tls_connect' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_connect": an integer is expected.'
-			],
-			'Test proxy.update: invalid "tls_connect" (not in range) for active proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'tls_connect' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be '.HOST_ENCRYPTION_NONE.'.'
-			],
-			'Test proxy.update: invalid "tls_connect" (not in range) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'tls_connect' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be one of '.
-					implode(', ', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]).'.'
-			],
-
-			// Check "tls_accept".
-			'Test proxy.update: invalid "tls_accept" (string)' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'tls_accept' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_accept": an integer is expected.'
-			],
-			'Test proxy.update: invalid "tls_accept" (not in range) for active proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'tls_accept' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be one of '.HOST_ENCRYPTION_NONE.'-'.
-					(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).'.'
-			],
-			'Test proxy.update: invalid "tls_accept" (not in range) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'tls_accept' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be '.HOST_ENCRYPTION_NONE.'.'
-			],
-
-			// Check "tls_psk_identity".
-			'Test proxy.update: invalid "tls_psk_identity" (bool)' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'tls_psk_identity' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": a character string is expected.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (string) for active proxy #1' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'tls_psk_identity' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (string) for active proxy #2' => [
-				'proxy' => [
-					'proxyid' => 'update_active_cert',
-					'tls_psk_identity' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (empty string) for active proxy #1' => [
-				'proxy' => [
-					'proxyid' => 'update_active_psk',
-					'tls_psk_identity' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (empty string) for active proxy #2' => [
-				'proxy' => [
-					'proxyid' => 'update_active_any',
-					'tls_psk_identity' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (too long) for active proxy #1' => [
-				'proxy' => [
-					'proxyid' => 'update_active_psk',
-					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (too long) for active proxy #2' => [
-				'proxy' => [
-					'proxyid' => 'update_active_any',
-					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (string) for passive proxy #1' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'tls_psk_identity' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (string) for passive proxy #2' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_cert',
-					'tls_psk_identity' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (empty string) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_psk',
-					'tls_psk_identity' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
-			],
-			'Test proxy.update: invalid "tls_psk_identity" (too long) for passive proxy' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_psk',
-					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value is too long.'
 			]
 		];
 	}
@@ -2101,6 +4318,61 @@ class testProxy extends CAPITest {
 						'address' => 'localhost',
 						'port' => '10051'
 					]
+				],
+				'expected_error' => null
+			],
+
+			// Check custom timeouts can be updated.
+			'Test proxy.update: enable custom timeouts' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '10s',
+					'timeout_simple_check' => '10s',
+					'timeout_snmp_agent' => '10s',
+					'timeout_external_check' => '10s',
+					'timeout_db_monitor' => '10s',
+					'timeout_http_agent' => '10s',
+					'timeout_ssh_agent' => '10s',
+					'timeout_telnet_agent' => '10s',
+					'timeout_script' => '10s'
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: disable custom timeouts' => [
+				'proxy' => [
+					'proxyid' => 'update_version_current_custom_timeouts',
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update single per-item-type timeout if custom timeouts are enabled' => [
+				'proxy' => [
+					'proxyid' => 'update_version_current_custom_timeouts',
+					'timeout_external_check' => '30s'
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update multiple per-item-type timeouts if custom timeouts are enabled' => [
+				'proxy' => [
+					'proxyid' => 'update_version_current_custom_timeouts',
+					'timeout_snmp_agent' => '30s',
+					'timeout_ssh_agent' => '5m'
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update multiple per-item-type timeouts with macros values if custom timeouts are enabled' => [
+				'proxy' => [
+					'proxyid' => 'update_version_current_custom_timeouts',
+					'timeout_zabbix_agent' => '{$TIMEOUT.ZABBIX.AGENT}',
+					'timeout_simple_check' => '{$TIMEOUT.SIMPLE.CHECK}',
+					'timeout_snmp_agent' => '{$TIMEOUT.SNMP.AGENT}',
+					'timeout_external_check' => '{$TIMEOUT.EXTERNAL.CHECK}',
+					'timeout_db_monitor' => '{$TIMEOUT.DB.MONITOR}',
+					'timeout_http_agent' => '{$TIMEOUT.HTTP.AGENT}',
+					'timeout_ssh_agent' => '{$TIMEOUT.SSH.AGENT}',
+					'timeout_telnet_agent' => '{$TIMEOUT.TELNET.AGENT}',
+					'timeout_script' => '{$TIMEOUT.SCRIPT}'
 				],
 				'expected_error' => null
 			],
@@ -2157,60 +4429,214 @@ class testProxy extends CAPITest {
 
 			$proxies_upd = $this->getProxies($proxyids);
 
+			$db_defaults = DB::getDefaults('proxy');
+			$timeout_fields = ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+				'timeout_telnet_agent', 'timeout_script'
+			];
+
 			// Compare records from DB before and after API call.
 			foreach ($proxies as $proxy) {
 				$db_proxy = $db_proxies[$proxy['proxyid']];
 				$proxy_upd = $proxies_upd[$proxy['proxyid']];
 
-				// Check "name".
 				$this->assertNotEmpty($proxy_upd['name']);
 
-				if (array_key_exists('name', $proxy)) {
-					$this->assertSame($proxy['name'], $proxy_upd['name']);
-				}
-				else {
-					$this->assertSame($db_proxy['name'], $proxy_upd['name']);
+				foreach (['name', 'description', 'allowed_addresses'] as $field) {
+					if (array_key_exists($field, $proxy)) {
+						$this->assertSame($proxy[$field], $proxy_upd[$field]);
+					}
+					else {
+						$this->assertSame($db_proxy[$field], $proxy_upd[$field]);
+					}
 				}
 
-				// Check "operating_mode".
 				if (array_key_exists('operating_mode', $proxy)) {
 					$this->assertEquals($proxy['operating_mode'], $proxy_upd['operating_mode']);
 				}
 				else {
-					// operating_mode has not changed.
 					$this->assertEquals($db_proxy['operating_mode'], $proxy_upd['operating_mode']);
 				}
 
-				// Check "description".
-				if (array_key_exists('description', $proxy)) {
-					$this->assertSame($proxy['description'], $proxy_upd['description']);
+				if ($proxy_upd['operating_mode'] != $db_proxy['operating_mode']) {
+					if ($proxy_upd['operating_mode'] == PROXY_OPERATING_MODE_ACTIVE) {
+						foreach (['address', 'port'] as $field) {
+							if (array_key_exists($field, $proxy)) {
+								$this->assertSame($proxy[$field], $proxy_upd[$field]);
+							}
+							else {
+								$this->assertSame($db_defaults[$field], $proxy_upd[$field]);
+							}
+						}
+
+						if (array_key_exists('tls_connect', $proxy)) {
+							$this->assertEquals($proxy['tls_connect'], $proxy_upd['tls_connect']);
+						}
+						else {
+							$this->assertEquals($db_defaults['tls_connect'], $proxy_upd['tls_connect']);
+						}
+					}
+					elseif ($proxy_upd['operating_mode'] == PROXY_OPERATING_MODE_PASSIVE) {
+						if (array_key_exists('tls_accept', $proxy)) {
+							$this->assertEquals($proxy['tls_accept'], $proxy_upd['tls_accept']);
+						}
+						else {
+							$this->assertEquals($db_defaults['tls_accept'], $proxy_upd['tls_accept']);
+						}
+					}
 				}
 				else {
-					$this->assertSame($db_proxy['description'], $proxy_upd['description']);
+					foreach (['address', 'port'] as $field) {
+						if (array_key_exists($field, $proxy)) {
+							$this->assertSame($proxy[$field], $proxy_upd[$field]);
+						}
+						else {
+							$this->assertSame($db_proxy[$field], $proxy_upd[$field]);
+						}
+					}
+
+					foreach (['tls_connect', 'tls_accept'] as $field) {
+						if (array_key_exists($field, $proxy)) {
+							$this->assertEquals($proxy[$field], $proxy_upd[$field]);
+						}
+						else {
+							$this->assertEquals($db_proxy[$field], $proxy_upd[$field]);
+						}
+					}
 				}
 
-				// Check "allowed_address".
-				if (array_key_exists('allowed_addresses', $proxy)) {
-					$this->assertSame($proxy['allowed_addresses'], $proxy_upd['allowed_addresses']);
+				if ($proxy_upd['operating_mode'] == PROXY_OPERATING_MODE_ACTIVE) {
+					if ($proxy_upd['tls_accept'] != $db_proxy['tls_accept']) {
+						foreach (['tls_issuer', 'tls_subject'] as $field) {
+							if ($proxy_upd['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) {
+								if (array_key_exists($field, $proxy)) {
+									$this->assertSame($proxy[$field], $proxy_upd[$field]);
+								}
+								else {
+									$this->assertEquals($db_proxy[$field], $proxy_upd[$field]);
+								}
+							}
+							else {
+								$this->assertSame($db_defaults[$field], $proxy_upd[$field]);
+							}
+						}
+
+						foreach (['tls_psk_identity', 'tls_psk'] as $field) {
+							if ($proxy_upd['tls_accept'] & HOST_ENCRYPTION_PSK) {
+								$this->assertNotEmpty($proxy_upd[$field]);
+
+								if (array_key_exists($field, $proxy)) {
+									$this->assertSame($proxy[$field], $proxy_upd[$field]);
+								}
+								else {
+									$this->assertSame($db_proxy[$field], $proxy_upd[$field]);
+								}
+							}
+							else {
+								$this->assertSame($db_defaults[$field], $proxy_upd[$field]);
+							}
+						}
+					}
+					else {
+						foreach (['tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'] as $field) {
+							if (array_key_exists($field, $proxy)) {
+								$this->assertSame($proxy[$field], $proxy_upd[$field]);
+							}
+							else {
+								$this->assertSame($db_proxy[$field], $proxy_upd[$field]);
+							}
+						}
+					}
 				}
-				else {
-					$this->assertSame($db_proxy['allowed_addresses'], $proxy_upd['allowed_addresses']);
+				elseif ($proxy_upd['operating_mode'] == PROXY_OPERATING_MODE_PASSIVE) {
+					foreach (['address', 'port'] as $field) {
+						$this->assertNotEmpty($proxy_upd[$field]);
+					}
+
+					if ($proxy_upd['tls_connect'] != $db_proxy['tls_connect']) {
+						foreach (['tls_issuer', 'tls_subject'] as $field) {
+							if ($proxy_upd['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) {
+								if (array_key_exists($field, $proxy)) {
+									$this->assertSame($proxy[$field], $proxy_upd[$field]);
+								}
+								else {
+									$this->assertEquals($db_proxy[$field], $proxy_upd[$field]);
+								}
+							}
+							else {
+								$this->assertSame($db_defaults[$field], $proxy_upd[$field]);
+							}
+						}
+
+						foreach (['tls_psk_identity', 'tls_psk'] as $field) {
+							if ($proxy_upd['tls_connect'] == HOST_ENCRYPTION_PSK) {
+								$this->assertNotEmpty($proxy_upd[$field]);
+
+								if (array_key_exists($field, $proxy)) {
+									$this->assertSame($proxy[$field], $proxy_upd[$field]);
+								}
+								else {
+									$this->assertSame($db_proxy[$field], $proxy_upd[$field]);
+								}
+							}
+							else {
+								$this->assertSame($db_defaults[$field], $proxy_upd[$field]);
+							}
+						}
+					}
+					else {
+						foreach (['tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'] as $field) {
+							if (array_key_exists($field, $proxy)) {
+								$this->assertSame($proxy[$field], $proxy_upd[$field]);
+							}
+							else {
+								$this->assertSame($db_proxy[$field], $proxy_upd[$field]);
+							}
+						}
+					}
 				}
 
-				// Check "address".
-				if (array_key_exists('address', $proxy)) {
-					$this->assertSame($proxy['address'], $proxy_upd['address']);
+				// Check custom per-item-type timeouts.
+				if (array_key_exists('custom_timeouts', $proxy)) {
+					$this->assertEquals($proxy['custom_timeouts'], $proxy_upd['custom_timeouts']);
 				}
 				else {
-					$this->assertSame($db_proxy['address'], $proxy_upd['address']);
+					$this->assertEquals($db_proxy['custom_timeouts'], $proxy_upd['custom_timeouts']);
 				}
 
-				// Check "port".
-				if (array_key_exists('port', $proxy)) {
-					$this->assertSame($proxy['port'], $proxy_upd['port']);
-				}
-				else {
-					$this->assertSame($db_proxy['port'], $proxy_upd['port']);
+				foreach ($timeout_fields as $field) {
+					if ($proxy_upd['custom_timeouts'] != $db_proxy['custom_timeouts']) {
+						if ($proxy_upd['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
+							if (array_key_exists($field, $proxy)) {
+								$this->assertSame($proxy[$field], $proxy_upd[$field]);
+							}
+							else {
+								$this->assertSame($db_defaults[$field], $proxy_upd[$field]);
+							}
+						}
+						elseif ($proxy_upd['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+							$this->assertNotEmpty($proxy_upd[$field]);
+							$this->assertSame($proxy[$field], $proxy_upd[$field]);
+						}
+					}
+					elseif ($proxy_upd['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
+						if (array_key_exists($field, $proxy)) {
+							$this->assertSame($proxy[$field], $proxy_upd[$field]);
+						}
+						else {
+							$this->assertSame($db_defaults[$field], $proxy_upd[$field]);
+						}
+					}
+					elseif ($proxy_upd['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+						$this->assertNotEmpty($proxy_upd[$field]);
+
+						if (array_key_exists($field, $proxy)) {
+							$this->assertSame($proxy[$field], $proxy_upd[$field]);
+						}
+						else {
+							$this->assertSame($db_proxy[$field], $proxy_upd[$field]);
+						}
+					}
 				}
 
 				// Check hosts.
@@ -2354,7 +4780,10 @@ class testProxy extends CAPITest {
 	private function getProxies(array $proxyids): array {
 		$response = $this->call('proxy.get', [
 			'output' => ['proxyid', 'name', 'operating_mode', 'description', 'allowed_addresses', 'address', 'port',
-				'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'lastaccess', 'version', 'compatibility'
+				'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent',
+				'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
+				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script',
+				'lastaccess', 'version', 'compatibility'
 			],
 			'selectHosts' => ['hostid'],
 			'proxyids' => $proxyids,
@@ -2454,6 +4883,21 @@ class testProxy extends CAPITest {
 				}
 			}
 			unset($host);
+		}
+
+		if (array_key_exists('filter', $request) && is_array($request['filter'])
+				&& array_key_exists('proxyid', $request['filter'])) {
+			if (is_array($request['filter']['proxyid'])) {
+				foreach ($request['filter']['proxyid'] as &$proxyid) {
+					if (self::isValidIdPlaceholder($proxyid)) {
+						$proxyid = self::$data['proxyids'][$proxyid];
+					}
+				}
+				unset($proxyid);
+			}
+			elseif (self::isValidIdPlaceholder($request['filter']['proxyid'])) {
+				$request['filter']['proxyid'] = self::$data['proxyids'][$request['filter']['proxyid']];
+			}
 		}
 
 		return $request;

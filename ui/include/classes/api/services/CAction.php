@@ -31,6 +31,10 @@ class CAction extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const OUTPUT_FIELDS = ['actionid', 'esc_period', 'eventsource', 'name', 'status', 'pause_symptoms',
+		'pause_suppressed', 'notify_if_canceled'
+	];
+
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
 	protected $sortColumns = ['actionid', 'name', 'status'];

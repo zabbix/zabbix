@@ -22,15 +22,20 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testTriggerExpressions extends CWebTest {
 
-	const TRIGGER_ID = 17094;		//'Lack of available memory on server {HOST.NAME}'
+	const TRIGGER_ID = 17094;		//'PHP-FPM: Pool has been restarted'
 
 	public function testTriggerExpressions_SimpleTest() {
 		// Open advanced editor for testing trigger expression results.
-		$this->page->login()->open('triggers.php?form=update&context=host&triggerid='.self::TRIGGER_ID);
+		$description = CDBHelper::getValue('SELECT description FROM triggers WHERE triggerid='.self::TRIGGER_ID);
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&context=template');
+		$form = CFilterElement::find()->one()->getForm();
+		$form->fill(['Name' => $description])->submit();
+		$this->query('link', $description)->one()->click();
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->query('button:Expression constructor')->waitUntilPresent()->one()->click();
 		$this->query('button:Test')->waitUntilPresent()->one()->click();
 
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 		// Check table headers presence in tesing dialog.
 		$table_headers = ['Expression variable elements', 'Result type', 'Value',

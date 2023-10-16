@@ -39,7 +39,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 
 	public static function getCreateWidgetData() {
 		return [
-			// Create a Host availability widget with default values.
+			// #0 Create a Host availability widget with default values.
 			[
 				[
 					'fields' => [
@@ -47,55 +47,57 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a Host availability widget with default values for Zabbix agent interface.
+			// #1 Create a Host availability widget with default values for Zabbix agent interface.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
 						'Name' => 'Single interface widget - default',
-						'Interface type' => 'Zabbix agent'
+						'Interface type' => 'Zabbix agent (passive checks)'
 					]
 				]
 			],
-			// Create a Host availability widget for Zabbix agent interface specifying every parameter.
+			// #2 Create a Host availability widget for Zabbix agent interface specifying every parameter.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
-						'Name' => 'Show hosts in maintenance',
+						'Name' => 'Include hosts in maintenance',
 						'Refresh interval' => '1 minute',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
-						'Interface type' => 'Zabbix agent',
-						'Show hosts in maintenance' => true
+						'Interface type' => 'Zabbix agent (passive checks)',
+						'Include hosts in maintenance' => true
 					],
 					'expected_values' => [
 						'Total' => '6',
 						'Available' => '2',
 						'Not available' => '2',
-						'Unknown' => '2'
+						'Unknown' => '2',
+						'Mixed' => '0'
 					]
 				]
 			],
-			// Create the same widget as previous one, but with 'Show hosts in maintenance' = false.
+			// #3 Create the same widget as previous one, but with 'Include hosts in maintenance' = false.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
-						'Name' => 'Dont show hosts in maintenance',
+						'Name' => 'Dont include hosts in maintenance',
 						'Refresh interval' => '10 minutes',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
-						'Interface type' => 'Zabbix agent',
-						'Show hosts in maintenance' => false
+						'Interface type' => 'Zabbix agent (passive checks)',
+						'Include hosts in maintenance' => false
 					],
 					'expected_values' => [
 						'Total' => '3',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '1'
+						'Unknown' => '1',
+						'Mixed' => '0'
 					]
 				]
 			],
-			// Create a Host availability widget that displays only IPMI interfaces including the ones in maintenance.
+			// #4 Create a Host availability widget that displays only IPMI interfaces including the ones in maintenance.
 			[
 				[
 					'fields' => [
@@ -103,17 +105,18 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Name' => 'Host availability widget - IPMI with maintenance',
 						'Refresh interval' => '10 seconds',
 						'Interface type' => 'IPMI',
-						'Show hosts in maintenance' => true
+						'Include hosts in maintenance' => true
 					],
 					'expected_values' => [
 						'Total' => '8',
 						'Available' => '2',
 						'Not available' => '2',
-						'Unknown' => '4'
+						'Unknown' => '4',
+						'Mixed' => '0'
 					]
 				]
 			],
-			// Create a Host availability widget that displays SNMP interface.
+			// #5 Create a Host availability widget that displays SNMP interface.
 			[
 				[
 					'fields' => [
@@ -127,11 +130,12 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Total' => '6',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '4'
+						'Unknown' => '4',
+						'Mixed' => '0'
 					]
 				]
 			],
-			// Create a Host availability widget that displays JMX interface.
+			// #6 Create a Host availability widget that displays JMX interface.
 			[
 				[
 					'fields' => [
@@ -144,54 +148,66 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Total' => '7',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '5'
+						'Unknown' => '5',
+						'Mixed' => '0'
 					]
 				]
 			],
-			// Create a Host availability widget with all 4 interfaces selected.
+			// #7 Create a Host availability widget with all 4 interfaces selected.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
 						'Name' => 'All interfaces selected',
 						'Layout' => 'Vertical',
-						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI']
-					]
+						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX', 'IPMI']
+					],
+					'vertical_interfaces' => ['Agent (passive)', 'SNMP', 'JMX', 'IPMI']
 				]
 			],
-			// Create a Host availability widget that displays SNMP, JMX, IPMI interface and display hosts in maintenance.
+			// #8 Create a Host availability widget that displays SNMP, JMX, IPMI interface and display hosts in maintenance.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
-						'Name' => 'HA widget - show hosts in maintenance SNMP + JMX + IPMI',
+						'Name' => 'HA widget - include hosts in maintenance SNMP + JMX + IPMI',
 						'Refresh interval' => '1 minute',
-						'Show hosts in maintenance' => true,
+						'Include hosts in maintenance' => true,
 						'Interface type' => ['SNMP', 'JMX', 'IPMI']
 					],
 					'expected_values' => [
+						'Total Hosts' => [
+							'Available' => '2',
+							'Not available' => '2',
+							'Mixed' => '0',
+							'Unknown' => '5',
+							'Total' => '9'
+						],
 						'SNMP' => [
 							'Available' => '2',
 							'Not available' => '2',
+							'Mixed' => '0',
 							'Unknown' => '4',
 							'Total' => '8'
 						],
 						'JMX' => [
 							'Available' => '2',
 							'Not available' => '2',
+							'Mixed' => '0',
 							'Unknown' => '5',
 							'Total' => '9'
 						],
 						'IPMI' => [
 							'Available' => '2',
 							'Not available' => '2',
+							'Mixed' => '0',
 							'Unknown' => '4',
 							'Total' => '8'
 						]
 					]
 				]
 			],
-			// Create a Host availability widget with Vertical layout that displays SNMP, JMX and IPMI interfaces.
+			// #9 Create a Host availability widget with Vertical layout that displays SNMP, JMX and IPMI interfaces.
 			[
 				[
 					'fields' => [
@@ -203,21 +219,31 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 					],
 					'expected_values' => [
 						'Available' => [
+							'Total Hosts' => '1',
 							'SNMP' => '1',
 							'JMX' => '1',
 							'IPMI' => '1'
 						],
 						'Not available' => [
+							'Total Hosts' => '1',
 							'SNMP' => '1',
 							'JMX' => '1',
 							'IPMI' => '1'
 						],
+						'Mixed' => [
+							'Total Hosts' => '0',
+							'SNMP' => '0',
+							'JMX' => '0',
+							'IPMI' => '0'
+						],
 						'Unknown' => [
+							'Total Hosts' => '5',
 							'SNMP' => '4',
 							'JMX' => '5',
 							'IPMI' => '4'
 						],
 						'Total' => [
+							'Total Hosts' => '7',
 							'SNMP' => '6',
 							'JMX' => '7',
 							'IPMI' => '6'
@@ -225,7 +251,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 					]
 				]
 			],
-			// HA widget that displays SNMP, JMX and SNMP interfaces for host group with only Zabbix agent interfaces.
+			// #10 HA widget that displays SNMP, JMX and SNMP interfaces for host group with only Zabbix agent interfaces.
 			[
 				[
 					'fields' => [
@@ -234,31 +260,41 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Refresh interval' => '1 minute',
 						'Host groups' => ['Group to check Overview'],
 						'Interface type' => ['SNMP', 'JMX', 'IPMI'],
-						'Show hosts in maintenance' => true
+						'Include hosts in maintenance' => true
 					],
 					'expected_values' => [
+						'Total Hosts' =>
+							[
+							'Available' => '0',
+							'Not available' => '0',
+							'Mixed' => '0',
+							'Unknown' => '0',
+							'Total' => '0'
+						],
 						'SNMP' => [
 							'Available' => '0',
 							'Not available' => '0',
+							'Mixed' => '0',
 							'Unknown' => '0',
 							'Total' => '0'
 						],
 						'JMX' => [
 							'Available' => '0',
 							'Not available' => '0',
+							'Mixed' => '0',
 							'Unknown' => '0',
 							'Total' => '0'
 						],
 						'IPMI' => [
 							'Available' => '0',
 							'Not available' => '0',
+							'Mixed' => '0',
 							'Unknown' => '0',
 							'Total' => '0'
 						]
 					]
 				]
 			]
-
 		];
 	}
 
@@ -295,25 +331,26 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 
 	public static function getUpdateWidgetData() {
 		return [
-			// Update the widget to return info for group in maintenance and remove "Show hosts in maintenance" flag.
+			// #0 Update the widget to return info for group in maintenance and remove "Include hosts in maintenance" flag.
 			[
 				[
 					'fields' => [
 						'Name' => 'Should return zeros',
 						'Refresh interval' => '1 minute',
 						'Host groups' => ['Group in maintenance for Host availability widget'],
-						'Interface type' => 'Zabbix agent',
-						'Show hosts in maintenance' => false
+						'Interface type' => 'Zabbix agent (passive checks)',
+						'Include hosts in maintenance' => false
 					],
 					'expected_values' => [
 						'Total' => '0',
 						'Available' => '0',
+						'Mixed' => '0',
 						'Not available' => '0',
 						'Unknown' => '0'
 					]
 				]
 			],
-			// Update the widget to return info for group in maintenance and set "Show hosts in maintenance" flag.
+			// #1 Update the widget to return info for group in maintenance and set "Include hosts in maintenance" flag.
 			[
 				[
 					'fields' => [
@@ -321,18 +358,19 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Name' => 'Return hosts in maintenance',
 						'Refresh interval' => '10 seconds',
 						'Host groups' => ['Group in maintenance for Host availability widget'],
-						'Interface type' => 'Zabbix agent',
-						'Show hosts in maintenance' => true
+						'Interface type' => 'Zabbix agent (passive checks)',
+						'Include hosts in maintenance' => true
 					],
 					'expected_values' => [
 						'Total' => '3',
 						'Available' => '1',
+						'Mixed' => '0',
 						'Not available' => '1',
 						'Unknown' => '1'
 					]
 				]
 			],
-			// Update the layout of the widget to Vertical and set Interface type to JMX.
+			// #2 Update the layout of the widget to Vertical and set Interface type to JMX.
 			[
 				[
 					'fields' => [
@@ -345,71 +383,75 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 					'expected_values' => [
 						'Total' => '7',
 						'Available' => '1',
+						'Mixed' => '0',
 						'Not available' => '1',
 						'Unknown' => '5'
 					]
 				]
 			],
-			// Setting name of the widget to default value.
+			// #3 Setting name of the widget to default value.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
 						'Name' => '',
 						'Refresh interval' => 'Default (15 minutes)',
-						'Interface type' => 'Zabbix agent'
+						'Interface type' => 'Zabbix agent (passive checks)'
 					]
 				]
 			],
-			// Update the widget to show hosts in maintenance option without defining host groups.
+			// #4 Update the widget to include hosts in maintenance option without defining host groups.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts',
 						'Refresh interval' => 'No refresh',
-						'Interface type' => 'Zabbix agent',
-						'Show hosts in maintenance' => true
+						'Interface type' => 'Zabbix agent (passive checks)',
+						'Include hosts in maintenance' => true
 					]
 				]
 			],
-			// Update the widget to display host availability for 2 interface types including hosts in maintenance.
+			// #5 Update the widget to display host availability for 2 interface types including hosts in maintenance.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts for Zabbix agent and SNMP',
 						'Refresh interval' => '10 seconds',
-						'Interface type' => ['Zabbix agent', 'SNMP'],
-						'Show hosts in maintenance' => true
-					]
+						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP'],
+						'Include hosts in maintenance' => true
+					],
+					'vertical_interfaces' => ['Agent (passive)', 'SNMP']
 				]
 			],
-			// Update the widget to display host availability for 3 interface types excluding hosts in maintenance.
+			// #6 Update the widget to display host availability for 3 interface types excluding hosts in maintenance.
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
 						'Name' => 'Show hosts for Zabbix agent, SNMP and JMX',
 						'Refresh interval' => '2 minutes',
-						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX']
-					]
+						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX']
+					],
+					'vertical_interfaces' => ['Agent (passive)', 'SNMP', 'JMX']
 				]
 			],
-			// Update the widget to display host availability for all interfaces including hosts in maintenance. Layout = Vertical
+			// #7 Update the widget to display host availability for all interfaces including hosts in maintenance. Layout = Vertical
 			[
 				[
 					'fields' => [
 						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts for all interfaces',
 						'Refresh interval' => '2 minutes',
-						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
-						'Show hosts in maintenance' => true,
+						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX', 'IPMI'],
+						'Include hosts in maintenance' => true,
 						'Layout' => 'Vertical'
-					]
+					],
+					'vertical_interfaces' => ['Agent (passive)', 'SNMP', 'JMX', 'IPMI']
 				]
 			],
-			// Display host availability for all interfaces for 2 host groups.
+			// #8 Display host availability for all interfaces for 2 host groups.
 			[
 				[
 					'fields' => [
@@ -417,30 +459,48 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Name' => 'Show all hosts for all interfaces of 2 groups',
 						'Refresh interval' => '10 minutes',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
-						'Show hosts in maintenance' => true
+						'Include hosts in maintenance' => true
 					],
 					'expected_values' => [
-						'Zabbix agent' => [
+						'Total Hosts' => [
 							'Available' => '2',
 							'Not available' => '2',
+							'Mixed' => '0',
+							'Unknown' => '2',
+							'Total' => '6'
+						],
+						'Agent (active)' => [
+							'Available' => '0',
+							'Not available' => '0',
+							'Mixed' => '-',
+							'Unknown' => '0',
+							'Total' => '0'
+						],
+						'Agent (passive)' => [
+							'Available' => '2',
+							'Not available' => '2',
+							'Mixed' => '0',
 							'Unknown' => '2',
 							'Total' => '6'
 						],
 						'SNMP' => [
 							'Available' => '2',
 							'Not available' => '2',
+							'Mixed' => '0',
 							'Unknown' => '0',
 							'Total' => '4'
 						],
 						'JMX' => [
 							'Available' => '2',
 							'Not available' => '2',
+							'Mixed' => '0',
 							'Unknown' => '0',
 							'Total' => '4'
 						],
 						'IPMI' => [
 							'Available' => '2',
 							'Not available' => '2',
+							'Mixed' => '0',
 							'Unknown' => '0',
 							'Total' => '4'
 						]
@@ -644,6 +704,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		$classes = [
 			'Available' => 'host-avail-true',
 			'Not available' => 'host-avail-false',
+			'Mixed' => 'host-avail-mixed',
 			'Unknown' => 'host-avail-unknown',
 			'Total' => 'host-avail-total'
 		];
@@ -660,7 +721,17 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		}
 		// Else get expected values from DB.
 		else {
-			$db_values = $this->getExpectedInterfaceCountFromDB($data, $data['fields']['Interface type']);
+			if ($data['fields']['Interface type'] === 'Zabbix agent (active checks)') {
+				$interface_type = 'Agent (active)';
+			}
+			elseif ($data['fields']['Interface type'] === 'Zabbix agent (passive checks)') {
+				$interface_type = 'Agent (passive)';
+			}
+			else {
+				$interface_type = $data['fields']['Interface type'];
+			}
+
+			$db_values = $this->getExpectedInterfaceCountFromDB($data, $interface_type);
 			// Verify that values from the widget match values from DB.
 			$this->assertEquals($db_values, $results);
 		}
@@ -672,15 +743,19 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	 */
 	private function checkMultipleInterfacesWidgetContent($data, $header) {
 		$default_interfaces = [
-			'type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
-			'status' => ['Available', 'Not available', 'Unknown', 'Total']
+			'type' => ['Agent (active)', 'Agent (passive)', 'SNMP', 'JMX', 'IPMI'],
+			'status' => ['Available', 'Not available', 'Mixed', 'Unknown', 'Total']
 		];
 		// Get widget content.
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($header);
 		$content = $widget->getContent()->asTable();
 
-		$interfaces = CTestArrayHelper::get($data, 'fields.Interface type', $default_interfaces['type']);
+
+		$interfaces = (array_key_exists('vertical_interfaces', $data))
+			? $data['vertical_interfaces']
+			: CTestArrayHelper::get($data, 'fields.Interface type', $default_interfaces['type']);
+
 		// Index table with widget content by interface type, that is located in a column with a blank name.
 		$rows = $content->index('');
 		$table_headers = $content->getHeadersText();
@@ -693,6 +768,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		}
 		else {
 			$column_headers = $interfaces;
+			array_unshift($column_headers, 'Total Hosts');
 			$row_headers = $default_interfaces['status'];
 		}
 		$this->assertSame($column_headers, $table_headers);
@@ -702,7 +778,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 			$this->assertEquals($data['expected_values'], $rows);
 		}
 		else {
-			// Take reference values from DB takin into account widget layout parameter.
+			// Take reference values from DB taking into account widget layout parameter.
 			foreach ($row_headers as $header) {
 				$db_values = $this->getExpectedInterfaceCountFromDB($data, $header);
 				$this->assertEquals($rows[$header], $db_values);
@@ -726,13 +802,15 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	private function getExpectedInterfaceCountFromDB($data, $header) {
 		$db_interfaces = [
 			'type' => [
-				'Zabbix agent' => 1,
+				'Agent (active)' => 5,
+				'Agent (passive)' => 1,
 				'SNMP' => 2,
 				'IPMI' => 3,
 				'JMX' => 4
 			],
 			'interface' => [
-				'Zabbix agent' => 'available',
+				'Agent (active)' => 'available',
+				'Agent (passive)' => 'available',
 				'SNMP' => 'available',
 				'IPMI' => 'available',
 				'JMX' => 'available'
@@ -744,51 +822,78 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 			]
 		];
 		// Select unique hostids for certain type of interfaces
-		$interfaces_sql = 'SELECT DISTINCT(hostid) FROM interface WHERE type=';
+		$interfaces_sql = 'SELECT DISTINCT(hostid) FROM interface WHERE type IN (';
 		// Select hostids for host entries that are not templates or proxies and that are not host prototypes.
 		$hosts_sql = 'SELECT hostid FROM hosts WHERE status IN (0,1) AND flags!=2';
 		// Construct sql for horizontal widget layout.
 		if (CTestArrayHelper::get($data, 'fields.Layout', 'Horizontal') === 'Horizontal') {
-			$total_sql = $interfaces_sql.$db_interfaces['type'][$header].' AND hostid IN ('.$hosts_sql;
-			// Filter out hosts in maintenance if the flag 'Show hosts in maintenance' is not set.
-			if (CTestArrayHelper::get($data['fields'], 'Show hosts in maintenance', false) === false) {
+			$total_sql = $interfaces_sql.$db_interfaces['type'][$header].') AND hostid IN ('.$hosts_sql;
+			// Filter out hosts in maintenance if the flag 'Include hosts in maintenance' is not set.
+			if (CTestArrayHelper::get($data['fields'], 'Include hosts in maintenance', false) === false) {
 				$total_sql = $total_sql.' AND maintenance_status=0';
 			}
-			// Add interface status flag. Possible values: 0 - unknown, 1 - available, 2 - not available.
-			$db_values = [
-				'Available' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=1)'),
-				'Not available' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=2)'),
-				'Unknown' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=0)'),
-				'Total' => CDBHelper::getCount($total_sql.')')
-			];
+
+			if ($header === 'Agent (active)') {
+				$db_values = [
+					'Available' => '0',
+					'Not available' => '0',
+					'Mixed' => '-',
+					'Unknown' => '0',
+					'Total' => '0'
+				];
+			}
+			else {
+				// Add interface status flag. Possible values: 0 - unknown, 1 - available, 2 - not available.
+				$db_values = [
+					'Available' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=1)'),
+					'Not available' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=2)'),
+					'Mixed' => '0',
+					'Unknown' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=0)'),
+					'Total' => CDBHelper::getCount($total_sql.')')
+				];
+			}
 		}
 		// Construct sql for vertical widget layout.
 		else {
-			// Filter out hosts in maintenance if the flag 'Show hosts in maintenance' is not set.
-			if (CTestArrayHelper::get($data['fields'], 'Show hosts in maintenance', false) === false) {
+			// Filter out hosts in maintenance if the flag 'Include hosts in maintenance' is not set.
+			if (CTestArrayHelper::get($data['fields'], 'Include hosts in maintenance', false) === false) {
 				$hosts_sql = $hosts_sql.' AND maintenance_status=0';
 			}
 			// The SQL for Total interface number doesn't use interface status and needs to be constructed separately.
 			if ($header === 'Total'){
 				$db_values = [
-					'Zabbix agent' => CDBHelper::getCount($interfaces_sql.'1 AND hostid IN ('.$hosts_sql.')'),
-					'SNMP' => CDBHelper::getCount($interfaces_sql.'2 AND hostid IN ('.$hosts_sql.')'),
-					'IPMI' => CDBHelper::getCount($interfaces_sql.'3 AND hostid IN ('.$hosts_sql.')'),
-					'JMX' => CDBHelper::getCount($interfaces_sql.'4 AND hostid IN ('.$hosts_sql.')')
+					'Total Hosts' => CDBHelper::getCount($interfaces_sql.'1,2,3,4) AND hostid IN ('.$hosts_sql.')'),
+					'Agent (passive)' => CDBHelper::getCount($interfaces_sql.'1) AND hostid IN ('.$hosts_sql.')'),
+					'SNMP' => CDBHelper::getCount($interfaces_sql.'2) AND hostid IN ('.$hosts_sql.')'),
+					'IPMI' => CDBHelper::getCount($interfaces_sql.'3) AND hostid IN ('.$hosts_sql.')'),
+					'JMX' => CDBHelper::getCount($interfaces_sql.'4) AND hostid IN ('.$hosts_sql.')')
 				];
 			}
 			else {
 				// Add interface status flag based on interface type.
-				$db_values = [
-					'Zabbix agent' => CDBHelper::getCount($interfaces_sql.'1 AND available='.
+				if ($header === 'Mixed') {
+					$db_values = [
+						'Total Hosts' => '0',
+						'Agent (passive)' => '0',
+						'SNMP' => '0',
+						'IPMI' => '0',
+						'JMX' => '0'
+					];
+				}
+				else {
+					$db_values = [
+						'Total Hosts' => CDBHelper::getCount($interfaces_sql.'1,2,3,4) AND available='.
 							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
-					'SNMP' => CDBHelper::getCount($interfaces_sql.'2 AND available='.
+						'Agent (passive)' => CDBHelper::getCount($interfaces_sql.'1) AND available='.
 							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
-					'IPMI' => CDBHelper::getCount($interfaces_sql.'3 AND available='.
+						'SNMP' => CDBHelper::getCount($interfaces_sql.'2) AND available='.
 							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
-					'JMX' => CDBHelper::getCount($interfaces_sql.'4 AND available='.
+						'IPMI' => CDBHelper::getCount($interfaces_sql.'3) AND available='.
+							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+						'JMX' => CDBHelper::getCount($interfaces_sql.'4) AND available='.
 							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')')
-				];
+					];
+				}
 			}
 		}
 
