@@ -132,13 +132,33 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 
 	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", config_icmpping->get_tmpdir(), progname);
 	if (-1 == (fd = mkstemp(filename)))
+	{
+		zbx_snprintf(error, max_error_len, "Cannot create temporary file \"%s\"", filename,
+				zbx_strerror(errno));
+
 		return FAIL;
+	}
 
 	len = strlen(address);
-	n = write(fd, address, len);
-	close(fd);
-	if (n != (ssize_t)len)
+	if (-1 == (n = write(fd, address, len)))
+	{
+		zbx_snprintf(error, max_error_len, "Cannot write address into temporary file: %s", zbx_strerror(errno));
+		close(fd);
 		goto out;
+	}
+
+	if (n != (ssize_t)len)
+	{
+		zbx_strlcpy(error, "Cannot write full address into temporary file", max_error_len);
+		close(fd);
+		goto out;
+	}
+
+	if (-1 == close(fd))
+	{
+		zbx_snprintf(error, max_error_len, "Cannot close temporary file: %s", zbx_strerror(errno));
+		goto out;
+	}
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1 < %s", fping, filename);
 
@@ -171,7 +191,7 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 
 	if (NULL == buffer)
 	{
-		zbx_strlcpy(error, "Can't obtain the program output", max_error_len);
+		zbx_strlcpy(error, "Cannot obtain the program output", max_error_len);
 		goto out;
 	}
 
