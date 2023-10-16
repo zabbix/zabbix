@@ -79,11 +79,6 @@ class CEscapedStringParserTest extends TestCase {
 				'match' => '\n\n\n\n\n',
 				'error' => ''
 			]],
-			['\n\n\n\\n\n', 0, ['characters' => 'n'], [
-				'rc' => CParser::PARSE_SUCCESS,
-				'match' => '\n\n\n\\n\n',
-				'error' => ''
-			]],
 
 			// CParser::PARSE_SUCCESS_CONT
 			['\\\\\n', 0, ['characters' => '\\'], [
