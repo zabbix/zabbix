@@ -80,6 +80,8 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -h 2>&1", fping);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
+
 	if (NULL == (f = popen(tmp, "r")))
 		return;
 
@@ -118,15 +120,27 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  * Return value: SUCCEED if processed successfully or FAIL otherwise          *
  *                                                                            *
  ******************************************************************************/
-static int	get_fping_out(const char *fping, char **out, char *error, size_t max_error_len)
+static int	get_fping_out(const char *fping, const char *address, char **out, char *error, size_t max_error_len)
 {
 	FILE		*f;
-	size_t		buf_size = 0, offset = 0;
+	size_t		buf_size = 0, offset = 0, len;
+	ssize_t		n;
 	char		tmp[MAX_STRING_LEN], *buffer = NULL;
-	int		ret = FAIL;
+	int		ret = FAIL, fd;
 	sigset_t	mask, orig_mask;
+	char		filename[MAX_STRING_LEN];
 
-	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1", fping);
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", config_icmpping->get_tmpdir(), progname);
+	if (-1 == (fd = mkstemp(filename)))
+		return FAIL;
+
+	len = strlen(address);
+	n = write(fd, address, len);
+	close(fd);
+	if (n != (ssize_t)len)
+		goto out;
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1 < %s", fping, filename);
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGINT);
@@ -134,6 +148,8 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 
 	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
 
 	if (NULL == (f = popen(tmp, "r")))
 	{
@@ -143,7 +159,7 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 
 	while (NULL != zbx_fgets(tmp, sizeof(tmp), f))
 	{
-		size_t	len = strlen(tmp);
+		len = strlen(tmp);
 
 		if (MAX_EXECUTE_OUTPUT_LEN < offset + len)
 			break;
@@ -164,6 +180,8 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 out:
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
+
+	unlink(filename);
 
 	return ret;
 }
@@ -315,11 +333,11 @@ static int	get_interval_option(const char *fping, const ZBX_FPING_HOST *hosts, i
 
 			zabbix_log(LOG_LEVEL_DEBUG, "testing fping interval %u ms", intervals[j]);
 
-			zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i%u %s", fping, intervals[j], dst);
+			zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i%u", fping, intervals[j]);
 
 			zbx_free(out);
 
-			if (FAIL == get_fping_out(tmp, &out, err, sizeof(err)))
+			if (FAIL == get_fping_out(tmp, dst, &out, err, sizeof(err)))
 			{
 				zbx_snprintf(error, max_error_len, "Cannot execute \"%s\": %s", tmp, err);
 				goto out;
@@ -423,9 +441,9 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 	int	ret;
 	char	tmp[MAX_STRING_LEN], *out = NULL, error[255];
 
-	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50 %s", fping, dst);
+	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50", fping);
 
-	if ((FAIL == (ret = get_fping_out(tmp, &out, error, sizeof(error))) ||
+	if ((FAIL == (ret = get_fping_out(tmp, dst, &out, error, sizeof(error))) ||
 			ZBX_KIBIBYTE < strlen(out) || NULL == strstr(out, dst)))
 	{
 		ret = FAIL;
@@ -1042,7 +1060,7 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 
 	fclose(f);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", linebuf);
+	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", linebuf);
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGINT);
