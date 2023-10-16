@@ -148,9 +148,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#navigate(e.detail, location.href),
-				{once: true}
-			);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
 		}
 
 		executeNow(target, data) {
@@ -183,54 +181,31 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				if (['item.update', 'item.create', 'item.delete'].indexOf(e.detail.action) != -1) {
-					uncheckTableRows('item');
-				}
-
-				if (e.detail.success.action === 'delete') {
-					let list_url = new Curl('zabbix.php');
-
-					list_url.setArgument('action', 'item.list');
-					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
-					original_url = list_url.getUrl();
-				}
-
 				history.replaceState({}, '', original_url);
-				this.#navigate(e.detail, original_url);
-			});
+				this.elementSuccess(e);
+			}, {once: true});
 
 			overlay.$dialogue[0].addEventListener('dialogue.close', e => history.replaceState({}, '', original_url));
 		}
 
 		openTemplatePopup(template_data) {
-			let original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				if (e.detail.success.action === 'delete') {
-					let list_url = new Curl('zabbix.php');
-
-					list_url.setArgument('action', 'item.list');
-					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
-					original_url = list_url.getUrl();
-				}
-
-				this.#navigate(e.detail, original_url)
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
 		}
 
 		#edit(target, parameters = {}) {
-			this.#popup('item.edit', parameters, {
+			const overlay = PopUp('item.edit', parameters, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
 				trigger_element: target
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
 		}
 
 		#enable(target, parameters) {
@@ -272,18 +247,25 @@
 		}
 
 		#copy(target, itemids) {
-			this.#popup('copy.edit', {source: 'items', itemids}, {
+			const overlay = PopUp('copy.edit', {source: 'items', itemids}, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static',
 				trigger_element: target
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
 		}
 
 		#massupdate(target, parameters) {
-			this.#popup('item.massupdate', {...this.token, ...parameters, prototype: 0}, {
+			const overlay = PopUp('item.massupdate', {...this.token, ...parameters, prototype: 0}, {
 				dialogue_class: 'modal-popup-preprocessing',
 				trigger_element: target
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				e => this.elementSuccess('title' in e.detail ? {detail: {success: e.detail}} : e),
+				{once: true}
+			);
 		}
 
 		#delete(target, parameters) {
@@ -316,25 +298,7 @@
 				body: JSON.stringify({...this.token, ...data})
 			})
 				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						if ('title' in response.error) {
-							postMessageError(response.error.title);
-						}
-
-						postMessageDetails('error', response.error.messages);
-					}
-					else if ('success' in response) {
-						postMessageOk(response.success.title);
-
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-					}
-
-					uncheckTableRows('item');
-					location.href = location.href;
-				})
+				.then((response) => this.elementSuccess({detail: response}))
 				.catch(() => {
 					clearMessages();
 
@@ -344,28 +308,10 @@
 				});
 		}
 
-		#popup(action, parameters, overlay_options) {
-			const overlay = PopUp(action, parameters, overlay_options);
+		elementSuccess(e) {
+			let new_href = location.href;
+			const response = e.detail;
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				uncheckTableRows('item');
-				location.href = location.href;
-			});
-
-			return overlay;
-		}
-
-		#navigate(response, url) {
 			if ('error' in response) {
 				if ('title' in response.error) {
 					postMessageError(response.error.title);
@@ -374,14 +320,25 @@
 				postMessageDetails('error', response.error.messages);
 			}
 			else if ('success' in response) {
+				uncheckTableRows('item');
 				postMessageOk(response.success.title);
 
 				if ('messages' in response.success) {
 					postMessageDetails('success', response.success.messages);
 				}
+
+				if (response.success.action === 'delete') {
+					// Items template or host were removed, redirect to list of items.
+					let list_url = new Curl('zabbix.php');
+
+					list_url.setArgument('action', 'item.list');
+					list_url.setArgument('context', this.context);
+					list_url.setArgument('filter_set', 1);
+					new_href = list_url.getUrl();
+				}
 			}
 
-			location.href = url;
+			location.href = new_href;
 		}
 	};
 </script>

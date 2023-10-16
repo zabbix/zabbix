@@ -471,10 +471,6 @@ function submitPopup(overlay) {
 				postMessageDetails('success', response.messages);
 			}
 
-			if ('clear_checkboxes' in response) {
-				uncheckTableRows(response.clear_checkboxes);
-			}
-
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location_url;
 		}

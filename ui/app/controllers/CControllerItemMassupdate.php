@@ -278,11 +278,9 @@ class CControllerItemMassupdate extends CController {
 
 		if ($result) {
 			$messages = CMessageHelper::getMessages();
-			$output = [
-				'title' => $item_prototypes
-					? _n('Item prototype updated', 'Item prototypes updated', $items_count)
-					: _n('Item updated', 'Items updated', $items_count),
-				'clear_checkboxes' => 'item'
+			$output = ['title' => $item_prototypes
+				? _n('Item prototype updated', 'Item prototypes updated', $items_count)
+				: _n('Item updated', 'Items updated', $items_count)
 			];
 
 			if (count($messages)) {
