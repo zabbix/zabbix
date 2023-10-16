@@ -432,6 +432,8 @@ static void	DCdump_interfaces(void)
 		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s", if_msg);
+
+		offset = 0;
 	}
 
 	zbx_free(if_msg);

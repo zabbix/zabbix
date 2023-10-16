@@ -2128,6 +2128,10 @@ msgstr "Nie można zmienić typu użytkownika własnej roli."
 msgid "Cannot clear history"
 msgstr "Nie można wyczyścić historii"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Nie można powielić prototypów wykresów."
@@ -3810,6 +3814,14 @@ msgstr "Wyczyść historię"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Wyczyść historię i trendy"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -8051,6 +8063,10 @@ msgstr "Podkreśl cały wiersz"
 #: jsLoader.php:372
 msgid "History"
 msgstr "Historia"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"

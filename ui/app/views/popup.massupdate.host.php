@@ -38,7 +38,8 @@ $host_tab = new CFormList('hostFormList');
 
 $host_tab->addRow(
 	(new CVisibilityBox('visible[templates]', 'linked-templates-field', _('Original')))
-		->setLabel(_('Link templates')),
+		->setLabel(_('Link templates'))
+		->setAttribute('autofocus', 'autofocus'),
 	(new CDiv([
 		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
 			->addValue(_('Link'), ZBX_ACTION_ADD)
@@ -69,9 +70,7 @@ $host_tab->addRow(
 );
 
 $host_tab->addRow(
-	(new CVisibilityBox('visible[groups]', 'groups-field', _('Original')))
-		->setLabel(_('Host groups'))
-		->setAttribute('autofocus', 'autofocus'),
+	(new CVisibilityBox('visible[groups]', 'groups-field', _('Original')))->setLabel(_('Host groups')),
 	(new CDiv([
 		(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
 			->addValue(_('Add'), ZBX_ACTION_ADD)

@@ -20,8 +20,9 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -31,16 +32,19 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardTriggerOverviewWidget extends CWebTest {
 
-	use TagTrait;
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
+	public function getBehaviors()
+	{
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
 	}
 
 	private static $dashboardid;
@@ -642,7 +646,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Hosts location' => 'Top'
 		]);
 
-		$this->setTagSelector('id:tags_table_tags');
 		$this->setTags([['name' => 'webhook', 'operator' => 'Equals', 'value' => '1']]);
 
 		// Save or cancel widget.
@@ -771,7 +774,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data,'tags', false)) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
