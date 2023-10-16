@@ -373,21 +373,21 @@ class CActionCondValidatorTest extends CValidatorTest {
 			],
 			[[],
 				[
-					'conditiontype' => 11 /* CONDITION_TYPE_DUPTIME */,
+					'conditiontype' => 11 /* ZBX_CONDITION_TYPE_DUPTIME */,
 					'value' => -1
 				],
 				'Incorrect value for field "value": value must be between "0" and "2592000".'
 			],
 			[[],
 				[
-					'conditiontype' => 11 /* CONDITION_TYPE_DUPTIME */,
+					'conditiontype' => 11 /* ZBX_CONDITION_TYPE_DUPTIME */,
 					'value' => 2592001 /* SEC_PER_MONTH + 1 */
 				],
 				'Incorrect value for field "value": value must be between "0" and "2592000".'
 			],
 			[[],
 				[
-					'conditiontype' => 11 /* CONDITION_TYPE_DUPTIME */,
+					'conditiontype' => 11 /* ZBX_CONDITION_TYPE_DUPTIME */,
 					'value' => 'abc'
 				],
 				'Incorrect value for field "value": value must be between "0" and "2592000".'
