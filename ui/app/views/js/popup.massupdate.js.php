@@ -106,7 +106,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 // Tags.
 (() => {
-	const tags_elem = document.querySelector('#tags-div');
+	const tags_elem = document.querySelector('#tags-field');
 	if (!tags_elem) {
 		return false;
 	}
