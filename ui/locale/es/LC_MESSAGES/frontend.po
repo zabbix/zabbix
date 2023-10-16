@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-06-27 14:59+0000\n"
-"Last-Translator: Rodrigo Romero <rodrigo.n.romero@gmail.com>\n"
+"PO-Revision-Date: 2023-09-11 10:01+0000\n"
+"Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -2103,6 +2103,10 @@ msgstr "No se puede cambiar el tipo de usuario del propio rol."
 msgid "Cannot clear history"
 msgstr "No se pudo eliminar el histórico"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "No se pudo clonar los prototipos de gráfico."
@@ -2839,7 +2843,7 @@ msgstr "No se puede vincular la plantilla \"%1$s\" al host \"%2$s\" debido a la 
 #: include/classes/api/services/CHostBase.php:806
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" al host \"%2$s\", porque se vincularía dos veces a través de la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
@@ -2865,7 +2869,7 @@ msgstr "No se puede vincular la plantilla \"%1$s\" al prototipo del equipo \"%2$
 #: include/classes/api/services/CHostBase.php:803
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" al prototipo de equipo \"%2$s\", porque se vincularía dos veces a través de la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -2901,37 +2905,37 @@ msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\" porqu
 #: include/classes/api/services/CHostBase.php:976
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\", porque se vincularía al equipo \"%3$s\" dos veces."
 
 #: include/classes/api/services/CHostBase.php:973
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\", porque se vincularía al prototipo de equipo \"%3$s\" dos veces."
 
 #: include/classes/api/services/CHostBase.php:970
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\", porque se vincularía a la plantilla \"%3$s\" dos veces."
 
 #: include/classes/api/services/CHostBase.php:800
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\", porque se vincularía dos veces a través de la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\", porque su plantilla padre \"%3$s\" se vincularía al equipo \"%4$s\" dos veces."
 
 #: include/classes/api/services/CHostBase.php:1000
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\", porque su plantilla padre \"%3$s\" se vincularía al prototipo de equipo \"%4$s\" dos veces."
 
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\", porque su plantilla padre \"%3$s\" se vincularía a la plantilla \"%4$s\" dos veces."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -2991,7 +2995,7 @@ msgstr "No se puede actualizar en masa los nombres visibles de los equipos."
 #: include/classes/api/services/CHostBase.php:1080
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
-msgstr ""
+msgstr "No se pueden pasar IDs de plantilla duplicados para el vínculo: %1$s."
 
 #: include/classes/db/DB.php:958
 #, c-format
@@ -3082,16 +3086,16 @@ msgstr "No se puede establecer campos de inventario en un inventario deshabilita
 
 #: include/classes/core/CCookieSession.php:127
 msgid "Cannot set session cookie."
-msgstr ""
+msgstr "No se puede configurar la cookie de sesión."
 
 #: include/classes/api/services/CService.php:1403
 #, c-format
 msgid "Cannot specify \"propagation_rule\" parameter without specifying \"propagation_value\" parameter for service \"%1$s\"."
-msgstr ""
+msgstr "No se puede especificar el parámetro \"propagation_rule\" sin especificar el parámetro \"propagation_value\" para el servicio \"%1$s\"."
 
 #: jsLoader.php:295
 msgid "Cannot support notification audio for this device."
-msgstr ""
+msgstr "La notificación de audio no esta soportada para este dispositivo."
 
 #: include/classes/api/services/CHostInterface.php:306
 msgid "Cannot switch host for interface."
@@ -3100,7 +3104,7 @@ msgstr "La interfaz no se puede cambiar de equipo."
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:71
 #: app/controllers/CControllerPopupMediatypeTestSend.php:81
 msgid "Cannot test disabled media type."
-msgstr ""
+msgstr "No se puede probar el tipo de medio deshabilitado."
 
 #: app/controllers/CControllerUserUnblock.php:68
 msgid "Cannot unblock user"
@@ -3511,7 +3515,7 @@ msgstr "Captura todos los traps SNMP que no fueron capturados por ninguno de los
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
 #: include/views/js/monitoring.sysmaps.js.php:35
 msgid "Center"
-msgstr ""
+msgstr "Centrar"
 
 #: app/partials/configuration.host.edit.html.php:433
 #: app/partials/configuration.host.edit.html.php:452
@@ -3529,7 +3533,7 @@ msgstr "Certificado"
 #: include/items.inc.php:1844
 msgctxt "noun"
 msgid "Change"
-msgstr ""
+msgstr "Cambio"
 
 #: app/partials/hostmacros.inherited.list.html.php:114
 #: include/classes/screens/CScreenBase.php:361
@@ -3543,7 +3547,7 @@ msgstr "Cambio"
 #: app/views/administration.proxy.edit.php:126
 #: include/views/configuration.host.prototype.edit.php:398
 msgid "Change PSK"
-msgstr ""
+msgstr "Cambiar PSK"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:354
 #: include/classes/widgets/forms/CWidgetFormItem.php:364
@@ -3551,7 +3555,7 @@ msgstr ""
 #: include/classes/widgets/views/widget.item.form.view.php:53
 #: include/classes/widgets/views/widget.item.form.view.php:184
 msgid "Change indicator"
-msgstr ""
+msgstr "Indicador de cambio"
 
 #: app/views/administration.authentication.edit.php:149
 #: app/views/administration.mediatype.edit.php:137
@@ -3566,11 +3570,11 @@ msgstr "Cambio por segundo"
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
 msgid "Change severity"
-msgstr ""
+msgstr "Gravedad del cambio"
 
 #: include/classes/html/CMacroValue.php:162
 msgid "Change type"
-msgstr ""
+msgstr "Cambiar tipo"
 
 #: app/partials/configuration.filter.items.php:139
 #: app/views/popup.massupdate.item.php:157 include/items.inc.php:127
@@ -3593,7 +3597,7 @@ msgstr "Cadena de caracteres no incluidos"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 #: app/controllers/CControllerPopupTriggerExpr.php:1141
 msgid "Chars"
-msgstr ""
+msgstr "Caracteres"
 
 #: include/hosts.inc.php:234
 msgid "Chassis"
@@ -3614,19 +3618,19 @@ msgstr "Verifique la parte de la expresión que inicia en \"%1$s\"."
 
 #: include/items.inc.php:1877
 msgid "Check for error in JSON"
-msgstr ""
+msgstr "Comprobar si hay errores en JSON"
 
 #: include/items.inc.php:1881
 msgid "Check for error in XML"
-msgstr ""
+msgstr "Comprobar si hay errores en XML"
 
 #: include/items.inc.php:1885
 msgid "Check for error using regular expression"
-msgstr ""
+msgstr "Comprobar si hay errores usando expresiones regulares"
 
 #: include/items.inc.php:1889
 msgid "Check for not supported value"
-msgstr ""
+msgstr "Verifique el valor no admitido"
 
 #: include/classes/setup/CSetupWizard.php:58
 #: include/classes/setup/CSetupWizard.php:465
@@ -3732,6 +3736,14 @@ msgstr "Limpiar histórico"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Limpiar historial y tendencias"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6719,11 +6731,11 @@ msgstr "Generación del evento"
 
 #: include/actions.inc.php:363
 msgid "Event is acknowledged"
-msgstr ""
+msgstr "El evento es reconocido"
 
 #: include/actions.inc.php:363
 msgid "Event is not acknowledged"
-msgstr ""
+msgstr "El evento no es reconocido"
 
 #: tr_events.php:187
 msgid "Event list [previous 20]"
@@ -7952,6 +7964,10 @@ msgstr ""
 #: jsLoader.php:372
 msgid "History"
 msgstr "Histórico"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -18797,7 +18813,7 @@ msgstr ""
 
 #: include/actions.inc.php:2079
 msgid "Unacknowledged"
-msgstr ""
+msgstr "Desconocido"
 
 #: app/views/administration.trigdisplay.edit.php:40
 msgid "Unacknowledged PROBLEM events"
@@ -22271,7 +22287,7 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:773
 msgid "no permissions to acknowledge problems"
-msgstr ""
+msgstr "no hay permisos para reconocer problemas"
 
 #: include/classes/api/services/CEvent.php:762
 msgid "no permissions to add problem comments"
@@ -22291,7 +22307,7 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:774
 msgid "no permissions to unacknowledge problems"
-msgstr ""
+msgstr "no hay permisos para desconocer problemas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:836
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
@@ -22322,6 +22338,10 @@ msgstr ""
 
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127

@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/behaviors/CPreprocessingBehavior.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
@@ -32,7 +33,14 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormTabIndicators extends CWebTest {
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CPreprocessingBehavior::class];
+	}
 
 	public function getTabData() {
 		return [

@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -106,7 +106,7 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 |MongoDB: Version has changed|<p>MongoDB version has changed. Acknowledge to close the problem manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version))>0`|Info|**Manual close**: Yes|
 |MongoDB: mongod process has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.uptime)<10m`|Info|**Manual close**: Yes|
 |MongoDB: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/MongoDB node by Zabbix agent 2/mongodb.uptime,10m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MongoDB: Connection to MongoDB is unavailable</li></ul>|
-|MongoDB: Total number of open connections is too high|<p>Too few available connections.If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.</p>|`min(/MongoDB node by Zabbix agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}`|Warning||
+|MongoDB: Total number of open connections is too high|<p>Too few available connections.<br>If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.</p>|`min(/MongoDB node by Zabbix agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}`|Warning||
 |MongoDB: Too many cursors opened by MongoDB for clients||`min(/MongoDB node by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}`|Warning||
 |MongoDB: Too many cursors are timing out||`min(/MongoDB node by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}`|Warning||
 
@@ -240,8 +240,8 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MongoDB: Available WiredTiger read tickets is low|<p>Too few available read tickets.When the number of available read tickets remaining reaches zero, new read requests will be queued until a new read ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
-|MongoDB: Available WiredTiger write tickets is low|<p>Too few available write tickets.When the number of available write tickets remaining reaches zero, new write requests will be queued until a new write ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
+|MongoDB: Available WiredTiger read tickets is low|<p>Too few available read tickets.<br>When the number of available read tickets remaining reaches zero, new read requests will be queued until a new read ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
+|MongoDB: Available WiredTiger write tickets is low|<p>Too few available write tickets.<br>When the number of available write tickets remaining reaches zero, new write requests will be queued until a new write ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
 
 ## Feedback
 

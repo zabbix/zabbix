@@ -186,7 +186,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	$result = deleteHistoryByHttpTestIds([getRequest('httptestid')]);
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
@@ -430,7 +430,7 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhist
 		uncheckTableRows(getRequest('hostid'));
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {

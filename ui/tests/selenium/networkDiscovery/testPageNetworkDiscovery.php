@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup drules
@@ -30,15 +30,16 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testPageNetworkDiscovery extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -524,7 +525,9 @@ class testPageNetworkDiscovery extends CWebTest {
 						: $count - count($data['name'])
 					);
 					if (CTestArrayHelper::get($data, 'single', false) === true) {
-						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.CDBHelper::escape($data['name']).')'));
+						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.
+								CDBHelper::escape($data['name']).')')
+						);
 					}
 					else {
 						$this->assertEquals($count - count($data['name']), CDBHelper::getCount('SELECT *FROM drules'));

@@ -38,7 +38,9 @@ class testMultiselect extends CWebTest {
 	}
 
 	public function testMultiselect_SuggestCreateNew() {
-		$this->checkSuggest('zabbix.php?action=host.edit','host-form', 'Groups', 'QQQwww', 'multiselect-suggest');
+		$this->checkSuggest('zabbix.php?action=host.edit','host-form', 'Groups', 'QQQwww',
+				'multiselect-suggest'
+		);
 	}
 
 	public function checkSuggest($link, $query, $name, $string, $class) {
@@ -49,8 +51,14 @@ class testMultiselect extends CWebTest {
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
 
+		// Cover proxy selection field, because it gets changed depending on proxy names' lengths in the dropdown.
+		$covered_region = ($query === 'host-form')
+			? [$element, ['x' => 196, 'y' => 330, 'width' => 452, 'height' => 22]]
+			: [$element];
+
 		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'table-forms'))
-				->one(), [$element], $string);
+				->one(), $covered_region, $string
+		);
 	}
 
 	public function testMultiselect_NotSuggestAlreadySelected() {
