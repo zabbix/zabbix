@@ -240,6 +240,14 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 					'discoveryids' => [$this->getInput('parent_discoveryid')]
 				]);
 
+				if (!$master_item) {
+					$master_item = API::Item()->get([
+						'output' => ['itemid', 'name'],
+						'itemids' => [$this->getInput('master_itemid')],
+						'hostids' => [$item['hostid']]
+					]);
+				}
+
 				if ($master_item) {
 					$item['master_itemid'] = $this->getInput('master_itemid');
 					$item['master_item'] =  reset($master_item);
