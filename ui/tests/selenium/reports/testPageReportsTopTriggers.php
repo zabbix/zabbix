@@ -991,7 +991,11 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by date label.
+			/*
+			 * Search by date label.
+			 * Note: This test case depends on time when executed. E.g. if execution time is around 00:00 - 00:30 expected
+			 * result will be different, because some of prepareData generated problems will appear in yesterday's filter.
+			 */
 			[
 				[
 					'date' => [
