@@ -55,6 +55,9 @@ class testPageHostDashboards extends CWebTest {
 									]
 								]
 							]
+						],
+						[
+							'name' => 'Page 2'
 						]
 					]
 				]
@@ -102,26 +105,37 @@ class testPageHostDashboards extends CWebTest {
 		$this->assertEquals('zabbix.php?action=host.view', $breadcrumbs->query('link:All hosts')->one()->getAttribute('href'));
 		$this->assertEquals(self::HOST_NAME, $breadcrumbs->query('xpath:./li[2]/span')->one()->getText());
 
-		$dashboard_nav = $this->query('class:host-dashboard-navigation')->one();
+		$dashboard_navigation = $this->query('class:host-dashboard-navigation')->one();
 
-		$prev_button = $dashboard_nav->query('xpath:.//button[@title="Previous dashboard"]')->one();
+		$prev_button = $dashboard_navigation->query('xpath:.//button[@title="Previous dashboard"]')->one();
 		$this->assertTrue($prev_button->isDisplayed());
 		$this->assertFalse($prev_button->isEnabled());
 
-		$dasboard_tab = $dashboard_nav->query('xpath:.//span[text()="Dashboard 1"]')->one();
+		$dasboard_tab = $dashboard_navigation->query('xpath:.//span[text()="Dashboard 1"]')->one();
 		$this->assertEquals('Dashboard 1', $dasboard_tab->getAttribute('title'));
 
 		// Assert the listed dashboard dropdown.
-		$list_button = $dashboard_nav->query('xpath:.//button[@title="Dashboard list"]')->one();
+		$list_button = $dashboard_navigation->query('xpath:.//button[@title="Dashboard list"]')->one();
 		$this->assertTrue($list_button->isClickable());
 		$list_button->click();
 		$popup_menu = $list_button->asPopupButton()->getMenu();
 		$this->assertEquals(['Dashboard 1'], $popup_menu->getItems()->asText());
 		$popup_menu->close();
 
-		$next_button = $dashboard_nav->query('xpath:.//button[@title="Next dashboard"]')->one();
+		$next_button = $dashboard_navigation->query('xpath:.//button[@title="Next dashboard"]')->one();
 		$this->assertTrue($next_button->isDisplayed());
 		$this->assertFalse($next_button->isEnabled());
+
+		// Check page tabs.
+		foreach (['Page 1', 'Page 2'] as $page) {
+			$this->assertTrue($this->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($page).']')->exists());
+		}
+
+		// Check Slideshow button.
+		foreach (['class:btn-dashboard-toggle-slideshow', 'xpath://span[text()="Start slideshow"]',
+				'xpath://span[text()="Stop slideshow"]'] as $selector) {
+			$this->assertTrue($this->query($selector)->exists());
+		}
 	}
 
 	/**
@@ -140,14 +154,19 @@ class testPageHostDashboards extends CWebTest {
 		$this->assertFalse($this->query('class:host-dashboard-navigation')->exists());
 		$this->assertTrue($this->query('class:dashboard')->exists());
 
+		// Check Dashboard page controls.
+		foreach (['Previous page', 'Stop slideshow', 'Next page'] as $button) {
+			$this->assertTrue($this->query('xpath://button[@title="'.$button.'"]')->exists());
+		}
+
 		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
-		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
-		$this->assertTrue($this->query('class:host-dashboard-navigation')->exists());
-		$this->assertTrue($this->query('class:dashboard')->exists());
+		foreach (['xpath://div[@aria-label="Filter"]', 'class:host-dashboard-navigation', 'class:dashboard'] as $selector) {
+			$this->assertTrue($this->query($selector)->exists());
+		}
 	}
 
 	public function getCheckFiltersData() {
@@ -323,17 +342,17 @@ class testPageHostDashboards extends CWebTest {
 		$this->openDashboardsForHost($data['host_name']);
 
 		// Parent to all Dashboard navigation elements.
-		$nav = $this->query('class:host-dashboard-navigation')->one();
+		$navigation = $this->query('class:host-dashboard-navigation')->one();
 
 		// Assert buttons.
-		$prev_button = $nav->query('xpath:.//button[@title="Previous dashboard"]')->one();
+		$prev_button = $navigation->query('xpath:.//button[@title="Previous dashboard"]')->one();
 		$this->assertFalse($prev_button->isEnabled());
-		$next_button = $nav->query('xpath:.//button[@title="Next dashboard"]')->one();
+		$next_button = $navigation->query('xpath:.//button[@title="Next dashboard"]')->one();
 		$this->assertEquals(count($api_dashboards) > 1, $next_button->isEnabled());
 
 		// Assert dashboard Tabs and Pages.
 		foreach ($api_dashboards as $i => $dashboard) {
-			$dasboard_tab = $nav->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($dashboard['name']).']')->one();
+			$dasboard_tab = $navigation->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($dashboard['name']).']')->one();
 			$this->assertEquals($dashboard['name'], $dasboard_tab->getAttribute('title'));
 
 			// Only switch the Dashboard if it is not the first one.
@@ -342,14 +361,21 @@ class testPageHostDashboards extends CWebTest {
 				$this->page->waitUntilReady();
 			}
 
-			// Check Page switching.
-			// It is expected that in every page there will be a Widget named like so: 'Dashboard 1 - Page 2 widget'.
+			/*
+			 * Check Page switching.
+			 * It is expected that in every page there will be a Widget named like so: 'Dashboard 1 - Page 2 widget'.
+			 */
 			if (count($dashboard['pages']) === 1) {
 				// Case when there is only one Page. The Page button is not even visible.
 				$this->checkDashboardOpen($dashboard);
 			}
 			else {
 				// When a Dashboard contains several Pages.
+
+				// Check that Slideshow button exists.
+				$this->assertTrue($this->query('class:btn-dashboard-toggle-slideshow')->exists());
+
+				// Parent to all Page tabs.
 				$page_tabs = $this->query('class:dashboard-navigation-tabs')->one();
 
 				foreach ($dashboard['pages'] as $j => $page) {
@@ -369,7 +395,7 @@ class testPageHostDashboards extends CWebTest {
 		}
 
 		// Assert the Dashboard dropdown.
-		$list_button = $nav->query('xpath:.//button[@title="Dashboard list"]')->one();
+		$list_button = $navigation->query('xpath:.//button[@title="Dashboard list"]')->one();
 		$list_button->click();
 		$popup_menu = $list_button->asPopupButton()->getMenu();
 		$this->assertEquals(array_column($api_dashboards, 'name'), $popup_menu->getItems()->asText());
@@ -403,22 +429,22 @@ class testPageHostDashboards extends CWebTest {
 	public function testPageHostDashboards_CheckNavigationButtons($data) {
 		$this->openDashboardsForHost($data['host_name']);
 
-		$prev = $this->query($data['previous_button_selector'])->one();
+		$previous = $this->query($data['previous_button_selector'])->one();
 		$next = $this->query($data['next_button_selector'])->one();
 
 		// If these are set then use them instead of the counter for determining the correct widget name.
-		$num_dash = ($data['host_name'] === 'Many Dashboards') ? null : 1;
-		$num_page = ($data['host_name'] === 'Many Pages') ? null : 1;
+		$dashboard_count = ($data['host_name'] === 'Many Dashboards') ? null : 1;
+		$page_count = ($data['host_name'] === 'Many Pages') ? null : 1;
 
 		// Cycle tabs in forward direction (by using the > button).
 		for ($i = 1; $i <= self::COUNT_MANY; $i++) {
 			$this->checkDashboardOpen(
-					['name' => 'Dashboard '.($num_dash === null ? $i : $num_dash)],
-					['name' => 'Page '.($num_page === null ? $i : $num_page)]
+					['name' => 'Dashboard '.($dashboard_count === null ? $i : $dashboard_count)],
+					['name' => 'Page '.($page_count === null ? $i : $page_count)]
 			);
 
 			//Assert if enabled/disabled correctly.
-			$this->assertEquals($i > 1, $prev->isEnabled());
+			$this->assertEquals($i > 1, $previous->isEnabled());
 			$this->assertEquals($i < self::COUNT_MANY, $next->isEnabled());
 
 			// Only switch the Dashboard if it is not the last one.
@@ -431,17 +457,17 @@ class testPageHostDashboards extends CWebTest {
 		// Cycle tabs in backward direction (by using the < button).
 		for ($i = self::COUNT_MANY; $i >= 1; $i--) {
 			$this->checkDashboardOpen(
-				['name' => 'Dashboard '.($num_dash === null ? $i : $num_dash)],
-				['name' => 'Page '.($num_page === null ? $i : $num_page)]
+				['name' => 'Dashboard '.($dashboard_count === null ? $i : $dashboard_count)],
+				['name' => 'Page '.($page_count === null ? $i : $page_count)]
 			);
 
 			//Assert if enabled/disabled correctly.
-			$this->assertEquals($i > 1, $prev->isEnabled());
+			$this->assertEquals($i > 1, $previous->isEnabled());
 			$this->assertEquals($i < self::COUNT_MANY, $next->isEnabled());
 
 			// Only switch the Dashboard if it is not the first one.
 			if ($i !== 1) {
-				$prev->click();
+				$previous->click();
 				$this->page->waitUntilReady();
 			}
 		}
