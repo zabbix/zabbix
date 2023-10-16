@@ -73,11 +73,11 @@ class CControllerItemUpdate extends CControllerItem {
 		$input = parent::getInputForApi();
 
 		[$db_item] = API::Item()->get([
-			'output' => ['templateid', 'flags', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
+			'output' => ['templateid', 'flags'],
 			'selectHosts' => ['status'],
 			'itemids' => [$this->getInput('itemid')]
 		]);
 
-		return ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($input + $db_item);
+		return ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($db_item + $input);
 	}
 }
