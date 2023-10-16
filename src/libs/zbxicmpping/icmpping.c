@@ -125,6 +125,10 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 		return FAIL;
 	}
 
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
 	len = strlen(address);
 	if (-1 == (n = write(fd, address, len)))
 	{
@@ -147,10 +151,6 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	}
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1 < %s", fping, filename);
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGINT);
-	sigaddset(&mask, SIGQUIT);
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
