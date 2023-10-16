@@ -399,19 +399,48 @@ window.item_edit_form = new class {
 		const fields = getFormFields(this.form);
 
 		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'ipmi_sensor') {
-				fields[key] = fields[key].trim();
+			switch (key) {
+				case 'ipmi_sensor':
+					// Value of ipmi sensor should not be trimmed.
+					break;
+
+				case 'query_fields':
+				case 'headers':
+					for (const [i, value] of Object.entries(fields[key].name)) {
+						fields[key].name[i] = value.trim();
+					}
+
+					for (const [i, value] of Object.entries(fields[key].value)) {
+						fields[key].value[i] = value.trim();
+					}
+
+					break;
+
+				case 'parameters':
+					for (const [i, param] of Object.entries(fields.parameters)) {
+						fields.parameters[i] = {name: param.name.trim(), value: param.value.trim()}
+					}
+
+					break;
+
+				case 'tags':
+					fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
+						if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
+							tags.push({tag: tag.tag, value: tag.value});
+						}
+
+						return tags;
+					}, []);
+
+					break;
+
+				default:
+					if (typeof fields[key] === 'string') {
+						fields[key] = fields[key].trim();
+					}
+
+					break;
 			}
-		}
-
-		if ('tags' in fields) {
-			fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
-				if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
-					tags.push({tag: tag.tag, value: tag.value});
-				}
-
-				return tags;
-			}, []);
 		}
 
 		return fields;
