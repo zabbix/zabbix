@@ -34,12 +34,25 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
+const (
+	startupTypeAuto = iota
+	startupTypeAutoDelayed
+	startupTypeManual
+	startupTypeDisabled
+	startupTypeUnknown
+	startupTypeTrigger
+)
+
+const (
+	ZBX_NON_EXISTING_SRV = 255
+)
+
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
-
-var impl Plugin
 
 type serviceDiscovery struct {
 	Name           string `json:"{#SERVICE.NAME}"`
@@ -54,18 +67,17 @@ type serviceDiscovery struct {
 	StartupName    string `json:"{#SERVICE.STARTUPNAME}"`
 }
 
-const (
-	startupTypeAuto = iota
-	startupTypeAutoDelayed
-	startupTypeManual
-	startupTypeDisabled
-	startupTypeUnknown
-	startupTypeTrigger
-)
-
-const (
-	ZBX_NON_EXISTING_SRV = 255
-)
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsServices",
+		"service.discovery", "List of Windows services for low-level discovery.",
+		"service.info", "Information about a service.",
+		"services", "Filtered list of Windows sercices.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func startupName(startup int) string {
 	switch startup {
@@ -496,17 +508,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.exportServices(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "WindowsServices",
-		"service.discovery", "List of Windows services for low-level discovery.",
-		"service.info", "Information about a service.",
-		"services", "Filtered list of Windows sercices.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

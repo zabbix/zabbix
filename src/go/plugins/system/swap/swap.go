@@ -27,12 +27,22 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Swap",
+		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if key != "system.swap.size" {
@@ -80,15 +90,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return float64(total-avail) / float64(total) * 100, nil
 	default:
 		return nil, errors.New("Invalid second parameter.")
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Swap",
-		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

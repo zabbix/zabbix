@@ -25,15 +25,28 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var (
+	impl  Plugin
+	stdOs std.Os
+)
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var (
-	impl  Plugin
-	stdOs std.Os
-)
+func init() {
+	stdOs = std.NewOs()
+	err := plugin.RegisterMetrics(
+		&impl, "Kernel",
+		"kernel.maxproc", "Returns maximum number of processes supported by OS.",
+		"kernel.maxfiles", "Returns maximum number of opened files supported by OS.",
+		"kernel.openfiles", "Returns number of currently open file descriptors.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -47,18 +60,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		/* SHOULD_NEVER_HAPPEN */
 		return 0, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	stdOs = std.NewOs()
-	err := plugin.RegisterMetrics(
-		&impl, "Kernel",
-		"kernel.maxproc", "Returns maximum number of processes supported by OS.",
-		"kernel.maxfiles", "Returns maximum number of opened files supported by OS.",
-		"kernel.openfiles", "Returns number of currently open file descriptors.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

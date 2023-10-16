@@ -148,7 +148,8 @@ func init() {
 		&impl,
 		"Modbus",
 		"modbus.get",
-		"Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].",
+		"Returns a JSON array of the requested values, usage: "+
+			"modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].",
 	)
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))

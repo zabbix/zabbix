@@ -25,15 +25,11 @@ import (
 	"zabbix.com/pkg/zbxlib"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
-}
-
-var impl Plugin
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
 }
 
 func init() {
@@ -43,4 +39,8 @@ func init() {
 	}
 
 	impl.SetCapacity(1)
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	return zbxlib.ExecuteCheck(key, params)
 }

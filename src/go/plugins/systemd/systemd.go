@@ -83,6 +83,18 @@ type stateMapping struct {
 	stateNames []string
 }
 
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Systemd",
+		"systemd.unit.get", "Returns the bulked info, usage: systemd.unit.get[unit,<interface>].",
+		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
+		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
 	var err error
 	var conn *dbus.Conn
@@ -395,16 +407,4 @@ func isEnabledUnit(units []unitJson, p string) bool {
 		}
 	}
 	return false
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Systemd",
-		"systemd.unit.get", "Returns the bulked info, usage: systemd.unit.get[unit,<interface>].",
-		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
-		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

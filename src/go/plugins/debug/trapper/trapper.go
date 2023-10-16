@@ -33,6 +33,8 @@ import (
 	"zabbix.com/pkg/watch"
 )
 
+var impl Plugin
+
 // Plugin
 type Plugin struct {
 	plugin.Base
@@ -40,7 +42,15 @@ type Plugin struct {
 	listeners map[int]*trapListener
 }
 
-var impl Plugin
+func init() {
+	impl.manager = watch.NewManager(&impl)
+	impl.listeners = make(map[int]*trapListener)
+
+	err := plugin.RegisterMetrics(&impl, "DebugTrapper", "debug.trap", "Listen on port for incoming TCP data.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.manager.Lock()
@@ -134,14 +144,4 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 		p.listeners[port] = listener
 	}
 	return listener, nil
-}
-
-func init() {
-	impl.manager = watch.NewManager(&impl)
-	impl.listeners = make(map[int]*trapListener)
-
-	err := plugin.RegisterMetrics(&impl, "DebugTrapper", "debug.trap", "Listen on port for incoming TCP data.")
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

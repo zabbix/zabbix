@@ -30,6 +30,8 @@ import (
 	"zabbix.com/pkg/watch"
 )
 
+var impl Plugin
+
 type watchRequest struct {
 	clientid uint64
 	targets  []*plugin.Request
@@ -50,7 +52,15 @@ type fsNotify interface {
 	removePath(path string)
 }
 
-var impl Plugin
+func init() {
+	impl.eventSources = make(map[string]*fileWatcher)
+	impl.manager = watch.NewManager(&impl)
+
+	err := plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) run() {
 	for {
@@ -149,14 +159,4 @@ func (p *Plugin) addPath(path string) error {
 func (p *Plugin) removePath(path string) {
 	_ = p.watcher.Remove(path)
 	delete(p.eventSources, path)
-}
-
-func init() {
-	impl.eventSources = make(map[string]*fileWatcher)
-	impl.manager = watch.NewManager(&impl)
-
-	err := plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

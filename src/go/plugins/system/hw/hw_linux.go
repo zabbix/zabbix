@@ -44,18 +44,6 @@ const (
 	minChassisTypelen = 1
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-	options Options
-}
-
-// Options -
-type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int
-}
-
 var impl Plugin
 
 // from System Management BIOS (SMBIOS) Reference Specification v2.7.1
@@ -96,6 +84,29 @@ var chassisTypes = []string{
 	"Embedded PC",
 	"Mini PC",
 	"Stick PC",
+}
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	options Options
+}
+
+// Options -
+type Options struct {
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int
+}
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Hw",
+		"system.hw.chassis", "Chassis information.",
+		"system.hw.devices", "Listing of PCI or USB devices.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }
 
 // Configure -
@@ -289,16 +300,5 @@ func getDeviceCmd(params []string) (string, error) {
 		return pciCMD, nil
 	default:
 		return "", zbxerr.ErrorTooManyParameters
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Hw",
-		"system.hw.chassis", "Chassis information.",
-		"system.hw.devices", "Listing of PCI or USB devices.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

@@ -33,6 +33,19 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "VfsFs",
+		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
+		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
+		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
 func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 	allData, err := p.getFsInfo()
 	if err != nil {
@@ -175,17 +188,4 @@ func getFsInode(path string) (stats *FsStats, err error) {
 	}
 
 	return
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "VfsFs",
-		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics.",
-		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
-		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

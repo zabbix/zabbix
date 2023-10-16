@@ -42,6 +42,8 @@ const (
 	attributeDiscovery = "smart.attribute.discovery"
 )
 
+var impl Plugin
+
 // Options -
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -55,7 +57,17 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Smart",
+		"smart.disk.discovery", "Returns JSON array of smart devices.",
+		"smart.disk.get", "Returns JSON data of smart device.",
+		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -425,16 +437,4 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	}
 
 	return ssdType
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Smart",
-		"smart.disk.discovery", "Returns JSON array of smart devices.",
-		"smart.disk.get", "Returns JSON data of smart device.",
-		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

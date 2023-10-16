@@ -26,6 +26,8 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
@@ -38,7 +40,12 @@ type watchRequest struct {
 	sink     plugin.ResultWriter
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "DebugLog", "debug.log", "Returns timestamp each second.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) run() {
 	p.Debugf("activating plugin")
@@ -97,11 +104,4 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 
 func (p *Plugin) Validate(private interface{}) (err error) {
 	return
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "DebugLog", "debug.log", "Returns timestamp each second.")
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

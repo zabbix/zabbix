@@ -26,29 +26,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(conn redisClient, params map[string]string) (res interface{}, err error)
-
-// getHandlerFunc returns a handlerFunc related to a given key.
-func getHandlerFunc(key string) handlerFunc {
-	switch key {
-	case keyConfig:
-		return configHandler
-
-	case keyInfo:
-		return infoHandler
-
-	case keyPing:
-		return pingHandler
-
-	case keySlowlog:
-		return slowlogHandler
-
-	default:
-		return nil
-	}
-}
-
 const (
 	keyConfig  = "redis.config"
 	keyInfo    = "redis.info"
@@ -91,9 +68,32 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramPassword}, false),
 }
 
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(conn redisClient, params map[string]string) (res interface{}, err error)
+
 func init() {
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
+// getHandlerFunc returns a handlerFunc related to a given key.
+func getHandlerFunc(key string) handlerFunc {
+	switch key {
+	case keyConfig:
+		return configHandler
+
+	case keyInfo:
+		return infoHandler
+
+	case keyPing:
+		return pingHandler
+
+	case keySlowlog:
+		return slowlogHandler
+
+	default:
+		return nil
 	}
 }

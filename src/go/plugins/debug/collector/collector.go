@@ -25,6 +25,8 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var impl Plugin
+
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
 	Interval             int
@@ -37,7 +39,13 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	impl.options.Interval = 1
+	err := plugin.RegisterMetrics(&impl, "DebugCollector", "debug.collector", "Returns empty value.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
@@ -65,12 +73,4 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 
 func (p *Plugin) Validate(private interface{}) (err error) {
 	return
-}
-
-func init() {
-	impl.options.Interval = 1
-	err := plugin.RegisterMetrics(&impl, "DebugCollector", "debug.collector", "Returns empty value.")
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

@@ -26,23 +26,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(conn MCClient, params map[string]string) (res interface{}, err error)
-
-// getHandlerFunc returns a handlerFunc related to a given key.
-func getHandlerFunc(key string) handlerFunc {
-	switch key {
-	case keyStats:
-		return statsHandler // memcached.stats[[connString][,user][,password][,type]]
-
-	case keyPing:
-		return pingHandler // memcached.ping[[connString][,user][,password]]
-
-	default:
-		return nil
-	}
-}
-
 const (
 	keyPing  = "memcached.ping"
 	keyStats = "memcached.stats"
@@ -91,9 +74,26 @@ var metrics = metric.MetricSet{
 	),
 }
 
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(conn MCClient, params map[string]string) (res interface{}, err error)
+
 func init() {
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
+// getHandlerFunc returns a handlerFunc related to a given key.
+func getHandlerFunc(key string) handlerFunc {
+	switch key {
+	case keyStats:
+		return statsHandler // memcached.stats[[connString][,user][,password][,type]]
+
+	case keyPing:
+		return pingHandler // memcached.ping[[connString][,user][,password]]
+
+	default:
+		return nil
 	}
 }

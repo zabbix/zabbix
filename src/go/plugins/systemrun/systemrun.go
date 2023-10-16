@@ -30,6 +30,8 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
+var impl Plugin
+
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
 	Timeout              int `conf:"optional,range=1:30"`
@@ -42,7 +44,12 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
@@ -93,11 +100,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return nil, fmt.Errorf("Invalid second parameter.")
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

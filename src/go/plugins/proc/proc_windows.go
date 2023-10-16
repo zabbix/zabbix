@@ -40,6 +40,17 @@ type Plugin struct {
 
 var impl Plugin
 
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Proc",
+		"proc.num", "The number of processes.",
+		"proc_info", "Various information about specific process(es).",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
 func getProcessUsername(pid uint32) (result string, err error) {
 	h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pid)
 	if err != nil {
@@ -336,16 +347,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.exportProcInfo(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Proc",
-		"proc.num", "The number of processes.",
-		"proc_info", "Various information about specific process(es).",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

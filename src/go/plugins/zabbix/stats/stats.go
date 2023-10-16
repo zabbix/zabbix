@@ -13,6 +13,10 @@ import (
 	"zabbix.com/pkg/zbxcomms"
 )
 
+const defaultServerPort = 10051
+
+var impl Plugin
+
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
 	Timeout              int    `conf:"optional,range=1:30"`
@@ -42,9 +46,16 @@ type response struct {
 	Info     string `json:"info,omitempty"`
 }
 
-const defaultServerPort = 10051
-
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "ZabbixStats",
+		"zabbix.stats", "Return a set of Zabbix server or proxy internal "+
+			"metrics or return number of monitored items in the queue which are delayed on Zabbix server or proxy.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	var parse response
@@ -155,15 +166,4 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
 	return conf.Unmarshal(options, &o)
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "ZabbixStats",
-		"zabbix.stats", "Return a set of Zabbix server or proxy internal "+
-			"metrics or return number of monitored items in the queue which are delayed on Zabbix server or proxy.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

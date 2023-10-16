@@ -25,14 +25,24 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
+const percent = 100
+
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-const percent = 100
-
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "VMemory",
+		"vm.vmemory.size", "Returns virtual memory size in bytes or in percentage.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -50,16 +60,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.exportVMVMemorySize(mode)
 	default:
 		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "VMemory",
-		"vm.vmemory.size", "Returns virtual memory size in bytes or in percentage.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }
 

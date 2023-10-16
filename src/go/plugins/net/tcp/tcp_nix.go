@@ -29,10 +29,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-func exportSystemTcpListen(port uint16) (result interface{}, err error) {
-	return nil, errors.New("Not supported.")
-}
-
 func init() {
 	err := plugin.RegisterMetrics(
 		&impl, "TCP",
@@ -44,4 +40,8 @@ func init() {
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
+}
+
+func exportSystemTcpListen(port uint16) (result interface{}, err error) {
+	return nil, errors.New("Not supported.")
 }

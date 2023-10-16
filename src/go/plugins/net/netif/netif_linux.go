@@ -61,6 +61,22 @@ var mapNetStatOut = map[string]uint{
 	"compressed": 15,
 }
 
+func init() {
+	stdOs = std.NewOs()
+
+	err := plugin.RegisterMetrics(
+		&impl, "NetIf",
+		"net.if.collisions", "Returns number of out-of-window collisions.",
+		"net.if.in", "Returns incoming traffic statistics on network interface.",
+		"net.if.out", "Returns outgoing traffic statistics on network interface.",
+		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
+		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
 func (p *Plugin) addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) error {
 	if statNum, ok := mapNetStat[statName]; ok {
 		*statNums = append(*statNums, statNum)
@@ -189,20 +205,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return p.getNetStats(params[0], mode, direction)
-}
-
-func init() {
-	stdOs = std.NewOs()
-
-	err := plugin.RegisterMetrics(
-		&impl, "NetIf",
-		"net.if.collisions", "Returns number of out-of-window collisions.",
-		"net.if.in", "Returns incoming traffic statistics on network interface.",
-		"net.if.out", "Returns outgoing traffic statistics on network interface.",
-		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
-		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

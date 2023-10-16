@@ -25,15 +25,11 @@ import (
 	"zabbix.com/pkg/zbxlib"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
-}
-
-var impl Plugin
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
 }
 
 func init() {
@@ -41,4 +37,8 @@ func init() {
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	return zbxlib.ExecuteCheck(key, params)
 }

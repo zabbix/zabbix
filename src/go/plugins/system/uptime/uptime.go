@@ -27,22 +27,14 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
 var (
 	impl  Plugin
 	stdOs std.Os
 )
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters.")
-	}
-	return getUptime()
+// Plugin -
+type Plugin struct {
+	plugin.Base
 }
 
 func init() {
@@ -52,4 +44,12 @@ func init() {
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
+}
+
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters.")
+	}
+	return getUptime()
 }

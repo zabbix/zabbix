@@ -28,13 +28,6 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-	cpus      []*cpuUnit
-	collector *pdhCollector
-}
-
 const (
 	modeParam = 2
 	cpuParam  = 1
@@ -42,6 +35,28 @@ const (
 
 	defaultIndex = 60
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	cpus      []*cpuUnit
+	collector *pdhCollector
+}
+
+func init() {
+	impl.collector = newPdhCollector(&impl)
+
+	err := plugin.RegisterMetrics(
+		&impl, pluginName,
+		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
+		"system.cpu.load", "CPU load.",
+		"system.cpu.num", "Number of CPUs.",
+		"system.cpu.util", "CPU utilization percentage.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func numCPUOnline() int {
 	return numCPU()
@@ -165,20 +180,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.getCpuUtil(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	impl.collector = newPdhCollector(&impl)
-
-	err := plugin.RegisterMetrics(
-		&impl, pluginName,
-		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
-		"system.cpu.load", "CPU load.",
-		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilization percentage.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

@@ -27,6 +27,8 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var impl Plugin
+
 type Plugin struct {
 	plugin.Base
 	options Options
@@ -37,7 +39,12 @@ type Options struct {
 	Timeout              int `conf:"optional,range=1:30"`
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	p.options.Timeout = global.Timeout
@@ -59,11 +66,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

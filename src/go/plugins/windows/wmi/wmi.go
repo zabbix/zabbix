@@ -28,12 +28,23 @@ import (
 	"zabbix.com/pkg/wmi"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Wmi",
+		"wmi.get", "Execute WMI query and return the first selected object.",
+		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -55,16 +66,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return string(b), nil
 	default:
 		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Wmi",
-		"wmi.get", "Execute WMI query and return the first selected object.",
-		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

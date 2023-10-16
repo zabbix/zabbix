@@ -28,15 +28,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-	devices map[string]*devUnit
-	mutex   sync.Mutex
-}
-
-var impl Plugin
-
 const (
 	maxInactivityPeriod = time.Hour * 3
 	maxHistory          = 60*15 + 1
@@ -54,7 +45,48 @@ const (
 	statTypeOPS
 )
 
+var impl Plugin
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	devices map[string]*devUnit
+	mutex   sync.Mutex
+}
+
 type historyIndex int
+
+type devIO struct {
+	sectors    uint64
+	operations uint64
+}
+
+type devStats struct {
+	clock int64
+	rx    devIO
+	tx    devIO
+}
+
+type devUnit struct {
+	name       string
+	head, tail historyIndex
+	accessed   time.Time
+	history    [maxHistory]devStats
+}
+
+func init() {
+	impl.devices = make(map[string]*devUnit)
+
+	err := plugin.RegisterMetrics(
+		&impl, "VFSDev",
+		"vfs.dev.read", "Disk read statistics.",
+		"vfs.dev.write", "Disk write statistics.",
+		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (h historyIndex) inc() historyIndex {
 	h++
@@ -78,24 +110,6 @@ func (h historyIndex) sub(value historyIndex) historyIndex {
 		h += maxHistory
 	}
 	return h
-}
-
-type devIO struct {
-	sectors    uint64
-	operations uint64
-}
-
-type devStats struct {
-	clock int64
-	rx    devIO
-	tx    devIO
-}
-
-type devUnit struct {
-	name       string
-	head, tail historyIndex
-	accessed   time.Time
-	history    [maxHistory]devStats
 }
 
 func (p *Plugin) Collect() (err error) {
@@ -239,19 +253,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		p.devices[devName] = &devUnit{name: devName, accessed: now}
 		return
-	}
-}
-
-func init() {
-	impl.devices = make(map[string]*devUnit)
-
-	err := plugin.RegisterMetrics(
-		&impl, "VFSDev",
-		"vfs.dev.read", "Disk read statistics.",
-		"vfs.dev.write", "Disk write statistics.",
-		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

@@ -34,6 +34,8 @@ import (
 	"zabbix.com/pkg/zbxlib"
 )
 
+var impl Plugin
+
 type Options struct {
 	plugin.SystemOptions `conf:"optional"`
 	MaxLinesPerSecond    int `conf:"range=1:1000,default=20"`
@@ -50,6 +52,19 @@ type metadata struct {
 	params    []string
 	blob      unsafe.Pointer
 	lastcheck time.Time
+}
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Log",
+		"log", "Log file monitoring.",
+		"logrt", "Log file monitoring with log rotation support.",
+		"log.count", "Count of matched lines in log file monitoring.",
+		"logrt.count", "Count of matched lines in log file monitoring with log rotation support.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -123,19 +138,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return results, nil
 	}
 	return nil, nil
-}
-
-var impl Plugin
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Log",
-		"log", "Log file monitoring.",
-		"logrt", "Log file monitoring with log rotation support.",
-		"log.count", "Count of matched lines in log file monitoring.",
-		"logrt.count", "Count of matched lines in log file monitoring with log rotation support.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

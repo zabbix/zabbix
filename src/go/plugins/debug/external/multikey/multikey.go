@@ -26,22 +26,11 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
-}
-
-var impl Plugin
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	switch key {
-	case "debug.external.multikeyOne":
-		return "debug first test response", nil
-	case "debug.external.multikeyTwo":
-		return "debug second test response", nil
-	default:
-		return "", errors.New("Unsupported metric")
-	}
 }
 
 func init() {
@@ -52,5 +41,16 @@ func init() {
 	)
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	switch key {
+	case "debug.external.multikeyOne":
+		return "debug first test response", nil
+	case "debug.external.multikeyTwo":
+		return "debug second test response", nil
+	default:
+		return "", errors.New("Unsupported metric")
 	}
 }

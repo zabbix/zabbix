@@ -35,6 +35,8 @@ import (
 	"zabbix.com/pkg/zbxregexp"
 )
 
+var impl Plugin
+
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
 	Timeout              int `conf:"optional,range=1:30"`
@@ -45,7 +47,17 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WebPage",
+		"web.page.get", "Get content of a web page.",
+		"web.page.perf", "Loading time of full web page (in seconds).",
+		"web.page.regexp", "Find string on a web page.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
@@ -154,17 +166,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		return web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, true)
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "WebPage",
-		"web.page.get", "Get content of a web page.",
-		"web.page.perf", "Loading time of full web page (in seconds).",
-		"web.page.regexp", "Find string on a web page.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

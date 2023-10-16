@@ -54,65 +54,6 @@ const (
 	keyUser                   = "oracle.user.info"
 )
 
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(ctx context.Context, conn OraClient,
-	params map[string]string, extraParams ...string) (res interface{}, err error)
-
-// getHandlerFunc returns a handlerFunc related to a given key.
-func getHandlerFunc(key string) handlerFunc {
-	switch key {
-	case keyASMDiskGroups:
-		return asmDiskGroupsHandler
-	case keyASMDiskGroupsDiscovery:
-		return asmDiskGroupsDiscovery
-	case keyArchive:
-		return archiveHandler
-	case keyArchiveDiscovery:
-		return archiveDiscoveryHandler
-	case keyCDB:
-		return cdbHandler
-	case keyCustomQuery:
-		return customQueryHandler
-	case keyDataFiles:
-		return dataFileHandler
-	case keyDatabasesDiscovery:
-		return databasesDiscoveryHandler
-	case keyFRA:
-		return fraHandler
-	case keyInstance:
-		return instanceHandler
-	case keyPDB:
-		return pdbHandler
-	case keyPDBDiscovery:
-		return pdbDiscoveryHandler
-	case keyPGA:
-		return pgaHandler
-	case keyPing:
-		return pingHandler
-	case keyProc:
-		return procHandler
-	case keyRedoLog:
-		return redoLogHandler
-	case keySGA:
-		return sgaHandler
-	case keySessions:
-		return sessionsHandler
-	case keySysMetrics:
-		return sysMetricsHandler
-	case keySysParams:
-		return sysParamsHandler
-	case keyTablespaces:
-		return tablespacesHandler
-	case keyTablespacesDiscovery:
-		return tablespacesDiscoveryHandler
-	case keyUser:
-		return userHandler
-
-	default:
-		return nil
-	}
-}
-
 var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "1521"}
 
 // Common params: [URI|Session][,User][,Password][,Service]
@@ -227,9 +168,68 @@ var metrics = metric.MetricSet{
 		}, false),
 }
 
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(ctx context.Context, conn OraClient,
+	params map[string]string, extraParams ...string) (res interface{}, err error)
+
 func init() {
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
+// getHandlerFunc returns a handlerFunc related to a given key.
+func getHandlerFunc(key string) handlerFunc {
+	switch key {
+	case keyASMDiskGroups:
+		return asmDiskGroupsHandler
+	case keyASMDiskGroupsDiscovery:
+		return asmDiskGroupsDiscovery
+	case keyArchive:
+		return archiveHandler
+	case keyArchiveDiscovery:
+		return archiveDiscoveryHandler
+	case keyCDB:
+		return cdbHandler
+	case keyCustomQuery:
+		return customQueryHandler
+	case keyDataFiles:
+		return dataFileHandler
+	case keyDatabasesDiscovery:
+		return databasesDiscoveryHandler
+	case keyFRA:
+		return fraHandler
+	case keyInstance:
+		return instanceHandler
+	case keyPDB:
+		return pdbHandler
+	case keyPDBDiscovery:
+		return pdbDiscoveryHandler
+	case keyPGA:
+		return pgaHandler
+	case keyPing:
+		return pingHandler
+	case keyProc:
+		return procHandler
+	case keyRedoLog:
+		return redoLogHandler
+	case keySGA:
+		return sgaHandler
+	case keySessions:
+		return sessionsHandler
+	case keySysMetrics:
+		return sysMetricsHandler
+	case keySysParams:
+		return sysParamsHandler
+	case keyTablespaces:
+		return tablespacesHandler
+	case keyTablespacesDiscovery:
+		return tablespacesDiscoveryHandler
+	case keyUser:
+		return userHandler
+
+	default:
+		return nil
 	}
 }

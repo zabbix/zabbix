@@ -86,6 +86,17 @@ var dnsTypes = map[string]uint16{
 	"SRV":   dns.TypeSRV,
 }
 
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "DNS",
+		"net.dns", "Checks if DNS service is up.",
+		"net.dns.record", "Performs a DNS query.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metric").Wrap(err))
+	}
+}
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
@@ -496,15 +507,4 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 	r, _, err := c.Exchange(m, resolver)
 
 	return r, err
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "DNS",
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs a DNS query.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metric").Wrap(err))
-	}
 }

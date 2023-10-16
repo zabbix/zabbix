@@ -70,6 +70,22 @@ var implExport PluginExport = PluginExport{}
 
 type historyIndex int
 
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+
+	err = plugin.RegisterMetrics(
+		&implExport, "ProcExporter",
+		"proc.mem", "Process memory utilization values.",
+		"proc.num", "The number of processes.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
 func (h historyIndex) inc() historyIndex {
 	h++
 	if h == maxHistory {
@@ -776,20 +792,4 @@ func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx 
 	}
 
 	return true
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
-
-	err = plugin.RegisterMetrics(
-		&implExport, "ProcExporter",
-		"proc.mem", "Process memory utilization values.",
-		"proc.num", "The number of processes.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

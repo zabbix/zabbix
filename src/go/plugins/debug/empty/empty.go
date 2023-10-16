@@ -24,16 +24,11 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
-}
-
-var impl Plugin
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	p.Debugf("export %s%v", key, params)
-	return &plugin.Result{}, nil
 }
 
 func init() {
@@ -41,4 +36,9 @@ func init() {
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	p.Debugf("export %s%v", key, params)
+	return &plugin.Result{}, nil
 }

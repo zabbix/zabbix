@@ -35,6 +35,8 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
@@ -54,7 +56,15 @@ type manager struct {
 	parser  func(in []string, regex string) ([]string, error)
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Sw",
+		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -213,14 +223,4 @@ func parseDpkg(in []string, regex string) (out []string, err error) {
 	}
 
 	return
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Sw",
-		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

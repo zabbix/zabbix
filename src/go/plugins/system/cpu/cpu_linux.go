@@ -36,15 +36,27 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+const (
+	procStatLocation = "/proc/stat"
+)
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 	cpus []*cpuUnit
 }
 
-const (
-	procStatLocation = "/proc/stat"
-)
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, pluginName,
+		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
+		"system.cpu.num", "Number of CPUs.",
+		"system.cpu.util", "CPU utilization percentage.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 	return nil, plugin.UnsupportedMetricError
@@ -165,17 +177,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.getCpuUtil(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, pluginName,
-		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
-		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilisation percentage.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

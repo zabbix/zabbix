@@ -24,12 +24,21 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Memory",
+		"vm.memory.size", "Returns memory size in bytes or in percentage from total.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -47,14 +56,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.exportVMMemorySize(mode)
 	default:
 		return nil, plugin.UnsupportedMetricError
-	}
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "Memory",
-		"vm.memory.size", "Returns memory size in bytes or in percentage from total.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 }

@@ -42,6 +42,10 @@ const (
 	langEnglish = 1
 )
 
+var impl Plugin = Plugin{
+	counters: make(map[perfCounterIndex]*perfCounter),
+}
+
 type perfCounterIndex struct {
 	path string
 	lang int
@@ -65,11 +69,18 @@ type Plugin struct {
 	collectError error
 }
 
-var impl Plugin = Plugin{
-	counters: make(map[perfCounterIndex]*perfCounter),
-}
-
 type historyIndex int
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsPerfMon",
+		"perf_counter", "Value of any Windows performance counter.",
+		"perf_counter_en", "Value of any Windows performance counter in English.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 func (h historyIndex) inc(interval int) historyIndex {
 	h++
@@ -266,15 +277,4 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "WindowsPerfMon",
-		"perf_counter", "Value of any Windows performance counter.",
-		"perf_counter_en", "Value of any Windows performance counter in English.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

@@ -25,10 +25,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-type metricMeta struct {
-	path string
-}
-
 const (
 	keyContainerInfo       = "docker.container_info"
 	keyContainerStats      = "docker.container_stats"
@@ -82,6 +78,10 @@ var metrics = metric.MetricSet{
 		nil, false),
 	keyInfo: metric.New("Returns information about the docker server.", nil, false),
 	keyPing: metric.New("Pings the server and returns 0 or 1.", nil, false),
+}
+
+type metricMeta struct {
+	path string
 }
 
 func init() {

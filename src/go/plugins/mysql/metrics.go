@@ -28,13 +28,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-func init() {
-	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
-}
-
 const (
 	keyCustomQuery            = "mysql.custom.query"
 	keyDatabasesDiscovery     = "mysql.db.discovery"
@@ -119,6 +112,13 @@ var (
 // handlerFunc defines an interface must be implemented by handlers.
 type handlerFunc func(ctx context.Context, conn MyClient,
 	params map[string]string, extraParams ...string) (res interface{}, err error)
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {

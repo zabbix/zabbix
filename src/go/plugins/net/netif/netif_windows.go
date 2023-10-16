@@ -38,6 +38,20 @@ const (
 	guidStringLen     = 38
 )
 
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "NetIf",
+		"net.if.list", "Returns a list of network interfaces in text format.",
+		"net.if.in", "Returns incoming traffic statistics on network interface.",
+		"net.if.out", "Returns outgoing traffic statistics on network interface.",
+		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
+		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
+
 func (p *Plugin) nToIP(addr uint32) net.IP {
 	b := (*[4]byte)(unsafe.Pointer(&addr))
 	return net.IPv4(b[0], b[1], b[2], b[3])
@@ -293,18 +307,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return p.getNetStats(params[0], mode, direction)
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "NetIf",
-		"net.if.list", "Returns a list of network interfaces in text format.",
-		"net.if.in", "Returns incoming traffic statistics on network interface.",
-		"net.if.out", "Returns outgoing traffic statistics on network interface.",
-		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
-		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
-	)
-	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
-	}
 }

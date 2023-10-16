@@ -26,22 +26,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-type command string
-
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(data map[command][]byte) (res interface{}, err error)
-
-type metricMeta struct {
-	commands []command
-	args     map[string]string
-	handler  handlerFunc
-}
-
-// handle runs metric's handler.
-func (m *metricMeta) handle(data map[command][]byte) (res interface{}, err error) {
-	return m.handler(data)
-}
-
 const (
 	keyDf            = "ceph.df.details"
 	keyOSD           = "ceph.osd.stats"
@@ -134,9 +118,25 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 }
 
+type command string
+
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(data map[command][]byte) (res interface{}, err error)
+
+type metricMeta struct {
+	commands []command
+	args     map[string]string
+	handler  handlerFunc
+}
+
 func init() {
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
+}
+
+// handle runs metric's handler.
+func (m *metricMeta) handle(data map[command][]byte) (res interface{}, err error) {
+	return m.handler(data)
 }
