@@ -2189,7 +2189,8 @@ button {
 @media print {
   .dashboard-page {
     margin: 10px;
-    break-after: page; } }
+    break-after: page;
+    break-inside: avoid; } }
 .diff {
   padding: 4px;
   background: #0e1012; }

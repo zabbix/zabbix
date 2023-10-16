@@ -24,9 +24,9 @@
  * @var array $data
  */
 
-const HEADER_TITLE_HEIGHT = 60;
-const PAGE_TITLE_HEIGHT = 50;
-const PAGE_WIDTH = 1940;
+const HEADER_TITLE_HEIGHT = 46;
+const PAGE_TITLE_HEIGHT = 35;
+const PAGE_WIDTH = 1960;
 const PAGE_MARGIN_TOP = 10;
 const PAGE_MARGIN_BOTTOM = 12;
 
