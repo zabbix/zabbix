@@ -704,7 +704,7 @@ class CApiInputValidator {
 	private static function validateEscapedStringUtf8($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
