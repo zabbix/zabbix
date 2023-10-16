@@ -125,6 +125,7 @@ class CControllerScriptCreate extends CController {
 				: SCRIPT_MANUALINPUT_DISABLED;
 
 			if ($script['manualinput']) {
+				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');
 				$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
 
 				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
@@ -136,8 +137,6 @@ class CControllerScriptCreate extends CController {
 				}
 
 				CScriptHelper::validateManualInput($script);
-
-				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');
 			}
 		}
 

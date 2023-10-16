@@ -20,6 +20,7 @@
 
 
 class CScriptHelper {
+
 	public static function validateManualInput(array &$script): bool {
 		if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 			// Check if values are unique.
