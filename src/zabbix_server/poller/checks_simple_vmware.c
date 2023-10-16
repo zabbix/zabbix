@@ -1060,23 +1060,29 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
  * Purpose: converts a single value of VMware event log level from string to  *
  *          bitmask                                                           *
  *                                                                            *
- * Parameters: level_str - [IN]                                               *
+ * Parameters: level         - [IN]                                           *
+ *             severity_mask - [OUT]                                          *
  *                                                                            *
- * Return value: result of conversion                                         *
+ * Return value: SUCCEED - if no errors were detected                         *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static unsigned char	severity_to_mask(const char *level)
+static int	severity_to_mask(const char *level, unsigned char *severity_mask)
 {
-	size_t			i;
+	size_t			i, levels_cnt;
 	static const char	*levels[] = {ZBX_VMWARE_EVTLOG_SEVERITIES};
 
-	for (i = 0; i < ARRSIZE(levels); i++)
+	levels_cnt = ARRSIZE(levels);
+
+	for (i = 0; i < levels_cnt; i++)
 	{
 		if (0 == strcmp(level, levels[i]))
 			break;
 	}
 
-	return (unsigned char)(1 << i);
+	*severity_mask = (unsigned char)(1 << i);
+
+	return (i < levels_cnt) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -1106,7 +1112,7 @@ static int	evt_severities_to_mask(const char *severity, unsigned char *mask, cha
 		if (NULL == (level = zbx_get_param_dyn(severity, i, NULL)))
 			continue;
 
-		if (ZBX_VMWARE_EVTLOG_SEVERITY_UNKNOWN == (level_mask = severity_to_mask(level)))
+		if (SUCCEED != severity_to_mask(level, &level_mask))
 		{
 			*error = zbx_dsprintf(*error, "Invalid event severity level \"%s\".", level);
 			zbx_free(level);

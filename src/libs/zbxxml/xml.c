@@ -1391,7 +1391,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a property value from xml node                           *
+ * Purpose: retrieves a property value from xml node                          *
  *                                                                            *
  * Parameters: node - [IN] the XML node                                       *
  *             name - [IN] the XML XPath                                      *

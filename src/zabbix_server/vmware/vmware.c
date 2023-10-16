@@ -5078,7 +5078,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	for (size_t i = 0; i < ARRSIZE(levels); i++)
 	{
-		if (0 != (UC(1 << i) & service->eventlog.severity))
+		if (0 != ((1 << i) & service->eventlog.severity))
 		{
 			zbx_snprintf_alloc(&filter, &alloc_len, &offset, ZBX_POST_VMWARE_EVENT_FILTER_SPEC_CATEGORY,
 					levels[i]);
@@ -5361,18 +5361,21 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 		{
 			switch(host_nodes[i].flag)
 			{
-			case ZBX_HOSTINFO_NODES_DS:
-				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " ds:%s", host_nodes[i].name);
-				break;
-			case ZBX_HOSTINFO_NODES_NET:
-				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " net:%s", host_nodes[i].name);
-				break;
-			case ZBX_HOSTINFO_NODES_DVS:
-				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " dvs:%s", host_nodes[i].name);
-				break;
-			default:
-				host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, "%s%s",
-						0 != nodes_det ? "/" : ": ", host_nodes[i].name);
+				case ZBX_HOSTINFO_NODES_DS:
+					host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " ds:%s",
+							host_nodes[i].name);
+					break;
+				case ZBX_HOSTINFO_NODES_NET:
+					host_nodes[i].name = zbx_dsprintf(host_nodes[i].name," net:%s",
+							host_nodes[i].name);
+					break;
+				case ZBX_HOSTINFO_NODES_DVS:
+					host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, " dvs:%s",
+							host_nodes[i].name);
+					break;
+				default:
+					host_nodes[i].name = zbx_dsprintf(host_nodes[i].name, "%s%s",
+							0 != nodes_det ? "/" : ": ", host_nodes[i].name);
 			}
 
 			nodes_det |= host_nodes[i].flag;
