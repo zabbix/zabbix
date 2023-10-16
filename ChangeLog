@@ -80,7 +80,6 @@ A......... [ZBX-23284] prevented deletion of the discovered group as a result of
 ..F....... [ZBX-23261] removed kiosk mode button from host inventory form (apoga)
 ..F....... [ZBX-23260] fixed (enabled) additional URL fields in map properties (apoga)
 ..F....... [ZBXNEXT-8658] improved Monitoring > Maps usability (agriscenko)
-..F.....S. [ZBX-21898] added escaping of backslashes in history function string parameters (epulke, kprutkovs)
 ...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
 ....I..... [ZBX-22779] replaced HTTP with HTTPS in Zabbix homepage address (mprihodko)
 .......PS. [ZBX-23298] fixed walk[oid] discovery rule not working as test item (vso)
