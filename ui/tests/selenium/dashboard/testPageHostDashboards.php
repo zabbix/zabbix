@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-
+define('CURRENT_YEAR', date("Y"));
 /**
  * @onBefore prepareHostDashboardsData
  *
@@ -174,7 +174,7 @@ class testPageHostDashboards extends CWebTest {
 			[
 				[
 					'fields' => ['id:from' => 'now-2h', 'id:to' => 'now-1h'],
-					'expected' => 'now-2h – now-1h',
+					'expected_tab' => 'now-2h – now-1h',
 					'zoom_buttons' => [
 						'js-btn-time-left' => true,
 						'btn-time-zoomout' => true,
@@ -185,7 +185,7 @@ class testPageHostDashboards extends CWebTest {
 			[
 				[
 					'fields' => ['id:from' => 'now-2y', 'id:to' => 'now-1y'],
-					'expected' => 'now-2y – now-1y',
+					'expected_tab' => 'now-2y – now-1y',
 					'zoom_buttons' => [
 						'js-btn-time-left' => true,
 						'btn-time-zoomout' => true,
@@ -196,6 +196,7 @@ class testPageHostDashboards extends CWebTest {
 			[
 				[
 					'link' => 'Last 30 days',
+					'expected_fields' => ['id:from' => 'now-30d', 'id:to' => 'now'],
 					'zoom_buttons' => [
 						'js-btn-time-left' => true,
 						'btn-time-zoomout' => true,
@@ -206,11 +207,50 @@ class testPageHostDashboards extends CWebTest {
 			[
 				[
 					'link' => 'Last 2 years',
+					'expected_fields' => ['id:from' => 'now-2y', 'id:to' => 'now'],
 					'zoom_buttons' => [
 						'js-btn-time-left' => true,
 						'btn-time-zoomout' => false,
 						'js-btn-time-right' => false
 					]
+				]
+			],
+			[
+				[
+					'fields' => ['id:from' => CURRENT_YEAR.'-01-01 00:00:00', 'id:to' => CURRENT_YEAR.'-01-01 01:00:00'],
+					'expected_tab' => CURRENT_YEAR.'-01-01 00:00:00 – '.CURRENT_YEAR.'-01-01 01:00:00',
+					'zoom_buttons' => [
+						'js-btn-time-left' => true,
+						'btn-time-zoomout' => true,
+						'js-btn-time-right' => true
+					]
+				]
+			],
+			[
+				[
+					'fields' => ['id:from' => CURRENT_YEAR.'-01', 'id:to' => CURRENT_YEAR.'-01'],
+					'expected_fields' => ['id:from' => CURRENT_YEAR.'-01-01 00:00:00', 'id:to' => CURRENT_YEAR.'-01-31 23:59:59'],
+					'expected_tab' => CURRENT_YEAR.'-01-01 00:00:00 – '.CURRENT_YEAR.'-01-31 23:59:59',
+					'zoom_buttons' => [
+						'js-btn-time-left' => true,
+						'btn-time-zoomout' => true,
+						'js-btn-time-right' => true
+					]
+				]
+			],
+			[
+				[
+					'fields' => ['id:from' => '$#^$@', 'id:to' => '&nbsp;'],
+					'error' => true,
+					'error_message_from' => 'Invalid date.',
+					'error_message_to' => 'Invalid date.'
+				]
+			],
+			[
+				[
+					'fields' => ['id:from' => 'now-3y', 'id:to' => 'now'],
+					'error' => true,
+					'error_message_from' => 'Maximum time period to display is 730 days.'
 				]
 			]
 		];
@@ -236,17 +276,35 @@ class testPageHostDashboards extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		// Check Zoom buttons.
-		foreach ($data['zoom_buttons'] as $button => $state) {
-			$this->assertTrue($this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($button).
-				')]')->one()->isEnabled($state)
+		if (!CTestArrayHelper::get($data, 'error', false)) {
+			// If error not expected.
+
+			// Check Zoom buttons.
+			foreach ($data['zoom_buttons'] as $button => $state) {
+				$this->assertTrue($this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($button).
+					')]')->one()->isEnabled($state)
+				);
+			}
+
+			// Check field values.
+			$form->checkValue(CTestArrayHelper::get($data, 'expected_fields', CTestArrayHelper::get($data, 'fields')));
+
+			// Check tab title.
+			$this->assertTrue($this->query('link',
+				CTestArrayHelper::get($data, 'expected_tab', CTestArrayHelper::get($data, 'link')))->exists()
 			);
 		}
+		else {
+			// If error expected.
 
-		// Check tab title.
-		$this->assertTrue($this->query('link',
-				CTestArrayHelper::get($data, 'expected', CTestArrayHelper::get($data, 'link')))->exists()
-		);
+			// Check error text if defined.
+			foreach (['from', 'to'] as $field) {
+				if (CTestArrayHelper::get($data, 'error_message_'.$field)) {
+					$message = $this->query('xpath://ul[@data-error-for='.CXPathHelper::escapeQuotes($field).']//li')->one();
+					$this->assertEquals($data['error_message_'.$field], $message->getText());
+				}
+			}
+		}
 	}
 
 	public function getCheckNavigationTabsData() {
