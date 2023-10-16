@@ -53,13 +53,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
 		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
+		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
 		CXmlConstantValue::REGEX => CXmlConstantName::REGEX,
 		CXmlConstantValue::XMLPATH => CXmlConstantName::XMLPATH,
 		CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH,
+		CXmlConstantValue::MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
 		CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
 		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
 		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,
@@ -70,7 +72,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
 		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
+		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [

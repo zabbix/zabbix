@@ -75,7 +75,7 @@ class testPageItems extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
 
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history', 'Delete');
+		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history and trends', 'Delete');
 	}
 
 	/**
@@ -89,7 +89,7 @@ class testPageItems extends CLegacyWebTest {
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
-			$this->assertFalse($this->query('button:Clear history')->one()->isEnabled());
+			$this->assertFalse($this->query('button:Clear history and trends')->one()->isEnabled());
 		}
 		else {
 			$this->zbxTestClickButtonText('Execute now');

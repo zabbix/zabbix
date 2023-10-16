@@ -234,9 +234,9 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
-			'name' => _('Clear history'),
-			'confirm_singular' => _('Delete history of selected web scenario?'),
-			'confirm_plural' => _('Delete history of selected web scenarios?'),
+			'name' => _('Clear history and trends'),
+			'confirm_singular' => _('Clear history and trends of selected web scenario?'),
+			'confirm_plural' => _('Clear history and trends of selected web scenarios?'),
 			'csrf_token' => $csrf_token
 		]
 	];

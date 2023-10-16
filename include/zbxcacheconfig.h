@@ -667,6 +667,8 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	char		*snmpv3_contextname;
 	unsigned char	allow_redirect;
+	int		timeout_sec;
+	char		*timeout_str;
 }
 zbx_dc_dcheck_t;
 
@@ -1161,7 +1163,7 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
 		int hostids_num, char **error);
 int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error);
+		int hostids_num, unsigned char env, char **error);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 
@@ -1315,5 +1317,6 @@ typedef struct
 zbx_dc_item_type_timeouts_t;
 
 void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts);
+char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
 
 #endif

@@ -343,22 +343,6 @@ $toc-title-bg-color: #4f4f4f;
 	color: darken($font-color, 85%);
 }
 
-// Widget "Host availability".
-.host-avail-widget {
-
-	&.list-table {
-		color: darken($font-color, 85%);
-
-		tbody th {
-			color: $font-color;
-		}
-	}
-
-	.host-avail-total {
-		color: $font-color;
-	}
-}
-
 .breadcrumbs {
 	&>::after {
 		content: " /";

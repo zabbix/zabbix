@@ -31,6 +31,7 @@ use Zabbix\Widgets\CWidgetField;
  */
 class CWidgetFieldDataSet extends CWidgetField {
 
+	public const DEFAULT_VIEW = CWidgetFieldDataSetView::class;
 	public const DEFAULT_VALUE = [];
 
 	public const DATASET_TYPE_SINGLE_ITEM = 0;
@@ -53,7 +54,6 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [self::DATASET_TYPE_SINGLE_ITEM, self::DATASET_TYPE_PATTERN_ITEM])],
 				'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
@@ -75,34 +75,6 @@ class CWidgetFieldDataSet extends CWidgetField {
 		}
 
 		return parent::setValue($data_sets);
-	}
-
-	public function setFlags($flags): self {
-		parent::setFlags($flags);
-
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-
-			if (!$this->isTemplateDashboard()) {
-				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
-			}
-
-			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
-			self::setValidationRuleFlag($strict_validation_rules['fields']['itemids'], API_NOT_EMPTY);
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules();
-		}
-
-		return $this;
-	}
-
-	public function setTemplateId($templateid): self {
-		parent::setTemplateId($templateid);
-
-		return $this->setFlags($this->getFlags());
 	}
 
 	public static function getDefaults(): array {
@@ -143,71 +115,65 @@ class CWidgetFieldDataSet extends CWidgetField {
 	}
 
 	public function validate(bool $strict = false): array {
+		if (!$strict) {
+			return [];
+		}
+
 		$errors = [];
 		$total_item_count = 0;
 
-		$validation_rules = ($strict && $this->strict_validation_rules !== null)
-			? $this->strict_validation_rules
-			: $this->validation_rules;
-		$validation_rules += $this->ex_validation_rules;
+		$validation_rules = $this->getValidationRules($strict);
+		$value = $this->getValue();
+		$label = $this->full_name ?? $this->label ?? $this->name;
 
-		$value = $this->value ?? $this->default;
-
-		if ($this->full_name !== null) {
-			$label = $this->full_name;
+		if (!count($value)) {
+			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+				$errors[] = $error;
+			}
 		}
 		else {
-			$label = $this->label ?? $this->name;
+			$validation_rules['type'] = API_OBJECT;
 		}
 
-		if ($strict) {
-			if (!count($value)) {
-				if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
-					$errors[] = $error;
+		foreach ($value as $index => $data) {
+			$validation_rules_by_type = $validation_rules;
+
+			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
+				foreach($data['type'] as $item_type) {
+					if ($item_type == self::ITEM_TYPE_TOTAL) {
+						$total_item_count++;
+					}
 				}
+
+				$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
+				$validation_rules_by_type['fields']['type']['flags'] |= API_REQUIRED;
+
+				unset($data['hosts'], $data['items']);
 			}
 			else {
-				$validation_rules['type'] = API_OBJECT;
+				$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
+
+				unset($data['itemids'], $data['type']);
 			}
 
-			foreach ($value as $i => $data) {
-				$validation_rules_by_type = $validation_rules;
-				if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
-					foreach($data['type'] as $item_type) {
-						if ($item_type == self::ITEM_TYPE_TOTAL) {
-							$total_item_count++;
-						}
-					}
+			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($index + 1), $error)) {
+				$errors[] = $error;
+				break;
+			}
+		}
 
-					$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
-					$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
-					$validation_rules_by_type['fields']['type']['flags'] |= API_REQUIRED;
+		if ($total_item_count > 1) {
+			$errors[] = _('Cannot add more than one item with type "Total" to the chart.');
+		}
 
-					unset($data['hosts'], $data['items']);
-				}
-				else {
-					$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
-					$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
-
-					unset($data['itemids'], $data['type']);
-				}
-
-				if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($i+1), $error)) {
-					$errors[] = $error;
+		if ($total_item_count > 0) {
+			foreach ($value as $data) {
+				if ($data['dataset_aggregation'] !== AGGREGATE_NONE) {
+					$errors[] =
+						_('Cannot set "Data set aggregation" when item with type "Total" is added to the chart.');
 					break;
-				}
-			}
-
-			if ($total_item_count > 1) {
-				$errors[] = _('Cannot add more than one item with type "Total" to the chart.');
-			}
-
-			if ($total_item_count > 0) {
-				foreach ($value as $data) {
-					if ($data['dataset_aggregation'] !== AGGREGATE_NONE) {
-						$errors[] = _('Cannot set "Data set aggregation" when item with type "Total" is added to the chart.');
-						break;
-					}
 				}
 			}
 		}
@@ -215,15 +181,11 @@ class CWidgetFieldDataSet extends CWidgetField {
 		if (!$errors) {
 			$this->setValue($value);
 		}
-		else {
-			$this->setValue($this->default);
-		}
+
 		return $errors;
 	}
 
 	public function toApi(array &$widget_fields = []): void {
-		$value = $this->getValue();
-
 		$dataset_fields = [
 			'dataset_type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -232,41 +194,45 @@ class CWidgetFieldDataSet extends CWidgetField {
 		];
 		$dataset_defaults = self::getDefaults();
 
-		foreach ($value as $index => $val) {
-			foreach ($val['hosts'] as $num => $pattern_host) {
+		foreach ($this->getValue() as $index => $value) {
+			foreach ($value['hosts'] as $host_index => $pattern_host) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.hosts.'.$index.'.'.$num,
+					'name' => $this->name.'.'.$index.'.hosts.'.$host_index,
 					'value' => $pattern_host
 				];
 			}
-			foreach ($val['items'] as $num => $pattern_item) {
+
+			foreach ($value['items'] as $item_index => $pattern_item) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.items.'.$index.'.'.$num,
+					'name' => $this->name.'.'.$index.'.items.'.$item_index,
 					'value' => $pattern_item
 				];
 			}
-			foreach ($val['itemids'] as $num => $itemid) {
+
+			foreach ($value['itemids'] as $item_index => $itemid) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-					'name' => $this->name.'.itemids.'.$index.'.'.$num,
+					'name' => $this->name.'.'.$index.'.itemids.'.$item_index,
 					'value' => $itemid
 				];
 			}
-			foreach ($val['type'] as $num => $type) {
+
+			foreach ($value['type'] as $type_index => $type) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.type.'.$index.'.'.$num,
+					'name' => $this->name.'.'.$index.'.type.'.$type_index,
 					'value' => $type
 				];
 			}
+
 			// Field "color" stored as array for dataset type DATASET_TYPE_SINGLE_ITEM (0)
-			if ($val['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
-				foreach ($val['color'] as $num => $color) {
+			if ($value['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
+				foreach ($value['color'] as $color_index => $color) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-						'name' => $this->name.'.color.'.$index.'.'.$num,
+						'name' => $this->name.'.'.$index.'.color.'.$color_index,
 						'value' => $color
 					];
 				}
@@ -274,20 +240,38 @@ class CWidgetFieldDataSet extends CWidgetField {
 			else {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.color.'.$index,
-					'value' => $val['color']
+					'name' => $this->name.'.'.$index.'.color',
+					'value' => $value['color']
 				];
 			}
+
 			// Other dataset fields are stored if different from the defaults.
 			foreach ($dataset_fields as $name => $type) {
-				if ($val[$name] !== null && $val[$name] != $dataset_defaults[$name]) {
+				if ($value[$name] !== null && $value[$name] != $dataset_defaults[$name]) {
 					$widget_fields[] = [
 						'type' => $type,
-						'name' => $this->name.'.'.$name.'.'.$index,
-						'value' => $val[$name]
+						'name' => $this->name.'.'.$index.'.'.$name,
+						'value' => $value[$name]
 					];
 				}
 			}
 		}
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		$validation_rules = parent::getValidationRules($strict);
+
+		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
+
+			if (!$this->isTemplateDashboard()) {
+				self::setValidationRuleFlag($validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			}
+
+			self::setValidationRuleFlag($validation_rules['fields']['items'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($validation_rules['fields']['itemids'], API_NOT_EMPTY);
+		}
+
+		return $validation_rules;
 	}
 }
