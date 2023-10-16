@@ -202,10 +202,10 @@ $item_form_list
 $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
-		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-field', _('Original')))
 			->setLabel(_('Preprocessing steps')),
 		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))
-			->setId('preprocessing_div')
+			->setId('preprocessing-field')
 	);
 
 $custom_intervals = (new CTable())
