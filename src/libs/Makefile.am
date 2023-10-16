@@ -82,6 +82,7 @@ SERVER_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
+	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
 	zbxcacheconfig \

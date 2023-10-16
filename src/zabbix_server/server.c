@@ -53,6 +53,7 @@
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
 #include "zbxconnector.h"
+#include "zbxdbconfigworker.h"
 #include "service/service_manager.h"
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
@@ -259,7 +260,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
-	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1 /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -573,6 +575,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DBCONFIGWORKER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_DBCONFIGWORKER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DBCONFIGWORKER];
 	}
 	else
 		return FAIL;
@@ -1702,6 +1709,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_CONNECTORWORKER:
 				thread_args.args = &connector_worker_args;
 				zbx_thread_start(connector_worker_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				zbx_thread_start(dbconfig_worker_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
 				thread_args.args = &report_manager_args;
