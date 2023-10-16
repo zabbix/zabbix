@@ -130,7 +130,7 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	sigset_t	mask, orig_mask;
 	char		filename[MAX_STRING_LEN];
 
-	if (FAIL == zbx_validate_hostname(address) && FAIL == is_supported_ip(address))
+	if (FAIL == zbx_validate_hostname(address) && FAIL == zbx_is_supported_ip(address))
 	{
 		zbx_strlcpy(error, "Invalid host name or IP address", max_error_len);
 		return FAIL;
@@ -144,6 +144,13 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 
 		return FAIL;
 	}
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set sigprocmask to block the user signal");
 
 	len = strlen(address);
 	if (-1 == (n = write(fd, address, len)))
@@ -167,13 +174,6 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	}
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1 < %s", fping, filename);
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGINT);
-	sigaddset(&mask, SIGQUIT);
-
-	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
-		zbx_error("cannot set sigprocmask to block the user signal");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
 
