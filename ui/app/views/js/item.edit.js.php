@@ -493,9 +493,11 @@ window.item_edit_form = new class {
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
+				this.#updateActionButtons();
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 			});
 	}
 
