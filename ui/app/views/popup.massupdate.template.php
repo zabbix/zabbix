@@ -115,7 +115,7 @@ $template_tab
 
 $tags_tab = (new CFormList('tags-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -126,7 +126,7 @@ $tags_tab = (new CFormList('tags-form-list'))
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass('tags-table')
-		]))->setId('tags-div')
+		]))->setId('tags-field')
 	);
 
 // Append tabs to the form.

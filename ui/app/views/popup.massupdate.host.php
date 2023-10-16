@@ -186,7 +186,7 @@ $tags_tab = new CFormList('tagsFormList');
 
 // append tags table to form list
 $tags_tab->addRow(
-	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+	(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 	(new CDiv([
 		(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 			->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -197,7 +197,7 @@ $tags_tab->addRow(
 		renderTagTable([['tag' => '', 'value' => '']])
 			->setHeader([_('Name'), _('Value'), _('Action')])
 			->addClass('tags-table')
-	]))->setId('tags-div')
+	]))->setId('tags-field')
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');
