@@ -42,7 +42,7 @@ class CControllerScriptUserInputCheck extends CController {
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])]))->disableView()
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 
@@ -56,47 +56,21 @@ class CControllerScriptUserInputCheck extends CController {
 	protected function doAction(): void {
 		$manualinput = $this->getInput('manualinput');
 		$output = [];
-		$result = false;
-		$test = $this->hasInput('test');
 
-		if ($this->getInput('manualinput_validator_type') == SCRIPT_MANUALINPUT_TYPE_LIST) {
-			$dropdown_values = explode(",", $this->getInput('input_validator'));
+		$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
+		$script['manualinput_validator'] = $this->getInput('input_validator');
 
-			if (in_array($manualinput, $dropdown_values)) {
-				$result = true;
-			}
-			else {
-				error(
-					_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
-						_s('value must be one of: %1$s', implode(', ', $dropdown_values))
-					)
-				);
-			}
+		if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+			$script['provided_manualinput'] = $manualinput;
 		}
-		else{
-			$input_validator = $this->getInput('input_validator');
-			$regular_expression = '/'.str_replace('/', '\/', $input_validator).'/';
-
-			if (@preg_match($regular_expression, '') === false) {
-				error(
-					_s('Incorrect value for field "%1$s": %2$s.', _('input_validator'),
-						_('invalid regular expression')
-					));
-			}
-			elseif (!preg_match($regular_expression, $manualinput)) {
-				error(
-					_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
-						_s('input does not match the provided pattern: %1$s', $input_validator)
-					)
-				);
-			}
-			else {
-				$result = true;
-			}
+		else {
+			$script['manualinput_default_value'] = $manualinput;
 		}
+
+		$result = CScriptHelper::validateManualInput($script);
 
 		if ($result) {
-			if ($test) {
+			if ($this->hasInput('test')) {
 				$output['success']['messages'] = ['User input has been successfully tested.'];
 				$output['success']['test'] = true;
 			}

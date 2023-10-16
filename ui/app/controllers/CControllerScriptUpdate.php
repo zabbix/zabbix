@@ -130,37 +130,15 @@ class CControllerScriptUpdate extends CController {
 				$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
 
 				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
-					// Check if values are unique.
-					$user_input_values = array_map('trim', explode(",", $this->getInput('dropdown_options')));
-
-					if (array_unique($user_input_values) !== $user_input_values) {
-						error(_('Dropdown options must be unique.'));
-					}
-
-					$script['manualinput_validator'] = implode(',', $user_input_values);
+					$script['manualinput_validator'] = $this->getInput('dropdown_options', []);
 				}
 				else {
-					$default_input = trim($this->getInput('manualinput_default_value', ''));
-					$input_validation = $this->getInput('manualinput_validator');
-					$regular_expression = '/'.str_replace('/', '\/', $input_validation).'/';
-
-					if (@preg_match($regular_expression, '') === false) {
-						error(
-							_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
-								_('invalid regular expression')
-							));
-					}
-					elseif (!preg_match($regular_expression, $default_input)) {
-						error(
-							_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
-								_s('input does not match the provided pattern: %1$s', $input_validation)
-							)
-						);
-					}
-
-					$script['manualinput_default_value'] = trim($default_input);
-					$script['manualinput_validator'] = $input_validation;
+					$script['manualinput_validator'] = $this->getInput('manualinput_validator', '');
+					$script['manualinput_default_value'] = $this->getInput('manualinput_default_value', '');
 				}
+
+				CScriptHelper::validateManualInput($script);
+
 				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');
 			}
 		}
