@@ -1069,12 +1069,10 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
  ******************************************************************************/
 static int	severity_to_mask(const char *level, unsigned char *severity_mask)
 {
-	size_t			i, levels_cnt;
+	size_t			i;
 	static const char	*levels[] = {ZBX_VMWARE_EVTLOG_SEVERITIES};
 
-	levels_cnt = ARRSIZE(levels);
-
-	for (i = 0; i < levels_cnt; i++)
+	for (i = 0; i < ARRSIZE(levels); i++)
 	{
 		if (0 == strcmp(level, levels[i]))
 			break;
@@ -1082,7 +1080,7 @@ static int	severity_to_mask(const char *level, unsigned char *severity_mask)
 
 	*severity_mask = (unsigned char)(1 << i);
 
-	return (i < levels_cnt) ? SUCCEED : FAIL;
+	return (i < ARRSIZE(levels)) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
