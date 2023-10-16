@@ -51,7 +51,7 @@ $item_form_list = (new CFormList('item-form-list'))
 // Append hosts interface select to form list.
 if ($data['single_host_selected'] && $data['context'] === 'host') {
 	$item_form_list->addRow(
-		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
+		(new CVisibilityBox('visible[interfaceid]', 'interface-field', _('Original')))
 			->setLabel(_('Host interface'))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
 		(new CDiv([
@@ -63,7 +63,7 @@ if ($data['single_host_selected'] && $data['context'] === 'host') {
 				->addClass(ZBX_STYLE_RED)
 				->setId('interface_not_defined')
 				->addStyle('display: none;')
-		]))->setId('interfaceDiv'),
+		]))->setId('interface-field'),
 		'interface_row'
 	);
 }
@@ -282,7 +282,7 @@ $item_form_list
 	)
 	// Append history to form list.
 	->addRow(
-		(new CVisibilityBox('visible[history]', 'history_div', _('Original')))
+		(new CVisibilityBox('visible[history]', 'history-field', _('Original')))
 			->setLabel(_('History storage period')),
 		(new CDiv([
 			(new CRadioButtonList('history_mode', ITEM_STORAGE_CUSTOM))
@@ -295,11 +295,11 @@ $item_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('history_div')
+			->setId('history-field')
 	)
 	// Append trends to form list.
 	->addRow(
-		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trend storage period')),
+		(new CVisibilityBox('visible[trends]', 'trends-field', _('Original')))->setLabel(_('Trend storage period')),
 		(new CDiv([
 			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
 				->addValue(_('Do not keep trends'), ITEM_STORAGE_CUSTOM)
@@ -311,7 +311,7 @@ $item_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('trends_div')
+			->setId('trends-field')
 	);
 
 // Append status to form list.
