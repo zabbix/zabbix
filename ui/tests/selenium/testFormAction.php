@@ -484,8 +484,8 @@ class testFormAction extends CLegacyWebTest {
 		]);
 
 		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
-			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name contains TEST1');
-			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name contains TEST2');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Event name contains TEST1');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Event name contains TEST2');
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
@@ -1245,7 +1245,7 @@ class testFormAction extends CLegacyWebTest {
 					'expected conditions' => [
 						'A' => 'Tag name does not contain Does not contain Tag',
 						'B' => 'Trigger severity equals Warning',
-						'C' => 'Trigger name contains trigger'
+						'C' => 'Event name contains trigger'
 					],
 					'operations' => [
 						[
@@ -1593,7 +1593,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('condition_type', 'Event name');
 		$this->zbxTestInputTypeWait('value', 'trigger');
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Trigger name contains trigger');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Event name contains trigger');
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
