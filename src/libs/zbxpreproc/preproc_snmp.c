@@ -1017,7 +1017,10 @@ skip:
 	}
 
 	if (NULL != *errmsg)
+	{
 		ret = FAIL;
+		goto out;
+	}
 
 	if (0 < grouped_prefixes.num_data)
 	{

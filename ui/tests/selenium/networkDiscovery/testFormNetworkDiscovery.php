@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup drules
@@ -29,7 +30,17 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testFormNetworkDiscovery extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const CANCEL_RULE = 'Discovery rule for cancelling scenario';
 	const CLONE_RULE = 'Discovery rule for clone';
@@ -44,15 +55,6 @@ class testFormNetworkDiscovery extends CWebTest {
 	 * Name of discovery rule for update scenario.
 	 */
 	protected static $update_rule = 'Discovery rule for update';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * Get discovery rules and checks tables hash values.

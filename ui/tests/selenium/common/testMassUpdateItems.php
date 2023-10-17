@@ -21,7 +21,7 @@
 require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
@@ -31,7 +31,17 @@ use Facebook\WebDriver\Exception\ElementClickInterceptedException;
  */
 class testMassUpdateItems extends CWebTest{
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
+	}
 
 	const HOSTID = 40001;	// Simple form test host.
 	const RULEID = 133800;	// testFormDiscoveryRule1 on Simple form test host.
@@ -60,15 +70,6 @@ class testMassUpdateItems extends CWebTest{
 					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		]
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * Add interface to host.
@@ -1566,6 +1567,7 @@ class testMassUpdateItems extends CWebTest{
 
 	public function getCommonPreprocessingChangeData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1579,6 +1581,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1594,6 +1597,7 @@ class testMassUpdateItems extends CWebTest{
 							'combinations of (type)=((9, 10)).'
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1608,6 +1612,7 @@ class testMassUpdateItems extends CWebTest{
 							'the value of parameter "/1/preprocessing/1/params/1".'
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1621,6 +1626,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1636,6 +1642,7 @@ class testMassUpdateItems extends CWebTest{
 							'combinations of (type)=((19, 20)).'
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1649,6 +1656,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1667,6 +1675,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
 				]
 			],
+			// #7.
 			[
 				[
 					'names' => [
@@ -1676,6 +1685,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => []
 				]
 			],
+			// #8.
 			[
 				[
 					'names' => [
@@ -1710,6 +1720,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'names' => [
@@ -1757,7 +1768,7 @@ class testMassUpdateItems extends CWebTest{
 		$form->getLabel('Preprocessing steps')->click();
 
 		if ($data['Preprocessing steps'] !== []) {
-			$this->addPreprocessingSteps($data['Preprocessing steps']);
+			$this->addPreprocessingSteps($data['Preprocessing steps'], true);
 
 			// Take a screenshot to test draggable object position of preprocessing steps in mass update.
 			if (array_key_exists('Screenshot', $data)) {
@@ -1765,9 +1776,13 @@ class testMassUpdateItems extends CWebTest{
 
 				// It is necessary because of unexpected viewport shift.
 				$this->page->updateViewport();
-				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(), 'Item mass update preprocessing'.$prototypes);
+				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(),
+						'Item mass update preprocessing'.$prototypes
+				);
 			}
-
+		}
+		else {
+			$form->fill(['id:preprocessing_action' => 'Remove all']);
 		}
 
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();
