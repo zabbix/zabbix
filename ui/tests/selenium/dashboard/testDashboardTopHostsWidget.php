@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
@@ -28,7 +29,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  *
  * @backup widget, profiles
  *
- * @onAfter clearData
+ *
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
@@ -134,8 +135,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$column_form = $column_dialog->asForm();
 
 		$this->assertEquals('New column', $column_dialog->getTitle());
-		$this->assertEquals(['Name', 'Data', 'Text', 'Item', 'Time shift', 'Aggregation function', 'Aggregation interval',
-				'Display', 'History data', 'Base colour', 'Min', 'Max', 'Decimal places', 'Thresholds'],
+		$this->assertEquals(['Name', 'Data', 'Text', 'Item', 'Display', 'Min', 'Max','Base colour', 'Thresholds',
+				'Decimal places', 'Aggregation function', 'Time period', 'Widget', 'From', 'To', 'History data'],
 				$column_form->getLabels()->asText()
 		);
 		$form->getRequiredLabels(['Name', 'Item', 'Aggregation interval']);
@@ -146,25 +147,27 @@ class testDashboardTopHostsWidget extends CWebTest {
 			'Text' => ['value' => '', 'placeholder' => 'Text, supports {INVENTORY.*}, {HOST.*} macros','maxlength' => 255,
 					'visible' => false, 'enabled' => false
 			],
-			'Aggregation function' => ['value' => 'none', 'options' => ['none', 'min', 'max', 'avg', 'count', 'sum',
-					'first', 'last']
-			],
-			'Aggregation interval' => ['value' => '1h', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'Item' => ['value' => ''],
-			'Time shift' => ['value' => '', 'placeholder' => 'none', 'maxlength' => 255],
 			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators']],
-			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
-			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
-			'Decimal places' => ['value' => 2, 'maxlength' => 2] ,
-			'Thresholds' => ['visible' => true]
+			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
+			'Thresholds' => ['visible' => true],
+			'Decimal places' => ['value' => 2, 'maxlength' => 2],
+			'Aggregation function' => ['value' => 'not used', 'options' => ['not used', 'min', 'max', 'avg', 'count', 'sum',
+					'first', 'last']
+			],
+			'Time period' => ['value' => 'Dashboard', 'labels' => ['Dashboard', 'Widget', 'Custom'], 'visible' => false, 'enabled' => false],
+			'Widget' => ['value' => '', 'visible' => false, 'enabled' => false],
+			'id:time_period_from' => ['value' => 'now-1h', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
+			'id:time_period_to' => ['value' => 'now', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
+			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']]
 		];
 		$this->checkFieldsAttributes($column_default_fields, $column_form);
 
 		// Reassign new fields' values for comparing them in other 'Data' values.
-		foreach (['Aggregation function', 'Item', 'Time shift', 'Display', 'History data', 'Min',
-				'Max', 'Decimal places','Thresholds' ] as $field) {
+		foreach (['Aggregation function', 'Item', 'Display', 'History data', 'Min',
+				'Max', 'Decimal places', 'Thresholds' ] as $field) {
 			$column_default_fields[$field]['visible'] = false;
 			$column_default_fields[$field]['enabled'] = false;
 		}
@@ -183,8 +186,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		// Adding those fields new info icons appear.
 		$warning_visibility = [
-			'Aggregation function' => ['none' => false, 'min' => true, 'max' => true, 'avg' => true, 'count' => true,
-					'sum' => true, 'first' => true, 'last' => true
+			'Aggregation function' => ['not used' => false, 'min' => true, 'max' => true, 'avg' => true, 'count' => false,
+					'sum' => true, 'first' => false, 'last' => false
 			],
 			'Display' => ['As is' => false, 'Bar' => true, 'Indicators' => true],
 			'History data' => ['Auto' => false, 'History' => false, 'Trends' => true]
@@ -194,7 +197,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		foreach ($warning_visibility as $warning_label => $options) {
 			$hint_text = ($warning_label === 'History data')
 				? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
-				: 'With this setting only numeric items will be displayed in this column.';
+				: 'With this setting only numeric items will be displayed.';
 			$warning_button = $column_form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
 
 			foreach ($options as $option => $visible) {
@@ -213,9 +216,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 					$hint_dialog->waitUntilNotPresent();
 				}
 
-				// Together with hintbox there are some additional fields' dependency.
-				if ($warning_label === 'Aggregation function') {
-					$this->assertTrue($column_form->getField('Aggregation interval')->isVisible($visible));
+				if ($warning_label === 'Aggregation function' && $option !== 'not used') {
+					$this->assertTrue($column_form->getLabel('Time period')->isDisplayed());
 				}
 
 				if ($warning_label === 'Display') {
@@ -230,7 +232,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$thresholds_container = $column_form->getFieldContainer('Thresholds');
 		$this->assertEquals(['', 'Threshold', 'Action'], $thresholds_container->asTable()->getHeadersText());
 		$thresholds_icon = $column_form->getLabel('Thresholds')->query('xpath:.//button[@data-hintbox]')->one();
-		$this->assertFalse($thresholds_icon->isVisible());
+		$this->assertTrue($thresholds_icon->isVisible());
 		$thresholds_container->query('button:Add')->one()->waitUntilClickable()->click();
 
 		$this->checkFieldsAttributes([
@@ -245,9 +247,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		$thresholds_icon->click();
 		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
-		$this->assertEquals('With this setting only numeric items will be displayed in this column.',
-				$hint_dialog->getText()
-		);
+		$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 		$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint_dialog->waitUntilNotPresent();
 	}
@@ -317,7 +317,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #3 Several item columns with different Aggregation function
+			// #3 Several item columns with different Aggregation function  and custom "From" time period.
 			[
 				[
 					'main_fields' =>  [
@@ -328,56 +328,63 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Data' => 'Item value',
 							'Name' => 'min',
 							'Aggregation function' => 'min',
-							'Aggregation interval' => '20s',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1m', // minimum time period to display is 1 minute.
 							'Item' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'max',
 							'Aggregation function' => 'max',
-							'Aggregation interval' => '20m',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-20m',
 							'Item' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'avg',
 							'Aggregation function' => 'avg',
-							'Aggregation interval' => '20h',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-20h',
 							'Item' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'count',
 							'Aggregation function' => 'count',
-							'Aggregation interval' => '20d',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-20d',
 							'Item' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'sum',
 							'Aggregation function' => 'sum',
-							'Aggregation interval' => '20w',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-20w',
 							'Item' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'first',
 							'Aggregation function' => 'first',
-							'Aggregation interval' => '20M',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-20M',
 							'Item' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'last',
 							'Aggregation function' => 'last',
-							'Aggregation interval' => '20y',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2y', // maximum time period to display is 730 days.
 							'Item' => 'Available memory'
 						]
 					],
 					'screenshot' => true
 				]
 			],
-			// #4 Several item columns with different display, time shift, min/max and history data.
+			// #4 Several item columns with different display, custom "From" time period, min/max and history data.
 			[
 				[
 					'main_fields' =>  [
@@ -390,13 +397,19 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Display' => 'As is',
 							'History data' => 'History',
-							'Time shift' => '1'
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom',
+							'id:time_period_to' => 'now-30m'
 						],
 						[
 							'Name' => 'Column_2',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
 							'Display' => 'As is',
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2h',
+							'id:time_period_to' => 'now-1h',
 							'History data' => 'Trends'
 						],
 						[
@@ -750,93 +763,78 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #19 Error when incorrect time shift added.
+			// #19 Error when time period "From" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
 					'main_fields' =>  [
-						'Name' => 'Incorrect time shift'
+						'Name' => 'Incorrect time period'
 					],
 					'column_fields' => [
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => 'zzz'
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-58s'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/timeshift": a time unit is expected.'
+						'Minimum time period to display is 1 minute.'
 					]
 				]
 			],
-			// #20 Error when 1M time shift added.
+			// #20 Error when time period "From" is above maximum time period.
 			[
 				[
 					'expected' => TEST_BAD,
 					'main_fields' =>  [
-						'Name' => '1M time shift'
+						'Name' => 'Maximum time period in From field'
 					],
 					'column_fields' => [
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '1M'
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2y-2s'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/timeshift": a time unit is expected.'
+						'Maximum time period to display is 730 days.'
 					]
 				]
 			],
-			// #21 Error when 1y time shift added.
+			// #21 Error when time period "From" is empty.
 			[
 				[
 					'expected' => TEST_BAD,
 					'main_fields' =>  [
-						'Name' => '1y time shift'
+						'Name' => 'From field is empty'
 					],
 					'column_fields' => [
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '1y'
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => ''
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/timeshift": a time unit is expected.'
+						'Invalid parameter "/1/From": cannot be empty.'
 					]
 				]
 			],
-			// #22 Error when incorrect aggregation interval added.
+			// #22 Incorrect value in "From" field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'main_fields' =>  [
-						'Name' => 'Incorrect aggregation interval'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item' => 'Available memory',
-							'Aggregation function' => 'count',
-							'Aggregation interval' => 'zzz'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/aggregate_interval": a time unit is expected.'
-					]
-				]
-			],
-			// #23 Error when empty aggregation function added.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' =>  [
-						'Name' => 'Empty aggregation interval'
+						'Name' => 'From field is with incorrect value'
 					],
 					'column_fields' => [
 						[
@@ -844,15 +842,174 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
 							'Aggregation function' => 'count',
-							'Aggregation interval' => ''
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'a'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/aggregate_interval": cannot be empty.'
+						'Invalid parameter "/1/From": a time is expected.'
 					]
 				]
 			],
-			// #24 Error when incorrect min value added.
+			// #23 Error when time period "To" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Incorrect time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_to' => 'now-59m-2s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #24 Error when time period fields values "From" and "To" are changed and maximum time period is >730 days.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Incorrect time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-4y',
+							'id:time_period_to' => 'now-1y'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is 730 days.'
+					]
+				]
+			],
+			// #25 Error when time period "To" is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'To field is empty'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'last',
+							'Time period' => 'Custom',
+							'id:time_period_to' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/To": cannot be empty.'
+					]
+				]
+			],
+			// #26 Error when time period "To" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'To field is with incorrect value'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_to' => 'b'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/To": a time is expected.'
+					]
+				]
+			],
+			// #27 Error when both time period selectors have invalid values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Both time selectors have invalid values'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'b',
+							'id:time_period_to' => 'b'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/From": a time is expected.',
+						'Invalid parameter "/1/To": a time is expected.'
+					]
+				]
+			],
+			// #28 Error when both time period selectors are empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Both time selectors have invalid values'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '',
+							'id:time_period_to' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/From": cannot be empty.',
+						'Invalid parameter "/1/To": cannot be empty.'
+					]
+				]
+			],
+			// #29 Error when widget field is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Both time selectors have invalid values'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Widget'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/Widget": cannot be empty.'
+					]
+				]
+			],
+			// #30 Error when incorrect min value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -873,7 +1030,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #25 Error when incorrect max value added.
+			// #31 Error when incorrect max value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -894,7 +1051,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #26 Color error in item column.
+			// #32 Color error in item column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -914,7 +1071,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #27 Color error when incorrect hexadecimal added in first threshold.
+			// #33 Color error when incorrect hexadecimal added in first threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -939,7 +1096,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #28 Color error when incorrect hexadecimal added in second threshold.
+			// #34 Color error when incorrect hexadecimal added in second threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -968,7 +1125,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #29 Error message when incorrect value added to threshold.
+			// #35 Error message when incorrect value added to threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -993,7 +1150,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #30 Spaces in fields' values.
+			// #36 Spaces in fields' values.
 			[
 				[
 					'trim' => true,
@@ -1008,7 +1165,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => '     Text column name with spaces 1     ',
 							'Data' => 'Text',
-							'Text' => '          Spaces in text          '
+							'Text' => '          Spaces in text          ',
+							'Base colour' => 'A5D6A7'
 						],
 						[
 							'Name' => '     Text column name with spaces 2     ',
@@ -1019,9 +1177,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => '     Text column name with spaces 3     ',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '     5m       ',
 							'Aggregation function' => 'avg',
-							'Aggregation interval' => '       10m       ',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '         now-2h         ',
+							'id:time_period_to' => '         now-1h         ',
 							'Display' => 'Bar',
 							'Min' => '         2       ',
 							'Max' => '         200     ',
@@ -1030,12 +1189,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 								[
 									'threshold' => '    5       '
 								]
-							]
+							],
+							'History data' => 'Trends'
 						]
 					]
 				]
 			],
-			// #31 User macros in fields' values.
+			// #37 User macros in fields' values.
 			[
 				[
 					'trim' => true,
@@ -1062,33 +1222,33 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						]
 					]
-				],
-				// #32 Global macros in fields' values.
+				]
+			],
+			// #38 Global macros in fields' values.
+			[
 				[
-					[
-						'trim' => true,
-						'main_fields' =>  [
-							'Name' => '{HOST.HOST}'
+					'trim' => true,
+					'main_fields' =>  [
+						'Name' => '{HOST.HOST}'
+					],
+					'tags' => [
+						['name' => '{HOST.NAME}', 'value' => '{ITEM.NAME}', 'operator' => 'Equals']
+					],
+					'column_fields' => [
+						[
+							'Name' => '{INVENTORY.ALIAS}',
+							'Data' => 'Text',
+							'Text' => '{HOST.DNS}'
 						],
-						'tags' => [
-							['name' => '{HOST.NAME}', 'value' => '{ITEM.NAME}', 'operator' => 'Equals']
+						[
+							'Name' => '{INVENTORY.ALIAS}',
+							'Data' => 'Host name',
+							'Base colour' => '0040DD'
 						],
-						'column_fields' => [
-							[
-								'Name' => '{INVENTORY.ALIAS}',
-								'Data' => 'Text',
-								'Text' => '{HOST.DNS}'
-							],
-							[
-								'Name' => '{INVENTORY.ALIAS}',
-								'Data' => 'Host name',
-								'Base colour' => '0040DD'
-							],
-							[
-								'Name' => '{HOST.IP}',
-								'Data' => 'Item value',
-								'Item' => 'Available memory'
-							]
+						[
+							'Name' => '{HOST.IP}',
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
 						]
 					]
 				]
@@ -1257,52 +1417,24 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #4 Time shift error in column.
+			// #4 Time period "From" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Time shift' => 'zzz'
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-58s'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/timeshift": a time unit is expected.'
+						'Minimum time period to display is 1 minute.'
 					]
 				]
 			],
-			// #5 Time shift error in column when add 1M.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Time shift' => '1M'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/timeshift": a time unit is expected.'
-					]
-				]
-			],
-			// #6 Time shift error in column when add 1y.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Time shift' => '1y'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/timeshift": a time unit is expected.'
-					]
-				]
-			],
-			// #7 Aggregation interval error in column.
+			// #5 Time period "From" is above maximum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1310,31 +1442,173 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Aggregation function' => 'max',
-							'Aggregation interval' => 'zzz'
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-63072002'
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/aggregate_interval": a time unit is expected.'
+						'Maximum time period to display is 730 days.'
 					]
 				]
 			],
-			// #8 Empty aggregation interval error in column.
+			// #6 Empty "From" field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Aggregation function' => 'max',
-							'Aggregation interval' => ''
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => ''
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/aggregate_interval": cannot be empty.'
+						'Invalid parameter "/1/From": cannot be empty.'
 					]
 				]
 			],
-			// #9 No item error in column.
+			// #7 Error when time period "From" is invalid.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'a'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/From": a time is expected.'
+					]
+				]
+			],
+			// #8 Error when time period "To" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_to' => 'now-3542s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #9  Error when time period fields values "From" and "To" are changed and maximum time period is >730 days.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-26M',
+							'id:time_period_to' => 'now-1M'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is 730 days.'
+					]
+				]
+			],
+			// #10 Error when time period "To" is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_to' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/To": cannot be empty.'
+					]
+				]
+			],
+			// #11 Error when time period "To" is invalid.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_to' => 'b'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/To": a time is expected.'
+					]
+				]
+			],
+			// #12 Error when both time period selectors have invalid values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'a',
+							'id:time_period_to' => 'b'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/From": a time is expected.',
+						'Invalid parameter "/1/To": a time is expected.'
+					]
+				]
+			],
+			// #13 Error when both time period selectors are empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '',
+							'id:time_period_to' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/From": cannot be empty.',
+						'Invalid parameter "/1/To": cannot be empty.'
+					]
+				]
+			],
+			// #14 Error when widget field is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Widget'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/Widget": cannot be empty.'
+					]
+				]
+			],
+			// #15 No item error in column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1349,7 +1623,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #10 Incorrect base color.
+			// #16 Incorrect base color.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1365,7 +1639,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #11 Update all main fields.
+			// #17 Update all main fields.
 			[
 				[
 					'main_fields' =>  [
@@ -1380,7 +1654,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #12 Update first item column to Text column and add some values.
+			// #18 Update first item column to Text column and add some values.
 			[
 				[
 					'main_fields' =>  [
@@ -1397,7 +1671,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #13 Update first column to Host name column and add some values.
+			// #19 Update first column to Host name column and add some values.
 			[
 				[
 					'main_fields' =>  [
@@ -1412,37 +1686,43 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #14 Update first column to Item column and check time suffix - seconds.
+			// #20 Update first column to Item column and check time From/To.
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'Time shift 10s'
+						'Name' => 'Time From/To'
 					],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '10s'
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-120s',
+							'id:time_period_to' => 'now-1m'
 						]
 					]
 				]
 			],
-			// #15 Time suffix "minutes" is checked in this case.
+			// #21 Update time From/To.
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'Time shift 10m'
+						'Name' => 'Time From/To'
 					],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '10m'
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1w',
+							'id:time_period_to' => 'now-1d'
 						]
 					]
 				]
 			],
-			// #16 Time suffix "hours" is checked in this case.
+			// #22 Update time From/To (day before yesterday).
 			[
 				[
 					'main_fields' =>  [
@@ -1452,12 +1732,15 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '10h'
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2d/d',
+							'id:time_period_to' => 'now-2d/d'
 						]
 					]
 				]
 			],
-			// #17 Time suffix "weeks" is checked in this case.
+			// #23 Update time From/To.
 			[
 				[
 					'main_fields' =>  [
@@ -1467,12 +1750,15 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '10w'
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-3M',
+							'id:time_period_to' => 'now-1M'
 						]
 					]
 				]
 			],
-			// #18 Spaces in fields' values.
+			// #24 Spaces in fields' values.
 			[
 				[
 					'trim' => true,
@@ -1487,15 +1773,17 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => '     Text column name with spaces 1     ',
 							'Data' => 'Text',
-							'Text' => '          Spaces in text 😅          '
+							'Text' => '          Spaces in text 😅          ',
+							'Base colour' => 'A5D6A7'
 						],
 						[
 							'Name' => '     Text column name with spaces2      ',
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Time shift' => '     5m       ',
 							'Aggregation function' => 'avg',
-							'Aggregation interval' => '       10m       ',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '  now-2d/d  ',
+							'id:time_period_to' => '  now-2d/d  ',
 							'Display' => 'Bar',
 							'Min' => '         2       ',
 							'Max' => '         200     ',
@@ -1510,12 +1798,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 									'index' => 1,
 									'threshold' => '    10      '
 								]
-							]
+							],
+							'History data' => 'Trends'
 						]
 					]
 				]
 			],
-			// #19 User macros in fields' values.
+			// #25 User macros in fields' values.
 			[
 				[
 					'trim' => true,
@@ -1537,77 +1826,78 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						]
 					]
-				],
-				// #20 Global macros in fields' values.
+				]
+			],
+			// #26 Global macros in fields' values.
+			[
 				[
-					[
-						'trim' => true,
-						'main_fields' =>  [
-							'Name' => '{HOST.HOST} updated'
+					'trim' => true,
+					'main_fields' =>  [
+						'Name' => '{HOST.HOST} updated'
+					],
+					'tags' => [
+						['name' => '{HOST.NAME}', 'value' => '{ITEM.NAME}', 'operator' => 'Equals']
+					],
+					'column_fields' => [
+						[
+							'Name' => '{INVENTORY.ALIAS}',
+							'Data' => 'Text',
+							'Text' => '{HOST.DNS}'
 						],
-						'tags' => [
-							['name' => '{HOST.NAME}', 'value' => '{ITEM.NAME}', 'operator' => 'Equals']
-						],
-						'column_fields' => [
-							[
-								'Name' => '{INVENTORY.ALIAS}',
-								'Data' => 'Text',
-								'Text' => '{HOST.DNS}'
-							],
-							[
-								'Name' => '{HOST.IP}',
-								'Data' => 'Item value',
-								'Item' => 'Available memory'
-							]
+						[
+							'Name' => '{HOST.IP}',
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
 						]
 					]
-				],
-				// #21 Update item column adding new values and fields.
+				]
+			],
+			// #27 Update item column adding new values and fields.
+			[
 				[
-					[
-						'main_fields' =>  [
-							'Name' => 'Updated values for item column 😅'
+					'main_fields' =>  [
+						'Name' => 'Updated values for item column 😅'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Host name',
+							'Name' => 'Only name changed'
 						],
-						'column_fields' => [
-							[
-								'Data' => 'Host name',
-								'Name' => 'Only name changed'
-							],
-							[
-								'Data' => 'Item value 😅',
-								'Item' => 'Available memory',
-								'Time shift' => '1',
-								'Display' => 'Indicators',
-								'History data' => 'Trends',
-								'Min' => '50',
-								'Max' => '100',
-								'Aggregation function' => 'avg',
-								'Aggregation interval' => '20h',
-								'Base colour' => '039BE5',
-								'Thresholds' => [
-									[
-										'action' => USER_ACTION_UPDATE,
-										'index' => 0,
-										'threshold' => '1',
-										'color' => 'FFEB3B'
-									],
-									[
-										'action' => USER_ACTION_UPDATE,
-										'index' => 1,
-										'threshold' => '100',
-										'color' => 'AAAAAA'
-									]
+						[
+							'Data' => 'Item value 😅',
+							'Item' => 'Available memory',
+							'Display' => 'Indicators',
+							'History data' => 'Trends',
+							'Min' => '50',
+							'Max' => '100',
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-3d',
+							'id:time_period_to' => 'now-1d',
+							'Base colour' => '039BE5',
+							'Thresholds' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'threshold' => '1',
+									'color' => 'FFEB3B'
+								],
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'threshold' => '100',
+									'color' => 'AAAAAA'
 								]
 							]
-						],
-						'tags' => [
-							['name' => 'value', 'value' => '12345', 'operator' => 'Contains'],
-							['name' => '@#$%@', 'value' => 'a1b2c3d4', 'operator' => 'Equals'],
-							['name' => 'AvF%21', 'operator' => 'Exists'],
-							['name' => '_', 'operator' => 'Does not exist'],
-							['name' => 'кириллица', 'value' => 'BcDa', 'operator' => 'Does not equal'],
-							['name' => 'aaa6 😅', 'value' => 'bbb6 😅', 'operator' => 'Does not contain']
 						]
+					],
+					'tags' => [
+						['name' => 'value', 'value' => '12345', 'operator' => 'Contains'],
+						['name' => '@#$%@', 'value' => 'a1b2c3d4', 'operator' => 'Equals'],
+						['name' => 'AvF%21', 'operator' => 'Exists'],
+						['name' => '_', 'operator' => 'Does not exist'],
+						['name' => 'кириллица', 'value' => 'BcDa', 'operator' => 'Does not equal'],
+						['name' => 'aaa6 😅', 'value' => 'bbb6 😅', 'operator' => 'Does not contain']
 					]
 				]
 			]
