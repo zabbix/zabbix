@@ -55,6 +55,10 @@ class WidgetForm extends CWidgetForm {
 	public const SIZE_CUSTOM = 1;
 	private const SIZE_AUTO = 0;
 
+	public const BOLD_ON = 1;
+
+	public const INTERPOLATION_ON = 1;
+
 	public function addFields(): self {
 		return $this
 			->addField($this->isTemplateDashboard()
@@ -93,9 +97,8 @@ class WidgetForm extends CWidgetForm {
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldTags('item_tags')
+			->addField(
+				new CWidgetFieldTags('item_tags')
 			)
 			->addField(
 				(new CWidgetFieldCheckBox(
@@ -112,52 +115,52 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				(new CWidgetFieldTextArea('primary', _('Primary label')))
+				(new CWidgetFieldTextArea('primary_label', _('Primary label')))
 					->setDefault('{HOST.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('primary_size_type', null, [
+				(new CWidgetFieldRadioButtonList('primary_label_size_type', null, [
 					self::SIZE_AUTO => _('Auto'),
 					self::SIZE_CUSTOM => _('Custom')
 				]))->setDefault(self::SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('primary_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
+				(new CWidgetFieldIntegerBox('primary_label_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
 					->setDefault(self::DEFAULT_PRIMARY_SIZE)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('primary_bold', _('Bold'))
+				new CWidgetFieldCheckBox('primary_label_bold', _('Bold'))
 			)
 			->addField(
-				new CWidgetFieldColor('primary_color', _('Color'))
+				new CWidgetFieldColor('primary_label_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldTextArea('secondary', _('Secondary label')))
+				(new CWidgetFieldTextArea('secondary_label', _('Secondary label')))
 					->setDefault('{ITEM.LASTVALUE}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('secondary_size_type', null, [
+				(new CWidgetFieldRadioButtonList('secondary_label_size_type', null, [
 					self::SIZE_AUTO => _('Auto'),
 					self::SIZE_CUSTOM => _('Custom')
 				]))->setDefault(self::SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('secondary_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
+				(new CWidgetFieldIntegerBox('secondary_label_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
 					->setDefault(self::DEFAULT_SECONDARY_SIZE)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('secondary_bold', _('Bold')))->setDefault(1)
+				(new CWidgetFieldCheckBox('secondary_label_bold', _('Bold')))->setDefault(self::BOLD_ON)
 			)
 			->addField(
-				new CWidgetFieldColor('secondary_color', _('Color'))
+				new CWidgetFieldColor('secondary_label_color', _('Color'))
 			)
 			->addField(
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))->setDefault(1)
+				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))->setDefault(self::INTERPOLATION_ON)
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))

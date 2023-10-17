@@ -68,10 +68,10 @@ $form
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addFieldsGroup(
-				getPrimaryFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-primary')
+				getPrimaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-primary')
 			)
 			->addFieldsGroup(
-				getSecondaryFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-secondary')
+				getSecondaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-secondary')
 			)
 			->addField(
 				new CWidgetFieldColorView($data['fields']['bg_color'])
@@ -86,9 +86,9 @@ $form
 		], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getPrimaryFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$primary_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['primary_size']));
-	$size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['primary_size_type']));
+function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$label_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['primary_label_size']));
+	$label_size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['primary_label_size_type']));
 
 	return (new CWidgetFieldsGroupView(_('Primary label')))
 		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
@@ -104,29 +104,29 @@ function getPrimaryFieldsGroupView(CWidgetFormView $form, array $fields): CWidge
 			])
 		)
 		->addField(
-			(new CWidgetFieldTextAreaView($fields['primary']))
+			(new CWidgetFieldTextAreaView($fields['primary_label']))
 				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)
 				->removeLabel()
 		)
 		->addItem([
-			$primary_size_field->getLabel(),
+			$label_size_field->getLabel(),
 			new CFormField([
-				($size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				($primary_size_field->getView())->setId('primary_custom_input'),
+				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				($label_size_field->getView())->setId('primary_label_custom_input'),
 				' %'
 			])
 		])
 		->addField(
-			new CWidgetFieldCheckBoxView($fields['primary_bold'])
+			new CWidgetFieldCheckBoxView($fields['primary_label_bold'])
 		)
 		->addField(
-			(new CWidgetFieldColorView($fields['primary_color']))
+			(new CWidgetFieldColorView($fields['primary_label_color']))
 		);
 }
 
-function getSecondaryFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$secondary_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['secondary_size']));
-	$size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['secondary_size_type']));
+function getSecondaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$label_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['secondary_label_size']));
+	$label_size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['secondary_label_size_type']));
 
 	return (new CWidgetFieldsGroupView(_('Secondary label')))
 		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
@@ -142,23 +142,23 @@ function getSecondaryFieldsGroupView(CWidgetFormView $form, array $fields): CWid
 			])
 		)
 		->addField(
-			(new CWidgetFieldTextAreaView($fields['secondary']))
+			(new CWidgetFieldTextAreaView($fields['secondary_label']))
 				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)
 				->removeLabel()
 		)
 		->addItem([
-			$secondary_size_field->getLabel(),
+			$label_size_field->getLabel(),
 			new CFormField([
-				($size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				($secondary_size_field->getView())->setId('secondary_custom_input'),
+				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				($label_size_field->getView())->setId('secondary_label_custom_input'),
 				' %'
 			])
 		])
 		->addField(
-			new CWidgetFieldCheckBoxView($fields['secondary_bold'])
+			new CWidgetFieldCheckBoxView($fields['secondary_label_bold'])
 		)
 		->addField(
-			(new CWidgetFieldColorView($fields['secondary_color']))
+			(new CWidgetFieldColorView($fields['secondary_label_color']))
 		);
 }
 

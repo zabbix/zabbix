@@ -75,14 +75,14 @@ window.widget_honeycomb_form = new class {
 		}
 
 		const is_primary_size_custom = this.#form
-			.querySelector('[name="primary_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
-		const primary_size_input = document.getElementById('primary_custom_input');
+			.querySelector('[name="primary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
+		const primary_size_input = document.getElementById('primary_label_custom_input');
 
 		primary_size_input.disabled = !is_primary_size_custom || !primary_show.checked;
 		primary_size_input.style.display = is_primary_size_custom && primary_show.checked ? '' : 'none';
 		primary_size_input.nextSibling.nodeValue = is_primary_size_custom && primary_show.checked ? ' %' : '';
 
-		if (document.activeElement === document.getElementById('primary_size_type_1')) {
+		if (document.activeElement === document.getElementById('primary_label_size_type_1')) {
 			primary_size_input.focus();
 		}
 
@@ -95,14 +95,14 @@ window.widget_honeycomb_form = new class {
 		}
 
 		const is_secondary_size_custom = this.#form
-			.querySelector('[name="secondary_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
-		const secondary_size_input = document.getElementById('secondary_custom_input');
+			.querySelector('[name="secondary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
+		const secondary_size_input = document.getElementById('secondary_label_custom_input');
 
 		secondary_size_input.disabled = !is_secondary_size_custom || !secondary_show.checked;
 		secondary_size_input.style.display = is_secondary_size_custom && secondary_show.checked ? '' : 'none';
 		secondary_size_input.nextSibling.nodeValue = is_secondary_size_custom && secondary_show.checked ? ' %' : '';
 
-		if (document.activeElement === document.getElementById('secondary_size_type_1')) {
+		if (document.activeElement === document.getElementById('secondary_label_size_type_1')) {
 			secondary_size_input.focus();
 		}
 
