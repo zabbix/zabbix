@@ -406,19 +406,9 @@ window.item_edit_form = new class {
 
 				case 'query_fields':
 				case 'headers':
-					for (const [i, value] of Object.entries(fields[key].name)) {
-						fields[key].name[i] = value.trim();
-					}
-
-					for (const [i, value] of Object.entries(fields[key].value)) {
-						fields[key].value[i] = value.trim();
-					}
-
-					break;
-
 				case 'parameters':
-					for (const [i, param] of Object.entries(fields.parameters)) {
-						fields.parameters[i] = {name: param.name.trim(), value: param.value.trim()}
+					for (const [i, param] of Object.entries(fields[key])) {
+						fields[key][i] = {name: param.name.trim(), value: param.value.trim()}
 					}
 
 					break;

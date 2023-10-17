@@ -1139,12 +1139,6 @@ return [
 				'length' => 2048,
 				'default' => ''
 			],
-			'query_fields' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => ''
-			],
 			'posts' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_NCLOB,
@@ -1172,11 +1166,6 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
-			],
-			'headers' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'retrieve_mode' => [

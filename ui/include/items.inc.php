@@ -2179,17 +2179,15 @@ function prepareLldOverrides(array $overrides, ?array $db_item): array {
 }
 
 function prepareItemQueryFields(array $query_fields): array {
-	$result = [];
+	foreach ($query_fields as $i => $query_field) {
+		unset($query_fields[$i]['sortorder']);
 
-	foreach ($query_fields as $query_field) {
-		if (!($query_field['name'] === '' && $query_field['value'] === '')) {
-			unset($query_field['sortorder']);
-
-			$result[] = $query_field;
+		if ($query_field['name'] === '' && $query_field['value'] === '') {
+			unset($query_fields[$i]);
 		}
 	}
 
-	return $result;
+	return array_values($query_fields);
 }
 
 /**
@@ -2200,17 +2198,15 @@ function prepareItemQueryFields(array $query_fields): array {
  * @return array
  */
 function prepareItemHeaders(array $headers): array {
-	$result = [];
+	foreach ($headers as $i => $header) {
+		unset($headers[$i]['sortorder']);
 
-	foreach ($headers as $header) {
-		if (!($header['name'] === '' && $header['value'] === '')) {
-			unset($header['sortorder']);
-
-			$result[] = $header;
+		if ($header['name'] === '' && $header['value'] === '') {
+			unset($headers[$i]);
 		}
 	}
 
-	return $result;
+	return $headers;
 }
 
 /**
