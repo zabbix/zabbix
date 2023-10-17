@@ -5565,8 +5565,10 @@ static zbx_uint64_t	permission_hgset_add(const char *hash_str, zbx_vector_uint64
 
 	for (i = 0; i < permissions.values_num; i++)
 	{
-		zbx_db_insert_add_values(&db_insert, permissions.values[i].ugsetid, hgsetid,
-				permissions.values[i].permission);
+		zbx_host_permission_t	*permission = &permissions.values[i];
+
+		if (0 != permission->permission)
+			zbx_db_insert_add_values(&db_insert, permission->ugsetid, hgsetid, permission->permission);
 	}
 
 	zbx_vector_host_permission_destroy(&permissions);
@@ -5586,9 +5588,6 @@ static int	permission_hgset_remove(zbx_uint64_t hgsetid)
 	int		ret = SUCCEED;
 	char		*sql;
 	zbx_db_result_t	result;
-
-	if (0 == hgsetid)
-		return SUCCEED;
 
 	sql = zbx_dsprintf(NULL, "select null from host_hgset where hgsetid=" ZBX_FS_UI64, hgsetid);
 	result = zbx_db_select_n(sql, 1);
@@ -5613,7 +5612,6 @@ static int	hostgroups_with_permissions_update(zbx_uint64_t hostid)
 				id_str[MAX_ID_LEN + 2], *id_str_p = id_str + 1, *sql = NULL;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_db_insert_t		db_insert;
 	sha256_ctx		ctx;
 	zbx_vector_uint64_t	groupids;
 
@@ -5623,7 +5621,7 @@ static int	hostgroups_with_permissions_update(zbx_uint64_t hostid)
 	zbx_db_select_uint64(sql, &groupids);
 
 	if (0 == groupids.values_num)
-		return FAIL;
+		goto err;
 
 	id_str[0] = '|';
 	zbx_sha256_init(&ctx);
@@ -5640,8 +5638,6 @@ static int	hostgroups_with_permissions_update(zbx_uint64_t hostid)
 	zbx_sha256_finish(&ctx, hash);
 	(void)zbx_bin2hex((const unsigned char *)hash, ZBX_SHA256_DIGEST_SIZE, hash_str,
 			ZBX_SHA256_DIGEST_SIZE * 2 + 1);
-
-	zbx_db_insert_prepare(&db_insert, "host_hgset", "hostid", "hgsetid", NULL);
 
 	if (0 == (hgsetid = permission_hgset_get(hash_str)))
 	{
@@ -5667,27 +5663,26 @@ static int	hostgroups_with_permissions_update(zbx_uint64_t hostid)
 	if (0 != hgsetid_old)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("update host_hgset set hgsetid=" ZBX_FS_UI64
-				" where hostid=" ZBX_FS_UI64,
-				hgsetid, hostid))
+				" where hostid=" ZBX_FS_UI64, hgsetid, hostid))
 		{
 			goto err;
 		}
+
+		ret = permission_hgset_remove(hgsetid_old);
 	}
 	else
 	{
+		zbx_db_insert_t	db_insert;
+
+		zbx_db_insert_prepare(&db_insert, "host_hgset", "hostid", "hgsetid", NULL);
 		zbx_db_insert_add_values(&db_insert, hostid, hgsetid);
 
-		if (SUCCEED != zbx_db_insert_execute(&db_insert))
-			goto err;
+		ret = zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
-
-	if (SUCCEED != permission_hgset_remove(hgsetid_old))
-		goto err;
-
-	ret = SUCCEED;
 err:
 	zbx_vector_uint64_destroy(&groupids);
-	zbx_db_insert_clean(&db_insert);
+	zbx_free(sql);
 
 	return ret;
 }
