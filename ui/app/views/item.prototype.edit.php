@@ -130,7 +130,7 @@ else {
 $tabsid = 'items-tab';
 $tabs = (new CTabView(['id' => $tabsid]))
 	->setSelected(0)
-	->addTab('item-tab', _('Item'),
+	->addTab('item-tab', _('Item prototype'),
 		new CPartial('item.edit.item.tab', [
 			'can_edit_source_timeouts' => $data['can_edit_source_timeouts'],
 			'config' => $data['config'],
