@@ -291,7 +291,7 @@ window.service_edit_popup = new class {
 		}
 
 		const overlay = PopUp('popup.service.statusrule.edit', parameters,
-			{dialogueid: 'service_status_rule_edit', dialogue_class: 'modal-popup-generic'}
+			{dialogueid: 'service_status_rule_edit', dialogue_class: 'modal-popup-medium'}
 		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {

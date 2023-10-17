@@ -244,7 +244,7 @@
 				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>,
 					userids: Array.from(userids)
-				}, {dialogue_class: 'modal-popup-generic', trigger_element: event.target});
+				}, {dialogue_class: 'modal-popup-medium', trigger_element: event.target});
 			});
 		}
 
@@ -259,7 +259,7 @@
 				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP ?>,
 					usrgrpids: Array.from(usrgrpids)
-				}, {dialogue_class: 'modal-popup-generic', trigger_element: event.target});
+				}, {dialogue_class: 'modal-popup-medium', trigger_element: event.target});
 			});
 		}
 	}
