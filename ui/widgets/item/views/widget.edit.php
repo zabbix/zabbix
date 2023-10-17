@@ -79,6 +79,7 @@ function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CW
 	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
 	return (new CWidgetFieldsGroupView(_('Description')))
+		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 		->setFieldHint(
 			makeHelpIcon([
 				_('Supported macros:'),

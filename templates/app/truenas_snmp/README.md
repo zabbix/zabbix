@@ -3,7 +3,7 @@
 
 ## Overview
 
-Template for monitoring TrueNAS by SNMP
+Template for monitoring TrueNAS by SNMP.
 
 ## Requirements
 
@@ -13,6 +13,7 @@ Zabbix version: 7.0 and higher.
 
 This template has been tested on:
 - TrueNAS Core 12.0-U8
+- TrueNAS Core 13.0-U5.3
 
 ## Configuration
 
@@ -20,10 +21,9 @@ This template has been tested on:
 
 ## Setup
 
-1. Import template into Zabbix
-2. Enable SNMP daemon at Services in TrueNAS web interface https://www.truenas.com/docs/core/services/snmp
-3. Link template to the host
-
+1. Import the template into Zabbix.
+2. Enable SNMP daemon at Services in TrueNAS web interface: https://www.truenas.com/docs/core/uireference/services/snmpscreen/
+3. Link the template to the host.
 
 ### Macros used
 
@@ -78,7 +78,8 @@ This template has been tested on:
 |TrueNAS: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node. If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |TrueNAS: System name|<p>MIB: SNMPv2-MIB</p><p>The host name of the system.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |TrueNAS: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining what kind of box is being managed.</p>|SNMP agent|system.objectid<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|TrueNAS: Uptime|<p>MIB: SNMPv2-MIB</p><p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|TrueNAS: Uptime|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|TrueNAS: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items.</p>|SNMP trap|snmptrap.fallback|
 |TrueNAS: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
 |TrueNAS: Interrupts per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of interrupts processed.</p>|SNMP agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |TrueNAS: Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
@@ -94,7 +95,7 @@ This template has been tested on:
 |TrueNAS: Memory utilization|<p>Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.</p>|Calculated|vm.memory.util|
 |TrueNAS: Total swap space|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of swap space configured for this host.</p>|SNMP agent|system.swap.total<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |TrueNAS: Free swap space|<p>MIB: UCD-SNMP-MIB</p><p>The amount of swap space currently unused or available.</p>|SNMP agent|system.swap.free<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Calculated|system.swap.pfree|
+|TrueNAS: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Calculated|system.swap.pfree<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `100`</p></li></ul>|
 |TrueNAS: ARC size|<p>MIB: FREENAS-MIB</p><p>ARC size in bytes.</p>|SNMP agent|truenas.zfs.arc.size<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |TrueNAS: ARC metadata size|<p>MIB: FREENAS-MIB</p><p>ARC metadata size used in bytes.</p>|SNMP agent|truenas.zfs.arc.meta<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |TrueNAS: ARC data size|<p>MIB: FREENAS-MIB</p><p>ARC data size used in bytes.</p>|SNMP agent|truenas.zfs.arc.data<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
