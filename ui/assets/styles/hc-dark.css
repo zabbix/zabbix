@@ -3576,7 +3576,8 @@ section {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover {
         background: #414141; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: #000000; }
+      background-color: #000000;
+      border-color: #444444; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.focused {
