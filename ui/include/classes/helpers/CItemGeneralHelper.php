@@ -278,15 +278,6 @@ class CItemGeneralHelper {
 			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
 		}
 
-		if ($item['master_itemid']) {
-			$master_item = API::Item()->get([
-				'output' => ['itemid', 'name'],
-				'itemids' => $item['master_itemid'],
-				'webitems' => true
-			]);
-			$item['master_item'] = $master_item ? reset($master_item) : [];
-		}
-
 		return $item;
 	}
 
