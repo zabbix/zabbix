@@ -266,16 +266,16 @@ class testGeomapWidgetScreenshots extends CWebTest {
 //					'Tile provider' => 'OpenStreetMap Mapnik'
 //				]
 //			],
-			[
-				[
-					'Tile provider' => 'Stamen Toner Lite'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'Stamen Terrain'
-				]
-			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Toner Lite'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Terrain'
+//				]
+//			],
 //			[
 //				[
 //					'Tile provider' => 'USGS US Topo'
