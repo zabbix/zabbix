@@ -381,7 +381,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.name[{#NAME}]'
               delay: '0'
-              history: 1d
+              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The name of the proxy server.'
@@ -423,7 +423,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.type[{#NAME}]'
               delay: '0'
-              history: 1d
+              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The type of the proxy server.'

@@ -906,7 +906,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.iax.trunk.get[{#OBJECTNAME}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for a IAX trunk.'
@@ -1045,7 +1045,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.pjsip.trunk.get[{#OBJECTNAME}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for a PJSIP trunk.'
@@ -1129,7 +1129,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.queue.get[{#QUEUE}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for a queue.'
@@ -1213,7 +1213,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.sip.trunk.get[{#OBJECTNAME}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for a SIP trunk.'

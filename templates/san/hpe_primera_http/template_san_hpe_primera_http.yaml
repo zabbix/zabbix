@@ -34,7 +34,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.disks.total
           delay: '0'
-          history: '0'
+          history: 7d
           description: 'Number of physical disks.'
           preprocessing:
             - type: JSONPATH
@@ -266,7 +266,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.errors
           delay: '0'
-          history: '0'
+          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'A list of errors from WSAPI requests.'

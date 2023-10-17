@@ -724,7 +724,7 @@ zabbix_export:
         - uuid: 5949fadcbe2b405baff0668e81627278
           name: 'Redis: Ping'
           key: 'redis.ping["{$REDIS.CONN.URI}"]'
-          history: 7h
+          history: 1h
           valuemap:
             name: 'Service state'
           preprocessing:
