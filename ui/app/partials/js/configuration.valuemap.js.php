@@ -92,7 +92,8 @@ var AddValueMap = class {
 			});
 
 			PopUp('popup.valuemap.edit', {...this.data, valuemap_names, edit: 1},
-					{dialogue_class: 'modal-popup-generic'});
+				{dialogue_class: 'modal-popup-generic'}
+			);
 		});
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));
