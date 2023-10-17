@@ -39,7 +39,7 @@ return [
 			'hash' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 65,
+				'length' => 64,
 				'default' => ''
 			]
 		]
@@ -220,7 +220,7 @@ return [
 			'hash' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 65,
+				'length' => 64,
 				'default' => ''
 			]
 		]
@@ -1711,7 +1711,7 @@ return [
 			]
 		]
 	],
-	'ugset_user' => [
+	'user_ugset' => [
 		'key' => 'userid,ugsetid',
 		'fields' => [
 			'userid' => [
@@ -3722,13 +3722,8 @@ return [
 		]
 	],
 	'permission' => [
-		'key' => 'permissionid',
+		'key' => 'ugsetid,hgsetid',
 		'fields' => [
-			'permissionid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
 			'ugsetid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,

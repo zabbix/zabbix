@@ -1229,7 +1229,7 @@ static int	DBpatch_6050123(void)
 			{"ugset", "ugsetid", 0,
 				{
 					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"hash", "", NULL, NULL, 65, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"hash", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -1319,7 +1319,7 @@ static int	DBpatch_6050133(void)
 			{"hgset", "hgsetid", 0,
 				{
 					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"hash", "", NULL, NULL, 65, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"hash", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -1462,7 +1462,7 @@ static int	dbupgrade_group_set_compare(const void *d1, const void *d2)
 	return strcmp(group_set1->hash_str, group_set2->hash_str);
 }
 
-static int	dbupgrade_groupsets_generate(zbx_vector_uint64_t *ids, const char *fld_name_id,
+static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_name_id,
 		const char *fld_name_groupid, const char *tbl_name_groups, zbx_hashset_t *group_sets,
 		int allow_empty_groups)
 {
@@ -1604,7 +1604,7 @@ static int	DBpatch_6050147(void)
 	zbx_vector_uint64_create(&ids);
 	zbx_db_select_uint64("select hostid from hosts where flags<>2", &ids);
 
-	if (SUCCEED == (ret = dbupgrade_groupsets_generate(&ids, "hostid", "groupid", "hosts_groups", &group_sets, 0)))
+	if (SUCCEED == (ret = dbupgrade_groupsets_make(&ids, "hostid", "groupid", "hosts_groups", &group_sets, 0)))
 		ret = dbupgrade_groupsets_insert("hgset", &group_sets, &db_insert, &db_insert_groups, &db_insert_hosts);
 
 	zbx_db_insert_clean(&db_insert);
@@ -1635,7 +1635,7 @@ static int	DBpatch_6050148(void)
 	zbx_vector_uint64_create(&ids);
 	zbx_db_select_uint64("select u.userid from users u join role r on u.roleid=r.roleid where r.type<>3", &ids);
 
-	if (SUCCEED == (ret = dbupgrade_groupsets_generate(&ids, "userid", "usrgrpid", "users_groups", &group_sets, 1)))
+	if (SUCCEED == (ret = dbupgrade_groupsets_make(&ids, "userid", "usrgrpid", "users_groups", &group_sets, 1)))
 		ret = dbupgrade_groupsets_insert("ugset", &group_sets, &db_insert, &db_insert_groups, &db_insert_hosts);
 
 	zbx_db_insert_clean(&db_insert);
