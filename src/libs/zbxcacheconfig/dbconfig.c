@@ -15307,7 +15307,7 @@ int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, 
 	zbx_token_t	token;
 	int		pos = 0, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, *text);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() '%s'", __func__, *text);
 
 	for (; SUCCEED == zbx_token_find(*text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
@@ -15336,7 +15336,7 @@ int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, 
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, *text);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() '%s'", __func__, *text);
 
 	return ret;
 }

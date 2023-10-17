@@ -18,6 +18,7 @@
 **/
 
 #include "zbxdbconfigworker.h"
+#include "zbx_host_constants.h"
 
 #include "zbxlog.h"
 #include "zbxself.h"
@@ -33,7 +34,7 @@
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
 
 
-static int	dbsync_macros(void)
+static int	dbsync_item_rtname(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -48,12 +49,10 @@ static int	dbsync_macros(void)
 	um_handle = zbx_dc_open_user_macros();
 	zbx_db_begin();
 
-	result = zbx_db_select("select i.itemid,i.hostid,i.name,i.name_resolved"
-			" from items i"
-			" join hosts h on i.hostid=h.hostid"
-			" where i.name_upper like '%%{$%%' and (h.status=0 or h.status=1)"
-					" and (i.flags=0 or i.flags=1 or i.flags=4)"
-			" order by itemid");
+	result = zbx_db_select("select i.itemid,i.hostid,i.name,n.name_resolved,i.flags,h.status"
+			" from items i,item_rtname n,hosts h"
+			" where i.hostid=h.hostid and n.itemid=i.itemid and n.name_upper like '%%{$%%'"
+			" order by n.itemid");
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -64,6 +63,12 @@ static int	dbsync_macros(void)
 		zbx_uint64_t	itemid, hostid;
 		const char	*name_resolved_current;
 		char		*name_resolved_new;
+
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == atoi(row[4]))
+			continue;
+
+		if (HOST_STATUS_TEMPLATE == atoi(row[5]))
+			continue;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
@@ -78,7 +83,7 @@ static int	dbsync_macros(void)
 		
 			name_resolved_esc = zbx_db_dyn_escape_string(name_resolved_new);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_rtname set"
 					" name_resolved='%s',name_resolved_upper=upper(name_resolved)"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					name_resolved_esc, itemid);
@@ -143,7 +148,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 	zbx_vector_uint64_create(&hostids);
 	zabbix_increase_log_level();
-	dbsync_macros();
+	dbsync_item_rtname();
 
 	while (ZBX_IS_RUNNING())
 	{
