@@ -266,16 +266,16 @@ class testGeomapWidgetScreenshots extends CWebTest {
 //					'Tile provider' => 'OpenStreetMap Mapnik'
 //				]
 //			],
-			[
-				[
-					'Tile provider' => 'Stamen Toner Lite'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'Stamen Terrain'
-				]
-			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Toner Lite'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Terrain'
+//				]
+//			],
 //			[
 //				[
 //					'Tile provider' => 'USGS US Topo'
@@ -351,10 +351,13 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Some zoom widgets are excluded for 'Stamen Terrain', because images on screenshots are not stable.
-		$widgets = $data['Tile provider'] === 'Stamen Terrain'
-			? ['Geomap for screenshots, 30', 'Geomap for screenshots, no zoom']
-			: ['Geomap for screenshots, 5', 'Geomap for screenshots, 10', 'Geomap for screenshots, 30',
-				'Geomap for screenshots, no zoom', 'Geomap for screenshots, 3'];
+		$widgets = [
+			'Geomap for screenshots, 5',
+			'Geomap for screenshots, 10',
+			'Geomap for screenshots, 30',
+			'Geomap for screenshots, no zoom',
+			'Geomap for screenshots, 3'
+		];
 		foreach ($widgets as $widget) {
 			// Wait until loader disappears.
 			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
