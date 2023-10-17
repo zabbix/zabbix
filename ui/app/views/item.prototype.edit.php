@@ -130,13 +130,13 @@ else {
 $tabsid = 'items-tab';
 $tabs = (new CTabView(['id' => $tabsid]))
 	->setSelected(0)
-	->addTab('item-tab', _('Item'),
+	->addTab('item-tab', _('Item prototype'),
 		new CPartial('item.edit.item.tab', [
 			'can_edit_source_timeouts' => $data['can_edit_source_timeouts'],
 			'config' => $data['config'],
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
-			'inventory_fields' => $data['inventory_fields'],
+			'inventory_fields' => [],
 			'item' => $item,
 			'source' => 'itemprototype',
 			'types' => $data['types'],
@@ -183,7 +183,6 @@ $form
 			'readonly' => $item['templated'] || $item['discovered'],
 			'source' => 'itemprototype',
 			'testable_item_types' => $data['testable_item_types'],
-			'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys']
 		]).');'))->setOnDocumentReady()

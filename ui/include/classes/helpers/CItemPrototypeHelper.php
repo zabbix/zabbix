@@ -60,6 +60,23 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			$item['delay_flex'] = [];
 		}
 
+		if ($item['master_itemid']) {
+			$master_item = API::ItemPrototype()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $item['master_itemid']
+			]);
+
+			if (!$master_item) {
+				$master_item = API::Item()->get([
+					'output' => ['itemid', 'name'],
+					'itemids' => $item['master_itemid'],
+					'webitems' => true
+				]);
+			}
+
+			$item['master_item'] = $master_item ? reset($master_item) : [];
+		}
+
 		return $item;
 	}
 

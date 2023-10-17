@@ -78,6 +78,6 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			'itemids' => $this->getInput('itemid')
 		]);
 
-		return ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($input + $db_item);
+		return ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($db_item + $input);
 	}
 }
