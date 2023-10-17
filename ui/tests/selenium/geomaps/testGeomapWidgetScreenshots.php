@@ -350,13 +350,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();
 
-		$widgets = [
-			'Geomap for screenshots, 5',
-			'Geomap for screenshots, 10',
-			'Geomap for screenshots, 30',
-			'Geomap for screenshots, no zoom',
-			'Geomap for screenshots, 3'
-		];
+		// Some zoom widgets are excluded for 'Stamen Terrain', because images on screenshots are not stable.
+		$widgets = $data['Tile provider'] === 'Stamen Terrain'
+			? ['Geomap for screenshots, 30', 'Geomap for screenshots, no zoom']
+			: ['Geomap for screenshots, 5', 'Geomap for screenshots, 10', 'Geomap for screenshots, 30',
+				'Geomap for screenshots, no zoom', 'Geomap for screenshots, 3'];
 		foreach ($widgets as $widget) {
 			// Wait until loader disappears.
 			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).

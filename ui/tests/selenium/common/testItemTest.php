@@ -20,27 +20,28 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * Base class for "Test item" function tests.
  */
 class testItemTest extends CWebTest {
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
-	const TEMPLATE_ID = 99137;	// 'Test Item Template'
-
-	use PreprocessingTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
 	}
+
+	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
+	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
 	/**
 	 * Test item button state data for item, item prototype and LLD.
