@@ -85,6 +85,49 @@ class testDashboardPieChartWidget extends CWebTest
 		]);
 	}
 
+	public function getLayoutData() {
+		return [
+			[
+				[
+					'action' => 'create',
+					'header_text' => 'Add widget',
+					'primary_button_text' => 'Add'
+				]
+			],
+			[
+				[
+					'action' => 'edit',
+					'header_text' => 'Edit widget',
+					'primary_button_text' => 'Apply'
+				]
+			],
+		];
+	}
+
+	/**
+	 * Test the elements and layout of the Pie chart create and edit form.
+	 *
+	 * @dataProvider getLayoutData
+	 */
+	public function testDashboardPieChartWidget_LayoutEdit($data) {
+		// Open the correct form.
+		if ($data['action'] === 'create') {
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+			$dashboard = CDashboardElement::find()->one();
+			$form = $dashboard->edit()->addWidget()->asForm();
+		}
+		else if ($data['action'] === 'edit') {
+			$widget_name = 'Layout widget';
+			$this->createCleanWidget($widget_name);
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+			$dashboard = CDashboardElement::find()->one();
+			$form = $dashboard->edit()->getWidget($widget_name)->edit();
+		}
+
+		$dialog = COverlayDialogElement::find()->one();
+		$form->highlight();
+	}
+
 	public function getCreateData() {
 		return [
 			// Mandatory fields only.
@@ -380,6 +423,31 @@ class testDashboardPieChartWidget extends CWebTest
 	public function testDashboardPieChartWidget_Update($data){
 		// Create a Pie chart widget for editing.
 		$widget_name = 'Edit widget';
+		$this->createCleanWidget($widget_name);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$form = $dashboard->edit()->getWidget($widget_name)->edit();
+
+		// Fill data and submit.
+		$this->fillForm($data['fields'], $form);
+		$form->submit();
+
+		// Assert result.
+		$this->assertEditFormAfterSave($data);
+
+		// Check total Widget count.
+		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+	}
+
+	/**
+	 * Resets the dashboard and creates a single Pie chart widget.
+	 *
+	 * @param string $widget_name    name of the widget to be created
+	 */
+	protected function createCleanWidget($widget_name){
 		CDataHelper::call('dashboard.update',
 			[
 				'dashboardid' => self::$dashboardid,
@@ -412,22 +480,6 @@ class testDashboardPieChartWidget extends CWebTest
 				]
 			]
 		);
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-
-		$dashboard = CDashboardElement::find()->one();
-		$old_widget_count = $dashboard->getWidgets()->count();
-		$form = $dashboard->edit()->getWidget($widget_name)->edit();
-
-		// Fill data and submit.
-		$this->fillForm($data['fields'], $form);
-		$form->submit();
-
-		// Assert result.
-		$this->assertEditFormAfterSave($data);
-
-		// Check total Widget count.
-		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 	}
 
 	/**
