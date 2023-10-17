@@ -40,6 +40,7 @@ function local_showHeader(array $data): void {
 		else {
 			$allowed_urls = explode(',', $x_frame_options);
 			$allowed_urls[] = $_SERVER['HTTP_HOST'];
+			$allowed_urls = array_unique($allowed_urls);
 
 			header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
 		}
