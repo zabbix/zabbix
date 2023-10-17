@@ -173,6 +173,14 @@ class testDashboardPieChartWidget extends CWebTest
 					]
 				]
 			],
+			// Several data sets.
+			[
+				[
+					'fields' => [
+						'Data set' => [[], [], [], [], []]
+					]
+				]
+			],
 			// Missing Data set.
 			[
 				[
@@ -187,6 +195,7 @@ class testDashboardPieChartWidget extends CWebTest
 			[
 				[
 					'fields' => [
+						'remake_data_set' => true,
 						'Data set' => ['item' => '*']
 					],
 					'result' => TEST_BAD,
@@ -197,6 +206,7 @@ class testDashboardPieChartWidget extends CWebTest
 			[
 				[
 					'fields' => [
+						'remake_data_set' => true,
 						'Data set' => ['host' => '*']
 					],
 					'result' => TEST_BAD,
@@ -362,22 +372,10 @@ class testDashboardPieChartWidget extends CWebTest
 		);
 	}
 
-	public function getUpdateData()
-	{
-		return [
-			// Mandatory fields only.
-			[
-				[
-					'fields' => []
-				]
-			]
-		];
-	}
-
 	/**
 	 * Test updating of Pie chart.
 	 *
-	 * @dataProvider getUpdateData
+	 * @dataProvider getCreateData
 	 */
 	public function testDashboardPieChartWidget_Update($data){
 		// Create a Pie chart widget for editing.
@@ -556,10 +554,19 @@ class testDashboardPieChartWidget extends CWebTest
 		$form->fill($main_fields);
 
 		// Fill datasets.
-		if (CTestArrayHelper::get($fields, 'delete_data_set')) {
+		$delete = CTestArrayHelper::get($fields, 'delete_data_set');
+		$remake = CTestArrayHelper::get($fields, 'remake_data_set');
+
+		if ($delete || $remake) {
 			$form->query('xpath://button[@title="Delete"]')->one()->click();
+
+			if ($remake) {
+				$form->query('button:Add new data set')->one()->click();
+				$form->invalidate();
+			}
 		}
-		else {
+
+		if (!$delete) {
 			$this->fillDatasets($this->extractDataSets($fields), $form);
 		}
 
@@ -711,6 +718,12 @@ class testDashboardPieChartWidget extends CWebTest
 
 		if (CTestArrayHelper::isAssociative($data_sets)) {
 			$data_sets = [$data_sets];
+		}
+
+		foreach ($data_sets as $i => $data_set) {
+			if ($data_set === []) {
+				$data_sets[$i] = ['host' => 'Test Host '.$i, 'item' => 'Test Item '.$i];
+			}
 		}
 
 		return $data_sets;
