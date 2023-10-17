@@ -527,7 +527,7 @@ class CControllerItemList extends CControllerItem {
 		];
 
 		if ($input['filter_groupids']) {
-			$options['groupids'] = getSubGroups($input['filter_groupids'], $ignore, ['editable' => true], $context);
+			$options['groupids'] = getSubGroups($input['filter_groupids'], $ignore, $context);
 		}
 
 		if ($input['filter_hostids']) {
