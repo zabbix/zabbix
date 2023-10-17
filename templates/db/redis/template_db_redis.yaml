@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:28:32Z'
+  date: '2023-10-17T14:13:27Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -722,7 +722,7 @@ zabbix_export:
         - uuid: 5949fadcbe2b405baff0668e81627278
           name: 'Redis: Ping'
           key: 'redis.ping["{$REDIS.CONN.URI}"]'
-          history: 7h
+          history: 1h
           valuemap:
             name: 'Service state'
           preprocessing:
