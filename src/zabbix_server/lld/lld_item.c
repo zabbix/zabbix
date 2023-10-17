@@ -683,8 +683,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch((zbx_vector_ptr_t *)items,
-					&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)items,
+					(const void *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -719,8 +719,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch((zbx_vector_ptr_t *)items,
-					&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)items,
+					(const void *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -754,8 +754,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch((zbx_vector_ptr_t *)items,
-					&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)items,
+					(const void *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
