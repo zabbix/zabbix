@@ -80,7 +80,7 @@ static int	dbsync_item_rtname(void)
 		if (0 != strcmp(name_resolved_current, name_resolved_new))
 		{
 			char	*name_resolved_esc;
-		
+
 			name_resolved_esc = zbx_db_dyn_escape_string(name_resolved_new);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_rtname set"
@@ -194,7 +194,6 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
-
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
