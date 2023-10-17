@@ -1387,7 +1387,6 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		}
 	}
 
-	zbx_vector_lld_hgset_ptr_sort(hgsets, lld_hgset_compare);
 	zbx_vector_str_create(&hashes);
 
 	for (i = 0; i < hgsets->values_num; i++)
@@ -1406,7 +1405,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			if (FAIL != (i = zbx_vector_lld_hgset_ptr_bsearch(hgsets, (void*)row[1],
+			if (FAIL != (i = zbx_vector_lld_hgset_ptr_search(hgsets, (void*)row[1],
 					lld_hgset_hash_search)))
 			{
 				ZBX_STR2UINT64(hgsets->values[i]->hgsetid, row[0]);
@@ -4309,6 +4308,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	zbx_db_commit();
 out:
+	zbx_vector_uint64_destroy(&used_hgsetids);
 	zbx_vector_uint64_destroy(&del_tagids);
 	zbx_vector_uint64_destroy(&del_snmp_ids);
 	zbx_vector_uint64_destroy(&del_interfaceids);
