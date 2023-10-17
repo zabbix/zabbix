@@ -294,6 +294,7 @@
 	 *
 	 * @param string options['url']					backend url
 	 * @param string options['name']				input element name
+	 * @param string options['id']					multiselect wrapper id
 	 * @param object options['labels']				translated labels (optional)
 	 * @param object options['data']				preload data {id, name, prefix} (optional)
 	 * @param string options['data'][id]
@@ -331,6 +332,7 @@
 		var defaults = {
 				url: '',
 				name: '',
+				id: '',
 				labels: {
 					'No matches found': t('No matches found'),
 					'More matches found...': t('More matches found...'),
@@ -393,7 +395,8 @@
 
 			$obj.wrap($('<div>', {
 				'class': ZBX_STYLE_CLASS,
-				css: ms.options.styles
+				css: ms.options.styles,
+				id: ms.options.id !== '' ? ms.options.id : null
 			}));
 
 			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {
