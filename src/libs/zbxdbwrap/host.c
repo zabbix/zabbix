@@ -5608,11 +5608,9 @@ static int	hostgroups_with_permissions_update(zbx_uint64_t hostid)
 	int			ret = FAIL;
 	zbx_uint64_t		hgsetid = 0, hgsetid_old = 0;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	char			hash[ZBX_SHA256_DIGEST_SIZE], hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1],
-				id_str[MAX_ID_LEN + 2], *id_str_p = id_str + 1, *sql = NULL;
+	char			*sql = NULL, hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	sha256_ctx		ctx;
 	zbx_vector_uint64_t	groupids;
 
 	zbx_vector_uint64_create(&groupids);
@@ -5623,21 +5621,7 @@ static int	hostgroups_with_permissions_update(zbx_uint64_t hostid)
 	if (0 == groupids.values_num)
 		goto err;
 
-	id_str[0] = '|';
-	zbx_sha256_init(&ctx);
-
-	for (int i = 0; i < groupids.values_num; i++)
-	{
-		if (1 == i)
-			id_str_p = id_str;
-
-		zbx_snprintf(id_str + 1, MAX_ID_LEN + 1, ZBX_FS_UI64, groupids.values[i]);
-		zbx_sha256_process_bytes(id_str_p, strlen(id_str_p), &ctx);
-	}
-
-	zbx_sha256_finish(&ctx, hash);
-	(void)zbx_bin2hex((const unsigned char *)hash, ZBX_SHA256_DIGEST_SIZE, hash_str,
-			ZBX_SHA256_DIGEST_SIZE * 2 + 1);
+	zbx_hgset_hash_calculate(&groupids, hash_str);
 
 	if (0 == (hgsetid = permission_hgset_get(hash_str)))
 	{
@@ -5687,7 +5671,7 @@ err:
 	return ret;
 }
 
-void	hostgroups_with_permissions_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
+void	zbx_hostgroups_with_permissions_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
 {
 	int		i;
 	zbx_uint64_t	hostgroupid, hostgroupid_audit;
@@ -5723,7 +5707,7 @@ void	hostgroups_with_permissions_add(zbx_uint64_t hostid, zbx_vector_uint64_t *g
 		zbx_audit_hostgroup_update_json_add_group(hostid, hostgroupid_audit++, groupids->values[i]);
 }
 
-int	hostgroups_with_permissions_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
+int	zbx_hostgroups_with_permissions_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
 {
 	size_t		sql_alloc = 0, sql_offset = 0;
 	char		*sql = NULL;
@@ -6392,7 +6376,7 @@ static int	hgset_hash_new_search(const void *d1, const void *d2)
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 {
 	int			i, new_hgsets = 0, ret = FAIL;
-	char			id_str[MAX_ID_LEN + 2], *sql = NULL;
+	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_uint64_t		hgsetid;
 	zbx_vector_uint64_t	ids, del_hgsetids;
@@ -6469,29 +6453,13 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_vector_hgset_ptr_sort(&hgsets, hgset_compare);
 	zbx_vector_str_create(&hashes);
 
-	id_str[0] = '|';
-
 	for (i = 0; i < hgsets.values_num; i++)
 	{
-		int		k;
-		char		hash[ZBX_SHA256_DIGEST_SIZE], hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1], *id_str_p;
-		sha256_ctx	ctx;
+		int	k;
+		char	hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 
-		zbx_sha256_init(&ctx);
-		id_str_p = id_str + 1;
 		hgset = hgsets.values[i];
-
-		for (k = 0; k < hgset->hgroupids.values_num; k++)
-		{
-			if (1 == k)
-				id_str_p = id_str;
-
-			zbx_snprintf(id_str + 1, MAX_ID_LEN + 1, ZBX_FS_UI64, hgset->hgroupids.values[k]);
-			zbx_sha256_process_bytes(id_str_p, strlen(id_str_p), &ctx);
-		}
-
-		zbx_sha256_finish(&ctx, hash);
-		(void)zbx_bin2hex((const unsigned char *)hash, sizeof(hash), hash_str, sizeof(hash_str));
+		zbx_hgset_hash_calculate(&hgset->hgroupids, hash_str);
 
 		if (FAIL != (k = zbx_vector_hgset_ptr_bsearch(&hgsets, (void*)hash_str, hgset_hash_search)))
 		{
@@ -6710,4 +6678,28 @@ void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str)
+{
+	char		hash[ZBX_SHA256_DIGEST_SIZE], id[MAX_ID_LEN + 2], *id_ins, *id_p;
+	sha256_ctx	ctx;
+
+	id_p = id_ins = id + 1;
+	zbx_sha256_init(&ctx);
+
+	for (int i = 0; i < groupids->values_num; i++)
+	{
+		if (1 == i)
+		{
+			id_p = id;
+			*id_p = '|';
+		}
+
+		zbx_snprintf(id_ins, MAX_ID_LEN + 1, ZBX_FS_UI64, groupids->values[i]);
+		zbx_sha256_process_bytes(id_p, strlen(id_p), &ctx);
+	}
+
+	zbx_sha256_finish(&ctx, hash);
+	(void)zbx_bin2hex((const unsigned char *)hash, sizeof(hash), hash_str, sizeof(hash_str));
 }

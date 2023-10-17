@@ -1622,7 +1622,7 @@ static int	DBpatch_6050148(void)
 	int			ret;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_t		group_sets;
-	zbx_db_insert_t		db_insert, db_insert_groups, db_insert_hosts;
+	zbx_db_insert_t		db_insert, db_insert_groups, db_insert_users;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1630,17 +1630,17 @@ static int	DBpatch_6050148(void)
 	zbx_hashset_create(&group_sets, 1, dbupgrade_group_set_hash, dbupgrade_group_set_compare);
 	zbx_db_insert_prepare(&db_insert, "ugset", "ugsetid", "hash", (char*)NULL);
 	zbx_db_insert_prepare(&db_insert_groups, "ugset_group", "ugsetid", "usrgrpid", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_hosts, "user_ugset", "userid", "ugsetid", (char*)NULL);
+	zbx_db_insert_prepare(&db_insert_users, "user_ugset", "userid", "ugsetid", (char*)NULL);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_db_select_uint64("select u.userid from users u join role r on u.roleid=r.roleid where r.type<>3", &ids);
 
 	if (SUCCEED == (ret = dbupgrade_groupsets_make(&ids, "userid", "usrgrpid", "users_groups", &group_sets, 1)))
-		ret = dbupgrade_groupsets_insert("ugset", &group_sets, &db_insert, &db_insert_groups, &db_insert_hosts);
+		ret = dbupgrade_groupsets_insert("ugset", &group_sets, &db_insert, &db_insert_groups, &db_insert_users);
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_clean(&db_insert_groups);
-	zbx_db_insert_clean(&db_insert_hosts);
+	zbx_db_insert_clean(&db_insert_users);
 
 	zbx_vector_uint64_destroy(&ids);
 	dbupgrade_groupsets_destroy(&group_sets);

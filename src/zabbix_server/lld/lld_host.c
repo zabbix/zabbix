@@ -1297,29 +1297,11 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 static zbx_lld_hgset_t	*lld_hgset_make(zbx_vector_uint64_t *groupids)
 {
-	char		hash[ZBX_SHA256_DIGEST_SIZE], id_str[MAX_ID_LEN + 2], *id_str_p = id_str + 1;
 	zbx_lld_hgset_t	*hgset;
-	sha256_ctx	ctx;
-
-	id_str[0] = '|';
 
 	hgset = zbx_malloc(NULL, sizeof(zbx_lld_hgset_t));
 	zbx_vector_uint64_create(&hgset->hgroupids);
-
-	zbx_sha256_init(&ctx);
-
-	for (int k = 0; k < groupids->values_num; k++)
-	{
-		if (1 == k)
-			id_str_p = id_str;
-
-		zbx_snprintf(id_str + 1, MAX_ID_LEN + 1, ZBX_FS_UI64, groupids->values[k]);
-		zbx_sha256_process_bytes(id_str_p, strlen(id_str_p), &ctx);
-		zbx_vector_uint64_append(&hgset->hgroupids, groupids->values[k]);
-	}
-
-	zbx_sha256_finish(&ctx, hash);
-	(void)zbx_bin2hex((const unsigned char *)hash, sizeof(hash), hgset->hash_str, sizeof(hgset->hash_str));
+	zbx_hgset_hash_calculate(groupids, hgset->hash_str);
 
 	return hgset;
 }
@@ -1354,6 +1336,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 		if (0 < host->old_groupids.values_num)
 		{
+			zbx_vector_uint64_sort(&host->old_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			hgset = lld_hgset_make(&host->old_groupids);
 
 			if (FAIL != (k = zbx_vector_lld_hgset_ptr_search(hgsets, hgset, lld_hgset_compare)))
@@ -1367,6 +1350,8 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 			{
 				hgset->hgsetid = 0;
 				hgset->opt = ZBX_LLD_HGSET_OPT_DELETE;
+				zbx_vector_uint64_append_array(&hgset->hgroupids, host->old_groupids.values,
+						host->old_groupids.values_num);
 				zbx_vector_lld_hgset_ptr_append(hgsets, hgset);
 			}
 		}
@@ -1389,6 +1374,8 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 				hgset->hgsetid = 0;
 				hgset->opt = ZBX_LLD_HGSET_OPT_INSERT;
 				host->hgset_idx = hgsets->values_num;
+				zbx_vector_uint64_append_array(&hgset->hgroupids, host->groupids.values,
+						host->groupids.values_num);
 				zbx_vector_lld_hgset_ptr_append(hgsets, hgset);
 			}
 		}
@@ -1400,6 +1387,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		}
 	}
 
+	zbx_vector_lld_hgset_ptr_sort(hgsets, lld_hgset_compare);
 	zbx_vector_str_create(&hashes);
 
 	for (i = 0; i < hgsets->values_num; i++)
@@ -1418,7 +1406,8 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			if (FAIL != (i = zbx_vector_lld_hgset_ptr_search(hgsets, (void*)row[1], lld_hgset_hash_search)))
+			if (FAIL != (i = zbx_vector_lld_hgset_ptr_bsearch(hgsets, (void*)row[1],
+					lld_hgset_hash_search)))
 			{
 				ZBX_STR2UINT64(hgsets->values[i]->hgsetid, row[0]);
 
@@ -1452,7 +1441,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 	for (i = 0; i < hgsets->values_num; i++)
 	{
-		if (ZBX_LLD_HGSET_OPT_INSERT == hgsets->values[i]->opt)
+		if (ZBX_LLD_HGSET_OPT_DELETE == hgsets->values[i]->opt)
 			zbx_vector_uint64_append(del_hgsetids, hgsets->values[i]->hgsetid);
 	}
 
@@ -1551,7 +1540,7 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 			if (ZBX_LLD_HGSET_OPT_INSERT != hgset->opt)
 				continue;
 
-			if (FAIL != zbx_vector_uint64_search(&hgset->hgroupids, hostgroupid,
+			if (FAIL != zbx_vector_uint64_bsearch(&hgset->hgroupids, hostgroupid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				prm.hgset_idx = i;

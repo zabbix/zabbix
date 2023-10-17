@@ -180,7 +180,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	}
 	zbx_db_free_result(result);
 
-	hostgroups_with_permissions_add(hostid, groupids);
+	zbx_hostgroups_with_permissions_add(hostid, groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1097,7 +1097,7 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 		zbx_db_free_result(result2);
 
 		if (0 != hostgroupids.values_num &&
-				SUCCEED == hostgroups_with_permissions_remove(hostid, groupids))
+				SUCCEED == zbx_hostgroups_with_permissions_remove(hostid, groupids))
 		{
 			zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, &found_groupids);
 		}
