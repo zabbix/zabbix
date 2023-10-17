@@ -103,21 +103,19 @@ switch ($page['type']) {
 		header('X-XSS-Protection: 1; mode=block');
 
 		if (strcasecmp(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS), 'null') !== 0) {
-			switch (true) {
-				case strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'SAMEORIGIN') === 0:
-				case strcasecmp(trim(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS)), '') === 0:
-					header('X-Frame-Options: SAMEORIGIN');
-					break;
+			$x_frame_options = trim(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
 
-				case strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'DENY') === 0:
-					header('X-Frame-Options: DENY');
-					break;
+			if ($x_frame_options === '' || strcasecmp($x_frame_options, 'SAMEORIGIN') === 0) {
+				header('X-Frame-Options: SAMEORIGIN');
+			}
+			elseif (strcasecmp($x_frame_options, 'DENY') === 0) {
+				header('X-Frame-Options: DENY');
+			}
+			else {
+				$allowed_urls = explode(',', $x_frame_options);
+				$allowed_urls[] = $_SERVER['HTTP_HOST'];
 
-				default:
-					$allowed_urls = explode(',', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
-					$allowed_urls[] = $_SERVER['HTTP_HOST'];
-
-					header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
+				header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
 			}
 		}
 }

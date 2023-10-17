@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -20,7 +20,7 @@
 
 
 /**
- * @var CView $this
+ * @var array $data
  */
 
 function local_showHeader(array $data): void {
@@ -29,21 +29,19 @@ function local_showHeader(array $data): void {
 	header('X-XSS-Protection: 1; mode=block');
 
 	if (strcasecmp($data['config']['x_frame_options'], 'null') !== 0) {
-		switch (true) {
-			case strcasecmp($data['config']['x_frame_options'], 'SAMEORIGIN') === 0:
-			case strcasecmp(trim($data['config']['x_frame_options']), '') === 0:
-				header('X-Frame-Options: SAMEORIGIN');
-				break;
+		$x_frame_options = trim($data['config']['x_frame_options']);
 
-			case strcasecmp($data['config']['x_frame_options'], 'DENY') === 0:
-				header('X-Frame-Options: DENY');
-				break;
+		if ($x_frame_options === '' || strcasecmp($x_frame_options, 'SAMEORIGIN') === 0) {
+			header('X-Frame-Options: SAMEORIGIN');
+		}
+		elseif (strcasecmp($x_frame_options, 'DENY') === 0) {
+			header('X-Frame-Options: DENY');
+		}
+		else {
+			$allowed_urls = explode(',', $x_frame_options);
+			$allowed_urls[] = $_SERVER['HTTP_HOST'];
 
-			default:
-				$allowed_urls = explode(',', $data['config']['x_frame_options']);
-				$allowed_urls[] = $_SERVER['HTTP_HOST'];
-
-				header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
+			header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
 		}
 	}
 
