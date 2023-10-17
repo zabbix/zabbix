@@ -35,44 +35,46 @@ window.drule_edit_popup = new class {
 		this.drule = drule;
 		this.dcheckid = getUniqueId();
 
+		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+
 		// Append existing discovery checks to check table.
 		if (typeof dchecks === 'object') {
 			dchecks = Object.values(dchecks);
 		}
 		for (const dcheck of dchecks) {
-			this._addCheck(dcheck);
+			this.#addCheck(dcheck);
 		}
 
-		this._addRadioButtonValues(drule);
-		this._initActionButtons();
-		this._updateForm();
+		this.#addRadioButtonValues(drule);
+		this.#initActionButtons();
+		this.#updateForm();
 		this.overlay.recoverFocus();
 	}
 
-	_initActionButtons() {
+	#initActionButtons() {
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-check-add')) {
-				this._editCheck();
+				this.#editCheck();
 			}
 			else if (e.target.classList.contains('js-remove')) {
-				this._removeDCheckRow(e.target.closest('tr').id);
+				this.#removeDCheckRow(e.target.closest('tr').id);
 				e.target.closest('tr').remove();
 			}
 			else if (e.target.classList.contains('js-edit')) {
-				this._editCheck(e.target.closest('tr'));
+				this.#editCheck(e.target.closest('tr'));
 			}
 		});
 
 		const max_sessions = this.form.querySelector('#concurrency_max_type');
 
 		max_sessions.onchange = () => {
-			this._updateForm();
+			this.#updateForm();
 		};
 
 		max_sessions.dispatchEvent(new Event('change'));
 	}
 
-	_updateForm() {
+	#updateForm() {
 		const concurrency_max_type = this.form.querySelector('[name="concurrency_max_type"]:checked').value;
 		const concurrency_max = this.form.querySelector('#concurrency_max');
 		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
@@ -83,15 +85,15 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_updateCheck(row, input) {
+	#updateCheck(row, input) {
 		delete input.dchecks;
 
-		this._addCheck(input, row, true);
+		this.#addCheck(input, row, true);
 		row.remove();
-		this._addInputFields(input);
+		this.#addInputFields(input);
 	}
 
-	_editCheck(row = null) {
+	#editCheck(row = null) {
 		let params = {
 			dcheckid: this.dcheckid
 		};
@@ -121,16 +123,16 @@ window.drule_edit_popup = new class {
 
 		overlay.$dialogue[0].addEventListener('check.submit', (e) => {
 			if (row !== null) {
-				this._updateCheck(row, e.detail);
+				this.#updateCheck(row, e.detail);
 			}
 			else {
 				this.dcheckid = getUniqueId()
-				this._addCheck(e.detail, null);
+				this.#addCheck(e.detail, null);
 			}
 		});
 	}
 
-	_addRadioButtonValues(drule) {
+	#addRadioButtonValues(drule) {
 		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(drule.uniqueness_criteria)+']')
 			.attr('checked', 'checked');
 		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(drule.host_source)+']')
@@ -140,12 +142,12 @@ window.drule_edit_popup = new class {
 
 		document.querySelectorAll('#host_source, #name_source').forEach((element) => {
 			element.addEventListener('change', (e) => {
-				this._updateRadioButtonValues(e);
+				this.#updateRadioButtonValues(e);
 			});
 		});
 	}
 
-	_updateRadioButtonValues(event) {
+	#updateRadioButtonValues(event) {
 		let target = event.target;
 		let name = target.getAttribute('name');
 
@@ -168,10 +170,8 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_addCheck(input, row = null, update = false) {
+	#addCheck(input, row = null, update = false) {
 		delete input.dchecks;
-
-		const available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
 		if (update === false) {
 			if (typeof input.host_source === 'undefined') {
@@ -189,7 +189,7 @@ window.drule_edit_popup = new class {
 			}
 		}
 		else {
-			if (available_device_types.includes(parseInt(input.type))) {
+			if (this.available_device_types.includes(parseInt(input.type))) {
 				input.host_source = document.querySelector('input[name=host_source]:checked').value;
 				input.name_source = document.querySelector('input[name=name_source]:checked').value;
 				input.uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked').value;
@@ -204,20 +204,20 @@ window.drule_edit_popup = new class {
 
 		if (row !== null) {
 			row.insertAdjacentHTML('afterend', template.evaluate(input));
-			this._addInputFields(input);
+			this.#addInputFields(input);
 		}
 		else {
 			document
 				.querySelector('#dcheckList tbody')
 				.insertAdjacentHTML('beforeend', template.evaluate(input));
 
-			this._addInputFields(input);
+			this.#addInputFields(input);
 		}
 
-		this._updateRadioButtonRows(input, update, row);
+		this.#updateRadioButtonRows(input, update, row);
 	}
 
-	_addInputFields(input) {
+	#addInputFields(input) {
 		for (let field_name in input) {
 			if (input.hasOwnProperty(field_name)) {
 				const input_element = document.createElement('input');
@@ -231,15 +231,14 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_updateRadioButtonRows(input, update, row = null) {
+	#updateRadioButtonRows(input, update, row = null) {
 		const templates = {
 			unique_template: ['#unique-row-tmpl', '#device-uniqueness-list', 'uniqueness_criteria_', 'ip'],
 			host_template: ['#host-source-row-tmpl', '#host_source', 'host_source_', 'chk_dns'],
 			name_template: ['#name-source-row-tmpl', '#name_source', 'name_source_', 'chk_host']
 		};
 
-		const available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
-		const need_to_add_row = available_device_types.includes(parseInt(input.type));
+		const need_to_add_row = this.available_device_types.includes(parseInt(input.type));
 
 		for (const [template, list, key, def] of Object.values(templates)) {
 			if (need_to_add_row) {
@@ -251,34 +250,36 @@ window.drule_edit_popup = new class {
 				}
 				else {
 					const template_html = document.querySelector(template).innerHTML;
-					const li = document.querySelector(`${list} input[value$="${input.dcheckid}"]`)?.closest('li');
+					const list_item = document.querySelector(`${list} input[value$="${input.dcheckid}"]`)
+						?.closest('li');
 
-					if (li) {
-						li.outerHTML = new Template(template_html).evaluate(input);
+					if (list_item !== null) {
+						list_item.outerHTML = new Template(template_html).evaluate(input);
 					}
 					else {
-						document.querySelector(list).insertAdjacentHTML('beforeend', new Template(template_html).evaluate(input));
+						document.querySelector(list).insertAdjacentHTML('beforeend', new Template(template_html)
+							.evaluate(input));
 					}
 				}
 			}
 			else {
-				const input_el = document.querySelector(`${list} input[value$="${input.dcheckid}"]`);
+				const dcheck_checkbox = document.querySelector(`${list} input[value$="${input.dcheckid}"]`);
 
-				if (input_el) {
-					if (input_el.checked) {
+				if (dcheck_checkbox !== null) {
+					if (dcheck_checkbox.checked) {
 						document.querySelector(`#${key}${def}`).checked = true;
 					}
 
-					input_el.closest('li')?.remove();
+					dcheck_checkbox.closest('li')?.remove();
 				}
 			}
 		}
 
 		if (update === false) {
-			this._addRadioButtonValues(this.drule);
+			this.#addRadioButtonValues(this.drule);
 		}
 		else {
-			this._addRadioButtonValues(input);
+			this.#addRadioButtonValues(input);
 
 			input.host_source = row.children[0].querySelector('input[name*="host_source"]').value;
 			input.name_source = row.children[0].querySelector('input[name*="name_source"]').value;
@@ -286,7 +287,7 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_removeDCheckRow(dcheckid) {
+	#removeDCheckRow(dcheckid) {
 		dcheckid = dcheckid.substring(dcheckid.indexOf('_') + 1);
 
 		const elements = {
@@ -323,7 +324,7 @@ window.drule_edit_popup = new class {
 			<?= json_encode(CCsrfTokenHelper::get('discovery'), JSON_THROW_ON_ERROR) ?>
 		);
 
-		this._post(curl.getUrl(), {druleids: [this.druleid]}, (response) => {
+		this.#post(curl.getUrl(), {druleids: [this.druleid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
@@ -340,14 +341,14 @@ window.drule_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.druleid === null ? 'discovery.create' : 'discovery.update');
 
-		this._post(curl.getUrl(), fields, (response) => {
+		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 
-	_post(url, data, success_callback) {
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
