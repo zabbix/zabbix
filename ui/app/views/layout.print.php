@@ -26,6 +26,7 @@
 
 function local_showHeader(array $data): void {
 	header('Content-Type: text/html; charset=UTF-8');
+	header('Cache-Control: no-store');
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
 
