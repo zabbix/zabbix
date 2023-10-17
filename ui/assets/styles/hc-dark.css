@@ -3515,7 +3515,6 @@ section {
     display: flex;
     flex: 1;
     justify-content: space-between;
-    background-color: #111111;
     margin-top: -3px; }
   .filter-container.tabfilter-container nav > ul > li {
     padding-top: 3px; }

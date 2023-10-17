@@ -33,7 +33,6 @@
 		display: flex;
 		flex: 1;
 		justify-content: space-between;
-		background-color: $body-bg-color;
 		// Sortable container have padding-top 3px for focused state be visible, therefore filter content shift compensated with negative margin of same size.
 		margin-top: -3px;
 	}
