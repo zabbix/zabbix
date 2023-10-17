@@ -2474,6 +2474,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       background-color: #2b2b2b;
       border: 1px solid #303030;
       border-bottom: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
       padding-bottom: 7px;
       vertical-align: baseline; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .tabfilter-item-link {

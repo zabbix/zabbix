@@ -128,6 +128,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			background-color: $tab-label-expanded-bg-color;
 			border: 1px solid $tab-label-expanded-border-color;
 			border-bottom: 0;
+			border-bottom-right-radius: 0;
+			border-bottom-left-radius: 0;
 			padding-bottom: 7px;
 			vertical-align: baseline;
 
