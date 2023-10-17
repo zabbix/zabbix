@@ -67,6 +67,8 @@
 							postMessageDetails('success', data.success.messages);
 						}
 					}
+
+					location.href = location.href;
 				}, {once: true}
 			);
 		},
