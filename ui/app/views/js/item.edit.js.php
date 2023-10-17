@@ -137,21 +137,25 @@ window.item_edit_form = new class {
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
-			rows: this.form_data.parameters
+			rows: this.form_data.parameters,
+			allow_empty: true
 		});
 		jQuery('#query-fields-table').dynamicRows({
 			sortable: true,
 			template: '#query-field-row-tmpl',
-			rows: this.form_data.query_fields
+			rows: this.form_data.query_fields,
+			allow_empty: true
 		}).sortable({disabled: this.form_readonly});
 		jQuery('#headers-table').dynamicRows({
 			sortable: true,
 			template: '#item-header-row-tmpl',
-			rows: this.form_data.headers
+			rows: this.form_data.headers,
+			allow_empty: true
 		}).sortable({disabled: this.form_readonly});
 		jQuery('#delay-flex-table').dynamicRows({
 			template: '#delay-flex-row-tmpl',
-			rows: this.form_data.delay_flex
+			rows: this.form_data.delay_flex,
+			allow_empty: true
 		});
 		this.form.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
 			const flexible = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
