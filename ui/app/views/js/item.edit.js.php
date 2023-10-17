@@ -25,6 +25,7 @@
 
 ?>
 (() => {
+const CSRF_TOKEN_NAME = <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>;
 const HOST_STATUS_MONITORED = <?= HOST_STATUS_MONITORED ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
@@ -50,7 +51,7 @@ window.item_edit_form = new class {
 
 	init({
 		actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		token, type_with_key_select, value_type_keys, source
+		type_with_key_select, value_type_keys, source
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -64,7 +65,6 @@ window.item_edit_form = new class {
 		this.type_interfaceids = {};
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
-		this.token = token;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -447,10 +447,14 @@ window.item_edit_form = new class {
 	}
 
 	#post(url, data, keep_open = false) {
+		if (this.form[CSRF_TOKEN_NAME]) {
+			data[CSRF_TOKEN_NAME] = this.form[CSRF_TOKEN_NAME].value;
+		}
+
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({...this.token, ...data})
+			body: JSON.stringify(data)
 		})
 			.then((response) => response.json())
 			.then((response) => {
