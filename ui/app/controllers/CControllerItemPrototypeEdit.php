@@ -72,20 +72,6 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			$item['timeout'] = $item['inherited_timeout'];
 		}
 
-		$set_inventory = array_column(API::Item()->get([
-			'output' => ['inventory_link'],
-			'hostids' => [$item['hostid']],
-			'nopermissions' => true
-		]), 'inventory_link', 'inventory_link');
-		$inventory_fields = [];
-
-		foreach (getHostInventories() as $inventory_field) {
-			$inventory_fields[$inventory_field['nr']] = [
-				'label' => $inventory_field['title'],
-				'disabled' => array_key_exists($inventory_field['nr'], $set_inventory)
-			];
-		};
-
 		$value_type_keys = [];
 		$key_value_type = CItemData::getValueTypeByKey();
 
@@ -134,7 +120,6 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'inherited_timeouts' => $inherited_timeouts,
 			'interface_types' => itemTypeInterface(),
-			'inventory_fields' => $inventory_fields,
 			'value_type_keys' => $value_type_keys,
 			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 			'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES,

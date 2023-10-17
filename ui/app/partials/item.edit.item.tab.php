@@ -823,7 +823,7 @@ $formgrid
 		))->setId('js-item-trapper-hosts-field')
 	]);
 
-if ($data['source'] === 'item' && !$item['discovered']) {
+if ($data['inventory_fields']) {
 	$select = (new CSelect('inventory_link'))
 		->setFocusableElementId('label-host-inventory')
 		->setValue($item['inventory_link'])

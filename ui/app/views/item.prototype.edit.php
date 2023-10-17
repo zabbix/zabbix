@@ -136,7 +136,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'config' => $data['config'],
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
-			'inventory_fields' => $data['inventory_fields'],
+			'inventory_fields' => [],
 			'item' => $item,
 			'source' => 'itemprototype',
 			'types' => $data['types'],
