@@ -2178,31 +2178,18 @@ function prepareLldOverrides(array $overrides, ?array $db_item): array {
 	return $overrides;
 }
 
-/**
- * Format query fields received via form for API input.
- *
- * @param array $query_fields
- *
- * @return array
- */
 function prepareItemQueryFields(array $query_fields): array {
-	if ($query_fields) {
-		$_query_fields = [];
+	$result = [];
 
-		foreach ($query_fields['name'] as $index => $key) {
-			$value = $query_fields['value'][$index];
-			$sortorder = $query_fields['sortorder'][$index];
+	foreach ($query_fields as $query_field) {
+		if (!($query_field['name'] === '' && $query_field['value'] === '')) {
+			unset($query_field['sortorder']);
 
-			if ($key !== '' || $value !== '') {
-				$_query_fields[$sortorder] = [$key => $value];
-			}
+			$result[] = $query_field;
 		}
-
-		ksort($_query_fields);
-		$query_fields = array_values($_query_fields);
 	}
 
-	return $query_fields;
+	return $result;
 }
 
 /**
@@ -2213,23 +2200,17 @@ function prepareItemQueryFields(array $query_fields): array {
  * @return array
  */
 function prepareItemHeaders(array $headers): array {
-	if ($headers) {
-		$_headers = [];
+	$result = [];
 
-		foreach ($headers['name'] as $i => $name) {
-			$value = $headers['value'][$i];
+	foreach ($headers as $header) {
+		if (!($header['name'] === '' && $header['value'] === '')) {
+			unset($header['sortorder']);
 
-			if ($name === '' && $value === '') {
-				continue;
-			}
-
-			$_headers[$name] = $value;
+			$result[] = $header;
 		}
-
-		$headers = $_headers;
 	}
 
-	return $headers;
+	return $result;
 }
 
 /**

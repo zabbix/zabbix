@@ -1207,24 +1207,32 @@ abstract class CControllerPopupItemTest extends CController {
 					continue;
 				}
 
-				foreach (['name', 'value'] as $key) {
-					foreach (array_keys($inputs[$field][$key]) as $nr) {
-						$str = &$inputs[$field][$key][$nr];
-						if (strstr($str, '{') !== false) {
-							$matched_macros = CMacrosResolverGeneral::getMacroPositions($str, $types);
+				foreach ($inputs[$field] as &$entry) {
+					if (strpos($entry['name'], '{') !== false) {
+						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['name'], $types);
 
-							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-								$macro_value = array_key_exists($macro, $macros_posted)
-									? $macros_posted[$macro]
-									: '';
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$macro_value = array_key_exists($macro, $macros_posted)
+								? $macros_posted[$macro]
+								: '';
 
-								$str = substr_replace($str, $macro_value, $pos, strlen($macro));
-							}
+							$entry['name'] = substr_replace($entry['name'], $macro_value, $pos, strlen($macro));
 						}
+					}
 
-						unset($str);
+					if (strpos($entry['value'], '{') !== false) {
+						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['value'], $types);
+
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$macro_value = array_key_exists($macro, $macros_posted)
+								? $macros_posted[$macro]
+								: '';
+
+							$entry['value'] = substr_replace($entry['value'], $macro_value, $pos, strlen($macro));
+						}
 					}
 				}
+				unset($entry);
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
 				if ($field === 'key') {

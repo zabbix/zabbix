@@ -437,19 +437,6 @@ class CItem extends CItemGeneral {
 			$result = zbx_cleanHashes($result);
 		}
 
-		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
-		foreach ($result as &$item) {
-			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
-				$item['query_fields'] = json_last_error() ? [] : $query_fields;
-			}
-
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = self::headersStringToArray($item['headers']);
-			}
-		}
-		unset($item);
-
 		return $result;
 	}
 
@@ -591,6 +578,7 @@ class CItem extends CItemGeneral {
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
 		self::updateTags($items);
+		self::updateHttpFields($items);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ITEM, $items);
 
@@ -641,14 +629,10 @@ class CItem extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		/*
-		 * The fields "headers" and "query_fields" in API are arrays, but there is necessary to get the values of these
-		 * fields as they stored in database.
-		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
 				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			], array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		]);
@@ -822,7 +806,7 @@ class CItem extends CItemGeneral {
 		$upd_itemids = [];
 
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
-		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
+		$nested_object_fields = array_flip(['headers', 'tags', 'preprocessing', 'parameters', 'query_fields']);
 
 		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
@@ -857,6 +841,7 @@ class CItem extends CItemGeneral {
 		self::updateTags($items, $db_items, $upd_itemids);
 		self::updatePreprocessing($items, $db_items, $upd_itemids);
 		self::updateParameters($items, $db_items, $upd_itemids);
+		self::updateHttpFields($items, $db_items, $upd_itemids);
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
@@ -920,7 +905,7 @@ class CItem extends CItemGeneral {
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
-			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])),
+			], array_diff(CItemType::FIELD_NAMES, ['headers', 'interfaceid', 'parameters', 'query_fields'])),
 			'filter' => [
 				'hostid' => $templateids,
 				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
@@ -943,6 +928,12 @@ class CItem extends CItemGeneral {
 			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
 				$item += ['parameters' => []];
 			}
+			elseif ($db_item['type'] == ITEM_TYPE_HTTPAGENT) {
+				$item += [
+					'headers' => [],
+					'query_fields' => []
+				];
+			}
 
 			$items[] = $item + [
 				'preprocessing' => [],
@@ -955,8 +946,16 @@ class CItem extends CItemGeneral {
 		$items = array_values($db_items);
 
 		foreach ($items as &$item) {
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = array_values($item['headers']);
+			}
+
 			if (array_key_exists('parameters', $item)) {
 				$item['parameters'] = array_values($item['parameters']);
+			}
+
+			if (array_key_exists('query_fields', $item)) {
+				$item['query_fields'] = array_values($item['query_fields']);
 			}
 
 			$item['preprocessing'] = array_values($item['preprocessing']);
@@ -1089,7 +1088,7 @@ class CItem extends CItemGeneral {
 		$upd_db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			], array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])),
 			'filter' => [
 				'templateid' => array_keys($db_items),
 				'hostid' => $hostids
@@ -1113,9 +1112,11 @@ class CItem extends CItemGeneral {
 				];
 
 				$upd_item += array_intersect_key([
+					'headers' => [],
 					'tags' => [],
 					'preprocessing' => [],
-					'parameters' => []
+					'parameters' => [],
+					'query_fields' => []
 				], $db_item);
 
 				$upd_items[] = $upd_item;
@@ -1199,7 +1200,7 @@ class CItem extends CItemGeneral {
 		$options = [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
 				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			], array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])),
 			'itemids' => array_keys($upd_db_items)
 		];
 		$result = DBselect(DB::makeSql('items', $options));
@@ -1216,9 +1217,11 @@ class CItem extends CItemGeneral {
 			$upd_items[] = [
 				'itemid' => $upd_db_item['itemid'],
 				'type' => $item['type'],
+				'headers' => [],
 				'tags' => [],
 				'preprocessing' => [],
-				'parameters' => []
+				'parameters' => [],
+				'query_fields' => []
 			];
 		}
 
@@ -1257,9 +1260,11 @@ class CItem extends CItemGeneral {
 			] + $item;
 
 			$upd_item += [
+				'headers' => [],
 				'tags' => [],
 				'preprocessing' => [],
-				'parameters' => []
+				'parameters' => [],
+				'query_fields' => []
 			];
 
 			$upd_items[] = $upd_item;
@@ -1856,6 +1861,7 @@ class CItem extends CItemGeneral {
 
 		DB::delete('graphs_items', ['itemid' => $del_itemids]);
 		DB::delete('widget_field', ['value_itemid' => $del_itemids]);
+		DB::delete('item_field', ['itemid' => $del_itemids]);
 		DB::delete('item_discovery', ['itemid' => $del_itemids]);
 		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);

@@ -236,26 +236,6 @@ class CItemGeneralHelper {
 			$item['authtype'] = DB::getDefault('items', 'authtype');
 			$item['username'] = '';
 			$item['password'] = '';
-			$query_fields = [];
-
-			foreach ($item['query_fields'] as $query_field) {
-				$query_fields[] = [
-					'name' => key($query_field),
-					'value' => reset($query_field)
-				];
-			}
-
-			$item['query_fields'] = $query_fields;
-			$headers = [];
-
-			foreach ($item['headers'] as $header => $value) {
-				$headers[] = [
-					'name' => $header,
-					'value' => $value
-				];
-			}
-
-			$item['headers'] = $headers;
 		}
 
 		if ($item['type'] != ITEM_TYPE_JMX) {
@@ -346,39 +326,8 @@ class CItemGeneralHelper {
 		}
 
 		if ($input['type'] == ITEM_TYPE_HTTPAGENT) {
-			$field_map['http_authtype'] = 'authtype';
-			$field_map['http_username'] = 'username';
-			$field_map['http_password'] = 'password';
-
-			if ($input['query_fields']) {
-				$query_fields = [];
-
-				foreach ($input['query_fields']['sortorder'] as $index) {
-					$name = $input['query_fields']['name'][$index];
-					$value = $input['query_fields']['value'][$index];
-
-					if ($name !== '' || $value !== '') {
-						$query_fields[] = [$name => $value];
-					}
-				}
-
-				$input['query_fields'] = $query_fields;
-			}
-
-			if ($input['headers']) {
-				$headers = [];
-
-				foreach ($input['headers']['sortorder'] as $index) {
-					$name = $input['headers']['name'][$index];
-					$value = $input['headers']['value'][$index];
-
-					if ($name !== '' || $value !== '') {
-						$headers[$name] = $value;
-					}
-				}
-
-				$input['headers'] = $headers;
-			}
+			$input['query_fields'] = prepareItemQueryFields($input['query_fields']);
+			$input['headers'] = prepareItemHeaders($input['headers']);
 		}
 		else {
 			$input['query_fields'] = [];

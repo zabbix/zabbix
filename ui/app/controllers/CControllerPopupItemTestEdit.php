@@ -280,19 +280,25 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					continue;
 				}
 
-				foreach (['name', 'value'] as $key) {
-					$texts_having_macros = array_filter($inputs[$field][$key], function($str) {
-						return (strstr($str, '{') !== false);
-					});
+				$texts_having_macros = [];
 
-					if ($texts_having_macros) {
-						$supported_macros = array_merge_recursive($supported_macros, $macros);
-						$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
-						$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+				foreach ($inputs[$field] as $entry) {
+					if (strpos($entry['name'], '{') !== false) {
+						$texts_having_macros[] = $entry['name'];
+					}
 
-						if ($support_lldmacros) {
-							$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
-						}
+					if (strpos($entry['value'], '{') !== false) {
+						$texts_having_macros[] = $entry['value'];
+					}
+				}
+
+				if ($texts_having_macros) {
+					$supported_macros = array_merge_recursive($supported_macros, $macros);
+					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+
+					if ($support_lldmacros) {
+						$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
 					}
 				}
 			}

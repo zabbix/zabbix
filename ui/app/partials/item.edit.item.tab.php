@@ -130,13 +130,13 @@ $formgrid = (new CFormGrid())
 				new CTemplateTag('query-field-row-tmpl', (new CRow([
 						(new CCol([
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('query_fields[sortorder][]', '#{rowNum}')
+							new CVar('query_fields[#{rowNum}][sortorder]', '#{rowNum}')
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('query_fields[name][#{rowNum}]', '#{name}', $readonly))
+						(new CTextBox('query_fields[#{rowNum}][name]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('query_fields[value][#{rowNum}]', '#{value}', $readonly))
+						(new CTextBox('query_fields[#{rowNum}][value]', '#{value}', $readonly))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -258,13 +258,13 @@ $formgrid = (new CFormGrid())
 					(new CRow([
 						(new CCol([
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('headers[sortorder][]', '#{rowNum}')
+							new CVar('headers[#{rowNum}][sortorder]', '#{rowNum}')
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('headers[name][#{rowNum}]', '#{name}', $readonly))
+						(new CTextBox('headers[#{rowNum}][name]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('headers[value][#{rowNum}]', '#{value}', $readonly, 2000))
+						(new CTextBox('headers[#{rowNum}][value]', '#{value}', $readonly, 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))

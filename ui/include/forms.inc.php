@@ -66,7 +66,7 @@ function getItemFormData(array $item = []) {
 		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT),
 		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 		'url' => getRequest('url'),
-		'query_fields' => getRequest('query_fields', []),
+		'query_fields' => prepareItemQueryFields(getRequest('query_fields', [])),
 		'parameters' => getRequest('parameters', []),
 		'posts' => getRequest('posts'),
 		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
@@ -75,7 +75,7 @@ function getItemFormData(array $item = []) {
 			: getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'http_proxy' => getRequest('http_proxy'),
-		'headers' => getRequest('headers', []),
+		'headers' => prepareItemHeaders(getRequest('headers', [])),
 		'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
 		'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
 		'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
@@ -121,22 +121,6 @@ function getItemFormData(array $item = []) {
 	}
 
 	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
-		foreach (['query_fields', 'headers'] as $property) {
-			$values = [];
-
-			if (is_array($data[$property]) && array_key_exists('name', $data[$property])
-					&& array_key_exists('value', $data[$property])) {
-				foreach ($data[$property]['name'] as $index => $key) {
-					if (array_key_exists($index, $data[$property]['value'])) {
-						$sortorder = $data[$property]['sortorder'][$index];
-						$values[$sortorder] = [$key => $data[$property]['value'][$index]];
-					}
-				}
-			}
-			ksort($values);
-			$data[$property] = $values;
-		}
-
 		$data['parameters'] = [];
 	}
 	elseif ($data['type'] == ITEM_TYPE_SCRIPT) {
@@ -263,17 +247,7 @@ function getItemFormData(array $item = []) {
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
 
-		if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
-			// Convert hash to array where every item is hash for single key value pair as it is used by view.
-			$headers = [];
-
-			foreach ($data['headers'] as $key => $value) {
-				$headers[] = [$key => $value];
-			}
-
-			$data['headers'] = $headers;
-		}
-		elseif ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
+		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
 		}
 
