@@ -347,7 +347,7 @@ if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data[
 		(new CMultiSelect([
 			'name' => 'valuemapid',
 			'object_name' => 'valuemaps',
-			'id' => 'valuemapid-field',
+			'multiselect_id' => 'valuemapid-field',
 			'multiple' => false,
 			'data' => [],
 			'popup' => [
@@ -386,7 +386,7 @@ if ($data['single_host_selected']) {
 			(new CMultiSelect([
 				'name' => 'master_itemid',
 				'object_name' => 'items',
-				'id' => 'master-item-field',
+				'multiselect_id' => 'master-item-field',
 				'multiple' => false,
 				'data' => [],
 				'popup' => [
