@@ -1929,7 +1929,7 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 				}
 				else {
 					zabbix_log(LOG_LEVEL_WARNING, "Failed to parse expression macro"
-							" \"%s\" in %s with id %s, errpr :%s",
+							" \"%s\" in %s with id %s: %s",
 							expression, data_name, row[0], error);
 					zbx_free(error);
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
