@@ -78,7 +78,6 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpUploadMaxFilesize();
 		$result[] = $this->checkPhpMaxExecutionTime();
 		$result[] = $this->checkPhpMaxInputTime();
-		$result[] = $this->checkLocaleSet();
 		$result[] = $this->checkPhpDatabases();
 		$result[] = $this->checkPhpBcmath();
 		$result[] = $this->checkPhpMbstring();
@@ -101,6 +100,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
 		$result[] = $this->checkPhpArgSeparatorOutput();
+		$result[] = $this->checkSystemLocale();
 
 		return $result;
 	}
@@ -231,39 +231,6 @@ class CFrontendSetup {
 			'error' => _s('Minimum required limit on input parse time for PHP scripts is %1$s (configuration option "max_input_time").',
 				self::MIN_PHP_MAX_INPUT_TIME
 			)
-		];
-	}
-
-	/**
-	 * Checks if selected locale is working.
-	 *
-	 * @return array
-	 */
-	public function checkLocaleSet() {
-		$result = true;
-		$current_locale = setlocale(LC_MONETARY, 0);
-
-		if ($current_locale === false) {
-			$result = false;
-		}
-
-		$locale_variants = zbx_locale_variants($this->default_lang);
-
-		if ($result && !setlocale(LC_MONETARY, $locale_variants)) {
-			$result = false;
-		}
-
-		if ($current_locale !== false) {
-			setlocale(LC_MONETARY, zbx_locale_variants($current_locale));
-		}
-
-		return [
-			'name' => _s('Locale'),
-			'current' => $current_locale ?: '',
-			'required' => $this->default_lang,
-			'result' => $result ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => 'Locale for language "'.$this->default_lang.'" is not found on the web server. Tried to set: '.
-				implode(', ', $locale_variants).'. Unable to translate Zabbix interface.'
 		];
 	}
 
@@ -695,6 +662,40 @@ class CFrontendSetup {
 			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'arg_separator.output',
 				self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT
 			)
+		];
+	}
+
+	/**
+	 * Checks if selected locale is working.
+	 *
+	 * @return array
+	 */
+	public function checkSystemLocale() {
+
+		$result = true;
+		$current_locale = setlocale(LC_MONETARY, 0);
+
+		if ($current_locale === false) {
+			$result = false;
+		}
+
+		$locale_variants = zbx_locale_variants($this->default_lang);
+
+		if ($result && !setlocale(LC_MONETARY, $locale_variants)) {
+			$result = false;
+		}
+
+		if ($current_locale !== false) {
+			setlocale(LC_MONETARY, zbx_locale_variants($current_locale));
+		}
+
+		return [
+			'name' => _('System locale'),
+			'current' => $current_locale ?: '',
+			'required' => $this->default_lang,
+			'result' => $result ? self::CHECK_OK : self::CHECK_FATAL,
+			'error' => 'Locale for language "'.$this->default_lang.'" is not found on the web server. Tried to set: '.
+				implode(', ', $locale_variants).'. Unable to translate Zabbix interface.'
 		];
 	}
 
