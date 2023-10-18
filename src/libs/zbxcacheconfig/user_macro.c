@@ -21,6 +21,11 @@
 #include "dbsync.h"
 #include "dbconfig.h"
 
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxvault.h"
+#include "zbxstr.h"
+#include "zbxexpr.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "zbxnum.h"

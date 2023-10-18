@@ -2037,7 +2037,7 @@ json_parse_return:
  * Purpose: parse autoregistration data contents and process it               *
  *                                                                            *
  * Parameters: jp_data         - [IN] JSON with autoregistration data         *
- *             proxyid    - [IN] proxy identifier from database          *
+ *             proxyid         - [IN] proxy identifier from database          *
  *             events_cbs      - [IN]                                         *
  *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *

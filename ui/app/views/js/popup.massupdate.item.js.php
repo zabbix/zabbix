@@ -60,6 +60,30 @@
 	}
 })();
 
+// Timeout.
+(() => {
+	const custom_timeout = document.getElementById('custom_timeout');
+
+	if (!custom_timeout) {
+		return false;
+	}
+
+	custom_timeout.addEventListener('change', () => {
+		const timeout = document.getElementById('timeout');
+
+		if (custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+			timeout.style.display = 'none';
+			timeout.disabled = true;
+		}
+		else {
+			timeout.style.display = '';
+			timeout.disabled = false;
+		}
+	});
+
+	custom_timeout.dispatchEvent(new CustomEvent('change'));
+})();
+
 // History mode.
 (() => {
 	const history_toggle = document.getElementById('history_mode');
@@ -143,4 +167,16 @@
 
 	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
 })();
+
+document.querySelectorAll('[name="preprocessing_action"]').forEach((button) => button.addEventListener('click', () =>
+	document.getElementById('preprocessing').style.display = button.value == <?= ZBX_ACTION_REPLACE ?> ? '' : 'none')
+);
+
+document.querySelector('#visible_preprocessing').addEventListener('change', () => {
+	const preprocessing = document.querySelector('#preprocessing');
+
+	if (preprocessing?.querySelectorAll('li.sortable').length == 0) {
+		preprocessing.querySelector('.element-table-add')?.click();
+	}
+});
 </script>

@@ -20,8 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup items
@@ -30,20 +30,21 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
-	use TableTrait;
-
-	const HOST_ID = 90001;
-
-	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
+
+	const HOST_ID = 90001;
+
+	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
@@ -73,9 +74,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'Type' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 						'SNMP agent', 'Zabbix internal','Zabbix trapper', 'External check',
 						'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent',
-						'TELNET agent', 'JMX agent', 'Dependent item', 'all'],
-				'State' => ['Normal', 'Not supported', 'all'],
-				'Status' => ['all', 'Enabled', 'Disabled']
+						'TELNET agent', 'JMX agent', 'Dependent item', 'All'],
+				'State' => ['Normal', 'Not supported', 'All'],
+				'Status' => ['All', 'Enabled', 'Disabled']
 		];
 		foreach ($dropdowns as $name => $values) {
 			foreach ($values as $value) {
@@ -91,7 +92,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					case 'Normal':
 					case 'Not supported':
 						$this->assertFalse($form->getField('Status')->isEnabled());
-						$this->assertEquals('all', $form->getField('Status')->getText());
+						$this->assertEquals('All', $form->getField('Status')->getText());
 						break;
 				}
 			}
@@ -547,7 +548,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Update interval' => '0',
 						'Keep lost resources period' => '30d',
-						'State' => 'all',
+						'State' => 'All',
 						'Status' => 'Enabled'
 					],
 					'expected' => [

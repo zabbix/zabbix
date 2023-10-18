@@ -2205,93 +2205,120 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Oracle by Zabbix agent 2'
                         name: 'Oracle: Cache Hit Ratios'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Oracle by Zabbix agent 2'
-                        name: 'Oracle: Sort Operations'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Oracle by Zabbix agent 2'
                         name: 'Oracle: Physical Read\Write Rate'
-                - type: graph
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Oracle by Zabbix agent 2'
-                        name: 'Oracle: Physical Read\Write Rate, Bytes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Oracle by Zabbix agent 2'
                         name: 'Oracle: Datafiles'
-                - type: graph
-                  x: '12'
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Oracle by Zabbix agent 2'
-                        name: 'Oracle: PGA'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
                 - type: graph
                   'y': '15'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Oracle by Zabbix agent 2'
                         name: 'Oracle: Processes'
-                - type: graph
-                  x: '12'
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Oracle by Zabbix agent 2'
-                        name: 'Oracle: Sessions'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
                 - type: graph
                   'y': '20'
                   width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Oracle by Zabbix agent 2'
                         name: 'Oracle: SGA Memory Usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Sort Operations'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                - type: graph
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Physical Read\Write Rate, Bytes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
+                - type: graph
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: PGA'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
+                - type: graph
+                  x: '12'
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Sessions'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
       valuemaps:
         - uuid: 5a90da8dd6124159a7f82a7a996f0a53
           name: 'Oracle Archivelog status'

@@ -49,13 +49,14 @@ class CControllerPopupMassupdateItem extends CController {
 			'discover' => 'in '.ZBX_PROTOTYPE_DISCOVER.','.ZBX_PROTOTYPE_NO_DISCOVER,
 			'tags' => 'array',
 			'preprocessing' => 'array',
+			'preprocessing_action' => 'in '.implode(',', [ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE_ALL]),
 
 			// The fields used for multiple item types.
 			'interfaceid' => 'id',
 			'authtype' => 'string',
 			'username' => 'string',
 			'password' => 'string',
-			'timeout' => 'string',
+			'timeout' => 'string|not_empty',
 			'delay' => 'string',
 			'trapper_hosts' => 'string',
 
@@ -144,7 +145,7 @@ class CControllerPopupMassupdateItem extends CController {
 				'authtype' => DB::getDefault('items', 'authtype'),
 				'username' => DB::getDefault('items', 'username'),
 				'password' => DB::getDefault('items', 'password'),
-				'timeout' => '',
+				'timeout' => DB::getDefault('items', 'timeout'),
 				'delay' => DB::getDefault('items', 'delay'),
 				'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
 
@@ -194,7 +195,10 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 
 			if (array_key_exists('preprocessing', $input)) {
-				$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
+				$input['preprocessing'] =
+					$this->getInput('preprocessing_action', ZBX_ACTION_REPLACE) == ZBX_ACTION_REMOVE_ALL
+						? []
+						: normalizeItemPreprocessingSteps($input['preprocessing']);
 			}
 
 			if (array_key_exists('delay', $input)) {
@@ -215,7 +219,7 @@ class CControllerPopupMassupdateItem extends CController {
 
 			if ($item_prototypes) {
 				$db_items = API::ItemPrototype()->get([
-					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps'],
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps', 'snmp_oid'],
 					'selectHosts' => ['status'],
 					'itemids' => $itemids,
 					'preservekeys' => true
@@ -223,7 +227,9 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 			else {
 				$db_items = API::Item()->get([
-					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps'],
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps',
+						'snmp_oid'
+					],
 					'selectHosts' => ['status'],
 					'itemids' => $itemids,
 					'preservekeys' => true
