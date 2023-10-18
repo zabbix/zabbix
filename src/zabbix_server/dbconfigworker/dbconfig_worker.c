@@ -112,12 +112,13 @@ static int	dbsync_item_rtname(void)
 
 ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 {
+#define DBCONFIG_WORKER_FLUSH_DELAY_SEC		1
 	zbx_ipc_service_t			service;
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					ret, processed_num = 0;
-	double					time_stat, time_idle = 0, time_now, sec;
+	int					ret, processed_num = 0, delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
+	double					sec = 0, time_flush;
 	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -134,6 +135,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
+	zabbix_increase_log_level();
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_DBCONFIG_WORKER, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start connector manager service: %s", error);
@@ -142,48 +144,56 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	}
 
 	/* initialize statistics */
-	time_stat = zbx_time();
+	time_flush = zbx_time();
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	zbx_vector_uint64_create(&hostids);
-	zabbix_increase_log_level();
-	dbsync_item_rtname();
+	zbx_vector_uint64_append(&hostids, 0);
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
-
-		if (STAT_INTERVAL < time_now - time_stat)
+		if (delay < zbx_time() - time_flush)
 		{
-			zbx_setproctitle("%s #%d [processed %d, idle "
-					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
-					get_process_type_string(process_type), process_num, processed_num,
-					time_idle, time_now - time_stat);
+			zbx_setproctitle("%s [synced macros in " ZBX_FS_DBL " sec, syncing configuration]",
+					get_process_type_string(process_type), sec);
 
-			time_stat = time_now;
-			time_idle = 0;
-			processed_num = 0;
+			sec = zbx_time();
+
+			if (0 != hostids.values_num)
+			{
+				zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+				zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+				if (0 == hostids.values[0])
+					dbsync_item_rtname();
+
+				zbx_vector_uint64_clear(&hostids);
+			}
+
+			time_flush = zbx_time();
+
+			if ((sec = time_flush - sec) > delay)
+				delay *= 2;
+			else
+				delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
+
+			zbx_setproctitle("%s [synced macros in " ZBX_FS_DBL " sec, idle %d sec]",
+					get_process_type_string(process_type), sec, delay);
 		}
 
-		zbx_vector_uint64_clear(&hostids);
-
-		time_now = zbx_time();
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-		sec = zbx_time();
-		zbx_update_env(get_process_type_string(process_type), sec);
 
-		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-			time_idle += sec - time_now;
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (NULL != message)
 		{
 			switch (message->code)
 			{
 				case ZBX_IPC_DBCONFIG_WORKER_REQUEST:
-				zbx_dbconfig_worker_deserialize_ids(message->data, message->size, &hostids);
+					zbx_dbconfig_worker_deserialize_ids(message->data, message->size, &hostids);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
