@@ -158,11 +158,12 @@ class testItemTypeSelection extends CWebTest {
 	 */
 	public function checkItemTypeSelection($data, $prototype = false) {
 		$link = ($prototype)
-			? 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLDID.'&context=host'
-			: 'items.php?form=create&hostid='.self::HOSTID.'&context=host';
+			? 'zabbix.php?action=item.prototype.list&parent_discoveryid='.self::LLDID.'&context=host'
+			: 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::HOSTID;
 
 		$this->page->login()->open($link)->waitUntilReady();
-		$form = $this->query('id', ($prototype) ? 'item-prototype-form' : 'item-form')->asForm()->waitUntilReady()->one();
+		$this->query('button:'.($prototype ? 'Create item prototype' : 'Create item'))->one()->click();
+		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 
 		// Make names unique for items and prototypes.
 		$data['fields']['Name'] = $data['fields']['Name'].microtime();
@@ -170,14 +171,14 @@ class testItemTypeSelection extends CWebTest {
 
 		// Check hintbox text.
 		if (CTestArrayHelper::get($data, 'hint')) {
-			$icon = $this->query('id:js-item-type-hint')->waitUntilClickable()->one();
+			$icon = $this->query('class:js-hint')->waitUntilClickable()->one();
 			$icon->click();
 			$this->assertEquals($data['hint_text'],
 					$form->query('xpath://div[@class="hintbox-wrap"]')->waitUntilPresent()->one()->getText()
 			);
 		}
 		elseif (CTestArrayHelper::get($data, 'hint') === false) {
-			$this->assertFalse($form->query('id:js-item-type-hint')->waitUntilPresent()->one()->isVisible());
+			$this->assertFalse($form->query('class:js-hint')->waitUntilPresent()->one()->isVisible());
 		}
 		else {
 			// Check that type changed to automatic.
@@ -193,12 +194,8 @@ class testItemTypeSelection extends CWebTest {
 					' AND name ='.zbx_dbstr($data['fields']['Name'])
 		);
 
-		$saved_link = ($prototype)
-			? 'disc_prototypes.php?form=update&parent_discoveryid='.self::LLDID.'&itemid='.$id.'&context=host'
-			: 'items.php?form=update&hostid='.self::HOSTID.'&itemid='.$id.'&context=host';
-
-		$this->page->open($saved_link)->waitUntilReady();
-
+		$this->page->open($link)->waitUntilReady();
+		$this->query('link:'.$data['fields']['Name'])->one()->click();
 		$form->invalidate();
 		$form->checkValue($data['fields']);
 
@@ -214,7 +211,8 @@ class testItemTypeSelection extends CWebTest {
 			$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype updated' : 'Item updated');
 
 			// Check that custom type remained in saved form.
-			$this->page->open($saved_link)->waitUntilReady();
+			$this->page->open($link)->waitUntilReady();
+			$this->query('link:'.$data['fields']['Name'])->one()->click();
 			$form->invalidate();
 			$this->assertEquals($data['fields']['Type of information'], $form->getField('Type of information')->getValue());
 
@@ -229,7 +227,8 @@ class testItemTypeSelection extends CWebTest {
 			// Check saved form.
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype updated' : 'Item updated');
-			$this->page->open($saved_link)->waitUntilReady();
+			$this->page->open($link)->waitUntilReady();
+			$this->query('link:'.$data['fields']['Name'])->one()->click();
 			$form->invalidate();
 			$this->assertEquals($data['automatic_type'], $form->getField('Type of information')->getValue());
 		}
@@ -238,4 +237,3 @@ class testItemTypeSelection extends CWebTest {
 		}
 	}
 }
-

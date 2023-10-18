@@ -34,7 +34,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckLayout($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
@@ -82,7 +82,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
@@ -186,7 +186,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider getHostAndGroupData
 	 */
 	public function testPageItems_FilterHostAndGroupsFilter($data) {
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D=99062&context=host');
+		$this->page->login()->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=99062');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Item create button enabled and breadcrumbs exist.
