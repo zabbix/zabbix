@@ -42,10 +42,9 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-              "cloudwatch:Describe*",
-              "cloudwatch:Get*",
-              "cloudwatch:List*",
-              "rds:Describe*"
+                "cloudwatch:DescribeAlarms",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances"
           ],
           "Effect":"Allow",
           "Resource":"*"
@@ -54,7 +53,35 @@ Add the following required permissions to your Zabbix IAM policy in order to col
   }
   ```
 
-Set macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.RDS.INSTANCE.ID}"
+If you are using role-based authorization, set the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+Set macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.RDS.INSTANCE.ID}"
+
+If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -74,6 +101,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`role_base`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -93,10 +121,10 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS RDS: Get metrics data|<p>Get instance metrics.</p><p>Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html</p><p>Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances</p>|Script|aws.rds.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS RDS: Get instance info|<p>Get instance info.</p><p>DescribeDBInstances API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html</p>|Script|aws.rds.get_instance_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS CloudWatch: Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.rds.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS RDS: Get instance events data|<p>DescribeEvents API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeEvents.html</p>|Script|aws.rds.get_events<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS RDS: Get metrics data|<p>Get instance metrics.</p><p>Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html</p><p>Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances</p>|Script|aws.rds.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS RDS: Get instance info|<p>Get instance info.</p><p>DescribeDBInstances API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html</p>|Script|aws.rds.get_instance_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS CloudWatch: Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.rds.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS RDS: Get instance events data|<p>DescribeEvents API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeEvents.html</p>|Script|aws.rds.get_events<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS RDS: Get metrics check|<p>Data collection check.</p>|Dependent item|aws.rds.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS RDS: Get instance info check|<p>Data collection check.</p>|Dependent item|aws.rds.instance_info.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS RDS: Get alarms check|<p>Data collection check.</p>|Dependent item|aws.rds.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|

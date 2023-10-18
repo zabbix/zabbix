@@ -20,7 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard
@@ -29,16 +30,15 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testDashboardPlainTextWidget extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -114,9 +114,9 @@ class testDashboardPlainTextWidget extends CWebTest {
 										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => '1'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							],
@@ -204,9 +204,9 @@ class testDashboardPlainTextWidget extends CWebTest {
 										'value' => '99142' // item name in widget 'Test item host: Master item'.
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => '1'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							]
@@ -238,7 +238,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			'Items location' => 'Left',
 			'Show lines' => '25',
 			'Show text as HTML' => false,
-			'Enable host selection' => false
+			'Override host' => ''
 		];
 		$form->checkValue($default_state);
 
@@ -276,12 +276,12 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$dialog->close();
 		$dashboard->save();
 
-		// Check parameter 'Enable host selection' true/false state.
+		// Check parameter 'Override host' true/false state.
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
 		$dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
-		$form->fill(['Enable host selection' => false])->submit();
+		$form->fill(['Override host' => ''])->submit();
 		$dashboard->save();
 		$this->assertFalse($host_selector->isVisible());
 	}
@@ -533,7 +533,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Enable host selection' => true,
+						'Override host' => 'Dashboard',
 						'Refresh interval' => '2 minutes'
 					],
 					'items' => [
@@ -545,7 +545,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Enable host selection' => false,
+						'Override host' => 'Dashboard',
 						'Refresh interval' => '1 minute'
 					],
 					'items' => [
@@ -577,7 +577,8 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Items location' => 'Top',
 						'Show lines' => '50',
 						'Show text as HTML' => true,
-						'Enable host selection' => true],
+						'Override host' => 'Dashboard'
+					],
 					'items' => [
 						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
@@ -1000,7 +1001,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case for 'Enable host selection' check.
+			// Test case for host selection check.
 			[
 				[
 					'host_select' => [

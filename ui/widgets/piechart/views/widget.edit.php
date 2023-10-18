@@ -31,7 +31,7 @@ use Widgets\PieChart\Includes\{
 	CWidgetFieldDataSetView
 };
 
-$form = (new CWidgetFormView($data));
+$form = new CWidgetFormView($data);
 
 $form_tabs = (new CTabView())
 	->addTab('data_set', _('Data set'), getDatasetTab($form, $data['fields']),
@@ -41,7 +41,7 @@ $form_tabs = (new CTabView())
 		'pie-display-options'
 	)
 	->addTab('time_period', _('Time period'), getTimePeriodTab($form, $data['fields']),
-		'pie-time'
+		'pie-time-period'
 	)
 	->addTab('legend_tab', _('Legend'), getLegendTab($form, $data['fields']),
 		'pie-legend'
@@ -152,31 +152,23 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 }
 
 function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$set_time_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_time']));
-	$time_from_field = $form->registerField(
-		(new CWidgetFieldDatePickerView($fields['time_from']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-	);
-	$time_to_field = $form->registerField(
-		(new CWidgetFieldDatePickerView($fields['time_to']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-	);
+	$time_period_field = (new CWidgetFieldTimePeriodView($fields['time_period']))
+		->setDateFormat(ZBX_FULL_DATE_TIME)
+		->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+		->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'));
 
-	return (new CFormGrid())
-		->addItem([
-			$set_time_field->getLabel(),
-			new CFormField($set_time_field->getView())
-		])
-		->addItem([
-			$time_from_field->getLabel(),
-			new CFormField($time_from_field->getView())
-		])
-		->addItem([
-			$time_to_field->getLabel(),
-			new CFormField($time_to_field->getView())
+	$form->registerField($time_period_field);
+
+	$form_grid = new CFormGrid();
+
+	foreach ($time_period_field->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+		$form_grid->addItem([
+			$label,
+			(new CFormField($view))->addClass($class)
 		]);
+	}
+
+	return $form_grid;
 }
 
 function getLegendTab(CWidgetFormView $form, array $fields): CDiv {

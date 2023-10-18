@@ -248,6 +248,18 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-get-value-tmpl">
+	<?= (new CSelect('preprocessing[#{rowNum}][params][0]'))
+			->setValue(ZBX_PREPROC_SNMP_UTF8_FROM_HEX)
+			->setAdaptiveWidth(202)
+			->addOptions([
+				new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+				new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+				new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+			])
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		function makeParameterInput(index, type) {
@@ -269,6 +281,9 @@
 			);
 			const preproc_param_check_not_supported_tmpl = new Template(
 				$('#preprocessing-steps-parameters-check-not-supported-row-tmpl').html()
+			);
+			const preproc_param_snmp_get_value_tmpl = new Template(
+				$('#preprocessing-steps-parameters-snmp-get-value-tmpl').html()
 			);
 
 			switch (type) {
@@ -383,11 +398,16 @@
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_VALUE ?>':
 					return $(preproc_param_snmp_walk_value_tmpl.evaluate({
-						rowNum: index,
+						rowNum: index
 					}));
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>':
 					return $(preproc_param_snmp_walk_to_json_tmpl.evaluate({
+						rowNum: index
+					}));
+
+				case '<?= ZBX_PREPROC_SNMP_GET_VALUE ?>':
+					return $(preproc_param_snmp_get_value_tmpl.evaluate({
 						rowNum: index
 					}));
 
@@ -399,7 +419,7 @@
 		var $preprocessing = $('#preprocessing');
 
 		if ($preprocessing.length === 0) {
-			const prep_elem = document.querySelector('#preprocessing_div');
+			const prep_elem = document.querySelector('#preprocessing-div');
 
 			if (!prep_elem) {
 				return false;
@@ -444,6 +464,7 @@
 					sortorder: sortable_count++
 				}));
 				const type = $('z-select[name*="type"]', $row).val();
+				const massupdate_form = document.getElementById('massupdate-form');
 
 				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
@@ -456,8 +477,18 @@
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>')
 						.addClass('<?= ZBX_STYLE_DISABLED ?>');
+
+					if (massupdate_form !== null) {
+						$preprocessing.find('button.btn-link.element-table-remove').attr('disabled', 'disabled');
+					}
 				}
 				else if (sortable_count > 1) {
+					if (massupdate_form !== null) {
+						$preprocessing.find('li.sortable').each(function() {
+							$(this).find('button.btn-link.element-table-remove').removeAttr('disabled');
+						})
+					}
+
 					$preprocessing
 						.sortable('enable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>')
@@ -493,6 +524,10 @@
 					$('.preprocessing-list-head').hide();
 				}
 				else if (sortable_count == 1) {
+					if (document.getElementById('massupdate-form') !== null) {
+						$preprocessing.find('button.btn-link.element-table-remove').attr('disabled', 'disabled');
+					}
+
 					$preprocessing
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');

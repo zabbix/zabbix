@@ -1743,30 +1743,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Tuples'
-                - type: graphprototype
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB [{#DBNAME}]: Events'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   'y': '5'
                   width: '12'
@@ -1775,14 +1759,62 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Block hit/read'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graphprototype
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'DB [{#DBNAME}]: Locks'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                - type: graphprototype
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'DB [{#DBNAME}]: Queries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
+                - type: graphprototype
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'DB [{#DBNAME}]: Events'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   x: '12'
                   'y': '5'
@@ -1792,30 +1824,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Temp files'
-                - type: graphprototype
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB [{#DBNAME}]: Locks'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graphprototype
                   x: '12'
                   'y': '10'
@@ -1825,30 +1841,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Database size'
-                - type: graphprototype
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB [{#DBNAME}]: Queries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
                 - type: graphprototype
                   x: '12'
                   'y': '15'
@@ -1858,14 +1858,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Slow queries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
         - uuid: f2ceabf59fd64ca9828ea55e9b9668bd
           name: 'PostgreSQL stat'
           pages:
@@ -1875,30 +1875,65 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL connections'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'PostgreSQL transactions'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL ping'
+                    - type: STRING
+                      name: reference
+                      value: AAAAK
+                - type: graph
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'PostgreSQL replication lag'
+                    - type: STRING
+                      name: reference
+                      value: AAAAM
+                - type: graph
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'PostgreSQL bgwriter'
+                    - type: STRING
+                      name: reference
+                      value: AAAAO
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'PostgreSQL transactions'
+                    - type: STRING
+                      name: reference
+                      value: AAAAJ
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -1906,20 +1941,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL uptime'
-                - type: graph
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'PostgreSQL replication lag'
+                    - type: STRING
+                      name: reference
+                      value: AAAAL
                 - type: graph
                   x: '12'
                   'y': '10'
@@ -1927,20 +1955,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL WAL'
-                - type: graph
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'PostgreSQL bgwriter'
+                    - type: STRING
+                      name: reference
+                      value: AAAAN
                 - type: graph
                   x: '12'
                   'y': '15'
@@ -1948,10 +1969,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL checkpoints'
+                    - type: STRING
+                      name: reference
+                      value: AAAAP
       valuemaps:
         - uuid: 2e376ee568d04e7bbe98cbae4181f313
           name: 'PostgreSQL recovery role'

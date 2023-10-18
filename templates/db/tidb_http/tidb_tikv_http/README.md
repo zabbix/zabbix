@@ -45,7 +45,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiKV: Get instance metrics|<p>Get TiKV instance metrics.</p>|HTTP agent|tikv.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
+|TiKV: Get instance metrics|<p>Get TiKV instance metrics.</p>|HTTP agent|tikv.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
 |TiKV: Store size|<p>The storage size of TiKV instance.</p>|Dependent item|tikv.engine_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "tikv_engine_size_bytes")].value.sum()`</p></li></ul>|
 |TiKV: Get store size metrics|<p>Get capacity metrics of TiKV instance.</p>|Dependent item|tikv.store_size.metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "tikv_store_size_bytes")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |TiKV: Available size|<p>The available capacity of TiKV instance.</p>|Dependent item|tikv.store_size.available<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "available")].value.first()`</p></li></ul>|

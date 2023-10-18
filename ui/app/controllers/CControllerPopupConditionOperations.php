@@ -33,7 +33,7 @@ class CControllerPopupConditionOperations extends CController {
 		$fields = [
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 			'source' =>			'required|in '.EVENT_SOURCE_TRIGGERS,
-			'condition_type' =>	'in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+			'condition_type' =>	'in '.ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 			'operator' =>		'in '.CONDITION_OPERATOR_EQUAL,
 			'value' =>			'in '.implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]),
 			'row_index' =>		'int32'
@@ -65,9 +65,9 @@ class CControllerPopupConditionOperations extends CController {
 				'action' => $this->getAction(),
 				'row_index' => $this->getInput('row_index'),
 				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-				'last_type' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+				'last_type' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 				'source' => EVENT_SOURCE_TRIGGERS,
-				'allowed_conditions' => [CONDITION_TYPE_EVENT_ACKNOWLEDGED],
+				'allowed_conditions' => [ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED],
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

@@ -19,7 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -31,7 +32,18 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
-	use TagTrait;
+	/**
+	 * Attach MessageBehavior and TagBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
+	}
 
 	/**
 	 * Widget name for update.
@@ -49,17 +61,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -613,7 +614,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						'Name' => 'Widget without columns'
 					],
 					'main_error' => [
-						'Invalid parameter "Columns": an array is expected.',
+						'Invalid parameter "Columns": cannot be empty.',
 						'Invalid parameter "Order column": an integer is expected.'
 					]
 				]
@@ -1116,7 +1117,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('tags', $data)) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
@@ -1637,7 +1637,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('tags', $data)) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 

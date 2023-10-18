@@ -22,6 +22,7 @@
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
+#include "zbxregexp.h"
 #include "zbxhash.h"
 #include "zbxcrypto.h"
 
@@ -1225,6 +1226,447 @@ static int	DBpatch_6050122(void)
 
 static int	DBpatch_6050123(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute("update item_preproc set params='-1' where type=26"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050124(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name in ('source_type','reference')"
+				" and widgetid in (select widgetid from widget where type='map')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050125(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='sysmapid._reference',value_str=CONCAT(value_str,'._mapid')"
+			" where name='filter_widget_reference'"
+				" and widgetid in (select widgetid from widget where type='map')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050126(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set type='1',name='override_hostid._reference',value_int=0,value_str='DASHBOARD._hostid'"
+			" where type=0"
+				" and name='dynamic'"
+				" and value_int=1"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050127(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+			"select w.widgetid,wf_from.value_str,wf_to.value_str"
+			" from widget w"
+			" left join widget_field wf_from"
+				" on w.widgetid=wf_from.widgetid"
+					" and (wf_from.name='time_from' or wf_from.name is null)"
+			" left join widget_field wf_to"
+				" on w.widgetid=wf_to.widgetid"
+					" and (wf_to.name='time_to' or wf_to.name is null)"
+			" where w.type='svggraph' and exists ("
+				"select null"
+				" from widget_field wf2"
+				" where wf2.widgetid=w.widgetid"
+					" and wf2.name='graph_time'"
+			")");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		if (SUCCEED == zbx_db_is_null(row[1]))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "time_period.from", "now-1h");
+
+		if (SUCCEED == zbx_db_is_null(row[2]))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "time_period.to", "now");
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050128(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='time_period.from'"
+			" where name='time_from'"
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050129(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='time_period.to'"
+			" where name='time_to'"
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050130(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name='graph_time'"
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050131(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='date_period.from'"
+			" where name='date_from'"
+				" and widgetid in (select widgetid from widget where type='slareport')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050132(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='date_period.to'"
+			" where name='date_to'"
+				" and widgetid in (select widgetid from widget where type='slareport')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050133(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	zbx_regexp_t	*regex1 = NULL, *regex2 = NULL;
+	char		*error = NULL, *replace_to = NULL, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = FAIL;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_regexp_compile_ext("^([a-z]+)\\.([a-z_]+)\\.(\\d+)\\.(\\d+)$", &regex1, 0, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "internal error, invalid regular expression: %s", error);
+		goto out;
+	}
+
+	if (FAIL == zbx_regexp_compile_ext("^([a-z]+)\\.([a-z_]+)\\.(\\d+)$", &regex2, 0, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "internal error, invalid regular expression: %s", error);
+		goto out;
+	}
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = zbx_db_select("select widget_fieldid,name from widget_field where name like '%%.%%.%%'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widget_fieldid;
+		char		*replace_from;
+
+		ZBX_STR2UINT64(widget_fieldid, row[0]);
+		replace_from = row[1];
+
+		if (SUCCEED != zbx_mregexp_sub_precompiled(
+						replace_from,
+						regex1,
+						"\\1.\\3.\\2.\\4",
+						0,	/* no output limit */
+						&replace_to)
+				&& SUCCEED != zbx_mregexp_sub_precompiled(
+						replace_from,
+						regex2,
+						"\\1.\\3.\\2",
+						0,	/* no output limit */
+						&replace_to))
+		{
+			continue;
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update widget_field"
+				" set name='%s'"
+				" where widget_fieldid=" ZBX_FS_UI64 ";\n",
+				replace_to, widget_fieldid);
+
+		zbx_free(replace_to);
+
+		if (SUCCEED != zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "internal error, cannot execute multiple SQL \"update\" operations");
+			zbx_db_free_result(result);
+
+			goto out;
+		}
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		zbx_db_execute("%s", sql);
+
+	ret = SUCCEED;
+out:
+	if (NULL != regex1)
+		zbx_regexp_free(regex1);
+	if (NULL != regex2)
+		zbx_regexp_free(regex2);
+
+	zbx_free(sql);
+	zbx_free(error);
+	zbx_free(replace_to);
+
+	return ret;
+}
+
+#define REFERENCE_LEN	5
+#define FIRST_LETTER	'A'
+#define TOTAL_LETTERS	26
+
+static char	*create_widget_reference(const zbx_vector_str_t *references)
+{
+	static char	buf[REFERENCE_LEN + 1];
+	static int	next_index;
+
+	while (1)
+	{
+		int	i, index = next_index++;
+
+		for (i = REFERENCE_LEN - 1; i >= 0; i--)
+		{
+			buf[i] = FIRST_LETTER + index % TOTAL_LETTERS;
+			index /= TOTAL_LETTERS;
+		}
+
+		if (FAIL == zbx_vector_str_search(references, buf, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			return buf;
+	}
+}
+
+#undef TOTAL_LETTERS
+#undef FIRST_LETTER
+#undef REFERENCE_LEN
+
+static int	DBpatch_6050134(void)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_db_insert_t		db_insert;
+	zbx_vector_str_t	references;
+	int			ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_str_create(&references);
+
+	result = zbx_db_select("select distinct value_str from widget_field where name='reference' order by value_str");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_vector_str_append(&references, zbx_strdup(NULL, row[0]));
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_str_sort(&references, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
+			NULL);
+
+	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "reference",
+				create_widget_reference(&references));
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_str_clear_ext(&references, zbx_str_free);
+	zbx_vector_str_destroy(&references);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050135(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050136(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.trigger_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050137(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050138(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.trigger_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050139(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select wf.widgetid from widget_field wf,widget w"
+			" where wf.name='interface_type' and w.type='hostavail' and w.widgetid=wf.widgetid"
+			" group by wf.widgetid having count(wf.name)=1");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "name", "type", "value_int",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, "only_totals", 0, 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050140(void)
+{
 	const zbx_db_table_t table =
 			{"ugset", "ugsetid", 0,
 				{
@@ -1238,12 +1680,12 @@ static int	DBpatch_6050123(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050124(void)
+static int	DBpatch_6050141(void)
 {
 	return DBcreate_index("ugset", "ugset_1", "hash", 0);
 }
 
-static int	DBpatch_6050125(void)
+static int	DBpatch_6050142(void)
 {
 	const zbx_db_table_t table =
 			{"ugset_group", "ugsetid,usrgrpid", 0,
@@ -1258,12 +1700,12 @@ static int	DBpatch_6050125(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050126(void)
+static int	DBpatch_6050143(void)
 {
 	return DBcreate_index("ugset_group", "ugset_group_1", "usrgrpid", 0);
 }
 
-static int	DBpatch_6050127(void)
+static int	DBpatch_6050144(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1271,14 +1713,14 @@ static int	DBpatch_6050127(void)
 	return DBadd_foreign_key("ugset_group", 1, &field);
 }
 
-static int	DBpatch_6050128(void)
+static int	DBpatch_6050145(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("ugset_group", 2, &field);
 }
 
-static int	DBpatch_6050129(void)
+static int	DBpatch_6050146(void)
 {
 	const zbx_db_table_t table =
 			{"user_ugset", "userid", 0,
@@ -1293,12 +1735,12 @@ static int	DBpatch_6050129(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050130(void)
+static int	DBpatch_6050147(void)
 {
 	return DBcreate_index("user_ugset", "user_ugset_1", "ugsetid", 0);
 }
 
-static int	DBpatch_6050131(void)
+static int	DBpatch_6050148(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1306,14 +1748,14 @@ static int	DBpatch_6050131(void)
 	return DBadd_foreign_key("user_ugset", 1, &field);
 }
 
-static int	DBpatch_6050132(void)
+static int	DBpatch_6050149(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("user_ugset", 2, &field);
 }
 
-static int	DBpatch_6050133(void)
+static int	DBpatch_6050150(void)
 {
 	const zbx_db_table_t table =
 			{"hgset", "hgsetid", 0,
@@ -1328,12 +1770,12 @@ static int	DBpatch_6050133(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050134(void)
+static int	DBpatch_6050151(void)
 {
 	return DBcreate_index("hgset", "hgset_1", "hash", 0);
 }
 
-static int	DBpatch_6050135(void)
+static int	DBpatch_6050152(void)
 {
 	const zbx_db_table_t table =
 			{"hgset_group", "hgsetid,groupid", 0,
@@ -1348,12 +1790,12 @@ static int	DBpatch_6050135(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050136(void)
+static int	DBpatch_6050153(void)
 {
 	return DBcreate_index("hgset_group", "hgset_group_1", "groupid", 0);
 }
 
-static int	DBpatch_6050137(void)
+static int	DBpatch_6050154(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1361,14 +1803,14 @@ static int	DBpatch_6050137(void)
 	return DBadd_foreign_key("hgset_group", 1, &field);
 }
 
-static int	DBpatch_6050138(void)
+static int	DBpatch_6050155(void)
 {
 	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("hgset_group", 2, &field);
 }
 
-static int	DBpatch_6050139(void)
+static int	DBpatch_6050156(void)
 {
 	const zbx_db_table_t table =
 			{"host_hgset", "hostid,hgsetid", 0,
@@ -1383,12 +1825,12 @@ static int	DBpatch_6050139(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050140(void)
+static int	DBpatch_6050157(void)
 {
 	return DBcreate_index("host_hgset", "host_hgset_1", "hgsetid", 0);
 }
 
-static int	DBpatch_6050141(void)
+static int	DBpatch_6050158(void)
 {
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1396,14 +1838,14 @@ static int	DBpatch_6050141(void)
 	return DBadd_foreign_key("host_hgset", 1, &field);
 }
 
-static int	DBpatch_6050142(void)
+static int	DBpatch_6050159(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_hgset", 2, &field);
 }
 
-static int	DBpatch_6050143(void)
+static int	DBpatch_6050160(void)
 {
 	const zbx_db_table_t table =
 			{"permission", "ugsetid,hgsetid", 0,
@@ -1419,12 +1861,12 @@ static int	DBpatch_6050143(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050144(void)
+static int	DBpatch_6050161(void)
 {
 	return DBcreate_index("permission", "permission_1", "hgsetid", 0);
 }
 
-static int	DBpatch_6050145(void)
+static int	DBpatch_6050162(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1432,7 +1874,7 @@ static int	DBpatch_6050145(void)
 	return DBadd_foreign_key("permission", 1, &field);
 }
 
-static int	DBpatch_6050146(void)
+static int	DBpatch_6050163(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1586,7 +2028,7 @@ static void	dbupgrade_groupsets_destroy(zbx_hashset_t *group_sets)
 	zbx_hashset_destroy(group_sets);
 }
 
-static int	DBpatch_6050147(void)
+static int	DBpatch_6050164(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -1617,7 +2059,7 @@ static int	DBpatch_6050147(void)
 	return ret;
 }
 
-static int	DBpatch_6050148(void)
+static int	DBpatch_6050165(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -1648,7 +2090,7 @@ static int	DBpatch_6050148(void)
 	return ret;
 }
 
-static int	DBpatch_6050149(void)
+static int	DBpatch_6050166(void)
 {
 	int		ret;
 	zbx_db_result_t	result;
@@ -1846,5 +2288,22 @@ DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
 DBPATCH_ADD(6050148, 0, 1)
 DBPATCH_ADD(6050149, 0, 1)
+DBPATCH_ADD(6050150, 0, 1)
+DBPATCH_ADD(6050151, 0, 1)
+DBPATCH_ADD(6050152, 0, 1)
+DBPATCH_ADD(6050153, 0, 1)
+DBPATCH_ADD(6050154, 0, 1)
+DBPATCH_ADD(6050155, 0, 1)
+DBPATCH_ADD(6050156, 0, 1)
+DBPATCH_ADD(6050157, 0, 1)
+DBPATCH_ADD(6050158, 0, 1)
+DBPATCH_ADD(6050159, 0, 1)
+DBPATCH_ADD(6050160, 0, 1)
+DBPATCH_ADD(6050161, 0, 1)
+DBPATCH_ADD(6050162, 0, 1)
+DBPATCH_ADD(6050163, 0, 1)
+DBPATCH_ADD(6050164, 0, 1)
+DBPATCH_ADD(6050165, 0, 1)
+DBPATCH_ADD(6050166, 0, 1)
 
 DBPATCH_END()

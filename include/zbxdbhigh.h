@@ -518,10 +518,9 @@ int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, co
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
-void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info);
+int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsupported);
 void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
-int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
@@ -903,7 +902,7 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_HOST_GROUP			0
 #define ZBX_CONDITION_TYPE_HOST				1
 #define ZBX_CONDITION_TYPE_TRIGGER			2
-#define ZBX_CONDITION_TYPE_TRIGGER_NAME			3
+#define ZBX_CONDITION_TYPE_EVENT_NAME			3
 #define ZBX_CONDITION_TYPE_TRIGGER_SEVERITY		4
 /* #define ZBX_CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define ZBX_CONDITION_TYPE_TIME_PERIOD			6
