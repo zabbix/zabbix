@@ -2080,7 +2080,14 @@ abstract class testFormPreprocessing extends CWebTest {
 	protected function addItemWithPreprocessing($data, $lld = false) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+
+		if ($lld == true) {
+			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
+		else{
+			$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
+		}
+
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
 
@@ -2123,8 +2130,16 @@ abstract class testFormPreprocessing extends CWebTest {
 
 			// Check result in frontend form.
 			$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
-			$this->page->open($this->ready_link.$id);
-			$form->selectTab('Preprocessing');
+
+			if ($lld == true) {
+				$this->page->open($this->ready_link.$id);
+			}
+			else {
+				$this->page->open($this->link)->waitUntilReady();
+				$this->query('link:'.$data['fields']['Name'])->one()->click();
+			}
+
+			$form->selectTab('Preprocessing')->waitUntilReady();
 			$this->assertPreprocessingSteps($data['preprocessing']);
 		}
 		else {
@@ -2226,7 +2241,15 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Check result in frontend form.
 		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
-		$this->page->open($this->ready_link.$id);
+
+		if ($lld == true) {
+			$this->page->open($this->ready_link.$id);
+		}
+		else {
+			$this->page->open($this->link)->waitUntilReady();
+			$this->query('link:'.$data['fields']['Name'])->one()->click();
+		}
+
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($data['preprocessing']);
 	}
@@ -2438,7 +2461,16 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Check saved preprocessing.
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
-		$this->page->open($this->ready_link.$itemid);
+		$item_name = CDBHelper::getValue('SELECT name FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
+
+		if ($lld == true) {
+			$this->page->open($this->ready_link.$id);
+		}
+		else {
+			$this->page->open($this->link)->waitUntilReady();
+			$this->query('link:'.$item_name)->one()->click()->waitUntilReady();
+		}
+
 		$form->selectTab('Preprocessing');
 		$steps = $this->assertPreprocessingSteps($data['preprocessing']);
 
@@ -2813,7 +2845,16 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Open original item on host and get its' preprocessing steps.
 		$this->page->login()->open($link);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+
+		if ($item !== 'Discovery rule') {
+			$item_name = CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? '15094' : '99102'));
+			$this->query('link', $item_name)->one()->click();
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$form = $dialog->asForm();
+		}
+		else {
+			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
 
 		if ($templated) {
 			// Check that right templated item is opened.
@@ -2826,7 +2867,13 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->selectTab($item);
 
 		// Clone item.
-		$form->query('button:Clone')->waitUntilPresent()->one()->click();
+		if ($item !== 'Discovery rule') {
+			$dialog->getFooter()->query('button:Clone')->one()->click();
+		}
+		else {
+			$form->query('button:Clone')->waitUntilPresent()->one()->click();
+		}
+
 		$form->invalidate();
 		$form->fill($cloned_values);
 
@@ -2837,7 +2884,15 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Open cloned item and check preprocessing steps in saved form.
 		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($cloned_values['Key']));
-		$this->page->open($this->ready_link.$id);
+
+		if ($item === 'Discovery rule') {
+			$this->page->open($this->ready_link.$id);
+		}
+		else {
+			$this->page->open($link);
+			$this->query('link', $cloned_values['Name'])->one()->click();
+		}
+
 		$form->invalidate();
 		$this->assertEquals($cloned_values['Name'], $form->getField('Name')->getValue());
 		$this->checkPreprocessingSteps($form, $original_steps);
