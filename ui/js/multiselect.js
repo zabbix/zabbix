@@ -434,7 +434,7 @@
 		var defaults = {
 			url: '',
 			name: '',
-			id: '',
+			multiselect_id: '',
 			object_labels: {object: '', objects: ''},
 			labels: {
 				'No matches found': t('No matches found'),
@@ -504,7 +504,7 @@
 			$obj.wrap($('<div>', {
 				'class': ZBX_STYLE_CLASS,
 				css: ms.options.styles,
-				id: ms.options.id !== '' ? ms.options.id : null
+				id: ms.options.multiselect_id !== '' ? ms.options.multiselect_id : null
 			}));
 
 			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {

@@ -238,7 +238,7 @@ $operations_popup_form_list
 		(new CMultiSelect([
 			'name' => 'optemplate[]',
 			'object_name' => 'templates',
-			'id' => 'optemplate-field',
+			'multiselect_id' => 'optemplate-field',
 			'data' => $field_values['optemplate'],
 			'disabled' => (bool) $options['templated'],
 			'popup' => [
