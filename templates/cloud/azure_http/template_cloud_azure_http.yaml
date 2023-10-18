@@ -2551,7 +2551,7 @@ zabbix_export:
           name: 'Azure MongoDB: Get data'
           type: SCRIPT
           key: azure.cosmosdb.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
