@@ -167,4 +167,16 @@
 
 	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
 })();
+
+document.querySelectorAll('[name="preprocessing_action"]').forEach((button) => button.addEventListener('click', () =>
+	document.getElementById('preprocessing').style.display = button.value == <?= ZBX_ACTION_REPLACE ?> ? '' : 'none')
+);
+
+document.querySelector('#visible_preprocessing').addEventListener('change', () => {
+	const preprocessing = document.querySelector('#preprocessing');
+
+	if (preprocessing?.querySelectorAll('li.sortable').length == 0) {
+		preprocessing.querySelector('.element-table-add')?.click();
+	}
+});
 </script>
