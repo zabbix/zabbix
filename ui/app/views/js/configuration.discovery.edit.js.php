@@ -253,7 +253,7 @@ window.drule_edit_popup = new class {
 					const list_item = document.querySelector(`${list} input[value$="${input.dcheckid}"]`)
 						?.closest('li');
 
-					if (list_item !== null) {
+					if (list_item) {
 						list_item.outerHTML = new Template(template_html).evaluate(input);
 					}
 					else {
