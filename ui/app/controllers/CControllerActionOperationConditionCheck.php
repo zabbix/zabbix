@@ -31,7 +31,7 @@ class CControllerActionOperationConditionCheck extends CController {
 			'actionid' =>		'db actions.actionid',
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 			'source' =>			'db actions.eventsource|required|in '. EVENT_SOURCE_TRIGGERS,
-			'condition_type' =>	'db opconditions.conditiontype|in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+			'condition_type' =>	'db opconditions.conditiontype|in '.ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 			'operator' =>		'db opconditions.conditiontype|in '.implode(',', [
 									CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL
 								]),

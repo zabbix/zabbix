@@ -212,7 +212,7 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger']
 			],
 			[
-				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger name']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Event name']
 			],
 			[
 				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger severity']
@@ -484,8 +484,8 @@ class testFormAction extends CLegacyWebTest {
 		]);
 
 		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
-			$this->zbxTestAssertElementText('//tr[@data-row_index="0"]//td[@class="wordwrap"]', 'Trigger name contains TEST1');
-			$this->zbxTestAssertElementText('//tr[@data-row_index="1"]//td[@class="wordwrap"]', 'Trigger name contains TEST2');
+			$this->zbxTestAssertElementText('//tr[@data-row_index="0"]//td[@class="wordwrap"]', 'Event name contains TEST1');
+			$this->zbxTestAssertElementText('//tr[@data-row_index="1"]//td[@class="wordwrap"]', 'Event name contains TEST2');
 			$this->zbxTestAssertElementPresentXpath('//tr[@data-row_index="0"]//button[@type="button" and text()="Remove"]');
 			$this->zbxTestAssertElementPresentXpath('//tr[@data-row_index="1"]//button[@type="button" and text()="Remove"]');
 		}
@@ -516,7 +516,7 @@ class testFormAction extends CLegacyWebTest {
 						'Template',
 						'Host',
 						'Trigger',
-						'Trigger name',
+						'Event name',
 						'Trigger severity',
 						'Time period',
 						'Problem is suppressed'
@@ -594,7 +594,7 @@ class testFormAction extends CLegacyWebTest {
 					'does not equal'
 				]);
 				break;
-			case 'Trigger name':
+			case 'Event name':
 			case 'Service name':
 			case 'Host name':
 			case 'Host metadata':
@@ -653,7 +653,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Service tag name':
 			case 'Service tag value':
 			case 'Service name':
-			case 'Trigger name':
+			case 'Event name':
 			case 'Time period':
 			case 'Host IP':
 			case 'Uptime/Downtime':
@@ -671,7 +671,7 @@ class testFormAction extends CLegacyWebTest {
 		switch ($new_condition_conditiontype) {
 			case 'Tag name':
 			case 'Tag value':
-			case 'Trigger name':
+			case 'Event name':
 			case 'Service tag name':
 			case 'Service tag value':
 			case 'Service name':
@@ -691,7 +691,7 @@ class testFormAction extends CLegacyWebTest {
 		switch ($new_condition_conditiontype) {
 			case 'Tag name':
 			case 'Tag value':
-			case 'Trigger name':
+			case 'Event name':
 			case 'Service tag name':
 			case 'Service tag value':
 			case 'Service name':
@@ -1223,7 +1223,7 @@ class testFormAction extends CLegacyWebTest {
 					'esc_period' => '123',
 					'conditions' => [
 						[
-							'Type' => CFormElement::RELOADABLE_FILL('Trigger name'),
+							'Type' => CFormElement::RELOADABLE_FILL('Event name'),
 							'Value' => 'trigger'
 						],
 						[
@@ -1239,7 +1239,7 @@ class testFormAction extends CLegacyWebTest {
 					'expected conditions' => [
 						'A' => 'Tag name does not contain Does not contain Tag',
 						'B' => 'Trigger severity equals Warning',
-						'C' => 'Trigger name contains trigger'
+						'C' => 'Event name contains trigger'
 					],
 					'operations' => [
 						[
@@ -1589,12 +1589,12 @@ class testFormAction extends CLegacyWebTest {
 		// adding conditions
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@class, "condition-create")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
-		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger name');
+		$this->zbxTestDropdownSelectWait('condition_type', 'Event name');
 		$this->zbxTestInputTypeWait('value', 'trigger');
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$condition_form = $this->query('id:popup.condition')->asForm()->one();
 		$condition_form->submit();
-		$this->zbxTestAssertElementText('//tr[@data-row_index="0"]//td[@class="wordwrap"]', 'Trigger name contains trigger');
+		$this->zbxTestAssertElementText('//tr[@data-row_index="0"]//td[@class="wordwrap"]', 'Event name contains trigger');
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@class, "condition-create")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
