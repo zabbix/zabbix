@@ -2153,17 +2153,17 @@ abstract class CItemGeneral extends CApiService {
 				' ORDER BY itemid,type,sortorder'
 			);
 
-			$fields = array_flip(['name', 'value']);
+			$output = array_flip(['name', 'value']);
 			$type_map = array_flip(self::HTTP_FIELD_TYPES);
 
 			while ($db_field = DBfetch($db_fields)) {
 				$field_type = $type_map[$db_field['type']];
 
 				if ($field_type === 'headers') {
-					$result[$db_field['itemid']]['headers'][] = array_intersect_key($db_field, $fields);
+					$result[$db_field['itemid']]['headers'][] = array_intersect_key($db_field, $output);
 				}
 				elseif ($field_type === 'query_fields') {
-					$result[$db_field['itemid']]['query_fields'][] = array_intersect_key($db_field, $fields);
+					$result[$db_field['itemid']]['query_fields'][] = array_intersect_key($db_field, $output);
 				}
 			}
 		}
@@ -2917,7 +2917,8 @@ abstract class CItemGeneral extends CApiService {
 			'filter' => [
 				'itemid' => array_keys($itemids),
 				'type' => array_intersect_key(self::HTTP_FIELD_TYPES, $field_types)
-			]
+			],
+			'sortfield' => ['sortorder']
 		];
 		$db_fields = DBselect(DB::makeSql('item_field', $options));
 

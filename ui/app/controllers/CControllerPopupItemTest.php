@@ -860,8 +860,8 @@ abstract class CControllerPopupItemTest extends CController {
 
 				unset($data['interface']['type']);
 			}
-			elseif ($key === 'query_fields') {
-				if ($value === '[]') {
+			elseif ($key === 'query_fields' || $key === 'headers') {
+				if (!$value) {
 					unset($data[$key]);
 				}
 			}
@@ -932,29 +932,6 @@ abstract class CControllerPopupItemTest extends CController {
 	}
 
 	/**
-	 * Transform front-end familiar array of http query fields to the form server is capable to handle.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return string
-	 */
-	protected function transformQueryFields(array $data) {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result[] = [$data['name'][$num] => $data['value'][$num]];
-				}
-			}
-		}
-
-		return json_encode($result);
-	}
-
-	/**
 	 * Transform front-end familiar array of parameters fields to the form server is capable to handle. Server expects
 	 * one object where parameter names are keys and parameter values are values. Note that parameter names are unique.
 	 *
@@ -976,29 +953,6 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Transform front-end familiar array of http header fields to the form server is capable to handle.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return string
-	 */
-	protected function transformHeaderFields(array $data) {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result[] = $data['name'][$num].': '.$data['value'][$num];
-				}
-			}
-		}
-
-		return implode("\r\n", $result);
 	}
 
 	/**

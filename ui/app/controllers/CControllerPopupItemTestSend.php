@@ -327,14 +327,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'item_type' => 'type'
 			]);
 
-			if (array_key_exists('headers', $item_test_data)) {
-				$item_test_data['headers'] = $this->transformHeaderFields($item_test_data['headers']);
-			}
-
-			if (array_key_exists('query_fields', $item_test_data)) {
-				$item_test_data['query_fields'] = $this->transformQueryFields($item_test_data['query_fields']);
-			}
-
 			if (array_key_exists('parameters', $item_test_data)) {
 				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
 			}

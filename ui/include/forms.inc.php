@@ -66,7 +66,7 @@ function getItemFormData(array $item = []) {
 		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT),
 		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 		'url' => getRequest('url'),
-		'query_fields' => prepareItemQueryFields(getRequest('query_fields', [])),
+		'query_fields' => [],
 		'parameters' => getRequest('parameters', []),
 		'posts' => getRequest('posts'),
 		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
@@ -75,7 +75,7 @@ function getItemFormData(array $item = []) {
 			: getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'http_proxy' => getRequest('http_proxy'),
-		'headers' => prepareItemHeaders(getRequest('headers', [])),
+		'headers' => [],
 		'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
 		'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
 		'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
@@ -93,6 +93,7 @@ function getItemFormData(array $item = []) {
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'tags' => getRequest('tags', []),
+		'parameters' => [],
 		'backurl' => getRequest('backurl')
 	];
 
@@ -121,7 +122,8 @@ function getItemFormData(array $item = []) {
 	}
 
 	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
-		$data['parameters'] = [];
+		$data['headers'] = prepareItemHeaders(getRequest('headers', []));
+		$data['query_fields'] = prepareItemQueryFields(getRequest('query_fields', []));
 	}
 	elseif ($data['type'] == ITEM_TYPE_SCRIPT) {
 		$values = [];
@@ -137,15 +139,8 @@ function getItemFormData(array $item = []) {
 				}
 			}
 		}
-		$data['parameters'] = $values;
 
-		$data['headers'] = [];
-		$data['query_fields'] = [];
-	}
-	else {
-		$data['headers'] = [];
-		$data['query_fields'] = [];
-		$data['parameters'] = [];
+		$data['parameters'] = $values;
 	}
 
 	// Dependent item initialization by master_itemid.
