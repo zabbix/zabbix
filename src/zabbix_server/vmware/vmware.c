@@ -5550,12 +5550,13 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		/* validate that last event from "latestPage" is connected with first event from ReadPreviousEvents */
 		if (0 != events->values_num && LAST_KEY(events) != ids.values[ids.values_num -1].id + 1)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d id gap:%d", __func__,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d id gap:%d severity:%d", __func__,
 					events->values_num, is_clear,
-					(int)(LAST_KEY(events) - (ids.values[ids.values_num -1].id + 1)));
+					(int)(LAST_KEY(events) - (ids.values[ids.values_num -1].id + 1)), (int)severity);
 
 			/* if sequence of events is not continuous, ignore events from "latestPage" property */
-			if (0 != is_clear)
+			/* except when we do not query all events by severity filter */
+			if (0 != is_clear && 0 == severity)
 				zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
 		}
 
@@ -5572,8 +5573,8 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	}
 	else if (0 != last_key && 0 != events->values_num && LAST_KEY(events) != last_key + 1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d last_key id gap:%d", __func__,
-				events->values_num, is_clear, (int)(LAST_KEY(events) - (last_key + 1)));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d last_key id gap:%d severity:%d", __func__,
+				events->values_num, is_clear, (int)(LAST_KEY(events) - (last_key + 1)), (int)severity);
 
 		/* if sequence of events is not continuous, ignore events from "latestPage" property */
 		/* except when we do not query all events by severity filter */
