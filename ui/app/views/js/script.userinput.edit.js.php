@@ -26,6 +26,14 @@
 
 window.script_userinput_popup = new class {
 
+	/**
+	 * Manualinput form setup.
+	 *
+	 * @param {boolean} test             Indicator if this is test form.
+	 * @param {int}     input_type       Manualinput type.
+	 * @param {string}  default_input    Manualinput default value.
+	 * @param {string}  input_validator  Manualinput validator value.
+	 */
 	init({test, input_type, default_input, input_validator}) {
 		this.overlay = overlays_stack.getById('script-userinput-form');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -35,14 +43,15 @@ window.script_userinput_popup = new class {
 		this.input_validator = input_validator;
 		this.default_input = default_input;
 
-		if (input_type == <?= SCRIPT_MANUALINPUT_TYPE_LIST ?> && test) {
+		if (input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_LIST ?> && test) {
 			document.querySelector('.userinput-submit').disabled = true;
 		}
 	}
 
-	test() {
+	submitTestForm() {
 		const curl = new Curl('zabbix.php');
 		const fields = getFormFields(this.form);
+
 		fields.manualinput_validator_type = this.input_type;
 		fields.input_validator = this.input_validator;
 		fields.manualinput_default_value = this.default_input;
@@ -59,6 +68,7 @@ window.script_userinput_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
+
 		fields.manualinput_validator_type = this.input_type;
 		fields.input_validator = this.input_validator;
 		fields.manualinput_default_value = this.default_input;
@@ -79,6 +89,7 @@ window.script_userinput_popup = new class {
 			.then((response) => response.json())
 			.then((response) => {
 				let messages;
+
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -92,6 +103,7 @@ window.script_userinput_popup = new class {
 					messages = response.success.messages;
 
 					const message_box = makeMessageBox('good', messages)[0];
+
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else if ('data' in response) {
@@ -117,10 +129,9 @@ window.script_userinput_popup = new class {
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
+
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
 }

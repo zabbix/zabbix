@@ -94,7 +94,7 @@ class CControllerScriptEdit extends CController {
 			'actions' => [],
 			'manualinput' => false,
 			'manualinput_prompt' => '',
-			'manualinput_validator_type' => SCRIPT_MANUALINPUT_TYPE_STRING,
+			'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 			'manualinput_validator' => '',
 			'manualinput_default_value' => ''
 		];

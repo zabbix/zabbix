@@ -51,9 +51,9 @@ class CControllerScriptCreate extends CController {
 			'groupid' =>					'db scripts.groupid',
 			'usrgrpid' =>					'db scripts.usrgrpid',
 			'hgstype' =>					'in 0,1',
-			'manualinput' =>				'db scripts.manualinput|in '.SCRIPT_MANUALINPUT_ENABLED,
+			'manualinput' =>				'db scripts.manualinput|in '.ZBX_SCRIPT_MANUALINPUT_ENABLED,
 			'manualinput_prompt' =>			'db scripts.manualinput_prompt',
-			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_STRING, SCRIPT_MANUALINPUT_TYPE_LIST]),
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]),
 			'manualinput_default_value' =>	'db scripts.manualinput_default_value|string',
 			'manualinput_validator' =>		'db scripts.manualinput_validator',
 			'dropdown_options' =>			'db scripts.manualinput_validator',
@@ -66,20 +66,20 @@ class CControllerScriptCreate extends CController {
 		if ($ret) {
 			if ($this->getInput('scope') != ZBX_SCRIPT_SCOPE_ACTION && $this->hasInput('manualinput')) {
 				if ($this->getInput('manualinput_prompt', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_prompt', _('cannot be empty')));
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_prompt', _('cannot be empty')));
 
 					$ret = false;
 				}
 
-				if ($this->getInput('manualinput_validator_type') == SCRIPT_MANUALINPUT_TYPE_LIST
+				if ($this->getInput('manualinput_validator_type') == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
 						&& $this->getInput('dropdown_options', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
 
 					$ret = false;
 				}
-				elseif ($this->getInput('manualinput_validator_type') == SCRIPT_MANUALINPUT_TYPE_STRING
+				elseif ($this->getInput('manualinput_validator_type') == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
 						&& $this->getInput('manualinput_validator', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
 
 					$ret = false;
 				}
@@ -121,14 +121,14 @@ class CControllerScriptCreate extends CController {
 			$script['usrgrpid'] = $this->getInput('usrgrpid', 0);
 
 			$script['manualinput'] = $this->hasInput('manualinput')
-				? SCRIPT_MANUALINPUT_ENABLED
-				: SCRIPT_MANUALINPUT_DISABLED;
+				? ZBX_SCRIPT_MANUALINPUT_ENABLED
+				: ZBX_SCRIPT_MANUALINPUT_DISABLED;
 
-			if ($script['manualinput']) {
+			if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');
 				$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
 
-				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 					$script['manualinput_validator'] = $this->getInput('dropdown_options', []);
 				}
 				else {

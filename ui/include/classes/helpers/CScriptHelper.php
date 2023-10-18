@@ -22,9 +22,9 @@
 class CScriptHelper {
 
 	public static function validateManualInput(array &$script): bool {
-		if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+		if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 			// Check if values are unique.
-			$user_input_values = array_map('trim', explode(",", $script['manualinput_validator']));
+			$user_input_values = array_map('trim', explode(',', $script['manualinput_validator']));
 
 			if (array_unique($user_input_values) !== $user_input_values) {
 				error(_('Dropdown options must be unique.'));
@@ -35,11 +35,9 @@ class CScriptHelper {
 			// Check if provided manualinput value is one of dropdown values when executing the script.
 			if (array_key_exists('provided_manualinput', $script)
 					&& !in_array($script['provided_manualinput'], $user_input_values, true)) {
-				error(
-					_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
-						_s('value must be one of: %1$s', implode(', ', explode(",", $script['manualinput_validator'])))
-					)
-				);
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
+					_s('value must be one of %1$s', $script['manualinput_validator'])
+				));
 			}
 		}
 		else {
@@ -49,18 +47,14 @@ class CScriptHelper {
 			$regex_validator = new CRegexValidator();
 
 			if (!$regex_validator->validate($input_validation)) {
-				error(
-					_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'),
-						_('invalid regular expression')
-					)
-				);
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'),
+					_('invalid regular expression')
+				));
 			}
 			elseif (!preg_match($regular_expression, $default_input)) {
-				error(
-					_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
-						_s('input does not match the provided pattern: %1$s', $input_validation)
-					)
-				);
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
+					_s('input does not match the provided pattern: %1$s', $input_validation)
+				));
 			}
 
 			$script['manualinput_default_value'] = $default_input;

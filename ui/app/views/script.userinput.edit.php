@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setId('script-userinput-form')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if ($data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+if ($data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 	$form
 		->addItem(
 			(new CSpan($data['manualinput_prompt']))
@@ -58,13 +58,13 @@ else {
 		);
 }
 
-if($data['test']) {
+if ($data['test']) {
 	$buttons = [
 		[
 			'title' => _('Test'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'script_userinput_popup.test();',
+			'action' => 'script_userinput_popup.submitTestForm();',
 			'class' => 'userinput-submit'
 		]
 	];

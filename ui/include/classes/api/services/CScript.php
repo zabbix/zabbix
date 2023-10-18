@@ -616,15 +616,15 @@ class CScript extends CApiService {
 			}
 
 			if ($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
-				if ($script['manualinput'] == SCRIPT_MANUALINPUT_DISABLED) {
+				if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_DISABLED) {
 					$script['manualinput_prompt'] = DB::getDefault('scripts', 'manualinput_prompt');
 					$script['manualinput_validator_type'] = DB::getDefault('scripts', 'manualinput_validator_type');
 					$script['manualinput_validator'] = DB::getDefault('scripts', 'manualinput_validator');
 					$script['manualinput_default_value'] = DB::getDefault('scripts', 'manualinput_default_value');
 				}
 
-				if ($script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED
-						&& $script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+				if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED
+						&& $script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 					$script['manualinput_default_value'] = DB::getDefault('scripts', 'manualinput_default_value');
 				}
 			}
@@ -652,7 +652,7 @@ class CScript extends CApiService {
 					: DB::getDefault('scripts', 'manualinput');
 			}
 
-			if ($script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED) {
+			if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 				if (!array_key_exists('manualinput_prompt', $script)) {
 					$script['manualinput_prompt'] = $db_script
 						? $db_script['manualinput_prompt']
@@ -664,8 +664,8 @@ class CScript extends CApiService {
 						? $db_script['manualinput_validator_type']
 						: DB::getDefault('scripts', 'manualinput_validator_type');
 				}
-				if (($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_STRING
-						|| $script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST)
+				if (($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
+						|| $script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST)
 						&& !array_key_exists('manualinput_validator', $script)) {
 					$script['manualinput_validator'] = $db_script
 						? $db_script['manualinput_validator']
@@ -673,7 +673,7 @@ class CScript extends CApiService {
 				}
 
 				$regex_validator = new CRegexValidator();
-				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_STRING) {
+				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
 					$default_input = trim($script['manualinput_default_value']);
 					$regular_expression = '/' . str_replace('/', '\/', $script['manualinput_validator']) . '/';
 
@@ -688,7 +688,7 @@ class CScript extends CApiService {
 
 					$script['manualinput_default_value'] = $default_input;
 				}
-				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 					$manualinput_validator = array_map('trim', explode(",", $script['manualinput_validator']));
 
 					if (array_unique($manualinput_validator) !== $manualinput_validator) {
@@ -786,23 +786,23 @@ class CScript extends CApiService {
 				'usrgrpid' =>		['type' => API_ID],
 				'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
 				'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
-				'manualinput' =>	['type' => API_INT32, 'in' => implode(',', [SCRIPT_MANUALINPUT_DISABLED, SCRIPT_MANUALINPUT_ENABLED])]
+				'manualinput' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED])]
 			];
 
-			if ($script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED) {
+			if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 				$common_fields += [
 					'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
-					'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING])],
+					'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST, ZBX_SCRIPT_MANUALINPUT_TYPE_STRING])],
 				];
 
-				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_STRING) {
+				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
 					$common_fields += [
 						'manualinput_validator' =>		['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
 						'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
 					];
 				}
 
-				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 					$common_fields += [
 						'manualinput_validator' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
 					];

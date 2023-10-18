@@ -107,9 +107,7 @@ window.script_edit_popup = new class {
 		this.form.querySelector('#enable_confirmation').onchange = (e) => this.#loadConfirmationFields(e);
 
 		// Test user input button.
-		this.form.querySelector('#test_user_input').addEventListener('click', () =>
-			this.#openTestPopup()
-		);
+		this.form.querySelector('#test_user_input').addEventListener('click', () => this.#openManualinputTestPopup());
 
 		// Test confirmation button.
 		this.form.querySelector('#test-confirmation').addEventListener('click', (e) =>
@@ -127,12 +125,12 @@ window.script_edit_popup = new class {
 		this.overlay.recoverFocus();
 	}
 
-	#openTestPopup() {
-		const input_validation = this.input_type == <?= SCRIPT_MANUALINPUT_TYPE_STRING ?>
+	#openManualinputTestPopup() {
+		const input_validation = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
 			? this.form.querySelector('#manualinput_validator').value
 			: this.form.querySelector('#dropdown_options').value;
 
-		const default_input = this.input_type == <?= SCRIPT_MANUALINPUT_TYPE_STRING ?>
+		const default_input = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
 			? this.form.querySelector('#manualinput_default_value').value
 			: '';
 
@@ -436,30 +434,21 @@ window.script_edit_popup = new class {
 		const default_input = this.form.querySelector('#manualinput_default_value');
 		const input_validation = this.form.querySelector('#manualinput_validator');
 		const dropdown_options = this.form.querySelector('#dropdown_options');
+
 		this.input_type = this.form.querySelector('input[name="manualinput_validator_type"]:checked').value;
 
+		const elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
+
+		elements.forEach(element => element.disabled = !this.user_input_checked);
+		input_type.querySelectorAll('input').forEach((element) => element.disabled = !this.user_input_checked);
+
 		if (this.user_input_checked) {
-			// Add asterisk mark to Input prompt field:
-			$('label[for=manualinput_prompt]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-
-			const enable_elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
-
-			enable_elements.forEach(element => element.disabled = false);
-
-			input_type.querySelectorAll('input').forEach(function(element) {
-				element.disabled = false;
-			});
+			document.querySelector('label[for="manualinput_prompt"]').classList
+				.add(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 		}
 		else {
-			$('label[for=manualinput_prompt]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-
-			const disable_elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
-
-			disable_elements.forEach(element => element.disabled = true);
-
-			input_type.querySelectorAll('input').forEach(function(element) {
-				element.disabled = true;
-			});
+			document.querySelector('label[for="manualinput_prompt"]').classList
+				.remove(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 		}
 
 		input_type.onchange = (e) => {
@@ -467,70 +456,52 @@ window.script_edit_popup = new class {
 				this.input_type = e.target.value;
 			}
 
-			if (this.input_type == <?= SCRIPT_MANUALINPUT_TYPE_STRING ?>) {
-				this.form.querySelector('#default-input-label').style.display = '';
-				this.form.querySelector('#default-input-field').style.display = '';
-
-				this.form.querySelector('#input-validation-label').style.display = '';
-				this.form.querySelector('#input-validation-field').style.display = '';
-
-				this.form.querySelector('#dropdown-options-label').style.display = 'none';
-				this.form.querySelector('#dropdown-options-field').style.display = 'none';
-
-				if (this.user_input_checked) {
-					$('label[for=manualinput_validator]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-				}
-				else {
-					$('label[for=manualinput_validator]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-				}
-
-				const updateTestUserInput = () => {
-					test_user_input.disabled = !(
-						input_prompt.value.trim() !== '' && input_validation.value.trim() !== ''
-							&& this.user_input_checked
-					);
-				};
-
-				input_prompt.onkeyup = updateTestUserInput;
-				input_validation.onkeyup = updateTestUserInput;
-
-				input_prompt.dispatchEvent(new Event('keyup'));
-				input_validation.dispatchEvent(new Event('keyup'));
+			if (this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>) {
+				this.#updateManualinputFields(test_user_input, input_prompt, input_validation, this.input_type);
 			}
 			else {
-				this.form.querySelector('#default-input-label').style.display = 'none';
-				this.form.querySelector('#default-input-field').style.display = 'none';
-
-				this.form.querySelector('#input-validation-label').style.display = 'none';
-				this.form.querySelector('#input-validation-field').style.display = 'none';
-
-				this.form.querySelector('#dropdown-options-label').style.display = '';
-				this.form.querySelector('#dropdown-options-field').style.display = '';
 				dropdown_options.disabled = !this.user_input_checked;
 
-				if (this.user_input_checked) {
-					$('label[for=dropdown_options]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-				}
-				else {
-					$('label[for=dropdown_options]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-				}
-
-				const updateTestUserInput = () => {
-					test_user_input.disabled = !(
-						input_prompt.value.trim() !== '' && dropdown_options.value.trim() !== ''
-							&& this.user_input_checked
-					);
-				};
-
-				input_prompt.onkeyup = updateTestUserInput;
-				dropdown_options.onkeyup = updateTestUserInput;
-
-				input_prompt.dispatchEvent(new Event('keyup'));
-				dropdown_options.dispatchEvent(new Event('keyup'));
+				this.#updateManualinputFields(test_user_input, input_prompt, dropdown_options, this.input_type);
 			}
 		}
 
 		this.form.querySelector('#manualinput_validator_type').dispatchEvent(new Event('change'));
+	}
+
+	#updateManualinputFields(test_user_input, input_prompt, validator) {
+		const input_type_string = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
+
+		this.form.querySelector('#default-input-label').style.display = input_type_string ? '' : 'none';
+		this.form.querySelector('#default-input-field').style.display = input_type_string ? '' : 'none';
+
+		this.form.querySelector('#input-validation-label').style.display = input_type_string ? '' : 'none';
+		this.form.querySelector('#input-validation-field').style.display = input_type_string ? '' : 'none';
+
+		this.form.querySelector('#dropdown-options-label').style.display = input_type_string ? 'none' : '';
+		this.form.querySelector('#dropdown-options-field').style.display = input_type_string ? 'none' : '';
+
+		if (this.user_input_checked) {
+			document.querySelector(`label[for="${validator.name}"]`).classList
+				.add(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+		}
+		else {
+			document.querySelector(`label[for="${validator.name}"]`).classList
+				.remove(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+		}
+
+		const updateTestUserInput = () => {
+			test_user_input.disabled = !(
+				input_prompt.value.trim() !== '' && validator.value.trim() !== ''
+				&& this.user_input_checked
+			);
+		};
+
+		input_prompt.onkeyup = updateTestUserInput;
+		validator.onkeyup = updateTestUserInput;
+
+		input_prompt.dispatchEvent(new Event('keyup'));
+		validator.dispatchEvent(new Event('keyup'));
 	}
 
 	/**
@@ -548,7 +519,9 @@ window.script_edit_popup = new class {
 		const test_confirmation = this.form.querySelector('#test-confirmation');
 
 		if (this.confirmation) {
-			$('label[for=confirmation]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+			document.querySelector('label[for="confirmation"]').classList
+				.add(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+
 			confirmation.removeAttribute('disabled');
 
 			confirmation.onkeyup = () => confirmation.value !== ''
@@ -558,7 +531,8 @@ window.script_edit_popup = new class {
 			confirmation.dispatchEvent(new Event('keyup'));
 		}
 		else {
-			$('label[for=confirmation]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+			document.querySelector('label[for="confirmation"]').classList
+				.remove(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 			confirmation.setAttribute('disabled', 'disabled');
 			test_confirmation.setAttribute('disabled', 'disabled');
 		}

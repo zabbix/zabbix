@@ -29,7 +29,7 @@ class CControllerScriptUserInputCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'manualinput' =>				'required|string',
-			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST, ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]),
 			'input_validator' =>			'db scripts.manualinput_validator|required|string',
 			'test' =>						'in 1'
 		];
@@ -60,7 +60,7 @@ class CControllerScriptUserInputCheck extends CController {
 		$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
 		$script['manualinput_validator'] = $this->getInput('input_validator');
 
-		if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
+		if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 			$script['provided_manualinput'] = $manualinput;
 		}
 		else {
@@ -71,7 +71,7 @@ class CControllerScriptUserInputCheck extends CController {
 
 		if ($result) {
 			if ($this->hasInput('test')) {
-				$output['success']['messages'] = ['User input has been successfully tested.'];
+				$output['success']['messages'] = [_('User input has been successfully tested.')];
 				$output['success']['test'] = true;
 			}
 			else {

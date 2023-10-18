@@ -29,7 +29,7 @@ class CControllerScriptUserInputEdit extends CController {
 		$fields = [
 			'manualinput_prompt' =>			'db scripts.manualinput_prompt|required|not_empty',
 			'manualinput_default_value' =>	'db scripts.manualinput_default_value|string',
-			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST, ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]),
 			'manualinput_validator' =>		'db scripts.manualinput_validator',
 			'test' =>						'in 1',
 			'confirmation' =>				'db scripts.confirmation'
@@ -62,11 +62,11 @@ class CControllerScriptUserInputEdit extends CController {
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'test' => $this->hasInput('test'),
 			'manualinput_validator_type' => $this->getInput('manualinput_validator_type'),
-			'confirmation' => $this->hasInput('confirmation') && strlen($this->getInput('confirmation')) > 0
+			'confirmation' => $this->hasInput('confirmation') && $this->getInput('confirmation') !== ''
 		];
 
-		if ($data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
-			$dropdown_values = explode(",", $this->getInput('manualinput_validator'));
+		if ($data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
+			$dropdown_values = explode(',', $this->getInput('manualinput_validator'));
 
 			foreach ($dropdown_values as $value) {
 				$data['dropdown_options'][$value] = $value;

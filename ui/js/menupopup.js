@@ -1535,14 +1535,12 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 				item.target = data.params.target;
 				item.rel = data.params.rel;
 
-				if (data.params.manualinput == 1) {
-					item.clickCallback = () => {
-						openManualinputDialogue(item, data)
-					}
+				if (data.params.manualinput === '1') {
+					item.clickCallback = () => openManualinputDialogue(item, data);
 				}
 
 				if (data.params.manualinput == 0 && data.params.confirmation !== '') {
-					item.url = data.params.url
+					item.url = data.params.url;
 
 					item.clickCallback = function() {
 						return confirm(data.params.confirmation);
@@ -1560,15 +1558,15 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 /**
  * Open manualinput popup before redirecting user to provided URL or before displaying confirmation dialogue.
  *
- * @param {object}  item  Item object.
- * @param {object}  data  Data object.
+ * @param {object} item  Item object.
+ * @param {object} data  Data object.
  */
 function openManualinputDialogue(item, data) {
 	const parameters = {
-		input_prompt: data.params.manualinput_prompt,
-		default_input: data.params.manualinput_default_value,
-		input_type: data.params.manualinput_validator_type,
-		input_validation: data.params.manualinput_validator,
+		manualinput_prompt: data.params.manualinput_prompt,
+		manualinput_default_value: data.params.manualinput_default_value,
+		manualinput_validator_type: data.params.manualinput_validator_type,
+		manualinput_validator: data.params.manualinput_validator,
 		confirmation: data.params.confirmation
 	};
 
@@ -1577,30 +1575,22 @@ function openManualinputDialogue(item, data) {
 		dialogue_class: 'modal-popup-small position-middle'
 	});
 
-	if (data.params.confirmation === '') {
-		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			item.url = data.params.url.replace(/{MANUALINPUT}/g,
-				e.detail.data.manualinput
-			);
+	overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+		if (data.params.confirmation === '') {
+			item.url = data.params.url.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
 
 			window.open(item.url, '_blank');
-		});
-	}
-	else {
-		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			item.url = data.params.url.replace(/{MANUALINPUT}/g,
-				e.detail.data.manualinput
-			);
+		}
+		else {
+			item.url = data.params.url.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
 
-			let confirmation_message = data.params.confirmation.replace(/{MANUALINPUT}/g,
-				e.detail.data.manualinput
-			);
+			let confirmation_message = data.params.confirmation.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
 
 			if (confirm(confirmation_message)) {
 				window.open(item.url, '_blank');
 			}
-		});
-	}
+		}
+	});
 }
 
 /**
@@ -1619,11 +1609,11 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 		Object.values(tree).map((data) => {
 			const item = {label: data.name};
 
-			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
+			if (data.items !== undefined && objectSize(data.items) > 0) {
 				item.items = getMenuPopupScriptItems(data.items, trigger_elm, csrf_token);
 			}
 
-			if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
+			if (data.params !== undefined && data.params.scriptid !== undefined) {
 				item.clickCallback = function(e) {
 					jQuery(this)
 						.closest('.menu-popup-top')

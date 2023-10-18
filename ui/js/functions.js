@@ -518,23 +518,22 @@ function overlayDialogue(params, trigger_elmnt) {
 /**
  * Execute script.
  *
- * @param string  scriptid                  Script ID.
- * @param string  confirmation              Confirmation text.
- * @param {Node}  trigger_element           UI element that was clicked to open overlay dialogue.
- * @param string  hostid                    Host ID.
- * @param string  eventid                   Event ID.
- * @param string  csrf_token                CSRF token.
- * @param string|null  manualinput          Manual input enabled/disabled or null.
- * @param string  manualinput_prompt        Manual input prompt text.
- * @param int manualinput_validator_tpye    Manual input type - 0(string) or 1 (dropdown).
- * @param string manualinput_validator      Validation rule - regular expression or list of allowed values.
- * @param string manualinput_default_value  Default value of manual input.
+ * @param {string}      scriptid                    Script ID.
+ * @param {string}      confirmation                Confirmation text.
+ * @param {Node}        trigger_element             UI element that was clicked to open overlay dialogue.
+ * @param {string}      hostid                      Host ID.
+ * @param {string}      eventid                     Event ID.
+ * @param {string}      csrf_token                  CSRF token.
+ * @param {string|null} manualinput                 Manual input enabled/disabled or null.
+ * @param {string}      manualinput_prompt          Manual input prompt text.
+ * @param {int}         manualinput_validator_type  Manual input type - 0 (string) or 1 (dropdown).
+ * @param {string}      manualinput_validator       Validation rule - regular expression or list of allowed values.
+ * @param {string}      manualinput_default_value   Default value of manual input.
  */
 function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token,
 		manualinput = null, manualinput_prompt, manualinput_validator_type, manualinput_validator,
 		manualinput_default_value) {
-
-	if (manualinput == 1) {
+	if (manualinput === '1') {
 		const parameters = {
 			manualinput_prompt: manualinput_prompt,
 			manualinput_default_value: manualinput_default_value,
@@ -571,12 +570,12 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 /**
  * Execute script.
  *
- * @param string  scriptid          Script ID.
- * @param string  eventid           Event ID.
- * @param string  hostid            Host ID.
- * @param string|null  manualinput  Manual input value.
- * @param string  csrf_token        CSRF token.
- * @param {Node}  trigger_element   UI element that was clicked to open overlay dialogue.
+ * @param {string}      scriptid         Script ID.
+ * @param {string|null} eventid          Event ID.
+ * @param {string|null} hostid           Host ID.
+ * @param {string|null} manualinput      Manual input value.
+ * @param {string}      csrf_token       CSRF token.
+ * @param {Node}        trigger_element  UI element that was clicked to open overlay dialogue.
  */
 function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element) {
 	var popup_options = {scriptid: scriptid};
@@ -593,7 +592,7 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
 		popup_options.manualinput = manualinput;
 	}
 
-	if (Object.keys(popup_options).length === 2 ||
+	if (Object.keys(popup_options).length == 2 ||
 		(manualinput !== null && Object.keys(popup_options).length === 3)) {
 		popup_options._csrf_token = csrf_token;
 
@@ -604,12 +603,13 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
 /**
  * Display script execution confirmation dialogue.
  *
- * @param string  confirmation     Confirmation text.
- * @param string  hostid           Host ID.
- * @param string  eventid          Event ID.
- * @param {Node}  trigger_element  UI element that was clicked to open overlay dialogue.
- * @param string  scriptid         Script ID.
- * @param string  csrf_token       CSRF token.
+ * @param {string}      confirmation     Confirmation text.
+ * @param {string|null} hostid           Host ID.
+ * @param {string|null} eventid          Event ID.
+ * @param {Node}        trigger_element  UI element that was clicked to open overlay dialogue.
+ * @param {string}      scriptid         Script ID.
+ * @param {string}      csrf_token       CSRF token.
+ * @param {string|null} manualinput      Manualinput value.
  */
 function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
 		manualinput = null) {
@@ -624,13 +624,13 @@ function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element
 				'title': t('Cancel'),
 				'class': 'btn-alt',
 				'focused': (hostid === null && eventid === null),
-				'action': function() {}
+				'action': () => {}
 			},
 			{
 				'title': t('Execute'),
 				'enabled': (hostid !== null || eventid !== null),
 				'focused': (hostid !== null || eventid !== null),
-				'action': function() {
+				'action': () => {
 					execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element);
 				}
 			}

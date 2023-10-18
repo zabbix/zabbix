@@ -147,6 +147,7 @@ class CZabbixServer {
 	 * @param string      $sid
 	 * @param null|string $hostid
 	 * @param null|string $eventid
+	 * @param null|string $manualinput
 	 *
 	 * @return bool|array
 	 */

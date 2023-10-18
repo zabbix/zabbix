@@ -282,11 +282,11 @@ $select_hgstype = (new CSelect('hgstype'))
 	->addOption(new CSelectOption(0, _('All')))
 	->addOption(new CSelectOption(1, _('Selected')));
 
-$validation_rule = $data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_STRING
+$validation_rule = $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
 	? $data['manualinput_validator']
 	: '';
 
-$dropdown_options = $data['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST
+$dropdown_options = $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
 	? $data['manualinput_validator']
 	: '';
 
@@ -349,8 +349,8 @@ $form_grid
 			(new CLabel(_('Input type'), 'manualinput_validator_type')),
 			new CFormField(
 				(new CRadioButtonList('manualinput_validator_type', (int) $data['manualinput_validator_type']))
-					->addValue(_('String'), SCRIPT_MANUALINPUT_TYPE_STRING)
-					->addValue(_('Dropdown'), SCRIPT_MANUALINPUT_TYPE_LIST)
+					->addValue(_('String'), ZBX_SCRIPT_MANUALINPUT_TYPE_STRING)
+					->addValue(_('Dropdown'), ZBX_SCRIPT_MANUALINPUT_TYPE_LIST)
 					->setModern()
 			)
 		])

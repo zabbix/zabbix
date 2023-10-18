@@ -370,7 +370,7 @@ function PopUp(action, parameters, {
 						buttons.push({
 							'title': t('Ok'),
 							'cancel': true,
-							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+							'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
 						});
 						break;
 
@@ -379,7 +379,7 @@ function PopUp(action, parameters, {
 							'title': t('Cancel'),
 							'class': 'btn-alt js-cancel',
 							'cancel': true,
-							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+							'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
 						});
 						break;
 
@@ -388,7 +388,7 @@ function PopUp(action, parameters, {
 							'title': t('Cancel'),
 							'class': 'btn-alt js-cancel',
 							'cancel': true,
-							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+							'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
 						});
 				}
 
