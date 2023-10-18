@@ -279,6 +279,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 		size_t		value_offset = 0;
 		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN];
+		int		snmp_legacy = 1;
 
 		switch (dcheck->type)
 		{
@@ -311,7 +312,14 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
-				item.key = item.key_orig;
+
+				if (0 == strncmp(dcheck->key_, "walk[", ZBX_CONST_STRLEN("walk[")) ||
+					0 == strncmp(dcheck->key_, "get[", ZBX_CONST_STRLEN("get[")))
+				{
+					snmp_legacy = 0;
+				}
+				else
+					item.key = item.key_orig;
 
 				item.interface.useip = 1;
 				item.interface.addr = ip;
@@ -354,19 +362,44 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				else
 #ifdef HAVE_NETSNMP
 				{
-					item.snmp_community = dcheck->snmp_community;
-					item.snmp_oid = dcheck->key_;
+					if (0 == snmp_legacy)
+					{
+						item.key = zbx_strdup(NULL, item.key_orig);
+						item.snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
+						item.snmp_oid = zbx_strdup(NULL, dcheck->key_);
+					}
+					else
+					{
+						item.snmp_community = dcheck->snmp_community;
+						item.snmp_oid = dcheck->key_;
+					}
+
 					item.timeout = dcheck->timeout;
 
 					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
-						item.snmpv3_securityname = dcheck->snmpv3_securityname;
+						if (0 == snmp_legacy)
+						{
+							item.snmpv3_securityname = zbx_strdup(NULL,
+									dcheck->snmpv3_securityname);
+							item.snmpv3_authpassphrase = zbx_strdup(NULL,
+									dcheck->snmpv3_authpassphrase);
+							item.snmpv3_privpassphrase = zbx_strdup(NULL,
+									dcheck->snmpv3_privpassphrase);
+							item.snmpv3_contextname = zbx_strdup(NULL,
+									dcheck->snmpv3_contextname);
+						}
+						else
+						{
+							item.snmpv3_securityname = dcheck->snmpv3_securityname;
+							item.snmpv3_authpassphrase = dcheck->snmpv3_authpassphrase;
+							item.snmpv3_privpassphrase = dcheck->snmpv3_privpassphrase;
+							item.snmpv3_contextname = dcheck->snmpv3_contextname;
+						}
+
 						item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-						item.snmpv3_authpassphrase = dcheck->snmpv3_authpassphrase;
-						item.snmpv3_privpassphrase = dcheck->snmpv3_privpassphrase;
 						item.snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
-						item.snmpv3_contextname = dcheck->snmpv3_contextname;
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER,
@@ -376,6 +409,9 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 					}
 					else
 						ret = FAIL;
+
+					if (0 == snmp_legacy)
+						zbx_free(item.snmp_oid);
 				}
 #else
 					ret = FAIL;
