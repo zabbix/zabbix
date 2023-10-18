@@ -29,12 +29,9 @@ class CControllerItemEdit extends CControllerItem {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context'		=> 'required|in host,template',
-			'hostid'		=> 'id',
-			'itemid'		=> 'id',
-			'master_itemid'	=> 'id',
-			'clone'			=> 'in 1'
-		];
+			'clone' => 'in 1'
+		] + static::getValidationFields();
+
 		$ret = $this->validateInput($fields) && $this->validateRefferedObjects();
 
 		if ($ret) {
@@ -100,6 +97,17 @@ class CControllerItemEdit extends CControllerItem {
 		}
 
 		if ($this->hasInput('clone')) {
+			$unchecked_values = [
+				'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
+				'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
+				'output_format' => HTTPCHECK_STORE_RAW,
+				'status' => ITEM_STATUS_DISABLED,
+				'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF
+			];
+			$item = $unchecked_values + $item;
+			$this->getInputs($item, array_keys(static::getValidationFields()));
+
 			if ($item['valuemap'] && $item['templateid']) {
 				$host_valuemap = API::ValueMap()->get([
 					'output' => ['valuemapid'],
