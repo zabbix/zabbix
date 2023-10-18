@@ -5563,7 +5563,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 					(int)(LAST_KEY(events) - (ids.values[ids.values_num -1].id + 1)), (int)severity);
 
 			/* if sequence of events is not continuous, ignore events from "latestPage" property */
-			/* except when we do not query all events by severity filter */
+			/* except when events are filtered by severity */
 			if (0 != is_clear && 0 == severity)
 				zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
 		}
@@ -5585,7 +5585,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 				events->values_num, is_clear, (int)(LAST_KEY(events) - (last_key + 1)), (int)severity);
 
 		/* if sequence of events is not continuous, ignore events from "latestPage" property */
-		/* except when we do not query all events by severity filter */
+		/* except when events are filtered by severity */
 		if (0 != is_clear && 0 == severity)
 			zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
 	}
@@ -6431,13 +6431,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the map of severity and event type                            *
+ * Purpose: gets the map of severity and event type                           *
  *                                                                            *
  * Parameters: service        - [IN] the vmware service                       *
  *             easyhandle     - [IN] the CURL handle                          *
  *             evt_severities - [IN/OUT] key-value vector with EventID and    *
- *                                      severity as value                     *
- *             error          - [OUT] the error message in the case of failure*
+ *                                       severity as value                    *
+ *             error          - [OUT] the error message in case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
@@ -6503,7 +6503,7 @@ static int	vmware_service_get_evt_severity(zbx_vmware_service_t *service, CURL *
 		char			*delimetr, *full_format;
 
 		if (NULL == (full_format = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XNN("fullFormat"))))
-				continue;
+			continue;
 
 		if (NULL != (delimetr = strchr(full_format, '|')))
 		{

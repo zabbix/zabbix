@@ -350,7 +350,7 @@ typedef struct
 #define ZBX_VMWARE_EVTLOG_SEVERITY_INFO		"info"
 #define ZBX_VMWARE_EVTLOG_SEVERITY_USER		"user"
 	unsigned char	severity;	/* bitmask for the event query filter */
-	zbx_hashset_t	evt_severities;	/* the events type severities */
+	zbx_hashset_t	evt_severities;	/* severity for event types */
 	unsigned char	oom;		/* no enough memory to store new events */
 	zbx_uint64_t	req_sz;		/* memory size required to store events */
 }
