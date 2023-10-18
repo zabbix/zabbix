@@ -79,47 +79,6 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			}
 		}
 
-		if ($this->hasInput('clone')) {
-			$unchecked_values = [
-				'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
-				'discover' => ZBX_PROTOTYPE_NO_DISCOVER,
-				'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
-				'output_format' => HTTPCHECK_STORE_RAW,
-				'status' => ITEM_STATUS_DISABLED,
-				'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
-				'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF
-			];
-			$item = $unchecked_values + $item;
-			$this->getInputs($item, array_keys(static::getValidationFields()));
-
-			if ($item['valuemap'] && $item['templateid']) {
-				$host_valuemap = API::ValueMap()->get([
-					'output' => ['valuemapid'],
-					'search' => ['name' => $item['valuemap']['name']],
-					'filter' => ['hostid' => $item['hostid']]
-				]);
-
-				if ($host_valuemap) {
-					$host_valuemap = reset($host_valuemap);
-					$item['valuemap']['valuemapid'] = $host_valuemap['valuemapid'];
-					$item['valuemap']['hostid'] = $item['hostid'];
-				}
-				else {
-					$item['valuemapid'] = 0;
-					$item['valuemap'] = [];
-				}
-			}
-
-			$item = [
-				'itemid' => 0,
-				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-				'templateid' => 0,
-				'parent_items' => [],
-				'discovered' => false,
-				'templated' => false
-			] + $item;
-		}
-
 		$data = [
 			'item' => $item,
 			'host' => $host,
@@ -201,7 +160,33 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 	protected function getItemPrototype(array $host): array {
 		$item = [];
 
-		if ($this->hasInput('itemid')) {
+		if ($this->hasInput('clone')) {
+			$item = [
+				'itemid' => 0,
+				'templateid' => 0,
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+				'parent_items' => [],
+				'discovered' => false,
+				'templated' => false
+			] + $this->getInputForApi();
+
+			if ($item['valuemapid'] && $this->getInput('templateid', 0)) {
+				$item_valuemap = API::ValueMap()->get([
+					'output' => ['name'],
+					'valuemapids' => [$item['valuemapid']]
+				]);
+
+				if ($item_valuemap) {
+					$host_valuemap = API::ValueMap()->get([
+						'output' => ['valuemapid'],
+						'search' => ['name' => $item_valuemap[0]['name']],
+						'filter' => ['hostid' => $item['hostid']]
+					]);
+					$item['valuemapid'] = $host_valuemap ? $host_valuemap[0]['valuemapid'] : 0;
+				}
+			}
+		}
+		elseif ($this->hasInput('itemid')) {
 			[$item] = API::ItemPrototype()->get([
 				'output' => [
 					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
@@ -217,10 +202,12 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 				'selectTags' => ['tag', 'value'],
 				'itemids' => $this->getInput('itemid')
 			]);
-			$item = CItemPrototypeHelper::convertApiInputForForm($item);
 		}
 
-		if (!$item) {
+		if ($item) {
+			$item = CItemPrototypeHelper::convertApiInputForForm($item);
+		}
+		else {
 			$item = CItemPrototypeHelper::getDefaults();
 			$item['hostid'] = $host['hostid'];
 			$item['parent_discoveryid'] = $this->getInput('parent_discoveryid');

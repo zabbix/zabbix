@@ -40,12 +40,16 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 */
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
-		$item['parent_items'] = makeItemTemplatesHtml(
-			$item['itemid'],
-			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
-			ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
+
+		if (!array_key_exists('parent_items', $item)) {
+			$item['parent_items'] = makeItemTemplatesHtml(
+				$item['itemid'],
+				getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
+				ZBX_FLAG_DISCOVERY_PROTOTYPE,
+				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
+		}
+
 		$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
