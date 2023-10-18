@@ -5360,11 +5360,19 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	if (NULL != type)
 	{
 		zbx_vmware_key_value_t	*severity, evt_cmp = {.key=type};
+		char			*value;
 
-		if (NULL == (severity = (zbx_vmware_key_value_t *)zbx_hashset_search(evt_severities, &evt_cmp)))
-			message = zbx_dsprintf(message, "%s\n\ntype: %s", message, type);
-		else
+		if (NULL != (value = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("severity"))))
+		{
+			message = zbx_dsprintf(message, "%s\n\ntype: %s/%s", message, value, type);
+			zbx_str_free(value);
+		}
+		else if (NULL != (severity = (zbx_vmware_key_value_t *)zbx_hashset_search(evt_severities, &evt_cmp)))
+		{
 			message = zbx_dsprintf(message, "%s\n\ntype: %s/%s", message, severity->value, type);
+		}
+		else
+			message = zbx_dsprintf(message, "%s\n\ntype: %s", message, type);
 	}
 
 	for (i = 0; i < ARRSIZE(host_nodes); i++)
