@@ -159,8 +159,8 @@ class CMultiSelect extends CTag {
 	 * @return array
 	 */
 	protected function mapOptions(array $options) {
-		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest'
+		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
+			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
 		];
 
 		foreach ($options as $field => $value) {
