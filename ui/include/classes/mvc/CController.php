@@ -77,6 +77,13 @@ abstract class CController {
 	 */
 	private bool $validate_csrf_token = true;
 
+	/**
+	 * Validation rules array set when controller performs validation the first time.
+	 *
+	 * @var array
+	 */
+	private static $validation_rules = [];
+
 	public function __construct() {
 		$this->init();
 		$this->populateRawInput();
@@ -209,6 +216,9 @@ abstract class CController {
 					}
 
 					$input = array_replace($input, $data['form']);
+
+					// Remove these fields, so that they are not passed again in future redirects if any.
+					unset($input['formdata'], $input['data'], $input['sign']);
 				}
 				else {
 					info(_('Operation cannot be performed due to unauthorized request.'));
@@ -245,6 +255,15 @@ abstract class CController {
 	}
 
 	/**
+	 * Get current controller validation rules. Rules are set when input is being validated.
+	 *
+	 * @return array
+	 */
+	public static function getValidationRules(): array {
+		return self::$validation_rules;
+	}
+
+	/**
 	 * Validate input parameters.
 	 *
 	 * @param array $validation_rules
@@ -252,6 +271,9 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
+		// Not nice, but beats writing a setValidationRules() in several hundred places.
+		self::$validation_rules = $validation_rules;
+
 		if ($this->raw_input === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
@@ -261,7 +283,7 @@ abstract class CController {
 		$validator = new CNewValidator($this->raw_input, $validation_rules);
 
 		foreach ($validator->getAllErrors() as $error) {
-			info($error);
+			error($error);
 		}
 
 		if ($validator->isErrorFatal()) {
@@ -452,6 +474,15 @@ abstract class CController {
 			default:
 				$this->raw_input = null;
 		}
+	}
+
+	/**
+	 * Get raw input from controller.
+	 *
+	 * @return array|null
+	 */
+	public function getRawInput(): ?array {
+		return $this->raw_input;
 	}
 
 	/**

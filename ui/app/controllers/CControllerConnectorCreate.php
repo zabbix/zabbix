@@ -69,7 +69,7 @@ class CControllerConnectorCreate extends CController {
 			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
 			foreach ($validator->getAllErrors() as $error) {
-				info($error);
+				error($error);
 			}
 
 			$ret = !$validator->isErrorFatal() && !$validator->isError();

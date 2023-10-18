@@ -47,7 +47,7 @@ class CControllerTimeSelectorCalc extends CController {
 			]);
 
 			foreach ($validator->getAllErrors() as $error) {
-				info($error);
+				error($error);
 			}
 
 			if ($validator->isErrorFatal() || $validator->isError()) {
