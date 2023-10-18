@@ -1876,7 +1876,8 @@ clean:
 	return ret;
 }
 
-static int	fix_expression_macro_escaping(const char *select, const char *update, const char *error_msg)
+static int	fix_expression_macro_escaping(const char *table, const char *id_col, const char *data_col,
+		const char *data_name)
 {
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
@@ -1888,8 +1889,11 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 
-	if (NULL == (result = zbx_db_select("%s like '%%%s%%'", select, like_condition)))
+	if (NULL == (result = zbx_db_select("select %s,%s from %s where %s like '%%%s%%'",
+			id_col, data_col, table, data_col, like_condition)))
+	{
 		goto clean;
+	}
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1924,7 +1928,9 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 					zbx_free(substitute);
 				}
 				else {
-					zabbix_log(LOG_LEVEL_WARNING, error_msg, expression, row[0], error);
+					zabbix_log(LOG_LEVEL_WARNING, "Failed to parse expression macro"
+							" \"%s\" in %s with id %s, errpr :%s",
+							expression, data_name, row[0], error);
 					zbx_free(error);
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
 						command + pos, token.loc.r - pos + 1);
@@ -1945,7 +1951,8 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 
 			tmp = zbx_db_dyn_escape_string(buf);
 			zbx_free(buf);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, update, tmp, row[0]);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='%s' where %s=%s;\n",
+					table, data_col, tmp, id_col, row[0]);
 			zbx_free(tmp);
 
 			if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
@@ -1974,51 +1981,39 @@ clean:
 
 static int	DBpatch_6050142(void)
 {
-	return fix_expression_macro_escaping("select scriptid,command from scripts where command",
-			"update scripts set command='%s' where scriptid=%s;\n",
-			"Failed to parse expression macro \"%s\" in script with id %s, error: %s");
+	return fix_expression_macro_escaping("scripts", "scriptid", "command", "script");
 }
 
 static int	DBpatch_6050143(void)
 {
-	return fix_expression_macro_escaping("select script_paramid,value from script_param where value",
-			"update script_param set value='%s' where script_paramid=%s;\n",
-			"Failed to parse expression macro \"%s\" in script parameter with id %s, error: %s");
+	return fix_expression_macro_escaping("script_param", "script_paramid", "value", "script parameter");
 }
 
 static int	DBpatch_6050144(void)
 {
-	return fix_expression_macro_escaping("select mediatype_messageid,message from media_type_message where message",
-			"update media_type_message set message='%s' where mediatype_messageid=%s;\n",
-			"Failed to parse expression macro \"%s\" in media type message with id %s, error: %s");
+	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "message",
+			"media type message");
 }
 
 static int	DBpatch_6050145(void)
 {
-	return fix_expression_macro_escaping("select mediatype_messageid,subject from media_type_message where subject",
-			"update media_type_message set subject='%s' where mediatype_messageid=%s;\n",
-			"Failed to parse expression macro \"%s\" in media type subject with id %s, error: %s");
+	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "subject",
+			"media type subject");
 }
 
 static int	DBpatch_6050146(void)
 {
-	return fix_expression_macro_escaping("select operationid,message from opmessage where message",
-			"update opmessage set message='%s' where operationid=%s;\n",
-			"Failed to parse expression macro \"%s\" in action operation message with id %s, error: %s");
+	return fix_expression_macro_escaping("opmessage", "operationid", "message", "action operation message");
 }
 
 static int	DBpatch_6050147(void)
 {
-	return fix_expression_macro_escaping("select operationid,subject from opmessage where subject",
-			"update opmessage set subject='%s' where operationid=%s;\n",
-			"Failed to parse expression macro \"%s\" in action operation subject with id %s, error: %s");
+	return fix_expression_macro_escaping("opmessage", "operationid", "subject", "action operation subject");
 }
 
 static int	DBpatch_6050148(void)
 {
-	return fix_expression_macro_escaping("select triggerid,event_name from triggers where event_name",
-			"update triggers set event_name='%s' where triggerid=%s;\n",
-			"Failed to parse expression macro \"%s\" in event name of the trigger with id %s, error: %s");
+	return fix_expression_macro_escaping("triggers", "triggerid", "event_name", "event name of the trigger");
 }
 
 #endif
