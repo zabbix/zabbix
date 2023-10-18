@@ -261,9 +261,7 @@ static int	check_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, ch
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select count(*) from permission p"
 			" join user_ugset u on p.ugsetid=u.ugsetid"
-			" where u.userid=" ZBX_FS_UI64
-				" and p.permission>0"
-				" and", userid);
+			" where u.userid=" ZBX_FS_UI64 " and", userid);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "p.hgsetid", hgsetids.values, hgsetids.values_num);
 	result = zbx_db_select("%s", sql);
 
