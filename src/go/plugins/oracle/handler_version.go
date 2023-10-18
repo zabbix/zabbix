@@ -29,7 +29,7 @@ import (
 // versionHandler queries the db server for version.
 func versionHandler(
 	ctx context.Context, conn OraClient, _ map[string]string, _ ...string,
-) (interface{}, error) {
+) (any, error) {
 	const query = `SELECT VERSION_FULL FROM V$INSTANCE`
 
 	row, err := conn.QueryRow(ctx, query)

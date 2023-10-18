@@ -28,14 +28,14 @@ import (
 )
 
 const (
-	keyArchive                = "oracle.archive.info"
-	keyArchiveDiscovery       = "oracle.archive.discovery"
 	keyASMDiskGroups          = "oracle.diskgroups.stats"
 	keyASMDiskGroupsDiscovery = "oracle.diskgroups.discovery"
+	keyArchive                = "oracle.archive.info"
+	keyArchiveDiscovery       = "oracle.archive.discovery"
 	keyCDB                    = "oracle.cdb.info"
 	keyCustomQuery            = "oracle.custom.query"
-	keyDatabasesDiscovery     = "oracle.db.discovery"
 	keyDataFiles              = "oracle.datafiles.stats"
+	keyDatabasesDiscovery     = "oracle.db.discovery"
 	keyFRA                    = "oracle.fra.stats"
 	keyInstance               = "oracle.instance.info"
 	keyPDB                    = "oracle.pdb.info"
@@ -44,8 +44,8 @@ const (
 	keyPing                   = "oracle.ping"
 	keyProc                   = "oracle.proc.stats"
 	keyRedoLog                = "oracle.redolog.info"
-	keySessions               = "oracle.sessions.stats"
 	keySGA                    = "oracle.sga.stats"
+	keySessions               = "oracle.sessions.stats"
 	keySysMetrics             = "oracle.sys.metrics"
 	keySysParams              = "oracle.sys.params"
 	keyTablespaces            = "oracle.ts.stats"
