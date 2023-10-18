@@ -3116,7 +3116,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server',
-					'manualinput_prompt' => '',
+					'manualinput_prompt' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
 			],
@@ -3126,7 +3126,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server',
-					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
 			],
@@ -3136,7 +3136,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server',
-					'manualinput_validator' => 'abc',
+					'manualinput_validator' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
 			],
@@ -3146,7 +3146,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server',
-					'manualinput_default_value' => 'abc',
+					'manualinput_default_value' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
 			],
@@ -7093,7 +7093,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'scriptid' => 'update_manualinput_params',
-						'manualinput_prompt' => 'prompt text updated',
+						'manualinput_prompt' => 'prompt text updated'
 					]
 				],
 				'expected_error' => null
@@ -7102,7 +7102,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'scriptid' => 'update_manualinput_params',
-						'manualinput_validator' => 'a,b,c',
+						'manualinput_validator' => 'a,b,c'
 					]
 				],
 				'expected_error' => null
