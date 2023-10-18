@@ -37,6 +37,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxlog.h"
+#include "zbx_scripts_constants.h"
 
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
