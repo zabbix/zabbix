@@ -3035,4 +3035,107 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		return $data;
 	}
+
+	/**
+	 * Resolve macros in labels of item-based widgets.
+	 *
+	 * @param array  $items
+	 *        string $items[n]['hostid']
+	 *        string $items[n]['itemid']
+	 *        string $items[n][$label]  Field to resolve.
+	 *
+	 * @param string $label Field to resolve (e.g., 'primary_label', 'secondary_label')
+	 *
+	 * @return array  Returns array of items with macros resolved.
+	 */
+	public function resolveLabels(array $items, string $label): array {
+		$types = [
+			'macros' => [
+				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
+					'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
+				],
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}',
+					'{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}',
+					'{ITEM.LOG.EVENTID}'
+				],
+				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+			],
+			'macro_funcs' => [
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+			],
+			'usermacros' => true
+		];
+
+		$macro_values = [];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => []];
+		$usermacros = [];
+
+		foreach ($items as $key => $item) {
+			$matched_macros = self::extractMacros([$item[$label]], $types);
+
+			foreach ($matched_macros['macros']['host'] as $token) {
+				if ($token === '{HOST.ID}') {
+					$macro_values[$key][$token] = $item['hostid'];
+				}
+				else {
+					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$item['hostid']][$key] = true;
+				}
+			}
+
+			foreach ($matched_macros['macros']['interface'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$item['itemid']][$key] = true;
+			}
+
+			foreach ($matched_macros['macros']['item'] as $token) {
+				if ($token === '{ITEM.ID}') {
+					$macro_values[$key][$token] = $item['itemid'];
+				}
+				else {
+					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['item'][$item['itemid']][$key] = true;
+				}
+			}
+
+			foreach ($matched_macros['macros']['item_value'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['item_value'][$item['itemid']][$key][$token] = ['macro' => substr($token, 1, -1)];
+			}
+
+			foreach ($matched_macros['macro_funcs']['item_value'] as $token => $data) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['item_value'][$item['itemid']][$key][$token] = $data;
+			}
+
+			foreach ($matched_macros['macros']['inventory'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$item['hostid']][$key] = true;
+			}
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
+		$macro_values = self::getItemMacrosByItemid($macros['item'], $macro_values);
+		$macro_values = self::getItemValueMacrosByItemid($macros['item_value'], $macro_values);
+		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
+
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		foreach ($macro_values as $key => $macro_value) {
+			$items[$key][$label] = strtr($items[$key][$label], $macro_value);
+		}
+
+		return $items;
+	}
 }

@@ -750,4 +750,22 @@ class CMacrosResolverHelper {
 
 		return self::$macrosResolver->resolveManualEventActionScripts($data, $events);
 	}
+
+	/**
+	 * Resolve macros in labels of item-based widgets.
+	 *
+	 * @param array  $items
+	 *        string $items[n]['hostid']
+	 *        string $items[n]['itemid']
+	 *        string $items[n][$label]  Field to resolve.
+	 *
+	 * @param string $label Field to resolve (e.g., 'primary_label', 'secondary_label')
+	 *
+	 * @return array  Returns array of items with macros resolved.
+	 */
+	public static function resolveLabels(array $items, string $label): array {
+		self::init();
+
+		return self::$macrosResolver->resolveLabels($items, $label);
+	}
 }
