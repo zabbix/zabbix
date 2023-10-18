@@ -157,8 +157,6 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	{
 		if (delay < zbx_time() - time_flush && 0 != hostids.values_num)
 		{
-			
-
 			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, syncing]",
 					get_process_type_string(process_type), processed_num, updated_num, sec);
 			processed_num = 0;
