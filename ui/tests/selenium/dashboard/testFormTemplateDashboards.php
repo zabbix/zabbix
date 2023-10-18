@@ -384,11 +384,6 @@ class testFormTemplateDashboards extends CWebTest {
 										'value' => self::TEMPLATE_ITEM
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.0.timeshift',
-										'value' => ''
-									],
-									[
 										'type' => 0,
 										'name' => 'columns.0.display',
 										'value' => 1

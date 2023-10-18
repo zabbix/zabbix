@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  *
  * @backup widget, profiles
  *
- *
+ * @onAfter clearData
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
@@ -1773,7 +1773,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => '     Text column name with spaces 1     ',
 							'Data' => 'Text',
-							'Text' => '          Spaces in text 😅          ',
+							'Text' => '         Spaces in text         ',
 							'Base colour' => 'A5D6A7'
 						],
 						[
@@ -1864,7 +1864,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'Only name changed'
 						],
 						[
-							'Data' => 'Item value 😅',
+							'Data' => 'Item value',
 							'Item' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
