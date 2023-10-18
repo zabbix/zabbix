@@ -430,7 +430,7 @@ window.item_edit_form = new class {
 				case 'tags':
 					fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 						if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
-							tags.push({tag: tag.tag, value: tag.value});
+							tags.push({tag: tag.tag.trim(), value: tag.value.trim()});
 						}
 
 						return tags;
