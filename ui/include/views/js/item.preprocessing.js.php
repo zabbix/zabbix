@@ -419,7 +419,7 @@
 		var $preprocessing = $('#preprocessing');
 
 		if ($preprocessing.length === 0) {
-			const prep_elem = document.querySelector('#preprocessing-div');
+			const prep_elem = document.querySelector('#preprocessing-field');
 
 			if (!prep_elem) {
 				return false;
