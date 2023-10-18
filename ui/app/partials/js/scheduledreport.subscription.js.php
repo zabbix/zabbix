@@ -102,7 +102,7 @@
 					}
 
 					PopUp('popup.scheduledreport.subscription.edit', parameters,
-						{dialogue_class: 'modal-popup-generic', trigger_element: event.target}
+						{dialogue_class: 'modal-popup-medium', trigger_element: event.target}
 					);
 				});
 			}
