@@ -367,7 +367,7 @@ window.item_edit_form = new class {
 		this.#updateCustomIntervalVisibility();
 		this.#updateHistoryModeVisibility();
 		this.#updateTrendsModeVisibility();
-		this.#updateValueTypeHintVisibility();
+		this.#updateValueTypeHintVisibility(preprocessing_active);
 		this.#updateValueTypeOptionVisibility();
 		this.#updateRetrieveModeVisibility();
 		this.#updateTimeoutVisibility();
@@ -659,13 +659,14 @@ window.item_edit_form = new class {
 		this.field.retrieve_mode.forEach(radio => radio.disabled = disable);
 	}
 
-	#updateValueTypeHintVisibility() {
+	#updateValueTypeHintVisibility(preprocessing_active) {
 		const key = this.field.key.value;
 		const value_type = this.field.value_type.value;
 		const inferred_type = this.#getInferredValueType(key);
 
-		this.label.value_type_hint
-			.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inferred_type === null || value_type == inferred_type);
+		this.label.value_type_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE,
+			preprocessing_active || inferred_type === null || value_type == inferred_type
+		);
 	}
 
 	#updateHistoryModeVisibility() {
