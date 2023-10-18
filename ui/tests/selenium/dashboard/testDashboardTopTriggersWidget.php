@@ -20,8 +20,9 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup dashboard
@@ -30,17 +31,17 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
  */
 class testDashboardTopTriggersWidget extends CWebTest {
 
-	use TableTrait;
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
 		];
 	}
 
@@ -695,7 +696,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data,'tags')) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
@@ -1164,67 +1164,66 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment the below case when ZBX-23288 is fixed.
-//			[
-//				[
-//					'fields' => [
-//						'High' => false,
-//						'Average' => false,
-//						'Disaster' => false,
-//						'Trigger count' => '2'
-//					],
-//					'trigger_data' => [
-//						[
-//							'name' => 'Problem Disaster',
-//							'time' => strtotime('now'),
-//							'problem_count' => '1'
-//						],
-//						[
-//							'name' => 'Severity status: High',
-//							'time' => strtotime('now'),
-//							'problem_count' => '1'
-//						],
-//						[
-//							'name' => 'Problem Average',
-//							'time' => strtotime('now'),
-//							'problem_count' => '1'
-//						],
-//						[
-//							'name' => 'Severity status: Warning⚠️',
-//							'time' => strtotime('now'),
-//							'problem_count' => '1'
-//						],
-//						[
-//							'name' => 'Problem Not classified',
-//							'time' => strtotime('now'),
-//							'problem_count' => '1'
-//						],
-//						[
-//							'name' => 'Problem Information',
-//							'time' => strtotime('now'),
-//							'problem_count' => '1'
-//						]
-//					],
-//					'expected' => [
-//						[
-//							'Host' => 'Host with top triggers trapper',
-//							'Trigger' => 'Problem Disaster',
-//							'Severity' => 'Disaster',
-//							'Number of problems' => '1'
-//						],
-//						[
-//							'Host' => 'Host with top triggers trapper2',
-//							'Trigger' => 'Severity status: High',
-//							'Severity' => 'High',
-//							'Number of problems' => '1'
-//						]
-//					],
-//					'background_color' => [
-//						'Problem Disaster' => 'disaster-bg',
-//						'Severity status: High' => 'high-bg'
-//					]
-//				]
-//			],
+			[
+				[
+					'fields' => [
+						'High' => false,
+						'Average' => false,
+						'Disaster' => false,
+						'Trigger count' => '2'
+					],
+					'trigger_data' => [
+						[
+							'name' => 'Problem Disaster',
+							'time' => strtotime('now'),
+							'problem_count' => '1'
+						],
+						[
+							'name' => 'Severity status: High',
+							'time' => strtotime('now'),
+							'problem_count' => '1'
+						],
+						[
+							'name' => 'Problem Average',
+							'time' => strtotime('now'),
+							'problem_count' => '1'
+						],
+						[
+							'name' => 'Severity status: Warning⚠️',
+							'time' => strtotime('now'),
+							'problem_count' => '1'
+						],
+						[
+							'name' => 'Problem Not classified',
+							'time' => strtotime('now'),
+							'problem_count' => '1'
+						],
+						[
+							'name' => 'Problem Information',
+							'time' => strtotime('now'),
+							'problem_count' => '1'
+						]
+					],
+					'expected' => [
+						[
+							'Host' => 'Host with top triggers trapper',
+							'Trigger' => 'Problem Disaster',
+							'Severity' => 'Disaster',
+							'Number of problems' => '1'
+						],
+						[
+							'Host' => 'Host with top triggers trapper2',
+							'Trigger' => 'Severity status: High',
+							'Severity' => 'High',
+							'Number of problems' => '1'
+						]
+					],
+					'background_color' => [
+						'Problem Disaster' => 'disaster-bg',
+						'Severity status: High' => 'high-bg'
+					]
+				]
+			],
 			// Check problems by tag name/value.
 			[
 				[

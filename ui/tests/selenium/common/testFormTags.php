@@ -1033,8 +1033,8 @@ class testFormTags extends CWebTest {
 		// Open host group, host or template and check object tags.
 		if ($target_type !== 'Host group') {
 			$this->page->open(($target_type === 'Host')
-					? self::HOST_LIST_PAGE
-					: 'zabbix.php?action=template.list')->waitUntilReady();
+				? self::HOST_LIST_PAGE
+				: 'zabbix.php?action=template.list')->waitUntilReady();
 
 			$this->query('button:Reset')->one()->click();
 			$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
@@ -1051,7 +1051,7 @@ class testFormTags extends CWebTest {
 		}
 		else {
 			$filter_form = CFilterElement::find()->one()->getForm();
-			$filter_form->fill(['Host groups' => $parent , 'Hosts' => '']);
+			$filter_form->fill(['Host groups' => $parent, 'Hosts' => '']);
 			$result_form = $this->query('xpath://form[@name='.CXPathHelper::escapeQuotes($table_name).']')->one();
 			$this->query('button:Apply')->one()->click();
 			$this->page->waitUntilReady();

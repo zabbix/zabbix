@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
@@ -28,18 +28,19 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  */
 abstract class testFormMacros extends CLegacyWebTest {
 
-	use MacrosTrait;
-
-	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
-
 	/**
 	 * Attach Behaviors to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
 	}
+
+	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);

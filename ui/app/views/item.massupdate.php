@@ -196,7 +196,7 @@ $item_form_list
 $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
-		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-div', _('Original')))
 			->setLabel([
 				_('Preprocessing steps'),
 				makeHelpIcon([
@@ -205,7 +205,14 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
 				])
 			]),
-		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))->setId('preprocessing_div')
+		(new CDiv([
+			(new CRadioButtonList('preprocessing_action', ZBX_ACTION_REPLACE))
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
+				->setModern(true)
+				->addStyle('margin-bottom: 10px;'),
+			getItemPreprocessing([], false, $data['preprocessing_types'])
+		]))->setId('preprocessing-div')
 	);
 
 $custom_intervals = (new CTable())

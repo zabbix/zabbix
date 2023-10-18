@@ -1260,6 +1260,7 @@ function getMenuPopupItemPrototype(options) {
 			view.editTriggerPrototype({
 				parent_discoveryid: options.parent_discoveryid,
 				name: options.name,
+				hostid: options.hostid,
 				expression: 'func(/' + options.host + '/' + options.key + ')',
 				context: options.context
 			});

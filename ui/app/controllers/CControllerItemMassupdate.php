@@ -49,6 +49,7 @@ class CControllerItemMassupdate extends CController {
 			'discover' => 'in '.ZBX_PROTOTYPE_DISCOVER.','.ZBX_PROTOTYPE_NO_DISCOVER,
 			'tags' => 'array',
 			'preprocessing' => 'array',
+			'preprocessing_action' => 'in '.implode(',', [ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE_ALL]),
 
 			// The fields used for multiple item types.
 			'interfaceid' => 'id',
@@ -194,7 +195,10 @@ class CControllerItemMassupdate extends CController {
 			}
 
 			if (array_key_exists('preprocessing', $input)) {
-				$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
+				$input['preprocessing'] =
+					$this->getInput('preprocessing_action', ZBX_ACTION_REPLACE) == ZBX_ACTION_REMOVE_ALL
+						? []
+						: normalizeItemPreprocessingSteps($input['preprocessing']);
 			}
 
 			if (array_key_exists('delay', $input)) {
