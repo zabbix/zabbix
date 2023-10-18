@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:11:33Z'
+  date: '2023-10-18T11:09:12Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -754,7 +754,7 @@ zabbix_export:
         - uuid: 3c8f26e4b80f4356bde061ccddb95f2c
           name: 'Docker: Ping'
           key: docker.ping
-          history: 7h
+          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
