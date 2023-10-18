@@ -64,49 +64,6 @@ int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_tim
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Return user permissions for access to the host                    *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: PERM_DENY - if host or user not found,                       *
- *                   or permission otherwise                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids)
-{
-	int		perm = PERM_DENY;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 == hostgroupids->values_num)
-		goto out;
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select min(r.permission)"
-			" from rights r"
-			" join users_groups ug on ug.usrgrpid=r.groupid"
-				" where ug.userid=" ZBX_FS_UI64 " and", userid);
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.id",
-			hostgroupids->values, hostgroupids->values_num);
-	result = zbx_db_select("%s", sql);
-
-	if (NULL != (row = zbx_db_fetch(result)) && FAIL == zbx_db_is_null(row[0]))
-		perm = atoi(row[0]);
-
-	zbx_db_free_result(result);
-	zbx_free(sql);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
-
-	return perm;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: Return user permissions for access to item                        *
  *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
