@@ -52,7 +52,7 @@ class CControllerItemClear extends CControllerItem {
 		$messages = array_column(get_and_clear_messages(), 'message');
 
 		if ($result) {
-			$output['success']['title'] = _('History cleared');
+			$output['success']['title'] = _('History and trends cleared');
 
 			if ($messages) {
 				$output['success']['messages'] = $messages;
@@ -60,7 +60,7 @@ class CControllerItemClear extends CControllerItem {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot clear history'),
+				'title' => _('Cannot clear history and trends'),
 				'messages' => $messages
 			];
 		}
