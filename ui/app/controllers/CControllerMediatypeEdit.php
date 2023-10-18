@@ -44,7 +44,7 @@ class CControllerMediatypeEdit extends CController {
 			'exec_params' =>			'array',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
-			'passwd' =>					'db media_type.passwd',
+			'passwd' =>					'db media_type.passwd|password',
 			'parameters' =>				'array',
 			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
