@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-18T11:08:52Z'
+  date: '2023-10-18T11:26:18Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1827,7 +1827,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'meraki.admin.get[{#ADMIN.ID}]'
               delay: '0'
-              history: 7d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for admin in this organization.'
@@ -1971,7 +1971,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'meraki.license.get[{#LICENSE.ID}]'
               delay: '0'
-              history: 7d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for a license.'
@@ -2145,7 +2145,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'meraki.saml.get[{#SAML.ID}]'
               delay: '0'
-              history: 7d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for SAML roles.'
