@@ -258,7 +258,6 @@ class testFormTags extends CWebTest {
 			case 'item':
 			case 'item prototype':
 				$sql = 'SELECT * FROM items ORDER BY itemid';
-				$locator = 'name:itemForm';
 				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true).'[{#KEY}]', 'Type' => 'Zabbix trapper'];
 				break;
 
@@ -319,13 +318,9 @@ class testFormTags extends CWebTest {
 			case 'connector':
 			case 'trigger':
 			case 'trigger prototype':
-				$form = COverlayDialogElement::find()->asGridForm(['normalized' => true])->one()->waitUntilVisible();
-				$form->fill($fields);
-				break;
-
 			case 'item':
 			case 'item prototype':
-				$form = $this->query($locator)->waitUntilPresent()->asGridForm(['normalized' => true])->one();
+				$form = COverlayDialogElement::find()->asGridForm(['normalized' => true])->one()->waitUntilVisible();
 				$form->fill($fields);
 				break;
 		}
@@ -478,7 +473,6 @@ class testFormTags extends CWebTest {
 			case 'item':
 			case 'item prototype':
 				$sql = 'SELECT * FROM items ORDER BY itemid';
-				$locator = 'name:itemForm';
 				break;
 
 			case 'web scenario':
@@ -524,8 +518,7 @@ class testFormTags extends CWebTest {
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 		}
 
-			$form = ($object === 'item' || $object === 'item prototype' || $object === 'web scenario'
-					|| $object === 'host prototype')
+			$form = ($object === 'web scenario' || $object === 'host prototype')
 					? $this->query($locator)->asForm()->waitUntilPresent()->one()
 					: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 
@@ -567,8 +560,7 @@ class testFormTags extends CWebTest {
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
-			if ($object === 'host' || $object === 'service' || $object === 'connector' || $object === 'template'
-					|| $object === 'trigger' || $object === 'trigger prototype') {
+			if ($object !== 'host prototype' || $object !== 'web scenario' || $object !== 'service') {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -616,7 +608,7 @@ class testFormTags extends CWebTest {
 			// Check the results in form.
 			$this->checkTagFields($data, $object, $form);
 
-			if ($object === 'connector' || $object === 'template' || $object === 'trigger' || $object === 'trigger prototype') {
+			if ($object !== 'host' || $object !== 'host prototype' || $object !== 'web scenario' || $object !== 'service') {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -656,7 +648,7 @@ class testFormTags extends CWebTest {
 
 			case 'item':
 			case 'item prototype':
-				$form = $this->query('name:itemForm')->asForm()->waitUntilPresent()->one();
+				$form = COverlayDialogElement::find()->asForm()->one();
 				$form->fill(['Name' => $new_name, 'Key' => 'newkey_'.microtime(true).'[{#KEY}]']);
 				$sql_old_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($new_name);
@@ -792,8 +784,7 @@ class testFormTags extends CWebTest {
 
 		$element->checkValue($tags);
 
-		if ($object === 'host' || $object === 'discovered host' || $object === 'connector' || $object === 'template'
-				|| $object === 'trigger' || $object === 'trigger prototype') {
+		if ($object !== 'web scenario' || $object !== 'service') {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -829,9 +820,16 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name', $data['name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
-		elseif ($object === 'connector' || $object === 'trigger' || $object === 'trigger prototype') {
+		elseif ($object === 'connector' || $object === 'trigger' || $object === 'trigger prototype'
+				|| $object === 'item prototype') {
 			$this->page->open($this->link);
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
+			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		}
+		elseif ($object === 'item') {
+			$this->page->open($this->link);
+			$table = $this->query('name:item_list')->asTable()->one()->waitUntilReady();
 			$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
@@ -898,11 +896,9 @@ class testFormTags extends CWebTest {
 		switch ($object) {
 			case 'trigger':
 			case 'trigger prototype':
-				$form = COverlayDialogElement::find()->asForm()->one();
-				break;
-
 			case 'item':
-				$form_selector = 'id:item-form';
+			case 'item prototype':
+				$form = COverlayDialogElement::find()->asForm()->one();
 				break;
 
 			case 'web scenario':
@@ -912,23 +908,16 @@ class testFormTags extends CWebTest {
 			case 'host prototype':
 				$form_selector = 'id:host-prototype-form';
 				break;
-
-			case 'item prototype':
-				$form_selector = 'id:item-prototype-form';
-				break;
 		}
 
-		if ($object === 'item'
-				|| $object === 'item prototype'
-				|| $object === 'web scenario'
-				|| $object === 'host prototype') {
+		if ($object === 'web scenario' || $object === 'host prototype') {
 			$form = $this->query($form_selector)->asForm()->waitUntilPresent()->one();
 		}
 
 		$form->selectTab('Tags');
 		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
-		if ($object === 'trigger' || $object === 'trigger prototype') {
+		if ($object !== 'web scenario' || $object !== 'host prototype') {
 			COverlayDialogElement::find()->one()->close();
 		}
 
@@ -973,8 +962,8 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $new_name)
-				->getColumn($column)->query('link', $column)->one()->click();
+		$this->query(($object === 'item') ? 'name:item_list' : 'xpath://table[@class="list-table"]')->asTable()->one()
+				->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
 			case 'trigger':
@@ -996,7 +985,8 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$new_form = ($object === 'trigger' || $object === 'trigger prototype')
+		$new_form = ($object === 'trigger' || $object === 'trigger prototype' || $object === 'item'
+				|| $object === 'item prototype')
 				? COverlayDialogElement::find()->one()->waitUntilReady()->asForm()
 				: $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
 
@@ -1004,7 +994,8 @@ class testFormTags extends CWebTest {
 		$element->invalidate();
 		$element->checkValue($tags);
 
-		if ($object === 'trigger' || $object === 'trigger prototype') {
+		if ($object === 'trigger' || $object === 'trigger prototype' || $object === 'item'
+				|| $object === 'item prototype') {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -1021,13 +1012,7 @@ class testFormTags extends CWebTest {
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
 		// Get tags of object and return to the list.
-		if ($object === 'trigger') {
-			$form = COverlayDialogElement::find()->asForm()->one();
-		}
-		else {
-			$form = $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
-		}
-
+		$form = COverlayDialogElement::find()->asForm()->one();
 		$form->selectTab('Tags');
 		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
@@ -1062,10 +1047,7 @@ class testFormTags extends CWebTest {
 			$form->invalidate();
 			$form->selectTab('Tags');
 			$element->checkValue($tags);
-
-			if ($object === 'trigger') {
-				COverlayDialogElement::find()->one()->close();
-			}
+			COverlayDialogElement::find()->one()->close();
 		}
 		else {
 			$filter_form = CFilterElement::find()->one()->getForm();
@@ -1171,7 +1153,8 @@ class testFormTags extends CWebTest {
 		// Check disabled inherited tags from host or template on created element.
 		$this->assertEquals($this->prepareInheritedTags($data['tags'], $parent_tags), $this->getInheritedTags());
 
-		if ($object === 'trigger' || $object === 'trigger prototype') {
+		if ($object === 'trigger' || $object === 'trigger prototype' || $object === 'item'
+				|| $object === 'item prototype') {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -1359,19 +1342,11 @@ class testFormTags extends CWebTest {
 		}
 
 		$locators = [
-			'host' => 'id:host-form',
-			'trigger' => 'name:triggersForm',
-			'trigger prototype' => 'name:triggersForm',
-			'item' => 'name:itemForm',
-			'item prototype' => 'name:itemForm',
 			'web scenario' => 'name:webscenario_form',
-			'service' => 'id:service-form',
 			'host prototype' => 'name:hostPrototypeForm',
-			'template' => 'name:templatesForm'
 		];
 
-		$form = ($object === 'host' || $object === 'service' || $object === 'connector' || $object === 'template'
-				|| $object === 'trigger' || $object === 'trigger prototype')
+		$form = ($object !== 'web scenario' || $object !== 'host prototype')
 				? COverlayDialogElement::find()->waitUntilVisible()->asForm()->one()
 				: $this->query($locators[$object])->asForm()->waitUntilPresent()->one();
 
