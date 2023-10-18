@@ -1836,7 +1836,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'meraki.admin.get[{#ADMIN.ID}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for admin in this organization.'
@@ -1980,7 +1980,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'meraki.license.get[{#LICENSE.ID}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for a license.'
@@ -2153,7 +2153,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'meraki.saml.get[{#SAML.ID}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Raw data for SAML roles.'

@@ -1572,7 +1572,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck{#SINGLETON}'
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck[{#SINGLETON}]'
-              history: 1h
+              history: 7d
               authtype: BASIC
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'

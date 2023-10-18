@@ -756,7 +756,7 @@ zabbix_export:
         - uuid: 3c8f26e4b80f4356bde061ccddb95f2c
           name: 'Docker: Ping'
           key: docker.ping
-          history: 1h
+          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
