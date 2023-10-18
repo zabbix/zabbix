@@ -257,8 +257,9 @@ window.drule_edit_popup = new class {
 						list_item.outerHTML = new Template(template_html).evaluate(input);
 					}
 					else {
-						document.querySelector(list).insertAdjacentHTML('beforeend', new Template(template_html)
-							.evaluate(input));
+						document.querySelector(list).insertAdjacentHTML('beforeend',
+							new Template(template_html).evaluate(input)
+						);
 					}
 				}
 			}
