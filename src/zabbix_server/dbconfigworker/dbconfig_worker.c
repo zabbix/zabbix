@@ -34,7 +34,7 @@
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
 
 
-static int	dbsync_item_rtname(void)
+static int	dbsync_item_rtname(int *processed_num, int *updated_num)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -42,7 +42,6 @@ static int	dbsync_item_rtname(void)
 	zbx_dc_um_handle_t	*um_handle;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	double			sec = zbx_time();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -70,6 +69,8 @@ static int	dbsync_item_rtname(void)
 		if (HOST_STATUS_TEMPLATE == atoi(row[5]))
 			continue;
 
+		(*processed_num)++;
+
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 		name_resolved_new = zbx_strdup(NULL, row[2]);
@@ -90,6 +91,7 @@ static int	dbsync_item_rtname(void)
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 			zbx_free(name_resolved_esc);
+			(*updated_num)++;
 		}
 
 		zbx_free(name_resolved_new);
@@ -105,7 +107,7 @@ static int	dbsync_item_rtname(void)
 	zbx_dc_close_user_macros(um_handle);
 	zbx_db_commit();
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s() in:" ZBX_FS_DBL, __func__, zbx_time() - sec);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return deleted;
 }
@@ -117,7 +119,8 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					ret, processed_num = 0, delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
+	int					processed_num = 0, updated_num = 0;
+	int					delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
 	double					sec = 0, time_flush;
 	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
@@ -135,7 +138,6 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	zabbix_increase_log_level();
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_DBCONFIG_WORKER, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start connector manager service: %s", error);
@@ -153,23 +155,23 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		if (delay < zbx_time() - time_flush)
+		if (delay < zbx_time() - time_flush && 0 != hostids.values_num)
 		{
-			zbx_setproctitle("%s [synced macros in " ZBX_FS_DBL " sec, syncing configuration]",
-					get_process_type_string(process_type), sec);
+			
 
+			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, syncing]",
+					get_process_type_string(process_type), processed_num, updated_num, sec);
+			processed_num = 0;
+			updated_num = 0;
 			sec = zbx_time();
 
-			if (0 != hostids.values_num)
-			{
-				zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-				zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-				if (0 == hostids.values[0])
-					dbsync_item_rtname();
+			if (0 == hostids.values[0])
+				dbsync_item_rtname(&processed_num, &updated_num);
 
-				zbx_vector_uint64_clear(&hostids);
-			}
+			zbx_vector_uint64_clear(&hostids);
 
 			time_flush = zbx_time();
 
@@ -178,12 +180,12 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 			else
 				delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
 
-			zbx_setproctitle("%s [synced macros in " ZBX_FS_DBL " sec, idle %d sec]",
-					get_process_type_string(process_type), sec, delay);
+			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, idle]",
+					get_process_type_string(process_type), processed_num, updated_num, sec);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
