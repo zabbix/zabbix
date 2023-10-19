@@ -179,7 +179,7 @@ $operations_popup_form_list
 		'opperiod_row'
 	)
 	->addRow(
-		(new CVisibilityBox('visible[ophistory]', 'ophistory_div', _('Original')))
+		(new CVisibilityBox('visible[ophistory]', 'ophistory-field', _('Original')))
 			->setLabel(_('History storage period'))
 			->setChecked(array_key_exists('ophistory', $options))
 			->setReadonly($options['templated']),
@@ -196,11 +196,11 @@ $operations_popup_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('ophistory_div'),
+			->setId('ophistory-field'),
 		'ophistory_row'
 	)
 	->addRow(
-		(new CVisibilityBox('visible[optrends]', 'optrends_div', _('Original')))
+		(new CVisibilityBox('visible[optrends]', 'optrends-field', _('Original')))
 			->setLabel(_('Trend storage period'))
 			->setChecked(array_key_exists('optrends', $options))
 			->setReadonly($options['templated']),
@@ -217,7 +217,7 @@ $operations_popup_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('optrends_div'),
+			->setId('optrends-field'),
 		'optrends_row'
 	)
 	->addRow(
