@@ -5467,8 +5467,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
  *             last_key       - [IN] the key of last parsed event             *
  *             is_prop        - [IN] read events from RetrieveProperties XML  *
  *             xdoc           - [IN] xml document with eventlog records       *
- *             severity       - [IN] severity filter                          *
- *             evt_severities - [IN] dictionary of severity for event types   *
+ *             eventlog       - [IN] VMware event log state                   *
  *             alloc_sz       - [OUT] allocated memory size for events        *
  *             node_count     - [OUT] count of xml event nodes                *
  *                                                                            *
@@ -5476,8 +5475,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, const int is_prop,
-		xmlDoc *xdoc, const unsigned char severity, const zbx_hashset_t *evt_severities,
-		zbx_uint64_t *alloc_sz, int *node_count)
+		xmlDoc *xdoc, const zbx_vmware_eventlog_state_t *eventlog, zbx_uint64_t *alloc_sz, int *node_count)
 {
 #	define LAST_KEY(evs)	(((const zbx_vmware_event_t *)evs->values[evs->values_num - 1])->key)
 
@@ -5560,11 +5558,12 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d id gap:%d severity:%d", __func__,
 					events->values_num, is_clear,
-					(int)(LAST_KEY(events) - (ids.values[ids.values_num -1].id + 1)), (int)severity);
+					(int)(LAST_KEY(events) - (ids.values[ids.values_num -1].id + 1)),
+					(int)eventlog->severity);
 
 			/* if sequence of events is not continuous, ignore events from "latestPage" property */
 			/* except when events are filtered by severity */
-			if (0 != is_clear && 0 == severity)
+			if (0 != is_clear && 0 == eventlog->severity)
 				zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
 		}
 
@@ -5572,8 +5571,8 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		/* so inside a "scrollable view" latest events should come first too */
 		for (i = ids.values_num - 1; i >= 0; i--)
 		{
-			if (SUCCEED == vmware_service_put_event_data(events, ids.values[i], xdoc, evt_severities,
-					alloc_sz))
+			if (SUCCEED == vmware_service_put_event_data(events, ids.values[i], xdoc,
+					&eventlog->evt_severities, alloc_sz))
 			{
 				parsed_num++;
 			}
@@ -5582,11 +5581,12 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	else if (0 != last_key && 0 != events->values_num && LAST_KEY(events) != last_key + 1)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d last_key id gap:%d severity:%d", __func__,
-				events->values_num, is_clear, (int)(LAST_KEY(events) - (last_key + 1)), (int)severity);
+				events->values_num, is_clear, (int)(LAST_KEY(events) - (last_key + 1)),
+				(int)eventlog->severity);
 
 		/* if sequence of events is not continuous, ignore events from "latestPage" property */
 		/* except when events are filtered by severity */
-		if (0 != is_clear && 0 == severity)
+		if (0 != is_clear && 0 == eventlog->severity)
 			zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
 	}
 
@@ -5651,8 +5651,8 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (SUCCEED != vmware_service_get_event_latestpage(service, easyhandle, event_session, &doc, error))
 		goto end_session;
 
-	if (0 < vmware_service_parse_event_data(events, eventlog_last_key, EVENT_TAG, doc,
-			service->eventlog.severity, &service->eventlog.evt_severities, alloc_sz, NULL) &&
+	if (0 < vmware_service_parse_event_data(events, eventlog_last_key, EVENT_TAG, doc, &service->eventlog, alloc_sz,
+			NULL) &&
 			LAST_KEY(events) == eventlog_last_key + 1)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s() latestPage events:%d", __func__, events->values_num);
@@ -5685,8 +5685,8 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		if (0 != node_count)
 			soap_retry = ATTEMPTS_NUM;
 	}
-	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, RETURNVAL_TAG, doc,
-			service->eventlog.severity, &service->eventlog.evt_severities, alloc_sz, &node_count) ||
+	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, RETURNVAL_TAG, doc, &service->eventlog,
+			alloc_sz, &node_count) ||
 			(0 == node_count && 0 < soap_retry--));
 
 	if (0 != eventlog_last_key && 0 != events->values_num && LAST_KEY(events) != eventlog_last_key + 1)
