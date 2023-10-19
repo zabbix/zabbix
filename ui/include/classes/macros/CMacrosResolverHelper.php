@@ -757,15 +757,14 @@ class CMacrosResolverHelper {
 	 * @param array  $items
 	 *        string $items[n]['hostid']
 	 *        string $items[n]['itemid']
-	 *        string $items[n][$label]  Field to resolve.
-	 *
-	 * @param string $label Field to resolve (e.g., 'primary_label', 'secondary_label')
+	 * @param string $label Field to resolve (e.g., 'primary_label', 'secondary_label').
+	 * @param array  $options Options for macros processing.
 	 *
 	 * @return array  Returns array of items with macros resolved.
 	 */
-	public static function resolveLabels(array $items, string $label): array {
+	public static function resolveLabels(array $items, string $label, array $options = []): array {
 		self::init();
 
-		return self::$macrosResolver->resolveLabels($items, $label);
+		return self::$macrosResolver->resolveLabels($items, $label, $options);
 	}
 }

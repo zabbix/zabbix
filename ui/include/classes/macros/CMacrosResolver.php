@@ -3042,13 +3042,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param array  $items
 	 *        string $items[n]['hostid']
 	 *        string $items[n]['itemid']
-	 *        string $items[n][$label]  Field to resolve.
-	 *
-	 * @param string $label Field to resolve (e.g., 'primary_label', 'secondary_label')
+	 * @param string $label Field to resolve (e.g., 'primary_label', 'secondary_label').
+	 * @param array  $options Options for macros processing.
 	 *
 	 * @return array  Returns array of items with macros resolved.
 	 */
-	public function resolveLabels(array $items, string $label): array {
+	public function resolveLabels(array $items, string $label, array $options = []): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
@@ -3123,7 +3122,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
 		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacrosByItemid($macros['item'], $macro_values);
-		$macro_values = self::getItemValueMacrosByItemid($macros['item_value'], $macro_values);
+		$macro_values = self::getItemValueMacrosByItemid($macros['item_value'], $macro_values,
+			$options['item_value_options'] ?: []
+		);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 
 		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {

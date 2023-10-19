@@ -25,6 +25,7 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CMacrosResolverHelper,
+	CNumberParser,
 	CSettingsHelper,
 	Manager;
 
@@ -131,19 +132,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$primary_label = $this->fields_values['primary_label'];
 			$secondary_label = $this->fields_values['secondary_label'];
 
-			if ($item['value'] !== null && $item['value'] != 0) {
+			$options = [
+				'item_value_options' => [
+					'decimals' => 4,
+					'small_scientific' => false,
+					'zero_as_zero' => false
+				]
+			];
+
+			if ($item['value'] !== null) {
 				if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
 					[[
 						'primary_label' => $primary_label
 					]] = CMacrosResolverHelper::resolveLabels([$item + [
 						'primary_label' => $primary_label
-					]], 'primary_label');
+					]], 'primary_label', $options);
 
 					[[
 						'secondary_label' => $secondary_label
 					]] = CMacrosResolverHelper::resolveLabels([$item + [
 						'secondary_label' => $secondary_label
-					]], 'secondary_label');
+					]], 'secondary_label', $options);
 				}
 
 				$cells[] = [
@@ -153,10 +162,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'secondary_label' => $secondary_label,
 					'value' => $item['value'],
 					'is_numeric' => $item['value_type'] == ITEM_VALUE_TYPE_FLOAT
-						|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64
+						|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64,
+					'is_binary_units' => isBinaryUnits($item['units'])
 				];
 			}
 		}
+		unset($item);
 
 		return $cells;
 	}
@@ -195,11 +206,32 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 		else {
-			$config['primary_label']['show'] = false;
+			$config['secondary_label']['show'] = false;
 		}
 
 		$config['apply_interpolation'] = $this->fields_values['interpolation'] == WidgetForm::INTERPOLATION_ON;
 		$config['thresholds'] = $this->fields_values['thresholds'];
+
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => false
+		]);
+
+		$number_parser_binary = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => true
+		]);
+
+		foreach ($config['thresholds'] as &$threshold) {
+			$number_parser_binary->parse($threshold['threshold']);
+			$threshold['threshold_binary'] = $number_parser_binary->calcValue();
+
+			$number_parser->parse($threshold['threshold']);
+			$threshold['threshold'] = $number_parser->calcValue();
+		}
+		unset($threshold);
 
 		return $config;
 	}
