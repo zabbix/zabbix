@@ -674,7 +674,10 @@ class CScript extends CApiService {
 
 				$regex_validator = new CRegexValidator();
 				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
-					$default_input = trim($script['manualinput_default_value']);
+					$default_input = array_key_exists('manualinput_default_value', $script)
+						? trim($script['manualinput_default_value'])
+						: '';
+
 					$regular_expression = '/' . str_replace('/', '\/', $script['manualinput_validator']) . '/';
 
 					if ($regex_validator->validate($script['manualinput_validator'])
