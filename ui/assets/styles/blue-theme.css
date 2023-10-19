@@ -6307,9 +6307,9 @@ svg {
     background-image: url("../img/icon-sprite.svg?20211222");
     background-repeat: no-repeat; }
 
-.icon-invisible:link, .icon-invisible:hover, .icon-invisible:focus {
+a.icon-invisible:link, a.icon-invisible:hover, a.icon-invisible:focus {
   border-bottom: none; }
-.icon-invisible:focus {
+a.icon-invisible:focus {
   box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
   border-radius: 2px; }
 
