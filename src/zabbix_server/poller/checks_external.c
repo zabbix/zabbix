@@ -41,7 +41,7 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		i, ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
+	int		i, ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
@@ -75,14 +75,7 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		zbx_free(param_esc);
 	}
 
-	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
-	{
-		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
-		/* failures are handled there */
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
-
-	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), timeout_sec,
+	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), item->timeout,
 			ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);

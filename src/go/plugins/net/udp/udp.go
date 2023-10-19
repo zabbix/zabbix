@@ -182,13 +182,7 @@ func (p *Plugin) exportNetService(params []string, timeout int) int {
 		port = service
 	}
 
-	udpTimeout := timeout
-
-	if timeout >= 2 {
-		udpTimeout--
-	}
-
-	return p.udpExpect(service, net.JoinHostPort(ip, port), udpTimeout)
+	return p.udpExpect(service, net.JoinHostPort(ip, port), timeout)
 }
 
 func toFixed(num float64, precision int) float64 {
@@ -266,4 +260,6 @@ func init() {
 		"net.udp.service", "Checks if service is running and responding to UDP requests.",
 		"net.udp.service.perf", "Checks performance of UDP service.",
 		"net.udp.socket.count", "Returns number of TCP sockets that match parameters.")
+
+	impl.SetHandleTimeout(true)
 }
