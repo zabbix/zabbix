@@ -187,7 +187,7 @@ window.item_edit_form = new class {
 		this.field.key.addEventListener('keyup', this.#keyChangeHandler.bind(this));
 		this.field.key_button?.addEventListener('click', this.#keySelectClickHandler.bind(this));
 		this.field.snmp_oid.addEventListener('keyup', this.updateFieldsVisibility.bind(this));
-		this.field.type.addEventListener('click', this.#typeChangeHandler.bind(this));
+		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
 		this.form.addEventListener('click', e => {
