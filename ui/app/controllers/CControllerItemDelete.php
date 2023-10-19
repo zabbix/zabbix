@@ -56,6 +56,7 @@ class CControllerItemDelete extends CControllerItem {
 
 		if ($result) {
 			$output['success']['title'] = _n('Item deleted', 'Items deleted', $count);
+			$output['success']['action'] = 'delete';
 
 			if ($messages) {
 				$output['success']['messages'] = $messages;
