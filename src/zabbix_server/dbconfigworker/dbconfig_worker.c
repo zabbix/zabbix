@@ -33,8 +33,7 @@
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
 
-
-static int	dbsync_item_rtname(int *processed_num, int *updated_num)
+static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -48,11 +47,19 @@ static int	dbsync_item_rtname(int *processed_num, int *updated_num)
 	um_handle = zbx_dc_open_user_macros();
 	zbx_db_begin();
 
-	result = zbx_db_select("select i.itemid,i.hostid,i.name,n.name_resolved,i.flags,h.status"
-			" from items i,item_rtname n,hosts h"
-			" where i.hostid=h.hostid and n.itemid=i.itemid and n.name_upper like '%%{$%%'"
-			" order by i.itemid");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i.itemid,i.hostid,i.name,ir.name_resolved"
+		" from items i,item_rtname ir"
+		" where i.name like '%%{$%%' and ir.itemid=i.itemid");
+	if (0 != hostids->values[0])
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+	}
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.itemid");
 
+	result = zbx_db_select("%s", sql);
+
+	sql_offset = 0;
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "fetch started");
@@ -62,12 +69,6 @@ static int	dbsync_item_rtname(int *processed_num, int *updated_num)
 		zbx_uint64_t	itemid, hostid;
 		const char	*name_resolved_current;
 		char		*name_resolved_new;
-
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == atoi(row[4]))
-			continue;
-
-		if (HOST_STATUS_TEMPLATE == atoi(row[5]))
-			continue;
 
 		(*processed_num)++;
 
@@ -166,8 +167,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-			if (0 == hostids.values[0])
-				dbsync_item_rtname(&processed_num, &updated_num);
+			dbsync_item_rtname(&hostids, &processed_num, &updated_num);
 
 			zbx_vector_uint64_clear(&hostids);
 

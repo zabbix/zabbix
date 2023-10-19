@@ -7006,6 +7006,7 @@ void	zbx_dc_config_get_updated_hosts(zbx_vector_uint64_t *hostids)
 	while (NULL != (dc_host = (const ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_uint64_t	revision = 0;
+
 		if (dc_host->revision >= config->revision.config)
 		{
 			zbx_vector_uint64_append(hostids, dc_host->hostid);
