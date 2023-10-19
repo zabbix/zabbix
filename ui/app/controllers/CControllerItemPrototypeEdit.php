@@ -166,6 +166,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 				'templateid' => 0,
 				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				'parent_items' => [],
+				'parent_discoveryid' => $this->getInput('parent_discoveryid'),
 				'discovered' => false,
 				'templated' => false
 			] + $this->getInputForApi();

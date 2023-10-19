@@ -50,7 +50,10 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			);
 		}
 
-		$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
+		if (!array_key_exists('parent_discoveryid', $item)) {
+			$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
+		}
+
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => true
