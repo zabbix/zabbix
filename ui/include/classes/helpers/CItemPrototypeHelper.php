@@ -50,7 +50,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			);
 		}
 
-		if (!array_key_exists('parent_discoveryid', $item)) {
+		if (array_key_exists('discoveryRule', $item)) {
 			$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
 		}
 
