@@ -5694,13 +5694,7 @@ void	zbx_hostgroups_with_permissions_add(zbx_uint64_t hostid, zbx_vector_uint64_
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	if (SUCCEED != hostgroups_with_permissions_update(hostid))
-	{
-		zbx_db_rollback();
-		return;
-	}
-
-	if (ZBX_DB_OK > zbx_db_commit())
+	if (SUCCEED != zbx_db_end(hostgroups_with_permissions_update(hostid)))
 		return;
 
 	for (i = 0; i < groupids->values_num; i++)
@@ -5728,16 +5722,7 @@ int	zbx_hostgroups_with_permissions_remove(zbx_uint64_t hostid, zbx_vector_uint6
 	zbx_db_execute("%s", sql);
 	zbx_free(sql);
 
-	if (SUCCEED != hostgroups_with_permissions_update(hostid))
-	{
-		zbx_db_rollback();
-		return FAIL;
-	}
-
-	if (ZBX_DB_OK > zbx_db_commit())
-		return FAIL;
-
-	return SUCCEED;
+	return zbx_db_end(hostgroups_with_permissions_update(hostid));
 }
 
 /******************************************************************************
