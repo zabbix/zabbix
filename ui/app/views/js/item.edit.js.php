@@ -26,7 +26,6 @@
 ?>
 (() => {
 const CSRF_TOKEN_NAME = <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>;
-const HOST_STATUS_MONITORED = <?= HOST_STATUS_MONITORED ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
@@ -36,7 +35,6 @@ const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
 const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
-const ITEM_TYPE_TRAPPER = <?= ITEM_TYPE_TRAPPER ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
@@ -519,10 +517,6 @@ window.item_edit_form = new class {
 			: this.testable_item_types.indexOf(type) != -1;
 	}
 
-	#isExecutableItem() {
-		return this.host.status == HOST_STATUS_MONITORED && this.field.type.value != ITEM_TYPE_TRAPPER;
-	}
-
 	#isFormModified() {
 		const fields = this.#getFormFields(this.form);
 
@@ -541,7 +535,6 @@ window.item_edit_form = new class {
 
 	#updateActionButtons() {
 		this.footer.querySelector('.js-test-item')?.toggleAttribute('disabled', !this.#isTestableItem());
-		this.footer.querySelector('.js-execute-item')?.toggleAttribute('disabled', !this.#isExecutableItem());
 	}
 
 	#updateCustomIntervalVisibility() {

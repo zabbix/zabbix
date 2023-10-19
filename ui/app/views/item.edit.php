@@ -95,9 +95,12 @@ if ($item['itemid']) {
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
 		$buttons[] = [
 			'title' => _('Execute now'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-execute-item']),
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
+			'enabled' => $data['host']['status'] == HOST_STATUS_MONITORED
+				&& $item['status'] == ITEM_STATUS_ACTIVE
+				&& in_array($item['type'], $data['executable_item_types']),
 			'action' => 'item_edit_form.execute();'
 		];
 	}

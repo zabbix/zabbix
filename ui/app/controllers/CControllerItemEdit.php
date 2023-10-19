@@ -101,6 +101,7 @@ class CControllerItemEdit extends CControllerItem {
 			'host' => $host,
 			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
+			'executable_item_types' => checkNowAllowedTypes(),
 			'inherited_timeouts' => $inherited_timeouts,
 			'interface_types' => itemTypeInterface(),
 			'inventory_fields' => $inventory_fields,
