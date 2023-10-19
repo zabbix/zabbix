@@ -673,6 +673,7 @@ class CScript extends CApiService {
 				}
 
 				$regex_validator = new CRegexValidator();
+
 				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
 					$default_input = array_key_exists('manualinput_default_value', $script)
 						? trim($script['manualinput_default_value'])
@@ -680,7 +681,7 @@ class CScript extends CApiService {
 
 					$regular_expression = '/' . str_replace('/', '\/', $script['manualinput_validator']) . '/';
 
-					if ($regex_validator->validate($script['manualinput_validator'])
+					if ($regex_validator->validate($script['manualinput_validator'] ?? '')
 							&& !preg_match($regular_expression, $default_input)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
