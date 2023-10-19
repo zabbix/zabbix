@@ -1207,7 +1207,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
-						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI']
+						'Master item' => ['id' => 'master-item-field', 'value' => '7_IPMI']
 					],
 					'expected_tags' => [
 						'15_Calculated' => [
