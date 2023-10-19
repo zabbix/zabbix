@@ -30,6 +30,10 @@ use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 $form = new CWidgetFormView($data);
 
+$history_warning_icon = makeWarningIcon(
+	_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+);
+
 $form
 	->addField(
 		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
@@ -79,7 +83,9 @@ $form
 					->addRowClass('js-row-time-period')
 			)
 			->addField(
-				new CWidgetFieldRadioButtonListView($data['fields']['history'])
+				(new CWidgetFieldRadioButtonListView($data['fields']['history']))->setFieldHint(
+					$history_warning_icon->setId('history_warning')
+				)
 			)
 	)
 	->addField($data['templateid'] === null

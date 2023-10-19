@@ -72,6 +72,7 @@ window.widget_item_form = new class {
 
 		document.getElementById('units_show').addEventListener('change', () => this.updateForm());
 		document.getElementById('aggregate_function').addEventListener('change', () => this.updateForm());
+		document.getElementById('history').addEventListener('change', () => this.updateForm());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -130,6 +131,13 @@ window.widget_item_form = new class {
 		const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
 			<?= AGGREGATE_SUM ?>
 		];
+
+		const history_data_trends = document.querySelector('#history input[name="history"]:checked')
+			.value == <?= Widget::HISTORY_DATA_TRENDS ?>;
+
+		document.getElementById('history_warning').style.display = history_data_trends && !this.#is_item_numeric
+			? ''
+			: 'none';
 
 		document.getElementById('item_value_aggregate_warning').style.display =
 				aggregate_warning_functions.includes(parseInt(aggregate_function.value)) && !this.#is_item_numeric
