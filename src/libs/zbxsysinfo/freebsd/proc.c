@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "zbxlog.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
 
@@ -77,10 +76,10 @@
 #endif
 
 #if (__FreeBSD_version) < 500000
-#	define ZBX_PROC_FLAG 	kp_proc.p_flag
+#	define ZBX_PROC_FLAG	kp_proc.p_flag
 #	define ZBX_PROC_MASK	P_INMEM
 #elif (__FreeBSD_version) < 700000
-#	define ZBX_PROC_FLAG 	ki_sflag
+#	define ZBX_PROC_FLAG	ki_sflag
 #	define ZBX_PROC_MASK	PS_INMEM
 #else
 #	define ZBX_PROC_TDFLAG	ki_tdflags
@@ -150,7 +149,7 @@ static void	proc_data_free(proc_data_t *proc_data)
 #define ARGV_START_SIZE	64
 static char	*get_commandline(struct kinfo_proc *proc)
 {
-	int		mib[4], i;
+	int		mib[4];
 	size_t		sz;
 	static char	*args = NULL;
 #if (__FreeBSD_version >= 802510)
@@ -216,9 +215,11 @@ static char	*get_commandline(struct kinfo_proc *proc)
 	if (-1 == err)
 		return NULL;
 #endif
-	for (i = 0; i < (int)(sz - 1); i++)
+	for (int i = 0; i < (int)(sz - 1); i++)
+	{
 		if (args[i] == '\0')
 			args[i] = ' ';
+	}
 
 	if (0 == sz)
 		zbx_strlcpy(args, proc->ZBX_PROC_COMM, args_alloc);
@@ -227,7 +228,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 }
 #undef ARGV_START_SIZE
 
-int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	1
 #define ZBX_RSS		2
@@ -237,7 +238,7 @@ int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
 	char		*procname, *proccomm, *param, *args, *mem_type = NULL;
-	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
+	int		do_task, pagesize, count, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
 	unsigned int	mibs;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
 	double		pct_size = 0.0, pct_value = 0.0;
@@ -387,7 +388,7 @@ int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	count = sz / sizeof(struct kinfo_proc);
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, proc[i].ZBX_PROC_COMM))
 			continue;
@@ -494,8 +495,8 @@ out:
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
-	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
-	int			count, i, proc_ok, stat_ok, comm_ok, mib[4], mibs;
+	int			zbx_proc_stat, count, proc_ok, stat_ok, comm_ok, mib[4], mibs, proccount = 0,
+				invalid_user = 0;
 	size_t			sz;
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
@@ -591,7 +592,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	count = sz / sizeof(struct kinfo_proc);
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		proc_ok = 0;
 		stat_ok = 0;
@@ -691,7 +692,7 @@ static char	*get_state(struct kinfo_proc *proc)
 int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
-	int				count, i, mib[4], mibs, zbx_proc_mode, pagesize, invalid_user = 0;
+	int				count, mib[4], mibs, zbx_proc_mode, pagesize, invalid_user = 0;
 	size_t				sz;
 	struct kinfo_proc		*proc = NULL;
 	struct passwd			*usrinfo;
@@ -810,7 +811,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	count = sz / sizeof(struct kinfo_proc);
 	zbx_vector_proc_data_ptr_create(&proc_data_ctx);
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		proc_data_t	*proc_data;
 		struct passwd	*pw;
@@ -830,7 +831,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
-			int			count_thread, k, mib_thread[4], mibs_thread;
+			int			count_thread, mib_thread[4], mibs_thread;
 			struct kinfo_proc	*proc_thread = NULL;
 
 			sz = 0;
@@ -853,7 +854,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			count_thread = sz / sizeof(struct kinfo_proc);
 
-			for (k = 0; k < count_thread; k++)
+			for (int k = 0; k < count_thread; k++)
 			{
 				proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
 
@@ -968,15 +969,13 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
-		int	k;
-
-		for (i = 0; i < proc_data_ctx.values_num; i++)
+		for (int i = 0; i < proc_data_ctx.values_num; i++)
 		{
 			proc_data_t	*pdata = proc_data_ctx.values[i];
 
 			pdata->processes = 1;
 
-			for (k = i + 1; k < proc_data_ctx.values_num; k++)
+			for (int k = i + 1; k < proc_data_ctx.values_num; k++)
 			{
 				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
 
@@ -1008,11 +1007,9 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < proc_data_ctx.values_num; i++)
+	for (int i = 0; i < proc_data_ctx.values_num; i++)
 	{
-		proc_data_t	*pdata;
-
-		pdata = proc_data_ctx.values[i];
+		proc_data_t	*pdata = proc_data_ctx.values[i];
 
 		zbx_json_addobject(&j, NULL);
 

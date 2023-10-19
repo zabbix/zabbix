@@ -20,8 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup module, widget
@@ -29,16 +29,15 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageAdministrationGeneralModules extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -71,6 +70,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'navigation tree.',
 		'Map navigation tree' => 'Allows to build a hierarchy of existing maps and display problem statistics for each '.
 				'included map and map group.',
+		'Pie chart' => 'Displays item values as a pie or doughnut chart.',
 		'Plain text' => 'Displays the latest data for the selected items in plain text.',
 		'Problem hosts' => 'Displays the problem count by host group and the highest problem severity within a group.',
 		'Problems' => 'Displays currently open problems with quick access links to the problem details.',
@@ -117,12 +117,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 									],
 									[
 										'type' => 1,
-										'name' => 'navtree.name.1',
+										'name' => 'navtree.1.name',
 										'value' => 'Awesome map'
 									],
 									[
 										'type' => 8,
-										'name' => 'navtree.sysmapid.1',
+										'name' => 'navtree.1.sysmapid',
 										'value' => 1
 									]
 								]
@@ -136,14 +136,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'source_type',
-										'value' => 2
-									],
-									[
 										'type' => 1,
-										'name' => 'filter_widget_reference',
-										'value' => 'GZCSV'
+										'name' => 'sysmapid._reference',
+										'value' => 'GZCSV._mapid'
 									]
 								]
 							],

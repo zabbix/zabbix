@@ -289,8 +289,16 @@ $form_grid->addItem([
 
 	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
 		? null
-		: (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
+		: (new CFormField([
+			(new CCheckBox('not_supported'))->setLabel(_('Not supported'))->setChecked((bool) $data['not_supported']),
+			(new CDiv([
+				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
+				(new CMultilineInput('runtime_error', '', ['readonly' => false]))
+			]))
+		]))
+			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+			->addClass('runtime-error-fields')
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
@@ -385,50 +393,40 @@ $form->addItem($form_grid);
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
-$templates = [
-	(new CTag('script', true))
-		->setAttribute('type', 'text/x-jquery-tmpl')
-		->setId('preprocessing-step-error-icon')
-		->addItem(makeErrorIcon('#{error}')),
-	(new CTag('script', true))
-		->setAttribute('type', 'text/x-jquery-tmpl')
-		->setId('preprocessing-gray-label')
-		->addItem(
-			(new CDiv('#{label}'))
-				->addStyle('margin-top: 5px;')
-				->addClass(ZBX_STYLE_GREY)
-		),
-	(new CTag('script', true))
-		->setAttribute('type', 'text/x-jquery-tmpl')
-		->setId('preprocessing-step-result')
-		->addItem(
+$form->addItem([
+	(new CTemplateTag('preprocessing-step-error-icon'))->addItem(
+		makeErrorIcon('#{error}')
+	),
+	(new CTemplateTag('preprocessing-gray-label'))->addItem(
+		(new CDiv('#{label}'))
+			->addStyle('margin-top: 5px;')
+			->addClass(ZBX_STYLE_GREY)
+	),
+	(new CTemplateTag('preprocessing-step-result'))->addItem(
+		(new CDiv(
+			(new CSpan('#{result}'))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setHint('#{result}', 'hintbox-wrap')
+		))
+			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	),
+	(new CTemplateTag('preprocessing-step-action-done'))->addItem(
+		(new CDiv([
+			'#{action_name} ',
 			(new CDiv(
-				(new CSpan('#{result}'))
+				(new CSpan('#{failed}'))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint('#{result}', 'hintbox-wrap')
+					->setHint('#{failed}', 'hintbox-wrap')
 			))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-		),
-	(new CTag('script', true))
-		->setAttribute('type', 'text/x-jquery-tmpl')
-		->setId('preprocessing-step-action-done')
-		->addItem(
-			(new CDiv([
-				'#{action_name} ',
-				(new CDiv(
-					(new CSpan('#{failed}'))
-						->addClass(ZBX_STYLE_LINK_ACTION)
-						->setHint('#{failed}', 'hintbox-wrap')
-				))
-					->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-					->addClass(ZBX_STYLE_REL_CONTAINER)
-			]))
-				->addStyle('margin-top: 1px;')
-				->addClass(ZBX_STYLE_GREY)
-		)
-];
+				->addClass(ZBX_STYLE_REL_CONTAINER)
+		]))
+			->addStyle('margin-top: 1px;')
+			->addClass(ZBX_STYLE_GREY)
+	)
+]);
 
 $warning_box = $data['show_warning']
 	? makeMessageBox(ZBX_STYLE_MSG_WARNING, [[
@@ -440,7 +438,7 @@ $output = [
 	'header' => $data['title'],
 	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TEST_EDIT),
 	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
-	'body' => (new CDiv([$warning_box, $form, $templates]))->toString(),
+	'body' => (new CDiv([$warning_box, $form]))->toString(),
 	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[

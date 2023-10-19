@@ -21,15 +21,18 @@
 #include "zbxexpression.h"
 
 #include "../../zabbix_server/poller/checks_agent.h"
+#ifdef HAVE_OPENIPMI
 #include "../../zabbix_server/ipmi/ipmi.h"
+#endif
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "../../zabbix_server/poller/checks_ssh.h"
+#endif
 #include "../../zabbix_server/poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
 #include "zbxnum.h"
-#include "zbxsysinfo.h"
 #include "zbxparam.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
@@ -460,10 +463,11 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	item.key = zbx_dsprintf(item.key, "system.run[%s%s]", param, NULL == result ? ",nowait" : "");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
+	item.timeout = config_timeout;
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = get_value_agent(&item, config_timeout, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = get_value_agent(&item, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -509,7 +513,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
-	int             (*function)(zbx_dc_item_t *, int timeout, const char*, AGENT_RESULT *);
+	int		(*function)(zbx_dc_item_t *, const char*, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -567,10 +571,11 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 #endif
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	item.params = zbx_strdup(item.params, script->command);
+	item.timeout = config_timeout;
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = function(&item, config_timeout, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = function(&item, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);

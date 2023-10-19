@@ -28,17 +28,6 @@ class CWidgetGauge extends CWidget {
 		this.gauge_link = document.createElement('a');
 	}
 
-	setDynamicHost(dynamic_hostid) {
-		if (this.gauge !== null) {
-			this.gauge.destroy();
-			this.gauge = null;
-		}
-
-		this._body.innerHTML = '';
-
-		super.setDynamicHost(dynamic_hostid);
-	}
-
 	onResize() {
 		if (this._state === WIDGET_STATE_ACTIVE && this.gauge !== null) {
 			this.gauge.setSize(super._getContentsSize());
@@ -79,8 +68,8 @@ class CWidgetGauge extends CWidget {
 
 		const value_data = {
 			value: response.value,
-			value_text: response.value_text,
-			units_text: response.units_text
+			value_text: response.value_text || null,
+			units_text: response.units_text || null
 		};
 
 		if (this.gauge !== null) {
@@ -102,8 +91,8 @@ class CWidgetGauge extends CWidget {
 		this.gauge.setValue(value_data);
 	}
 
-	getActionsContextMenu({can_paste_widget}) {
-		const menu = super.getActionsContextMenu({can_paste_widget});
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_copy_widget, can_paste_widget});
 
 		if (this.isEditMode()) {
 			return menu;

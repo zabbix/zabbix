@@ -59,12 +59,13 @@ class TabIndicators {
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
+		const PIE_CHART = document.querySelector('#widget-dialogue-form');
 		const PROXY = document.querySelector('#proxy-form');
 		const SERVICE = document.querySelector('#service-form');
 		const SLA = document.querySelector('#sla-form');
 		const TEMPLATE = document.querySelector('#templates-form');
-		const TRIGGER = document.querySelector('#triggers-form');
-		const TRIGGER_PROTOTYPE = document.querySelector('#triggers-prototype-form');
+		const TRIGGER = document.querySelector('#trigger-form');
+		const TRIGGER_PROTOTYPE = document.querySelector('#trigger-prototype-form');
 		const USER = document.querySelector('#user-form');
 		const USER_GROUP = document.querySelector('#user-group-form');
 		const WEB_SCENARIO = document.querySelector('#webscenario-form');
@@ -84,6 +85,8 @@ class TabIndicators {
 				return HOST_DISCOVERY;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
+			case !!PROXY:
+				return PROXY;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
@@ -92,6 +95,8 @@ class TabIndicators {
 				return MAP;
 			case !!MEDIA_TYPE:
 				return MEDIA_TYPE;
+			case !!PIE_CHART:
+				return PIE_CHART;
 			case !!PROXY:
 				return PROXY;
 			case !!SERVICE:
@@ -197,8 +202,8 @@ class TabIndicatorFactory {
 				return new GraphOverridesTabIndicatorItem;
 			case 'GraphProblems':
 				return new GraphProblemsTabIndicatorItem;
-			case 'GraphTime':
-				return new GraphTimeTabIndicatorItem;
+			case 'GraphTimePeriod':
+				return new GraphTimePeriodTabIndicatorItem;
 			case 'HostMacros':
 				return new HostMacrosTabIndicatorItem;
 			case 'HostPrototypeMacros':
@@ -229,10 +234,20 @@ class TabIndicatorFactory {
 				return new TemplatePermissionsTabIndicatorItem;
 			case 'HostPermissions':
 				return new HostPermissionsTabIndicatorItem;
+			case 'PieDataset':
+				return new PieDatasetTabIndicatorItem;
+			case 'PieDisplayOptions':
+				return new PieDisplayOptionsTabIndicatorItem;
+			case 'PieLegend':
+				return new PieLegendTabIndicatorItem;
+			case 'PieTimePeriod':
+				return new PieTimePeriodTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
 				return new ProxyEncryptionTabIndicatorItem;
+			case 'ProxyTimeouts':
+				return new ProxyTimeoutsTabIndicatorItem;
 			case 'Saml':
 				return new SamlTabIndicatorItem;
 			case 'Sharing':
@@ -754,6 +769,27 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 		for (const _element of document.querySelectorAll(
 				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate')) {
 			_element.addEventListener('change', () => this.addAttributes(element));
+		}
+	}
+}
+
+class ProxyTimeoutsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const custom_timeouts = document.querySelector('[name="custom_timeouts"]:checked');
+
+		return custom_timeouts !== null && custom_timeouts.value === '1';
+	}
+
+	initObserver() {
+		for (const input of document.querySelectorAll('[name="custom_timeouts"]')) {
+			input.addEventListener('click', () => {
+				this.addAttributes();
+			});
 		}
 	}
 }
@@ -1383,17 +1419,17 @@ class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class GraphTimeTabIndicatorItem extends TabIndicatorItem {
+class GraphTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.querySelector('#graph_time');
+		const element = document.querySelector('input[name="time_period[data_source]"]');
 
 		if (element !== null) {
-			return element.checked;
+			return !element.checked;
 		}
 
 		return false;
@@ -1425,6 +1461,12 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend_statistic = document.getElementById('legend_statistic');
 
 		if (legend_statistic !== null && legend_statistic.checked) {
+			return true;
+		}
+
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked && !legend_aggregation.disabled) {
 			return true;
 		}
 
@@ -1509,15 +1551,24 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#templategroup-right-table tbody tr')
-			.length > 1;
+		return [...document.querySelectorAll('#templategroup-right-table .form_row')]
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
+			.length;
 	}
 
-	initObserver(element) {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
-		});
+	initObserver() {
+		const target_node = document.getElementById('templategroup-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1528,15 +1579,24 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#group-right-table tbody tr')
-			.length > 1;
+		return [...document.querySelectorAll('#hostgroup-right-table .form_row')]
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
+			.length;
 	}
 
 	initObserver() {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes();
-		});
+		const target_node = document.getElementById('hostgroup-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1593,5 +1653,135 @@ class TemplateValuemapsTabIndicatorItem extends TabIndicatorItem {
 				subtree: true
 			});
 		}
+	}
+}
+
+class PieDatasetTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#data_set .list-accordion-item')
+			.length;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#data_set');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+	}
+}
+
+class PieDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
+
+	static PIE_CHART_SPACE_DEFAULT = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const names = ['source', 'draw_type', 'merge'];
+
+		for (const name of names) {
+			const elem = document.querySelector("[name='" + name + "']:checked");
+			if (elem !== null && elem.value > 0) {
+				return true;
+			}
+		}
+
+		const space = document.getElementById('space');
+
+		if (space !== null && space.value != PieDisplayOptionsTabIndicatorItem.PIE_CHART_SPACE_DEFAULT) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class PieTimePeriodTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.querySelector('input[name="time_period[data_source]"]');
+
+		if (element !== null) {
+			return !element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class PieLegendTabIndicatorItem extends TabIndicatorItem {
+
+	static PIE_CHART_LEGEND_LINES_MIN = 1;
+	static PIE_CHART_LEGEND_COLUMNS_MAX = 4;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const legend = document.getElementById('legend');
+
+		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked) {
+			return true;
+		}
+
+		const legend_lines = document.getElementById('legend_lines');
+
+		if (legend_lines !== null && legend_lines.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_LINES_MIN) {
+			return true;
+		}
+
+		const legend_columns = document.getElementById('legend_columns');
+
+		if (legend_columns !== null
+			&& legend_columns.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_COLUMNS_MAX) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }

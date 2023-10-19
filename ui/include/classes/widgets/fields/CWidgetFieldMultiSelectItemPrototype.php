@@ -23,8 +23,12 @@ namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldMultiSelectItemPrototype extends CWidgetFieldMultiSelect {
 
+	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectItemPrototypeView::class;
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
+
+		$this->inaccessible_caption = _('Inaccessible item prototype');
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE);
 	}

@@ -336,7 +336,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'triggers.php?context=host',
+				'url' => 'zabbix.php?action=trigger.list&context=host',
 				'title' =>	'Configuration of triggers',
 				'header' => 'Triggers',
 				'users' => [

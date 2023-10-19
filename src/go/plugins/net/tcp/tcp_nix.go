@@ -38,4 +38,6 @@ func init() {
 		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
 		"net.tcp.service.perf", "Checks performance of TCP service.",
 		"net.tcp.socket.count", "Returns number of TCP sockets that match parameters.")
+
+	impl.SetHandleTimeout(true)
 }

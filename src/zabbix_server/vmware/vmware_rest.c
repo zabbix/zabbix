@@ -18,12 +18,13 @@
 **/
 
 #include "vmware.h"
+#include "vmware_internal.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "zbxstr.h"
-
-#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
+#include "zbxjson.h"
+#include "zbxalgo.h"
 
 typedef struct
 {
@@ -32,7 +33,7 @@ typedef struct
 	size_t	offset;
 	char	*url;
 }
-ZBX_HTTPPAGE;
+ZBX_HTTPPAGE_REST;
 
 /******************************************************************************
  *                                                                            *
@@ -42,7 +43,7 @@ ZBX_HTTPPAGE;
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t		r_size = size * nmemb;
-	ZBX_HTTPPAGE	*page_http = (ZBX_HTTPPAGE *)userdata;
+	ZBX_HTTPPAGE_REST	*page_http = (ZBX_HTTPPAGE_REST *)userdata;
 
 	zbx_strncpy_alloc(&page_http->data, &page_http->alloc, &page_http->offset, (const char *)ptr, r_size);
 
@@ -251,12 +252,12 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  *                                                                            *
  ******************************************************************************/
 static int	vmware_curl_init(const char *url, unsigned char is_new_api, const char *config_source_ip,
-		int config_vmware_timeout, CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers,
+		int config_vmware_timeout, CURL **easyhandle, ZBX_HTTPPAGE_REST *page, struct curl_slist **headers,
 		char **error)
 {
 #	define INIT_PERF_REST_SIZE	2 * ZBX_KIBIBYTE
-#	define ZBX_XML_HEADER1		"Accept: application/json, text/plain, */*"
-#	define ZBX_XML_HEADER2		"Content-Type:application/json;charset=utf-8"
+#	define ZBX_XML_HEADER1_REST	"Accept: application/json, text/plain, */*"
+#	define ZBX_XML_HEADER2_REST	"Content-Type:application/json;charset=utf-8"
 
 	int		ret = FAIL;
 	size_t		url_sz;
@@ -293,8 +294,8 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, const cha
 	else
 		memcpy(&page->url[url_sz - ZBX_CONST_STRLEN("api")], "api", ZBX_CONST_STRLEN("api"));
 
-	*headers = curl_slist_append(*headers, ZBX_XML_HEADER1);
-	*headers = curl_slist_append(*headers, ZBX_XML_HEADER2);
+	*headers = curl_slist_append(*headers, ZBX_XML_HEADER1_REST);
+	*headers = curl_slist_append(*headers, ZBX_XML_HEADER2_REST);
 
 	if (CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_HTTPHEADER, *headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
@@ -322,8 +323,8 @@ out:
 	return ret;
 
 #	undef INIT_PERF_REST_SIZE
-#	undef ZBX_XML_HEADER1
-#	undef ZBX_XML_HEADER2
+#	undef ZBX_XML_HEADER1_REST
+#	undef ZBX_XML_HEADER2_REST
 }
 
 /******************************************************************************
@@ -421,7 +422,7 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service, unsigned char is_new_api,
-		CURL *easyhandle, struct curl_slist **headers, ZBX_HTTPPAGE *page, char **error)
+		CURL *easyhandle, struct curl_slist **headers, ZBX_HTTPPAGE_REST *page, char **error)
 {
 	int		ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
@@ -507,7 +508,7 @@ out:
  *             page       - [IN/OUT] the response buffer for cURL             *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE *page)
+static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE_REST *page)
 {
 	char		tmp[MAX_STRING_LEN];
 	CURLcode	err;
@@ -550,7 +551,7 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
 	char		url[MAX_STRING_LEN];
 	CURLcode	err;
 	CURLoption	opt;
-	ZBX_HTTPPAGE	*page;
+	ZBX_HTTPPAGE_REST	*page;
 
 	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_PRIVATE, (char **)&page)))
 	{
@@ -897,7 +898,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 	zbx_vector_vmware_key_value_t	categories;
 	CURL				*easyhandle = NULL;
 	struct curl_slist		*headers = NULL;
-	ZBX_HTTPPAGE			page = {.data = NULL, .url = NULL};
+	ZBX_HTTPPAGE_REST			page = {.data = NULL, .url = NULL};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

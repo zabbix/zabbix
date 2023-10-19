@@ -64,7 +64,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HashiCorp Nomad: Nomad clients get|<p>Nomad clients data in raw format.</p>|HTTP agent|nomad.client.nodes.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
+|HashiCorp Nomad: Nomad clients get|<p>Nomad clients data in raw format.</p>|HTTP agent|nomad.client.nodes.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
 |HashiCorp Nomad: Client nodes API response|<p>Client nodes API response message.</p>|Dependent item|nomad.client.nodes.api.response<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HashiCorp Nomad: Nomad servers get|<p>Nomad servers data in raw format.</p>|Script|nomad.server.nodes.get|
 |HashiCorp Nomad: Server-related APIs response|<p>Server-related (`operator/raft/configuration`, `agent/members`) APIs error response message.</p>|Dependent item|nomad.server.api.response<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: `HTTP/1.1 200 OK`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -173,7 +173,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HashiCorp Nomad Client: Telemetry get|<p>Telemetry data in raw format.</p>|HTTP agent|nomad.client.data.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
+|HashiCorp Nomad Client: Telemetry get|<p>Telemetry data in raw format.</p>|HTTP agent|nomad.client.data.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
 |HashiCorp Nomad Client: Metrics|<p>Nomad client metrics in raw format.</p>|Dependent item|nomad.client.metrics.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.body`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |HashiCorp Nomad Client: Monitoring API response|<p>Monitoring API response message.</p>|Dependent item|nomad.client.data.api.response<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HashiCorp Nomad Client: Service [rpc] state|<p>Current [rpc] service state.</p>|Simple check|net.tcp.service[tcp,,{$NOMAD.CLIENT.RPC.PORT}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -203,10 +203,10 @@ This template has been tested on:
 |HashiCorp Nomad Client: Memory size|<p>Total amount of physical memory on the node.</p>|Dependent item|nomad.client.memory.total<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(nomad_client_host_memory_total)`</p></li></ul>|
 |HashiCorp Nomad Client: Memory used|<p>Amount of memory used by processes.</p>|Dependent item|nomad.client.memory.used<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(nomad_client_host_memory_used)`</p></li></ul>|
 |HashiCorp Nomad Client: Uptime|<p>Uptime of the host running the Nomad client.</p>|Dependent item|nomad.client.uptime<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(nomad_client_uptime)`</p></li></ul>|
-|HashiCorp Nomad Client: Node info get|<p>Node info data in raw format.</p>|HTTP agent|nomad.client.node.info.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
+|HashiCorp Nomad Client: Node info get|<p>Node info data in raw format.</p>|HTTP agent|nomad.client.node.info.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
 |HashiCorp Nomad Client: Nomad client version|<p>Nomad client version.</p>|Dependent item|nomad.client.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.body..Version.first()`</p></li></ul>|
 |HashiCorp Nomad Client: Nodes API response|<p>Nodes API response message.</p>|Dependent item|nomad.client.node.info.api.response<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HashiCorp Nomad Client: Allocated jobs get|<p>Allocated jobs data in raw format.</p>|HTTP agent|nomad.client.job.allocs.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
+|HashiCorp Nomad Client: Allocated jobs get|<p>Allocated jobs data in raw format.</p>|HTTP agent|nomad.client.job.allocs.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
 |HashiCorp Nomad Client: Allocations API response|<p>Allocations API response message.</p>|Dependent item|nomad.client.job.allocs.api.response<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
@@ -352,10 +352,10 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HashiCorp Nomad Server: Telemetry get|<p>Telemetry data in raw format.</p>|HTTP agent|nomad.server.data.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
+|HashiCorp Nomad Server: Telemetry get|<p>Telemetry data in raw format.</p>|HTTP agent|nomad.server.data.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
 |HashiCorp Nomad Server: Metrics|<p>Nomad server metrics in raw format.</p>|Dependent item|nomad.server.metrics.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.body`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |HashiCorp Nomad Server: Monitoring API response|<p>Monitoring API response message.</p>|Dependent item|nomad.server.data.api.response<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HashiCorp Nomad Server: Internal stats get|<p>Internal stats data in raw format.</p>|HTTP agent|nomad.server.stats.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
+|HashiCorp Nomad Server: Internal stats get|<p>Internal stats data in raw format.</p>|HTTP agent|nomad.server.stats.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"header":{"HTTP/1.1 408 Request timeout":""}}`</p></li></ul>|
 |HashiCorp Nomad Server: Internal stats API response|<p>Internal stats API response message.</p>|Dependent item|nomad.server.stats.api.response<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HashiCorp Nomad Server: Nomad server version|<p>Nomad server version.</p>|Dependent item|nomad.server.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.body.config.Version.Version`</p></li></ul>|
 |HashiCorp Nomad Server: Nomad raft version|<p>Nomad raft version.</p>|Dependent item|nomad.raft.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.body.stats.raft.protocol_version`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

@@ -19,18 +19,14 @@
 #ifndef ZABBIX_VMWARE_H
 #define ZABBIX_VMWARE_H
 
-#include "config.h"
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxcomms.h"
 
 /* the vmware service state */
 #define ZBX_VMWARE_STATE_NEW		0x001
 #define ZBX_VMWARE_STATE_READY		0x002
 #define ZBX_VMWARE_STATE_FAILED		0x004
-
-#define ZBX_VMWARE_STATE_MASK		0x0FF
 
 #define ZBX_VMWARE_EVENT_KEY_UNINITIALIZED	__UINT64_C(0xffffffffffffffff)
 
@@ -219,7 +215,8 @@ ZBX_PTR_VECTOR_DECL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
 #define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		4
 #define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	5
 #define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		6
-#define ZBX_VMWARE_DEV_PROPS_NUM			7
+#define ZBX_VMWARE_DEV_PROPS_IFIPS			7
+#define ZBX_VMWARE_DEV_PROPS_NUM			8
 
 typedef struct
 {
@@ -567,39 +564,20 @@ zbx_thread_vmware_args;
 
 ZBX_THREAD_ENTRY(vmware_thread, args);
 
-int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
+zbx_hash_t	vmware_hv_hash(const void *data);
+int	vmware_hv_compare(const void *d1, const void *d2);
 void	zbx_vmware_destroy(void);
 
 void	zbx_vmware_lock(void);
 void	zbx_vmware_unlock(void);
 
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
-char	*zbx_vmware_get_vm_resourcepool_path(zbx_vector_vmware_resourcepool_t *rp, char *id);
 
 void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip,
-		int config_vmware_timeout, int cache_update_period);
-int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,
-		int config_vmware_timeout);
-int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip,
-		int config_vmware_timeout);
-void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
-void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
-int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
-void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags);
-void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vmware_data_tags_t *dst);
-
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
-
-int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid,
-		int *unit);
-int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid, const char *instance);
-zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
-		const char *id);
 
 zbx_vmware_cust_query_t *zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *soap_type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
@@ -698,7 +676,45 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 #define ZBX_VMWARE_UNIT_TERABYTES		12
 #define ZBX_VMWARE_UNIT_WATT			13
 #define ZBX_VMWARE_UNIT_CELSIUS			14
+#define ZBX_VMWARE_UNIT_NANOSECOND		15
+
+#	define ZBX_XNN(NN)			"*[local-name()='" NN "']"
+#	define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)
+#	define ZBX_XPATH_LN(LN)			"/" ZBX_XPATH_NN(LN)
+#	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
+#	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
+#	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
+
+typedef struct
+{
+	char	*data;
+	size_t	alloc;
+	size_t	offset;
+}
+ZBX_HTTPPAGE;
+
+/*
+ * SOAP support
+ */
+#define	ZBX_XML_HEADER1_VERSION	21
+#define	ZBX_XML_HEADER1_V4	"Soapaction:urn:vim25/4.1"
+#define	ZBX_XML_HEADER1_V6	"Soapaction:urn:vim25/6.0"
+#define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
+/* cURL specific attribute to prevent the use of "Expect" directive */
+/* according to RFC 7231/5.1.1 if xml request is larger than 1k */
+#define ZBX_XML_HEADER3		"Expect:"
+
+char	*vmware_shared_strdup(const char *str);
+void	vmware_shared_strfree(char *str);
+
+int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
+		const char *config_source_ip, int config_vmware_timeout, char **error);
+
+int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
+
+zbx_vmware_t			*zbx_vmware_get_vmware(void);
+int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
 
 #endif	/* ZABBIX_VMWARE_H */

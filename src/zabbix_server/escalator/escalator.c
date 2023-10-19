@@ -325,7 +325,8 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 		zbx_free(tag_esc);
 	}
 
-	result = zbx_db_select("%s) limit 1", sql);
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+	result = zbx_db_select_n(sql, 1);
 
 	if (NULL != zbx_db_fetch(result))
 		perm = PERM_READ;

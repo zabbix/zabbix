@@ -257,7 +257,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result, item->timeout))
 			ret = SUCCEED;
 	}
 

@@ -22,7 +22,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get swap usage statistics                                         *
+ * Purpose: gets swap usage statistics                                        *
  *                                                                            *
  * Return value: SUCCEED if swap usage statistics retrieved successfully      *
  *               FAIL otherwise                                               *

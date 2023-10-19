@@ -74,12 +74,25 @@
 		 */
 		#next_dashboard;
 
-		init({host, dashboard, widget_defaults, configuration_hash, time_period, web_layout_mode, host_dashboards}) {
-			this.#hostid = host.hostid;
+		/**
+		 * @type {boolean}
+		 */
+		#skip_time_selector_range_update = false;
+
+		init({
+			host_dashboards,
+			dashboard,
+			widget_defaults,
+			configuration_hash,
+			broadcast_requirements,
+			dashboard_host,
+			dashboard_time_period,
+			web_layout_mode
+		}) {
+			this.#hostid = dashboard_host.hostid;
 			this.#dashboardid = dashboard.dashboardid;
 
-			if (dashboard.pages.length > 1
-					|| (dashboard.pages.length === 1 && dashboard.pages[0].widgets.length !== 0)) {
+			if (dashboard.pages.length > 1 || (dashboard.pages.length === 1 && dashboard.pages[0].widgets.length > 0)) {
 				timeControl.refreshPage = false;
 
 				ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
@@ -102,7 +115,7 @@
 							slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW ?>')
 						},
 					data: {
-						dashboardid: this.#dashboardid,
+						dashboardid: dashboard.dashboardid,
 						name: dashboard.name,
 						userid: null,
 						templateid: dashboard.templateid,
@@ -111,7 +124,7 @@
 					},
 					max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
 					cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-					cell_height: 70,
+					cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 					max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 					max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 					widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
@@ -122,24 +135,42 @@
 					is_edit_mode: false,
 					can_edit_dashboards: false,
 					is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
-					time_period: time_period,
-					dynamic_hostid: this.#hostid,
+					broadcast_options: {
+						_hostid: {rebroadcast: false},
+						_timeperiod: {rebroadcast: true}
+					},
 					csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 				});
 
 				for (const page of dashboard.pages) {
 					for (const widget of page.widgets) {
-						widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+						widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 					}
 
 					ZABBIX.Dashboard.addDashboardPage(page);
 				}
 
+				ZABBIX.Dashboard.broadcast({
+					_hostid: dashboard_host.hostid,
+					_timeperiod: {
+						from: dashboard_time_period.from,
+						from_ts: dashboard_time_period.from_ts,
+						to: dashboard_time_period.to,
+						to_ts: dashboard_time_period.to_ts
+					}
+				});
+
 				ZABBIX.Dashboard.activate();
+
+				ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, (e) => this.#onFeedback(e));
 
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, () => {
 					location.href = location.href;
 				});
+			}
+
+			if ('_timeperiod' in broadcast_requirements) {
+				jQuery.subscribe('timeselector.rangeupdate', (e, data) => this.#onTimeSelectorRangeUpdate(data));
 			}
 
 			jqBlink.blink();
@@ -274,10 +305,48 @@
 			}
 		}
 
+		#onTimeSelectorRangeUpdate(data) {
+			if (this.#skip_time_selector_range_update) {
+				this.#skip_time_selector_range_update = false;
+
+				return;
+			}
+
+			ZABBIX.Dashboard.broadcast({
+				_timeperiod: {
+					from: data.from,
+					from_ts: data.from_ts,
+					to: data.to,
+					to_ts: data.to_ts
+				}
+			});
+		}
+
+		#onFeedback(e) {
+			if (e.detail.type === '_timeperiod') {
+				this.#skip_time_selector_range_update = true;
+
+				$.publish('timeselector.rangechange', {
+					from: e.detail.value.from,
+					to: e.detail.value.to
+				});
+			}
+		}
+
 		editHost(hostid) {
 			const host_data = {hostid};
 
 			this.#openHostPopup(host_data);
+		}
+
+		editTrigger(trigger_data) {
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		}
 
 		#openHostPopup(host_data) {

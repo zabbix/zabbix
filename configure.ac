@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha5])
+AC_INIT([Zabbix],[7.0.0alpha7])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1977,8 +1977,15 @@ AC_CONFIG_FILES([
 	include/Makefile
 	database/Makefile
 	database/mysql/Makefile
+	database/mysql/option-patches/Makefile
 	database/oracle/Makefile
+	database/oracle/option-patches/Makefile
 	database/postgresql/Makefile
+	database/postgresql/option-patches/Makefile
+	database/postgresql/timescaledb/Makefile
+	database/postgresql/timescaledb/option-patches/Makefile
+	database/postgresql/timescaledb/option-patches/with-compression/Makefile
+	database/postgresql/timescaledb/option-patches/without-compression/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
@@ -2353,6 +2360,6 @@ echo "***********************************************************"
 echo "*            Now run '${am_make} install'                       *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
-echo "*              <http://www.zabbix.com>                    *"
+echo "*              <https://www.zabbix.com>                   *"
 echo "***********************************************************"
 echo

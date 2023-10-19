@@ -110,7 +110,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
 
-		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->trends_global)
 			item->trends_sec = config_hk->trends;
 
 		item->trends = (0 != item->trends_sec);

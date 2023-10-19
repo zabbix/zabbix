@@ -319,16 +319,6 @@ $item_tab
 			->setReadonly($readonly)
 		))->setId('js-item-request-method-field')
 	])
-	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->setAsteriskMark()
-			->setId('js-item-timeout-label'),
-		(new CFormField((new CTextBox('timeout', $data['timeout'], $readonly))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		))->setId('js-item-timeout-field')
-	])
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
 	->addItem([
 		(new CLabel(_('Request body type'), 'post_type'))->setId('js-item-post-type-label'),
@@ -608,12 +598,34 @@ if ($data['display_interfaces']) {
 
 // Append SNMP common fields.
 $item_tab->addItem([
-	(new CLabel(_('SNMP OID'), 'snmp_oid'))
+	(new CLabel([
+		_('SNMP OID'),
+		makeHelpIcon([
+			_('Field requirements:'),
+			(new CList([
+				new CListItem([
+					(new CSpan('walk[OID1,OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('to retrieve a subtree')
+				]),
+				new CListItem([
+					(new CSpan('get[OID]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('to retrieve a single value')
+				]),
+				new CListItem([
+					(new CSpan('OID'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('(legacy) to retrieve a single value synchronously, optionally combined with other values')
+				])
+			]))->addClass(ZBX_STYLE_LIST_DASHED)
+		])
+	], 'snmp_oid'))
 		->setAsteriskMark()
 		->setId('js-item-snmp-oid-label'),
 	(new CFormField((new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
+		->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 		->setAriaRequired()
 	))->setId('js-item-snmp-oid-field')
 ]);
@@ -773,20 +785,59 @@ $delayFlexTable->addRow([(new CButton('interval_add', _('Add')))
 	->addClass('element-table-add')
 ]);
 
+$item_tab->addItem([
+	(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
+	(new CFormField((new CDiv($delayFlexTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	))->setId('js-item-flex-intervals-field')
+]);
+
+/**
+ * Append timeout field to form list for item types:
+ * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ */
+$edit_source_timeouts_link = null;
+
+if ($data['can_edit_source_timeouts']
+		&& (($readonly && $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) || !$readonly)) {
+	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
+		? (new CLink(_('Timeouts')))
+			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
+			->onClick('view.editProxy(event, this.dataset.proxyid);')
+		: (new CLink(_('Timeouts'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+		))->setTarget('_blank');
+}
+
+$item_tab->addItem([
+	(new CLabel(_('Timeout'), 'timeout'))
+		->setAsteriskMark()
+		->setId('js-item-timeout-label'),
+	(new CFormField([
+		(new CRadioButtonList('custom_timeout', $data['custom_timeout']))
+			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+			->setReadonly($readonly)
+			->setModern(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('timeout', $data['timeout'],
+			$readonly || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired(),
+		$edit_source_timeouts_link
+	]))->setId('js-item-timeout-field')
+]);
+
 $item_tab
 	->addItem([
-		(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
-		(new CFormField((new CDiv($delayFlexTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		))->setId('js-item-flex-intervals-field')
-	])
-	->addItem([
-		(new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
+		(new CLabel(_('History'), 'history'))->setAsteriskMark(),
 		new CFormField([
 			(new CRadioButtonList('history_mode', (int) $data['history_mode']))
-				->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('history', $data['history']))
@@ -795,13 +846,13 @@ $item_tab
 		])
 	])
 	->addItem([
-		(new CLabel(_('Trend storage period'), 'trends'))
+		(new CLabel(_('Trends'), 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
 			(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('trends', $data['trends']))
@@ -884,7 +935,6 @@ $item_tabs = (new CTabView())
 			'source' => 'item',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'
 		]),
@@ -894,10 +944,15 @@ $item_tabs = (new CTabView())
 		(new CFormGrid())
 			->setId('item_preproc_list')
 			->addItem([
-				new CLabel(_('Preprocessing steps')),
-				new CFormField(
-					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
-				)
+				new CLabel([
+					_('Preprocessing steps'),
+					makeHelpIcon([
+						_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
+						BR(), BR(),
+						_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
+					])
+				]),
+				new CFormField(getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types']))
 			])
 			->addItem([
 				(new CLabel(_('Type of information'), 'label-value-type-steps'))
@@ -951,7 +1006,8 @@ $html_page->show();
 		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'inherited_timeouts' => $data['inherited_timeouts']['timeouts']
 	]).');
 '))->show();
 

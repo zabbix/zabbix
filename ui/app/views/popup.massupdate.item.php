@@ -94,10 +94,6 @@ $item_form_list
 			->setId('post_type_container')
 			->setModern(true)
 	)
-	->addRow(
-		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))->setLabel(_('Timeout')),
-		(new CTextBox('timeout', DB::getDefault('items', 'timeout')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	)
 	// Append ITEM_TYPE_HTTPAGENT Request body.
 	->addRow(
 		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))->setLabel(_('Request body')),
@@ -202,10 +198,23 @@ $item_form_list
 $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
-		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
-			->setLabel(_('Preprocessing steps')),
-		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))
-			->setId('preprocessing_div')
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-div', _('Original')))
+			->setLabel([
+				_('Preprocessing steps'),
+				makeHelpIcon([
+					_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
+					BR(), BR(),
+					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
+				])
+			]),
+		(new CDiv([
+			(new CRadioButtonList('preprocessing_action', ZBX_ACTION_REPLACE))
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
+				->setModern(true)
+				->addStyle('margin-bottom: 10px;'),
+			getItemPreprocessing([], false, $data['preprocessing_types'])
+		]))->setId('preprocessing-div')
 	);
 
 $custom_intervals = (new CTable())
@@ -281,14 +290,30 @@ $item_form_list
 		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
 		$update_interval
 	)
+	// Append timeout to form list.
+	->addRow(
+		(new CVisibilityBox('visible[timeout]', 'timeout-field', _('Original')))->setLabel(_('Timeout')),
+		(new CDiv([
+			(new CRadioButtonList('custom_timeout', ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED))
+				->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+				->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('timeout', DB::getDefault('items', 'timeout')))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))
+			->setId('timeout-field')
+			->addClass('wrap-multiple-controls')
+	)
 	// Append history to form list.
 	->addRow(
 		(new CVisibilityBox('visible[history]', 'history_div', _('Original')))
-			->setLabel(_('History storage period')),
+			->setLabel(_('History')),
 		(new CDiv([
 			(new CRadioButtonList('history_mode', ITEM_STORAGE_CUSTOM))
-				->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('history', DB::getDefault('items', 'history')))
@@ -300,11 +325,11 @@ $item_form_list
 	)
 	// Append trends to form list.
 	->addRow(
-		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trend storage period')),
+		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trends')),
 		(new CDiv([
 			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('trends', DB::getDefault('items', 'trends')))
