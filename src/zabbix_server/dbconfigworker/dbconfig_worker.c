@@ -33,7 +33,8 @@
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
 
-static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num)
+static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
+		int *macros_names)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -44,16 +45,27 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (0 == hostids->values[0])
+	{
+		if (0 == *macros_names)
+			zbx_vector_uint64_remove(hostids, 0);
+
+		if (0 == hostids->values_num)
+			goto out;
+	}
+
 	um_handle = zbx_dc_open_user_macros();
 	zbx_db_begin();
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i.itemid,i.hostid,i.name,ir.name_resolved"
-		" from items i,item_rtname ir"
-		" where i.name like '%%{$%%' and ir.itemid=i.itemid");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.itemid,i.hostid,i.name,ir.name_resolved"
+			" from items i,item_rtname ir"
+			" where i.name like '%%{$%%' and ir.itemid=i.itemid");
 	if (0 != hostids->values[0])
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values,
+				hostids->values_num);
 	}
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.itemid");
 
@@ -86,9 +98,9 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 			name_resolved_esc = zbx_db_dyn_escape_string(name_resolved_new);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_rtname set"
-					" name_resolved='%s',name_resolved_upper=upper(name_resolved)"
+					" name_resolved='%s',name_resolved_upper=upper('%s')"
 					" where itemid=" ZBX_FS_UI64 ";\n",
-					name_resolved_esc, itemid);
+					name_resolved_esc, name_resolved_esc, itemid);
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 			zbx_free(name_resolved_esc);
@@ -108,6 +120,9 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 	zbx_dc_close_user_macros(um_handle);
 	zbx_db_commit();
 
+	if (0 == hostids->values[0] || 0 != *processed_num)
+		*macros_names = *processed_num;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return deleted;
@@ -116,19 +131,19 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 {
 #define DBCONFIG_WORKER_FLUSH_DELAY_SEC		1
-	zbx_ipc_service_t			service;
-	char					*error = NULL;
-	zbx_ipc_client_t			*client;
-	zbx_ipc_message_t			*message;
-	int					processed_num = 0, updated_num = 0;
-	int					delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
-	double					sec = 0, time_flush;
-	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
-	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
-	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_vector_uint64_t			hostids;
+	zbx_ipc_service_t	service;
+	char			*error = NULL;
+	zbx_ipc_client_t	*client;
+	zbx_ipc_message_t	*message;
+	int			processed_num = 0, updated_num = 0, macro_names = 1;
+	int			delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
+	double			sec = 0, time_flush;
+	zbx_timespec_t		timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_vector_uint64_t	hostids;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -167,7 +182,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-			dbsync_item_rtname(&hostids, &processed_num, &updated_num);
+			dbsync_item_rtname(&hostids, &processed_num, &updated_num, &macro_names);
 
 			zbx_vector_uint64_clear(&hostids);
 
