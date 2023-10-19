@@ -1585,6 +1585,7 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	ackid;
 	char		*period = NULL;
+	const char	*error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1721,8 +1722,6 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 	if (0 == mediatypeid)
 	{
 err_alert:
-		const char	*error;
-
 		have_alerts = 1;
 		error = "No media defined for user.";
 
@@ -3550,7 +3549,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 {
 	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				now, nextcheck, sleeptime = -1, escalations_count = 0,
+	int				sleeptime = -1, escalations_count = 0,
 					old_escalations_count = 0;
 	double				total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
