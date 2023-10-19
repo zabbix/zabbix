@@ -225,16 +225,12 @@ foreach ($data['discoveries'] as $discovery) {
 			$description[] = $discovery['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink($discovery['master_item']['name'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'item.list')
-					->setArgument('form', 'update')
-					->setArgument('itemid', $discovery['master_item']['itemid'])
-					->setArgument('context', $data['context'])
-					->getUrl()
-			))
+			$description[] = (new CLink($discovery['master_item']['name']))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL);
+				->addClass(ZBX_STYLE_TEAL)
+				->addClass('js-update-item')
+				->setAttribute('data-itemid', $discovery['master_item']['itemid'])
+				->setAttribute('data-context', $data['context']);
 		}
 
 		$description[] = NAME_DELIMITER;
@@ -390,6 +386,7 @@ $html_page
 		'context' => $data['context'],
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'g_hostdruleid',
+		'form_name' => $discoveryForm->getName(),
 		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')]
 	]).');
 '))

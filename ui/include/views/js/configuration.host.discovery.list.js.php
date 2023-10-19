@@ -30,10 +30,11 @@
 		checkbox_hash: null,
 		token: null,
 
-		init({checkbox_hash, checkbox_object, context, token}) {
+		init({checkbox_hash, checkbox_object, context, token, form_name}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
+			this.form = document.forms[form_name];
 			this.token = token;
 
 			this.initEvents();
@@ -43,14 +44,32 @@
 			if (this.context === 'host') {
 				document.getElementById('filter_state').addEventListener('change', e => this.updateFieldsVisibility());
 				document.querySelector('.js-massexecute-item')
-					.addEventListener('click', e => this.executeNow(e.target));
+					.addEventListener('click', (e) => this.executeNow(e.target));
 			}
+
+			this.form.addEventListener('click', (e) => {
+				const target = e.target;
+
+				if (target.classList.contains('js-update-item')) {
+					this.editItem(target, target.dataset);
+				}
+			})
 		},
 
 		updateFieldsVisibility() {
 			const disabled = document.querySelector('[name="filter_state"]:checked').value != -1;
 
 			document.querySelectorAll('[name="filter_status"]').forEach(radio => radio.disabled = disabled);
+		},
+
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		},
 
 		editHost(e, hostid) {
