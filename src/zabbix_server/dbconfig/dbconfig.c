@@ -139,7 +139,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 				free(data);
 			}
-	
+
 			zbx_dc_update_interfaces_availability();
 			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 
