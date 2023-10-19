@@ -828,15 +828,52 @@ class testDashboardURLWidget extends CWebTest {
 		}
 	}
 
+	public function getXframOptionsData() {
+		return [
+			[
+				[
+					'x_frame_value' => 'DENY',
+					'refused' => true,
+				]
+			],
+			[
+				[
+					'x_frame_value' => 'null'
+				]
+			],
+			[
+				[
+					'x_frame_value' => 'SAMEORIGIN'
+				]
+			],
+			[
+				[
+					'x_frame_value' => 'test'
+				]
+			],
+			[
+				[
+					"x_frame_value" => "comma,seperated, host.names,  with-different,	spacing"
+				]
+			],
+			[
+				[
+					"x_frame_value" => "h0st.nam3.w1th.numb3rs"
+				]
+			]
+		];
+	}
+
 	/**
 	 * Modify value of 'HTTP X-Frame-options header' and check widget content with changed Xframe options.
-	 * TODO: new test cases should be added after ZBX-21973 fix.
+	 *
+	 * @dataProvider getXframOptionsData
 	 */
-	public function testDashboardURLWidget_XframeOptions() {
+	public function testDashboardURLWidget_XframeOptions($data) {
 		// Change Xframe options.
 		$this->page->login()->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
-		$other_form->fill(['X-Frame-Options HTTP header' => 'DENY']);
+		$other_form->fill(['X-Frame-Options HTTP header' => $data['x_frame_value']]);
 		$other_form->submit();
 
 		// Check widget content with changed Xframe options.
@@ -844,8 +881,17 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget(self::$frame_widget)->getContent();
 		$this->page->switchTo($widget->query('id:iframe')->one());
-		$error_details = $this->query('id:sub-frame-error-details')->one()->getText();
-		$this->assertStringContainsString( 'refused to connect.', $error_details);
+
+		if (CTestArrayHelper::get($data, 'refused')) {
+			// Assert refused to connect iframe.
+			$error_details = $this->query('id:sub-frame-error-details')->one()->getText();
+			$this->assertStringContainsString( 'refused to connect.', $error_details);
+		}
+		else {
+			// Assert the iframe with Host form loaded.
+			$this->page->assertHeader('Host');
+		}
+
 		$this->page->switchTo();
 	}
 }
