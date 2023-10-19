@@ -1770,7 +1770,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].rowshare'
+                    - $.rowshare
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
