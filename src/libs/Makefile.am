@@ -39,6 +39,7 @@ DIST_SUBDIRS = \
 	zbxicmpping \
 	zbxip \
 	zbxipcservice \
+	zbxipmi \
 	zbxjson \
 	zbxkvs \
 	zbxlog \
@@ -103,6 +104,7 @@ SERVER_SUBDIRS = \
 	zbxhttp \
 	zbxicmpping \
 	zbxip \
+	zbxipmi \
 	zbxkvs \
 	zbxmedia \
 	zbxnum \
@@ -156,6 +158,7 @@ PROXY_SUBDIRS = \
 	zbxhttp \
 	zbxicmpping \
 	zbxip \
+	zbxipmi \
 	zbxkvs \
 	zbxnum \
 	zbxodbc \

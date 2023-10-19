@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_IPMI_POLLER_H
-#define ZABBIX_IPMI_POLLER_H
+#ifndef ZABBIX_IPMI_MANAGER_H
+#define ZABBIX_IPMI_MANAGER_H
 
 #include "zbxcommon.h"
 
@@ -26,7 +26,7 @@
 
 #include "zbxthreads.h"
 
-ZBX_THREAD_ENTRY(ipmi_poller_thread, args);
+
 
 #endif
 

@@ -20,9 +20,6 @@
 #include "zbxscripts.h"
 #include "zbxexpression.h"
 
-#ifdef HAVE_OPENIPMI
-#include "../../zabbix_server/ipmi/ipmi.h"
-#endif
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
@@ -34,6 +31,7 @@
 #include "zbx_availability_constants.h"
 #include "zbx_scripts_constants.h"
 #include "zbxpoller.h"
+#include "zbxipmi.h"
 
 #define REMOTE_COMMAND_NEW		0
 #define REMOTE_COMMAND_RESULT_OOM	1

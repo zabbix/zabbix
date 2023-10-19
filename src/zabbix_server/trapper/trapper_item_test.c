@@ -23,9 +23,7 @@
 #include "../poller/poller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
-#ifdef HAVE_OPENIPMI
-#include "../ipmi/ipmi.h"
-#endif
+#include "zbxipmi.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "trapper_auth.h"

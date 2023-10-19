@@ -17,7 +17,6 @@ SUBDIRS = \
 	proxypoller \
 	vmware \
 	taskmanager \
-	ipmi \
 	stats \
 	preproc \
 	connector \
@@ -167,7 +166,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a
 if HAVE_IPMI
-zabbix_server_LDADD += ipmi/libipmi.a
+zabbix_server_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a
 endif
 
 zabbix_server_LDADD += $(SERVER_LIBS)

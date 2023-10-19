@@ -30,12 +30,13 @@
 #include "zbxalgo.h"
 #include "ipmi_protocol.h"
 #include "ipmi.h"
-#include "../poller/poller.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxipmi.h"
+#include "zbxpoller.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
@@ -954,7 +955,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 	ipmi_manager_process_poller_queue(manager, poller, now);
 }
 
-ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
+ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 {
 	zbx_ipc_service_t		ipmi_service;
 	char				*error = NULL;

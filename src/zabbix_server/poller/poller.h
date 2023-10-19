@@ -41,8 +41,6 @@ ZBX_THREAD_ENTRY(poller_thread, args);
 
 ZBX_THREAD_ENTRY(async_poller_thread, args);
 
-void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
-		char *host, unsigned char **data, size_t *data_alloc, size_t *data_offset);
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
 		char *host, char *key_orig, unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		int unavailable_delay, int unreachable_period, int unreachable_delay, const char *error);

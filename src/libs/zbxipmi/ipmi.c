@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "ipmi.h"
+#include "zbxipmi.h"
 
 #include "config.h"
 
@@ -29,6 +29,7 @@
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
 #include "zbxnum.h"
+#include "ipmi.h"
 
 /******************************************************************************
  *                                                                            *

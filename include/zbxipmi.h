@@ -17,14 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_IPMI_MANAGER_H
-#define ZABBIX_IPMI_MANAGER_H
+#ifndef ZABBIX_ZBXIPMI_H
+#define ZABBIX_ZBXIPMI_H
 
-#include "zbxcommon.h"
-
-#ifdef HAVE_OPENIPMI
-
-#include "zbxthreads.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {
@@ -35,8 +31,11 @@ typedef struct
 }
 zbx_thread_ipmi_manager_args;
 
-ZBX_THREAD_ENTRY(ipmi_manager_thread, args);
+ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args);
+ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args);
 
-#endif
+int	zbx_ipmi_test_item(const zbx_dc_item_t *item, char **info);
+
+int	zbx_ipmi_execute_command(const zbx_dc_host_t *host, const char *command, char *error, size_t max_error_len);
 
 #endif
