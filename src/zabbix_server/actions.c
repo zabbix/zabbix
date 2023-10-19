@@ -30,7 +30,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 
-ZBX_PTR_VECTOR_IMPL(db_action, zbx_db_action*)
+ZBX_PTR_VECTOR_IMPL(db_action_ptr, zbx_db_action*)
 
 /******************************************************************************
  *                                                                            *
@@ -3507,7 +3507,7 @@ out:
  * Comments: use 'free_db_action' function to release allocated memory        *
  *                                                                            *
  ******************************************************************************/
-void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_t *actions)
+void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_ptr_t *actions)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -3552,7 +3552,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_t 
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 
-		zbx_vector_db_action_append(actions, action);
+		zbx_vector_db_action_ptr_append(actions, action);
 	}
 	zbx_db_free_result(result);
 
@@ -3565,7 +3565,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_t 
 		int		index;
 
 		ZBX_STR2UINT64(actionid, row[0]);
-		if (FAIL != (index = zbx_vector_db_action_bsearch(actions, (zbx_db_action *)&actionid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL != (index = zbx_vector_db_action_ptr_bsearch(actions, (zbx_db_action *)&actionid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			action = (zbx_db_action *)actions->values[index];
 			action->recovery = ZBX_ACTION_RECOVERY_OPERATIONS;
