@@ -17,14 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_ssh.h"
+#include "zbxpoller.h"
+
 #include "ssh_run.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 
 #include "zbxsysinfo.h"
 
-int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;

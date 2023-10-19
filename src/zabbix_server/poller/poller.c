@@ -26,8 +26,6 @@
 #include "checks_simple.h"
 #include "checks_snmp.h"
 #include "checks_db.h"
-#include "checks_ssh.h"
-#include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
 #include "checks_http.h"
@@ -334,7 +332,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			res = get_value_telnet(item, config_comms->config_source_ip, result);
+			res = zbx_telnet_get_value(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);

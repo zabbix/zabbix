@@ -23,10 +23,6 @@
 #ifdef HAVE_OPENIPMI
 #include "../../zabbix_server/ipmi/ipmi.h"
 #endif
-#if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "../../zabbix_server/poller/checks_ssh.h"
-#endif
-#include "../../zabbix_server/poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
@@ -565,7 +561,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	{
 #endif
 		item.key = zbx_dsprintf(item.key, "telnet.run[,,%s]", script->port);
-		function = get_value_telnet;
+		function = zbx_telnet_get_value;
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	}
 #endif

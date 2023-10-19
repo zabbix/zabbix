@@ -3,4 +3,17 @@
 noinst_LIBRARIES = libzbxpoller.a
 
 libzbxpoller_a_SOURCES = \
-	agent.c
+	checks_agent.c \
+	checks_ssh.c \
+	checks_telnet.c \
+	ssh_run.h \
+	telnet_run.c \
+	telnet_run.h
+
+if HAVE_SSH
+libzbxpoller_a_SOURCES += ssh_run.c
+endif
+
+if HAVE_SSH2
+libzbxpoller_a_SOURCES += ssh2_run.c
+endif

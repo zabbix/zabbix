@@ -23,10 +23,8 @@
 #include "zbxcommon.h"
 
 #include "test_get_value_ssh.h"
-#include "../../../src/zabbix_server/poller/checks_ssh.h"
 
 #include "test_get_value_telnet.h"
-#include "../../../src/zabbix_server/poller/checks_telnet.h"
 
 void	zbx_mock_test_entry(void **state)
 {

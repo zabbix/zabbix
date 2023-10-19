@@ -9,6 +9,7 @@ COMMON_SRC_FILES = \
 POLLER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
@@ -43,8 +44,6 @@ POLLER_LIBS = \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_poller_test_SOURCES = \
-	../../../src/zabbix_server/poller/checks_ssh.c \
-	../../../src/zabbix_server/poller/checks_telnet.c \
 	zbx_poller_test.c \
 	test_get_value_ssh.c \
 	test_get_value_telnet.c \

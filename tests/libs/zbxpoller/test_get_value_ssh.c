@@ -21,13 +21,6 @@
 #include "zbxmocktest.h"
 
 #include "zbxsysinfo.h"
-#include "../../../src/zabbix_server/poller/checks_ssh.h"
-
-#if defined(HAVE_SSH)
-#	include "../../../src/zabbix_server/poller/ssh_run.c"
-#elif defined(HAVE_SSH2)
-#	include "../../../src/zabbix_server/poller/ssh2_run.c"
-#endif
 
 int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options,
 		int timeout, const char *config_source_ip);

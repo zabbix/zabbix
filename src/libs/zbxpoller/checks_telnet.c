@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_telnet.h"
-#include "telnet_run.h"
+#include "zbxpoller.h"
 
 #include "zbxsysinfo.h"
+#include "telnet_run.h"
 
-int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;

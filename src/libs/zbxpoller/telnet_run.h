@@ -17,41 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "telnet_run.h"
+#ifndef ZABBIX_ZBXPOLLER_POLLER_H
+#define ZABBIX_ZBXPOLLER_POLLER_H
 
-#include "zbxcomms.h"
-#include "zbxnum.h"
-
-/*
- * Example: telnet.run["ls /"]
- */
 int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, int timeout,
-		const char *config_source_ip)
-{
-	zbx_socket_t	s;
-	int		ret = NOTSUPPORTED;
+		const char *config_source_ip);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (FAIL == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to TELNET server: %s",
-				zbx_socket_strerror()));
-		goto close;
-	}
-
-	if (FAIL == zbx_telnet_login(&s, item->username, item->password, result))
-		goto tcp_close;
-
-	if (FAIL == zbx_telnet_execute(&s, item->params, result, encoding))
-		goto tcp_close;
-
-	ret = SUCCEED;
-tcp_close:
-	zbx_tcp_close(&s);
-close:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
+#endif
