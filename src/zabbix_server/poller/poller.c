@@ -20,7 +20,6 @@
 #include "poller.h"
 #include "zbxexpression.h"
 
-#include "checks_agent.h"
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"
@@ -49,6 +48,7 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxsysinfo.h"
+#include "zbxpoller.h"
 
 /******************************************************************************
  *                                                                            *
@@ -303,7 +303,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = get_value_agent(item, config_comms->config_source_ip, result);
+			res = zbx_agent_get_value(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */

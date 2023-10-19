@@ -2040,6 +2040,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnum/Makefile
 	src/libs/zbxodbc/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpoller/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxproxybuffer/Makefile

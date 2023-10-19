@@ -20,7 +20,6 @@
 #include "zbxscripts.h"
 #include "zbxexpression.h"
 
-#include "../../zabbix_server/poller/checks_agent.h"
 #ifdef HAVE_OPENIPMI
 #include "../../zabbix_server/ipmi/ipmi.h"
 #endif
@@ -38,6 +37,7 @@
 #include "zbxshmem.h"
 #include "zbx_availability_constants.h"
 #include "zbx_scripts_constants.h"
+#include "zbxpoller.h"
 
 #define REMOTE_COMMAND_NEW		0
 #define REMOTE_COMMAND_RESULT_OOM	1
@@ -467,7 +467,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = get_value_agent(&item, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = zbx_agent_get_value(&item, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);

@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 #include "async_agent.h"
-#include "checks_agent.h"
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
 #include "async_poller.h"
+#include "zbxpoller.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 {

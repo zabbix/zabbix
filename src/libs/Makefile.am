@@ -49,6 +49,7 @@ DIST_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
@@ -107,6 +108,7 @@ SERVER_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
@@ -158,6 +160,7 @@ PROXY_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
