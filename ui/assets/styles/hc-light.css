@@ -3951,6 +3951,9 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
+form.dashboard-widget-honeycomb #tags_table_item_tags .form_row td:nth-child(3) input[type="text"],
+form.dashboard-widget-honeycomb #tags_table_host_tags .form_row td:nth-child(3) input[type="text"] {
+  width: 159px !important; }
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary {
   display: grid;
   grid-template-columns: minmax(25px, max-content) 1fr minmax(70px, max-content) 15px minmax(90px, max-content) 38px;
