@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 13:43+0300\n"
-"PO-Revision-Date: 2023-09-22 06:39+0000\n"
-"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
+"POT-Creation-Date: 2023-10-19 13:48+0300\n"
+"PO-Revision-Date: 2023-10-12 06:04+0000\n"
+"Last-Translator: Yurii Denys <yurii.denys@meest.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -949,7 +949,7 @@ msgstr "Додати (досягнуто ліміту типу повідомл�
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Додати стовпчик"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
@@ -981,7 +981,7 @@ msgstr "Додати вузел мережі"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Додайте теги вузла мережі"
 
 #: app/partials/trigger.edit.dependencies.tab.php:65
 #: app/partials/trigger.edit.dependencies.tab.php:91
@@ -1183,11 +1183,11 @@ msgstr "Функції агрегації"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Агрегує кожен елемент даних у наборі даних."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Агрегує весь набір даних."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:282
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
@@ -1341,11 +1341,11 @@ msgstr "Альтернативно, ви можете встановити йо�
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Обсяг фізичної пам'яті віртуальної машини, що вивантажено у файл підкачки, \"url\" - URL служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware"
 
 #: include/classes/data/CItemData.php:2352
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Обсяг физичної пам'яті вузла мережі, що використано на резервне копіювання сторінок фізичної памяті віртуальної машини, \"url\" - URL служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware"
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1415,7 +1415,7 @@ msgstr "Та/Або"
 
 #: widgets/gauge/includes/WidgetForm.php:170
 msgid "Angle"
-msgstr ""
+msgstr "Кут"
 
 #: app/views/popup.sla.edit.php:79 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
@@ -1423,7 +1423,7 @@ msgstr "Щорічно"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Використовується інший віджет як джерело даних."
 
 #: app/partials/monitoring.host.filter.php:134 app/views/action.list.php:95
 #: app/views/administration.proxy.list.php:53
@@ -1448,7 +1448,7 @@ msgstr "Будь-який"
 #: app/views/js/trigger.edit.js.php:886
 #: app/views/js/trigger.massupdate.js.php:67
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Будь-які зміни, внесені в поточну форму, буде втрачено."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1501,11 +1501,11 @@ msgstr "Квітень"
 
 #: widgets/gauge/includes/WidgetForm.php:246
 msgid "Arc background"
-msgstr ""
+msgstr "Фон дуги"
 
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
-msgstr ""
+msgstr "Розмір дуги"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -1568,12 +1568,12 @@ msgstr[2] ""
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
 msgid "At %1$s on %2$s %3$s of every %4$s"
-msgstr ""
+msgstr "О %1$s %2$s %3$s кожні %4$s"
 
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
 msgid "At %1$s on day %2$s of every %3$s"
-msgstr ""
+msgstr "Об %1$s на %2$s день кожний %3$s"
 
 #: app/views/maintenance.timeperiod.edit.php:189
 msgid "At (hour:minute)"
@@ -1671,7 +1671,7 @@ msgstr "Атрибут"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "Текст атрибуції"
 
 #: app/controllers/CControllerAuditLogList.php:190
 #: app/views/administration.audit.settings.edit.php:29
@@ -1850,11 +1850,11 @@ msgstr "Середня"
 
 #: include/classes/data/CItemData.php:2478
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Середня кількість невиконаних запитів на читання віртуального диска протягом інтервалу збору даних, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware, \"instance\" - екземпляр дискового пристрою"
 
 #: include/classes/data/CItemData.php:2513
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Середня кількість невиконаних запитів на запис віртуального диска протягом інтервалу збору даних, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware, \"instance\" - екземпляр дискового пристрою"
 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
@@ -2084,23 +2084,23 @@ msgstr "Завантаження CPU. Повертає дробове значе
 
 #: include/classes/data/CItemData.php:2282
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "Час процесора, витрачений на очікування заміни, \"url\" - URL-адреса служби VMware, \"uuid\" - ім'я хоста віртуальної машини VMware, \"instance\" - екземпляр ЦП"
 
 #: include/classes/data/CItemData.php:1939
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Використання ЦП у відсотках протягом інтервалу залежить від керування живленням або багатопотоковості, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор гіпервізора VMware"
 
 #: include/classes/data/CItemData.php:1925
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Використання ЦП у відсотках протягом інтервалу, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор гіпервізора VMware"
 
 #: include/classes/data/CItemData.php:2289
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Використання ЦП у відсотках протягом інтервалу, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware"
 
 #: include/classes/data/CItemData.php:2205
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
-msgstr ""
+msgstr "Використання ЦП у герцах протягом інтервалу в пулі ресурсів VMware, \"url\" - URL-адреса служби VMware, \"rpid\" - ідентифікатор пулу ресурсів VMware"
 
 #: include/classes/data/CItemData.php:1399
 msgid "CPU utilization percentage. Returns float"
@@ -2269,7 +2269,7 @@ msgstr "Неможливо додати більше одного елемент
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "До діаграми не можна додати більше одного елемента даних із типом \"Усього\"."
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -2414,27 +2414,27 @@ msgstr[2] "Не вдалося скопіювати графіки"
 #: include/classes/helpers/CGraphHelper.php:74
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
-msgstr ""
+msgstr "Неможливо скопіювати графік \"%1$s\", оскільки він містить елементи даних з кількох вузлів мережі."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:91
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "Неможливо скопіювати графік \"%1$s\", оскільки елемент даних з ключем \"%2$s\" не існує на вузлі \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:92
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "Неможливо скопіювати графік \"%1$s\", оскільки елемент даних з ключем \"%2$s\" не існує в шаблоні \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:96
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "Неможливо скопіювати прототип графіку \"%1$s\", оскільки елемент даних з ключем \"%2$s\" не існує на вузлі \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:97
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "Неможливо скопіювати прототип графіку \"%1$s\", оскільки елемент даних з ключем \"%2$s\" не існує в шаблоні \"%3$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
@@ -2463,12 +2463,12 @@ msgstr[2] "Не вдалося скопіювати тригери"
 #: include/classes/helpers/CTriggerGeneralHelper.php:196
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
-msgstr ""
+msgstr "Неможливо скопіювати тригер \"%1$s\" без тригера \"%2$s\", від якого він залежить, на вузлі \"%3$s\"."
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:197
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
-msgstr ""
+msgstr "Неможливо скопіювати тригер \"%1$s\" без тригера \"%2$s\", від якого він залежить, в шаблоні \"%3$s\"."
 
 #: include/classes/helpers/CTriggerHelper.php:76
 #, c-format
@@ -2478,7 +2478,7 @@ msgstr "Не вдалося скопіювати тригер \"%1$s\", оскі
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr ""
+msgstr "Не вдалося скопіювати тригер \"%1$s\", оскільки він містить кілька шаблонів у виразі."
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
@@ -2507,7 +2507,7 @@ msgstr "Не вдалося створити правило виявлення"
 #: app/controllers/CControllerCorrelationCreate.php:48
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot create event correlation"
-msgstr ""
+msgstr "Неможливо створити кореляцію подій"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
@@ -2549,7 +2549,7 @@ msgstr "Не вдалося створити роль користувача"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "Не вдалося створити крок веб-сценарію"
 
 #: app/controllers/CControllerTokenDelete.php:72
 msgid "Cannot delete API token"
@@ -2614,9 +2614,9 @@ msgstr[2] "Не вдалося видалити правила виявленн�
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не вдалося видалити кореляцію подій"
+msgstr[1] "Не вдалося видалити кореляції подій"
+msgstr[2] "Не вдалося видалити кореляцій подій"
 
 #: graphs.php:281 graphs.php:338
 #, fuzzy
@@ -2925,9 +2925,9 @@ msgstr[2] "Не вдалося дезактивувати правила вия�
 #: app/controllers/CControllerCorrelationDisable.php:76
 msgid "Cannot disable event correlation"
 msgid_plural "Cannot disable event correlations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не вдалося відключити кореляцію подій"
+msgstr[1] "Не вдалося відключити кореляції подій"
+msgstr[2] "Не вдалося відключити кореляцій подій"
 
 #: app/controllers/CControllerHostGroupDisable.php:91
 #: app/controllers/CControllerPopupMassupdateHost.php:498
@@ -3028,9 +3028,9 @@ msgstr[2] "Не вдалося активувати правила виявле�
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable event correlation"
 msgid_plural "Cannot enable event correlations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не вдалося активувати кореляцію подій"
+msgstr[1] "Не вдалося активувати кореляції подій"
+msgstr[2] "Не вдалося активувати кореляцій подій"
 
 #: app/controllers/CControllerHostGroupEnable.php:91
 #: app/controllers/CControllerPopupMassupdateHost.php:497
@@ -3320,7 +3320,7 @@ msgstr "Неможливо успадкувати правило LLD із клю
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Неможливо успадкувати правило LLD із ключем \"%1$s\" шаблону \"%2$s\" для хосту \"%3$s\", оскільки LLD правило із таким самим ключем уже успадковано від шаблону \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
@@ -3340,7 +3340,7 @@ msgstr "Неможливо успадкувати правило LLD із клю
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Неможливо успадкувати правило LLD із ключем \"%1$s\" шаблону \"%2$s\" для шаблону \"%3$s\", оскільки LLD правило із таким самим ключем уже успадковано від шаблону \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
@@ -3380,7 +3380,7 @@ msgstr "Неможливо успадкувати прототип елемен�
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Неможливо успадкувати прототип елемента з ключем \"%1$s\" шаблону \"%2$s\" для хосту \"%3$s\", оскільки прототип елемента із таким самим ключем уже успадковано від шаблону \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
@@ -3400,7 +3400,7 @@ msgstr "Неможливо успадкувати прототип елемен�
 #: include/classes/api/services/CItemGeneral.php:881
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Неможливо успадкувати прототип елемента з ключем \"%1$s\" шаблону \"%2$s\" для шаблону \"%3$s\", оскільки прототип елемента із таким самим ключем уже успадковано від шаблону \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:830
 #, c-format
@@ -3504,7 +3504,7 @@ msgstr "Не вдалося приєднати шаблон"
 #: include/classes/api/services/CHostBase.php:806
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із вузлом \"%2$s\", оскільки він буде двічі зв'язаний через шаблон \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:872
 #, c-format
@@ -3514,7 +3514,7 @@ msgstr "Неможливо зв’язати шаблон «%1$s» із хост
 #: include/classes/api/services/CHostBase.php:803
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із прототипом вузла \"%2$s\", оскільки він буде двічі зв'язаний через шаблон \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:869
 #, c-format
@@ -3540,37 +3540,37 @@ msgstr "Неможливо пов’язати шаблон «%1$s» із шаб
 #: include/classes/api/services/CHostBase.php:976
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки він буде зв'язаний із вузлом \"%3$s\" двічі."
 
 #: include/classes/api/services/CHostBase.php:973
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки він буде зв'язаний із прототипом вузла \"%3$s\" двічі."
 
 #: include/classes/api/services/CHostBase.php:970
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки він буде зв'язаний із шаблоном \"%3$s\" двічі."
 
 #: include/classes/api/services/CHostBase.php:800
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки він буде двічі зв'язаний через шаблон \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки його батьківський шаблон \"%3$s\" буде зв’язано з вузлом \"%4$s\" двічі."
 
 #: include/classes/api/services/CHostBase.php:1000
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки його батьківський шаблон \"%3$s\" буде пов’язано з прототипом вузла \"%4$s\" двічі."
 
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки його батьківський шаблон \"%3$s\" буде зв’язано з шаблоном \"%4$s\" двічі."
 
 #: include/classes/api/services/CHostBase.php:866
 #, c-format
@@ -3956,7 +3956,7 @@ msgstr[2] "Не вдалося оновити події"
 #: app/controllers/CControllerCorrelationUpdate.php:49
 #: app/controllers/CControllerCorrelationUpdate.php:117
 msgid "Cannot update event correlation"
-msgstr ""
+msgstr "Не вдалося оновити кореляцію подій"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
@@ -4186,7 +4186,7 @@ msgstr "Не вдалося оновити веб сценарій"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:57
 msgid "Cannot update web scenario step"
-msgstr ""
+msgstr "Не вдалося оновити крок веб-сценарію"
 
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
@@ -4596,7 +4596,7 @@ msgstr "Колір (ОК)"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
-msgstr ""
+msgstr "Кольори"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -5193,7 +5193,7 @@ msgstr "Кількість співпавших рядків в лог файл�
 
 #: include/classes/data/CItemData.php:2645
 msgid "Count of network checks enqueued in the discovery queue."
-msgstr ""
+msgstr "Кількість мережевих перевірок, поставлених у чергу виявлення."
 
 #: include/classes/data/CItemData.php:2638
 msgid "Count of values enqueued in the connector queue."
@@ -5287,7 +5287,7 @@ msgstr "Створювати активованим"
 
 #: app/views/correlation.list.php:35
 msgid "Create event correlation"
-msgstr ""
+msgstr "Створити кореляцію подій"
 
 #: include/views/configuration.graph.list.php:63
 msgid "Create graph"
@@ -5678,11 +5678,11 @@ msgstr[2] "Панелі видалено"
 
 #: jsLoader.php:200
 msgid "Dashboard is used as data source."
-msgstr ""
+msgstr "Панель використовується як джерело даних."
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Dashboard list"
-msgstr ""
+msgstr "Список панелей"
 
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
@@ -6147,7 +6147,7 @@ msgstr "Видалити правило виявлення?"
 
 #: app/views/correlation.edit.php:329
 msgid "Delete event correlation?"
-msgstr ""
+msgstr "Видалити кореляцію подій?"
 
 #: app/views/js/trigger.edit.js.php:464
 msgid "Delete expression?"
@@ -6252,11 +6252,11 @@ msgstr "Видалити вибрані елементи?"
 
 #: app/views/js/correlation.list.js.php:96
 msgid "Delete selected event correlation?"
-msgstr ""
+msgstr "Видалити вибрану кореляцію подій?"
 
 #: app/views/js/correlation.list.js.php:95
 msgid "Delete selected event correlations?"
-msgstr ""
+msgstr "Видалити вибрані кореляції подій?"
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6752,11 +6752,11 @@ msgstr "Дезактивувати вибрані правила виявлен�
 
 #: app/views/js/correlation.list.js.php:147
 msgid "Disable selected event correlation?"
-msgstr ""
+msgstr "Вимкнути вибрану кореляцію подій?"
 
 #: app/views/js/correlation.list.js.php:146
 msgid "Disable selected event correlations?"
-msgstr ""
+msgstr "Вимкнути вибрані кореляції подій?"
 
 #: app/views/usergroup.list.php:231
 msgid "Disable selected group?"
@@ -6971,27 +6971,27 @@ msgstr "Виявлення сховищ даних гіпервізора VMware
 
 #: include/classes/data/CItemData.php:2107
 msgid "Discovery of VMware hypervisor network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Виявлення мережевих інтерфейсів гіпервізора VMware, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор гіпервізора VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:1995
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Виявлення гіпервізорів VMware, \"url\" - URL-адреса служби VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:2541
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Виявлення дискових пристроїв віртуальної машини VMware, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:2562
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Виявлення файлових систем віртуальної машини VMware, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:2408
 msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Виявлення мережевих інтерфейсів віртуальної машини VMware, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор віртуальної машини VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:2310
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Виявлення віртуальних машин VMware, \"url\" - URL-адреса служби VMware. Повертає JSON"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
@@ -7560,11 +7560,11 @@ msgstr "Активувати вибрані правила виявлення?"
 
 #: app/views/js/correlation.list.js.php:121
 msgid "Enable selected event correlation?"
-msgstr ""
+msgstr "Увімкнути вибрану кореляцію подій?"
 
 #: app/views/js/correlation.list.js.php:120
 msgid "Enable selected event correlations?"
-msgstr ""
+msgstr "Увімкнути вибрані кореляції подій?"
 
 #: app/views/usergroup.list.php:221
 msgid "Enable selected group?"
@@ -7799,36 +7799,36 @@ msgstr "Кореляція подій"
 #: include/classes/api/services/CCorrelation.php:536
 #, c-format
 msgid "Event correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "Кореляція подій \"%1$s\" вже існує."
 
 #: app/controllers/CControllerCorrelationCreate.php:107
 msgid "Event correlation created"
-msgstr ""
+msgstr "Кореляція подій створена"
 
 #: app/controllers/CControllerCorrelationDelete.php:60
 msgid "Event correlation deleted"
 msgid_plural "Event correlations deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Кореляцію подій видалено"
+msgstr[1] "Кореляції подій видалено"
+msgstr[2] "Кореляцій подій видалено"
 
 #: app/controllers/CControllerCorrelationDisable.php:68
 msgid "Event correlation disabled"
 msgid_plural "Event correlations disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Кореляцію подій дезактивовано"
+msgstr[1] "Кореляції подій дезактивовано"
+msgstr[2] "Кореляцій подій дезактивовано"
 
 #: app/controllers/CControllerCorrelationEnable.php:68
 msgid "Event correlation enabled"
 msgid_plural "Event correlations enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Кореляцію подій активовано"
+msgstr[1] "Кореляції подій активовано"
+msgstr[2] "Кореляцій подій активовано"
 
 #: include/events.inc.php:143
 msgid "Event correlation rule"
-msgstr ""
+msgstr "Правило кореляції подій"
 
 #: app/controllers/CControllerCorrelationEdit.php:130
 #: app/controllers/CControllerCorrelationList.php:128
@@ -7837,7 +7837,7 @@ msgstr "Правила кореляції події"
 
 #: app/controllers/CControllerCorrelationUpdate.php:109
 msgid "Event correlation updated"
-msgstr ""
+msgstr "Кореляція подій оновлена"
 
 #: tr_events.php:29 tr_events.php:172 tr_events.php:191
 msgid "Event details"
@@ -7861,7 +7861,7 @@ msgstr "Список подій [20 попередніх]"
 
 #: include/classes/data/CItemData.php:962
 msgid "Event log monitoring. Returns count of entries"
-msgstr ""
+msgstr "Моніторинг журналів подій. Повертає кількість записів"
 
 #: include/classes/data/CItemData.php:956
 msgid "Event log monitoring. Returns log"
@@ -8726,12 +8726,12 @@ msgstr "Графік \"%1$s\" вже існує у \"%2$s\"."
 #: include/classes/api/services/CGraph.php:479
 #, c-format
 msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Графік \"%1$s\" вже існує у вузла мережі \"%2$s\"."
 
 #: include/classes/api/services/CGraph.php:480
 #, c-format
 msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Графік \"%1$s\" вже існує у шаблоні \"%2$s\"."
 
 #: include/classes/api/services/CGraph.php:38
 #, c-format
@@ -8776,12 +8776,12 @@ msgstr "Прототип графіків"
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
-msgstr ""
+msgstr "Прототип графіка \"%1$s\" уже існує в LLD правилі з ключем \"%2$s\" вузла мережі \"%3$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
-msgstr ""
+msgstr "Прототип графіка \"%1$s\" уже існує в LLD правилі з ключем \"%2$s\" шаблону \"%3$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:702
 #, c-format
@@ -8910,7 +8910,7 @@ msgstr "Група \"%1$s\" для вузла мережі \"%2$s\" не існ�
 
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
-msgstr ""
+msgstr "Базовий DN для пошуку групи (Base DN)"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9300,7 +9300,7 @@ msgstr "Кількість вузлів мережі"
 
 #: app/views/monitoring.host.dashboard.view.php:73
 msgid "Host dashboards"
-msgstr ""
+msgstr "Панелі вузлів"
 
 #: app/controllers/CControllerHostMassDelete.php:66
 #, fuzzy
@@ -9707,7 +9707,7 @@ msgstr "Угорська (hu_HU)"
 #: widgets/geomap/Widget.php:50
 msgctxt "abbreviation of severity level"
 msgid "I"
-msgstr ""
+msgstr "I"
 
 #: app/partials/massupdate.macros.tab.php:112
 msgid "I confirm to remove all macros"
@@ -9910,24 +9910,24 @@ msgstr "При відповідності фільтру"
 #, c-format
 msgid "If less than %2$s child service has %1$s status or below"
 msgid_plural "If less than %2$s child services have %1$s status or below"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Якщо менше %2$s дочірньої служби мають статус %1$s або нижче"
+msgstr[1] "Якщо менше %2$s дочірні служби мають статус %1$s або нижче"
+msgstr[2] "Якщо менше %2$s дочірніх служб мають статус %1$s або нижче"
 
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
 msgid "If less than %2$s child services have %1$s status or below"
-msgstr ""
+msgstr "Якщо менше %2$s дочірніх служб мають статус %1$s або нижче"
 
 #: include/classes/helpers/CServiceHelper.php:50
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
-msgstr ""
+msgstr "Якщо менше ніж %2$s дочірніх служб мають статус %1$s або нижче"
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
-msgstr ""
+msgstr "Якщо групи користувачів не вказано, принаймні один користувач має бути включений до списку розсилки."
 
 #: include/classes/helpers/CServiceHelper.php:55
 #: include/classes/helpers/CServiceHelper.php:60
@@ -9935,7 +9935,7 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:110
 #, c-format
 msgid "If weight of child services with %1$s status or above is at least %2$s"
-msgstr ""
+msgstr "Якщо вага дочірніх служб зі статусом %1$s або вище становить принаймні %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:65
 #: include/classes/helpers/CServiceHelper.php:70
@@ -9943,7 +9943,7 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:118
 #, c-format
 msgid "If weight of child services with %1$s status or below is less than %2$s"
-msgstr ""
+msgstr "Якщо вага дочірніх служб зі статусом %1$s або нижче менше ніж %2$s"
 
 #: include/classes/core/ZBase.php:767 include/func.inc.php:1688
 #: include/func.inc.php:1710
@@ -10909,7 +10909,7 @@ msgstr "Інфо"
 
 #: include/classes/data/CItemData.php:2002
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Інформація про внутрішні диски гіпервізора необхідна для vmware.datastore.perfcounter, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор гіпервізора VMware. Повертає JSON"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: widgets/geomap/Widget.php:40
@@ -18427,7 +18427,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:356
 msgid "Sign"
-msgstr ""
+msgstr "Підписувати"
 
 #: include/views/general.login.php:64 include/views/general.login.php:79
 msgid "Sign in"

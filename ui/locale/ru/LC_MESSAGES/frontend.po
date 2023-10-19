@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 13:43+0300\n"
-"PO-Revision-Date: 2023-09-22 06:33+0000\n"
-"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
+"POT-Creation-Date: 2023-10-19 13:48+0300\n"
+"PO-Revision-Date: 2023-10-04 15:31+0000\n"
+"Last-Translator: Aleksej <azaletski@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -949,7 +949,7 @@ msgstr "Добавить (достигнуто максимальное коли
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Добавьте колонку"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
@@ -1001,7 +1001,7 @@ msgstr "Добавить несколько карт"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:89
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:93
 msgid "Add new data set"
-msgstr "Добавить новый набор данных"
+msgstr "Новый набор данных"
 
 #: app/partials/configuration.host.edit.html.php:242
 #: include/views/configuration.host.prototype.edit.php:286
@@ -1183,11 +1183,11 @@ msgstr "Функции агрегации"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Агрегирование каждого элемента данных в наборе данных."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Агрегирование всего набора данных."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:282
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
@@ -1423,7 +1423,7 @@ msgstr "Ежегодно"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Источником данных используется другой виджет."
 
 #: app/partials/monitoring.host.filter.php:134 app/views/action.list.php:95
 #: app/views/administration.proxy.list.php:53
@@ -1568,12 +1568,12 @@ msgstr[2] ""
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
 msgid "At %1$s on %2$s %3$s of every %4$s"
-msgstr ""
+msgstr "В %1$s в %2$s %3$s каждый %4$s"
 
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
 msgid "At %1$s on day %2$s of every %3$s"
-msgstr ""
+msgstr "В %1$s на %2$s каждый %3$s"
 
 #: app/views/maintenance.timeperiod.edit.php:189
 msgid "At (hour:minute)"
@@ -2269,7 +2269,7 @@ msgstr "Невозможно добавить более одного элеме
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "Невозможно добавить к диаграмме более одного элемента данных с типом \"Итого\"."
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -3320,7 +3320,7 @@ msgstr "Не удалось унаследовать LDD правило с кл�
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Не удалось унаследовать низкоуровневое правило обнаружения с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как низкоуровневое правило обнаружения с таким же ключом уже унаследовано с шаблона \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
@@ -3340,7 +3340,7 @@ msgstr "Не удалось унаследовать LDD правило с кл�
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Не удалось унаследовать низкоуровневое правило обнаружения с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как низкоуровневое правило обнаружения с таким же ключом уже унаследовано с шаблона \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
@@ -3380,7 +3380,7 @@ msgstr "Не удалось унаследовать прототип элеме
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Не удалось унаследовать прототип элементов данных с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как прототип элементов данных с таким же ключом уже унаследован с шаблона \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
@@ -3400,7 +3400,7 @@ msgstr "Не удалось унаследовать прототип элеме
 #: include/classes/api/services/CItemGeneral.php:881
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Не удалось унаследовать прототип элементов данных с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как прототип элементов данных с таким же ключом уже унаследован с шаблона \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:830
 #, c-format
@@ -3730,7 +3730,7 @@ msgstr "Не удалось установить \"%1$s\" для прототи�
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
-msgstr ""
+msgstr "Невозможно задать \"Агрегирование набора данных\" при добавленном на диаграмму элементе данных с типом \"Итого\"."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4328,11 +4328,11 @@ msgstr "Проверьте часть выражения начиная с \"%1$
 
 #: include/items.inc.php:1614
 msgid "Check for error in JSON"
-msgstr "Проверьте на ошибку в JSON"
+msgstr "Проверка на ошибку в JSON"
 
 #: include/items.inc.php:1618
 msgid "Check for error in XML"
-msgstr "Проверьте на ошибку в XML"
+msgstr "Проверка на ошибку в XML"
 
 #: include/items.inc.php:1622
 msgid "Check for error using regular expression"
@@ -4624,7 +4624,7 @@ msgstr "Команды"
 
 #: app/views/administration.timeouts.edit.php:138
 msgid "Communication"
-msgstr ""
+msgstr "Взаимодействие"
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -4809,7 +4809,7 @@ msgstr "Настройка шаблонов"
 
 #: app/controllers/CControllerTimeoutsEdit.php:110
 msgid "Configuration of timeouts"
-msgstr ""
+msgstr "Настройка времени ожидания"
 
 #: app/controllers/CControllerTrigDisplayEdit.php:132
 msgid "Configuration of trigger displaying options"
@@ -4897,7 +4897,7 @@ msgstr "Соединение"
 
 #: app/views/administration.timeouts.edit.php:148
 msgid "Connection"
-msgstr ""
+msgstr "Подключение"
 
 #: app/views/administration.mediatype.edit.php:91
 #: app/views/mediatype.edit.php:105
@@ -5678,11 +5678,11 @@ msgstr[2] "Панели удалены"
 
 #: jsLoader.php:200
 msgid "Dashboard is used as data source."
-msgstr ""
+msgstr "Источником данных используется панель."
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Dashboard list"
-msgstr ""
+msgstr "Список панелей"
 
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
@@ -5771,7 +5771,7 @@ msgstr "Набор данных"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:304
 msgid "Data set aggregation"
-msgstr ""
+msgstr "Агрегация набора данных"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:325
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:449
@@ -7195,7 +7195,7 @@ msgstr "Точечная линия"
 
 #: widgets/piechart/includes/WidgetForm.php:122
 msgid "Doughnut"
-msgstr ""
+msgstr "Кольцевая диаграмма"
 
 #: widgets/discovery/views/widget.view.php:37
 msgctxt "discovery results in dashboard"
@@ -8195,7 +8195,7 @@ msgstr "Ошибка при обновлении общего доступа к 
 
 #: jsLoader.php:128
 msgid "Failed to update time selector."
-msgstr ""
+msgstr "Ошибка при обновлении выбора времени."
 
 #: jsLoader.php:143
 msgid "Failed to update widget properties."
@@ -8557,7 +8557,7 @@ msgstr "Доступ к веб-интерфейсу деактивирован."
 
 #: widgets/gauge/Widget.php:46
 msgid "Gauge"
-msgstr ""
+msgstr "Радиальный датчик"
 
 #: include/classes/helpers/CMenuHelper.php:338
 #: include/classes/helpers/CRoleHelper.php:507
@@ -8620,7 +8620,7 @@ msgstr "Заданное выражение не является макросо
 #: include/views/configuration.item.edit.php:866
 #: include/views/configuration.item.prototype.edit.php:820
 msgid "Global"
-msgstr ""
+msgstr "Глобальный"
 
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
@@ -8629,7 +8629,7 @@ msgstr "Глобальное регулярное выражение \"%1$s\" н
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
-msgstr ""
+msgstr "Глобальное время ожидания"
 
 #: app/partials/hostmacros.inherited.list.html.php:57
 msgid "Global value"
@@ -8776,12 +8776,12 @@ msgstr "Прототип графиков"
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
-msgstr ""
+msgstr "Прототип графиков \"%1$s\" уже существует в низкоуровневом правиле обнаружения с ключом \"%2$s\" у узла сети \"%3$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
-msgstr ""
+msgstr "Прототип графиков \"%1$s\" уже существует в низкоуровневом правиле обнаружения с ключом \"%2$s\" у шаблона \"%3$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:702
 #, c-format
@@ -9300,7 +9300,7 @@ msgstr "Количество узлов сети"
 
 #: app/views/monitoring.host.dashboard.view.php:73
 msgid "Host dashboards"
-msgstr ""
+msgstr "Панели узла сети"
 
 #: app/controllers/CControllerHostMassDelete.php:66
 #, fuzzy
@@ -9698,7 +9698,7 @@ msgstr "Очистка истории"
 #: include/views/configuration.item.edit.php:1084
 #: include/views/configuration.item.prototype.edit.php:952
 msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
-msgstr ""
+msgstr "Однако, если добавлены шаги \"Проверка на неподдерживамое значение\", эти шаги всегда располагаются и выполняются первыми (при этом \"любая ошибка\" располагается последним из этих шагов)."
 
 #: include/locales.inc.php:47
 msgid "Hungarian (hu_HU)"
@@ -11701,7 +11701,7 @@ msgstr "Теги элемента данных"
 
 #: app/views/administration.timeouts.edit.php:178
 msgid "Item test"
-msgstr ""
+msgstr "Тест элементов данных"
 
 #: jsLoader.php:400
 msgid "Item type does not use interface"
@@ -11955,7 +11955,7 @@ msgstr "LLD макросы"
 
 #: app/controllers/CControllerAuditLogList.php:242
 msgid "LLD rule"
-msgstr ""
+msgstr "Правило LLD"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
@@ -12984,7 +12984,7 @@ msgstr "Соответствие способов оповещений"
 
 #: app/views/administration.timeouts.edit.php:158
 msgid "Media type test"
-msgstr ""
+msgstr "Тест способов оповещения"
 
 #: app/controllers/CControllerMediatypeTestSend.php:50
 #: app/controllers/CControllerMediatypeTestSend.php:174
@@ -13072,7 +13072,7 @@ msgstr "Путь в меню"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
-msgstr ""
+msgstr "Объединение секторов меньших чем"
 
 #: app/partials/scheduledreport.formgrid.html.php:178
 #: app/views/mediatype.message.edit.php:96
@@ -13667,7 +13667,7 @@ msgstr "Перейти к начальному виду"
 #: widgets/gauge/includes/WidgetForm.php:190
 #: widgets/gauge/views/widget.edit.php:197
 msgid "Needle"
-msgstr ""
+msgstr "Стрелка"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -13701,7 +13701,7 @@ msgstr "Карты сетей"
 
 #: app/views/administration.timeouts.edit.php:136
 msgid "Network timeouts for UI"
-msgstr ""
+msgstr "Время ожидания сети для веб-интерфейса"
 
 #: include/classes/data/CItemData.php:2429
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
@@ -13834,7 +13834,7 @@ msgstr "Новый шаг веб-сценария"
 
 #: app/controllers/CControllerUsergroupTagFilterEdit.php:65
 msgid "New tag filter"
-msgstr ""
+msgstr "Новый фильтр тегов"
 
 #: app/views/correlation.condition.edit.php:136
 msgid "New tag name"
@@ -13851,11 +13851,11 @@ msgstr "Новая группа шаблонов"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "Новый триггер"
 
 #: app/views/trigger.prototype.edit.php:144
 msgid "New trigger prototype"
-msgstr ""
+msgstr "Новый прототип триггеров"
 
 #: include/views/js/monitoring.sysmaps.js.php:191
 msgid "New triggers"
@@ -13930,7 +13930,7 @@ msgstr "Без изменений."
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
-msgstr ""
+msgstr "Совместимые виджеты отсутствуют."
 
 #: jsLoader.php:412 tests/selenium/modules/clock32/views/widget.view.php:83
 #: widgets/clock/views/widget.view.php:83
@@ -15131,7 +15131,7 @@ msgstr "Замещение"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
-msgstr ""
+msgstr "Переопределение узла сети"
 
 #: app/partials/administration.system.info.php:210
 #: app/views/administration.housekeeping.edit.php:129
@@ -15665,7 +15665,7 @@ msgstr "Круговой"
 
 #: widgets/piechart/Widget.php:31
 msgid "Pie chart"
-msgstr ""
+msgstr "Круговая диаграмма"
 
 #: include/views/js/monitoring.sysmaps.js.php:138
 msgid "Placing algorithm"
@@ -15820,7 +15820,7 @@ msgstr "Предобработка"
 #: include/views/configuration.item.edit.php:1082
 #: include/views/configuration.item.prototype.edit.php:950
 msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
-msgstr ""
+msgstr "Предварительная обработка - преобразование до сохранения значения в базу данных. Можно задать последовательность шагов предварительной обработки, и они будут выполнены в заданном порядке."
 
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
@@ -16243,7 +16243,7 @@ msgstr "Файл публичного ключа"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
-msgstr ""
+msgstr "Нажать"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -17101,7 +17101,7 @@ msgstr "Получение количества UDP сокетов, которы
 
 #: include/classes/data/CItemData.php:2862
 msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
-msgstr ""
+msgstr "Возвращает количество изменений состояния с режимов диск / память с момента запуска. Частое изменение состояния указывает на то, что необходимо увеличить размер буфера или срок хранения данных в буфере."
 
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
@@ -17289,7 +17289,7 @@ msgstr "SLA с ID \"%1$s\" недоступен."
 
 #: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
 msgid "SLAs"
-msgstr ""
+msgstr "SLA"
 
 #: app/partials/service.info.php:61 app/views/slareport.list.php:164
 msgid "SLI"
@@ -17626,7 +17626,7 @@ msgstr[2] "Регулярные отчеты активированы"
 
 #: app/views/administration.timeouts.edit.php:188
 msgid "Scheduled report test"
-msgstr ""
+msgstr "Текст регулярных отчетов"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
@@ -17702,7 +17702,7 @@ msgstr "Скрипт не имеет параметров."
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
-msgstr ""
+msgstr "Выполнение скриптов"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -18279,7 +18279,7 @@ msgstr "Показать"
 #: widgets/piechart/includes/WidgetForm.php:205
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
-msgstr ""
+msgstr "Отображение функции агрегирования"
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -18394,7 +18394,7 @@ msgstr "Шкала времени"
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
-msgstr ""
+msgstr "Отображение общего значения"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -18607,7 +18607,7 @@ msgstr "Источник"
 
 #: widgets/piechart/includes/WidgetForm.php:132
 msgid "Space between sectors"
-msgstr ""
+msgstr "Интервал между секторами"
 
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
@@ -18730,7 +18730,7 @@ msgstr "Статистика и доступность кэша записи в 
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
-msgstr ""
+msgstr "Статистика и доступность буфера памяти прокси. Режим (режимы: pfree, free, total, used, pused)."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -19006,7 +19006,7 @@ msgstr "Поддержка"
 
 #: include/classes/setup/CSetupWizard.php:517
 msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
-msgstr ""
+msgstr "Начиная с Zabbix 7.0, поддержка БД Oracle является устаревшей и будет прекращена в будущих версиях."
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:37
 msgid "Supported formats:"
@@ -19185,7 +19185,7 @@ msgstr "Теги для совпадения"
 
 #: app/views/usergroup.tagfilter.edit.php:75
 msgid "Tag list"
-msgstr ""
+msgstr "Список тегов"
 
 #: app/partials/monitoring.latest.filter.php:156
 #: app/partials/monitoring.problem.filter.php:260 include/actions.inc.php:67
@@ -19927,16 +19927,16 @@ msgstr "Время ожидания"
 #: include/views/configuration.item.prototype.edit.php:806
 #: include/views/configuration.item.prototype.edit.php:809
 msgid "Timeouts"
-msgstr ""
+msgstr "Время ожидания"
 
 #: app/views/popup.proxy.edit.php:186
 msgid "Timeouts are disabled because the proxy and server versions do not match."
-msgstr ""
+msgstr "Время ожидания отключено, поскольку версии прокси и сервера не совпадают."
 
 #: app/views/administration.timeouts.edit.php:42
 #: app/views/popup.proxy.edit.php:191
 msgid "Timeouts for item types"
-msgstr ""
+msgstr "Время ожидания по типам элементов данных"
 
 #: include/classes/screens/CScreenHistory.php:265
 #: include/classes/screens/CScreenHistory.php:397
@@ -19998,7 +19998,7 @@ msgstr "По верхнему краю"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr ""
+msgstr "Топ 100 триггеров"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -20010,7 +20010,7 @@ msgstr "Топ узлов сети"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
-msgstr ""
+msgstr "Топ триггеров"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: widgets/hostavail/views/widget.view.php:44
@@ -20209,7 +20209,7 @@ msgstr[2] "Триггера скопированы"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger count"
-msgstr ""
+msgstr "Количество триггеров"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -20832,7 +20832,7 @@ msgstr "Единицы измерения"
 
 #: widgets/gauge/includes/WidgetForm.php:259
 msgid "Units size"
-msgstr ""
+msgstr "Размер единицы измерения"
 
 #: app/controllers/CControllerMediatypeTestSend.php:197
 #: app/partials/action.operations.php:77
@@ -22046,7 +22046,7 @@ msgstr "Значение \"%1$s\" является слишком длинным
 #: widgets/gauge/includes/WidgetForm.php:243
 #: widgets/gauge/views/widget.edit.php:189
 msgid "Value arc"
-msgstr ""
+msgstr "Значение дуги"
 
 #: include/classes/data/CItemData.php:2820
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -22119,7 +22119,7 @@ msgstr "Значение тега"
 
 #: widgets/gauge/includes/WidgetForm.php:231
 msgid "Value size"
-msgstr ""
+msgstr "Размер значений"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:345
 msgid "Value: no data"
@@ -22296,7 +22296,7 @@ msgstr "Предупреждающее сообщение"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
-msgstr ""
+msgstr "Предупреждение! Начиная с Zabbix 7.0, поддержка БД Oracle является устаревшей и будет прекращена в будущих версиях."
 
 #: app/partials/administration.system.info.php:155
 msgid "Warning! Unable to retrieve database version."
@@ -22445,7 +22445,7 @@ msgstr "Когда активен"
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
 #: jsLoader.php:195 jsLoader.php:199
 msgid "Widget"
-msgstr ""
+msgstr "Виджет"
 
 #: include/classes/api/services/CDashboardGeneral.php:352
 #, c-format
@@ -23032,7 +23032,7 @@ msgstr "ожидается строка, число или отсутствие 
 
 #: include/classes/api/services/CDiscoveryRule.php:1726
 msgid "a template ID is expected"
-msgstr ""
+msgstr "ожидается ID шаблона"
 
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
@@ -23112,7 +23112,7 @@ msgstr "ожидается IP адрес"
 
 #: include/classes/validators/CApiInputValidator.php:2807
 msgid "an IP or DNS is expected"
-msgstr ""
+msgstr "ожидается IP или DNS"
 
 #: include/classes/api/services/CDRule.php:495
 #: include/classes/api/services/CDRule.php:502
@@ -23192,7 +23192,7 @@ msgstr "и"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
-msgstr ""
+msgstr "любая ошибка"
 
 #: include/views/monitoring.history.php:181
 msgid "as Blue"
@@ -23489,7 +23489,7 @@ msgstr "не удалось отсоединить"
 
 #: include/classes/api/services/CDiscoveryRule.php:3034
 msgid "cannot delete inherited LLD rule"
-msgstr ""
+msgstr "невозможно удалить унаследованное правило низкоуровневого обнаружения"
 
 #: include/classes/api/services/CItem.php:909
 msgid "cannot delete inherited item"
@@ -23724,11 +23724,11 @@ msgstr "равно"
 
 #: include/forms.inc.php:1452 include/views/js/item.preprocessing.js.php:239
 msgid "error does not match"
-msgstr ""
+msgstr "ошибка не соответствует"
 
 #: include/forms.inc.php:1451 include/views/js/item.preprocessing.js.php:238
 msgid "error matches"
-msgstr ""
+msgstr "ошибка соответствует"
 
 #: include/views/js/item.preprocessing.js.php:615
 msgid "error message"
@@ -23736,7 +23736,7 @@ msgstr "сообщение об ошибке"
 
 #: app/views/js/popup.itemtestedit.view.js.php:479
 msgid "error text"
-msgstr ""
+msgstr "текст ошибки"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
@@ -24097,7 +24097,7 @@ msgstr "элемент данных с таким UUID уже существуе
 
 #: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "jsonpath() - Returns JSONPath result"
-msgstr ""
+msgstr "jsonpath() - Возвращает результат JSONPath"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -24498,7 +24498,7 @@ msgstr "число"
 
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
-msgstr ""
+msgstr "объект не существует или принадлежит другому объекту"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
@@ -24940,7 +24940,7 @@ msgstr "timeleft() - Время достижения порога вычисле
 
 #: include/classes/api/services/CProxy.php:835
 msgid "timeouts are disabled because the proxy and server versions do not match"
-msgstr ""
+msgstr "время ожидания отключено, поскольку версии прокси и сервера не совпадают"
 
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
@@ -25362,7 +25362,7 @@ msgstr "ошибочный тип основного элемента данны
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1207
 msgid "xmlxpath() - Returns XML XPath result"
-msgstr ""
+msgstr "xmlxpath() - Возвращает результат XML XPath"
 
 #: include/func.inc.php:565 jsLoader.php:208
 msgctxt "year short"
