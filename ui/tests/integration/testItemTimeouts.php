@@ -237,7 +237,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_SNMP,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '10s',
-				'timeout' => '6s',
+				'timeout' => '6s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_SSH],
@@ -250,7 +250,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_SSH,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '10s',
-				'timeout' => '6s',
+				'timeout' => '6s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_SIMPLE],
@@ -259,7 +259,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_SIMPLE,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '10s',
-				'timeout' => '6s',
+				'timeout' => '6s'
 			]
 		];
 
