@@ -109,6 +109,7 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	int		ret = FAIL, fd;
 	sigset_t	mask, orig_mask;
 	char		filename[MAX_STRING_LEN];
+	mode_t		mode;
 
 	if (FAIL == zbx_validate_hostname(address) && FAIL == is_supported_ip(address))
 	{
@@ -117,7 +118,12 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	}
 
 	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", CONFIG_TMPDIR, progname);
-	if (-1 == (fd = mkstemp(filename)))
+
+	mode = umask(077);
+	fd = mkstemp(filename);
+	umask(mode);
+
+	if (-1 == fd)
 	{
 		zbx_snprintf(error, max_error_len, "Cannot create temporary file \"%s\": %s", filename,
 				zbx_strerror(errno));
