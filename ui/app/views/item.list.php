@@ -29,6 +29,10 @@ $this->addJsFile('items.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
+if ($data['uncheck']) {
+	uncheckTableRows('item');
+}
+
 $filter = new CPartial('item.list.filter', [
 	'action' => $data['action'],
 	'context' => $data['context'],
