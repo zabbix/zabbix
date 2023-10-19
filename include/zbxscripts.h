@@ -22,6 +22,24 @@
 
 #include "zbxcacheconfig.h"
 
+typedef struct
+{
+	unsigned char	type;
+	unsigned char	execute_on;
+	char		*port;
+	unsigned char	authtype;
+	char		*username;
+	char		*password;
+	char		*publickey;
+	char		*privatekey;
+	char		*command;
+	char		*command_orig;
+	zbx_uint64_t	scriptid;
+	unsigned char	host_access;
+	int		timeout;
+}
+zbx_script_t;
+
 void	zbx_script_init(zbx_script_t *script);
 void	zbx_script_clean(zbx_script_t *script);
 int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid);

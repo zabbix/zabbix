@@ -349,24 +349,6 @@ typedef enum
 }
 zbx_user_permission_t;
 
-typedef struct
-{
-	unsigned char	type;
-	unsigned char	execute_on;
-	char		*port;
-	unsigned char	authtype;
-	char		*username;
-	char		*password;
-	char		*publickey;
-	char		*privatekey;
-	char		*command;
-	char		*command_orig;
-	zbx_uint64_t	scriptid;
-	unsigned char	host_access;
-	int		timeout;
-}
-zbx_script_t;
-
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	5
 
