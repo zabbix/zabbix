@@ -302,7 +302,7 @@ class CItemHelper extends CItemGeneralHelper {
 			$query_fields[] = [$field['name'] => $field['value']];
 		}
 
-		return json_encode($query_fields, JSON_UNESCAPED_UNICODE);
+		return $query_fields ? json_encode($query_fields, JSON_UNESCAPED_UNICODE) : '';
 	}
 
 	/**
