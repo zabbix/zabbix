@@ -202,6 +202,7 @@ function createFontSelect(string $name): CSelect {
 							(new CButton(null, _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->setId('newSelementTriggers')
+								->addStyle('margin-top: 5px;')
 						],
 						'triggerSelectRow'
 					)
