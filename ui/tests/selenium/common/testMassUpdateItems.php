@@ -1369,9 +1369,11 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
-				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$form = $overlay->asForm();
 
 				foreach ($data['change'] as $field => $value) {
 					switch ($field) {
@@ -1392,7 +1394,7 @@ class testMassUpdateItems extends CWebTest{
 						case 'User name':
 						case 'Password':
 						case 'Log time format':
-						case 'Timeout':
+						case 'id:timeout':
 							$this->assertEquals($value['value'], $form->getField($field)->getValue());
 							break;
 
@@ -1437,8 +1439,8 @@ class testMassUpdateItems extends CWebTest{
 									unset($interval['action'], $interval['index']);
 								}
 								unset($interval);
-								$this->assertEquals($value['Custom intervals'], $form->query('id:delayFlexTable')
-										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()->getValue()
+								$this->assertEquals($value['Custom intervals'], $form->getField('Custom intervals')
+										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->getValue()
 								);
 							}
 							break;
@@ -1450,7 +1452,7 @@ class testMassUpdateItems extends CWebTest{
 							}
 							unset($header);
 
-							$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
+							$this->assertEquals($value, $form->query('xpath:.//div[@id="js-item-headers-field"]//table')
 									->asMultifieldTable()->one()->getValue()
 							);
 							break;
@@ -1487,7 +1489,7 @@ class testMassUpdateItems extends CWebTest{
 					$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($data['expected_tags'][$name]);
 				}
 
-				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$overlay->getFooter()->query('button:Cancel')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -1798,7 +1800,8 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 				// TODO: not stable test testPageMassUpdateItems_ChangePreprocessing#8 on Jenkins, failed to properly waitUntilReady for page
 				try {
 					$table->query('link', $name)->one()->waitUntilClickable()->click();
@@ -1806,10 +1809,11 @@ class testMassUpdateItems extends CWebTest{
 				catch (ElementClickInterceptedException $e) {
 					$table->query('link', $name)->one()->waitUntilClickable()->click();
 				}
-				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$form = $overlay->asForm();
 				$form->selectTab('Preprocessing');
 				$this->assertPreprocessingSteps($data['Preprocessing steps']);
-				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -2241,9 +2245,11 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
-				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$form = $overlay->asForm();
 				$form->selectTab('Tags');
 
 				$expected = $data['Tags']['tags'];
@@ -2272,7 +2278,7 @@ class testMassUpdateItems extends CWebTest{
 				$expected_tags = array_key_exists('expected_tags', $data) ? $data['expected_tags'][$name] : $expected;
 				$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
 
-				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -2311,12 +2317,13 @@ class testMassUpdateItems extends CWebTest{
 	 */
 	private function openMassUpdateForm($prototypes, $data) {
 		$link = ($prototypes)
-			? 'disc_prototypes.php?parent_discoveryid='.self::RULEID.'&context=host'
-			: 'items.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
+			? 'zabbix.php?action=item.prototype.list&parent_discoveryid='.self::RULEID.'&context=host'
+			: 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
 		$this->page->login()->open($link);
 
 		// Get item table.
-		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+		$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+		$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 		$table->findRows('Name', $data)->select();
 
 		// Open mass update form.
