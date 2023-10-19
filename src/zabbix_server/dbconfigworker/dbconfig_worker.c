@@ -34,7 +34,7 @@
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
 
 static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
-		int *macros_names)
+		int *macro_used)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -47,7 +47,7 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 
 	if (0 == hostids->values[0])
 	{
-		if (0 == *macros_names)
+		if (0 == *macro_used)
 			zbx_vector_uint64_remove(hostids, 0);
 
 		if (0 == hostids->values_num)
@@ -121,7 +121,7 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 	zbx_db_commit();
 
 	if (0 == hostids->values[0] || 0 != *processed_num)
-		*macros_names = *processed_num;
+		*macro_used = *processed_num;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -135,7 +135,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	int			processed_num = 0, updated_num = 0, macro_names = 1;
+	int			processed_num = 0, updated_num = 0, macro_used = 1;
 	int			delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
 	double			sec = 0, time_flush;
 	zbx_timespec_t		timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
@@ -182,7 +182,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-			dbsync_item_rtname(&hostids, &processed_num, &updated_num, &macro_names);
+			dbsync_item_rtname(&hostids, &processed_num, &updated_num, &macro_used);
 
 			zbx_vector_uint64_clear(&hostids);
 
