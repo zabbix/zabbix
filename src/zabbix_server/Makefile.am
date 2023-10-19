@@ -77,7 +77,6 @@ zabbix_server_LDADD = \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
 	connector/libconnector.a \
-	dbconfigworker/libdbconfigworker.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
@@ -111,6 +110,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
+	dbconfigworker/libdbconfigworker.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_builddir)/src/libs/zbxshmem/libzbxshmem.a \

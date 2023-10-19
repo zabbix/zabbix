@@ -8,6 +8,7 @@ DIST_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
+	zbxdbconfigworker \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -136,6 +137,7 @@ PROXY_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
+	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
 	zbxcacheconfig \

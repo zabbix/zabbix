@@ -51,7 +51,7 @@ static int	dbsync_item_rtname(int *processed_num, int *updated_num)
 	result = zbx_db_select("select i.itemid,i.hostid,i.name,n.name_resolved,i.flags,h.status"
 			" from items i,item_rtname n,hosts h"
 			" where i.hostid=h.hostid and n.itemid=i.itemid and n.name_upper like '%%{$%%'"
-			" order by n.itemid");
+			" order by i.itemid");
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -144,7 +144,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
+	zabbix_increase_log_level();
 	/* initialize statistics */
 	time_flush = zbx_time();
 
