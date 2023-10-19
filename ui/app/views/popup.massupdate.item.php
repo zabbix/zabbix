@@ -427,12 +427,13 @@ if ($data['single_host_selected']) {
 				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(true)
+				->setAriaRequired()
 		);
 	}
 	else {
 		$item_form_list->addRow(
-			(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
+			(new CVisibilityBox('visible[master_itemid]', 'master_item-field', _('Original')))
+				->setLabel(_('Master item')),
 			(new CDiv([
 				(new CVar('master_itemname')),
 				[
@@ -474,7 +475,7 @@ if ($data['single_host_selected']) {
 							}, {dialogue_class: "modal-popup-generic"});
 						')
 				]
-			]))->setId('master_item')
+			]))->setId('master_item-field')
 		);
 	}
 }

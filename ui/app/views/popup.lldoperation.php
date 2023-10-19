@@ -258,8 +258,7 @@ $operations_popup_form_list
 			->setLabel(_('Tags'))
 			->setChecked(array_key_exists('optag', $options))
 			->setReadonly($options['templated']),
-		renderTagTable($field_values['optag'], $options['templated'],
-				['field_name' => 'optag', 'add_post_js' => false])
+		renderTagTable($field_values['optag'], $options['templated'], ['field_name' => 'optag', 'add_post_js' => false])
 			->setHeader([_('Name'), _('Value'), _('Action')])
 			->setId('optag-field')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

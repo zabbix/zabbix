@@ -49,7 +49,7 @@ $trigger_form_list = (new CFormList('trigger-form-list'))
 		(new CVisibilityBox('visible[priority]', 'priority', _('Original')))
 			->setLabel(_('Severity'))
 			->setAttribute('autofocus', 'autofocus'),
-		(new CSeverity('priority', 0))->setId('priority')
+		(new CSeverity('priority'))->setId('priority')
 	)
 	->addRow(
 		(new CVisibilityBox('visible[manual_close]', 'manual-close', _('Original')))

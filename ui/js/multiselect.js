@@ -390,6 +390,7 @@
 	 * a 'data-params' attribute with the following possible properties:
 	 *     string url                   backend url
 	 *     string name                  input element name
+	 *     string multiselect_id        multiselect wrapper id (optional)
 	 *     object labels                translated labels (optional)
 	 *     array  data                  preload data {id, name, prefix} (optional)
 	 *     string data[][id]

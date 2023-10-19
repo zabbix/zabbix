@@ -214,7 +214,7 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 
 $encryption_tab = new CFormList('encryption');
 
-$encryption_table = (new CFormList('encryption'))
+$encryption_table = (new CFormList('encryption-field'))
 	->addRow(_('Connections to host'),
 		(new CRadioButtonList('tls_connect', HOST_ENCRYPTION_NONE))
 			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
@@ -263,9 +263,7 @@ $encryption_table = (new CFormList('encryption'))
 
 $encryption_tab->addRow(
 	(new CVisibilityBox('visible[encryption]', 'encryption-field', _('Original')))->setLabel(_('Connections')),
-	(new CDiv($encryption_table))
-		->setId('encryption-field')
-		->addStyle('margin-top: -5px;')
+	$encryption_table->addStyle('margin-top: -5px;')
 );
 
 // append tabs to form
