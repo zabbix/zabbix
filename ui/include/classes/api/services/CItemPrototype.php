@@ -417,7 +417,7 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $items
 	 */
 	public static function createForce(array &$items): void {
-		$itemids = DB::insert('items', $items);
+		$itemids = DB::insert('items', self::encodeHttpFields($items));
 
 		$ins_items_discovery = [];
 		$host_statuses = [];
@@ -446,7 +446,6 @@ class CItemPrototype extends CItemGeneral {
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
 		self::updateTags($items);
-		self::updateHttpFields($items);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ITEM_PROTOTYPE, $items);
 
@@ -498,18 +497,15 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		/*
-		 * The fields "headers" and "query_fields" in API are arrays, but there is necessary to get the values of these
-		 * fields as they stored in database.
-		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
 				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
-			], array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])),
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
+		self::extractHttpFields($db_items);
 		self::addInternalFields($db_items);
 
 		foreach ($items as $i => &$item) {
@@ -661,10 +657,10 @@ class CItemPrototype extends CItemGeneral {
 		$upd_itemids = [];
 
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
-		$nested_object_fields = array_flip(['headers', 'tags', 'preprocessing', 'parameters', 'query_fields']);
+		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
 
 		foreach ($items as $i => &$item) {
-			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
+			$upd_item = DB::getUpdatedValues('items', CItemHelper::encodeHttpFields($item), $db_items[$item['itemid']]);
 
 			if ($upd_item) {
 				$upd_items[] = [
@@ -696,8 +692,6 @@ class CItemPrototype extends CItemGeneral {
 		self::updateTags($items, $db_items, $upd_itemids);
 		self::updatePreprocessing($items, $db_items, $upd_itemids);
 		self::updateParameters($items, $db_items, $upd_itemids);
-		self::updateHttpFields($items, $db_items, $upd_itemids);
-
 		self::updateDiscoveredItems($items, $db_items);
 
 		$items = array_intersect_key($items, $upd_itemids);
@@ -803,7 +797,7 @@ class CItemPrototype extends CItemGeneral {
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
-			], array_diff(CItemType::FIELD_NAMES, ['headers', 'interfaceid', 'parameters', 'query_fields'])),
+			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])),
 			'filter' => [
 				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				'hostid' => $templateids
@@ -815,6 +809,7 @@ class CItemPrototype extends CItemGeneral {
 			return;
 		}
 
+		self::extractHttpFields($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];
@@ -986,7 +981,7 @@ class CItemPrototype extends CItemGeneral {
 		$upd_db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
-			], array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])),
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'filter' => [
 				'templateid' => array_keys($db_items),
 				'hostid' => $hostids
@@ -994,6 +989,7 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
+		self::extractHttpFields($upd_db_items);
 		self::addInternalFields($upd_db_items);
 
 		if ($upd_db_items) {
@@ -1129,7 +1125,7 @@ class CItemPrototype extends CItemGeneral {
 		$options = [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
 				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
-			], array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])),
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];
 		$result = DBselect(DB::makeSql('items', $options));
@@ -1137,6 +1133,8 @@ class CItemPrototype extends CItemGeneral {
 		while ($row = DBfetch($result)) {
 			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
 		}
+
+		self::extractHttpFields($upd_db_items);
 
 		$upd_items = [];
 
@@ -1535,7 +1533,6 @@ class CItemPrototype extends CItemGeneral {
 
 		DB::delete('graphs_items', ['itemid' => $del_itemids]);
 		DB::delete('widget_field', ['value_itemid' => $del_itemids]);
-		DB::delete('item_field', ['itemid' => $del_itemids]);
 		DB::delete('item_discovery', ['itemid' => $del_itemids]);
 		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);

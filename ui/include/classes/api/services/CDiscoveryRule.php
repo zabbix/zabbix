@@ -985,7 +985,7 @@ class CDiscoveryRule extends CItemGeneral {
 	private static function createForce(array &$items): void {
 		self::addValueType($items);
 
-		$itemids = DB::insert('items', $items);
+		$itemids = DB::insert('items', self::encodeHttpFields($items));
 
 		$ins_items_rtdata = [];
 		$host_statuses = [];
@@ -1011,7 +1011,6 @@ class CDiscoveryRule extends CItemGeneral {
 		self::updateLldMacroPaths($items);
 		self::updateItemFilters($items);
 		self::updateOverrides($items);
-		self::updateHttpFields($items);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_LLD_RULE, $items);
 
@@ -1075,18 +1074,15 @@ class CDiscoveryRule extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		/*
-		 * The fields "headers" and "query_fields" in API are arrays, but it is necessary to get the values of these
-		 * fields as stored in database.
-		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
-				array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
+		self::extractHttpFields($db_items);
 		self::addInternalFields($db_items);
 
 		foreach ($items as $i => &$item) {
@@ -1295,7 +1291,6 @@ class CDiscoveryRule extends CItemGeneral {
 		self::addAffectedItemFilters($items, $db_items);
 		self::addAffectedOverrides($items, $db_items);
 		self::addAffectedParameters($items, $db_items);
-		self::addAffectedHttpFields($items, $db_items);
 	}
 
 	/**
@@ -1733,12 +1728,10 @@ class CDiscoveryRule extends CItemGeneral {
 		$upd_itemids = [];
 
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
-		$nested_object_fields = array_flip(['headers', 'preprocessing', 'lld_macro_paths', 'filter', 'overrides',
-			'parameters', 'query_fields'
-		]);
+		$nested_object_fields = array_flip(['preprocessing', 'lld_macro_paths', 'filter', 'overrides', 'parameters']);
 
 		foreach ($items as $i => &$item) {
-			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
+			$upd_item = DB::getUpdatedValues('items', CItemHelper::encodeHttpFields($item), $db_items[$item['itemid']]);
 
 			if ($upd_item) {
 				$upd_items[] = [
@@ -1772,7 +1765,6 @@ class CDiscoveryRule extends CItemGeneral {
 		self::updateLldMacroPaths($items, $db_items, $upd_itemids);
 		self::updateItemFilters($items, $db_items, $upd_itemids);
 		self::updateOverrides($items, $db_items, $upd_itemids);
-		self::updateHttpFields($items, $db_items, $upd_itemids);
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
@@ -2516,7 +2508,7 @@ class CDiscoveryRule extends CItemGeneral {
 	public static function linkTemplateObjects(array $templateids, array $hostids): void {
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
-				array_diff(CItemType::FIELD_NAMES, ['headers', 'interfaceid', 'parameters', 'query_fields'])
+				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
 			),
 			'filter' => [
 				'hostid' => $templateids,
@@ -2529,6 +2521,7 @@ class CDiscoveryRule extends CItemGeneral {
 			return;
 		}
 
+		self::extractHttpFields($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];
@@ -2747,7 +2740,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$options = [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
-				array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'itemids' => array_keys($upd_db_items)
 		];
@@ -2756,6 +2749,8 @@ class CDiscoveryRule extends CItemGeneral {
 		while ($row = DBfetch($result)) {
 			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
 		}
+
+		self::extractHttpFields($upd_db_items);
 
 		$upd_items = [];
 
@@ -2871,7 +2866,7 @@ class CDiscoveryRule extends CItemGeneral {
 	private static function getChildObjectsUsingTemplateid(array $items, array $db_items, array $hostids): array {
 		$upd_db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
-				array_diff(CItemType::FIELD_NAMES, ['headers', 'parameters', 'query_fields'])
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'filter' => [
 				'templateid' => array_keys($db_items),
@@ -2880,6 +2875,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
+		self::extractHttpFields($upd_db_items);
 		self::addInternalFields($upd_db_items);
 
 		if ($upd_db_items) {
@@ -3060,7 +3056,6 @@ class CDiscoveryRule extends CItemGeneral {
 		self::deleteAffectedHostPrototypes($del_itemids);
 		self::deleteAffectedOverrides($del_itemids);
 
-		DB::delete('item_field', ['itemid' => $del_itemids]);
 		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::delete('lld_macro_path', ['itemid' => $del_itemids]);
@@ -3531,6 +3526,8 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!$src_items) {
 			return;
 		}
+
+		self::extractHttpFields($src_items);
 
 		$src_itemids = array_fill_keys(array_keys($src_items), true);
 		$src_valuemapids = [];

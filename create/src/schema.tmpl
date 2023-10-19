@@ -263,11 +263,13 @@ FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|master_itemid	|t_id		|	|NULL		|ZBX_PROXY		|5|items	|itemid		|RESTRICT
 FIELD		|timeout	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|query_fields	|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|posts		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|status_codes	|t_varchar(255)	|'200'	|NOT NULL	|ZBX_PROXY
 FIELD		|follow_redirects|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|post_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|headers	|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|retrieve_mode	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|request_method	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|output_format	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -2184,17 +2186,8 @@ FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|version	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compatibility	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 
-TABLE|item_field|item_fieldid|ZBX_DATA
-FIELD		|item_fieldid	|t_id			|		|NOT NULL	|0
-FIELD		|itemid			|t_id			|		|NOT NULL	|0	|1|items|	|RESTRICT
-FIELD		|type			|t_integer		|'0'	|NOT NULL	|0
-FIELD		|sortorder		|t_integer		|'0'	|NOT NULL	|0
-FIELD		|name			|t_varchar(255)	|''		|NOT NULL	|0
-FIELD		|value			|t_shorttext	|''		|NOT NULL	|0
-INDEX		|1				|itemid,type
-
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050143	|6050143
+ROW		|1		|6050144	|6050144

@@ -860,12 +860,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 				unset($data['interface']['type']);
 			}
-			elseif ($key === 'query_fields' || $key === 'headers') {
-				if (!$value) {
-					unset($data[$key]);
-				}
-			}
-			elseif ($key === 'parameters') {
+			elseif ($key === 'query_fields' || $key === 'headers' || $key === 'parameters') {
 				if (!$value) {
 					unset($data[$key]);
 				}

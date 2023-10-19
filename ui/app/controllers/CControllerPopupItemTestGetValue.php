@@ -189,12 +189,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'item_type' => 'type'
 		]);
 
+		// Only non-empty fields need to be sent to server.
+		$data = $this->unsetEmptyValues($data);
+
+		$data = CItemHelper::encodeHttpFields($data);
+
 		if (array_key_exists('parameters', $data)) {
 			$data['parameters'] = $this->transformParametersFields($data['parameters']);
 		}
-
-		// Only non-empty fields need to be sent to server.
-		$data = $this->unsetEmptyValues($data);
 
 		/*
 		 * Server will turn off status code check if field value is empty. If field is not present, then server will

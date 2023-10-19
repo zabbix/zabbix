@@ -141,18 +141,26 @@ window.item_edit_form = new class {
 			rows: this.form_data.parameters,
 			allow_empty: true
 		});
+
+		const update_sortorder = function () {
+			$(this).find('.form_row').each(function(index) {
+				$(this).find('[name*="sortorder"]').val(index);
+			});
+		};
+
 		jQuery('#query-fields-table').dynamicRows({
 			sortable: true,
 			template: '#query-field-row-tmpl',
 			rows: this.form_data.query_fields,
 			allow_empty: true
-		}).sortable({disabled: this.form_readonly});
+		}).sortable({disabled: this.form_readonly, update: update_sortorder});
 		jQuery('#headers-table').dynamicRows({
 			sortable: true,
 			template: '#item-header-row-tmpl',
 			rows: this.form_data.headers,
 			allow_empty: true
-		}).sortable({disabled: this.form_readonly});
+		}).sortable({disabled: this.form_readonly, update: update_sortorder});
+
 		jQuery('#delay-flex-table').dynamicRows({
 			template: '#delay-flex-row-tmpl',
 			rows: this.form_data.delay_flex,
@@ -411,6 +419,12 @@ window.item_edit_form = new class {
 
 				case 'query_fields':
 				case 'headers':
+					for (const [_, param] of Object.entries(fields[key])) {
+						fields[key][param.sortorder] = {name: param.name.trim(), value: param.value.trim()};
+					};
+
+					break;
+
 				case 'parameters':
 					for (const [i, param] of Object.entries(fields[key])) {
 						fields[key][i] = {name: param.name.trim(), value: param.value.trim()}

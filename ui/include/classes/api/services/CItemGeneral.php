@@ -272,6 +272,41 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 			}
+
+			if (array_key_exists('query_fields', $item)) {
+				if (strlen(CItemHelper::encodeQueryFields($item['query_fields']))
+						> DB::getFieldLength('items', 'query_fields')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/query_fields', _('value is too long')
+					));
+				}
+
+				$sortorder = 0;
+				$fields = [];
+
+				foreach ($item['query_fields'] as $field) {
+					$fields[++$sortorder] = ['sortorder' => $sortorder] + $field;
+				}
+
+				$item['query_fields'] = $fields;
+			}
+
+			if (array_key_exists('headers', $item)) {
+				if (strlen(CItemHelper::encodeHeaders($item['headers'])) > DB::getFieldLength('items', 'headers')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/headers', _('value is too long')
+					));
+				}
+
+				$sortorder = 0;
+				$fields = [];
+
+				foreach ($item['headers'] as $field) {
+					$fields[++$sortorder] = ['sortorder' => $sortorder] + $field;
+				}
+
+				$item['headers'] = $fields;
+			}
 		}
 		unset($item);
 	}
@@ -1694,147 +1729,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array      $items
-	 * @param array|null $db_items
-	 * @param array|null $upd_itemids
-	 */
-	protected static function updateHttpFields(array &$items, array $db_items = null,
-			array &$upd_itemids = null): void {
-		$ins_fields = [];
-		$upd_fields = [];
-		$del_fieldids = [];
-		$default_field_value = DB::getDefault('item_field', 'value');
-
-		foreach ($items as $i => &$item) {
-			$changed = false;
-
-			if (array_key_exists('headers', $item)) {
-				$db_headers = $db_items === null ? [] : $db_items[$item['itemid']]['headers'];
-				$sortorder = -1;
-
-				foreach ($item['headers'] as &$header) {
-					$header += ['sortorder' => ++$sortorder, 'value' => $default_field_value];
-
-					$db_header = current(array_filter($db_headers, static function (array $db_header)
-							use ($header): bool {
-						return $db_header['name'] === $header['name'] && $db_header['value'] === $header['value'];
-					}));
-
-					if ($db_header) {
-						$header['item_fieldid'] = $db_header['item_fieldid'];
-						unset($db_headers[$db_header['item_fieldid']]);
-
-						$upd_header = DB::getUpdatedValues('item_field', $header, $db_header);
-
-						if ($upd_header) {
-							$upd_fields[] = [
-								'values' => $header,
-								'where' => ['item_fieldid' => $db_header['item_fieldid']]
-							];
-							$changed = true;
-						}
-					}
-					else {
-						$ins_fields[] = ['itemid' => $item['itemid'], 'type' => ZBX_HTTPFIELD_HEADER] + $header;
-						$changed = true;
-					}
-				}
-				unset($header);
-
-				if ($db_headers) {
-					$del_fieldids = array_merge($del_fieldids, array_column($db_headers, 'item_fieldid'));
-					$changed = true;
-				}
-			}
-
-			if (array_key_exists('query_fields', $item)) {
-				$db_query_fields = $db_items === null ? [] : $db_items[$item['itemid']]['query_fields'];
-				$sortorder = -1;
-
-				foreach ($item['query_fields'] as &$query_field) {
-					$query_field += ['sortorder' => ++$sortorder, 'value' => $default_field_value];
-
-					$db_query_field = current(array_filter($db_query_fields, static function (array $db_query_field)
-							use ($query_field): bool {
-						return $db_query_field['name'] === $query_field['name']
-								&& $db_query_field['value'] === $query_field['value'];
-					}));
-
-					if ($db_query_field) {
-						$query_field['item_fieldid'] = $db_query_field['item_fieldid'];
-						unset($db_query_fields[$db_query_field['item_fieldid']]);
-
-						$upd_query_field = DB::getUpdatedValues('item_field', $query_field, $db_query_field);
-
-						if ($upd_query_field) {
-							$upd_fields[] = [
-								'values' => $query_field,
-								'where' => ['item_fieldid' => $db_query_field['item_fieldid']]
-							];
-							$changed = true;
-						}
-					}
-					else {
-						$ins_fields[] = ['itemid' => $item['itemid'], 'type' => ZBX_HTTPFIELD_QUERY_FIELD]
-							+ $query_field;
-						$changed = true;
-					}
-				}
-				unset($query_field);
-
-				if ($db_query_fields) {
-					$del_fieldids = array_merge($del_fieldids, array_column($db_query_fields, 'item_fieldid'));
-					$changed = true;
-				}
-			}
-
-			if ($db_items !== null) {
-				if ($changed) {
-					$upd_itemids[$i] = $item['itemid'];
-				}
-				else {
-					unset($item['headers']);
-					unset($item['query_fields']);
-				}
-			}
-		}
-		unset($item);
-
-		if ($del_fieldids) {
-			DB::delete('item_field', ['item_fieldid' => $del_fieldids]);
-		}
-
-		if ($upd_fields) {
-			DB::update('item_field', $upd_fields);
-		}
-
-		if ($ins_fields) {
-			$item_fields = DB::insert('item_field', $ins_fields);
-		}
-
-		foreach ($items as &$item) {
-			if (array_key_exists('headers', $item)) {
-				foreach ($item['headers'] as &$header) {
-					if (!array_key_exists('item_fieldid', $header)) {
-						$header['item_fieldid'] = array_shift($item_fields);
-					}
-				}
-				unset($header);
-			}
-
-			if (array_key_exists('query_fields', $item)) {
-				foreach ($item['query_fields'] as &$query_field) {
-					if (!array_key_exists('item_fieldid', $query_field)) {
-						$query_field['item_fieldid'] = array_shift($item_fields);
-					}
-				}
-				unset($query_field);
-			}
-		}
-		unset($item);
-	}
-
-	/**
 	 * Check for unique item keys.
 	 *
 	 * @param array      $items
@@ -2124,49 +2018,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		$requested_fields = array_filter([
-			'headers' => $this->outputIsRequested('headers', $options['output']),
-			'query_fields' => $this->outputIsRequested('query_fields', $options['output']),
-		]);
-
-		if ($requested_fields) {
-			$itemids = [];
-
-			foreach ($result as $itemid => &$item) {
-				if (array_key_exists('headers', $requested_fields)) {
-					$item['headers'] = [];
-					$itemids[$itemid] = true;
-				}
-
-				if (array_key_exists('query_fields', $requested_fields)) {
-					$item['query_fields'] = [];
-					$itemids[$itemid] = true;
-				}
-			}
-			unset($item);
-
-			$db_fields = DBselect(
-				'SELECT itemid,type,name,value'.
-				' FROM item_field'.
-				' WHERE '.dbConditionId('itemid', array_keys($itemids)).
-				' AND '.dbConditionInt('type', array_intersect_key(self::HTTP_FIELD_TYPES, $requested_fields)).
-				' ORDER BY itemid,type,sortorder'
-			);
-
-			$output = array_flip(['name', 'value']);
-			$type_map = array_flip(self::HTTP_FIELD_TYPES);
-
-			while ($db_field = DBfetch($db_fields)) {
-				$field_type = $type_map[$db_field['type']];
-
-				if ($field_type === 'headers') {
-					$result[$db_field['itemid']]['headers'][] = array_intersect_key($db_field, $output);
-				}
-				elseif ($field_type === 'query_fields') {
-					$result[$db_field['itemid']]['query_fields'][] = array_intersect_key($db_field, $output);
-				}
-			}
-		}
+		self::extractHttpFields($result);
 
 		return $result;
 	}
@@ -2772,7 +2624,6 @@ abstract class CItemGeneral extends CApiService {
 		self::addAffectedTags($items, $db_items);
 		self::addAffectedPreprocessing($items, $db_items);
 		self::addAffectedParameters($items, $db_items);
-		self::addAffectedHttpFields($items, $db_items);
 	}
 
 	/**
@@ -2870,72 +2721,6 @@ abstract class CItemGeneral extends CApiService {
 		while ($db_item_parameter = DBfetch($db_item_parameters)) {
 			$db_items[$db_item_parameter['itemid']]['parameters'][$db_item_parameter['item_parameterid']] =
 				array_diff_key($db_item_parameter, array_flip(['itemid']));
-		}
-	}
-
-	/**
-	 * @param array $items
-	 * @param array $db_items
-	 */
-	protected static function addAffectedHttpFields(array $items, array &$db_items): void {
-		$field_types = [];
-		$itemids = [];
-
-		foreach ($items as $item) {
-			$itemid = $item['itemid'];
-			$db_type = $db_items[$itemid]['type'];
-
-			if ((array_key_exists('headers', $item) && $item['type'] == ITEM_TYPE_HTTPAGENT)
-					|| ($item['type'] != $db_type && $db_type == ITEM_TYPE_HTTPAGENT)) {
-				$field_types['headers'] = true;
-
-				$itemids[$itemid] = true;
-				$db_items[$itemid]['headers'] = [];
-			}
-			elseif (array_key_exists('headers', $item)) {
-				$db_items[$itemid]['headers'] = [];
-			}
-
-			if ((array_key_exists('query_fields', $item) && $item['type'] == ITEM_TYPE_HTTPAGENT)
-					|| ($item['type'] != $db_type && $db_type == ITEM_TYPE_HTTPAGENT)) {
-				$field_types['query_fields'] = true;
-
-				$itemids[$itemid] = true;
-				$db_items[$itemid]['query_fields'] = [];
-			}
-			elseif (array_key_exists('query_fields', $item)) {
-				$db_items[$itemid]['query_fields'] = [];
-			}
-		}
-
-		if (!$field_types) {
-			return;
-		}
-
-		$options = [
-			'output' => ['item_fieldid', 'itemid', 'type', 'sortorder', 'name', 'value'],
-			'filter' => [
-				'itemid' => array_keys($itemids),
-				'type' => array_intersect_key(self::HTTP_FIELD_TYPES, $field_types)
-			],
-			'sortfield' => ['sortorder']
-		];
-		$db_fields = DBselect(DB::makeSql('item_field', $options));
-
-		$type_map = array_flip(self::HTTP_FIELD_TYPES);
-		$internal_fields = array_flip(['itemid', 'type']);
-
-		while ($db_field = DBfetch($db_fields)) {
-			$field_type = $type_map[$db_field['type']];
-
-			if ($field_type === 'headers') {
-				$db_items[$db_field['itemid']]['headers'][$db_field['item_fieldid']] =
-					array_diff_key($db_field, $internal_fields);
-			}
-			elseif ($field_type === 'query_fields') {
-				$db_items[$db_field['itemid']]['query_fields'][$db_field['item_fieldid']] =
-					array_diff_key($db_field, $internal_fields);
-			}
 		}
 	}
 
@@ -3052,5 +2837,35 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return array_merge($ns_regex, $ns_any, $other);
+	}
+
+	/**
+	 * @param array $items
+	 */
+	protected static function extractHttpFields(array &$items): void {
+		foreach ($items as &$item) {
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = CItemHelper::extractHeaders($item['headers']);
+			}
+
+			if (array_key_exists('query_fields', $item)) {
+				$item['query_fields'] = CItemHelper::extractQueryFields($item['query_fields']);
+			}
+		}
+		unset($item);
+	}
+
+	/**
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	protected static function encodeHttpFields(array &$items): array {
+		foreach ($items as &$item) {
+			$item = CItemHelper::encodeHttpFields($item);
+		}
+		unset($item);
+
+		return $items;
 	}
 }

@@ -267,4 +267,91 @@ class CItemHelper extends CItemGeneralHelper {
 			'preservekeys' => true
 		] + $src_options);
 	}
+
+	/**
+	 * @param string $encoded
+	 *
+	 * @return array
+	 */
+	public static function extractQueryFields(string $encoded): array {
+		if ($encoded === '') {
+			return [];
+		}
+
+		$fields = json_decode($encoded, true);
+		$query_fields = [];
+
+		if (json_last_error() == JSON_ERROR_NONE) {
+			foreach ($fields as $i => $field) {
+				$query_fields[] = ['sortorder' => $i + 1, 'name' => key($field), 'value' => reset($field)];
+			}
+		}
+
+		return $query_fields;
+	}
+
+	/**
+	 * @param array $fields
+	 *
+	 * @return string
+	 */
+	public static function encodeQueryFields(array $fields): string {
+		$query_fields = [];
+
+		foreach ($fields as $field) {
+			$query_fields[] = [$field['name'] => $field['value']];
+		}
+
+		return json_encode($query_fields, JSON_UNESCAPED_UNICODE);
+	}
+
+	/**
+	 * @param string $headers
+	 *
+	 * @return array
+	 */
+	public static function extractHeaders(string $headers): array {
+		$result = [];
+
+		if ($headers !== '') {
+			foreach (explode("\r\n", $headers) as $i => $header) {
+				[$name, $value] = explode(': ', $header, 2) + [1 => ''];
+
+				$result[] = ['sortorder' => $i + 1, 'name' => $name, 'value' => $value];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $headers
+	 *
+	 * @return string
+	 */
+	public static function encodeHeaders(array $headers): string {
+		foreach ($headers as &$header) {
+			$header = $header['name'].': '.$header['value'];
+		}
+		unset($header);
+
+		return $headers ? implode("\r\n", $headers) : '';
+	}
+
+	/**
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	public static function encodeHttpFields(array $item): array {
+		if (array_key_exists('headers', $item)) {
+			$item['headers'] = self::encodeHeaders($item['headers']);
+		}
+
+		if (array_key_exists('query_fields', $item)) {
+			$item['query_fields'] = self::encodeQueryFields($item['query_fields']);
+		}
+
+		return $item;
+	}
 }

@@ -1139,6 +1139,11 @@ return [
 				'length' => 2048,
 				'default' => ''
 			],
+			'query_fields' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_NCLOB,
+				'default' => ''
+			],
 			'posts' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_NCLOB,
@@ -1166,6 +1171,11 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => ''
+			],
+			'headers' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'retrieve_mode' => [
@@ -9860,46 +9870,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			]
-		]
-	],
-	'item_field' => [
-		'key' => 'item_fieldid',
-		'fields' => [
-			'item_fieldid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'itemid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'items',
-				'ref_field' => 'itemid'
-			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'sortorder' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => ''
 			]
 		]
 	],

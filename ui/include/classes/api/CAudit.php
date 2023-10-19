@@ -392,7 +392,7 @@ class CAudit {
 		'dashboard.pages.widgets.fields' => 'widget_field',
 		'discoveryrule.filter' => 'items',
 		'discoveryrule.filter.conditions' => 'item_condition',
-		'discoveryrule.headers' => 'item_field',
+		'discoveryrule.headers' => 'virtual.field',
 		'discoveryrule.lld_macro_paths' => 'lld_macro_path',
 		'discoveryrule.overrides' => 'lld_override',
 		'discoveryrule.overrides.filter' => 'lld_override',
@@ -409,7 +409,7 @@ class CAudit {
 		'discoveryrule.overrides.operations.optrends' => 'lld_override_optrends',
 		'discoveryrule.parameters' => 'item_parameter',
 		'discoveryrule.preprocessing' => 'item_preproc',
-		'discoveryrule.query_fields' => 'item_field',
+		'discoveryrule.query_fields' => 'virtual.field',
 		'hostgroup.hosts' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
@@ -419,16 +419,16 @@ class CAudit {
 		'hostprototype.tags' => 'host_tag',
 		'hostprototype.templates' => 'hosts_templates',
 		'iconmap.mappings' => 'icon_mapping',
-		'item.headers' => 'item_field',
+		'item.headers' => 'virtual.field',
 		'item.parameters' => 'item_parameter',
 		'item.preprocessing' => 'item_preproc',
 		'item.tags' => 'item_tag',
-		'item.query_fields' => 'item_field',
-		'itemprototype.headers' => 'item_field',
+		'item.query_fields' => 'virtual.field',
+		'itemprototype.headers' => 'virtual.field',
 		'itemprototype.parameters' => 'item_parameter',
 		'itemprototype.preprocessing' => 'item_preproc',
 		'itemprototype.tags' => 'item_tag',
-		'itemprototype.query_fields' => 'item_field',
+		'itemprototype.query_fields' => 'virtual.field',
 		'maintenance.groups' => 'maintenances_groups',
 		'maintenance.hosts' => 'maintenances_hosts',
 		'maintenance.tags' => 'maintenance_tag',
@@ -505,7 +505,7 @@ class CAudit {
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
 		'discoveryrule.filter.conditions' => 'item_conditionid',
-		'discoveryrule.headers' => 'item_fieldid',
+		'discoveryrule.headers' => 'sortorder',
 		'discoveryrule.lld_macro_paths' => 'lld_macro_pathid',
 		'discoveryrule.overrides' => 'lld_overrideid',
 		'discoveryrule.overrides.filter.conditions' => 'lld_override_conditionid',
@@ -514,7 +514,7 @@ class CAudit {
 		'discoveryrule.overrides.operations.optemplate' => 'lld_override_optemplateid',
 		'discoveryrule.parameters' => 'item_parameterid',
 		'discoveryrule.preprocessing' => 'item_preprocid',
-		'discoveryrule.query_fields' => 'item_fieldid',
+		'discoveryrule.query_fields' => 'sortorder',
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',
 		'hostprototype.groupPrototypes' => 'group_prototypeid',
@@ -523,16 +523,16 @@ class CAudit {
 		'hostprototype.tags' => 'hosttagid',
 		'hostprototype.templates' => 'hosttemplateid',
 		'iconmap.mappings' => 'iconmappingid',
-		'item.headers' => 'item_fieldid',
+		'item.headers' => 'sortorder',
 		'item.parameters' => 'item_parameterid',
 		'item.preprocessing' => 'item_preprocid',
 		'item.tags' => 'itemtagid',
-		'item.query_fields' => 'item_fieldid',
-		'itemprototype.headers' => 'item_fieldid',
+		'item.query_fields' => 'sortorder',
+		'itemprototype.headers' => 'sortorder',
 		'itemprototype.parameters' => 'item_parameterid',
 		'itemprototype.preprocessing' => 'item_preprocid',
 		'itemprototype.tags' => 'itemtagid',
-		'itemprototype.query_fields' => 'item_fieldid',
+		'itemprototype.query_fields' => 'sortorder',
 		'maintenance.groups' => 'maintenance_groupid',
 		'maintenance.hosts' => 'maintenance_hostid',
 		'maintenance.tags' => 'maintenancetagid',
@@ -933,6 +933,10 @@ class CAudit {
 
 		if ($object_path !== self::API_NAMES[$resource]) {
 			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[self::getAbstractPath($object_path)];
+
+			if ($table_name === 'virtual.field') {
+				return false;
+			}
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];
