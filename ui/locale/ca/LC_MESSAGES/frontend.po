@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-09-23 06:49+0000\n"
+"PO-Revision-Date: 2023-09-27 10:32+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -328,6 +328,15 @@ msgstr "(Només els superadministradors poden crear grups)"
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
 msgstr "(creat per la descoberta d'equips)"
+
+#: include/views/configuration.item.edit.php:648
+#: include/views/configuration.item.prototype.edit.php:619
+msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:553
+msgid "(legacy) to retrieve a subtree in JSON"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -1109,6 +1118,14 @@ msgstr "Edat inferior a"
 msgid "Agent"
 msgstr "Agent"
 
+#: widgets/hostavail/views/widget.view.php:82
+msgid "Agent (active)"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:83
+msgid "Agent (passive)"
+msgstr ""
+
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Comprovació de disponibilitat de l'agent. No retorna res - no disponible; 1 - disponible"
@@ -1375,7 +1392,7 @@ msgstr "Anualment"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "S'empra un altre giny com a font de dades."
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
@@ -1507,12 +1524,26 @@ msgstr "Afirmacions"
 msgid "Asset tag"
 msgstr "Etiqueta d'actiu"
 
+#: include/classes/helpers/CMaintenanceHelper.php:86
+#, c-format
+msgid "At %1$s %2$s of every %3$s week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/helpers/CMaintenanceHelper.php:85
 #, c-format
 msgid "At %1$s %2$s of every week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
 msgstr[0] "%1$s %2$s de cada setmana"
 msgstr[1] "%1$s %2$s de cada  %3$s setmanes"
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every %2$s day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
 #, c-format
@@ -1613,6 +1644,10 @@ msgstr "Com a mínim ha d'existir una operació."
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
 msgstr "Com a mínim un paràmetre \"%1$s\" o \"%2$s\" s'ha d'activar."
+
+#: widgets/gauge/views/widget.edit.php:50
+msgid "At least one parameter must be enabled."
+msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -2398,6 +2433,10 @@ msgstr "No es pot pas canviar el tipus d'usuari del propi rol."
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
 msgstr "No es pot pas esborrar l'historial"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "Cannot clear history and trends"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -4589,6 +4628,22 @@ msgstr "Netejar l'historial"
 msgid "Clear history and trends"
 msgstr "Netejar historial i tendències"
 
+#: include/views/configuration.item.list.php:315
+msgid "Clear history and trends of selected item?"
+msgstr ""
+
+#: include/views/configuration.item.list.php:316
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Clear history and trends of selected web scenario?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:239
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
+
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
 msgid "Clear when unlinking"
@@ -5907,7 +5962,7 @@ msgstr[1] "S'han esborrat els taulers"
 
 #: jsLoader.php:200
 msgid "Dashboard is used as data source."
-msgstr ""
+msgstr "El tauler de control s'empra com a font de dades."
 
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
@@ -7437,6 +7492,16 @@ msgstr "No desis pas l'historial"
 msgid "Do not keep trends"
 msgstr "No desis pas les tendències"
 
+#: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
+#: app/views/popup.massupdate.item.php:315
+#: app/views/popup.massupdate.item.php:331
+#: include/views/configuration.item.edit.php:902
+#: include/views/configuration.item.edit.php:937
+#: include/views/configuration.item.prototype.edit.php:839
+#: include/views/configuration.item.prototype.edit.php:854
+msgid "Do not store"
+msgstr ""
+
 #: jsLoader.php:226 jsLoader.php:363
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Voleu substituir l'expressió condicional?"
@@ -8248,6 +8313,10 @@ msgstr "Supervisió del registre d'esdeveniments. Retorna un registre"
 msgid "Event name"
 msgstr "Nom de l'esdeveniment"
 
+#: app/views/popup.condition.edit.php:672
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Parell d'etiquetes d'esdeveniment"
@@ -8578,7 +8647,7 @@ msgstr "No s'ha pogut actualitzar la compartició de tauler."
 
 #: jsLoader.php:128
 msgid "Failed to update time selector."
-msgstr ""
+msgstr "Ha fallat l'actualització del selector d'hora."
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -8670,6 +8739,12 @@ msgstr "Hi manca el camp \"%1$s\"."
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
 msgstr "Nom del camp"
+
+#: include/views/configuration.host.discovery.edit.php:543
+#: include/views/configuration.item.edit.php:633
+#: include/views/configuration.item.prototype.edit.php:604
+msgid "Field requirements:"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9557,6 +9632,10 @@ msgstr "Ressalteu la filera sencera"
 #: jsLoader.php:372
 msgid "History"
 msgstr "Història"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "History and trends compression"
@@ -10576,6 +10655,10 @@ msgstr "Incloure"
 #: app/views/administration.mediatype.edit.php:242
 msgid "Include event menu entry"
 msgstr "Inclou l'entrada del menú d'esdeveniments"
+
+#: widgets/hostavail/includes/WidgetForm.php:62
+msgid "Include hosts in maintenance"
+msgstr ""
 
 #: app/views/administration.usergroup.edit.php:142
 #: app/views/administration.usergroup.edit.php:193
@@ -13854,6 +13937,15 @@ msgstr "Manquen elements per al prototip de gràfic \"%1$s\"."
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Manca la clau \"%1$s\" per a l'equip \"%2$s\"."
 
+#: widgets/hostavail/views/widget.view.php:38
+msgid "Mixed"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:39
+msgctxt "compact table header"
+msgid "Mixed"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:52
 #: app/views/administration.proxy.list.php:78 report2.php:203
@@ -14489,11 +14581,11 @@ msgstr "Nou grup de plantilles"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "Nou trigger"
 
 #: app/views/trigger.prototype.edit.php:143
 msgid "New trigger prototype"
-msgstr ""
+msgstr "Nou prototip de trigger"
 
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
@@ -14594,7 +14686,7 @@ msgstr "Sense canvis."
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
-msgstr ""
+msgstr "No hi ha ginys compatibles."
 
 #: app/views/configuration.correlation.edit.php:56
 #: include/views/configuration.action.edit.php:58
@@ -15833,7 +15925,7 @@ msgstr "Anul·lació"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
-msgstr ""
+msgstr "Anul·la l'equip"
 
 #: app/views/administration.housekeeping.edit.php:128
 msgid "Override item history period"
@@ -18065,7 +18157,7 @@ msgstr "L'SLA amb l'identificador \"%1$s\" no és pas disponible."
 
 #: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
 msgid "SLAs"
-msgstr ""
+msgstr "SLAs"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
@@ -18150,6 +18242,10 @@ msgstr "Agent SNMP"
 #: app/views/popup.itemtestedit.view.php:141
 msgid "SNMP community"
 msgstr "Comunitat SNMP"
+
+#: include/items.inc.php:1570
+msgid "SNMP get value"
+msgstr ""
 
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
@@ -19090,6 +19186,10 @@ msgstr "Mostra les línies"
 msgid "Show number of records"
 msgstr "Mostra el nombre de registres"
 
+#: widgets/hostavail/includes/WidgetForm.php:66
+msgid "Show only totals"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:240
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
@@ -19680,6 +19780,16 @@ msgstr "Període d'emmagatzematge"
 #: include/classes/setup/CSetupWizard.php:510
 msgid "Store credentials in"
 msgstr "Emmagatzema les credencials a"
+
+#: app/views/popup.lldoperation.php:189 app/views/popup.lldoperation.php:210
+#: app/views/popup.massupdate.item.php:316
+#: app/views/popup.massupdate.item.php:332
+#: include/views/configuration.item.edit.php:903
+#: include/views/configuration.item.edit.php:938
+#: include/views/configuration.item.prototype.edit.php:840
+#: include/views/configuration.item.prototype.edit.php:855
+msgid "Store up to"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:656
 #: include/classes/setup/CSetupWizard.php:657
@@ -20797,6 +20907,10 @@ msgstr "Total"
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
 msgstr "Temps total d'Elasticsearch: %1$s"
+
+#: widgets/hostavail/views/widget.view.php:81
+msgid "Total Hosts"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:149
 #, c-format
@@ -23525,7 +23639,7 @@ msgstr "Quan sigui actiu"
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
 #: jsLoader.php:195 jsLoader.php:199
 msgid "Widget"
-msgstr ""
+msgstr "Giny"
 
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format
@@ -23953,9 +24067,17 @@ msgstr "Suport tècnic de Zabbix"
 msgid "Zabbix agent"
 msgstr "Agent de Zabbix"
 
+#: widgets/hostavail/includes/WidgetForm.php:47
+msgid "Zabbix agent (active checks)"
+msgstr ""
+
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
 msgstr "Agent de Zabbix (actiu)"
+
+#: widgets/hostavail/includes/WidgetForm.php:48
+msgid "Zabbix agent (passive checks)"
+msgstr ""
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -26182,6 +26304,17 @@ msgstr "timeleft() - Temps per assolir el llindar estimat en funció del períod
 msgid "timeouts are disabled because the proxy and server versions do not match"
 msgstr "els temps d'espera són desactivats perquè les versions del proxy i del servidor no coincideixen pas"
 
+#: include/views/configuration.item.edit.php:643
+#: include/views/configuration.item.prototype.edit.php:614
+msgid "to retrieve a single value"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:548
+#: include/views/configuration.item.edit.php:638
+#: include/views/configuration.item.prototype.edit.php:609
+msgid "to retrieve a subtree"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() - Valor mitjà d'un període T amb un canvi de període exacte"
@@ -26431,6 +26564,11 @@ msgstr "no s'ha trobat pas el valor \"%1$s\""
 #, c-format
 msgid "value %1$s already exists"
 msgstr "ja existeix el valor %1$s"
+
+#: include/classes/parsers/CEscapedStringParser.php:72
+#, c-format
+msgid "value contains unescaped character at position %1$d"
+msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1773
 #: include/classes/api/services/CTriggerGeneral.php:1793

@@ -347,6 +347,15 @@ msgstr "(Только супер администраторы могут соз�
 msgid "(created by host discovery)"
 msgstr "(создано с помощью обнаружения узлов сети)"
 
+#: include/views/configuration.item.edit.php:648
+#: include/views/configuration.item.prototype.edit.php:619
+msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:553
+msgid "(legacy) to retrieve a subtree in JSON"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
 msgstr "(связано с помощью обнаружения узлов сети)"
@@ -1132,6 +1141,14 @@ msgstr "Возраст менее чем"
 msgid "Agent"
 msgstr "Агент"
 
+#: widgets/hostavail/views/widget.view.php:82
+msgid "Agent (active)"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:83
+msgid "Agent (passive)"
+msgstr ""
+
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Проверка доступности агента. Ничего не возвращает - недоступен; 1 - доступен"
@@ -1530,10 +1547,26 @@ msgstr "Декларации"
 msgid "Asset tag"
 msgstr "Этикетка владельца"
 
+#: include/classes/helpers/CMaintenanceHelper.php:86
+#, c-format
+msgid "At %1$s %2$s of every %3$s week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: include/classes/helpers/CMaintenanceHelper.php:85
 #, c-format
 msgid "At %1$s %2$s of every week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every %2$s day"
+msgid_plural "At %1$s every %2$s days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
@@ -1640,6 +1673,10 @@ msgstr "Должна существовать по крайней мере од�
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
 msgstr "Как минимум один параметр должен быть включён \"%1$s\" или \"%2$s\"."
+
+#: widgets/gauge/views/widget.edit.php:50
+msgid "At least one parameter must be enabled."
+msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -2426,6 +2463,10 @@ msgstr "Не удалось изменить тип пользователя с�
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "Cannot clear history and trends"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -4682,6 +4723,22 @@ msgstr "Очистить историю"
 #: include/views/configuration.item.edit.php:1073
 msgid "Clear history and trends"
 msgstr "Очистить историю и динамику изменений"
+
+#: include/views/configuration.item.list.php:315
+msgid "Clear history and trends of selected item?"
+msgstr ""
+
+#: include/views/configuration.item.list.php:316
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Clear history and trends of selected web scenario?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:239
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7544,6 +7601,16 @@ msgstr "Не хранить историю"
 msgid "Do not keep trends"
 msgstr "Не хранить динамику изменений"
 
+#: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
+#: app/views/popup.massupdate.item.php:315
+#: app/views/popup.massupdate.item.php:331
+#: include/views/configuration.item.edit.php:902
+#: include/views/configuration.item.edit.php:937
+#: include/views/configuration.item.prototype.edit.php:839
+#: include/views/configuration.item.prototype.edit.php:854
+msgid "Do not store"
+msgstr ""
+
 #: jsLoader.php:226 jsLoader.php:363
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Вы хотите заменить условие выражения?"
@@ -8358,6 +8425,10 @@ msgstr "Мониторинг журнала событий. Возвращает
 msgid "Event name"
 msgstr "Имя события"
 
+#: app/views/popup.condition.edit.php:672
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Пара тегов событий"
@@ -8781,6 +8852,12 @@ msgstr "Поле \"%1$s\" должно быть пропущено."
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
 msgstr "Имя поля"
+
+#: include/views/configuration.host.discovery.edit.php:543
+#: include/views/configuration.item.edit.php:633
+#: include/views/configuration.item.prototype.edit.php:604
+msgid "Field requirements:"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9670,6 +9747,10 @@ msgstr "Подсвечивать всю строку"
 #: jsLoader.php:372
 msgid "History"
 msgstr "История"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "History and trends compression"
@@ -10696,6 +10777,10 @@ msgstr "Включено"
 #: app/views/administration.mediatype.edit.php:242
 msgid "Include event menu entry"
 msgstr "Добавить запись в меню события"
+
+#: widgets/hostavail/includes/WidgetForm.php:62
+msgid "Include hosts in maintenance"
+msgstr ""
 
 #: app/views/administration.usergroup.edit.php:142
 #: app/views/administration.usergroup.edit.php:193
@@ -13989,6 +14074,15 @@ msgstr "Отсутствуют элементы данных для протот
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Отсутствует ключ \"%1$s\" для узла сети \"%2$s\"."
+
+#: widgets/hostavail/views/widget.view.php:38
+msgid "Mixed"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:39
+msgctxt "compact table header"
+msgid "Mixed"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:52
@@ -18299,6 +18393,10 @@ msgstr "SNMP агент"
 msgid "SNMP community"
 msgstr "SNMP community"
 
+#: include/items.inc.php:1570
+msgid "SNMP get value"
+msgstr ""
+
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
 msgstr "Интерфейсы SNMP"
@@ -19243,6 +19341,10 @@ msgstr "Количество строк"
 msgid "Show number of records"
 msgstr "Отображение количества записей"
 
+#: widgets/hostavail/includes/WidgetForm.php:66
+msgid "Show only totals"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:240
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
@@ -19833,6 +19935,16 @@ msgstr "Период хранения"
 #: include/classes/setup/CSetupWizard.php:510
 msgid "Store credentials in"
 msgstr "Хранение учётных данных в"
+
+#: app/views/popup.lldoperation.php:189 app/views/popup.lldoperation.php:210
+#: app/views/popup.massupdate.item.php:316
+#: app/views/popup.massupdate.item.php:332
+#: include/views/configuration.item.edit.php:903
+#: include/views/configuration.item.edit.php:938
+#: include/views/configuration.item.prototype.edit.php:840
+#: include/views/configuration.item.prototype.edit.php:855
+msgid "Store up to"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:656
 #: include/classes/setup/CSetupWizard.php:657
@@ -20953,6 +21065,10 @@ msgstr "Всего"
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
 msgstr "Всего затрачено времени на Elasticsearch: %1$s"
+
+#: widgets/hostavail/views/widget.view.php:81
+msgid "Total Hosts"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:149
 #, c-format
@@ -24121,9 +24237,17 @@ msgstr "Техническая Поддержка Zabbix"
 msgid "Zabbix agent"
 msgstr "Zabbix агент"
 
+#: widgets/hostavail/includes/WidgetForm.php:47
+msgid "Zabbix agent (active checks)"
+msgstr ""
+
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
 msgstr "Zabbix агент (активный)"
+
+#: widgets/hostavail/includes/WidgetForm.php:48
+msgid "Zabbix agent (passive checks)"
+msgstr ""
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -26350,6 +26474,17 @@ msgstr "timeleft() - Время достижения порога вычисле
 msgid "timeouts are disabled because the proxy and server versions do not match"
 msgstr ""
 
+#: include/views/configuration.item.edit.php:643
+#: include/views/configuration.item.prototype.edit.php:614
+msgid "to retrieve a single value"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:548
+#: include/views/configuration.item.edit.php:638
+#: include/views/configuration.item.prototype.edit.php:609
+msgid "to retrieve a subtree"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() - Среднее значение за период Т с точным сдвигом периода"
@@ -26599,6 +26734,11 @@ msgstr "значение \"%1$s\" не найдено"
 #, c-format
 msgid "value %1$s already exists"
 msgstr "значение %1$s уже существует"
+
+#: include/classes/parsers/CEscapedStringParser.php:72
+#, c-format
+msgid "value contains unescaped character at position %1$d"
+msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1773
 #: include/classes/api/services/CTriggerGeneral.php:1793

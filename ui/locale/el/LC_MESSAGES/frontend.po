@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-09-22 06:09+0000\n"
-"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
+"PO-Revision-Date: 2023-10-04 09:39+0000\n"
+"Last-Translator: natalja.romancaka <natalja.romancaka@zabbix.com>\n"
 "Language-Team: none\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -23,14 +23,14 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "Η ημερομηνία \"%1$s\" πρέπει να είναι μικρότερη από την ημερομηνία \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" αντί για \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:323
 #: include/classes/import/validators/C10XmlValidator.php:341
@@ -48,32 +48,32 @@ msgstr ""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "Αναμένεται το \"%1$s\""
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "Το \"%1$s\" πρέπει να είναι μια κενή συμβολοσειρά, ή μεγαλύτερη από \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "Η τιμή του \"%1$s\" πρέπει να είναι μικρότερη ή ίση από την τιμή του \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "Αναμένεται το ζεύγος \"host:key\""
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "Το \"hostid\" του ανεξάρτητου αντικειμένου και του κύριου αντικειμένου πρέπει να ταιριάζουν"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "Το \"ruleid\" του ανεξάρτητου αντικειμένου και του κύριου αντικειμένου πρέπει να ταιριάζουν"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
@@ -85,7 +85,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "Οι %1$d χαρακτήρες υπερβαίνουν το μέγιστο μήκος των %2$d χαρακτήρων"
 
 #: include/func.inc.php:488
 #, c-format
@@ -98,19 +98,19 @@ msgstr[1] "%1$d ημέρες"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "Βρέθηκαν %1$d αντιστοιχίσεις για το %2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Το πρόβλημα %1$d από %3$d%2$s εμφανίζεται"
+msgstr[1] "Τα προβλήματα %1$d από %3$d%2$s εμφανίζονται"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "Επιλέχθηκαν %1$d προβλήματα."
 
 #: chart4.php:94
 #, c-format
@@ -120,39 +120,39 @@ msgstr "%1$s (έτος %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - ρίχτηκε από τη μονάδα που βρίσκεται στο %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Γραμμή: %2$s | Στήλη: %3$s]"
 
 #: include/actions.inc.php:1893
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ενέργεια %1$s"
+msgstr[1] "Ενέργειες %1$s"
 
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s χαρακτήρες"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "Απομένουν %1$s χαρακτήρες"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s συμβάν"
+msgstr[1] "%1$s συμβάντα"
 
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
@@ -163,15 +163,15 @@ msgstr ""
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s διακομιστής σε συντήρηση"
+msgstr[1] "%1$s διακομιστές σε συντήρηση"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ώρα"
+msgstr[1] "%1$s ώρες"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -179,16 +179,16 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s στοιχείο"
+msgstr[1] "%1$s στοιχεία"
 
 #: include/actions.inc.php:1731
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s μήνυμα"
+msgstr[1] "%1$s μηνύματα"
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -205,29 +205,29 @@ msgstr[1] "%1$s λεπτά"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s από %2$s στοιχείο σε προβληματική κατάσταση"
+msgstr[1] "%1$s από %2$s στοιχεία σε προβληματική κατάσταση"
 
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s προεπιλεγμένο, χρησιμοποιήστε τα πλήκτρα κάτω, επάνω βέλος και enter για να επιλέξετε"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s πρόβλημα"
+msgstr[1] "%1$s προβλήματα"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s πρόβλημα συνολικά"
+msgstr[1] "%1$s προβλήματα συνολικά"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -253,27 +253,27 @@ msgstr[1] "%1$s δευτερόλεπτα"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s μη αναγνωρισμένο πρόβλημα"
+msgstr[1] "%1$s μη αναγνωρισμένα προβλήματα"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Σοβαρότητα, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, μόνο για ανάγνωση"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, επιλεγμένο"
 
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
@@ -283,7 +283,7 @@ msgstr ""
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "Η κλάση %1$s.php πρέπει να επεκτείνει το %2$s για τη μονάδα που βρίσκεται στο %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
@@ -293,14 +293,14 @@ msgstr ""
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$sο εκατοστημόριο: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "%4$s αποτυχία σύνδεσης. Τελευταία προσπάθεια ήταν από %1$s την %2$s στις %3$s."
-msgstr[1] "%4$s αποτυχίες σύνδεσης. Τελευταία προσπάθεια ήταν από %1$s την %2$s στις %3$s."
+msgstr[0] "%4$s αποτυχία σύνδεσης. Τελευταία αποτυχημένη προσπάθεια από %1$s την %2$s στις %3$s."
+msgstr[1] "%4$s αποτυχίες σύνδεσης. Τελευταία αποτυχημένη προσπάθεια από %1$s την %2$s στις %3$s."
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
@@ -317,11 +317,11 @@ msgstr "(%1$s %2$s)"
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - απεριόριστα)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - χρήση προεπιλογής ενέργειας)"
 
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
@@ -331,11 +331,20 @@ msgstr "(Μόνο υπερδιαχειριστές δημιουργούν ομά
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
+msgstr "(δημιουργήθηκε από τον εντοπισμό διακομιστή)"
+
+#: include/views/configuration.item.edit.php:648
+#: include/views/configuration.item.prototype.edit.php:619
+msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:553
+msgid "(legacy) to retrieve a subtree in JSON"
 msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(συνδέθηκε από τον εντοπισμό διακομιστή)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -346,7 +355,7 @@ msgstr "(χωρίς διαμεσολαβητή)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - χρήση προεπιλεγμένης θύρας"
 
 #: include/triggers.inc.php:1594
 msgid "0 or 1"
@@ -368,15 +377,15 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12ωρο"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24ωρο"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -404,11 +413,11 @@ msgstr "500 τελευταίες τιμές"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<κενή συμβολοσειρά>"
 
 #: include/forms.inc.php:1406 include/views/js/item.preprocessing.js.php:220
 msgid "<label name>"
-msgstr ""
+msgstr "<όνομα ετικέτας>"
 
 #: include/views/monitoring.sysmap.edit.php:129
 msgid "<manual>"
@@ -435,16 +444,16 @@ msgstr ""
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "ΞΥΠΝΗΤΗΡΙ"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
-msgstr ""
+msgstr "Πρόσβαση API"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:287
 msgid "API methods"
-msgstr ""
+msgstr "Μέθοδοι API"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
@@ -501,15 +510,15 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Πάνω από την τιμή"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Τετμημένη"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
-msgstr ""
+msgstr "Απαγορευμένη πρόσβαση"
 
 #: sysmap.php:81
 msgid "Access denied!"
@@ -518,27 +527,27 @@ msgstr "Απαγορευμένη πρόσβαση!"
 #: app/views/administration.user.edit.php:603
 #: app/views/administration.userrole.edit.php:273
 msgid "Access to API"
-msgstr ""
+msgstr "Πρόσβαση στο API"
 
 #: app/views/administration.user.edit.php:456
 #: app/views/administration.userrole.edit.php:83
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Πρόσβαση σε στοιχεία διεπαφής χρήστη"
 
 #: app/views/administration.user.edit.php:632
 #: app/views/administration.userrole.edit.php:322
 msgid "Access to actions"
-msgstr ""
+msgstr "Πρόσβαση σε ενέργειες"
 
 #: app/views/administration.user.edit.php:574
 #: app/views/administration.userrole.edit.php:224
 msgid "Access to modules"
-msgstr ""
+msgstr "Πρόσβαση σε ενότητες"
 
 #: app/views/administration.user.edit.php:478
 #: app/views/administration.userrole.edit.php:136
 msgid "Access to services"
-msgstr ""
+msgstr "Πρόσβαση σε υπηρεσίες"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
@@ -551,7 +560,7 @@ msgstr "Αναγνώριση"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Αναγνώριση"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -559,7 +568,7 @@ msgstr "Αναγνώριση"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Αναγνώριση προβλημάτων"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -572,12 +581,12 @@ msgstr "Αναγνωρισμένα συμβάντα ΠΡΟΒΛΗΜΑ"
 
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Αναγνωρισμένα συμβάντα ΕΠΙΛΥΜΕΝΑ"
 
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:103
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "Κατάσταση αναγνώρισης"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -654,7 +663,7 @@ msgstr "Ενέργεια"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Ενέργεια"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -664,7 +673,7 @@ msgstr "Ενέργεια \"%1$s\" υπάρχει ήδη."
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Η ενέργεια \"%2$s\" δεν είναι διαθέσιμη για τον ρόλο χρήστη \"%1$s\"."
 
 #: actionconf.php:301
 msgid "Action added"
@@ -673,7 +682,7 @@ msgstr "Η ενέργεια προστέθηκε"
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Η κλάση ενέργειας %1$s πρέπει να επεκτείνει την κλάση %2$s."
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -702,7 +711,7 @@ msgstr "Ενέργεια καταγραφής"
 #: app/views/administration.script.list.php:52
 #: app/views/administration.script.list.php:91
 msgid "Action operation"
-msgstr ""
+msgstr "Λειτουργία ενέργειας"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -711,7 +720,7 @@ msgstr "Η Ενέργεια ενημερώθηκε"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Η ενέργεια με ΑΑ \"%1$s\" δεν είναι διαθέσιμη."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -733,7 +742,7 @@ msgstr "Ενέργειες"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Ενέργειες"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -750,7 +759,7 @@ msgstr "Ενεργό"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Ενεργοί έλεγχοι"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -919,7 +928,7 @@ msgstr ""
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Προσθήκη στήλης"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -927,39 +936,39 @@ msgstr ""
 
 #: jsLoader.php:204
 msgid "Add child element"
-msgstr ""
+msgstr "Προσθήκη θυγατρικού στοιχείου"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Προσθήκη θυγατρικών στοιχείων"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "Προσθήκη θυγατρικής υπηρεσίας"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "Προσθήκη θυγατρικών υπηρεσιών"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Προσθήκη από"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "Προσθήκη από διακομιστή"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "Προσθήκη από πρότυπο"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
-msgstr "Προσθήκη ξενιστή"
+msgstr "Προσθήκη διακομιστή"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Προσθήκη ετικετών διακομιστή"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -969,25 +978,25 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Προσθήκη στήλης στοιχείου"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "Προσθήκη όσων λείπουν"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
-msgstr ""
+msgstr "Προσθήκη πολλαπλών χαρτών"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr ""
+msgstr "Προσθήκη νέου συνόλου δεδομένων"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:267
 msgid "Add new interface"
-msgstr ""
+msgstr "Προσθήκη νέας διεπαφής"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
@@ -996,15 +1005,15 @@ msgstr ""
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:290
 msgid "Add page"
-msgstr ""
+msgstr "Προσθήκη σελίδας"
 
 #: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
-msgstr ""
+msgstr "Προσθήκη γονικών υπηρεσιών"
 
 #: include/classes/helpers/CRoleHelper.php:461
 msgid "Add problem comments"
-msgstr ""
+msgstr "Προσθήκη σχολίων στο πρόβλημα"
 
 #: app/views/popup.massupdate.trigger.php:101
 #: include/views/configuration.graph.edit.php:410
@@ -1014,19 +1023,19 @@ msgstr "Προσθήκη προτότυπου"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Προσθήκη προγραμματισμένης αναφοράς"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
-msgstr ""
+msgstr "Προσθήκη υπηρεσιών"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
-msgstr ""
+msgstr "Προσθήκη υποχαρτών"
 
 #: app/controllers/CControllerFavouriteDelete.php:69 include/html.inc.php:153
 msgid "Add to favorites"
-msgstr ""
+msgstr "Προσθήκη στα αγαπημένα"
 
 #: include/actions.inc.php:1033
 msgid "Add to host group"
@@ -1038,11 +1047,11 @@ msgstr "Προσθήκη στις ομάδες ξενιστών"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Προσθήκη χρήστη"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "Προσθήκη ομάδας χρηστών"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
@@ -1053,25 +1062,25 @@ msgstr ""
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Προστέθηκε"
 
 #: jsLoader.php:340
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
-msgstr ""
+msgstr "Προστέθηκε, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Πρόσθετος κανόνας"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Πρόσθετοι κανόνες"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Διεύθυνση"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1085,19 +1094,19 @@ msgstr "Διαχείριση"
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Προηγμένη διαμόρφωση"
 
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
-msgstr "Σύνθετες ετικέτες"
+msgstr "Προηγμένες ετικέτες"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "Προχωρημένες επιλογές"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "Μετά την τιμή"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1111,7 +1120,15 @@ msgstr "Ηλικία μικρότερη απο"
 #: include/items.inc.php:347 include/views/configuration.httpconf.edit.php:98
 #: jsLoader.php:317
 msgid "Agent"
-msgstr "Αντιπρόσωπος"
+msgstr "Πράκτορας"
+
+#: widgets/hostavail/views/widget.view.php:82
+msgid "Agent (active)"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:83
+msgid "Agent (passive)"
+msgstr ""
 
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1119,62 +1136,62 @@ msgstr ""
 
 #: app/views/configuration.host.list.php:197
 msgid "Agent encryption"
-msgstr ""
+msgstr "Κρυπτογράφηση πράκτορα"
 
 #: include/classes/data/CItemData.php:810
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Μεταδεδομένα πράκτορα του διακομιστή. Επιστρέφει συμβολοσειρά"
 
 #: include/classes/data/CItemData.php:814
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Όνομα διακομιστή του πράκτορα. Επιστρέφει συμβολοσειρά"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
-msgstr "Διεπαφές αντιπρόσωπου"
+msgstr "Διεπαφές πράκτορα"
 
 #: include/classes/data/CItemData.php:822
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Έλεγχος παραλλαγής πράκτορα. Επιστρέφει 1 - για τον πράκτορα Zabbix. 2 - για τον πράκτορα Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
-msgstr ""
+msgstr "Σύνολο"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Συγκεντρωτικές συναρτήσεις"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:284
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Συγκεντρώνει κάθε στοιχείο στο σύνολο δεδομένων."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:306
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Συγκεντρώνει ολόκληρο το σύνολο δεδομένων."
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr ""
+msgstr "Συνάρτηση συγκέντρωσης"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Διάστημα συγκέντρωσης"
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
-msgstr ""
+msgstr "Μήνυμα συναγερμού"
 
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Συναγερμοί"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Αλγόριθμος"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1182,7 +1199,7 @@ msgstr "Ψευδώνυμο"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "Ευθυγράμμιση στοιχείων χάρτη"
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/controllers/CControllerAuditLogList.php:173
@@ -1205,21 +1222,21 @@ msgstr "Όλα"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
-msgstr ""
+msgstr "Όλοι οι πίνακες ελέγχου"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
-msgstr ""
+msgstr "Όλα τα γραφήματα"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:429
 #: app/views/administration.user.edit.php:435
 msgid "All groups"
-msgstr ""
+msgstr "Όλες οι ομάδες"
 
 #: app/views/monitoring.host.dashboard.view.php:120 include/html.inc.php:305
 msgid "All hosts"
-msgstr ""
+msgstr "Όλοι οι διακομιστές"
 
 #: jsLoader.php:284
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -1227,112 +1244,112 @@ msgstr "Όλοι οι σύνδεσμοι πρέπει να έχουν \"Όνομ
 
 #: include/html.inc.php:516
 msgid "All maps"
-msgstr ""
+msgstr "Όλοι οι χάρτες"
 
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:543
 msgid "All problems"
-msgstr ""
+msgstr "Όλα τα προβλήματα"
 
 #: include/views/configuration.trigger.prototype.edit.php:515
 #: include/views/configuration.triggers.edit.php:544
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "Όλα τα προβλήματα εάν οι τιμές των ετικετών ταιριάζουν"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Όλες οι υπηρεσίες"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr ""
+msgstr "Όλες οι ετικέτες"
 
 #: include/html.inc.php:267
 msgid "All templates"
-msgstr ""
+msgstr "Όλα τα πρότυπα"
 
 #: app/views/administration.userrole.edit.php:291
 msgid "Allow list"
-msgstr ""
+msgstr "Λίστα επιτρεπόμενων"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:527
 #: include/views/configuration.triggers.edit.php:556
 msgid "Allow manual close"
-msgstr ""
+msgstr "Επιτρέπεται το χειροκίνητο κλείσιμο"
 
 #: app/views/popup.discovery.check.php:125
 msgid "Allow redirect"
-msgstr ""
+msgstr "Επιτρέπεται η ανακατεύθυνση"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
 #: include/views/configuration.item.edit.php:945
 #: include/views/configuration.item.prototype.edit.php:852
 msgid "Allowed hosts"
-msgstr "Επιτρεπόμενοι ξενιστές"
+msgstr "Επιτρεπόμενοι διακομιστές"
 
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
-msgstr ""
+msgstr "Επιτρεπόμενες μέθοδοι"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
 msgid "Also used as legend label for aggregated data sets."
-msgstr ""
+msgstr "Χρησιμοποιείται επίσης ως ετικέτα λεζάντας για συγκεντρωτικά σύνολα δεδομένων."
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Εναλλακτικά, μπορείτε να το εγκαταστήσετε χειροκίνητα:"
 
 #: include/classes/data/CItemData.php:1623
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Ποσότητα φυσικής μνήμης του επισκέπτη που ανταλλάσσεται στον χώρο ανταλλαγής, \"url\" - URL υπηρεσίας VMware, \"uuid\" - παγκόσμιο μοναδικό αναγνωριστικό εικονικής μηχανής VMware"
 
 #: include/classes/data/CItemData.php:1442
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Ποσότητα φυσικής μνήμης του επισκέπτη που ανταλλάσσεται στον χώρο ανταλλαγής, <url> - URL υπηρεσίας VMware, <uuid> - Όνομα διακομιστή εικονικής μηχανής VMware"
 
 #: include/classes/data/CItemData.php:1643
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Ποσότητα φυσικής μνήμης του διακομιστή που καταναλώνεται για τη δημιουργία αντιγράφων ασφαλείας σελίδων φυσικής μνήμης επισκέπτη, \"url\" - URL υπηρεσίας VMware, \"uuid\" - παγκόσμιο μοναδικό αναγνωριστικό εικονικής μηχανής VMware"
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Ποσότητα φυσικής μνήμης διακομιστή που καταναλώνεται για τη δημιουργία αντιγράφων ασφαλείας σελίδων φυσικής μνήμης επισκέπτη, <url> - URL υπηρεσίας VMware, <uuid> - Όνομα κεντρικού υπολογιστή εικονικής μηχανής VMware"
 
 #: include/classes/api/services/CItemGeneral.php:1544
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Ένας κανόνας LLD με κλειδί \"%1$s\" υπάρχει ήδη στον διακομιστή \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1543
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Ένας κανόνας LLD με το κλειδί \"%1$s\" υπάρχει ήδη στο πρότυπο \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1538
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Ένα πρωτότυπο αντικειμένου με το κλειδί \"%1$s\" υπάρχει ήδη στον διακομιστή \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1537
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Ένα πρωτότυπο αντικειμένου με το κλειδί \"%1$s\" υπάρχει ήδη στο πρότυπο \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1532
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Ένα αντικείμενο με το κλειδί \"%1$s\" υπάρχει ήδη στον διακομιστή \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1531
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Ένα αντικείμενο με το κλειδί \"%1$s\" υπάρχει ήδη στο πρότυπο \"%2$s\"."
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "Αναλογικό"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -1371,15 +1388,15 @@ msgstr "Καί/Ή"
 
 #: widgets/gauge/includes/WidgetForm.php:173
 msgid "Angle"
-msgstr ""
+msgstr "Γωνία"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Ετησίως"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Ένα άλλο γραφικό στοιχείο χρησιμοποιείται ως πηγή δεδομένων."
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
@@ -1403,7 +1420,7 @@ msgstr "Κάθε"
 
 #: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Τυχόν αλλαγές που έγιναν στην τρέχουσα φόρμα θα χαθούν."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1432,21 +1449,21 @@ msgstr "Εφαρμογή"
 
 #: include/views/configuration.hostgroups.edit.php:48
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr ""
+msgstr "Εφαρμογή δικαιωμάτων και φίλτρων ετικετών σε όλες τις υποομάδες"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Εφαρμογή δικαιωμάτων σε όλες τις υποομάδες"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr "Προσεγγίζοντας"
+msgstr "Πλησιάζοντας"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "Προσέγγιση"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1458,28 +1475,28 @@ msgstr "Απρίλιος"
 
 #: widgets/gauge/includes/WidgetForm.php:221
 msgid "Arc"
-msgstr ""
+msgstr "Τόξο"
 
 #: widgets/gauge/includes/WidgetForm.php:240
 msgid "Arc background"
-msgstr ""
+msgstr "Φόντο τόξου"
 
 #: widgets/gauge/includes/WidgetForm.php:232
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
-msgstr ""
+msgstr "Μέγεθος τόξου"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το φίλτρο;"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Είστε βέβαιοι ότι θέλετε να διαγράψετε;"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Είστε βέβαιοι ότι θέλετε να εκτελέσετε αυτήν την ενέργεια;"
 
 #: include/views/js/monitoring.sysmaps.js.php:122
 msgid "Area size"
@@ -1491,12 +1508,12 @@ msgstr "Τύπος περιοχής"
 
 #: include/items.inc.php:1835
 msgid "Arithmetic"
-msgstr ""
+msgstr "Αριθμητικό"
 
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "Ως έχει"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1511,10 +1528,24 @@ msgstr ""
 msgid "Asset tag"
 msgstr "Ετικέτα αποκτήματος"
 
+#: include/classes/helpers/CMaintenanceHelper.php:86
+#, c-format
+msgid "At %1$s %2$s of every %3$s week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/helpers/CMaintenanceHelper.php:85
 #, c-format
 msgid "At %1$s %2$s of every week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] "Την %1$s %2$s κάθε εβδομάδας"
+msgstr[1] "Σε %1$s %2$s κάθε %3$s εβδομάδες"
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every %2$s day"
+msgid_plural "At %1$s every %2$s days"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1522,8 +1553,8 @@ msgstr[1] ""
 #, c-format
 msgid "At %1$s every day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Στις %1$s κάθε μέρα"
+msgstr[1] "Στο %1$s κάθε %2$s ημέρες"
 
 #: include/classes/helpers/CMaintenanceHelper.php:113
 #, c-format
@@ -1539,15 +1570,15 @@ msgstr ""
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Στις %1$s:%2$s %3$s κάθε εβδομάδας"
+msgstr[1] "Σε %1$s:%2$s %3$s κάθε %4$s εβδομάδες"
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Στις %1$s:%2$s κάθε μέρα"
+msgstr[1] "Στο %1$s:%2$s κάθε %3$s ημέρες"
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -1565,102 +1596,106 @@ msgstr "Σε (ώρα:λεπτό)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Πρέπει να υπάρχει τουλάχιστον ένας διακομιστής LDAP."
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "Πρέπει να ελεγχθεί τουλάχιστον ένα στοιχείο διεπαφής χρήστη."
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "Τουλάχιστον ένα στοιχείο διεπαφής χρήστη πρέπει να είναι ενεργοποιημένο για τον ρόλο χρήστη \"%1$s\"."
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Τουλάχιστον μία ενέργεια είναι υποχρεωτική."
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Πρέπει να υπάρχει τουλάχιστον ένας ενεργός χρήστης με ρόλο \"%1$s\"."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Πρέπει να οριστεί τουλάχιστον μία ημέρα της εβδομάδας ή ημέρα του μήνα."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
 #: include/views/configuration.maintenance.edit.php:247
 msgid "At least one host group or host must be selected."
-msgstr ""
+msgstr "Πρέπει να επιλεγεί τουλάχιστον μία ομάδα διακομιστών ή διακομιστής."
 
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "Πρέπει να καθοριστεί τουλάχιστον ένας διακομιστής ή πρότυπο."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Θα πρέπει να υποστηρίζεται τουλάχιστον ένα από τα MySQL, PostgreSQL ή Oracle."
 
 #: app/views/configuration.correlation.edit.php:161
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Πρέπει να επιλεγεί τουλάχιστον μία λειτουργία."
 
 #: include/views/configuration.action.edit.php:522
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "Πρέπει να υπάρχει τουλάχιστον μία λειτουργία."
 
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
+msgstr "Πρέπει να είναι ενεργοποιημένη τουλάχιστον μία παράμετρος \"%1$s\" ή \"%2$s\"."
+
+#: widgets/gauge/views/widget.edit.php:50
+msgid "At least one parameter must be enabled."
 msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Τουλάχιστον μία λειτουργία ενημέρωσης ή μήνυμα είναι υποχρεωτικό"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
-msgstr ""
+msgstr "Πρέπει να υπάρχει τουλάχιστον μία λειτουργία ενημέρωσης ή μήνυμα."
 
 #: app/partials/popup.operations.php:75
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "Πρέπει να επιλεγεί τουλάχιστον ένας χρήστης ή ομάδα χρηστών."
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "Πρέπει να καθοριστεί τουλάχιστον ένας χρήστης ή ομάδα χρηστών."
 
 #: app/views/administration.mediatype.edit.php:342
 msgid "Attempt interval"
-msgstr ""
+msgstr "Διάστημα προσπάθειας"
 
 #: app/views/administration.mediatype.edit.php:337 httpconf.php:43
 #: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
-msgstr ""
+msgstr "Προσπάθειες"
 
 #: app/views/administration.authentication.edit.php:520
 #: app/views/popup.ldap.edit.php:265
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "Χαρακτηριστικό"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Απόδοση"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "Απόδοση HTML"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "Κείμενο απόδοσης"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1674,11 +1709,11 @@ msgstr "Επιθεώρηση"
 #: app/views/reports.auditlog.list.php:78
 #: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:892
 msgid "Audit log"
-msgstr "Έλεγχος καταγραφής"
+msgstr "Ημερολόγιο επιθεώρησης"
 
 #: app/views/administration.housekeeping.edit.php:180
 msgid "Audit settings"
-msgstr ""
+msgstr "Ρυθμίσεις επιθεωρήσεων"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1694,7 +1729,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN αιτήματα"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1716,7 +1751,7 @@ msgstr "Αλγόριθμος ταυτοποίησης"
 #: include/classes/api/services/CUser.php:2022
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr ""
+msgstr "Η ταυτοποίηση απέτυχε: %1$s."
 
 #: app/views/administration.script.edit.php:131
 #: app/views/popup.massupdate.item.php:169
@@ -1741,27 +1776,27 @@ msgstr "Πρωτόκολλο ταυτοποίησης"
 #: app/controllers/CControllerAuthenticationUpdate.php:395
 #: app/controllers/CControllerAuthenticationUpdate.php:403
 msgid "Authentication settings updated"
-msgstr ""
+msgstr "Οι ρυθμίσεις ταυτοποίησης ενημερώθηκαν"
 
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:77
 msgid "Author"
-msgstr ""
+msgstr "Συγγραφέας"
 
 #: app/views/administration.miscconfig.edit.php:87
 msgid "Authorization"
-msgstr ""
+msgstr "Εξουσιοδότηση"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Αυτόματο"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:226
 msgctxt "history source selection method"
 msgid "Auto"
-msgstr ""
+msgstr "Αυτόματο"
 
 #: app/views/administration.user.edit.php:261
 msgid "Auto-login"
@@ -1769,11 +1804,11 @@ msgstr "Αυτόματη σύνδεση"
 
 #: include/classes/api/services/CUser.php:1012
 msgid "Auto-login and auto-logout options cannot be enabled together."
-msgstr ""
+msgstr "Οι επιλογές αυτόματης σύνδεσης και αυτόματης αποσύνδεσης δεν μπορούν να ενεργοποιηθούν μαζί."
 
 #: app/views/administration.user.edit.php:266
 msgid "Auto-logout"
-msgstr ""
+msgstr "Αυτόματη αποσύνδεση"
 
 #: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
@@ -1801,16 +1836,16 @@ msgstr "Αυτόματη επιλογή εικονιδίου"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Αυτόματη εγγραφή"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:36
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Ενέργειες αυτόματης εγγραφής"
 
 #: app/views/administration.housekeeping.edit.php:87
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Περίοδος αποθήκευσης δεδομένων αυτόματης εγγραφής"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:196
@@ -1827,12 +1862,12 @@ msgstr "Αναφορά διαθεσιμότητας"
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
 msgid "Available"
-msgstr "Διαθέσιμο"
+msgstr "Διαθέσιμος"
 
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Διαθέσιμος"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -1856,16 +1891,16 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Αποφύγετε τους εύκολους να μαντευτούν κωδικούς πρόσβασης"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
-msgstr ""
+msgstr "Άξονες"
 
 #: include/classes/setup/CSetupWizard.php:334
 #: include/classes/setup/CSetupWizard.php:755
 msgid "Back"
-msgstr ""
+msgstr "Πίσω"
 
 #: app/views/administration.image.edit.php:74
 #: app/views/administration.image.list.php:52
@@ -1876,7 +1911,7 @@ msgstr "Παρασκήνιο"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:582
 msgid "Background color"
-msgstr ""
+msgstr "Χρώμα παρασκηνίου"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background image"
@@ -1887,7 +1922,7 @@ msgstr "Εικόνα παρασκηνίου"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr ""
+msgstr "Μπάρα"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1897,7 +1932,7 @@ msgstr "Βάση DN"
 #: include/classes/widgets/CWidgetHelper.php:954
 #: include/classes/widgets/CWidgetHelper.php:1210
 msgid "Base color"
-msgstr ""
+msgstr "Βασικό χρώμα"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
@@ -1905,7 +1940,7 @@ msgstr "Βασική"
 
 #: app/views/connector.edit.php:136
 msgid "Bearer"
-msgstr ""
+msgstr "Φορέας"
 
 #: app/views/connector.edit.php:156
 msgid "Bearer token"
@@ -1913,18 +1948,18 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "Πριν την τιμή"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Κάτω από την τιμή"
 
 #: app/partials/configuration.filter.items.php:147
 #: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
 #: include/views/configuration.item.edit.php:126
 #: include/views/configuration.item.prototype.edit.php:112
 msgid "Binary"
-msgstr ""
+msgstr "Δυάδικο"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1397
 #, c-format
@@ -1942,11 +1977,11 @@ msgstr "Συσχέτιση συνθηματικού"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Bits για ολίσθηση"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Συναρτήσεις σε bits"
 
 #: app/views/administration.user.list.php:144
 msgid "Blocked"
@@ -1954,28 +1989,28 @@ msgstr "Αποκλεισμένο"
 
 #: include/classes/core/ZBase.php:358
 msgid "Blue"
-msgstr ""
+msgstr "Μπλε"
 
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:400
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr ""
+msgstr "Σώμα"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:402
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr ""
+msgstr "Σώμα και κεφαλίδες"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Έντονο"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:804
 #: include/views/js/monitoring.sysmaps.js.php:894
@@ -1984,27 +2019,27 @@ msgstr "Έντονη γραμμή"
 
 #: include/items.inc.php:1848
 msgid "Boolean to decimal"
-msgstr ""
+msgstr "Δυαδικό σε δεκαδικό"
 
 #: include/views/js/monitoring.sysmaps.js.php:421
 msgid "Border"
-msgstr ""
+msgstr "Πλαίσιο"
 
 #: include/views/js/monitoring.sysmaps.js.php:613
 msgid "Border color"
-msgstr ""
+msgstr "Χρώμα πλαισίου"
 
 #: include/views/js/monitoring.sysmaps.js.php:591
 msgid "Border type"
-msgstr ""
+msgstr "Τύπος πλαισίου"
 
 #: include/views/js/monitoring.sysmaps.js.php:603
 msgid "Border width"
-msgstr ""
+msgstr "Πλάτος πλαισίου"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Και οι δύο κωδικοί πρόσβασης πρέπει να είναι ίσοι."
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -2018,7 +2053,7 @@ msgstr "Κάτω"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "Τελευταίοι Ν"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -2026,7 +2061,7 @@ msgstr ""
 
 #: jsLoader.php:275
 msgid "Bring to front"
-msgstr ""
+msgstr "Στο προσκήνιο"
 
 #: include/locales.inc.php:34
 msgid "Bulgarian (bg_BG)"
@@ -2034,16 +2069,16 @@ msgstr "Βουλγαρικά (bg_BG)"
 
 #: report2.php:195
 msgid "By host"
-msgstr "Ανά ξενιστή"
+msgstr "Ανά διακομιστή"
 
 #: app/partials/monitoring.problem.filter.php:154
 #: widgets/problems/includes/WidgetForm.php:136
 msgid "By me"
-msgstr ""
+msgstr "Από μένα"
 
 #: report2.php:196
 msgid "By trigger template"
-msgstr "Με σχεδιότυπο εναύσματος"
+msgstr "Με πρότυπο εναύσματος"
 
 #: app/views/administration.proxy.list.php:142
 #: app/views/administration.proxy.list.php:155
@@ -2063,11 +2098,11 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1066
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "Πληροφορίες CPU. Επιστρέφει συμβολοσειρά ή ακέραιο"
 
 #: include/classes/data/CItemData.php:1042
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "Φορτίο CPU. Επιστρέφει αριθμό κινητής υποδιαστολής"
 
 #: include/classes/data/CItemData.php:1603
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -2111,20 +2146,20 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Ποσοστό χρήσης CPU. Επιστρέφει αριθμό κινητής υποδιαστολής"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1828
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV σε JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "Αναμένεται CUID"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
@@ -2133,7 +2168,7 @@ msgstr "Υπολογισμένο"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Ημερολόγιο"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -2183,13 +2218,13 @@ msgstr ""
 #: include/classes/api/services/CGraph.php:545
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr "Αδύνατη η προσθήκη μη αριθμητικού συλλέκτη \"%1$s\" στο γράφημα \"%2$s\"."
+msgstr "Αδύνατη η προσθήκη μη αριθμητικού αντικειμένου \"%1$s\" στο γράφημα \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #: include/classes/api/services/CGraphPrototype.php:535
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr "Αδύνατη η προσθήκη μη αριθμητικού συλλέκτη \"%1$s\" στο πρωτότυπο γράφημα \"%2$s\"."
+msgstr "Αδύνατη η προσθήκη μη αριθμητικού αντικειμένου \"%1$s\" στο πρότυπο γράφημα \"%2$s\"."
 
 #: actionconf.php:302
 msgid "Cannot add action"
@@ -2197,17 +2232,17 @@ msgstr "Αδύνατη η προσθήκη ενέργειας"
 
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "Αδυνατή η προσθήκη συσχέτισης"
 
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Δεν είναι δυνατή η προσθήκη σελίδας πίνακα ελέγχου: έχει προστεθεί ο μέγιστος αριθμός %1$d σελίδων πίνακα ελέγχου."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
 msgid "Cannot add dependency from a host to a template."
-msgstr "Αδύνατη η προσθήκη εξάρτησης απο ξενιστή σε σχεδιότυπο."
+msgstr "Αδύνατη η προσθήκη εξάρτησης απο διακομιστή σε πρότυπο."
 
 #: include/classes/api/services/CDiscoveryRule.php:889
 #: include/triggers.inc.php:371
@@ -2239,11 +2274,11 @@ msgstr "Αδύνατη η προσθήκη ξενιστή"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Αδύνατη η προσθήκη ομάδας διακομιστών"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
-msgstr "δύνατη η προσθήκη πρωτότυπου ξενιστή"
+msgstr "Αδύνατη η προσθήκη πρότυπου διακομιστή"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:101
@@ -2253,11 +2288,11 @@ msgstr "Αδύνατη η προσθήκη εικόνας"
 
 #: items.php:876
 msgid "Cannot add item"
-msgstr "Αδύνατη η προσθήκη συλλέκτη"
+msgstr "Αδύνατη η προσθήκη αντικειμένου"
 
 #: disc_prototypes.php:553
 msgid "Cannot add item prototype"
-msgstr "Αδύνατη η προσθήκη πρωτότυπου συλλέκτη"
+msgstr "Αδύνατη η προσθήκη πρωτύπου αντικειμένου"
 
 #: maintenance.php:123
 msgid "Cannot add maintenance"
@@ -2266,7 +2301,7 @@ msgstr "Αδύνατη η προσθήκη συντήρησης"
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Δεν είναι δυνατή η προσθήκη στοιχείου στο χάρτη \"%1$s\" λόγω κυκλικής αναφοράς."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -2277,22 +2312,22 @@ msgstr "Αδύνατη η προσθήκη τύπου μέσων"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η προσθήκη της μονάδας: %1$s."
+msgstr[1] "Αδύνατη η προσθήκη της μονάδας: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "Αδύνατη η προσθήκη περισσοτέρων του ενός συλλέκτη τύπου \"Graph sum\" στο γράφημα \"%1$s\"."
+msgstr "Αδύνατη η προσθήκη πλέον του ενός αντικειμένου τύπου \"Graph sum\" στο γράφημα \"%1$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "Αδύνατη η προσθήκη πλέον του ενός συλλέκτη τύπου \"Graph sum\" στο πρωτότυπο γράφημα \"%1$s\"."
+msgstr "Αδύνατη η προσθήκη πλέον του ενός αντικειμένου τύπου \"Graph sum\" στο πρότυπο γράφημα \"%1$s\"."
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:202
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "Αδύνατη η προσθήκη πλέον του ενός αντικειμένου με τύπο \"Σύνολο\" στο γράφημα."
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -2310,7 +2345,7 @@ msgstr "Αδύνατη η προσθήκη κανονικής έκφρασης"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Αδύνατη η προσθήκη προγραμματισμένης αναφοράς"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2319,16 +2354,16 @@ msgstr "Αδύνατη η προσθήκη δέσμης ενεργειών"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "Δεν είναι δυνατή η προσθήκη υποχάρτων. Επιτεύχθηκε μέγιστο βάθος."
 
 #: templates.php:205
 msgid "Cannot add template"
-msgstr "Αδύνατη η προσθήκη σχεδιότυπου"
+msgstr "Αδύνατη η προσθήκη προτύπου"
 
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Αδύνατη η προσθήκη ομάδας προτύπων"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2346,7 +2381,7 @@ msgstr "Αδύνατη η προσθήκη χρήστη"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Αδύνατη η προσθήκη ομάδας χρηστών"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2354,11 +2389,11 @@ msgstr "Αδύνατη η προσθήκη σενάριου ιστού"
 
 #: jsLoader.php:129
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "Αδύνατη η προσθήκη γραφικού στοιχείου: δεν υπάρχουν διαθέσιμα γραφικά στοιχεία."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Αδύνατη η προσθήκη γραφικού στοιχείου: δεν υπάρχει αρκετός ελεύθερος χώρος στον πίνακα ελέγχου."
 
 #: include/classes/api/services/CItem.php:1532
 #, c-format
@@ -2378,30 +2413,34 @@ msgstr ""
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Δεν μπορεί να αφαιρεθεί"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Aδύνατη η ανώνυμη σύνδεση με τον διακομιστή LDAP."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Aδύνατη η σύνδεση με διακομιστή LDAP."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Aδύνατη η δημιουργία δέντρου έκφρασης: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Aδύνατη του τύπου χρήστη του δικού του ρόλου."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
 msgstr "Αδύνατη η εκκαθάριση ιστορικού"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "Cannot clear history and trends"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -2420,66 +2459,66 @@ msgstr "Αδύνατη η κλωνοποίηση προτότυπων εναυσ
 #: include/classes/api/services/CEvent.php:848
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "Aδύνατο το κλείσιμο του προβλήματος: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Aδύνατη η σύνδεση με διακομιστή LDAP."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Aδύνατη η σύνδεση στη βάση δεδομένων."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Aδύνατη η μετατροπή δεδομένων POST:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Aδύνατη η αντιγραφή γραφήματος"
+msgstr[1] "Aδύνατη η αντιγραφή γραφημάτων"
 
 #: include/classes/helpers/CGraphHelper.php:74
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
-msgstr ""
+msgstr "Αδύνατη η αντιγραφή του γραφήματος \"%1$s\", επειδή έχει αντικείμενα από τους πολλούς διακομιστές."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:91
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "Αδύνατη η αντιγραφή του γραφήματος \"%1$s\", επειδή το αντικείμενο με το κλειδί \"%2$s\" δεν υπάρχει στον διακομιστή \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:92
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "Αδύνατη η αντιγραφή του γραφήματος \"%1$s\", επειδή το αντικείμενο με το κλειδί \"%2$s\" δεν υπάρχει στο πρότυπο \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:96
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "Αδύνατη η αντιγραφή του πρωτοτύπου γραφήματος \"%1$s\", επειδή το αντικείμενο με το κλειδί \"%2$s\" δεν υπάρχει στον διακομιστή \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:97
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "Αδύνατη η αντιγραφή του πρωτοτύπου γραφήματος \"%1$s\", επειδή το αντικείμενο με το κλειδί \"%2$s\" δεν υπάρχει στο πρότυπο \"%3$s\"."
 
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η αντιγραφή του αντικειμένου"
+msgstr[1] "Αδύνατη η αντιγραφή του αντικειμένων"
 
 #: include/classes/api/services/CDiscoveryRule.php:2475
 #, c-format
 msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Αδύνατη η αντιγραφή του πρωτοτύπου αντικειμένου με το κλειδί \"%1$s\" χωρίς το κύριο αντικείμενο του με το κλειδί \"%2$s\"."
 
 #: include/items.inc.php:590
 #, c-format
 msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Αδύνατη η αντιγραφή του αντικειμένου με το κλειδί \"%1$s\" χωρίς το κύριο αντικείμενο του με το κλειδί \"%2$s\"."
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2515,12 +2554,12 @@ msgstr "Αδύνατη η αντιγραφή εναύσματος \"%1$s:%2$s\",
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr "Αδύνατη η δημιουργία πρωτότυπου ξενιστή σε εντοπισμένο ξενιστή \"%1$s\"."
+msgstr "Αδύνατη η δημιουργία ενός πρωτότυπου διακομιστή σε έναν εντοπισμένο διακομιστή \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -2534,7 +2573,7 @@ msgstr "Αδύνατη η δημιουργία κυκλικών εξαρτήσε
 #: app/controllers/CControllerConnectorCreate.php:89
 #: app/controllers/CControllerConnectorCreate.php:164
 msgid "Cannot create connector"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία συνδέσμου"
 
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
@@ -2552,7 +2591,7 @@ msgstr "Αδύνατη η δημιουργία κανόνα εντοπισμού
 #: app/controllers/CControllerCorrelationCreate.php:48
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot create event correlation"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία συσχέτισης συμβάντων"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
@@ -2561,39 +2600,39 @@ msgstr "Αδύνατη η δημιουργία αντιστοίχισης εικ
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία περιόδου συντήρησης"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία αιτήματος"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία προγραμματισμένης αναφοράς"
 
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία υπηρεσίας"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Αδύνατη η δημιουργία της υπηρεσίας \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Αδύνατη η δημιουργία του αρχείου διαμόρφωσης."
 
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία ρόλου χρήστη"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "Αδύνατη η δημιουργία βήματος σεναρίου ιστού"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2604,7 +2643,7 @@ msgstr[1] ""
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
+msgstr[0] "Αδύνατη η διαγραφή του SLA"
 msgstr[1] ""
 
 #: include/classes/api/services/CUser.php:1257
@@ -2619,30 +2658,30 @@ msgstr "Αδύνατη η διαγραφή ενέργειας"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή του εκχωρημένου ρόλου χρήστη \"%1$s\"."
 
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
 msgid_plural "Cannot delete connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή του συνδέσμου"
+msgstr[1] "Αδύνατη η διαγραφή των συνδέσμων"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της συσχέτισης"
+msgstr[1] "Αδύνατη η διαγραφή των συσχετίσεων"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή του πίνακα ελέγχου"
+msgstr[1] "Αδύνατη η διαγραφή των πινάκων ελέγχου"
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή του προεπιλεγμένου καταλόγου χρήστη."
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2650,7 +2689,6 @@ msgid "Cannot delete dependency"
 msgstr "Αδύνατη η διαγραφή εξάρτησης"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Αδύνατη η διαγραφή κανόνα εντοπισμού"
@@ -2663,8 +2701,8 @@ msgstr "Αδύνατη η διαγραφή κανόνων εντοπισμού"
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή συσχέτισης συμβάντων"
+msgstr[1] "Αδύνατη η διαγραφή συσχετίσεων συμβάντων"
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2696,36 +2734,36 @@ msgstr "Αδύνατη η διαγραφή ξενιστή"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή του διακομιστή %1$s επειδή η συντήρηση \"%2$s\" πρέπει να περιέχει τουλάχιστον έναν διακομιστή ή ομάδα διακομιστών."
+msgstr[1] "Αδύνατη η διαγραφή των διακομιστών %1$s επειδή η συντήρηση \"%2$s\" πρέπει να περιέχει τουλάχιστον έναν διακομιστή ή ομάδα διακομιστών."
 
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της ομάδας διακομιστή"
+msgstr[1] "Αδύνατη η διαγραφή των ομάδων διακομιστή"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της ομάδας διακομιστών %1$s επειδή η συντήρηση \"%2$s\" πρέπει να περιέχει τουλάχιστον έναν διακομιστή ή ομάδα διακομιστών."
+msgstr[1] "Αδύνατη η διαγραφή των ομάδων διακομιστών %1$s επειδή η συντήρηση \"%2$s\" πρέπει να περιέχει τουλάχιστον έναν διακομιστή ή ομάδα διακομιστών."
 
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "Αδύνατη η διαγραφή ομάδων διακομιστών"
 
 #: host_prototypes.php:293
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή του πρωτότυπου διακομιστή"
+msgstr[1] "Αδύνατη η διαγραφή των πρωτοτύπων διακομιστών"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
-msgstr "Αδύνατη η διαγραφή πρωτότυπων ξενιστών"
+msgstr "Αδύνατη η διαγραφή πρωτότυπων διακομιστών"
 
 #: app/controllers/CControllerIconMapDelete.php:65
 msgid "Cannot delete icon map"
@@ -2738,7 +2776,7 @@ msgstr "Αδύνατη η διαγραφή εικόνας"
 #: include/classes/api/services/CHostInterface.php:636
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή διεπαφής για τον ανακαλυφθέντα διακομιστή \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
@@ -2767,22 +2805,21 @@ msgstr "Αδύνατη η διαγραφή συντήρησης"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της περιόδου συντήρησης"
+msgstr[1] "Αδύνατη η διαγραφή των περιόδων συντήρησης"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Αδύνατη η διαγραφή τύπου μέσων"
-msgstr[1] "Αδύνατη η διαγραφή τύπου μέσων"
+msgstr[1] "Αδύνατη η διαγραφή τύπων μέσων"
 
 #: app/controllers/CControllerModuleScan.php:118
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της μονάδας: %1$s."
+msgstr[1] "Αδύνατη η διαγραφή των μονάδων: %1$s."
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2790,19 +2827,18 @@ msgstr "Αδύνατη η διαγραφή χάρτη δικτύου"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "Αδύνατη η διαγραφή διακομιστών μεσολάβησης"
 
 #: app/controllers/CControllerProxyDelete.php:69
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] "Αδύνατη η διαγραφή διαμεσολαβητή"
-msgstr[1] "Αδύνατη η διαγραφή διαμεσολαβητή"
+msgstr[0] "Αδύνατη η διαγραφή του διακομιστή μεσολάβησης"
+msgstr[1] "Αδύνατη η διαγραφή των διακομιστών μεσολάβησης"
 
 #: include/classes/api/services/CRole.php:369
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή του ρόλου χρήστη μόνο για ανάγνωση \"%1$s\"."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2813,15 +2849,14 @@ msgstr[1] "Αδύνατη η διαγραφή κανονικών εκφράσε�
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της προγραμματισμένης αναφοράς"
+msgstr[1] "Αδύνατη η διαγραφή των προγραμματισμένων αναφορών"
 
 #: app/controllers/CControllerScriptDelete.php:69
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Αδύνατη η διαγραφή δέσμης ενεργειών"
-msgstr[1] "Αδύνατη η διαγραφή δέσμης ενεργειών"
+msgstr[1] "Αδύνατη η διαγραφή δεσμών ενεργειών"
 
 #: include/classes/api/services/CScript.php:877
 #, c-format
@@ -2833,47 +2868,46 @@ msgid "Cannot delete selected actions"
 msgstr "Αδύνατη η διαγραφή επιλεγμένων ενεργειών"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Αδύνατη η διαγραφή υπηρεσίας"
-msgstr[1] "Αδύνατη η διαγραφή υπηρεσίας"
+msgstr[1] "Αδύνατη η διαγραφή υπηρεσιών"
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή της υπηρεσίας \"%1$s\": %2$s."
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
-msgstr "Αδύνατη η διαγραφή σχεδιότυπου"
+msgstr "Αδύνατη η διαγραφή προτύπου"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της ομάδας προτύπων"
+msgstr[1] "Αδύνατη η διαγραφή των ομάδων προτύπων"
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή του πρωτότυπου γραφήματος που έχει γίνει πρότυπο."
 
 #: include/classes/api/services/CGraph.php:374
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή του γραφήματος που έχει γίνει πρότυπο."
 
 #: include/classes/api/services/CItemPrototype.php:663
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή του πρωτότυπου στοιχείου που έχει γίνει πρότυπο."
 
 #: include/classes/api/services/CItem.php:778
 msgid "Cannot delete templated item."
-msgstr "Αδύνατη η διαγραφή σχεδιότυπου συλλέκτη."
+msgstr "Αδύνατη η διαγραφή αντικειμένου που έχει γίνει πρότυπο."
 
 #: include/classes/api/services/CDiscoveryRule.php:581
 msgid "Cannot delete templated items."
-msgstr "Αδύνατη η διαγραφή σχεδιότυπων συλλεκτών."
+msgstr "Αδύνατη η διαγραφή αντικειμένων που έχουν γίνει πρότυπα."
 
 #: include/classes/api/services/CTrigger.php:657
 #, c-format
@@ -2910,24 +2944,24 @@ msgstr "Αδύνατη η διαγραφή εναυσμάτων"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Αδύνατη η διαγραφή χρήστη"
-msgstr[1] ""
+msgstr[1] "Αδύνατη η διαγραφή χρηστών"
 
 #: include/classes/api/services/CUserDirectory.php:398
 #, c-format
 msgid "Cannot delete user directory \"%1$s\"."
-msgstr ""
+msgstr "Αδύνατη η διαγραφή του καταλόγου χρήστη \"%1$s\"."
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή της ομάδας χρηστών"
+msgstr[1] "Αδύνατη η διαγραφή των ομάδων χρηστών"
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η διαγραφή του ρόλου χρήστη"
+msgstr[1] "Αδύνατη η διαγραφή των ρόλων χρήστη"
 
 #: httpconf.php:177 httpconf.php:442
 msgid "Cannot delete web scenario"
@@ -2942,8 +2976,8 @@ msgstr[1] ""
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η απενεργοποίηση του SLA"
+msgstr[1] "Αδύνατη η απενεργοποίηση των SLA"
 
 #: actionconf.php:499
 msgid "Cannot disable action"
@@ -2954,8 +2988,8 @@ msgstr[1] "Αδύνατη η απενεργοποίηση ενεργειών"
 #: app/controllers/CControllerConnectorDisable.php:77
 msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η απενεργοποίηση του συνδέσμου"
+msgstr[1] "Αδύνατη η απενεργοποίηση των συνδέσμων"
 
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
@@ -3056,8 +3090,8 @@ msgstr[1] "Αδύνατη η ενεργοποίηση ενεργειών"
 #: app/controllers/CControllerConnectorEnable.php:77
 msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η ενεργοποίηση του συνδέσμου"
+msgstr[1] "Αδύνατη η ενεργοποίηση των συνδέσμων"
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3176,17 +3210,17 @@ msgstr "Δεν βρίσκω ομάδα \"%1$s\" χρησιμοποιούμενη
 #: include/classes/import/importers/CTemplateDashboardImporter.php:140
 #, c-format
 msgid "Cannot find host \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Αδύνατη η εύρεση του διακομιστή \"%1$s\" που χρησιμοποιείται στον πίνακα ελέγχου \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:164
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμενο στο χάρτη \"%2$s\"."
+msgstr "Αδύνατη η εύρεση του διακομιστή \"%1$s\" που χρησιμοποιείται στον χάρτη \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1211
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "Δεν βρίσκω ομάδα ξενιστή \"%1$s\" για πρωτότυπο ξενιστή \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
+msgstr "Αδύνατη η εύρεση της ομάδας διακομιστή \"%1$s\" για το πρωτότυπο διακομιστή \"%2$s\" του κανόνα εντοπισμού \"%3$s\" στο \"%4$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:2146
 #: include/classes/api/services/CDiscoveryRule.php:2350
@@ -3194,17 +3228,17 @@ msgstr "Δεν βρίσκω ομάδα ξενιστή \"%1$s\" για πρωτό
 #: include/items.inc.php:701
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "Δεν βρίσκω διεπαφή ξενιστή στον \"%1$s\" για κλειδί συλλέκτη \"%2$s\"."
+msgstr "Αδύνατη η εύρεση διεπαφής διακομιστή στο \"%1$s\" για το κλειδί αντικειμένου \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:2517
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "Αδύνατη η εύρεση διεπαφής διακομιστή στο \"%1$s\" για το πρωτότυπο αντικειμένου με το κλειδί \"%2$s\"."
 
 #: include/items.inc.php:640
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
-msgstr ""
+msgstr "Αδύνατη η εύρεση διεπαφής διακομιστή στο \"%1$s\" για αντικείμενο με κλειδί \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
@@ -3289,7 +3323,7 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "Δεν βρίσκω σχεδιότυπο \"%1$s\" για πρωτότυπο ξενιστή \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
+msgstr "Αδύνατη η εύρεση του προτύπου \"%1$s\" για το πρωτότυπο διακομιστή \"%2$s\" του κανόνα εντοπισμού \"%3$s\" στο \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
@@ -4075,7 +4109,7 @@ msgstr "Αδύνατη η ενημέρωση διαμόρφωσης"
 #: app/controllers/CControllerConnectorUpdate.php:90
 #: app/controllers/CControllerConnectorUpdate.php:173
 msgid "Cannot update connector"
-msgstr ""
+msgstr "Αδύνατη η ενημέρωση του συνδέσμου"
 
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
@@ -4600,6 +4634,22 @@ msgstr ""
 #: include/views/configuration.item.edit.php:1073
 msgid "Clear history and trends"
 msgstr "Εκκαθάριση ιστορικού και τάσεων"
+
+#: include/views/configuration.item.list.php:315
+msgid "Clear history and trends of selected item?"
+msgstr ""
+
+#: include/views/configuration.item.list.php:316
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Clear history and trends of selected web scenario?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:239
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -5160,44 +5210,44 @@ msgstr ""
 #: app/controllers/CControllerAuditLogList.php:212
 #: app/views/connector.edit.php:283 app/views/connector.edit.php:297
 msgid "Connector"
-msgstr ""
+msgstr "Σύνδεσμος"
 
 #: include/classes/api/services/CConnector.php:446
 #, c-format
 msgid "Connector \"%1$s\" already exists."
-msgstr ""
+msgstr "Ο σύνδεσμος \"%1$s\" υπάρχει ήδη."
 
 #: app/controllers/CControllerConnectorCreate.php:156
 msgid "Connector created"
-msgstr ""
+msgstr "Ο σύνδεσμος δημιουργήθηκε"
 
 #: app/controllers/CControllerConnectorDelete.php:60
 msgid "Connector deleted"
 msgid_plural "Connectors deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ο σύνδεσμος διαγράφηκε"
+msgstr[1] "Οι σύνδεσμοι διαγράφηκαν"
 
 #: app/controllers/CControllerConnectorDisable.php:69
 msgid "Connector disabled"
 msgid_plural "Connectors disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ο σύνδεσμος απενεργοποιήθηκε"
+msgstr[1] "Οι σύνδεσμοι απενεργοποιήθηκαν"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
 msgid_plural "Connectors enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ο σύνδεσμος ενεργοποιήθηκε"
+msgstr[1] "Οι σύνδεσμοι ενεργοποιήθηκαν"
 
 #: app/controllers/CControllerConnectorUpdate.php:165
 msgid "Connector updated"
-msgstr ""
+msgstr "Ο σύνδεσμος ενημερώθηκε"
 
 #: app/controllers/CControllerConnectorList.php:104
 #: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
 #: include/html.inc.php:891
 msgid "Connectors"
-msgstr ""
+msgstr "Σύνδεσμοι"
 
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
@@ -5416,7 +5466,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
-msgstr ""
+msgstr "Πλήθος τιμών στην ουρά του συνδέσμου."
 
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
@@ -5457,7 +5507,7 @@ msgstr "Δημιουργία παρασκηνίου"
 
 #: app/views/connector.list.php:139
 msgid "Create connector"
-msgstr ""
+msgstr "Δημιουργία συνδέσμου"
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -6444,11 +6494,11 @@ msgstr "Διαγραφή επιλεγμένων ενεργειών;"
 
 #: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
 msgid "Delete selected connector?"
-msgstr ""
+msgstr "Διαγραφή επιλεγμένου συνδέσμου;"
 
 #: app/views/js/connector.list.js.php:128
 msgid "Delete selected connectors?"
-msgstr ""
+msgstr "Διαγραφή επιλεγμένων συνδέσμων;"
 
 #: app/views/configuration.correlation.list.php:159
 msgid "Delete selected correlation?"
@@ -6966,11 +7016,11 @@ msgstr "Απενεργοποίηση επιλεγμένων ενεργειών;"
 
 #: app/views/js/connector.list.js.php:114
 msgid "Disable selected connector?"
-msgstr ""
+msgstr "Απενεργοποίηση επιλεγμένου συνδέσμου;"
 
 #: app/views/js/connector.list.js.php:113
 msgid "Disable selected connectors?"
-msgstr ""
+msgstr "Απενεργοποίηση επιλεγμένων συνδέσμων;"
 
 #: app/views/configuration.correlation.list.php:153
 msgid "Disable selected correlation?"
@@ -7428,6 +7478,16 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
+#: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
+#: app/views/popup.massupdate.item.php:315
+#: app/views/popup.massupdate.item.php:331
+#: include/views/configuration.item.edit.php:902
+#: include/views/configuration.item.edit.php:937
+#: include/views/configuration.item.prototype.edit.php:839
+#: include/views/configuration.item.prototype.edit.php:854
+msgid "Do not store"
+msgstr ""
+
 #: jsLoader.php:226 jsLoader.php:363
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Θέλετε να αντικαταστήσετε την υπο συνθήκη έκφραση;"
@@ -7873,11 +7933,11 @@ msgstr "Ενεργοποίηση επιλεγμένων ενεργειών;"
 
 #: app/views/js/connector.list.js.php:99
 msgid "Enable selected connector?"
-msgstr ""
+msgstr "Ενεργοποίηση επιλεγμένου συνδέσμου;"
 
 #: app/views/js/connector.list.js.php:98
 msgid "Enable selected connectors?"
-msgstr ""
+msgstr "Ενεργοποίηση επιλεγμένων συνδέσμων;"
 
 #: app/views/configuration.correlation.list.php:147
 msgid "Enable selected correlation?"
@@ -8238,6 +8298,10 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:80
 #: include/views/configuration.triggers.edit.php:102
 msgid "Event name"
+msgstr ""
+
+#: app/views/popup.condition.edit.php:672
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
 msgstr ""
 
 #: include/classes/helpers/CCorrelationHelper.php:55
@@ -8661,6 +8725,12 @@ msgstr "Πεδίο \"%1$s\" πρέπει να λείπει."
 #: include/views/js/item.preprocessing.js.php:164
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:543
+#: include/views/configuration.item.edit.php:633
+#: include/views/configuration.item.prototype.edit.php:604
+msgid "Field requirements:"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1150
@@ -9549,6 +9619,10 @@ msgstr ""
 #: jsLoader.php:372
 msgid "History"
 msgstr "Ιστορικό"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "History and trends compression"
@@ -10568,6 +10642,10 @@ msgstr "Συμπεριλαμβάνω"
 
 #: app/views/administration.mediatype.edit.php:242
 msgid "Include event menu entry"
+msgstr ""
+
+#: widgets/hostavail/includes/WidgetForm.php:62
+msgid "Include hosts in maintenance"
 msgstr ""
 
 #: app/views/administration.usergroup.edit.php:142
@@ -13849,6 +13927,15 @@ msgstr "Απόντες συλλέκτες πρωτότυπου γραφήματ�
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Απουσία κλειδιού \"%1$s\" ξενιστή \"%2$s\"."
 
+#: widgets/hostavail/views/widget.view.php:38
+msgid "Mixed"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:39
+msgctxt "compact table header"
+msgid "Mixed"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:52
 #: app/views/administration.proxy.list.php:78 report2.php:203
@@ -14380,7 +14467,7 @@ msgstr "Νέα συνθήκη"
 
 #: app/views/connector.edit.php:312 app/views/connector.edit.php:341
 msgid "New connector"
-msgstr ""
+msgstr "Νέος σύνδεσμος"
 
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
@@ -18148,6 +18235,10 @@ msgstr ""
 msgid "SNMP community"
 msgstr "SNMP κοινότητα"
 
+#: include/items.inc.php:1570
+msgid "SNMP get value"
+msgstr ""
+
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
 msgstr "Διεπαφές SNMP"
@@ -19089,6 +19180,10 @@ msgstr "Εμφάνιση γραμμών"
 msgid "Show number of records"
 msgstr ""
 
+#: widgets/hostavail/includes/WidgetForm.php:66
+msgid "Show only totals"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:240
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
@@ -19678,6 +19773,16 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:510
 msgid "Store credentials in"
+msgstr ""
+
+#: app/views/popup.lldoperation.php:189 app/views/popup.lldoperation.php:210
+#: app/views/popup.massupdate.item.php:316
+#: app/views/popup.massupdate.item.php:332
+#: include/views/configuration.item.edit.php:903
+#: include/views/configuration.item.edit.php:938
+#: include/views/configuration.item.prototype.edit.php:840
+#: include/views/configuration.item.prototype.edit.php:855
+msgid "Store up to"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:656
@@ -20795,6 +20900,10 @@ msgstr ""
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:81
+msgid "Total Hosts"
 msgstr ""
 
 #: include/classes/debug/CProfiler.php:149
@@ -23953,9 +24062,17 @@ msgstr ""
 msgid "Zabbix agent"
 msgstr "Αντιπρόσωπος Zabbix"
 
+#: widgets/hostavail/includes/WidgetForm.php:47
+msgid "Zabbix agent (active checks)"
+msgstr ""
+
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
 msgstr "Αντιπρόσωπος Zabbix (ενεργός)"
+
+#: widgets/hostavail/includes/WidgetForm.php:48
+msgid "Zabbix agent (passive checks)"
+msgstr ""
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -26176,6 +26293,17 @@ msgstr ""
 msgid "timeouts are disabled because the proxy and server versions do not match"
 msgstr ""
 
+#: include/views/configuration.item.edit.php:643
+#: include/views/configuration.item.prototype.edit.php:614
+msgid "to retrieve a single value"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:548
+#: include/views/configuration.item.edit.php:638
+#: include/views/configuration.item.prototype.edit.php:609
+msgid "to retrieve a subtree"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr ""
@@ -26424,6 +26552,11 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:2075
 #, c-format
 msgid "value %1$s already exists"
+msgstr ""
+
+#: include/classes/parsers/CEscapedStringParser.php:72
+#, c-format
+msgid "value contains unescaped character at position %1$d"
 msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1773

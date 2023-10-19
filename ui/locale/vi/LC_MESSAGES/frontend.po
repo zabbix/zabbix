@@ -313,6 +313,15 @@ msgstr "(chỉ có nhóm super admins mới có thể tạo nhóm)"
 msgid "(created by host discovery)"
 msgstr ""
 
+#: include/views/configuration.item.edit.php:648
+#: include/views/configuration.item.prototype.edit.php:619
+msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:553
+msgid "(legacy) to retrieve a subtree in JSON"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
 msgstr ""
@@ -1088,6 +1097,14 @@ msgstr "Thời gian ít hơn"
 msgid "Agent"
 msgstr "Agent"
 
+#: widgets/hostavail/views/widget.view.php:82
+msgid "Agent (active)"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:83
+msgid "Agent (passive)"
+msgstr ""
+
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Kiểm tra tính sẵn sàng của agent. Trả về 0 - không sẵn sàng; 1 - sẵn sàng"
@@ -1486,10 +1503,22 @@ msgstr ""
 msgid "Asset tag"
 msgstr "Asset tag"
 
+#: include/classes/helpers/CMaintenanceHelper.php:86
+#, c-format
+msgid "At %1$s %2$s of every %3$s week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+
 #: include/classes/helpers/CMaintenanceHelper.php:85
 #, c-format
 msgid "At %1$s %2$s of every week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every %2$s day"
+msgid_plural "At %1$s every %2$s days"
 msgstr[0] ""
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
@@ -1591,6 +1620,10 @@ msgstr "Ít nhất một thao tác phải tồn tại."
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
+msgstr ""
+
+#: widgets/gauge/views/widget.edit.php:50
+msgid "At least one parameter must be enabled."
 msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
@@ -2376,6 +2409,10 @@ msgstr ""
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
 msgstr "Không thể xóa lịch sử"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "Cannot clear history and trends"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -4503,6 +4540,22 @@ msgstr "Xóa lịch sử"
 #: include/views/configuration.item.edit.php:1073
 msgid "Clear history and trends"
 msgstr "Xóa lịch sử và phương hướng."
+
+#: include/views/configuration.item.list.php:315
+msgid "Clear history and trends of selected item?"
+msgstr ""
+
+#: include/views/configuration.item.list.php:316
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Clear history and trends of selected web scenario?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:239
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -7319,6 +7372,16 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
+#: app/views/popup.lldoperation.php:188 app/views/popup.lldoperation.php:209
+#: app/views/popup.massupdate.item.php:315
+#: app/views/popup.massupdate.item.php:331
+#: include/views/configuration.item.edit.php:902
+#: include/views/configuration.item.edit.php:937
+#: include/views/configuration.item.prototype.edit.php:839
+#: include/views/configuration.item.prototype.edit.php:854
+msgid "Do not store"
+msgstr ""
+
 #: jsLoader.php:226 jsLoader.php:363
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Bạn có muốn thay thế biểu thức điều kiện không?"
@@ -8127,6 +8190,10 @@ msgstr "Theo dõi log sự kiện. Trả về log"
 msgid "Event name"
 msgstr ""
 
+#: app/views/popup.condition.edit.php:672
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Cặp thẻ sự kiện"
@@ -8547,6 +8614,12 @@ msgstr "Trường \"%1$s\" phải bị lỗi."
 #: include/views/js/item.preprocessing.js.php:164
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:543
+#: include/views/configuration.item.edit.php:633
+#: include/views/configuration.item.prototype.edit.php:604
+msgid "Field requirements:"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1150
@@ -9433,6 +9506,10 @@ msgstr "Làm nổi bật toàn bộ hàng"
 #: jsLoader.php:372
 msgid "History"
 msgstr "Lịch sử"
+
+#: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "History and trends compression"
@@ -10444,6 +10521,10 @@ msgstr "Bao gồm"
 
 #: app/views/administration.mediatype.edit.php:242
 msgid "Include event menu entry"
+msgstr ""
+
+#: widgets/hostavail/includes/WidgetForm.php:62
+msgid "Include hosts in maintenance"
 msgstr ""
 
 #: app/views/administration.usergroup.edit.php:142
@@ -13706,6 +13787,15 @@ msgstr "Thiếu các item cho kiểu đồ thị \"%1$s\"."
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Thiếu key \"%1$s\" cho host \"%2$s\"."
+
+#: widgets/hostavail/views/widget.view.php:38
+msgid "Mixed"
+msgstr ""
+
+#: widgets/hostavail/views/widget.view.php:39
+msgctxt "compact table header"
+msgid "Mixed"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:52
@@ -17992,6 +18082,10 @@ msgstr ""
 msgid "SNMP community"
 msgstr "SNMP community"
 
+#: include/items.inc.php:1570
+msgid "SNMP get value"
+msgstr ""
+
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
 msgstr "SNMP interfaces"
@@ -18927,6 +19021,10 @@ msgstr "Hiển thị các dòng"
 msgid "Show number of records"
 msgstr ""
 
+#: widgets/hostavail/includes/WidgetForm.php:66
+msgid "Show only totals"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:240
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
@@ -19516,6 +19614,16 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:510
 msgid "Store credentials in"
+msgstr ""
+
+#: app/views/popup.lldoperation.php:189 app/views/popup.lldoperation.php:210
+#: app/views/popup.massupdate.item.php:316
+#: app/views/popup.massupdate.item.php:332
+#: include/views/configuration.item.edit.php:903
+#: include/views/configuration.item.edit.php:938
+#: include/views/configuration.item.prototype.edit.php:840
+#: include/views/configuration.item.prototype.edit.php:855
+msgid "Store up to"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:656
@@ -20631,6 +20739,10 @@ msgstr ""
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
 msgstr "Tổng thời gian tìm kiếm: %1$s"
+
+#: widgets/hostavail/views/widget.view.php:81
+msgid "Total Hosts"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:149
 #, c-format
@@ -23775,9 +23887,17 @@ msgstr "Hỗ trợ kỹ thuật zabbix"
 msgid "Zabbix agent"
 msgstr "Zabbix agent"
 
+#: widgets/hostavail/includes/WidgetForm.php:47
+msgid "Zabbix agent (active checks)"
+msgstr ""
+
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
 msgstr "Zabbix agent (active)"
+
+#: widgets/hostavail/includes/WidgetForm.php:48
+msgid "Zabbix agent (passive checks)"
+msgstr ""
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -25998,6 +26118,17 @@ msgstr "timeleft () - Thời gian để đạt ngưỡng ước tính dựa trê
 msgid "timeouts are disabled because the proxy and server versions do not match"
 msgstr ""
 
+#: include/views/configuration.item.edit.php:643
+#: include/views/configuration.item.prototype.edit.php:614
+msgid "to retrieve a single value"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:548
+#: include/views/configuration.item.edit.php:638
+#: include/views/configuration.item.prototype.edit.php:609
+msgid "to retrieve a subtree"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr ""
@@ -26247,6 +26378,11 @@ msgstr "Giá trị \"%1$s\" không được tìm thấy"
 #, c-format
 msgid "value %1$s already exists"
 msgstr "Giá trị \"%1$s\" đã tồn tại"
+
+#: include/classes/parsers/CEscapedStringParser.php:72
+#, c-format
+msgid "value contains unescaped character at position %1$d"
+msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1773
 #: include/classes/api/services/CTriggerGeneral.php:1793
