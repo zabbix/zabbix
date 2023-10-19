@@ -1138,6 +1138,49 @@ zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
 	return (zbx_vmware_tag_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_tag_t));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies events severity vector into shared memory hashset          *
+ *                                                                            *
+ * Parameters: dst - [IN] the destination hashset                             *
+ *             src - [IN] the source vector                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src)
+{
+	int	i;
+
+	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	for (i = 0; i < src->values_num; i++)
+	{
+		zbx_vmware_key_value_t	*es_dst, *es_src = &src->values[i];
+
+		es_dst = (zbx_vmware_key_value_t *)zbx_hashset_insert(dst, es_src, sizeof(zbx_vmware_key_value_t));
+
+		/* check if the event type was inserted - copy severity only for inserted event types */
+		if (es_dst->key == es_src->key)
+		{
+			es_dst->key = vmware_shared_strdup(es_src->key);
+			es_dst->value = vmware_shared_strdup(es_src->value);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store zbx_vmware_key_value_t  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_shmem_vmware_key_value_free(zbx_vmware_key_value_t *value)
+{
+	vmware_shared_strfree(value->key);
+	vmware_shared_strfree(value->value);
+}
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 /******************************************************************************
@@ -1186,48 +1229,4 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: copies events severity vector into shared memory hashset          *
- *                                                                            *
- * Parameters: dst - [IN] the destination hashset                             *
- *             src - [IN] the source vector                                   *
- *                                                                            *
- ******************************************************************************/
-void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src)
-{
-	int	i;
-
-	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
-	for (i = 0; i < src->values_num; i++)
-	{
-		zbx_vmware_key_value_t	*es_dst, *es_src = &src->values[i];
-
-		es_dst = (zbx_vmware_key_value_t *)zbx_hashset_insert(dst, es_src, sizeof(zbx_vmware_key_value_t));
-
-		/* check if the event type was inserted - copy severity only for inserted event types */
-		if (es_dst->key == es_src->key)
-		{
-			es_dst->key = vmware_shared_strdup(es_src->key);
-			es_dst->value = vmware_shared_strdup(es_src->value);
-		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees shared resources allocated to store zbx_vmware_key_value_t  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_shmem_vmware_key_value_free(zbx_vmware_key_value_t *value)
-{
-	vmware_shared_strfree(value->key);
-	vmware_shared_strfree(value->value);
 }
