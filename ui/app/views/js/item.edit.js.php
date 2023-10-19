@@ -169,7 +169,7 @@ window.item_edit_form = new class {
 
 	initItemPrototypeForm() {
 		let node;
-		const master_item = this.form.querySelector('.multiselect-control:has(#master_itemid)');
+		const master_item = this.form.querySelector('#master_itemid').parentElement;
 
 		node = document.createElement('div');
 		node.classList.add(ZBX_STYLE_FORM_INPUT_MARGIN);
