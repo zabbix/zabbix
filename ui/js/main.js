@@ -871,6 +871,8 @@ function getConditionFormula(conditions, evalType) {
 	 * - counter 				- number to start row enumeration from
 	 * - dataCallback			- function to generate the data passed to the template
 	 * - remove_next_sibling	- remove also next element
+	 * - sortable				- enable jQuery UI sortable initialization
+	 * - sortableOptions		- additional options to pass to jQuery UI sortable initialization
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
@@ -990,6 +992,10 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', false);
 				}
 
+				if (options.sortable) {
+					table.sortable($(options.row, table).length < 2 ? 'disable' : 'enable');
+				}
+
 				table.trigger('afteradd.dynamicRows', options);
 			});
 
@@ -1005,6 +1011,10 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', true);
 
 					table.trigger('afteradd.dynamicRows', options);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length < 2 ? 'disable' : 'enable');
 				}
 			});
 
