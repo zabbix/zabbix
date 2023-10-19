@@ -553,7 +553,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
 		item.key = zbx_dsprintf(item.key, "ssh.run[,,%s]", script->port);
-		function = get_value_ssh;
+		function = zbx_ssh_get_value;
 	}
 	else
 	{

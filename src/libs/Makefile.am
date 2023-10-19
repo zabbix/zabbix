@@ -104,7 +104,6 @@ SERVER_SUBDIRS = \
 	zbxhttp \
 	zbxicmpping \
 	zbxip \
-	zbxipmi \
 	zbxkvs \
 	zbxmedia \
 	zbxnum \
@@ -132,6 +131,9 @@ SERVER_SUBDIRS = \
 	zbxvault \
 	zbxversion \
 	zbxxml
+if HAVE_IPMI
+SERVER_SUBDIRS += zbxipmi
+endif
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -158,7 +160,6 @@ PROXY_SUBDIRS = \
 	zbxhttp \
 	zbxicmpping \
 	zbxip \
-	zbxipmi \
 	zbxkvs \
 	zbxnum \
 	zbxodbc \
@@ -184,6 +185,9 @@ PROXY_SUBDIRS = \
 	zbxvault \
 	zbxversion \
 	zbxxml
+if HAVE_IPMI
+PROXY_SUBDIRS += zbxipmi
+endif
 endif
 endif
 

@@ -88,7 +88,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			res = get_value_ssh(item, config_comms->config_source_ip, result);
+			res = zbx_ssh_get_value(item, config_comms->config_source_ip, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXIPMI_H
 #define ZABBIX_ZBXIPMI_H
 
+#ifdef HAVE_OPENIPMI
+
 #include "zbxcacheconfig.h"
 
 typedef struct
@@ -37,5 +39,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args);
 int	zbx_ipmi_test_item(const zbx_dc_item_t *item, char **info);
 
 int	zbx_ipmi_execute_command(const zbx_dc_host_t *host, const char *command, char *error, size_t max_error_len);
+
+#endif /* HAVE_OPENIPMI */
 
 #endif

@@ -13,8 +13,10 @@ libzbxpoller_a_SOURCES = \
 
 if HAVE_SSH
 libzbxpoller_a_SOURCES += ssh_run.c
+libzbxpoller_a_CFLAGS = $(SSH_CFLAGS)
 endif
 
 if HAVE_SSH2
 libzbxpoller_a_SOURCES += ssh2_run.c
+libzbxpoller_a_CFLAGS = $(SSH2_CFLAGS)
 endif

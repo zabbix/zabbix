@@ -52,8 +52,6 @@ libzbxpoller_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxcachehistory \
 	-I$(top_srcdir)/src/libs/zbxcachevalue \
 	$(SNMP_CFLAGS) \
-	$(SSH2_CFLAGS) \
-	$(SSH_CFLAGS) \
 	$(LIBXML2_CFLAGS) \
 	$(TLS_CFLAGS) \
 	$(LIBEVENT_CFLAGS)

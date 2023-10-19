@@ -17,10 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxpoller.h"
+
 #include "test_get_value_ssh.h"
 #include "zbxmocktest.h"
 
 #include "zbxsysinfo.h"
+
+#if defined(HAVE_SSH)
+#	include "../../../src/libs/zbxpoller/ssh_run.c"
+#elif defined(HAVE_SSH2)
+#	include "../../../src/libs/zbxpoller/ssh2_run.c"
+#endif
 
 int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options,
 		int timeout, const char *config_source_ip);
@@ -32,7 +40,7 @@ int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
 	int		ret;
 
 	zbx_init_agent_result(&result);
-	ret = get_value_ssh(item, get_zbx_config_source_ip(), &result);
+	ret = zbx_ssh_get_value(item, get_zbx_config_source_ip(), &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
 	{
