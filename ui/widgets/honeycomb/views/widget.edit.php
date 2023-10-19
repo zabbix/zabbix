@@ -55,9 +55,8 @@ $form
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['evaltype_item'])
 	)
-	->addField(array_key_exists('item_tags', $data['fields'])
-		? new CWidgetFieldTagsView($data['fields']['item_tags'])
-		: null
+	->addField(
+		new CWidgetFieldTagsView($data['fields']['item_tags'])
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
@@ -88,7 +87,9 @@ $form
 
 function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$label_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['primary_label_size']));
-	$label_size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['primary_label_size_type']));
+	$label_size_type_field = $form->registerField(
+		new CWidgetFieldRadioButtonListView($fields['primary_label_size_type'])
+	);
 
 	return (new CWidgetFieldsGroupView(_('Primary label')))
 		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
@@ -113,7 +114,7 @@ function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): C
 			new CFormField([
 				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				($label_size_field->getView())->setId('primary_label_custom_input'),
-				' %'
+				'%'
 			])
 		])
 		->addField(
@@ -126,7 +127,9 @@ function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): C
 
 function getSecondaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$label_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['secondary_label_size']));
-	$label_size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['secondary_label_size_type']));
+	$label_size_type_field = $form->registerField(
+		new CWidgetFieldRadioButtonListView($fields['secondary_label_size_type'])
+	);
 
 	return (new CWidgetFieldsGroupView(_('Secondary label')))
 		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
@@ -151,7 +154,7 @@ function getSecondaryLabelFieldsGroupView(CWidgetFormView $form, array $fields):
 			new CFormField([
 				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				($label_size_field->getView())->setId('secondary_label_custom_input'),
-				' %'
+				'%'
 			])
 		])
 		->addField(
@@ -170,7 +173,8 @@ function getThresholdFieldsGroupView(CWidgetFormView $form, array $fields): CWid
 			makeWarningIcon(_('This setting applies only to numeric data.'))
 		)
 		->addItem([
-			(new CDiv([$color_interpolation_field->getView(), $color_interpolation_field->getLabel()]))->addClass('form-row-interpolation')
+			(new CDiv([$color_interpolation_field->getView(), $color_interpolation_field->getLabel()]))
+				->addClass('form-row-interpolation')
 		])
 		->addField(
 			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()

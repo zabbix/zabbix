@@ -117,7 +117,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextArea('primary_label', _('Primary label')))
 					->setDefault('{HOST.NAME}')
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('primary_label_size_type', null, [
@@ -126,8 +126,9 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('primary_label_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_PRIMARY_SIZE)
+				(new CWidgetFieldIntegerBox('primary_label_size', _('Size'), self::SIZE_PERCENT_MIN,
+					self::SIZE_PERCENT_MAX)
+				)->setDefault(self::DEFAULT_PRIMARY_SIZE)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('primary_label_bold', _('Bold'))
@@ -138,7 +139,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextArea('secondary_label', _('Secondary label')))
 					->setDefault('{ITEM.LASTVALUE}')
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('secondary_label_size_type', null, [
@@ -147,8 +148,9 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('secondary_label_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_SECONDARY_SIZE)
+				(new CWidgetFieldIntegerBox('secondary_label_size', _('Size'), self::SIZE_PERCENT_MIN,
+					self::SIZE_PERCENT_MAX)
+				)->setDefault(self::DEFAULT_SECONDARY_SIZE)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('secondary_label_bold', _('Bold')))->setDefault(self::BOLD_ON)
@@ -160,7 +162,8 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))->setDefault(self::INTERPOLATION_ON)
+				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))
+					->setDefault(self::INTERPOLATION_ON)
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))

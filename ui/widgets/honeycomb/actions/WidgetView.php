@@ -126,7 +126,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$history = Manager::History()->getLastValues($items, 1, $history_period);
 
 		foreach ($items as &$item) {
-			$item['value'] = $history[$item['itemid']] ? $history[$item['itemid']][0]['value'] : null;
+			$item['value'] = array_key_exists($item['itemid'], $history) ? $history[$item['itemid']][0]['value'] : null;
 
 			$primary_label = $this->fields_values['primary_label'];
 			$secondary_label = $this->fields_values['secondary_label'];
