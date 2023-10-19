@@ -64,8 +64,9 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			$this->updateProfileSort();
 		}
 
-		[$lld_rule] = API::DiscoveryRule()->get([
+		[$lld] = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
+			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
@@ -73,12 +74,19 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			'action' => $this->getAction(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'context' => $this->getInput('context'),
-			'hostid' => $lld_rule['hostid'],
-			'items' => $this->getItems($profile),
+			'hostid' => $lld['hostid'],
+			'items' => [],
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
 			'sort' => $profile['sort'],
 			'sortorder' => $profile['sortorder']
 		];
+		$context = $this->getInput('context');
+		$is_template_lld = $lld['hosts'][0]['status'] == HOST_STATUS_TEMPLATE;
+
+		if (($context === 'template' && $is_template_lld) || ($context === 'host' && !$is_template_lld)) {
+			$data['items'] = $this->getItems($profile);
+		}
+
 		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $data['items'], $profile['sort'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', $data['action'])

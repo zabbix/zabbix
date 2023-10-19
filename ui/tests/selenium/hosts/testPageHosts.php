@@ -19,9 +19,9 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @dataSource TagFilter, Proxies, WebScenarios
@@ -33,19 +33,20 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 class testPageHosts extends CLegacyWebTest {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
 	}
 
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
-
-	use TagTrait;
-	use TableTrait;
 
 	public static function prepareHostsData() {
 		CDataHelper::createHosts([

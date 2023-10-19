@@ -19,8 +19,16 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 class testPageItemPrototypes extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	// Returns all item protos
 	public static function data() {
@@ -39,7 +47,8 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	*/
 	public function testPageItemPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
-		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid'].'&context=host');
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
+				$data['parent_itemid'].'&context=host');
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
@@ -69,16 +78,17 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$itemid = $data['itemid'];
 		$drule = $data['d_name'];
 
-		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid'].'&context=host');
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
+				$data['parent_itemid'].'&context=host');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
-		$this->zbxTestClickButton('itemprototype.massdelete');
+		$this->zbxTestCheckboxSelect('itemids_'.$itemid);
+		$this->query('button:Delete')->one()->click();
 
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
-		$this->zbxTestTextPresent('Item prototype deleted');
+		$this->assertMessage(TEST_GOOD, 'Item prototype deleted');
 
 		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -109,16 +119,16 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$itemids = CDBHelper::getAll('select itemid from item_discovery where parent_itemid='.$druleid);
 		$itemids = zbx_objectValues($itemids, 'itemid');
 
-		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid.'&context=host');
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$druleid.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
-		$this->zbxTestClickButton('itemprototype.massdelete');
+		$this->query('button:Delete')->one()->click();
 
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
-		$this->zbxTestTextPresent('Item prototype deleted');
+		$this->assertMessage(TEST_GOOD, 'Item prototype deleted');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
 		$this->assertEquals(0, CDBHelper::getCount($sql));

@@ -63,11 +63,12 @@ class CControllerItemTagsList extends CController {
 		$data = [
 			'tags' => [],
 			'show_inherited_tags' => 0,
+			'source' => 'item'
 		];
 		$this->getInputs($data, array_keys($data));
 
 		$data['tags'] = array_filter($data['tags'], function ($tag) {
-			return $tag['tag'] !== '' && $tag['value'] !== '';
+			return $tag['tag'] !== '' || $tag['value'] !== '';
 		});
 
 		if ($this->hasInput('itemid')) {

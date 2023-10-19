@@ -36,6 +36,7 @@ const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
 const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
+const ITEM_TYPE_TRAPPER = <?= ITEM_TYPE_TRAPPER ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
@@ -137,21 +138,25 @@ window.item_edit_form = new class {
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
-			rows: this.form_data.parameters
+			rows: this.form_data.parameters,
+			allow_empty: true
 		});
 		jQuery('#query-fields-table').dynamicRows({
 			sortable: true,
 			template: '#query-field-row-tmpl',
-			rows: this.form_data.query_fields
+			rows: this.form_data.query_fields,
+			allow_empty: true
 		}).sortable({disabled: this.form_readonly});
 		jQuery('#headers-table').dynamicRows({
 			sortable: true,
 			template: '#item-header-row-tmpl',
-			rows: this.form_data.headers
+			rows: this.form_data.headers,
+			allow_empty: true
 		}).sortable({disabled: this.form_readonly});
 		jQuery('#delay-flex-table').dynamicRows({
 			template: '#delay-flex-row-tmpl',
-			rows: this.form_data.delay_flex
+			rows: this.form_data.delay_flex,
+			allow_empty: true
 		});
 		this.form.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
 			const flexible = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
@@ -363,7 +368,7 @@ window.item_edit_form = new class {
 		this.#updateCustomIntervalVisibility();
 		this.#updateHistoryModeVisibility();
 		this.#updateTrendsModeVisibility();
-		this.#updateValueTypeHintVisibility();
+		this.#updateValueTypeHintVisibility(preprocessing_active);
 		this.#updateValueTypeOptionVisibility();
 		this.#updateRetrieveModeVisibility();
 		this.#updateTimeoutVisibility();
@@ -416,7 +421,7 @@ window.item_edit_form = new class {
 				case 'tags':
 					fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 						if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
-							tags.push({tag: tag.tag, value: tag.value});
+							tags.push({tag: tag.tag.trim(), value: tag.value.trim()});
 						}
 
 						return tags;
@@ -505,7 +510,7 @@ window.item_edit_form = new class {
 	}
 
 	#isExecutableItem() {
-		return this.host.status == HOST_STATUS_MONITORED;
+		return this.host.status == HOST_STATUS_MONITORED && this.field.type.value != ITEM_TYPE_TRAPPER;
 	}
 
 	#isFormModified() {
@@ -645,13 +650,14 @@ window.item_edit_form = new class {
 		this.field.retrieve_mode.forEach(radio => radio.disabled = disable);
 	}
 
-	#updateValueTypeHintVisibility() {
+	#updateValueTypeHintVisibility(preprocessing_active) {
 		const key = this.field.key.value;
 		const value_type = this.field.value_type.value;
 		const inferred_type = this.#getInferredValueType(key);
 
-		this.label.value_type_hint
-			.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inferred_type === null || value_type == inferred_type);
+		this.label.value_type_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE,
+			preprocessing_active || inferred_type === null || value_type == inferred_type
+		);
 	}
 
 	#updateHistoryModeVisibility() {

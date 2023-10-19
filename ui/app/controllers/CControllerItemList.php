@@ -62,7 +62,8 @@ class CControllerItemList extends CControllerItem {
 			'subfilter_tags'			=> 'array',
 			'sort'						=> 'in name,key_,delay,history,trends,type,status',
 			'sortorder'					=> 'in '.implode(',', [ZBX_SORT_DOWN.','.ZBX_SORT_UP]),
-			'page'						=> 'ge 1'
+			'page'						=> 'ge 1',
+			'uncheck'					=> 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -112,7 +113,8 @@ class CControllerItemList extends CControllerItem {
 			'check_now_types' => checkNowAllowedTypes(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'sort' => $filter['sort'],
-			'sortorder' => $filter['sortorder']
+			'sortorder' => $filter['sortorder'],
+			'uncheck' => $this->hasInput('uncheck')
 		];
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 

@@ -696,7 +696,7 @@ $formgrid->addItem([
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('inherited_timeout', $item['inherited_timeout']))
-			->setEnabled(false)
+			->setReadonly(true)
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->addClass($custom_timeout_enabled ? ZBX_STYLE_DISPLAY_NONE : null),
 		(new CTextBox('timeout', $item['timeout'], $readonly))

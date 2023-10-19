@@ -165,16 +165,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=update&hostid=50011&itemid=99086&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'incorrect_request' => true,
+					'overlay' => 'item_update'
 				]
 			],
 			// #11 Item create.
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=create&hostid=50011&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'incorrect_request' => true,
+					'overlay' => 'create'
 				]
 			],
 			// #12 Trigger update.
@@ -659,6 +661,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				'create' => "//div[@class=\"header-controls\"]//button",
 				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
 				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[4]/a",
+				'item_update' => "//table[@class=\"list-table\"]//tr[1]/td[3]/a",
 				'problem' => '//table[@class="list-table"]//tr[1]//a[text()="Update"]',
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];
@@ -698,19 +701,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 	public static function getCheckTokenData() {
 		return [
-			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL (update item).
-			[
-				[
-					'token' => true,
-					'token_url' => 'items.php?form=update&hostid=99134&itemid=99114&context=host',
-					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=update&hostid=99134&itemid=99114&context=host&name=4_item&description='.
-							'&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT&update=Update'.
-							'&_csrf_token=',
-					'error' => self::INCORRECT_REQUEST
-				]
-			],
-			// #1 Correct token (update global macros).
+			// #0 Correct token (update global macros).
 			[
 				[
 					'token' => true,
@@ -724,7 +715,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #2 Correct token (create graph).
+			// #1 Correct token (create graph).
 			[
 				[
 					'token' => true,
@@ -735,7 +726,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'error' => self::INCORRECT_REQUEST
 				]
 			],
-			// #3 No token.
+			// #2 No token.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -757,7 +748,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #4 Empty token.
+			// #3 Empty token.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -789,7 +780,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #5 Incorrect token.
+			// #4 Incorrect token.
 			[
 				[
 					'db' => 'SELECT * FROM config',

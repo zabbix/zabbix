@@ -29,6 +29,10 @@ $this->addJsFile('items.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
+if ($data['uncheck']) {
+	uncheckTableRows('item');
+}
+
 $filter = new CPartial('item.list.filter', [
 	'action' => $data['action'],
 	'context' => $data['context'],
@@ -232,7 +236,7 @@ $buttons = [
 			->setAttribute('data-required', 'execute')
 	],
 	'clearhistory' => [
-		'content' => (new CSimpleButton(_('Clear history')))
+		'content' => (new CSimpleButton(_('Clear history and trends')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massclearhistory-item')
 			->addClass('js-no-chkbxrange')
@@ -299,7 +303,7 @@ $confirm_messages = [
 	'item.enable' => [_('Enable selected item?'), _('Enable selected items?')],
 	'item.disable' => [_('Disable selected item?'), _('Disable selected items?')],
 	'item.clear' => $data['context'] === 'host' && !CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
-		? [_('Delete history of selected item?'), _('Delete history of selected items?')]
+		? [_('Clear history and trends of selected item?'), _('Clear history and trends of selected items?')]
 		: [],
 	'item.delete' => [_('Delete selected item?'), _('Delete selected items?')]
 ];

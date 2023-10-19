@@ -34,7 +34,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckLayout($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
@@ -75,21 +75,21 @@ class testPageItems extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
 
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history', 'Delete');
+		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history and trends', 'Delete');
 	}
 
 	/**
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
-			$this->assertFalse($this->query('button:Clear history')->one()->isEnabled());
+			$this->assertFalse($this->query('button:Clear history and trends')->one()->isEnabled());
 		}
 		else {
 			$this->zbxTestClickButtonText('Execute now');
@@ -186,7 +186,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider getHostAndGroupData
 	 */
 	public function testPageItems_FilterHostAndGroupsFilter($data) {
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D=99062&context=host');
+		$this->page->login()->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=99062');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Item create button enabled and breadcrumbs exist.
