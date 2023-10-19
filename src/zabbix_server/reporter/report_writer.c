@@ -287,7 +287,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		const char *config_source_ip, const char *config_webservice_url, char **error)
 {
 	zbx_vector_ptr_pair_t	params;
-	int			ret, width, height;
+	int			ret;
 	const char		*subject = "", *message = "";
 	char			*url, *cookie, *report = NULL, *name;
 	size_t			report_size = 0;
