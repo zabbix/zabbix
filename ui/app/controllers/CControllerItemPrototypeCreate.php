@@ -28,7 +28,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 	protected function checkInput(): bool {
 		$fields = [
 			'parent_discoveryid' => 'required|id'
-		] + static::getValidationFields(['name', 'key']);
+		] + static::getValidationFields();
 
 		$ret = $this->validateInput($fields) && $this->validateInputEx();
 

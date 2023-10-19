@@ -34,12 +34,10 @@ abstract class CControllerItemPrototype extends CController {
 	/**
 	 * Common item prototype field validation rules.
 	 *
-	 * @param array $not_empty_fields  Array of fields to be set as not empty when validating.
-	 *
 	 * @return array
 	 */
-	protected static function getValidationFields(array $not_empty_fields = []): array {
-		$fields = [
+	protected static function getValidationFields(): array {
+		return [
 			'name'					=> 'db items.name',
 			'type'					=> 'in '.implode(',', array_keys(item_type2str())),
 			'key'					=> 'db items.key_',
@@ -104,30 +102,61 @@ abstract class CControllerItemPrototype extends CController {
 			'parent_discoveryid'	=> 'id',
 			'templateid'			=> 'id'
 		];
-
-		foreach ($not_empty_fields as $field) {
-			$fields[$field] = $fields[$field].'|not_empty';
-		}
-
-		return $fields;
 	}
 
+	/**
+	 * Additional validation for user input consumed by create and update actions.
+	 *
+	 * @return bool
+	 */
 	protected function validateInputEx(): bool {
 		$ret = true;
+		$type = $this->getInput('type', -1);
+		$fields = array_fill_keys(['name', 'key'], '');
+		$this->getInputs($fields, array_keys($fields));
 
-		if ($ret && $this->hasInput('type') && $this->hasInput('key')) {
-			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
+		foreach ($fields as $field => $value) {
+			if ($value === '') {
+				$ret = false;
+				error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+			}
+		}
+
+		if (isItemExampleKey($type, $this->getInput('key', ''))) {
+			$ret = false;
 		}
 
 		$delay_flex = $this->getInput('delay_flex', []);
 
-		if ($ret && $delay_flex) {
-			$ret = isValidCustomIntervals($delay_flex);
+		if ($delay_flex && !isValidCustomIntervals($delay_flex)) {
+			$ret = false;
+		}
+
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => false
+		]);
+
+		if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+				&& !($type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($this->getInput('key', ''), 'mqtt.get', 8) == 0)
+				&& $simple_interval_parser->parse($this->getInput('delay', '')) != CParser::PARSE_SUCCESS) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('a time unit is expected')));
+			$ret = false;
+		}
+
+		$timeout_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+		];
+
+		if (in_array($type, $timeout_types)
+				&& $this->getInput('custom_timeout', -1) == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
+				&& $simple_interval_parser->parse($this->getInput('timeout', '')) != CParser::PARSE_SUCCESS) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
+			$ret = false;
 		}
 
 		return $ret && $this->validateRefferedObjects();
 	}
-
 
 	/**
 	 * Validate for reffered objects exists and user have access.
