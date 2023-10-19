@@ -320,7 +320,7 @@
 				postMessageDetails('error', response.error.messages);
 			}
 			else if ('success' in response) {
-				uncheckTableRows('item');
+				chkbxRange.clearSelectedOnFilterChange();
 				postMessageOk(response.success.title);
 
 				if ('messages' in response.success) {

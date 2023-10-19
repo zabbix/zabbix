@@ -29,10 +29,6 @@ $this->addJsFile('items.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
-if ($data['uncheck']) {
-	uncheckTableRows('item');
-}
-
 $filter = new CPartial('item.list.filter', [
 	'action' => $data['action'],
 	'context' => $data['context'],
@@ -265,7 +261,7 @@ if ($data['context'] === 'template') {
 	unset($buttons['execute'], $buttons['clearhistory']);
 }
 
-$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item'));
+$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'items_'.($data['hostid'] ?? 9)));
 
 (new CHtmlPage())
 	->setTitle(_('Items'))
