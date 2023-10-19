@@ -1567,6 +1567,7 @@ class testMassUpdateItems extends CWebTest{
 
 	public function getCommonPreprocessingChangeData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1580,6 +1581,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1595,6 +1597,7 @@ class testMassUpdateItems extends CWebTest{
 							'combinations of (type)=((9, 10)).'
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1609,6 +1612,7 @@ class testMassUpdateItems extends CWebTest{
 							'the value of parameter "/1/preprocessing/1/params/1".'
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1622,6 +1626,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1637,6 +1642,7 @@ class testMassUpdateItems extends CWebTest{
 							'combinations of (type)=((19, 20)).'
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1650,6 +1656,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1668,6 +1675,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
 				]
 			],
+			// #7.
 			[
 				[
 					'names' => [
@@ -1677,6 +1685,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => []
 				]
 			],
+			// #8.
 			[
 				[
 					'names' => [
@@ -1711,6 +1720,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'names' => [
@@ -1758,7 +1768,7 @@ class testMassUpdateItems extends CWebTest{
 		$form->getLabel('Preprocessing steps')->click();
 
 		if ($data['Preprocessing steps'] !== []) {
-			$this->addPreprocessingSteps($data['Preprocessing steps']);
+			$this->addPreprocessingSteps($data['Preprocessing steps'], true);
 
 			// Take a screenshot to test draggable object position of preprocessing steps in mass update.
 			if (array_key_exists('Screenshot', $data)) {
@@ -1766,9 +1776,13 @@ class testMassUpdateItems extends CWebTest{
 
 				// It is necessary because of unexpected viewport shift.
 				$this->page->updateViewport();
-				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(), 'Item mass update preprocessing'.$prototypes);
+				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(),
+						'Item mass update preprocessing'.$prototypes
+				);
 			}
-
+		}
+		else {
+			$form->fill(['id:preprocessing_action' => 'Remove all']);
 		}
 
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();
