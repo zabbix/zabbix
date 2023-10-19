@@ -180,13 +180,13 @@ $operations_popup_form_list
 	)
 	->addRow(
 		(new CVisibilityBox('visible[ophistory]', 'ophistory-field', _('Original')))
-			->setLabel(_('History storage period'))
+			->setLabel(_('History'))
 			->setChecked(array_key_exists('ophistory', $options))
 			->setReadonly($options['templated']),
 		(new CDiv([
 			(new CRadioButtonList('ophistory[history_mode]', (int) $field_values['ophistory']['history_mode']))
-				->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true)
 				->setReadonly($options['templated']),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -201,13 +201,13 @@ $operations_popup_form_list
 	)
 	->addRow(
 		(new CVisibilityBox('visible[optrends]', 'optrends-field', _('Original')))
-			->setLabel(_('Trend storage period'))
+			->setLabel(_('Trends'))
 			->setChecked(array_key_exists('optrends', $options))
 			->setReadonly($options['templated']),
 		(new CDiv([
 			(new CRadioButtonList('optrends[trends_mode]', (int) $field_values['optrends']['trends_mode']))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true)
 				->setReadonly($options['templated']),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
