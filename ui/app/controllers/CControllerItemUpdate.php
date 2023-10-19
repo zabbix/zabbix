@@ -28,7 +28,7 @@ class CControllerItemUpdate extends CControllerItem {
 	protected function checkInput(): bool {
 		$fields = [
 			'itemid'	=> 'required|id'
-		] + static::getValidationFields();
+		] + static::getValidationFields(['name', 'key']);
 
 		$ret = $this->validateInput($fields) && $this->validateInputEx();
 

@@ -34,13 +34,15 @@ abstract class CControllerItem extends CController {
 	/**
 	 * Common item field validation rules.
 	 *
+	 * @param array $not_empty_fields  Array of fields to be set as not empty when validating.
+	 *
 	 * @return array
 	 */
-	protected static function getValidationFields(): array {
-		return [
-			'name'					=> 'db items.name|not_empty',
+	protected static function getValidationFields(array $not_empty_fields = []): array {
+		$fields = [
+			'name'					=> 'db items.name',
 			'type'					=> 'in '.implode(',', array_keys(item_type2str())),
-			'key'					=> 'db items.key_|not_empty',
+			'key'					=> 'db items.key_',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
 			'url'					=> 'db items.url',
 			'query_fields'			=> 'array',
@@ -100,6 +102,12 @@ abstract class CControllerItem extends CController {
 			'itemid'				=> 'id',
 			'templateid'			=> 'id'
 		];
+
+		foreach ($not_empty_fields as $field) {
+			$fields[$field] = $fields[$field].'|not_empty';
+		}
+
+		return $fields;
 	}
 
 	/**
