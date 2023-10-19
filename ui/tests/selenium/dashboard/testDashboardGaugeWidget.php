@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup config, widget
@@ -31,7 +32,17 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGaugeWidget extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const HOST = 'Host for all item value types';
 	const DELETE_GAUGE = 'Gauge for deleting';
@@ -57,15 +68,6 @@ class testDashboardGaugeWidget extends CWebTest {
 	protected static $dashboardid;
 
 	protected static $update_gauge = 'Gauge for updating';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
 
 	/**
 	 * Get Thresholds table element with mapping set.

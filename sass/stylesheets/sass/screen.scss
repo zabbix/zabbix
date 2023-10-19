@@ -694,6 +694,7 @@ form {
 	}
 
 	.table-forms-td-left {
+		position: relative;
 		display: table-cell;
 		padding: 5px 0;
 		text-align: right;
@@ -710,6 +711,12 @@ form {
 			.icon {
 				margin-left: 5px;
 			}
+		}
+
+		.checkbox-radio {
+			right: 0;
+			margin-right: 0;
+			margin-left: 0;
 		}
 	}
 
@@ -4031,6 +4038,11 @@ z-select {
 	&.disabled {
 		background-color: $white;
 		opacity: 1;
+
+		.geomap-filter-button {
+			cursor: default;
+			opacity: .4;
+		}
 	}
 }
 
