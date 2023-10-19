@@ -655,8 +655,7 @@ $formgrid
 						],
 						(new CTextBox('delay_flex[#{rowNum}][period]', '#{period}', $item['discovered']))
 							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
-						(new CButtonLink(_('Remove')))
-							->addClass('element-table-remove')
+						$item['discovered'] ? null : (new CButtonLink(_('Remove')))->addClass('element-table-remove')
 					]))->addClass('form_row')
 				)
 			]))
