@@ -186,7 +186,8 @@ class CControllerItemEdit extends CControllerItem {
 				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
 				'parent_items' => [],
 				'discovered' => false,
-				'templated' => false
+				'templated' => false,
+				'inventory_link' => 0
 			] + $this->getInputForApi();
 
 			if ($item['valuemapid'] && $this->getInput('templateid', 0)) {
