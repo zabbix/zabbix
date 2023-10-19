@@ -896,11 +896,11 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 }
 
 $item_tab->addItem([
-	(new CLabel([_('History storage period'), $keep_history_hint], 'history'))->setAsteriskMark(),
+	(new CLabel([_('History'), $keep_history_hint], 'history'))->setAsteriskMark(),
 	new CFormField([
 		(new CRadioButtonList('history_mode', (int) $data['history_mode']))
-			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+			->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 			->setReadonly($discovered_item)
 			->setModern(true),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -929,13 +929,13 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 
 $item_tab
 	->addItem([
-		(new CLabel([_('Trend storage period'), $keep_trend_hint], 'trends'))
+		(new CLabel([_('Trends'), $keep_trend_hint], 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
 			(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setReadonly($discovered_item)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

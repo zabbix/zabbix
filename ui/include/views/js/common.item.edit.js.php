@@ -344,7 +344,7 @@
 
 				this.updateHintDisplay();
 
-				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
+				// 'Do not store' trends for Calculated with string-types of information is forced on Item save.
 				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?> && !this.discovered_item) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
