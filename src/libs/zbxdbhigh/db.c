@@ -3083,7 +3083,7 @@ retry_oracle:
 					}
 					else
 						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-					
+
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 
 					if (0 != (field->flags & ZBX_UPPER))

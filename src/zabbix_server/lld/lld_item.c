@@ -2844,7 +2844,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 		zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
-		
+
 		zbx_audit_item_create_entry(ZBX_AUDIT_ACTION_ADD, *itemid, item->name, ZBX_FLAG_DISCOVERY_CREATED);
 		zbx_audit_item_update_json_add_lld_data(*itemid, item, item_prototype, hostid);
 		item->itemid = (*itemid)++;
@@ -3415,7 +3415,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
 				"name_resolved_upper", (char *)NULL);
-		
 	}
 
 	for (i = 0; i < items->values_num; i++)
