@@ -32,9 +32,9 @@ Refer to the vendor documentation.
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP availability trigger.</p>|`5m`|
 |{$MEMORY.UTIL.MAX}|<p>Threshold of memory utilization for trigger in %</p>|`90`|
 |{$DISK.FREE.MIN}|<p>Threshold of disk free space for trigger in %</p>|`20`|
-|{$IF.ERRORS.WARN}||`2`|
-|{$IF.UTIL.MAX}||`95`|
-|{$IFCONTROL}||`1`|
+|{$IF.ERRORS.WARN}|<p>Threshold of error packets rate for warning trigger. Can be used with interface name as context.</p>|`2`|
+|{$IF.UTIL.MAX}|<p>Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.</p>|`95`|
+|{$IFCONTROL}|<p>Macro for operational state of the interface for link down trigger. Can be used with interface name as context.</p>|`1`|
 |{$NET.IF.IFADMINSTATUS.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`^2$`|
 |{$NET.IF.IFDESCR.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
@@ -52,7 +52,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FortiGate: Firmware version|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Firmware version of the device</p>|SNMP agent|system.hw.firmware<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|FortiGate: Firmware version|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Firmware version of the device</p>|SNMP agent|system.hw.firmware<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |FortiGate: Hardware model name|<p>MIB: ENTITY-MIB</p><p>Model of the device.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |FortiGate: Hardware serial number|<p>MIB: ENTITY-MIB</p><p>Serial number of the device</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |FortiGate: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
