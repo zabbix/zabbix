@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -26,6 +27,15 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup regexps
  */
 class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
+
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	private $regexp = 'test_regexp1';
 	private $regexp2 = 'test_regexp2';
@@ -98,7 +108,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputTypeWait('test_string', $test_string);
 		$this->zbxTestClick('add');
-		$this->zbxTestTextPresent('Regular expression added');
+		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($name).' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Regular expression with such name has not been added');
@@ -113,8 +123,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestInputType('expressions_0_expression', 'first test string');
 		$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		$this->zbxTestClickWait('add');
-
-		$this->zbxTestTextPresent(['Cannot add regular expression', 'Regular expression "'.$this->regexp.'" already exists.']);
+		$this->assertMessage(TEST_BAD, 'Cannot add regular expression', 'Regular expression "'.$this->regexp.'" already exists.');
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
@@ -126,7 +135,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestInputType('name', '1_regexp3');
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestTextPresent(['Cannot add regular expression', 'Expression cannot be empty']);
+		$this->assertMessage(TEST_BAD, 'Cannot add regular expression', 'Expression cannot be empty');
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestTrue() {
@@ -159,7 +168,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputType('name', $this->regexp.'_clone');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Regular expression added');
+		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->cloned_regexp).' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Cloned regular expression does not exist in the DB');
@@ -171,7 +180,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestInputTypeOverwrite('name', $this->regexp.'2');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Regular expression updated');
+		$this->assertMessage(TEST_GOOD, 'Regular expression updated');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->regexp.'2').' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');
@@ -184,7 +193,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
+		$this->assertMessage(TEST_GOOD, 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($this->regexp2);
@@ -204,7 +213,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestTextPresent('Regular expressions deleted');
+		$this->assertMessage(TEST_GOOD, 'Regular expressions deleted');
 
 		$sql = 'SELECT * FROM regexps';
 		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');

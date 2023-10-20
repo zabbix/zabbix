@@ -19,11 +19,21 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup config
  */
 class testFormAdministrationGeneralGUI extends CLegacyWebTest {
+
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	public static function allValues() {
 		return CDBHelper::getDataProvider(
@@ -82,14 +92,16 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('default_theme', 'Dark');
 		$this->assertEquals('dark-theme', $this->zbxTestGetValue('//z-select[@name="default_theme"]'));
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('dark-theme');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: "Dark" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->zbxTestDropdownSelect('default_theme', 'Blue');
 		$this->assertEquals('blue-theme', $this->zbxTestGetValue('//z-select[@name="default_theme"]'));
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('blue-theme');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: "Blue" theme can not be selected as default theme: it does not exist in the DB');
 
@@ -103,17 +115,19 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 		$this->zbxTestInputType('search_limit', '1000');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Limit for search and filter results']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1000';
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Incorrect value in the DB field "search_limit"');
 
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Limit for search and filter results']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
@@ -123,7 +137,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '999999');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Limit for search and filter results']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=999999';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
@@ -136,8 +151,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
-		$this->zbxTestTextPresent('Incorrect value "0" for "search_limit" field.');
+		$this->assertMessage(TEST_BAD, 'Cannot update configuration', 'Incorrect value "0" for "search_limit" field.');
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		// Check to enter -1 value
@@ -148,7 +162,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
-		$this->zbxTestTextPresent(['Cannot update configuration', 'Incorrect value "-1" for "search_limit" field.']);
+		$this->assertMessage(TEST_BAD, 'Cannot update configuration', 'Incorrect value "-1" for "search_limit" field.');
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -161,11 +175,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$this->zbxTestInputTypeOverwrite('max_in_table', '1000');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent([
-			'Configuration updated',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		]);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Max count of elements to show inside table cell']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM config WHERE max_in_table=1000'));
 
@@ -174,11 +185,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputType('max_in_table', '1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent([
-			'Configuration updated',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		]);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Max count of elements to show inside table cell']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM config WHERE max_in_table=1'));
 
@@ -187,11 +195,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('max_in_table', '99999');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent([
-			'Configuration updated',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		]);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Max count of elements to show inside table cell']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM config WHERE max_in_table=99999'));
 
@@ -200,12 +205,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('max_in_table', '-1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent([
-			'Cannot update configuration',
-			'Incorrect value "-1" for "max_in_table" field.',
-			'GUI',
-			'Max count of elements to show inside table cell'
-		]);
+		$this->assertMessage(TEST_BAD, 'Cannot update configuration', 'Incorrect value "-1" for "max_in_table" field.');
+		$this->zbxTestTextPresent(['GUI', 'Max count of elements to show inside table cell']);
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -218,7 +219,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 		$this->zbxTestCheckboxSelect('server_check_interval');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestTextPresent('Show warning if Zabbix server is down');
 		$this->assertTrue($this->zbxTestCheckboxSelected('server_check_interval'));
@@ -232,7 +233,8 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('server_check_interval', false);
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Show warning if Zabbix server is down']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->zbxTestTextPresent(['GUI', 'Show warning if Zabbix server is down']);
 		$this->assertFalse($this->zbxTestCheckboxSelected('server_check_interval'));
 
 		$sql = 'SELECT server_check_interval FROM config WHERE server_check_interval=0';
