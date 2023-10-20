@@ -560,7 +560,7 @@ class testFormTags extends CWebTest {
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
-			if ($object !== 'host prototype' || $object !== 'web scenario' || $object !== 'service') {
+			if (!$object === 'host prototype' || !$object === 'web scenario' || !$object === 'service') {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -608,7 +608,7 @@ class testFormTags extends CWebTest {
 			// Check the results in form.
 			$this->checkTagFields($data, $object, $form);
 
-			if ($object !== 'host' || $object !== 'host prototype' || $object !== 'web scenario' || $object !== 'service') {
+			if (!$object === 'host' || !$object === 'host prototype' || !$object === 'web scenario' || !$object === 'service') {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -784,7 +784,7 @@ class testFormTags extends CWebTest {
 
 		$element->checkValue($tags);
 
-		if ($object !== 'web scenario' || $object !== 'service') {
+		if (!$object === 'web scenario' || !$object === 'service') {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -917,7 +917,7 @@ class testFormTags extends CWebTest {
 		$form->selectTab('Tags');
 		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
-		if ($object !== 'web scenario' || $object !== 'host prototype') {
+		if (!$object === 'web scenario' || !$object === 'host prototype') {
 			COverlayDialogElement::find()->one()->close();
 		}
 
@@ -1346,7 +1346,7 @@ class testFormTags extends CWebTest {
 			'host prototype' => 'name:hostPrototypeForm'
 		];
 
-		$form = ($object !== 'web scenario' || $object !== 'host prototype')
+		$form = (!$object === 'web scenario' || !$object === 'host prototype')
 				? COverlayDialogElement::find()->waitUntilVisible()->asForm()->one()
 				: $this->query($locators[$object])->asForm()->waitUntilPresent()->one();
 
