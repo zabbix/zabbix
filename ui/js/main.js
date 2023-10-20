@@ -993,7 +993,7 @@ function getConditionFormula(conditions, evalType) {
 				}
 
 				if (options.sortable) {
-					table.sortable($(options.row, table).length < 2 ? 'disable' : 'enable');
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 
 				table.trigger('afteradd.dynamicRows', options);
@@ -1014,7 +1014,7 @@ function getConditionFormula(conditions, evalType) {
 				}
 
 				if (options.sortable) {
-					table.sortable($(options.row, table).length < 2 ? 'disable' : 'enable');
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 			});
 
