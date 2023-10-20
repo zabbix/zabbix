@@ -42,3 +42,15 @@ form.dashboard-widget-honeycomb {
 		}
 	}
 }
+
+// Widget view.
+
+div.dashboard-widget-honeycomb {
+	overflow-x: hidden;
+
+	.dashboard-grid-widget-body {
+		svg {
+			display: block;
+		}
+	}
+}

@@ -37,6 +37,6 @@
     }
   },
   "assets": {
-    "js": ["class.widget.js"]
+    "js": ["class.svghoneycomb.js", "class.widget.js"]
   }
 }

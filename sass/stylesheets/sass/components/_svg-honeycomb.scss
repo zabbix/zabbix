@@ -1,0 +1,25 @@
+.svg-honeycomb {
+	.svg-honeycomb-cell path {
+		fill: $honeycomb-cell-color;
+	}
+
+	.svg-honeycomb-cell-popped {
+		transition: filter 0.2s;
+	}
+
+	.svg-honeycomb-label {
+		fill: $honeycomb-label-color;
+		text-anchor: middle;
+	}
+
+	.svg-honeycomb-cell-no-data path,
+	.svg-honeycomb-cell-other path {
+		fill: $honeycomb-cell-no-data-color;
+	}
+
+	.svg-honeycomb-cell-no-data text,
+	.svg-honeycomb-cell-other text {
+		text-anchor: middle;
+		fill: $honeycomb-label-no-data-color;
+	}
+}

@@ -412,6 +412,9 @@ $translate_strings = [
 	'class.csvgauge.js' => [
 		'No data' => _('No data')
 	],
+	'class.csvghoneycomb.js' => [
+		'No data' => _('No data')
+	],
 	'common.js' => [
 		'Cancel' => _('Cancel'),
 		'Ok' => _('Ok'),

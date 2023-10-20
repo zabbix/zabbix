@@ -51,6 +51,21 @@ class CWidgetHoneycomb extends CWidget {
 	}
 
 	setContents(response) {
+		if (this.#honeycomb === null) {
+			const padding = {
+				vertical: CWidgetHoneycomb.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
+				horizontal: CWidgetHoneycomb.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
+			};
+
+			this.#honeycomb = new CSVGHoneycomb(padding, response.config);
+			this._body.prepend(this.#honeycomb.getSVGElement());
+
+			this.#honeycomb.setSize(super._getContentsSize());
+		}
+
+		this.#honeycomb.setValue({
+			cells: response.cells
+		});
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
@@ -88,5 +103,9 @@ class CWidgetHoneycomb extends CWidget {
 		});
 
 		return menu;
+	}
+
+	hasPadding() {
+		return false;
 	}
 }

@@ -3550,6 +3550,21 @@ section {
     height: 10px;
     margin-right: 10px; }
 
+.svg-honeycomb .svg-honeycomb-cell path {
+  fill: #3d5059; }
+.svg-honeycomb .svg-honeycomb-cell-popped {
+  transition: filter 0.2s; }
+.svg-honeycomb .svg-honeycomb-label {
+  fill: #eeeeee;
+  text-anchor: middle; }
+.svg-honeycomb .svg-honeycomb-cell-no-data path,
+.svg-honeycomb .svg-honeycomb-cell-other path {
+  fill: #383838; }
+.svg-honeycomb .svg-honeycomb-cell-no-data text,
+.svg-honeycomb .svg-honeycomb-cell-other text {
+  text-anchor: middle;
+  fill: #eeeeee; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
@@ -4024,6 +4039,11 @@ form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .form-f
   grid-column: 1 / -1; }
 form.dashboard-widget-honeycomb .fields-group .form-row-interpolation {
   margin-bottom: 10px; }
+
+div.dashboard-widget-honeycomb {
+  overflow-x: hidden; }
+  div.dashboard-widget-honeycomb .dashboard-grid-widget-body svg {
+    display: block; }
 
 div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
   padding-top: 5px;
