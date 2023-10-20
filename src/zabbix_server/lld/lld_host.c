@@ -286,6 +286,8 @@ zbx_lld_host_t;
 static void	lld_host_free(zbx_lld_host_t *host)
 {
 	zbx_vector_uint64_destroy(&host->new_groupids);
+	zbx_vector_uint64_destroy(&host->old_groupids);
+	zbx_vector_uint64_destroy(&host->groupids);
 	zbx_vector_uint64_destroy(&host->lnk_templateids);
 	zbx_vector_uint64_destroy(&host->del_templateids);
 	zbx_vector_ptr_clear_ext(&host->new_hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
