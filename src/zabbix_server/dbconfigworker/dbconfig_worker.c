@@ -173,7 +173,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-	zabbix_increase_log_level();
+
 	/* initialize statistics */
 	time_flush = zbx_time();
 

@@ -3246,6 +3246,18 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 
 	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
+	{
+		value_esc = zbx_db_dyn_escape_string(item->name);
+
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update item_rtname set"
+				" name_resolved='%s',name_resolved_upper=upper('%s')"
+				" where itemid=" ZBX_FS_UI64 ";\n",
+				value_esc, value_esc, item->itemid);
+		zbx_free(value_esc);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+	}
 }
 
 /******************************************************************************
