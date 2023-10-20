@@ -5107,6 +5107,9 @@ form.is-loading {
         padding-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
+  .table-forms .table-subforms {
+    margin-top: -5px;
+    margin-bottom: -5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {

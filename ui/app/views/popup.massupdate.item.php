@@ -269,26 +269,15 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-// Prepare Update interval for form list.
-$update_interval = (new CTable())
-	->setId('update_interval')
-	->addRow([
-		_('Delay'),
-		new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
-	])
-	->addRow(
-		(new CRow([
-			(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
-			new CCol($custom_intervals)
-		]))
-	);
-
 // Append update interval to form list.
 $item_form_list
 	// Append delay to form list.
 	->addRow(
 		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
-		$update_interval
+		(new CFormList('update_interval'))
+			->addClass(ZBX_STYLE_TABLE_SUBFORMS)
+			->addRow(_('Delay'), (new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
+			->addRow(_('Custom intervals'), $custom_intervals)
 	)
 	// Append timeout to form list.
 	->addRow(
