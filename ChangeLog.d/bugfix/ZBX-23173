@@ -1,0 +1,1 @@
+...G...... [ZBX-23173] fixed memory leak in agent 2 for Windows Events processing on MS Windows (akozlovs, Andris, esneiders, MVekslers)
