@@ -39,7 +39,7 @@ Get the generated service account token using the command:
 
 `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
 
-Then set it to the macro `{$KUBE.API.TOKEN}`.  
+Then set it to the macro `{$KUBE.API.TOKEN}`.
 Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
 
 *NOTE.* If you wish to monitor Controller Manager and Scheduler components, you might need to set the `--binding-address` option for them to the address where Zabbix proxy can reach them.
@@ -115,6 +115,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
+|{$OPENSHIFT.STATE.ENDPOINT.NAME}|<p>OpenShift state endpoint name.</p>|`openshift-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.API_SERVER.PORT}|<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p>|`6443`|
 |{$KUBE.CONTROL_PLANE.TAINT}|<p>Taint that applies to control plane nodes. Change if needed. Used in ControlPlane LLD.</p>|`node-role.kubernetes.io/control-plane`|
@@ -407,8 +408,8 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |----|-----------|----|-----------------------|
 |Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Suspend|<p>Suspend flag tells the controller to suspend subsequent executions.</p>|Dependent item|kube.cronjob.spec_suspend[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Active|<p>Active holds pointers to currently running jobs.</p>|Dependent item|kube.cronjob.status_active[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Last schedule|<p>LastScheduleTime keeps information of when was the last time the job was successfully scheduled.</p>|Dependent item|kube.cronjob.last_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `return new Date(value * 1000).toString().slice(0,19);`</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Next schedule|<p>Next time the cronjob should be scheduled. The time after lastScheduleTime, or after the cron job's creation time if it's never been scheduled. Use this to determine if the job is delayed.</p>|Dependent item|kube.cronjob.next_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `return new Date(value * 1000).toString().slice(0,19);`</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Last schedule|<p>LastScheduleTime keeps information of when was the last time the job was successfully scheduled.</p>|Dependent item|kube.cronjob.last_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Next schedule|<p>Next time the cronjob should be scheduled. The time after lastScheduleTime, or after the cron job's creation time if it's never been scheduled. Use this to determine if the job is delayed.</p>|Dependent item|kube.cronjob.next_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Failed|<p>The number of pods which reached Phase Failed and the reason for failure.</p>|Dependent item|kube.cronjob.status_failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Succeeded|<p>The number of pods which reached Phase Succeeded.</p>|Dependent item|kube.cronjob.status_succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Completion succeeded|<p>Number of job has completed its execution.</p>|Dependent item|kube.cronjob.completion.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -482,6 +483,71 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Kubernetes: Livez [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0`|Warning||
+
+### LLD rule OpenShift BuildConfig discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift BuildConfig discovery||Dependent item|openshift.buildconfig.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_buildconfig_created`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift BuildConfig discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Namespace [{#NAMESPACE}] BuildConfig [{#NAME}]: Created|<p>OpenShift BuildConfig Unix creation timestamp.</p>|Dependent item|openshift.buildconfig.created.time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] BuildConfig [{#NAME}]: Generation|<p>Sequence number representing a specific generation of the desired state.</p>|Dependent item|openshift.buildconfig.generation[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] BuildConfig [{#NAME}]: Latest version|<p>The latest version of BuildConfig.</p>|Dependent item|openshift.buildconfig.status[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule OpenShift Build discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift Build discovery||Dependent item|openshift.build.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_build_created`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift Build discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Namespace [{#NAMESPACE}] Build [{#NAME}]: Created|<p>OpenShift Build Unix creation timestamp.</p>|Dependent item|openshift.build.created.time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] Build [{#NAME}]: Generation|<p>Sequence number representing a specific generation of the desired state.</p>|Dependent item|openshift.build.sequence.number[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] Build [{#NAME}]: Status phase|<p>The Build phase.</p>|Dependent item|openshift.build.status_phase[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+
+### Trigger prototypes for OpenShift Build discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OpenShift: Build [{#NAME}]: Build has failed||`count(/Kubernetes cluster state by HTTP/openshift.build.status_phase[{#NAMESPACE}/{#NAME}],2m,"ge",6)>=2`|Warning||
+
+### LLD rule OpenShift ClusterResourceQuota discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift ClusterResourceQuota discovery||Dependent item|openshift.cluster.resource.quota.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_clusterresourcequota_usage`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift ClusterResourceQuota discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Quota [{#NAME}] Resource [{#RESOURCE}]: Type [{#TYPE}]]|<p>Usage about resource quota.</p>|Dependent item|openshift.cluster.resource.quota[{#RESOURCE}/{#NAME}/{#TYPE}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### LLD rule OpenShift Route discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift Route discovery||Dependent item|openshift.route.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_route_info`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift Route discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Namespace [{#NAMESPACE}] Route [{#NAME}]: Created|<p>OpenShift Route Unix creation timestamp.</p>|Dependent item|openshift.route.created.time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] Route [{#NAME}]: Status|<p>Information about route status.</p>|Dependent item|openshift.route.status[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `openshift_route_status{route="{#NAME}"} == 1` label `status`</p><p>⛔️Custom on fail: Discard value</p></li><li>Boolean to decimal</li></ul>|
+
+### Trigger prototypes for OpenShift Route discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OpenShift: Route [{#NAME}] with issue: Status has false||`count(/Kubernetes cluster state by HTTP/openshift.route.status[{#NAMESPACE}/{#NAME}],2m,,0)>=2`|Warning||
 
 ## Feedback
 
