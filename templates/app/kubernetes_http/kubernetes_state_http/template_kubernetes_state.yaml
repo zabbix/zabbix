@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-13T07:57:17Z'
+  date: '2023-10-20T06:40:28Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -687,7 +687,7 @@ zabbix_export:
                         }
                     });
                     if (endpoint.length === 0) {
-                        throw 'Cannot get kube-state-metrics endpoints from Kubernetes API. Check debug log for more information.';
+                        throw 'Cannot get state metrics endpoints from Kubernetes API. Check debug log for more information.';
                     }
                     return endpoint;
                 },
@@ -703,6 +703,7 @@ zabbix_export:
             
                     if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
                         request.setProxy(Kube.params.http_proxy);
+                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
                     }
             
                     metrics_endpoint.forEach(function (endpoint) {
@@ -716,9 +717,9 @@ zabbix_export:
                             throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                         }
                         if (response === null) {
-                            throw 'failed to get Kubernetes state metrics. Check debug log for more information.';
+                            throw 'Failed to get state metrics. Check debug log for more information.';
                         }
-                        result += response + '\n'
+                        result += response + '\n';
                     }
                     );
             
@@ -1004,7 +1005,7 @@ zabbix_export:
               history: 7d
               description: 'Suspend flag tells the controller to suspend subsequent executions.'
               valuemap:
-                name: 'CronJob suspend flag'
+                name: 'Boolean format'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -3611,6 +3612,9 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
               master_item:
                 key: kube.state.metrics
               tags:
@@ -3650,7 +3654,7 @@ zabbix_export:
             - uuid: 9a8bdd353a5a499c8c66468c1325ae16
               name: 'OpenShift: Namespace [{#NAMESPACE}] Build [{#NAME}]: Status phase'
               type: DEPENDENT
-              key: 'openshift.build.status[{#NAMESPACE}/{#NAME}]'
+              key: 'openshift.build.status_phase[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
               description: 'The Build phase.'
@@ -3679,7 +3683,7 @@ zabbix_export:
                   value: '{#NAMESPACE}'
               trigger_prototypes:
                 - uuid: b3364370ae954d69b7fad1ac3afd238b
-                  expression: 'count(/Kubernetes cluster state by HTTP/openshift.build.status[{#NAMESPACE}/{#NAME}],10m,"regexp","^(6|7)$")>=9'
+                  expression: 'count(/Kubernetes cluster state by HTTP/openshift.build.status_phase[{#NAMESPACE}/{#NAME}],2m,"ge",6)>=2'
                   name: 'OpenShift: Build [{#NAME}]: Build has failed'
                   priority: WARNING
                   tags:
@@ -3734,6 +3738,9 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
               master_item:
                 key: kube.state.metrics
               tags:
@@ -3748,7 +3755,7 @@ zabbix_export:
             - uuid: 2e90ec2497eb4eb3bf41b68282f07e6d
               name: 'OpenShift: Namespace [{#NAMESPACE}] BuildConfig [{#NAME}]: Generation'
               type: DEPENDENT
-              key: 'openshift.buildconfig.sequence.number[{#NAMESPACE}/{#NAME}]'
+              key: 'openshift.buildconfig.generation[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
               description: 'Sequence number representing a specific generation of the desired state.'
@@ -3812,6 +3819,54 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+        - uuid: d7e21c75073548078e06159ff94680c9
+          name: 'OpenShift ClusterResourceQuota discovery'
+          type: DEPENDENT
+          key: openshift.cluster.resource.quota.discovery
+          delay: '0'
+          lifetime: '0'
+          item_prototypes:
+            - uuid: 0b3826bad61c407ab4b9e103f0a3ae18
+              name: 'OpenShift: Quota [{#NAME}] Resource [{#RESOURCE}]: Type [{#TYPE}]]'
+              type: DEPENDENT
+              key: 'openshift.cluster.resource.quota[{#RESOURCE}/{#NAME}/{#TYPE}]'
+              delay: '0'
+              history: 7d
+              description: 'Usage about resource quota.'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'openshift_clusterresourcequota_usage{name="{#NAME}", resource="{#RESOURCE}", type="{#TYPE}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                - tag: component
+                  value: openshift
+                - tag: quota
+                  value: '{#NAME}'
+                - tag: resource
+                  value: '{#RESOURCE}'
+                - tag: type
+                  value: '{#TYPE}'
+          master_item:
+            key: kube.state.metrics
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.labels.name
+            - lld_macro: '{#RESOURCE}'
+              path: $.labels.resource
+            - lld_macro: '{#TYPE}'
+              path: $.labels.type
+          preprocessing:
+            - type: PROMETHEUS_TO_JSON
+              parameters:
+                - openshift_clusterresourcequota_usage
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         - uuid: 140a80726c60443ca5bb87b758924f7f
           name: 'OpenShift Route discovery'
           type: DEPENDENT
@@ -3847,11 +3902,16 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
               master_item:
                 key: kube.state.metrics
               tags:
                 - tag: component
                   value: openshift
+                - tag: component
+                  value: route
                 - tag: host
                   value: '{#HOST}'
                 - tag: namespace
@@ -3866,7 +3926,7 @@ zabbix_export:
               history: 7d
               description: 'Information about route status.'
               valuemap:
-                name: 'CronJob suspend flag'
+                name: 'Boolean format'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -3882,12 +3942,22 @@ zabbix_export:
               tags:
                 - tag: component
                   value: openshift
+                - tag: component
+                  value: route
                 - tag: host
                   value: '{#HOST}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
                 - tag: route
                   value: '{#NAME}'
+              trigger_prototypes:
+                - uuid: 98a6d7ba3a4049d693f5471819ee4b2e
+                  expression: 'count(/Kubernetes cluster state by HTTP/openshift.route.status[{#NAMESPACE}/{#NAME}],2m,,0)>=2'
+                  name: 'OpenShift: Route [{#NAME}] with issue: Status has false'
+                  priority: WARNING
+                  tags:
+                    - tag: scope
+                      value: availability
           master_item:
             key: kube.state.metrics
           lld_macro_paths:
@@ -3993,6 +4063,13 @@ zabbix_export:
           value: openshift-state-metrics
           description: 'OpenShift state endpoint name.'
       valuemaps:
+        - uuid: a435f7e23050406ca40cf6f5f872b5a7
+          name: 'Boolean format'
+          mappings:
+            - value: '0'
+              newvalue: 'False'
+            - value: '1'
+              newvalue: 'True'
         - uuid: a315a447059e49f9bc0c3e2e9964696f
           name: 'Build status phases'
           mappings:
@@ -4010,13 +4087,6 @@ zabbix_export:
               newvalue: failed
             - value: '7'
               newvalue: error
-        - uuid: a435f7e23050406ca40cf6f5f872b5a7
-          name: 'CronJob suspend flag'
-          mappings:
-            - value: '0'
-              newvalue: 'False'
-            - value: '1'
-              newvalue: 'True'
         - uuid: f5aa4a786972420b859029116aac8a2f
           name: 'PV and PVC status phases'
           mappings:
