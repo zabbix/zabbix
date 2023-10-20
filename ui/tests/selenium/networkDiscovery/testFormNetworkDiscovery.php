@@ -1390,7 +1390,6 @@ class testFormNetworkDiscovery extends CWebTest {
 			// #1 Change SNMP to other type of checks.
 			[
 				[
-					'expected' => TEST_BAD,
 					'Checks' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1403,34 +1402,36 @@ class testFormNetworkDiscovery extends CWebTest {
 							'index' => 1,
 							'Check type' => 'POP',
 							'Port range' => 2020
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'Check type' => 'Zabbix agent',
+							'Key' => 'test_key'
 						]
 					],
 					'expected_checks' => [
 						'ICMP ping "allow redirect"',
 						'POP (2020)',
-						'Telnet (205)'
+						'Zabbix agent "test_key"'
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
+							'IP address' => true,
+							'Zabbix agent "test_key"' => false
 						],
 						'Host name' => [
-							'DNS name' => false,
+							'DNS name' => true,
 							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => true,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
+							'Zabbix agent "test_key"' => false
 						],
 						'Visible name' => [
 							'Host name' => false,
 							'DNS name' => false,
 							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
+							'Zabbix agent "test_key"' => false
 						]
-					],
-					'error_details' => 'Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.'
+					]
 				]
 			],
 			// #2 Delete two checks, one left.
