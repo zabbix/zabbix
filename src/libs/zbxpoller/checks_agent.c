@@ -96,6 +96,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 		case ZBX_TCP_SEC_TLS_PSK:
 			tls_arg1 = item->host.tls_psk_identity;
 			tls_arg2 = item->host.tls_psk;
+			ZBX_UNUSED(program_type);
 			break;
 #else
 		case ZBX_TCP_SEC_TLS_CERT:
