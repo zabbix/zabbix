@@ -1785,6 +1785,8 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.23rc1
 
 New features:
+.........T [ZBXNEXT-8552] added FortiGate by SNMP and FortiGate by HTTP templates (aiantsen)
+.........T [ZBXNEXT-8727] added additional metrics in Cisco Meraki organization by HTTP template (egordymov)
 .........T [ZBXNEXT-7097] added item and trigger for monitoring PostgreSQL version into PostgreSQL by ODBC and PostgreSQL by Zabbix agent 2 templates (akotsegubov)
 .........T [ZBXNEXT-8283] implemented role based authentication for AWS monitoring (abakaldin)
 .........T [ZBXNEXT-8575] added Nextcloud template (abakaldin)
@@ -1792,6 +1794,15 @@ New features:
 .......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-23173] fixed memory leak in agent 2 for Windows Events processing on MS Windows (akozlovs, Andris, esneiders, MVekslers)
+..F....... [ZBX-23265] fixed transfer of PSK encryption details when cloning proxy (jfreibergs)
+.........T [ZBX-23563] fixed JSONPath for rowshare locks metric in PostgreSQL by Zabbix agent 2 template (drasikhov)
+.........T [ZBX-22907] removed unused LLD macro in PostgreSQL by Zabbix agent template (drasikhov)
+.......PS. [ZBX-23377] added support for vmware perfCounter with type nanosecond (MVekslers)
+........S. [ZBX-23012] possible optimization of the sql queries when updating LLD items (kprutkovs)
+..F....... [ZBX-23325] fixed ability to add duplicate ICMP ping checks to discovery rule configuration form via popup (agriscenko)
+A.F.....S. [ZBX-23270] renamed trigger name condition to event name condition (agriscenko, asitals)
+...G...... [ZBX-23340] fixed tls parameter handling in mysql plugin for Zabbix agent 2 (esneiders)
 .......PS. [ZBX-23461] fixed output of redundant data in DCdump_interfaces (dgoloscapov, wiper)
 ..F....... [ZBX-23528] fixed inability to resize trigger expression field horizontally (agriscenko)
 ..F....... [ZBX-22977] fixed positioning of hidden checkbox inputs and fixed autofocus in massupdate templates/hosts (dfofanovs)
