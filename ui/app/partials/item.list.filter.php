@@ -143,7 +143,7 @@ $filter_columns[1]
 	])
 	->addItem([
 		new CLabel(_('Type of information'), $info_type_select->getFocusableElementId()),
-		new CFormField($info_type_select),
+		new CFormField($info_type_select)
 	])
 	->addItem([
 		(new CLabel(_('SNMP OID'), 'filter_snmp_oid'))->setId('js-filter-snmp-oid-label'),

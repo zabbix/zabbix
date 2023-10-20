@@ -271,7 +271,7 @@ $formgrid = (new CFormGrid())
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
 					]))->addClass('form_row')
-				),
+				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')

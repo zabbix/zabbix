@@ -1343,7 +1343,7 @@ class testFormTags extends CWebTest {
 
 		$locators = [
 			'web scenario' => 'name:webscenario_form',
-			'host prototype' => 'name:hostPrototypeForm',
+			'host prototype' => 'name:hostPrototypeForm'
 		];
 
 		$form = ($object !== 'web scenario' || $object !== 'host prototype')

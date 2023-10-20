@@ -323,7 +323,7 @@ class CControllerItemList extends CControllerItem {
 			],
 			[
 				'key' => 'subfilter_hosts',
-				'label' => _('Hosts'),
+				'label' => _('Hosts')
 			],
 			[
 				'key' => 'subfilter_types',
