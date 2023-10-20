@@ -32,6 +32,12 @@
 #include "zbx_scripts_constants.h"
 #include "zbxpoller.h"
 #include "zbxipmi.h"
+#include "zbxalgo.h"
+#include "zbxavailability.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 #define REMOTE_COMMAND_NEW		0
 #define REMOTE_COMMAND_RESULT_OOM	1
