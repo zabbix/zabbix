@@ -607,8 +607,8 @@ zabbix_export:
           triggers:
             - uuid: 11831c52e86445498eed42de6a629b65
               expression: 'min(/PostgreSQL by Zabbix agent/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
-              name: 'PostgreSQL: Streaming lag with {#MASTER} is too high'
-              event_name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
+              name: 'PostgreSQL: Streaming lag with master is too high'
+              event_name: 'PostgreSQL: Streaming lag with master is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
               description: 'Replication lag with master is higher than {$PG.REPL_LAG.MAX.WARN} for 5m.'
               tags:
