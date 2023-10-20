@@ -13,3 +13,7 @@ libzbxipmi_a_SOURCES = \
 	ipmi_protocol.h \
 	ipmi.c \
 	ipmi.h
+
+libzbxipmi_a_CFLAGS = \
+	$(OPENIPMI_CFLAGS) \
+	$(TLS_CFLAGS)
