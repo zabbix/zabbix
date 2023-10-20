@@ -3247,7 +3247,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = 0; i < diffs.values_num; i++)
+		for (int i = 0; i < diffs.values_num; i++)
 		{
 			char	separator = ' ';
 
