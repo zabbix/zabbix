@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-09T09:52:09Z'
+  date: '2023-10-12T13:37:18Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -213,7 +213,7 @@ zabbix_export:
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 12h
+                - 1d
           tags:
             - tag: component
               value: system
@@ -545,27 +545,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -573,6 +552,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -960,10 +960,13 @@ zabbix_export:
           description: 'Threshold of average ICMP response time for warning trigger in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '95'
+          description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.'
         - macro: '{$IFCONTROL}'
           value: '1'
+          description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
           description: 'Threshold of memory utilization for trigger in %'
@@ -1013,75 +1016,46 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: ITEM
-                  name: Firmware
-                  x: '16'
-                  'y': '3'
+                  name: 'SNMP State'
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'FortiGate by SNMP'
-                        key: system.hw.firmware
-                - type: ITEM
-                  name: Model
-                  x: '8'
-                  width: '8'
-                  height: '3'
-                  fields:
+                        key: 'zabbix[host,snmp,available]'
                     - type: INTEGER
                       name: show
                       value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by SNMP'
-                        key: system.hw.model
                 - type: ITEM
                   name: Name
                   'y': '3'
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'FortiGate by SNMP'
                         key: system.name
-                - type: ITEM
-                  name: 'Serial Number'
-                  x: '16'
-                  width: '8'
-                  height: '3'
-                  fields:
                     - type: INTEGER
                       name: show
                       value: '2'
+                - type: ITEM
+                  name: Model
+                  x: '8'
+                  width: '8'
+                  height: '3'
+                  fields:
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'FortiGate by SNMP'
-                        key: system.hw.serialnumber
-                - type: ITEM
-                  name: 'SNMP State'
-                  width: '8'
-                  height: '3'
-                  fields:
+                        key: system.hw.model
                     - type: INTEGER
                       name: show
                       value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by SNMP'
-                        key: 'zabbix[host,snmp,available]'
                 - type: ITEM
                   name: Uptime
                   x: '8'
@@ -1089,17 +1063,46 @@ zabbix_export:
                   width: '8'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'FortiGate by SNMP'
                         key: 'system.uptime[fgSysUpTime.0]'
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Serial Number'
+                  x: '16'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'FortiGate by SNMP'
+                        key: system.hw.serialnumber
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: ITEM
+                  name: Firmware
+                  x: '16'
+                  'y': '3'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'FortiGate by SNMP'
+                        key: system.hw.firmware
+                    - type: INTEGER
+                      name: show
+                      value: '2'
             - name: 'System performance'
               widgets:
                 - type: GRAPH_CLASSIC
@@ -1112,16 +1115,6 @@ zabbix_export:
                         host: 'FortiGate by SNMP'
                         name: 'FortiGate: CPU utilization'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'FortiGate by SNMP'
-                        name: 'FortiGate: Memory usage'
-                - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1131,6 +1124,16 @@ zabbix_export:
                       value:
                         host: 'FortiGate by SNMP'
                         name: 'FortiGate: Memory utilization'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'FortiGate by SNMP'
+                        name: 'FortiGate: Memory usage'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'
@@ -1151,14 +1154,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: 3ba88094988045799337ddb456936f15
           name: 'IF-MIB::ifOperStatus'
