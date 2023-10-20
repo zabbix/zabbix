@@ -257,40 +257,42 @@ $subfilters_table = (new CTableInfo())
 		])
 	], ZBX_STYLE_HOVER_NOBG);
 
-foreach ($data['subfilter'] as $subfilter) {
-	$cell = [];
+if ($data['filtered_count'] > 1) {
+	foreach ($data['subfilter'] as $subfilter) {
+		$cell = [];
 
-	if (count($subfilter['values']) < 2) {
-		continue;
-	}
-
-	foreach ($subfilter['values'] as $value => $count) {
-		$is_selected = array_key_exists($value, $subfilter['selected']);
-		$prefix = ($subfilter['selected'] && !$is_selected && $count > 0) ? '+' : '';
-		$value_label = $value;
-
-		if (array_key_exists('labels', $subfilter)) {
-			$value_label = $subfilter['labels'][$value];
+		if (count($subfilter['values']) < 2) {
+			continue;
 		}
 
-		$name = $subfilter['key'].'[]';
-		$cell[] = (new CSpan([
-			($count > 0 || $is_selected)
-				? (new CLinkAction($value_label))
-					->setAttribute('data-name', $name)
-					->setAttribute('data-value', $value)
-				: (new CSpan($value_label))->addClass(ZBX_STYLE_GREY),
-			$is_selected ? new CInput('hidden', $name, $value) : null,
-			' ',
-			new CSup($prefix.$count)
-		]))
-			->addClass(ZBX_STYLE_SUBFILTER)
-			->addClass($is_selected ? ZBX_STYLE_SUBFILTER_ENABLED : null);
-	}
+		foreach ($subfilter['values'] as $value => $count) {
+			$is_selected = array_key_exists($value, $subfilter['selected']);
+			$prefix = ($subfilter['selected'] && !$is_selected && $count > 0) ? '+' : '';
+			$value_label = $value;
 
-	if ($cell) {
-		array_unshift($cell, new CTag('h3', true, $subfilter['label']));
-		$subfilters_table->addRow([$cell]);
+			if (array_key_exists('labels', $subfilter)) {
+				$value_label = $subfilter['labels'][$value];
+			}
+
+			$name = $subfilter['key'].'[]';
+			$cell[] = (new CSpan([
+				($count > 0 || $is_selected)
+					? (new CLinkAction($value_label))
+						->setAttribute('data-name', $name)
+						->setAttribute('data-value', $value)
+					: (new CSpan($value_label))->addClass(ZBX_STYLE_GREY),
+				$is_selected ? new CInput('hidden', $name, $value) : null,
+				' ',
+				new CSup($prefix.$count)
+			]))
+				->addClass(ZBX_STYLE_SUBFILTER)
+				->addClass($is_selected ? ZBX_STYLE_SUBFILTER_ENABLED : null);
+		}
+
+		if ($cell) {
+			array_unshift($cell, new CTag('h3', true, $subfilter['label']));
+			$subfilters_table->addRow([$cell]);
+		}
 	}
 }
 

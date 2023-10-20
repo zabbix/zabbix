@@ -34,6 +34,7 @@ $filter = new CPartial('item.list.filter', [
 	'context' => $data['context'],
 	'filter_data' => $data['filter_data'],
 	'subfilter' => $data['subfilter'],
+	'filtered_count' => $data['filtered_count'],
 	'types' => $data['types']
 ]);
 
