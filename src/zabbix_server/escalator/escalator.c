@@ -1766,8 +1766,7 @@ static int	check_operation_conditions(zbx_db_event *event, zbx_uint64_t operatio
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	int		ret = SUCCEED;	/* SUCCEED required for ZBX_CONDITION_EVAL_TYPE_AND_OR */
-	int		exit = 0;
+	int		exit = 0, ret = SUCCEED;	/* SUCCEED required for ZBX_CONDITION_EVAL_TYPE_AND_OR */
 	unsigned char	old_type = 0xff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, operationid);
