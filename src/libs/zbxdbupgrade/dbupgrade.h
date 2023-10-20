@@ -73,6 +73,7 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 int	DBadd_foreign_key(const char *table_name, int id, const zbx_db_field_t *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
 
+
 #	ifdef HAVE_ORACLE
 int	DBcreate_serial_sequence(const char *table_name);
 int	DBcreate_serial_trigger(const char *table_name, const char *field_name);
@@ -81,6 +82,7 @@ int	DBcreate_serial_trigger(const char *table_name, const char *field_name);
 int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_name);
 int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_name);
 int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_name);
+int	DBdrop_trigger(const char *trigger_name, const char *table_name);
 
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,

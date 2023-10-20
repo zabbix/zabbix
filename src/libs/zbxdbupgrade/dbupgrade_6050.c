@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxregexp.h"
+#include "zbx_host_constants.h"
 
 /*
  * 7.0 development database patches
@@ -1663,6 +1664,64 @@ static int	DBpatch_6050139(void)
 	return ret;
 }
 
+static int	DBpatch_6050140(void)
+{
+	const zbx_db_table_t	table =
+			{"item_rtname", "itemid", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name_resolved", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"name_resolved_upper", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050141(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_rtdata", 1, &field);
+}
+
+static int	DBpatch_6050142(void)
+{
+	if (ZBX_DB_OK <= zbx_db_execute("insert into item_rtname (itemid,name_resolved,name_resolved_upper)"
+			" select i.itemid,i.name,i.name_upper from"
+			" items i,hosts h"
+			" where i.hostid=h.hostid and (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_6050143(void)
+{
+	return DBdrop_index("items", "items_9");
+}
+
+static int	DBpatch_6050144(void)
+{
+	return DBdrop_field("items", "name_upper");
+}
+
+static int	DBpatch_6050145(void)
+{
+	return DBdrop_trigger("items_name_upper_insert", "items");
+}
+
+static int	DBpatch_6050146(void)
+{
+	return DBdrop_trigger("items_name_upper_update", "items");
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1807,5 +1866,12 @@ DBPATCH_ADD(6050136, 0, 1)
 DBPATCH_ADD(6050137, 0, 1)
 DBPATCH_ADD(6050138, 0, 1)
 DBPATCH_ADD(6050139, 0, 1)
+DBPATCH_ADD(6050140, 0, 1)
+DBPATCH_ADD(6050141, 0, 1)
+DBPATCH_ADD(6050142, 0, 1)
+DBPATCH_ADD(6050143, 0, 1)
+DBPATCH_ADD(6050144, 0, 1)
+DBPATCH_ADD(6050145, 0, 1)
+DBPATCH_ADD(6050146, 0, 1)
 
 DBPATCH_END()

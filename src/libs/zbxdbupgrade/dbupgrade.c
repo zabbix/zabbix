@@ -606,6 +606,24 @@ static int	DBdrop_serial_trigger(const char *table_name)
 
 #endif
 
+int	DBdrop_trigger(const char *trigger_name, const char *table_name)
+{
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_DB_OK > zbx_db_execute("drop trigger %s on %s" , trigger_name, table_name))
+	{
+		return FAIL;
+	}
+#else
+	ZBX_UNUSED(table_name);
+	if (ZBX_DB_OK > zbx_db_execute("drop trigger %s" , trigger_name))
+	{
+		return FAIL;
+	}
+#endif
+
+	return SUCCEED;
+}
+
 int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, const zbx_db_field_t *old_field)
 {
 	char	*sql = NULL;
