@@ -1247,9 +1247,8 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		zbx_script_t		script;
 		zbx_alert_status_t	status = ALERT_STATUS_NOT_SENT;
 		zbx_uint64_t		alertid, groupid;
-		char			*webhook_params_json = NULL, *script_name = NULL;
+		char			*webhook_params_json = NULL, *script_name = NULL, error[ALERT_ERROR_LEN_MAX];
 		zbx_vector_ptr_pair_t	webhook_params;
-		char			error[ALERT_ERROR_LEN_MAX];
 
 		*error = '\0';
 		memset(&host, 0, sizeof(host));
@@ -1475,7 +1474,6 @@ static void	get_mediatype_params_object(const zbx_db_event *event, const zbx_db_
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-
 	struct zbx_json		json;
 	int			message_type;
 	zbx_dc_um_handle_t	*um_handle;
@@ -1527,7 +1525,6 @@ static void	get_mediatype_params_array(const zbx_db_event *event, const zbx_db_e
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-
 	struct zbx_json		json;
 	int			message_type;
 	zbx_dc_um_handle_t	*um_handle;
@@ -1770,7 +1767,6 @@ static int	check_operation_conditions(zbx_db_event *event, zbx_uint64_t operatio
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-
 	int		ret = SUCCEED;	/* SUCCEED required for ZBX_CONDITION_EVAL_TYPE_AND_OR */
 	int		exit = 0;
 	unsigned char	old_type = 0xff;
