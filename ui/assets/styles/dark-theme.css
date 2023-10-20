@@ -3584,6 +3584,9 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+  .table-forms .table-subforms {
+    margin-top: -5px;
+    margin-bottom: -5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {

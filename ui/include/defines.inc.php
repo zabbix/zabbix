@@ -2019,6 +2019,7 @@ define('ZBX_STYLE_SUBFILTER', 'subfilter');
 define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');
 define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
+define('ZBX_STYLE_TABLE_SUBFORMS', 'table-subforms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
 define('ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN', 'table-forms-second-column');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
