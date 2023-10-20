@@ -1666,6 +1666,7 @@ static int	DBpatch_6050139(void)
 
 static int	DBpatch_6050140(void)
 {
+	zabbix_increase_log_level();
 	const zbx_db_table_t	table =
 			{"item_rtname", "itemid", 0,
 				{
