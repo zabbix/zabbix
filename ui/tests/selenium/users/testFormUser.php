@@ -112,7 +112,7 @@ const SQL = 'SELECT * FROM users';
 					'enabled_buttons' => ['Add', 'Cancel', 'Select'],
 					'count' => 3,
 					'hintbox_warning' => 'You are not able to choose some of the languages, '.
-							'because locales for them are not installed on the web server.',
+							'because locales for them are not installed on the web server.'
 				]
 			],
 			[
