@@ -632,7 +632,7 @@ int	DBdrop_function(const char *function_name)
 		return FAIL;
 	}
 #else
-	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(function_name);
 #endif
 
 	return SUCCEED;

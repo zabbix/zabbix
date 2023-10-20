@@ -21,7 +21,7 @@ SUBDIRS = \
 	stats \
 	preproc \
 	connector \
-	dbconfigworker \ 
+	dbconfigworker \
 	lld \
 	reporter \
 	service \
