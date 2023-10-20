@@ -89,6 +89,7 @@ const SQL = 'SELECT * FROM users';
 		return [
 			[
 				[
+					'role' => '',
 					'required' => ['Username', 'Password', 'Password (once again)', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => '',
@@ -108,13 +109,16 @@ const SQL = 'SELECT * FROM users';
 						'URL (after login)' => ''
 					],
 					'disabled' => ['id:autologout'],
-					'buttons' => ['Add', 'Cancel', 'Select'],
-					'count' => 3
+					'enabled_buttons' => ['Add', 'Cancel', 'Select'],
+					'count' => 3,
+					'hintbox_warning' => 'You are not able to choose some of the languages, '.
+							'because locales for them are not installed on the web server.',
 				]
 			],
 			[
 				[
 					'user' => 'guest',
+					'role' => 'Guest role',
 					'required' => ['Username', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => 'guest',
@@ -126,14 +130,15 @@ const SQL = 'SELECT * FROM users';
 						'URL (after login)' => ''
 					],
 					'disabled' => ['Change password', 'id:label-lang', 'id:label-timezone', 'id:label-theme'],
-					'buttons' => ['Update', 'Delete', 'Cancel', 'Select'],
-					'count' => 4
+					'enabled_buttons' => ['Update', 'Delete', 'Cancel', 'Select'],
+					'count' => 4,
+					'hintbox_warning' => 'Password can only be changed for users using the internal Zabbix authentication.'
 				]
 			],
 			[
 				[
-					'action' => 'edit',
 					'user' => 'Admin',
+					'role' => 'Super admin role',
 					'required' => ['Username', 'Current password', 'Password',  'Password (once again)', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => 'Admin',
@@ -154,8 +159,10 @@ const SQL = 'SELECT * FROM users';
 						'URL (after login)' => ''
 					],
 					'disabled' => ['id:autologout', 'button:Delete'],
-					'buttons' => ['Update', 'Cancel', 'Select'],
-					'count' => 3
+					'enabled_buttons' => ['Update', 'Cancel', 'Select'],
+					'count' => 3,
+					'hintbox_warning' => 'You are not able to choose some of the languages, '.
+							'because locales for them are not installed on the web server.'
 				]
 			]
 		];
@@ -180,8 +187,7 @@ const SQL = 'SELECT * FROM users';
 
 		// Check tabs available in the form.
 		$form = $this->query('name:user_form')->asForm()->one();
-		$tabs = ['User', 'Media', 'Permissions'];
-		$this->assertEquals($tabs, $form->getTabs());
+		$this->assertEquals(['User', 'Media', 'Permissions'], $form->getTabs());
 
 		// Check default values.
 		if (array_key_exists('user', $data) && $user === 'Admin') {
@@ -195,10 +201,6 @@ const SQL = 'SELECT * FROM users';
 					->all()->filter(CElementFilter::CLICKABLE)->count()
 			);
 			$this->assertEquals(0, $form->query('id:username')->all()->filter(CElementFilter::CLICKABLE)->count());
-			$info_password = 'Password can only be changed for users using the internal Zabbix authentication.';
-			$this->assertEquals($info_password, $this->query('xpath://button[contains(@data-hintbox-contents, "'.$info_password.'")]')
-					->one()->getAttribute('data-hintbox-contents')
-			);
 		}
 		else {
 			$inputs = [
@@ -245,26 +247,26 @@ const SQL = 'SELECT * FROM users';
 			$form->getLabel('Password')->query('xpath:./button[@data-hintbox]')->one()->click();
 			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilReady();
 			$help_message = "Password requirements:".
-				"\nmust be at least 8 characters long".
-				"\nmust not contain user's name, surname or username".
-				"\nmust not be one of common or context-specific passwords";
+					"\nmust be at least 8 characters long".
+					"\nmust not contain user's name, surname or username".
+					"\nmust not be one of common or context-specific passwords";
 			$this->assertEquals($help_message, $hint->one()->getText());
 			$hint->query('class:btn-overlay-close')->one()->click();
 
 			$info_message = 'Password is not mandatory for non internal authentication type.';
 			$this->assertEquals($info_message, $form->query('xpath://div[contains(text(), "'.$info_message.'")]')->one()->getText());
-
-			$hintbox = 'You are not able to choose some of the languages, because locales for them are not installed on the web server.';
-			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-contents, "'.$hintbox.'")]')
-					->one()->getAttribute('data-hintbox-contents')
-			);
 		}
+
+		// Check hintbox contains correct text message.
+		$this->assertEquals($data['hintbox_warning'], $this->query('xpath://button[contains(@data-hintbox-contents, "'.
+				$data['hintbox_warning'].'")]')->one()->getAttribute('data-hintbox-contents')
+		);
 
 		// Check required fields.
 		$this->assertEquals($data['required'], $form->getRequiredLabels());
 
 		// Check that buttons are present and clickable.
-		$this->assertEquals($data['count'], $form->query('button', $data['buttons'])->all()
+		$this->assertEquals($data['count'], $form->query('button', $data['enabled_buttons'])->all()
 				->filter(CElementFilter::CLICKABLE)->count()
 		);
 
@@ -277,7 +279,7 @@ const SQL = 'SELECT * FROM users';
 				$media_table->getHeadersText()
 		);
 
-		// Check that media tab buttons are present.
+		// Check that Media tab buttons are present.
 		if (array_key_exists('user', $data)) {
 			if ($user === 'Admin') {
 				$this->assertEquals(3, $form->query('button', ['Add', 'Update', 'Cancel'])->all()
@@ -326,18 +328,16 @@ const SQL = 'SELECT * FROM users';
 
 		// Check Permissions tab layout.
 		$form->selectTab('Permissions');
+		$form->checkValue($data['role']);
 
-		if (array_key_exists('user', $data)) {
-			if ($user === 'Admin') {
-				$this->assertFalse($form->isRequired('Role'));
-				$form->checkValue(['Role' => 'Super admin role']);
-			}
-			else {
-				$form->checkValue(['Role' => 'Guest role']);
-			}
+		if (array_key_exists('user', $data) && $user === 'Admin') {
+			$this->assertFalse($form->isRequired('Role'));
 		}
 		else {
 			$this->assertTrue($form->isRequired('Role'));
+		}
+
+		if($data['role'] === '') {
 			$this->assertTrue($form->getField('id:roleid_ms')->isAttributePresent(['placeholder' => 'type here to search']));
 		}
 	}
