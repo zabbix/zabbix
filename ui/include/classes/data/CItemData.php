@@ -495,8 +495,15 @@ final class CItemData {
 	 * @return array
 	 */
 	public static function filterSwitchingConfiguration(): array {
+		$all_item_types = -1;
+
 		return [
 			'for_type' => [
+				$all_item_types => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
 				ITEM_TYPE_CALCULATED => [
 					'js-filter-delay-label',
 					'js-filter-delay-field',
