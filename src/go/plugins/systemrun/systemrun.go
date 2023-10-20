@@ -93,4 +93,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
+
+	impl.SetHandleTimeout(true)
 }

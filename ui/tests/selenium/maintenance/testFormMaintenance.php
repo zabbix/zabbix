@@ -73,7 +73,7 @@ class testFormMaintenance extends CLegacyWebTest {
 				'fields' => [
 					'Period type' => 'Daily'
 				],
-				'result' => [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every day']]
+				'result' => [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day']]
 			],
 			[
 				'fields' => [
@@ -81,7 +81,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'Monday' => true,
 					'Sunday' => true
 				],
-				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Sunday of every week']]
+				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Sunday of every 1 week']]
 			],
 			[
 				'fields' => [
@@ -191,7 +191,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'Wednesday' => true,
 					'Friday' => true
 				],
-				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Wednesday, Friday, Sunday of every week']]
+				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Wednesday, Friday, Sunday of every 1 week']]
 			],
 			[
 				'schedule' => 'Monthly',

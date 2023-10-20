@@ -385,12 +385,12 @@ class testPageReportsTopTriggers extends CWebTest {
 			],
 			[
 				'name' => 'Problem Disaster',
-				'time' => self::$time - 90000, // now - 25 hours.
+				'time' => strtotime('yesterday'),
 				'problem_count' => '1'
 			],
 			[
 				'name' => 'Problem Warning',
-				'time' => self::$time - 180000, // now - 50 hours.
+				'time' => strtotime('-2 days'),
 				'problem_count' => '1'
 			],
 			[
@@ -991,7 +991,11 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by date label.
+			/*
+			 * Search by date label.
+			 * Note: This test case depends on time when executed. E.g. if execution time is around 00:00 - 00:30 expected
+			 * result will be different, because some of prepareData generated problems will appear in yesterday's filter.
+			 */
 			[
 				[
 					'date' => [

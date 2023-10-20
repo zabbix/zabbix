@@ -74,6 +74,17 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  default timezone '%s'", config->config->default_timezone);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_enabled: %d", config->config->auditlog_enabled);
+
+	zabbix_log(LOG_LEVEL_TRACE, "item timeouts:");
+	zabbix_log(LOG_LEVEL_TRACE, "  agent:%s", config->config->item_timeouts.agent);
+	zabbix_log(LOG_LEVEL_TRACE, "  simple:%s", config->config->item_timeouts.simple);
+	zabbix_log(LOG_LEVEL_TRACE, "  snmp:%s", config->config->item_timeouts.snmp);
+	zabbix_log(LOG_LEVEL_TRACE, "  external:%s", config->config->item_timeouts.external);
+	zabbix_log(LOG_LEVEL_TRACE, "  odbc:%s", config->config->item_timeouts.odbc);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:%s", config->config->item_timeouts.http);
+	zabbix_log(LOG_LEVEL_TRACE, "  ssh:%s", config->config->item_timeouts.ssh);
+	zabbix_log(LOG_LEVEL_TRACE, "  telnet:%s", config->config->item_timeouts.telnet);
+	zabbix_log(LOG_LEVEL_TRACE, "  script:%s", config->config->item_timeouts.script);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
