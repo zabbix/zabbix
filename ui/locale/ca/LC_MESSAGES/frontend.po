@@ -6760,6 +6760,10 @@ msgstr "Supervisió del registre d'esdeveniments. Retorna un registre"
 msgid "Event name"
 msgstr "Nom de l'esdeveniment"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Parell d'etiquetes d'esdeveniment"
