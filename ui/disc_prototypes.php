@@ -133,7 +133,7 @@ $fields = [
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update}))'.
 											' && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
-										_('History storage period')
+										_('History')
 									],
 	'trends_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'trends' =>						[T_ZBX_STR, O_OPT, null,	null,
@@ -141,7 +141,7 @@ $fields = [
 											' && isset({trends_mode}) && {trends_mode}=='.ITEM_STORAGE_CUSTOM.
 											' && isset({value_type})'.
 											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
-										_('Trend storage period')
+										_('Trends')
 									],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX

@@ -135,7 +135,7 @@ class testAlertingForServices extends CIntegrationTest {
 				'evaltype' => 0,
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_SERVICE,
+						'conditiontype' => ZBX_CONDITION_TYPE_SERVICE,
 						'operator' => 0,
 						'value' => self::$serviceid
 					]
