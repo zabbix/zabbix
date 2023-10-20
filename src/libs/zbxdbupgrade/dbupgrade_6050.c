@@ -1684,7 +1684,7 @@ static int	DBpatch_6050141(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("item_rtdata", 1, &field);
+	return DBadd_foreign_key("item_rtname", 1, &field);
 }
 
 static int	DBpatch_6050142(void)

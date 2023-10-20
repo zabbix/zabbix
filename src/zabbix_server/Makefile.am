@@ -191,3 +191,4 @@ install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(ALERT_SCRIPTS_PATH)"
 	$(MKDIR_P) "$(DESTDIR)$(LOAD_MODULE_PATH)"
 	test -f "$(DESTDIR)$(SERVER_CONFIG_FILE)" || cp "../../conf/zabbix_server.conf" "$(DESTDIR)$(SERVER_CONFIG_FILE)"
+
