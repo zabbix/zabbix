@@ -181,6 +181,42 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 
 typedef struct
 {
+	zbx_uint64_t		hgsetid;
+	char			hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	zbx_vector_uint64_t	hgroupids;
+#define ZBX_LLD_HGSET_OPT_REUSE		0
+#define ZBX_LLD_HGSET_OPT_DELETE	1
+#define ZBX_LLD_HGSET_OPT_INSERT	2
+	int			opt;
+} zbx_lld_hgset_t;
+
+ZBX_PTR_VECTOR_DECL(lld_hgset_ptr, zbx_lld_hgset_t*)
+ZBX_PTR_VECTOR_IMPL(lld_hgset_ptr, zbx_lld_hgset_t*)
+
+static int	lld_hgset_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_hgset_t	*h1 = *((const zbx_lld_hgset_t * const *)d1);
+	const zbx_lld_hgset_t	*h2 = *((const zbx_lld_hgset_t * const *)d2);
+
+	return strcmp(h1->hash_str, h2->hash_str);
+}
+
+static void	lld_hgset_free(zbx_lld_hgset_t *hgset)
+{
+	zbx_vector_uint64_destroy(&hgset->hgroupids);
+	zbx_free(hgset);
+}
+
+static int	lld_hgset_hash_search(const void *d1, const void *d2)
+{
+	const zbx_lld_hgset_t	*h1 = *((const zbx_lld_hgset_t * const *)d1);
+	const char		*h2 = *((const char * const *)d2);
+
+	return strcmp(h1->hash_str, h2);
+}
+
+typedef struct
+{
 	zbx_uint64_t			hostid;
 	zbx_vector_uint64_t		groupids;
 	zbx_vector_uint64_t		old_groupids;
@@ -243,7 +279,7 @@ typedef struct
 	char				tls_connect_orig;
 	char				tls_accept_orig;
 	zbx_uint64_t			hgsetid_orig;
-	int				hgset_idx;
+	zbx_lld_hgset_t			*hgset;
 }
 zbx_lld_host_t;
 
@@ -355,45 +391,9 @@ zbx_lld_group_rights_t;
 
 typedef struct
 {
-	zbx_uint64_t		hgsetid;
-	char			hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	zbx_vector_uint64_t	hgroupids;
-#define ZBX_LLD_HGSET_OPT_REUSE		0
-#define ZBX_LLD_HGSET_OPT_DELETE	1
-#define ZBX_LLD_HGSET_OPT_INSERT	2
-	int			opt;
-} zbx_lld_hgset_t;
-
-ZBX_PTR_VECTOR_DECL(lld_hgset_ptr, zbx_lld_hgset_t*)
-ZBX_PTR_VECTOR_IMPL(lld_hgset_ptr, zbx_lld_hgset_t*)
-
-static int	lld_hgset_compare(const void *d1, const void *d2)
-{
-	const zbx_lld_hgset_t	*h1 = *((const zbx_lld_hgset_t * const *)d1);
-	const zbx_lld_hgset_t	*h2 = *((const zbx_lld_hgset_t * const *)d2);
-
-	return strcmp(h1->hash_str, h2->hash_str);
-}
-
-static void	lld_hgset_free(zbx_lld_hgset_t *hgset)
-{
-	zbx_vector_uint64_destroy(&hgset->hgroupids);
-	zbx_free(hgset);
-}
-
-static int	lld_hgset_hash_search(const void *d1, const void *d2)
-{
-	const zbx_lld_hgset_t	*h1 = *((const zbx_lld_hgset_t * const *)d1);
-	const char		*h2 = *((const char * const *)d2);
-
-	return strcmp(h1->hash_str, h2);
-}
-
-typedef struct
-{
 	zbx_uint64_t		ugsetid;
 	int			permission;
-	int			hgset_idx;
+	zbx_lld_hgset_t		*hgset;
 } zbx_lld_permission_t;
 
 ZBX_VECTOR_DECL(lld_permission, zbx_lld_permission_t)
@@ -405,7 +405,7 @@ static int	lld_permission_compare(const void *d1, const void *d2)
 	const zbx_lld_permission_t	*p2 = (const zbx_lld_permission_t * )d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->ugsetid, p2->ugsetid);
-	ZBX_RETURN_IF_NOT_EQUAL(p1->hgset_idx, p2->hgset_idx);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->hgset, p2->hgset);
 
 	return 0;
 }
@@ -1231,6 +1231,10 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 	for (i = 0; i < hosts->values_num; i++)
 	{
 		host = (zbx_lld_host_t *)hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
 		zbx_vector_uint64_sort(&host->new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_append_array(&host->groupids, host->new_groupids.values,
 				host->new_groupids.values_num);
@@ -1332,6 +1336,12 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
+		if (0 == host->groupids.values_num)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
 		zbx_vector_uint64_append(&hostids, host->hostid);
 
 		if (0 < host->old_groupids.values_num)
@@ -1356,28 +1366,25 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 			}
 		}
 
-		if (0 < host->groupids.values_num)
+		hgset = lld_hgset_make(&host->groupids);
+
+		if (FAIL != (k = zbx_vector_lld_hgset_ptr_search(hgsets, hgset, lld_hgset_compare)))
 		{
-			hgset = lld_hgset_make(&host->groupids);
+			lld_hgset_free(hgset);
 
-			if (FAIL != (k = zbx_vector_lld_hgset_ptr_search(hgsets, hgset, lld_hgset_compare)))
-			{
-				lld_hgset_free(hgset);
+			if (ZBX_LLD_HGSET_OPT_DELETE == hgsets->values[k]->opt)
+				hgsets->values[k]->opt = ZBX_LLD_HGSET_OPT_REUSE;
 
-				if (ZBX_LLD_HGSET_OPT_DELETE == hgsets->values[k]->opt)
-					hgsets->values[k]->opt = ZBX_LLD_HGSET_OPT_REUSE;
-
-				host->hgset_idx = k;
-			}
-			else
-			{
-				hgset->hgsetid = 0;
-				hgset->opt = ZBX_LLD_HGSET_OPT_INSERT;
-				host->hgset_idx = hgsets->values_num;
-				zbx_vector_uint64_append_array(&hgset->hgroupids, host->groupids.values,
-						host->groupids.values_num);
-				zbx_vector_lld_hgset_ptr_append(hgsets, hgset);
-			}
+			host->hgset = hgsets->values[k];
+		}
+		else
+		{
+			hgset->hgsetid = 0;
+			hgset->opt = ZBX_LLD_HGSET_OPT_INSERT;
+			host->hgset = hgset;
+			zbx_vector_uint64_append_array(&hgset->hgroupids, host->groupids.values,
+					host->groupids.values_num);
+			zbx_vector_lld_hgset_ptr_append(hgsets, hgset);
 		}
 
 		if (0 != host->hostid && (0 < host->new_groupids.values_num ||
@@ -1398,8 +1405,8 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 	if (0 < hashes.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hgsetid,hash from hgset where");
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "hash", (const char * const *)hashes.values,
-				hashes.values_num);
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "hash",
+				(const char * const *)hashes.values, hashes.values_num);
 
 		result = zbx_db_select("%s", sql);
 
@@ -1426,13 +1433,12 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		if (0 == host->hostid || 0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID) &&
-				hgsets->values[host->hgset_idx]->hgsetid == host->hgsetid_orig)
+		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID) && host->hgset->hgsetid == host->hgsetid_orig)
 		{
 			host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HGSETID;
 		}
 		else if (0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID) &&
-				hgsets->values[host->hgset_idx]->hgsetid != host->hgsetid_orig)
+				host->hgset->hgsetid != host->hgsetid_orig)
 		{
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HGSETID;
 		}
@@ -1464,11 +1470,14 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 			ZBX_STR2UINT64(hgsetid, row[0]);
 
-			if (FAIL != (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid,
+			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				zbx_vector_uint64_remove(del_hgsetids, i);
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
 			}
+
+			zbx_vector_uint64_remove(del_hgsetids, i);
 		}
 		zbx_db_free_result(result);
 	}
@@ -1542,7 +1551,7 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 			if (FAIL != zbx_vector_uint64_bsearch(&hgset->hgroupids, hostgroupid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				prm.hgset_idx = i;
+				prm.hgset = hgset;
 
 				if (FAIL != (k = zbx_vector_lld_permission_search(permissions, prm,
 						lld_permission_compare)))
@@ -3640,8 +3649,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	{
 		zbx_lld_permission_t	*permission = &permissions->values[i];
 
-		zbx_db_insert_add_values(&db_insert_permission, permission->ugsetid,
-				hgsets->values[permission->hgset_idx]->hgsetid, permission->permission);
+		zbx_db_insert_add_values(&db_insert_permission, permission->ugsetid, permission->hgset->hgsetid,
+				permission->permission);
 	}
 
 	for (i = 0; i < hosts->values_num; i++)
@@ -3665,8 +3674,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
-			zbx_db_insert_add_values(&db_insert_host_hgset, host->hostid,
-					hgsets->values[host->hgset_idx]->hgsetid);
+			zbx_db_insert_add_values(&db_insert_host_hgset, host->hostid, host->hgset->hgsetid);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 			{
@@ -3878,7 +3886,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 						"update host_hgset"
 						" set hgsetid=" ZBX_FS_UI64
 						" where hostid=" ZBX_FS_UI64 ";\n",
-						hgsets->values[host->hgset_idx]->hgsetid, host->hostid);
+						host->hgset->hgsetid, host->hostid);
 			}
 		}
 
