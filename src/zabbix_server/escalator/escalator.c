@@ -2121,8 +2121,8 @@ static void	escalation_execute_update_operations(zbx_db_event *event, const zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check whether the escalation trigger and related items, hosts are *
- *          not deleted or disabled.                                          *
+ * Purpose: Checks whether the escalation trigger and related items, hosts    *
+ *          are not deleted or disabled.                                      *
  *                                                                            *
  * Parameters: triggerid   - [IN] id of trigger to check                      *
  *             source      - [IN] escalation event source                     *
@@ -2309,7 +2309,7 @@ static const char	*escalation_status_string(unsigned char status)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check whether escalation must be cancelled, deleted, skipped or   *
+ * Purpose: Checks whether escalation must be cancelled, deleted, skipped or  *
  *          processed.                                                        *
  *                                                                            *
  * Parameters: escalation - [IN] escalation to check                          *
