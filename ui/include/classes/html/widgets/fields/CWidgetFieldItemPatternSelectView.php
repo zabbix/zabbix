@@ -46,6 +46,23 @@ class CWidgetFieldItemPatternSelectView extends CWidgetFieldView {
 	}
 
 	public function getView(): CPatternSelect {
+		$parameters = $this->field->isTemplateDashboard()
+			? [
+				'srctbl' => 'items',
+				'srcfld1' => 'name',
+				'hostid' => $this->field->getTemplateId(),
+				'hide_host_filter' => true,
+				'dstfrm' => $this->form_name,
+				'dstfld1' => zbx_formatDomId($this->field->getName().'[]')
+			]
+			: [
+				'srctbl' => 'items',
+				'srcfld1' => 'name',
+				'real_hosts' => true,
+				'dstfrm' => $this->form_name,
+				'dstfld1' => zbx_formatDomId($this->field->getName().'[]')
+			];
+
 		return (new CPatternSelect([
 			'name' => $this->field->getName().'[]',
 			'object_name' => 'items',
@@ -53,13 +70,7 @@ class CWidgetFieldItemPatternSelectView extends CWidgetFieldView {
 			'placeholder' => $this->placeholder,
 			'wildcard_allowed' => 1,
 			'popup' => [
-				'parameters' => [
-					'srctbl' => 'items',
-					'srcfld1' => 'name',
-					'real_hosts' => 1,
-					'dstfrm' => $this->form_name,
-					'dstfld1' => zbx_formatDomId($this->field->getName().'[]')
-				]
+				'parameters' => $parameters
 			],
 			'add_post_js' => false
 		]))

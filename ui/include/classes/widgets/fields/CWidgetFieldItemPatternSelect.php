@@ -35,4 +35,14 @@ class CWidgetFieldItemPatternSelect extends CWidgetField {
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_STRINGS_UTF8]);
 	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		$validation_rules = parent::getValidationRules($strict);
+
+		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
+		}
+
+		return $validation_rules;
+	}
 }
