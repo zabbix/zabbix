@@ -41,6 +41,11 @@ const (
 	keyStatusVars             = "mysql.get_status_variables"
 	keyVersion                = "mysql.version"
 
+	uriParam        = "URI"
+	tlsConnectParam = "TLSConnect"
+	tlsCAParam      = "TLSCAFile"
+	tlsCertParam    = "TLSCertFile"
+	tlsKeyParam     = "TLSKeyFile"
 	masterHostParam = "Master"
 )
 
@@ -48,15 +53,15 @@ var (
 	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "3306"}
 
 	// Common params: [URI|Session][,User][,Password]
-	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
+	paramURI = metric.NewConnParam(uriParam, "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	paramUsername    = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
 	paramPassword    = metric.NewConnParam("Password", "User's password.").WithDefault("")
-	paramTLSConnect  = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
-	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
-	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
-	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
+	paramTLSConnect  = metric.NewSessionOnlyParam(tlsConnectParam, "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewSessionOnlyParam(tlsCAParam, "TLS ca file path.").WithDefault("")
+	paramTLSCertFile = metric.NewSessionOnlyParam(tlsCertParam, "TLS cert file path.").WithDefault("")
+	paramTLSKeyFile  = metric.NewSessionOnlyParam(tlsKeyParam, "TLS key file path.").WithDefault("")
 
 	metrics = metric.MetricSet{
 		keyCustomQuery: metric.New("Returns result of a custom query.",
@@ -97,8 +102,9 @@ var (
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(ctx context.Context, conn MyClient,
-	params map[string]string, extraParams ...string) (res interface{}, err error)
+type handlerFunc func(
+	ctx context.Context, conn MyClient, params map[string]string, extraParams ...string,
+) (res interface{}, err error)
 
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {

@@ -554,7 +554,9 @@ class CWidgetGeoMap extends CWidget {
 	setEditMode() {
 		super.setEditMode();
 
-		this._map.severityFilterControl.close();
-		this._map.severityFilterControl.disable();
+		if (this._map !== null) {
+			this._map.severityFilterControl.close();
+			this._map.severityFilterControl.disable();
+		}
 	}
 }
