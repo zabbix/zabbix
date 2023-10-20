@@ -54,7 +54,7 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 		if (0 == *macro_used)
 			zbx_vector_uint64_remove(hostids, 0);
 		else
-		 	hostids->values_num = 1;
+			hostids->values_num = 1;
 
 		if (0 == hostids->values_num)
 			goto out;
