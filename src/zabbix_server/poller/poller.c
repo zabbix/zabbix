@@ -55,7 +55,7 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 }
 
 static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	int	res = FAIL;
 
@@ -64,7 +64,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = zbx_agent_get_value(item, config_comms->config_source_ip, result);
+			res = zbx_agent_get_value(item, config_comms->config_source_ip, program_type, result);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -507,7 +507,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, unsigned char program_type)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -538,7 +538,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 	{
 		if (SUCCEED == errcodes[0])
 			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
-				config_startup_time);
+				config_startup_time, program_type);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -630,7 +630,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  **********************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
-		int config_unreachable_delay)
+		int config_unreachable_delay, unsigned char program_type)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
@@ -655,7 +655,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_vector_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
-	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time);
+	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
+			program_type);
 
 	zbx_timespec(&timespec);
 
@@ -834,7 +835,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
 				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
-				poller_args_in->config_unreachable_period, poller_args_in->config_unreachable_delay);
+				poller_args_in->config_unreachable_period, poller_args_in->config_unreachable_delay,
+				info->program_type);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

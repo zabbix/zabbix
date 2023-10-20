@@ -48,7 +48,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		unsigned char expand_macros);
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time);
+		int config_startup_time, unsigned char program_type);
 void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 

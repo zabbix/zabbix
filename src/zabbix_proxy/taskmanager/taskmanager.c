@@ -58,7 +58,7 @@ extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
  **************************************************************************************/
 static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, time_t now, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, int config_enable_remote_commands,
-		int config_log_remote_commands)
+		int config_log_remote_commands, unsigned char program_type)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -138,7 +138,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	}
 
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_trapper_timeout,
-			config_source_ip, CONFIG_FORKS, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
+			config_source_ip, CONFIG_FORKS, program_type, 0 == alertid ? &info : NULL, error, sizeof(error),
+			NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}
@@ -229,7 +230,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
  *                                                                            *
  ******************************************************************************/
 static int	tm_execute_data_json(int type, const char *data, char **info,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	struct zbx_json_parse	jp_data;
 
@@ -242,8 +243,8 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 	switch (type)
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
-			return zbx_trapper_item_test_run(&jp_data, 0, info, config_comms,
-					config_startup_time);
+			return zbx_trapper_item_test_run(&jp_data, 0, info, config_comms, config_startup_time,
+					program_type);
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			return zbx_diag_get_info(&jp_data, info);
 	}
@@ -295,7 +296,8 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
-			ret = tm_execute_data_json(data_type, row[1], &info, config_comms, config_startup_time);
+			ret = tm_execute_data_json(data_type, row[1], &info, config_comms, config_startup_time,
+					program_type);
 			break;
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
@@ -367,7 +369,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now,
 						config_comms->config_timeout, config_comms->config_trapper_timeout,
 						config_comms->config_source_ip, config_enable_remote_commands,
-						config_log_remote_commands))
+						config_log_remote_commands, program_type))
 				{
 					processed_num++;
 				}

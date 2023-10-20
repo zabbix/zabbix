@@ -58,6 +58,7 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
  *                                                                            *
  * Parameters: item             - [IN] item we are interested in              *
  *             config_source_ip - [IN]                                        *
+ *             program_type     - [IN]                                        *
  *             result           - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
@@ -70,7 +71,8 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, unsigned char program_type,
+		AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;

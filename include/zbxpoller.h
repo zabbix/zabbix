@@ -32,7 +32,8 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *inter
 void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result);
 
 int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
-int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
+int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, unsigned char program_type,
+		AGENT_RESULT *result);
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 #endif

@@ -420,7 +420,7 @@ out:
 }
 
 static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		const char *config_source_ip, char *error, size_t max_error_len)
+		const char *config_source_ip, unsigned char program_type, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -461,7 +461,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = zbx_agent_get_value(&item, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = zbx_agent_get_value(&item, config_source_ip, program_type, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -483,7 +483,8 @@ fail:
 }
 
 static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, const char *config_source_ip, int config_forks[], char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, int config_forks[], unsigned char program_type,
+		char *error, size_t max_error_len)
 {
 	zbx_dc_interface_t	interface;
 
@@ -497,7 +498,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 				error, max_error_len);
 	}
 
-	return passive_command_send_and_result_fetch(host, command, result, config_source_ip, error,
+	return passive_command_send_and_result_fetch(host, command, result, config_source_ip, program_type, error,
 			max_error_len);
 }
 
@@ -842,7 +843,7 @@ out:
  **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip, int config_forks[],
-		char **result, char *error, size_t max_error_len, char **debug)
+		unsigned char program_type, char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -861,7 +862,8 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
-							config_source_ip, config_forks, error, max_error_len);
+							config_source_ip, config_forks, program_type, error,
+							max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
