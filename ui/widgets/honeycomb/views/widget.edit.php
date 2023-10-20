@@ -67,16 +67,16 @@ $form
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addFieldsGroup(
-				getPrimaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-primary')
+				getPrimaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-primary-label')
 			)
 			->addFieldsGroup(
-				getSecondaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-secondary')
+				getSecondaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-secondary-label')
 			)
 			->addField(
 				new CWidgetFieldColorView($data['fields']['bg_color'])
 			)
 			->addFieldsGroup(
-				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('js-row-thresholds')
+				getThresholdFieldsGroupView($form, $data['fields'])
 			)
 	)
 	->includeJsFile('widget.edit.js.php')
@@ -113,7 +113,9 @@ function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): C
 			$label_size_field->getLabel(),
 			new CFormField([
 				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				($label_size_field->getView())->setId('primary_label_custom_input'),
+				($label_size_field->getView())
+					->addClass('custom_size_input')
+					->setId('primary_label_custom_size'),
 				'%'
 			])
 		])
@@ -153,7 +155,9 @@ function getSecondaryLabelFieldsGroupView(CWidgetFormView $form, array $fields):
 			$label_size_field->getLabel(),
 			new CFormField([
 				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				($label_size_field->getView())->setId('secondary_label_custom_input'),
+				($label_size_field->getView())
+					->addClass('custom_size_input')
+					->setId('secondary_label_custom_size'),
 				'%'
 			])
 		])

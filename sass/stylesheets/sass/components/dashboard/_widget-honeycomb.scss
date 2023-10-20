@@ -13,8 +13,8 @@ form.dashboard-widget-honeycomb {
 	}
 
 	.fields-group {
-		&.fields-group-primary,
-		&.fields-group-secondary {
+		&.fields-group-primary-label,
+		&.fields-group-secondary-label {
 			display: grid;
 			grid-template-columns: minmax(25px, max-content) 1fr minmax(70px, max-content) 15px minmax(90px, max-content) 38px;
 			align-items: center;
@@ -24,10 +24,14 @@ form.dashboard-widget-honeycomb {
 			.form-field {
 				line-height: 24px;
 			}
+
+			.custom_size_input {
+				margin-right: 5px;
+			}
 		}
 
-		&.fields-group-primary,
-		&.fields-group-secondary {
+		&.fields-group-primary-label,
+		&.fields-group-secondary-label {
 			.form-field:nth-child(1) {
 				grid-column: 1 / -1;
 			}

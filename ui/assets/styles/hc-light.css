@@ -3954,15 +3954,17 @@ div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
 form.dashboard-widget-honeycomb #tags_table_item_tags .form_row td:nth-child(3) input[type="text"],
 form.dashboard-widget-honeycomb #tags_table_host_tags .form_row td:nth-child(3) input[type="text"] {
   width: 159px !important; }
-form.dashboard-widget-honeycomb .fields-group.fields-group-primary, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary {
+form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
   grid-template-columns: minmax(25px, max-content) 1fr minmax(70px, max-content) 15px minmax(90px, max-content) 38px;
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-honeycomb .fields-group.fields-group-primary .form-field, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary .form-field {
+  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .form-field, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .form-field {
     line-height: 24px; }
-form.dashboard-widget-honeycomb .fields-group.fields-group-primary .form-field:nth-child(1), form.dashboard-widget-honeycomb .fields-group.fields-group-secondary .form-field:nth-child(1) {
+  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .custom_size_input, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .custom_size_input {
+    margin-right: 5px; }
+form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .form-field:nth-child(1), form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .form-field:nth-child(1) {
   grid-column: 1 / -1; }
 form.dashboard-widget-honeycomb .fields-group .form-row-interpolation {
   margin-bottom: 10px; }

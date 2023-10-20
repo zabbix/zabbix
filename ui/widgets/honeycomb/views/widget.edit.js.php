@@ -59,51 +59,52 @@ window.widget_honeycomb_form = new class {
 	#updateForm(trigger = null) {
 		const primary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY ?>}`);
 		const secondary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY ?>}`);
+		const is_primary_size_custom = this.#form
+			.querySelector('[name="primary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
+		const is_secondary_size_custom = this.#form
+			.querySelector('[name="secondary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
 
-		if ([primary_show, secondary_show].filter((checkbox) =>
-			checkbox.checked && !checkbox.disabled).length === 0) {
+		if ([primary_show, secondary_show].filter((checkbox) => checkbox.checked && !checkbox.disabled).length === 0) {
 			trigger.checked = true;
 			this.#updateForm(trigger);
 		}
 
-		for (const element of this.#form.querySelectorAll('.fields-group-primary')) {
+		for (const element of this.#form.querySelectorAll('.fields-group-primary-label')) {
 			element.style.display = primary_show.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input, textarea')) {
-				input.disabled = !primary_show.checked;
+				if (input.id === 'primary_label_custom_size') {
+					input.style.display = is_primary_size_custom && primary_show.checked ? '' : 'none';
+					input.nextSibling.nodeValue = is_primary_size_custom && primary_show.checked ? '%' : '';
+					input.disabled = !is_primary_size_custom || !primary_show.checked;
+				}
+				else {
+					input.disabled = !primary_show.checked;
+				}
 			}
 		}
 
-		const is_primary_size_custom = this.#form
-			.querySelector('[name="primary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
-		const primary_size_input = document.getElementById('primary_label_custom_input');
-
-		primary_size_input.disabled = !is_primary_size_custom || !primary_show.checked;
-		primary_size_input.style.display = is_primary_size_custom && primary_show.checked ? '' : 'none';
-		primary_size_input.nextSibling.nodeValue = is_primary_size_custom && primary_show.checked ? ' %' : '';
-
 		if (document.activeElement === document.getElementById('primary_label_size_type_1')) {
-			primary_size_input.focus();
+			document.getElementById('primary_label_custom_size').focus();
 		}
 
-		for (const element of this.#form.querySelectorAll('.fields-group-secondary')) {
+		for (const element of this.#form.querySelectorAll('.fields-group-secondary-label')) {
 			element.style.display = secondary_show.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input, textarea')) {
-				input.disabled = !secondary_show.checked;
+				if (input.id === 'secondary_label_custom_size') {
+					input.style.display = is_secondary_size_custom && secondary_show.checked ? '' : 'none';
+					input.nextSibling.nodeValue = is_secondary_size_custom && secondary_show.checked ? '%' : '';
+					input.disabled = !is_secondary_size_custom || !secondary_show.checked;
+				}
+				else {
+					input.disabled = !secondary_show.checked;
+				}
 			}
 		}
 
-		const is_secondary_size_custom = this.#form
-			.querySelector('[name="secondary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
-		const secondary_size_input = document.getElementById('secondary_label_custom_input');
-
-		secondary_size_input.disabled = !is_secondary_size_custom || !secondary_show.checked;
-		secondary_size_input.style.display = is_secondary_size_custom && secondary_show.checked ? '' : 'none';
-		secondary_size_input.nextSibling.nodeValue = is_secondary_size_custom && secondary_show.checked ? ' %' : '';
-
 		if (document.activeElement === document.getElementById('secondary_label_size_type_1')) {
-			secondary_size_input.focus();
+			document.getElementById('secondary_label_custom_size').focus();
 		}
 
 		const filled_thresholds_count = this.#countFilledThresholds();
