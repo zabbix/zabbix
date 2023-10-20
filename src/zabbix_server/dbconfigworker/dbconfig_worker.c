@@ -29,9 +29,11 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxtypes.h"
 
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
+#define ZBX_DBSYNC_BATCH_SIZE		1000
 
 static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
@@ -42,6 +44,8 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 	zbx_dc_um_handle_t	*um_handle;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql_select = NULL;
+	size_t			sql_select_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -49,73 +53,82 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 	{
 		if (0 == *macro_used)
 			zbx_vector_uint64_remove(hostids, 0);
+		else
+		 	hostids->values_num = 1;
 
 		if (0 == hostids->values_num)
 			goto out;
 	}
 
 	um_handle = zbx_dc_open_user_macros();
+
 	zbx_db_begin();
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,i.hostid,i.name,ir.name_resolved"
-			" from items i,item_rtname ir"
-			" where i.name like '%%{$%%' and ir.itemid=i.itemid");
-	if (0 != hostids->values[0])
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values,
-				hostids->values_num);
-	}
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.itemid");
-
-	result = zbx_db_select("%s", sql);
-
-	sql_offset = 0;
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "fetch started");
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	for (zbx_uint64_t *batch = hostids->values; batch < hostids->values + hostids->values_num;
+			batch += ZBX_DBSYNC_BATCH_SIZE)
 	{
-		zbx_uint64_t	itemid, hostid;
-		const char	*name_resolved_current;
-		char		*name_resolved_new;
+		int	batch_size = MIN(ZBX_DBSYNC_BATCH_SIZE, hostids->values + hostids->values_num - batch);
+		size_t	sql_select_offset = 0;
 
-		(*processed_num)++;
-
-		ZBX_STR2UINT64(itemid, row[0]);
-		ZBX_STR2UINT64(hostid, row[1]);
-		name_resolved_new = zbx_strdup(NULL, row[2]);
-		name_resolved_current = row[3];
-
-		(void)zbx_dc_expand_user_macros(um_handle, &name_resolved_new, &hostid, 1, NULL);
-
-		if (0 != strcmp(name_resolved_current, name_resolved_new))
+		zbx_strcpy_alloc(&sql_select, &sql_select_alloc, &sql_select_offset,
+				"select i.itemid,i.hostid,i.name,ir.name_resolved"
+				" from items i,item_rtname ir"
+				" where i.name like '%%{$%%' and ir.itemid=i.itemid");
+		if (0 != batch[0])
 		{
-			char	*name_resolved_esc;
-
-			name_resolved_esc = zbx_db_dyn_escape_string(name_resolved_new);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_rtname set"
-					" name_resolved='%s',name_resolved_upper=upper('%s')"
-					" where itemid=" ZBX_FS_UI64 ";\n",
-					name_resolved_esc, name_resolved_esc, itemid);
-			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-			zbx_free(name_resolved_esc);
-			(*updated_num)++;
+			zbx_strcpy_alloc(&sql_select, &sql_select_alloc, &sql_select_offset, " and");
+			zbx_db_add_condition_alloc(&sql_select, &sql_select_alloc, &sql_select_offset, "i.hostid",
+					batch, batch_size);
 		}
+		zbx_strcpy_alloc(&sql_select, &sql_select_alloc, &sql_select_offset, " order by i.itemid");
 
-		zbx_free(name_resolved_new);
+		result = zbx_db_select("%s", sql_select);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "fetch started");
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	itemid, hostid;
+			const char	*name_resolved_current;
+			char		*name_resolved_new;
+
+			(*processed_num)++;
+
+			ZBX_STR2UINT64(itemid, row[0]);
+			ZBX_STR2UINT64(hostid, row[1]);
+			name_resolved_new = zbx_strdup(NULL, row[2]);
+			name_resolved_current = row[3];
+
+			(void)zbx_dc_expand_user_macros(um_handle, &name_resolved_new, &hostid, 1, NULL);
+
+			if (0 != strcmp(name_resolved_current, name_resolved_new))
+			{
+				char	*name_resolved_esc;
+
+				name_resolved_esc = zbx_db_dyn_escape_string(name_resolved_new);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_rtname set"
+						" name_resolved='%s',name_resolved_upper=upper('%s')"
+						" where itemid=" ZBX_FS_UI64 ";\n",
+						name_resolved_esc, name_resolved_esc, itemid);
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+				zbx_free(name_resolved_esc);
+				(*updated_num)++;
+			}
+
+			zbx_free(name_resolved_new);
+		}
+		zbx_db_free_result(result);
 	}
-	zbx_db_free_result(result);
 
 	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		zbx_db_execute("%s", sql);
 
+	zbx_free(sql_select);
 	zbx_free(sql);
 	zbx_dc_close_user_macros(um_handle);
 	zbx_db_commit();
