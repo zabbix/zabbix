@@ -28,6 +28,8 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 	public const DEFAULT_VIEW = \CWidgetFieldCheckBoxListView::class;
 	public const DEFAULT_VALUE = [];
 
+	public const EMPTY_VALUE = '';
+
 	private array $values;
 
 	public function __construct(string $name, string $label = null, array $values = []) {
@@ -46,7 +48,7 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 	}
 
 	public function setValue($value): self {
-		$this->value = (array) $value;
+		$this->value = $value === self::EMPTY_VALUE ? [] : (array) $value;
 
 		return $this;
 	}
