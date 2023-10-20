@@ -1,9 +1,28 @@
 Changes for 7.0.0alpha7
 
 New features:
+.........T [ZBXNEXT-8552] added FortiGate by SNMP and FortiGate by HTTP templates (aiantsen)
+..F....PS. [ZBXNEXT-5524] added vmware.eventlog event filtering by severity; added event type and extended event source in latest data (mprihodko)
+.......PS. [ZBXNEXT-7754] added info with list of vm guest ip to vmware.vm.discovery (MVekslers)
+...G...PS. [ZBXNEXT-8726] refactored item timeout handling on Server and Proxy (dgoloscapov, wiper)
+..F.....S. [ZBXNEXT-6741] added all dashboard pages to PDF document sent in scheduled report (dfofanovs, mprihodko)
+..F....... [ZBXNEXT-8750] implemented label changes for history and trends storage parameters (dpetra)
+.........T [ZBXNEXT-8727] added additional metrics in Cisco Meraki organization by HTTP template (egordymov)
+..F....... [ZBXNEXT-8716] implemented usability improvements for item mass update form, preprocessing tab (dpetra)
 .........T [ZBXNEXT-7097] added item and trigger for monitoring PostgreSQL version into PostgreSQL by ODBC and PostgreSQL by Zabbix agent 2 templates (akotsegubov)
 
 Bug fixes:
+...G...... [ZBX-23173] fixed memory leak in agent 2 for Windows Events processing on MS Windows (akozlovs, Andris, esneiders, MVekslers)
+.......PS. [ZBX-23484] fixed incorrect handling of float values when testing calculated items (dgoloscapov, wiper)
+.........T [ZBX-23563] fixed JSONPath for rowshare locks metric in PostgreSQL by Zabbix agent 2 template (drasikhov)
+.........T [ZBX-22907] removed unused LLD macro in PostgreSQL by Zabbix agent template (drasikhov)
+.........T [ZBX-23539] fixed missing filesystem label macro in Windows by Zabbix agent templates, added discard to filesystems discovery (drasikhov)
+.......PS. [ZBX-23377] added support for vmware perfCounter with type nanosecond (MVekslers)
+........S. [ZBX-23012] possible optimization of the sql queries when updating LLD items (kprutkovs)
+..F....... [ZBX-23554] fixed translation strings that were causing issue with gettext extension (vmurzins)
+A.F....... [ZBX-23318] fixed 'replace' preprocessing step parameter validation checking if backslashes are escaped (miks)
+A.F.....S. [ZBX-23270] renamed trigger name condition to event name condition (agriscenko, asitals)
+...G...... [ZBX-23340] fixed tls parameter handling in mysql plugin for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-23259] fixed field focus on label click in user group mapping form for user authentication (epulke)
 ..F....... [ZBX-22977] fixed positioning of hidden checkbox inputs and fixed autofocus in massupdate templates/hosts (dfofanovs)
 .......PS. [ZBX-23475] fixed memory leak when SNMP walk to JSON preprocessing step fails due to parsing error (dgoloscapov)
