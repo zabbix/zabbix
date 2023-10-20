@@ -1722,6 +1722,11 @@ static int	DBpatch_6050146(void)
 	return DBdrop_trigger("items_name_upper_update", "items");
 }
 
+static int	DBpatch_6050147(void)
+{
+	return DBdrop_function("items_name_upper_upper");
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1873,5 +1878,6 @@ DBPATCH_ADD(6050143, 0, 1)
 DBPATCH_ADD(6050144, 0, 1)
 DBPATCH_ADD(6050145, 0, 1)
 DBPATCH_ADD(6050146, 0, 1)
+DBPATCH_ADD(6050147, 0, 1)
 
 DBPATCH_END()

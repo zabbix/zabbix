@@ -624,6 +624,20 @@ int	DBdrop_trigger(const char *trigger_name, const char *table_name)
 	return SUCCEED;
 }
 
+int	DBdrop_function(const char *function_name)
+{
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_DB_OK > zbx_db_execute("drop function %s" , function_name))
+	{
+		return FAIL;
+	}
+#else
+	ZBX_UNUSED(table_name);
+#endif
+
+	return SUCCEED;
+}
+
 int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, const zbx_db_field_t *old_field)
 {
 	char	*sql = NULL;
