@@ -76,7 +76,6 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
-	int		timeout_sec;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -114,19 +113,12 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 			goto out;
 	}
 
-	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
-	{
-		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
-		/* failures are handled there */
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
-
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
-			timeout_sec + 1, item->host.tls_connect, tls_arg1, tls_arg2))
+			item->timeout + 1, item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
 
-		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)timeout_sec,
+		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)item->timeout,
 				ZBX_TCP_PROTOCOL, 0))
 		{
 			ret = NETWORK_ERROR;

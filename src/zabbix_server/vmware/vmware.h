@@ -215,7 +215,8 @@ ZBX_PTR_VECTOR_DECL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
 #define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		4
 #define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	5
 #define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		6
-#define ZBX_VMWARE_DEV_PROPS_NUM			7
+#define ZBX_VMWARE_DEV_PROPS_IFIPS			7
+#define ZBX_VMWARE_DEV_PROPS_NUM			8
 
 typedef struct
 {
@@ -675,6 +676,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 #define ZBX_VMWARE_UNIT_TERABYTES		12
 #define ZBX_VMWARE_UNIT_WATT			13
 #define ZBX_VMWARE_UNIT_CELSIUS			14
+#define ZBX_VMWARE_UNIT_NANOSECOND		15
 
 #	define ZBX_XNN(NN)			"*[local-name()='" NN "']"
 #	define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)

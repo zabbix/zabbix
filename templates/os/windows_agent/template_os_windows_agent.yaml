@@ -1367,10 +1367,31 @@ zabbix_export:
           lld_macro_paths:
             - lld_macro: '{#FSDRIVETYPE}'
               path: $.fsdrivetype
+            - lld_macro: '{#FSLABEL}'
+              path: $.fslabel
             - lld_macro: '{#FSNAME}'
               path: $.fsname
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var filesystems = JSON.parse(value);
+                  
+                  result = filesystems.map(function (filesystem) {
+                      return {
+                          'fsname': filesystem.fsname,
+                          'fstype': filesystem.fstype,
+                          'fslabel': filesystem.fslabel,
+                          'fsdrivetype': filesystem.fsdrivetype
+                      };
+                  });
+                  
+                  return JSON.stringify(result);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: os

@@ -309,11 +309,11 @@ $item_form_list
 	// Append history to form list.
 	->addRow(
 		(new CVisibilityBox('visible[history]', 'history_div', _('Original')))
-			->setLabel(_('History storage period')),
+			->setLabel(_('History')),
 		(new CDiv([
 			(new CRadioButtonList('history_mode', ITEM_STORAGE_CUSTOM))
-				->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('history', DB::getDefault('items', 'history')))
@@ -325,11 +325,11 @@ $item_form_list
 	)
 	// Append trends to form list.
 	->addRow(
-		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trend storage period')),
+		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trends')),
 		(new CDiv([
 			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('trends', DB::getDefault('items', 'trends')))
