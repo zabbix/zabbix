@@ -21,8 +21,6 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "ipmi_manager.h"
-
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
