@@ -1723,15 +1723,60 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets list of ip for virtual machine network interface             *
+ *                                                                            *
+ * Parameters: details       - [IN] xml document containing vm data           *
+ *             guestnet_node - [IN] xml node containing list of guest ips     *
+ *             mac_addr      - [IN] mac address of network interface          *
+ *                                                                            *
+ * Return value: json with array of ip                                        *
+ *                                                                            *
+ ******************************************************************************/
+static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_node, const char *mac_addr)
+{
+	char			xpath[VMWARE_SHORT_STR_LEN], *val = NULL;
+	zbx_vector_str_t	ips;
+
+	zbx_vector_str_create(&ips);
+
+	zbx_snprintf(xpath, sizeof(xpath), "*[*[local-name()='macAddress']/text()='%s']" ZBX_XPATH_LN("ipAddress") ,
+			mac_addr);
+
+	if (SUCCEED == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
+	{
+		struct zbx_json	json_data;
+		int		i;
+
+		zbx_json_initarray(&json_data, VMWARE_SHORT_STR_LEN);
+
+		for (i = 0; i < ips.values_num; i++)
+			zbx_json_addstring(&json_data, NULL, ips.values[i], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json_data);
+		val = zbx_strdup(val, json_data.buffer);
+		zbx_json_free(&json_data);
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() empty list of guest ips for mac:%s", __func__, mac_addr);
+
+	zbx_vector_str_clear_ext(&ips, zbx_str_free);
+	zbx_vector_str_destroy(&ips);
+
+	return val;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets virtual machine network interface devices' additional        *
  * properties (props member of zbx_vmware_dev_t)                              *
  *                                                                            *
  * Parameters: details - [IN] an xml document containing virtual machine data *
  *             xmlNode - [IN] an xml document node that corresponds to given  *
  *                            network interface device                        *
+ *             xmlNode - [IN] an xml node containing list of guest ips        *
  *                                                                            *
  ******************************************************************************/
-static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
+static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xmlNode *guestnet_node)
 {
 	char	**props;
 	xmlChar	*attr_value;
@@ -1760,6 +1805,8 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portgroupKey"));
 	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portKey"));
+	props[ZBX_VMWARE_DEV_PROPS_IFIPS] = vmware_vm_get_nic_device_ips(details, guestnet_node,
+			props[ZBX_VMWARE_DEV_PROPS_IFMAC]);
 
 	return props;
 }
@@ -1780,6 +1827,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
+	xmlNode		*guestnet_node;
 	int		i, nics = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1796,6 +1844,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	guestnet_node = zbx_xml_doc_get(details, ZBX_XPATH_PROP_NAME("guest.net"));
 	zbx_vector_ptr_reserve(&vm->devs, (size_t)(nodeset->nodeNr + vm->devs.values_alloc));
 
 	for (i = 0; i < nodeset->nodeNr; i++)
@@ -1811,7 +1860,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		dev->instance = key;
 		dev->label = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
 				"*[local-name()='deviceInfo']/*[local-name()='label']");
-		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i]);
+		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i], guestnet_node);
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
@@ -2113,6 +2162,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>customValue</ns0:pathSet>"	\
 					"<ns0:pathSet>availableField</ns0:pathSet>"	\
 					"<ns0:pathSet>triggeredAlarmState</ns0:pathSet>"\
+					"<ns0:pathSet>guest.net</ns0:pathSet>"		\
 					"%s"						\
 					"%s"						\
 				"</ns0:propSet>"					\

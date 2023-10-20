@@ -904,22 +904,9 @@ int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsuppo
 	if (0 != zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		goto out;
 
-	/* at this point we are sure the TimescaleDB extension is enabled in Zabbix */
+	/* at this point we know the TimescaleDB extension is enabled in Zabbix */
 
 	zbx_tsdb_info_extract(info);
-
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
-	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
-	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
-	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > info->current_version)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
-				" required is %d.", (unsigned long)info->current_version,
-				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
-		info->ext_err_code = ZBX_TIMESCALEDB_POSTGRES_TOO_OLD;
-		ret = FAIL;
-		goto out;
-	}
 
 	if (DB_VERSION_FAILED_TO_RETRIEVE == info->ext_flag)
 	{
@@ -1115,7 +1102,11 @@ void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
 	zbx_free(version_info->ext_friendly_current_version);
 }
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 #ifdef HAVE_ORACLE
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
@@ -1365,7 +1356,11 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num)
 {
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 	int	i, cnt = 0;
 	char	*value_esc;

@@ -1629,11 +1629,47 @@ static int	DBpatch_6050138(void)
 
 static int	DBpatch_6050139(void)
 {
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select wf.widgetid from widget_field wf,widget w"
+			" where wf.name='interface_type' and w.type='hostavail' and w.widgetid=wf.widgetid"
+			" group by wf.widgetid having count(wf.name)=1");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "name", "type", "value_int",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, "only_totals", 0, 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050140(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
-			" (" ZBX_FS_UI64 ",'piechart','widgets/piechart',%d,'[]')", zbx_db_get_maxid("module"), 1))
+			" (" ZBX_FS_UI64 ",'honeycomb','widgets/honeycomb',%d,'[]')", zbx_db_get_maxid("module"), 1))
 	{
 		return FAIL;
 	}
@@ -1785,5 +1821,6 @@ DBPATCH_ADD(6050136, 0, 1)
 DBPATCH_ADD(6050137, 0, 1)
 DBPATCH_ADD(6050138, 0, 1)
 DBPATCH_ADD(6050139, 0, 1)
+DBPATCH_ADD(6050140, 0, 1)
 
 DBPATCH_END()

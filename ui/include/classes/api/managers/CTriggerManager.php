@@ -60,7 +60,7 @@ class CTriggerManager {
 		$db_actions = DBselect(
 			'SELECT ac.conditionid,ac.actionid'.
 			' FROM conditions ac'.
-			' WHERE ac.conditiontype='.CONDITION_TYPE_TRIGGER.
+			' WHERE ac.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
 				' AND '.dbConditionString('ac.value', $del_triggerids)
 		);
 		while ($db_action = DBfetch($db_actions)) {

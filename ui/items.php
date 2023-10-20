@@ -59,7 +59,7 @@ $fields = [
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update}))'.
 										' && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
-										_('History storage period')
+										_('History')
 									],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
@@ -76,7 +76,7 @@ $fields = [
 										' && isset({trends_mode}) && {trends_mode}=='.ITEM_STORAGE_CUSTOM.
 										' && isset({value_type})'.
 										' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
-										_('Trend storage period')
+										_('Trends')
 									],
 	'value_type' =>					[T_ZBX_INT, O_OPT, null,
 										IN([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
@@ -684,7 +684,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = (bool) API::History()->clear([getRequest('itemid')]);
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massenable', 'item.massdisable']) && hasRequest('group_itemid')) {
 	$itemids = getRequest('group_itemid');
@@ -720,7 +720,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
 	$group_itemid = getRequest('group_itemid');

@@ -936,8 +936,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if (array_key_exists($data['f_num'], $functionids)) {
 				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
 					'token' => $token,
-					'function' => $data['function'],
-					'parameters' => $data['parameters']
+					'macrofunc' => $data['macrofunc']
 				];
 			}
 		}

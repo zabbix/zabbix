@@ -627,12 +627,34 @@ if ($data['display_interfaces']) {
 
 // Append SNMP common fields.
 $item_tab->addItem([
-	(new CLabel(_('SNMP OID'), 'snmp_oid'))
+	(new CLabel([
+		_('SNMP OID'),
+		makeHelpIcon([
+			_('Field requirements:'),
+			(new CList([
+				new CListItem([
+					(new CSpan('walk[OID1,OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('to retrieve a subtree')
+				]),
+				new CListItem([
+					(new CSpan('get[OID]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('to retrieve a single value')
+				]),
+				new CListItem([
+					(new CSpan('OID'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+					' - ',
+					_('(legacy) to retrieve a single value synchronously, optionally combined with other values')
+				])
+			]))->addClass(ZBX_STYLE_LIST_DASHED)
+		])
+	], 'snmp_oid'))
 		->setAsteriskMark()
 		->setId('js-item-snmp-oid-label'),
 	(new CFormField((new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
+		->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 		->setAriaRequired()
 	))->setId('js-item-snmp-oid-field')
 ]);
@@ -874,11 +896,11 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 }
 
 $item_tab->addItem([
-	(new CLabel([_('History storage period'), $keep_history_hint], 'history'))->setAsteriskMark(),
+	(new CLabel([_('History'), $keep_history_hint], 'history'))->setAsteriskMark(),
 	new CFormField([
 		(new CRadioButtonList('history_mode', (int) $data['history_mode']))
-			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+			->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 			->setReadonly($discovered_item)
 			->setModern(true),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -907,13 +929,13 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 
 $item_tab
 	->addItem([
-		(new CLabel([_('Trend storage period'), $keep_trend_hint], 'trends'))
+		(new CLabel([_('Trends'), $keep_trend_hint], 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
 			(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setReadonly($discovered_item)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

@@ -129,7 +129,8 @@
 				'js-item-timeout-label',
 				'js-item-timeout-field'
 			];
-			const set_hidden = document.getElementById('snmp_oid').value.substring(0, 5) !== 'walk[';
+			const snmp_oid = document.getElementById('snmp_oid').value;
+			const set_hidden = snmp_oid.substring(0, 4) !== 'get[' && snmp_oid.substring(0, 5) !== 'walk[';
 			const object_switcher = globalAllObjForViewSwitcher['type'];
 
 			toggle_fields.forEach((element_id) =>
@@ -343,7 +344,7 @@
 
 				this.updateHintDisplay();
 
-				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
+				// 'Do not store' trends for Calculated with string-types of information is forced on Item save.
 				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?> && !this.discovered_item) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {

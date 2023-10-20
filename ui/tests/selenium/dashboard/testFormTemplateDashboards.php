@@ -553,9 +553,13 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
 		$this->checkDialogue('Dashboard properties');
+		// TODO: added updateViewport due to unstable test on Jenkins, scroll appears for 0.5 seconds
+		// after closing the overlay dialog and incorrect click location of $control_buttons occurs.
+		$this->page->updateViewport();
 
 		// Check the default new dashboard state (title, empty, editable).
-		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilReady();
+
 		$this->assertEquals('Dashboards', $dashboard->getTitle());
 		$this->assertTrue($dashboard->isEditable());
 		$this->assertTrue($dashboard->isEmpty());
@@ -981,21 +985,6 @@ class testFormTemplateDashboards extends CWebTest {
 									'type' => 'color_picker'
 								],
 								[
-									'field' => 'Arc',
-									'fieldid' => 'value_arc',
-									'type' => 'checkbox',
-									'value' => true
-								],
-								[
-									'field' => 'Arc size',
-									'fieldid' => 'value_arc_size',
-									'value' => 20,
-									'attributes' => [
-										'maxlength' => 3
-									],
-									'symbol_after' => '%'
-								],
-								[
 									'field_locator' => 'id:units_show',
 									'type' => 'checkbox',
 									'value' => true
@@ -1041,16 +1030,28 @@ class testFormTemplateDashboards extends CWebTest {
 								]
 							]
 						],
+						// TODO: fix after DEV-2674
+//						[
+//							'field' => 'Value arc',
+//							'type' => 'complex_field',
+//							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-value-arc"]',
+//							'contents' => [
+//								[
+//									'field' => 'Size',
+//									'fieldid' => 'value_arc_size',
+//									'value' => 20,
+//									'attributes' => [
+//										'maxlength' => 3
+//									],
+//									'symbol_after' => '%'
+//								]
+//							]
+//						],
 						[
 							'field' => 'Needle',
 							'type' => 'complex_field',
 							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-needle"]',
 							'contents' => [
-								[
-									'field_locator' => 'id:needle_show',
-									'type' => 'checkbox',
-									'value' => false
-								],
 								[
 									'field_locator' => 'xpath:.//button[@id="lbl_needle_color"]/..',
 									'type' => 'color_picker'
@@ -1063,11 +1064,6 @@ class testFormTemplateDashboards extends CWebTest {
 							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-scale"]',
 							'contents' => [
 								[
-									'field_locator' => 'id:scale_show',
-									'type' => 'checkbox',
-									'value' => true
-								],
-								[
 									'field_locator' => 'id:scale_show_units',
 									'type' => 'checkbox',
 									'value' => true
@@ -1075,7 +1071,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Size',
 									'fieldid' => 'scale_size',
-									'value' => 10,
+									'value' => 15,
 									'attributes' => [
 										'maxlength' => 3
 									],
@@ -1126,12 +1122,6 @@ class testFormTemplateDashboards extends CWebTest {
 					 */
 					'disabled' => [
 						[
-							'field' => 'Colour',
-							'fieldid' => 'lbl_needle_color',
-							'disabled_locator' => 'id:needle_color',
-							'type' => 'color_picker'
-						],
-						[
 							'field' => 'Show labels',
 							'type' => 'checkbox',
 							'value' => false
@@ -1143,7 +1133,7 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field_locator' => 'id:th_arc_size',
-							'value' => 10,
+							'value' => 5,
 							'attributes' => [
 								'maxlength' => 3
 							],
@@ -1152,13 +1142,13 @@ class testFormTemplateDashboards extends CWebTest {
 						]
 					],
 					'fill_for_hidden' => [
-						'Advanced configuration' => true
+						'Advanced configuration' => true,
+						'id:show_3' => true // Show: Needle
 					],
 					'click_hidden' => [
 						'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]'
 					],
 					'fill_for_disabled' => [
-						'id:needle_show' => true,
 						'id:thresholds_0_threshold' => '33',
 						'Show arc' => true
 					],
@@ -1303,7 +1293,12 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Interface type',
 							'type' => 'checkbox_list',
-							'checkboxes' => ['Zabbix agent' => false, 'SNMP' => false, 'JMX' => false, 'IPMI' => false]
+							'checkboxes' => [
+								'Zabbix agent (active checks)' => false,
+								'Zabbix agent (passive checks)' => false,
+								'SNMP' => false,
+								'JMX' => false,
+								'IPMI' => false]
 						],
 						[
 							'field' => 'Layout',
@@ -1313,6 +1308,11 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'Show data in maintenance',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show only totals',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -2997,6 +2997,7 @@ class testFormTemplateDashboards extends CWebTest {
 						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
 						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
 						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
+						'Show' => ['Description', 'Value', 'Value arc', 'Needle', 'Scale'],
 						'Advanced configuration' => true,
 						'Angle' => '270°',
 						'id:description' => '𒀐 New test Description 😁🙂😁🙂',
@@ -3008,14 +3009,12 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:value_size' => 50,
 						'id:value_bold' => true,
 						'xpath:.//input[@id="value_color"]/..' => '283593',
-						'id:value_arc' => true,
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Above value',
 						'xpath:.//input[@id="units_color"]/..' => '4E342E',
-						'id:needle_show' => true,
 						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
 						'id:scale_size' => 33,
 						'id:scale_decimal_places' => 8
@@ -3287,9 +3286,16 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Host availability'),
 						'Name' => 'Host availability with all possible parameters',
 						'Refresh interval' => '10 minutes',
-						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
+						'Interface type' => [
+							'Zabbix agent (active checks)',
+							'Zabbix agent (passive checks)',
+							'SNMP',
+							'JMX',
+							'IPMI'
+						],
 						'Layout' => 'Vertical',
-						'Show data in maintenance' => true
+						'Show data in maintenance' => true,
+						'Show only totals' => true
 					]
 				]
 			],

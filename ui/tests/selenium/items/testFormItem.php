@@ -587,8 +587,20 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
+				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', 'walk[OID1,OID2,...]');
 			}
+
+			//Check hintbox.
+			$hint_text = "Field requirements:".
+				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
+				"\nget[OID] - to retrieve a single value".
+				"\nOID - (legacy) to retrieve a single value synchronously, optionally combined with other values";
+
+			$form->getLabel('SNMP OID')->query('xpath:./button[@data-hintbox]')->one()->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
+			$this->assertEquals($hint_text, $hint->one()->getText());
+			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+			$hint->waitUntilNotPresent();
 		}
 		else {
 			$this->zbxTestTextNotVisible('SNMP OID');
@@ -678,7 +690,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleId('interval_add');
 		}
 
-		$this->zbxTestTextPresent('History storage period');
+		$this->zbxTestTextPresent('History');
 		$this->zbxTestAssertVisibleId('history');
 		$this->zbxTestAssertAttribute("//input[@id='history']", 'maxlength', 255);
 		if (!isset($itemid)) {
@@ -686,7 +698,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->zbxTestTextPresent('Trend storage period');
+			$this->zbxTestTextPresent('Trends');
 			$this->zbxTestAssertVisibleId('trends');
 			$this->zbxTestAssertAttribute("//input[@id='trends']", 'maxlength', 255);
 			if (!isset($itemid)) {
@@ -694,7 +706,7 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextNotVisible('Trend storage period');
+			$this->zbxTestTextNotVisible('Trends');
 			$this->zbxTestAssertNotVisibleId('trends');
 		}
 

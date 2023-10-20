@@ -36,6 +36,7 @@ $available_js = [
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
+	'class.dashboard.print.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
 	'class.widget-base.js' => '',
 	'class.widget.js' => '',
@@ -407,6 +408,9 @@ $translate_strings = [
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
+	],
+	'class.csvgauge.js' => [
+		'No data' => _('No data')
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel'),

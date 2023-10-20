@@ -7692,6 +7692,12 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/params": unexpected parameter "3".'
 			],
 			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"zabbix\nzabbix\ ",
+				'/1/params',
+				'Invalid parameter "/1/params/2": value contains unescaped character at position 7.'
+			],
+			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
 				"-1",
 				'/1/params',
@@ -7948,6 +7954,60 @@ class CApiInputValidatorTest extends TestCase {
 				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n1\n",
 				'/1/params',
 				'Invalid parameter "/1/params/7": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"",
+				'/1/params',
+				'Invalid parameter "/1/params/1": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"abc",
+				'/1/params',
+				'Invalid parameter "/1/params/1": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"0",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"1",
+				'/1/params',
+				"1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"2",
+				'/1/params',
+				"2"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"3",
+				'/1/params',
+				"3"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"4",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"1\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
 			],
 			[
 				['type' => API_PROMETHEUS_PATTERN],
@@ -8540,6 +8600,36 @@ class CApiInputValidatorTest extends TestCase {
 				'{#MACRO1}',
 				'/1/address',
 				'{#MACRO1}'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'',
+				'/',
+				'Invalid parameter "/": cannot be empty.'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				[],
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'characters' => '\\nrts'],
+				'\\\n\r\t\s',
+				'/',
+				'\\\n\r\t\s'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8],
+				'\\',
+				'/',
+				'Invalid parameter "/": value contains unescaped character at position 1.'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'characters' => 'nrts'],
+				'\n\n\n\ ',
+				'/',
+				'Invalid parameter "/": value contains unescaped character at position 7.'
 			]
 		];
 	}
