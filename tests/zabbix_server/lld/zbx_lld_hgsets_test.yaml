@@ -1,0 +1,35 @@
+---
+test case: Remove host from host group, reuse existing hgset
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 1
+      old_groupids:
+        - 1
+        - 2
+      res_groupids:
+        - 2
+out:
+  hgsets:
+    - hgsetid: 1
+      hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+      opt: ZBX_LLD_HGSET_OPT_DELETE
+      hgroupids:
+        - 1
+        - 2
+    - hgsetid: 2
+      hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 2
+  hosts:
+    - hostid: 1
+      hgsetid: 2
+      update_hgsetid: yes
+  del_hgsetids:
+    - 1
+db data:
+  hgset:
+    - [2, 'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35']
+  host_hgset: []
+...
