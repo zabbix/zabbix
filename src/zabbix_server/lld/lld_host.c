@@ -1307,7 +1307,7 @@ static zbx_lld_hgset_t	*lld_hgset_make(zbx_vector_uint64_t *groupids)
 
 	hgset = zbx_malloc(NULL, sizeof(zbx_lld_hgset_t));
 	zbx_vector_uint64_create(&hgset->hgroupids);
-	zbx_hgset_hash_calculate(groupids, hgset->hash_str);
+	zbx_hgset_hash_calculate(groupids, hgset->hash_str, sizeof(hgset->hash_str));
 
 	return hgset;
 }
@@ -1327,6 +1327,8 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
+
+	/* make hgsets and assign them to hosts */
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -1356,11 +1358,14 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 				lld_hgset_free(hgset);
 
 				if (ZBX_LLD_HGSET_OPT_INSERT == hgsets->values[k]->opt)
+				{
+					hgset->hgsetid = host->hgsetid_orig;
 					hgsets->values[k]->opt = ZBX_LLD_HGSET_OPT_REUSE;
+				}
 			}
 			else
 			{
-				hgset->hgsetid = 0;
+				hgset->hgsetid = host->hgsetid_orig;
 				hgset->opt = ZBX_LLD_HGSET_OPT_DELETE;
 				zbx_vector_uint64_append_array(&hgset->hgroupids, host->old_groupids.values,
 						host->old_groupids.values_num);
@@ -1396,11 +1401,13 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		}
 	}
 
+	/* get ids for hgsets which are marked for insert */
+
 	zbx_vector_str_create(&hashes);
 
 	for (i = 0; i < hgsets->values_num; i++)
 	{
-		if (ZBX_LLD_HGSET_OPT_REUSE != hgsets->values[i]->opt)
+		if (ZBX_LLD_HGSET_OPT_INSERT == hgsets->values[i]->opt)
 			zbx_vector_str_append(&hashes, hgsets->values[i]->hash_str);
 	}
 
@@ -1418,9 +1425,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 					lld_hgset_hash_search)))
 			{
 				ZBX_STR2UINT64(hgsets->values[i]->hgsetid, row[0]);
-
-				if (ZBX_LLD_HGSET_OPT_INSERT == hgsets->values[i]->opt)
-					hgsets->values[i]->opt = ZBX_LLD_HGSET_OPT_REUSE;
+				hgsets->values[i]->opt = ZBX_LLD_HGSET_OPT_REUSE;
 			}
 		}
 		zbx_db_free_result(result);
@@ -1428,6 +1433,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 	zbx_vector_str_destroy(&hashes);
 
+	/* validate update flag */
 	for (i = 0; i < hosts->values_num; i++)
 	{
 		host = (zbx_lld_host_t *)hosts->values[i];
@@ -1446,9 +1452,11 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		}
 	}
 
+	/* get hgset ids to be deleted */
+
 	for (i = 0; i < hgsets->values_num; i++)
 	{
-		if (ZBX_LLD_HGSET_OPT_DELETE == hgsets->values[i]->opt)
+		if (ZBX_LLD_HGSET_OPT_DELETE == hgsets->values[i]->opt && 0 != hgsets->values[i]->hgsetid)
 			zbx_vector_uint64_append(del_hgsetids, hgsets->values[i]->hgsetid);
 	}
 
@@ -5597,8 +5605,12 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 		lld_groups_save(&groups_out, &group_prototypes, error);
 
 		lld_hostgroups_make(&groupids, &hosts, &groups_out, &del_hostgroupids);
-		lld_hgsets_make(&hosts, &hgsets, &del_hgsetids);
-		lld_permissions_make(&permissions, &hgsets);
+
+		if (0 != hosts.values_num)
+		{
+			lld_hgsets_make(&hosts, &hgsets, &del_hgsetids);
+			lld_permissions_make(&permissions, &hgsets);
+		}
 
 		lld_templates_make(parent_hostid, &hosts);
 

@@ -5621,7 +5621,7 @@ static int	hostgroups_with_permissions_update(zbx_uint64_t hostid)
 	if (0 == groupids.values_num)
 		goto err;
 
-	zbx_hgset_hash_calculate(&groupids, hash_str);
+	zbx_hgset_hash_calculate(&groupids, hash_str, sizeof(hash_str));
 
 	if (0 == (hgsetid = permission_hgset_get(hash_str)))
 	{
@@ -6444,7 +6444,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		char	hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 
 		hgset = hgsets.values[i];
-		zbx_hgset_hash_calculate(&hgset->hgroupids, hash_str);
+		zbx_hgset_hash_calculate(&hgset->hgroupids, hash_str, sizeof(hgset->hash_str));
 
 		if (FAIL != (k = zbx_vector_hgset_ptr_bsearch(&hgsets, (void*)hash_str, hgset_hash_search)))
 		{
@@ -6665,7 +6665,7 @@ void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str)
+void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len)
 {
 	char		hash[ZBX_SHA256_DIGEST_SIZE], id[MAX_ID_LEN + 2], *id_ins, *id_p;
 	sha256_ctx	ctx;
@@ -6686,5 +6686,5 @@ void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str)
 	}
 
 	zbx_sha256_finish(&ctx, hash);
-	(void)zbx_bin2hex((const unsigned char *)hash, sizeof(hash), hash_str, sizeof(hash_str));
+	(void)zbx_bin2hex((const unsigned char *)hash, sizeof(hash), hash_str, hash_len);
 }

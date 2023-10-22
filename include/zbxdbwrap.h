@@ -94,7 +94,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 void	zbx_hostgroups_with_permissions_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 int	zbx_hostgroups_with_permissions_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 
-void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str);
+void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
 
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags);
