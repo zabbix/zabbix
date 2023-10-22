@@ -154,9 +154,9 @@ class CWidgetGraph extends CWidget {
 
 			if (descriptor !== null && descriptor.sender_type === 'widget'
 					&& descriptor.widget_type === 'graphprototype') {
-				const graph_prototype_widget = ZABBIX.Dashboard.getSelectedDashboardPage().getWidget(
-					descriptor.sender_unique_id
-				);
+				const graph_prototype_widget = ZABBIX.Dashboard
+					.getDashboardPage(this._dashboard_page.unique_id)
+					.getWidget(descriptor.sender_unique_id);
 
 				has_custom_time_period = graph_prototype_widget.hasCustomTimePeriod();
 			}
