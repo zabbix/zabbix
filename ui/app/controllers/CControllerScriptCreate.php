@@ -68,37 +68,6 @@ class CControllerScriptCreate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			if ($this->getInput('scope') != ZBX_SCRIPT_SCOPE_ACTION && $this->hasInput('manualinput')) {
-				if ($this->getInput('manualinput_prompt', '') === '') {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_prompt', _('cannot be empty')));
-				}
-
-				if ($this->getInput('manualinput_validator_type') == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
-						&& $this->getInput('dropdown_options', '') === '') {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
-				}
-				elseif ($this->getInput('manualinput_validator_type') == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
-						&& $this->getInput('manualinput_validator', '') === '') {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator', _('cannot be empty')));
-				}
-
-				$this->getInputs($this->script, ['manualinput', 'manualinput_validator_type']);
-
-				if ($this->script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
-					$this->script['manualinput_validator'] = $this->getInput('dropdown_options', []);
-				}
-				else {
-					$this->script['manualinput_validator'] = $this->getInput('manualinput_validator', '');
-					$this->script['manualinput_default_value'] = $this->getInput('manualinput_default_value', '');
-				}
-
-				CScriptHelper::validateManualInput($this->script);
-
-				$ret = !hasErrorMessages();
-			}
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
@@ -139,6 +108,16 @@ class CControllerScriptCreate extends CController {
 
 			if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');
+				$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
+
+				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
+					$user_input_values = array_map('trim', explode(',', $this->getInput('dropdown_options', [])));
+					$script['manualinput_validator'] = implode(',', $user_input_values);
+				}
+				else {
+					$script['manualinput_validator'] = $this->getInput('manualinput_validator', '');
+					$script['manualinput_default_value'] = trim($this->getInput('manualinput_default_value'));
+				}
 			}
 		}
 
