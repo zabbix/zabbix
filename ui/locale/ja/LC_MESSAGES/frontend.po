@@ -6676,6 +6676,10 @@ msgstr "イベントログの監視。ログ値を返す。"
 msgid "Event name"
 msgstr "イベント名"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "イベントタグのペア"

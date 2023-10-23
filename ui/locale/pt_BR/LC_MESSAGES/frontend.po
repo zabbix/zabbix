@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-27 04:19+0000\n"
-"Last-Translator: Patrick Silva <patrickeessd@gmail.com>\n"
+"PO-Revision-Date: 2023-10-19 13:56+0000\n"
+"Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -1345,7 +1345,7 @@ msgstr "Às %1$s:%2$s do dia %3$s de cada %4$s"
 
 #: app/views/popup.maintenance.period.php:154
 msgid "At (hour:minute)"
-msgstr "Às (horas:minutos)"
+msgstr "Às (hora:minuto)"
 
 #: app/views/administration.userrole.edit.php:115
 msgid "At least one UI element must be checked."
@@ -2106,7 +2106,7 @@ msgstr "Histórico não foi limpado"
 
 #: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Não é possível limpar o histórico e estatísticas"
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -3740,11 +3740,11 @@ msgstr "Limpar histórico e estatísticas (médias)"
 
 #: include/views/configuration.item.list.php:293
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "Limpar o histórico e estatísticas dos itens selecionados?"
 
 #: include/views/configuration.httpconf.list.php:218
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "Limpar o histórico e estatísticas dos cenários web selecionados?"
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6764,6 +6764,10 @@ msgstr "Monitoração do log de eventos. Retorna: log"
 msgid "Event name"
 msgstr "Nome do Evento"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Conjunto de etiqueta de evento"
@@ -7981,7 +7985,7 @@ msgstr "Histórico"
 
 #: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
 msgid "History and trends cleared"
-msgstr ""
+msgstr "Histórico e estatísticas apagados"
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -11889,7 +11893,7 @@ msgstr "Severidade mínima"
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] "Período mínimo para apresentação é %1$s minuto."
-msgstr[1] "Período mínimo para apresentação são %1$s minutos."
+msgstr[1] "Período mínimo para apresentação é de %1$s minutos."
 
 #: app/views/popup.maintenance.period.php:175
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -22084,7 +22088,7 @@ msgstr "ltrim() - Remove os caracteres especificados do início de uma string"
 #: include/func.inc.php:595 jsLoader.php:126 jsLoader.php:225 jsLoader.php:406
 msgctxt "minute short"
 msgid "m"
-msgstr "m"
+msgstr "min"
 
 #: include/func.inc.php:592 jsLoader.php:222
 msgctxt "month short"
