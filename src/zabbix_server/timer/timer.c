@@ -343,18 +343,18 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 
 static void     service_delete_redundant_alarms(const zbx_vector_uint64_t *eventids)
 {
-        unsigned char   *data = NULL;
-        size_t          data_alloc = 0, data_offset = 0;
-        int             i;
+	unsigned char   *data = NULL;
+	size_t          data_alloc = 0, data_offset = 0;
+	int             i;
 
-        for (i = 0; i < eventids->values_num; i++)
-                zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
+	for (i = 0; i < eventids->values_num; i++)
+		zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
 
-        if (NULL == data)
-                return;
+	if (NULL == data)
+		return;
 
-        zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, (zbx_uint32_t)data_offset);
-        zbx_free(data);
+	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, (zbx_uint32_t)data_offset);
+	zbx_free(data);
 }
 
 /******************************************************************************
