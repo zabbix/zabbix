@@ -130,7 +130,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 					&deleted_itemids, dbconfig_args_in->config_vault,
 					dbconfig_args_in->proxyconfig_frequency);
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip);
-			zbx_dc_config_get_updated_hosts(revision, &hostids);
+			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
 			zbx_dbconfig_worker_send_ids(&hostids);
 
 			zbx_dc_update_interfaces_availability();

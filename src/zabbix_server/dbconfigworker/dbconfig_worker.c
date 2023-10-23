@@ -199,7 +199,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 			zbx_vector_uint64_clear(&hostids);
 
 			time_flush = zbx_time();
-
+			sec = time_flush - sec;
 			delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
 
 			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, idle]",

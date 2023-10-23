@@ -22,7 +22,6 @@
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 
-
 static void	dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
