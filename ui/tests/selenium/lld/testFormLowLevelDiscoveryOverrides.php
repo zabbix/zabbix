@@ -1614,14 +1614,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
 						'Create enabled' => 'Yes',
 						'Discover' => 'Yes',
-						// TODO: uncomment after fix DEV-1071 and it is possible to check this field.
-//						'Update interval' => [
-//							'Delay' => '1m',
-//							'Custom intervals' => [
-//								['type' => 'Flexible', 'delay' => '50s', 'period' => '1-7,00:00-24:00'],
-//								['type' => 'Scheduling', 'delay' => 'wd1-5h9-18']
-//							]
-//						],
+						'Update interval' => [
+							'Delay' => '1m',
+							'Custom intervals' => [
+								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
+								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+							]
+						],
 						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
 						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep trends']
 					],
