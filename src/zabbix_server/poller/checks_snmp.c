@@ -2675,7 +2675,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip)
 {
-	int			i, ret = SUCCEED, pdu_type, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
+	int			i, ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
@@ -2699,14 +2699,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 
 	zbx_init_agent_result(&snmp_context->item.result);
 
-	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
-	{
-		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
-		/* failures are handled there */
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
-
-	snmp_context->config_timeout = timeout_sec;
+	snmp_context->config_timeout = item->timeout;
 
 	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
 	snmp_context->arg = arg;
@@ -2790,7 +2783,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		zbx_vector_bulkwalk_context_append(&snmp_context->bulkwalk_contexts, bulkwalk_context);
 	}
 
-	zbx_async_poller_add_task(base, dnsbase, snmp_context->item.interface.addr, snmp_context, timeout_sec,
+	zbx_async_poller_add_task(base, dnsbase, snmp_context->item.interface.addr, snmp_context, item->timeout,
 			snmp_task_process, clear_cb);
 
 	ret = SUCCEED;
@@ -3150,7 +3143,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 	zbx_snmp_sess_t		ssp;
 	char			error[MAX_STRING_LEN];
 	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = ZBX_MAX_SNMP_ITEMS + 1,
-				bulk = SNMP_BULK_ENABLED, timeout_sec;
+				bulk = SNMP_BULK_ENABLED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__func__, items[0].host.host, items[0].interface.addr, num);
@@ -3220,13 +3213,11 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
 
-		zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
-
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
-			timeout_sec, config_source_ip)))
+			item->timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -3246,13 +3237,11 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
 
-		zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
-
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
-			timeout_sec, config_source_ip)))
+			item->timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -3272,13 +3261,11 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
 
-		zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
-
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
-			timeout_sec, config_source_ip)))
+			item->timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;

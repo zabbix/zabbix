@@ -132,8 +132,6 @@ typedef struct
 {
 	zbx_uint64_t		access_userid;
 	zbx_uint64_t		batchid;
-	int			report_width;
-	int			report_height;
 	char			*url;
 	char			*report_name;
 	zbx_vector_uint64_t	userids;
@@ -647,15 +645,13 @@ static char	*rm_get_report_name(const char *name, int report_time)
  *             period        - [IN] report period                             *
  *             userids       - [IN] recipient user identifiers                *
  *             userids_num   - [IN] number of recipients                      *
- *             report_width  - [IN]                                           *
- *             report_height - [IN]                                           *
  *             params        - [IN] viewing and processing parameters         *
  *             error         - [OUT]                                          *
  *                                                                            *
  ******************************************************************************/
 static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, zbx_uint64_t dashboardid,
 		zbx_uint64_t access_userid, int report_time, unsigned char period, zbx_uint64_t *userids,
-		int userids_num, int report_width, int report_height, const zbx_vector_ptr_pair_t *params, char **error)
+		int userids_num, const zbx_vector_ptr_pair_t *params, char **error)
 {
 	size_t		url_alloc = 0, url_offset = 0;
 	struct tm	from, to;
@@ -699,8 +695,6 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 	job->session = rm_session_start(manager, access_userid);
 
 	job->access_userid = access_userid;
-	job->report_width = report_width;
-	job->report_height = report_height;
 
 	return job;
 }
@@ -1436,54 +1430,6 @@ static void	zbx_report_dst_free(zbx_report_dst_t *dst)
 	zbx_free(dst);
 }
 
-#define	ZBX_REPORT_DEFAULT_WIDTH	1920
-#define	ZBX_REPORT_DEFAULT_HEIGHT	1080
-#define ZBX_REPORT_ROW_HEIGHT		70
-#define ZBX_REPORT_BOTTOM_MARGIN	12
-
-/******************************************************************************
- *                                                                            *
- * Purpose: calculates report dimensions based on dashboard contents          *
- *                                                                            *
- * Parameters: dashboardid - [IN]                                             *
- *             width       - [OUT] report width in pixels                     *
- *             height      - [OUT] report height in pixels                    *
- *                                                                            *
- ******************************************************************************/
-static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *height)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		y_max = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dashboardid:" ZBX_FS_UI64, __func__, dashboardid);
-
-	result = zbx_db_select("select w.y,w.height"
-			" from widget w,dashboard_page p"
-			" where w.dashboard_pageid=p.dashboard_pageid"
-				" and p.dashboardid=" ZBX_FS_UI64
-				" and p.sortorder=0", dashboardid);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		int	bottom;
-
-		bottom = atoi(row[0]) + atoi(row[1]);
-		if (bottom > y_max)
-			y_max = bottom;
-	}
-	zbx_db_free_result(result);
-
-	if (0 != y_max)
-		*height = y_max * ZBX_REPORT_ROW_HEIGHT + ZBX_REPORT_BOTTOM_MARGIN;
-	else
-		*height = ZBX_REPORT_DEFAULT_HEIGHT;
-
-	*width = ZBX_REPORT_DEFAULT_WIDTH;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() width:%d height:%d", __func__, *width, *height);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: processes job by sending it to writer                             *
@@ -1542,8 +1488,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 		goto out;
 	}
 
-	size = report_serialize_begin_report(&data, job->report_name, job->url, job->session->cookie, job->report_width,
-			job->report_height, &job->params);
+	size = report_serialize_begin_report(&data, job->report_name, job->url, job->session->cookie, &job->params);
 
 	if (SUCCEED != zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_BEGIN_REPORT, data, size))
 	{
@@ -1659,8 +1604,6 @@ out:
  *             access_userid - [IN] user id used to create the report         *
  *             now           - [IN]                                           *
  *             params        - [IN] report parameters                         *
- *             width         - [IN] report width                              *
- *             height        - [IN] report height                             *
  *             jobs          - [IN/OUT] created jobs                          *
  *             error         - [OUT] error message                            *
  *                                                                            *
@@ -1670,8 +1613,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint64_t userid,
-		zbx_uint64_t access_userid, int now, const zbx_vector_ptr_pair_t *params, int width, int height,
-		zbx_vector_ptr_t *jobs, char **error)
+		zbx_uint64_t access_userid, int now, const zbx_vector_ptr_pair_t *params, zbx_vector_ptr_t *jobs,
+		char **error)
 {
 	int		i;
 	zbx_rm_job_t	*job;
@@ -1689,7 +1632,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 	if (i == jobs->values_num)
 	{
 		if (NULL == (job = rm_create_job(manager, report->name, report->dashboardid, access_userid, now,
-				report->period, &userid, 1, width, height, params, error)))
+				report->period, &userid, 1, params, error)))
 		{
 			return FAIL;
 		}
@@ -1709,8 +1652,6 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
  *             report  - [IN] report to process                               *
  *             now     - [IN]                                                 *
  *             params  - [IN] report parameters                               *
- *             width   - [IN] report width                                    *
- *             height  - [IN] report height                                   *
  *             jobs    - [IN/OUT] created jobs                                *
  *             error   - [OUT] error message                                  *
  *                                                                            *
@@ -1719,7 +1660,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
  *                                                                            *
  ******************************************************************************/
 static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int now,
-		const zbx_vector_ptr_pair_t *params, int width, int height, zbx_vector_ptr_t *jobs, char **error)
+		const zbx_vector_ptr_pair_t *params, zbx_vector_ptr_t *jobs, char **error)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1760,8 +1701,7 @@ static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *r
 		if (0 == access_userid)
 			access_userid = userid;
 
-		if (SUCCEED != rm_jobs_add_user(manager, report, userid, access_userid, now, params, width, height,
-				jobs, error))
+		if (SUCCEED != rm_jobs_add_user(manager, report, userid, access_userid, now, params, jobs, error))
 		{
 			goto out;
 		}
@@ -1793,15 +1733,13 @@ out:
 static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int now, char **error)
 {
 	zbx_vector_ptr_t	jobs;
-	int			jobs_num, width, height, ret = FAIL;
+	int			jobs_num, ret = FAIL;
 	zbx_uint64_t		access_userid;
 	zbx_rm_batch_t		*batch, batch_local;
 	zbx_vector_ptr_pair_t	params;
 	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 , __func__, report->reportid);
-
-	rm_get_report_dimensions(report->dashboardid, &width, &height);
 
 	zbx_vector_ptr_create(&jobs);
 	zbx_vector_ptr_pair_create(&params);
@@ -1834,7 +1772,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 			access_userid = report->users.values[i].id;
 
 		if (SUCCEED != rm_jobs_add_user(manager, report, report->users.values[i].id, access_userid, now,
-				&params, width, height, &jobs, error))
+				&params, &jobs, error))
 		{
 			goto out;
 		}
@@ -1842,8 +1780,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 	if (0 != report->usergroups.values_num)
 	{
-		if (SUCCEED != rm_report_create_usergroup_jobs(manager, report, now, &params, width, height, &jobs,
-				error))
+		if (SUCCEED != rm_report_create_usergroup_jobs(manager, report, now, &params, &jobs, error))
 		{
 			goto out;
 		}
@@ -2131,7 +2068,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 {
 	zbx_uint64_t		dashboardid, userid, access_userid;
 	zbx_vector_ptr_pair_t	params;
-	int			report_time, ret, width, height;
+	int			report_time, ret;
 	unsigned char		period;
 	zbx_rm_job_t		*job;
 	char			*name;
@@ -2140,8 +2077,6 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 
 	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &access_userid, &report_time,
 			&period, &params);
-
-	rm_get_report_dimensions(dashboardid, &width, &height);
 
 	for (int i = 0; i < params.values_num; i++)
 	{
@@ -2154,7 +2089,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	}
 
 	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
-			width, height, &params, error)))
+			&params, error)))
 	{
 		zbx_ipc_client_addref(client);
 		job->client = client;

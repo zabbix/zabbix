@@ -103,7 +103,7 @@ class testEscalations extends CIntegrationTest {
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
+						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$triggerid
 					]
@@ -664,7 +664,7 @@ class testEscalations extends CIntegrationTest {
 				'filter' => [
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => $symptom_triggerids[$i]
 						]
@@ -860,7 +860,7 @@ HEREDOC;
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
+						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$triggerid
 					]
@@ -978,7 +978,7 @@ HEREDOC;
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
+						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$triggerid
 					]

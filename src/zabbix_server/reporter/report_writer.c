@@ -80,8 +80,6 @@ static char	*rw_curl_error(CURLcode err)
  *                                                                            *
  * Parameters: url                   - [IN] report url                        *
  *             cookie                - [IN] authentication cookie             *
- *             width                 - [IN] report width                      *
- *             height                - [IN] report height                     *
  *             report                - [OUT] downloaded report                *
  *             report_size           - [OUT]                                  *
  *             config_tls_ca_file    - [IN]                                   *
@@ -95,16 +93,17 @@ static char	*rw_curl_error(CURLcode err)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rw_get_report(const char *url, const char *cookie, int width, int height, char **report,
+static int	rw_get_report(const char *url, const char *cookie, char **report,
 		size_t *report_size, const char *config_tls_ca_file, const char *config_tls_cert_file,
 		const char *config_tls_key_file, const char *config_source_ip, const char *config_webservice_url,
 		char **error)
 {
+#define ZBX_REPORT_DEFAULT_WIDTH	1920
+#define ZBX_REPORT_DEFAULT_HEIGHT	1080
+
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(url);
 	ZBX_UNUSED(cookie);
-	ZBX_UNUSED(width);
-	ZBX_UNUSED(height);
 	ZBX_UNUSED(report);
 	ZBX_UNUSED(report_size);
 	ZBX_UNUSED(config_tls_ca_file);
@@ -127,7 +126,7 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 	CURLoption		opt;
 	struct curl_slist	*headers = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:%s width:%d height:%d", __func__, url, width, height);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:%s", __func__, url);
 
 	cookie_value = zbx_dsprintf(NULL, "zbx_session=%s", cookie);
 
@@ -139,9 +138,9 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 	zbx_json_close(&j);
 
 	zbx_json_addobject(&j, ZBX_PROTO_TAG_PARAMETERS);
-	zbx_snprintf(buffer, sizeof(buffer), "%d", width);
+	zbx_snprintf(buffer, sizeof(buffer), "%d", ZBX_REPORT_DEFAULT_WIDTH);
 	zbx_json_addstring(&j, "width", buffer, ZBX_JSON_TYPE_STRING);
-	zbx_snprintf(buffer, sizeof(buffer), "%d", height);
+	zbx_snprintf(buffer, sizeof(buffer), "%d", ZBX_REPORT_DEFAULT_HEIGHT);
 	zbx_json_addstring(&j, "height", buffer, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
@@ -261,6 +260,9 @@ out:
 
 	return ret;
 #endif
+
+#undef ZBX_REPORT_DEFAULT_WIDTH
+#undef ZBX_REPORT_DEFAULT_HEIGHT
 }
 
 /******************************************************************************
@@ -285,7 +287,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		const char *config_source_ip, const char *config_webservice_url, char **error)
 {
 	zbx_vector_ptr_pair_t	params;
-	int			ret, width, height;
+	int			ret;
 	const char		*subject = "", *message = "";
 	char			*url, *cookie, *report = NULL, *name;
 	size_t			report_size = 0;
@@ -294,7 +296,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_begin_report(msg->data, &name, &url, &cookie, &width, &height, &params);
+	report_deserialize_begin_report(msg->data, &name, &url, &cookie, &params);
 
 	for (int i = 0; i < params.values_num; i++)
 	{
@@ -313,7 +315,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		}
 	}
 
-	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, config_tls_ca_file,
+	if (SUCCEED == (ret = rw_get_report(url, cookie, &report, &report_size, config_tls_ca_file,
 			config_tls_cert_file, config_tls_key_file, config_source_ip, config_webservice_url, error)))
 	{
 		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, name, "application/pdf", report,

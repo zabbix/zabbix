@@ -685,6 +685,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		raw_value = 0;
 		pos = token.loc.l;
 		inner_token = token;
+		ret = SUCCEED;
 
 		switch (token.type)
 		{
@@ -717,7 +718,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					/* Ignore functions with macros not supporting them, but do not skip the */
 					/* whole token, nested macro should be resolved in this case. */
 					pos++;
-					continue;
+					ret = FAIL;
 				}
 				break;
 			case ZBX_TOKEN_USER_MACRO:
@@ -739,7 +740,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				continue;
 		}
 
-		ret = SUCCEED;
+		if (SUCCEED == ret)
+		{
 
 		if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
 				ZBX_MACRO_TYPE_MESSAGE_UPDATE |
@@ -770,7 +772,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 
 					pos = token.loc.r;
 				}
-				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
+				else if (ZBX_TOKEN_EXPRESSION_MACRO == inner_token.type)
 				{
 					zbx_timespec_t	ts;
 					char		*errmsg = NULL;
@@ -2766,6 +2768,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 						(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
 				res = FAIL;
 			}
+		}
 		}
 
 		if (FAIL == ret)

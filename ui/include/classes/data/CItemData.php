@@ -257,7 +257,7 @@ final class CItemData {
 			'vmware.dc.tags.get[url,id]',
 			'vmware.dvswitch.discovery[url]',
 			'vmware.dvswitch.fetchports.get[url,uuid,<filter>,<mode>]',
-			'vmware.eventlog[url,<mode>]',
+			'vmware.eventlog[url,<mode>,<severity>]',
 			'vmware.fullname[url]',
 			'vmware.hv.alarms.get[url,uuid]',
 			'vmware.hv.cluster.name[url,uuid]',
@@ -1886,8 +1886,8 @@ final class CItemData {
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.dvswitch.fetchports'
 				]
 			],
-			'vmware.eventlog[url,<mode>]' => [
-				'description' => _('VMware event log, "url" - VMware service URL, "mode"- all (default), skip - skip processing of older data'),
+			'vmware.eventlog[url,<mode>,<severity>]' => [
+				'description' => _('VMware event log, "url" - VMware service URL, "mode"- all (default) or skip - skip processing of older data, "severity" - filtering is disabled by default or "error,warning,info,user" in any combination'),
 				'value_type' => ITEM_VALUE_TYPE_LOG,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.eventlog'

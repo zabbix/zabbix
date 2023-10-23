@@ -113,7 +113,3 @@
 		</td>
 	</tr>
 </script>
-
-<script>
-
-</script>

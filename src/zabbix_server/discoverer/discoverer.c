@@ -187,16 +187,20 @@ static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint
 	return SUCCEED;
 }
 
-static int	dcheck_get_timeout(unsigned char type, char **timeout, int *timeout_sec)
+static int	dcheck_get_timeout(unsigned char type, int *timeout_sec)
 {
-	char	error_val[MAX_STRING_LEN];
+	char	*tmt, error_val[MAX_STRING_LEN];
+	int	ret;
 
-	*timeout = zbx_dc_get_global_item_type_timeout(type);
+	tmt = zbx_dc_get_global_item_type_timeout(type);
 
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, NULL, timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			NULL, NULL, &tmt, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
-	return zbx_validate_item_timeout(*timeout, timeout_sec, error_val, sizeof(error_val));
+	ret = zbx_validate_item_timeout(tmt, timeout_sec, error_val, sizeof(error_val));
+	zbx_free(tmt);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -292,7 +296,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, dcheck->timeout_sec) ||
+				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, dcheck->timeout) ||
 						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
 					ret = FAIL;
@@ -307,7 +311,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
-				item.key = item.key_orig;
 
 				item.interface.useip = 1;
 				item.interface.addr = ip;
@@ -336,8 +339,9 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 
 				if (SVC_AGENT == dcheck->type)
 				{
+					item.key = item.key_orig;
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
-					item.timeout = dcheck->timeout_str;
+					item.timeout = dcheck->timeout;
 
 					if (SUCCEED == get_value_agent(&item, source_ip, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
@@ -350,19 +354,25 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				else
 #ifdef HAVE_NETSNMP
 				{
-					item.snmp_community = dcheck->snmp_community;
+					item.key = zbx_strdup(NULL, item.key_orig);
+					item.snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
 					item.snmp_oid = dcheck->key_;
-					item.timeout = dcheck->timeout_str;
+					item.timeout = dcheck->timeout;
 
 					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
-						item.snmpv3_securityname = dcheck->snmpv3_securityname;
+						item.snmpv3_securityname = zbx_strdup(NULL,
+								dcheck->snmpv3_securityname);
+						item.snmpv3_authpassphrase = zbx_strdup(NULL,
+								dcheck->snmpv3_authpassphrase);
+						item.snmpv3_privpassphrase = zbx_strdup(NULL,
+								dcheck->snmpv3_privpassphrase);
+
+						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
+
 						item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-						item.snmpv3_authpassphrase = dcheck->snmpv3_authpassphrase;
-						item.snmpv3_privpassphrase = dcheck->snmpv3_privpassphrase;
 						item.snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
-						item.snmpv3_contextname = dcheck->snmpv3_contextname;
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER,
@@ -372,6 +382,13 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 					}
 					else
 						ret = FAIL;
+
+					zbx_free(item.key);
+					zbx_free(item.snmp_community);
+					zbx_free(item.snmpv3_securityname);
+					zbx_free(item.snmpv3_authpassphrase);
+					zbx_free(item.snmpv3_privpassphrase);
+					zbx_free(item.snmpv3_contextname);
 				}
 #else
 					ret = FAIL;
@@ -403,6 +420,7 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	dst->uniq = src->uniq;
 	dst->type = src->type;
 	dst->allow_redirect = src->allow_redirect;
+	dst->timeout = src->timeout;
 
 	if (SVC_SNMPv1 == src->type || SVC_SNMPv2c == src->type || SVC_SNMPv3 == src->type)
 	{
@@ -414,14 +432,7 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 		dst->snmpv3_authprotocol = src->snmpv3_authprotocol;
 		dst->snmpv3_privprotocol = src->snmpv3_privprotocol;
 		dst->snmpv3_contextname = zbx_strdup(NULL, src->snmpv3_contextname);
-		dst->timeout_str = zbx_strdup(NULL, src->timeout_str);
 	}
-	else if (SVC_AGENT == src->type)
-	{
-		dst->timeout_str = zbx_strdup(NULL, src->timeout_str);
-	}
-	else
-		dst->timeout_sec = src->timeout_sec;
 }
 
 static void	service_free(zbx_discoverer_dservice_t *service)
@@ -973,8 +984,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts)
 {
-	int				rule_count = 0, delay, i, k, tmt_simple = 0;
-	char				*delay_str = NULL, *tmt_agent = NULL, *tmt_snmp = NULL, *tmt_tmp = NULL;
+	int				rule_count = 0, delay, i, k, tmt_simple = 0, tmt_agent = 0, tmt_snmp = 0;
+	char				*delay_str = NULL;
 	zbx_uint64_t			queue_checks_count = 0;
 	zbx_dc_um_handle_t		*um_handle;
 	time_t				now;
@@ -1034,39 +1045,37 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 
 			if (SVC_AGENT == dcheck->type)
 			{
-				if (NULL == tmt_agent && FAIL == dcheck_get_timeout(ITEM_TYPE_ZABBIX, &tmt_agent, NULL))
+				if (0 == tmt_agent && FAIL == dcheck_get_timeout(ITEM_TYPE_ZABBIX, &tmt_agent))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid global timeout "
-							"\"%s\" for Zabbix Agent checks", drule->name, tmt_agent);
-					zbx_free(tmt_agent);
+							"\"%i\" for Zabbix Agent checks", drule->name, tmt_agent);
 					goto next;
 				}
 
-				dcheck->timeout_str = zbx_strdup(NULL, tmt_agent);
+				dcheck->timeout = tmt_agent;
 			}
 			else if (SVC_SNMPv1 == dcheck->type || SVC_SNMPv2c == dcheck->type ||
 					SVC_SNMPv3 == dcheck->type)
 			{
-				if (NULL == tmt_snmp && FAIL == dcheck_get_timeout(ITEM_TYPE_SNMP, &tmt_snmp, NULL))
+				if (0 == tmt_snmp && FAIL == dcheck_get_timeout(ITEM_TYPE_SNMP, &tmt_snmp))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid global timeout "
-							"\"%s\" for SNMP checks", drule->name, tmt_snmp);
-					zbx_free(tmt_snmp);
+							"\"%i\" for SNMP checks", drule->name, tmt_snmp);
 					goto next;
 				}
 
-				dcheck->timeout_str = zbx_strdup(NULL, tmt_snmp);
+				dcheck->timeout = tmt_snmp;
 			}
 			else
 			{
-				if (0 == tmt_simple && FAIL == dcheck_get_timeout(ITEM_TYPE_SIMPLE, &tmt_tmp, &tmt_simple))
+				if (0 == tmt_simple && FAIL == dcheck_get_timeout(ITEM_TYPE_SIMPLE, &tmt_simple))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid global timeout "
-							"\"%s\" for simple checks", drule->name, tmt_tmp);
+							"\"%i\" for simple checks", drule->name, tmt_simple);
 					goto next;
 				}
 
-				dcheck->timeout_sec = tmt_simple;
+				dcheck->timeout = tmt_simple;
 			}
 
 			if (0 != dcheck->uniq)
@@ -1124,9 +1133,6 @@ next:
 
 	zbx_dc_close_user_macros(um_handle);
 	zbx_free(delay_str);
-	zbx_free(tmt_agent);
-	zbx_free(tmt_snmp);
-	zbx_free(tmt_tmp);
 
 	zbx_vector_dc_drule_ptr_clear_ext(&drules, zbx_discovery_drule_free);
 	zbx_vector_dc_drule_ptr_destroy(&drules);

@@ -197,7 +197,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
 					->setDefault('{ITEM.NAME}')
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('desc_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))

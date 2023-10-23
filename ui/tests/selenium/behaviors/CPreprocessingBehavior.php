@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CBehavior.php';
 
 /**
- * Trait for preprocessing related tests.
+ * Behavior for preprocessing related tests.
  */
-trait PreprocessingTrait {
+class CPreprocessingBehavior extends CBehavior {
 
 	/**
 	 * Get descriptors of preprocessing fields.
@@ -85,7 +85,7 @@ trait PreprocessingTrait {
 	 *
 	 * @return CElement|CNullElement
 	 */
-	protected static function getPreprocessingField($container, $field) {
+	public static function getPreprocessingField($container, $field) {
 		$query = $container->query($field['selector']);
 
 		if (array_key_exists('class', $field)) {
@@ -103,16 +103,20 @@ trait PreprocessingTrait {
 	/**
 	 * Add new preprocessing, select preprocessing type and parameters if exist.
 	 *
-	 * @param array $steps    preprocessing step values
+	 * @param array $steps            preprocessing step values
+	 * @param boolean $mass_update    true if editing mass update preprocessing form, false if not
 	 */
-	protected function addPreprocessingSteps($steps) {
-		$rows = $this->query('class:preprocessing-list-item')->count() + 1;
-		$add = $this->query('id:param_add')->one();
+	public function addPreprocessingSteps($steps, $mass_update = false) {
+		$rows = $this->test->query('class:preprocessing-list-item')->count() + ($mass_update ? null : 1);
+		$add = $this->test->query('id:param_add')->one();
 		$fields = self::getPreprocessingFieldDescriptors();
 
-		foreach ($steps as $options) {
-			$add->click();
-			$container = $this->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
+		foreach ($steps as $i => $options) {
+			if (!$mass_update || $i !== 0)  {
+				$add->click();
+			}
+
+			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
 					->waitUntilPresent()->one();
 
 			foreach ($fields as $field) {
@@ -132,12 +136,12 @@ trait PreprocessingTrait {
 	 *
 	 * @return array
 	 */
-	protected function getPreprocessingSteps($extended = false) {
+	public function getPreprocessingSteps($extended = false) {
 		$steps = [];
 
 		$fields = self::getPreprocessingFieldDescriptors();
 
-		foreach ($this->query('class:preprocessing-list-item')->all() as $row) {
+		foreach ($this->test->query('class:preprocessing-list-item')->all() as $row) {
 			$preprocessing = [];
 
 			foreach ($fields as $field) {
@@ -163,9 +167,9 @@ trait PreprocessingTrait {
 	 *
 	 * @return array
 	 */
-	protected function assertPreprocessingSteps($data) {
+	public function assertPreprocessingSteps($data) {
 		$steps = $this->getPreprocessingSteps(true);
-		$this->assertEquals(count($data), count($steps), 'Preprocessing step count should match step count in data.');
+		$this->test->assertEquals(count($data), count($steps), 'Preprocessing step count should match step count in data.');
 
 		foreach ($data as $i => $options) {
 			foreach ($steps[$i] as $control) {
@@ -183,7 +187,7 @@ trait PreprocessingTrait {
 						array_key_exists('params', $field['value']) ? $field['value']['params'] : []
 				);
 
-				$this->assertEquals($options[$field['name']], $value);
+				$this->test->assertEquals($options[$field['name']], $value);
 			}
 		}
 
@@ -204,7 +208,7 @@ trait PreprocessingTrait {
 	 *
 	 * @return array
 	 */
-	protected function listPreprocessingSteps() {
+	public function listPreprocessingSteps() {
 		$data = [];
 		foreach ($this->getPreprocessingSteps(true) as $i => $step) {
 			$values = [];

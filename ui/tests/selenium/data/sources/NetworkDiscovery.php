@@ -380,12 +380,12 @@ class NetworkDiscovery {
 					'evaltype' => 0,
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_DCHECK,
+							'conditiontype' => ZBX_CONDITION_TYPE_DCHECK,
 							'operator' => 0,
 							'value' => $check_id_delete
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_DCHECK,
+							'conditiontype' => ZBX_CONDITION_TYPE_DCHECK,
 							'operator' => 0,
 							'value' => $check_id_cancel
 						]
