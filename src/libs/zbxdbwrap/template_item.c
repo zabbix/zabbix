@@ -919,14 +919,17 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME))
 		{
-			str_esc = zbx_db_dyn_escape_string(item->name);
+			if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+			{
+				str_esc = zbx_db_dyn_escape_string(item->name);
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update item_rtname set"
-					" name_resolved='%s',name_resolved_upper=upper('%s')"
-					" where itemid=" ZBX_FS_UI64 ";\n",
-					str_esc, str_esc, item->itemid);
-			zbx_free(str_esc);
-			zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update item_rtname set"
+						" name_resolved='%s',name_resolved_upper=upper('%s')"
+						" where itemid=" ZBX_FS_UI64 ";\n",
+						str_esc, str_esc, item->itemid);
+				zbx_free(str_esc);
+				zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+			}
 		}
 	}
 	else

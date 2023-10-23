@@ -31,9 +31,8 @@
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 
-#define ZBX_CONNECTOR_MANAGER_DELAY	1
-#define ZBX_CONNECTOR_FLUSH_INTERVAL	1
-#define ZBX_DBSYNC_BATCH_SIZE		1000
+#define ZBX_DBCONFIG_WORKER_DELAY	1
+#define ZBX_DBCONFIG_BATCH_SIZE		1000
 
 static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
@@ -66,9 +65,9 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (zbx_uint64_t *batch = hostids->values; batch < hostids->values + hostids->values_num;
-			batch += ZBX_DBSYNC_BATCH_SIZE)
+			batch += ZBX_DBCONFIG_BATCH_SIZE)
 	{
-		int	batch_size = MIN(ZBX_DBSYNC_BATCH_SIZE, hostids->values + hostids->values_num - batch);
+		int	batch_size = MIN(ZBX_DBCONFIG_BATCH_SIZE, hostids->values + hostids->values_num - batch);
 		size_t	sql_select_offset = 0;
 
 		zbx_strcpy_alloc(&sql_select, &sql_select_alloc, &sql_select_offset,
@@ -151,7 +150,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	int			processed_num = 0, updated_num = 0, macro_used = 1;
 	int			delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
 	double			sec = 0, time_flush;
-	zbx_timespec_t		timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
+	zbx_timespec_t		timeout = {ZBX_DBCONFIG_WORKER_DELAY, 0};
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
@@ -201,10 +200,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 			time_flush = zbx_time();
 
-			if ((sec = time_flush - sec) > delay)
-				delay *= 2;
-			else
-				delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
+			delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
 
 			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, idle]",
 					get_process_type_string(process_type), processed_num, updated_num, sec);

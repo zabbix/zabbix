@@ -20,8 +20,6 @@
 #include "zbxdbconfigworker.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"
-#include "zbxcacheconfig.h"
-#include "zbxtime.h"
 
 void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_vector_uint64_t ids)

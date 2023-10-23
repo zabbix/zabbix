@@ -6990,14 +6990,14 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_dc_config_get_updated_hosts(zbx_vector_uint64_t *hostids)
+void	zbx_dc_config_get_updated_hosts(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_HOST	*dc_host;
 	zbx_uint64_t		global_revision = 0;
 
 	if (SUCCEED == um_cache_get_host_revision(config->um_cache, 0, &global_revision) &&
-			global_revision >= config->revision.config)
+			global_revision >= new_revision)
 	{
 		zbx_vector_uint64_append(hostids, 0);
 	}
@@ -7007,14 +7007,14 @@ void	zbx_dc_config_get_updated_hosts(zbx_vector_uint64_t *hostids)
 	{
 		zbx_uint64_t	revision = 0;
 
-		if (dc_host->revision >= config->revision.config)
+		if (dc_host->revision >= new_revision)
 		{
 			zbx_vector_uint64_append(hostids, dc_host->hostid);
 			continue;
 		}
 
 		if (SUCCEED == um_cache_get_host_revision(config->um_cache, dc_host->hostid, &revision) &&
-				revision >= config->revision.config)
+				revision >= new_revision)
 		{
 			zbx_vector_uint64_append(hostids, dc_host->hostid);
 		}
@@ -7026,7 +7026,7 @@ void	zbx_dc_config_get_updated_hosts(zbx_vector_uint64_t *hostids)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
+zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault, int proxyconfig_frequency)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
@@ -8026,6 +8026,8 @@ clean:
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return new_revision;
 }
 
 /******************************************************************************

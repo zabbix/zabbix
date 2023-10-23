@@ -27,7 +27,7 @@ void	zbx_dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
 {
 	static zbx_ipc_socket_t	socket;
 
-	/* each process has a permanent connection to connector manager */
+	/* configuration syncer process has a permanent connection to worker */
 	if (0 == socket.fd)
 	{
 		char	*error = NULL;
@@ -46,3 +46,16 @@ void	zbx_dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
 	}
 }
 
+void	zbx_dbconfig_worker_send_ids(const zbx_vector_uint64_t *hostids)
+{
+	if (0 != hostids->values_num)
+	{
+		unsigned char	*data = NULL;
+		size_t		data_alloc = 0, data_offset = 0;
+
+		zbx_dbconfig_worker_serialize_ids(&data, &data_alloc, &data_offset, *hostids);
+		zbx_dbconfig_worker_send(ZBX_IPC_DBCONFIG_WORKER_REQUEST, data, data_offset);
+
+		free(data);
+	}
+}
