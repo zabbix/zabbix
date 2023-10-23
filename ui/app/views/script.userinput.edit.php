@@ -86,7 +86,7 @@ $form
 			'test' => $data['test'],
 			'input_type' => $data['manualinput_validator_type'],
 			'default_input' => $data['manualinput_default_value'],
-			'input_validator' => $data['manualinput_validator']
+			'manualinput_validator' => $data['manualinput_validator']
 		]).');'))->setOnDocumentReady()
 	);
 

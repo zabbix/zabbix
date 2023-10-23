@@ -533,6 +533,7 @@ function overlayDialogue(params, trigger_elmnt) {
 function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token,
 		manualinput = null, manualinput_prompt, manualinput_validator_type, manualinput_validator,
 		manualinput_default_value) {
+
 	if (manualinput === '1') {
 		const parameters = {
 			manualinput_prompt: manualinput_prompt,
@@ -548,14 +549,14 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			if (confirmation) {
+			if (confirmation === '') {
+				execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
+			}
+			else {
 				confirmation = confirmation.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
 
 				showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
 					e.detail.data.manualinput);
-			}
-			else {
-				execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
 			}
 		});
 	}
@@ -578,7 +579,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
  * @param {Node}        trigger_element  UI element that was clicked to open overlay dialogue.
  */
 function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element) {
-	var popup_options = {scriptid: scriptid};
+	const popup_options = {scriptid: scriptid};
 
 	if (hostid !== null) {
 		popup_options.hostid = hostid;
@@ -592,8 +593,8 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
 		popup_options.manualinput = manualinput;
 	}
 
-	if (Object.keys(popup_options).length == 2 ||
-		(manualinput !== null && Object.keys(popup_options).length === 3)) {
+	if (Object.keys(popup_options).length == 2
+			|| (manualinput !== null && Object.keys(popup_options).length === 3)) {
 		popup_options._csrf_token = csrf_token;
 
 		PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});

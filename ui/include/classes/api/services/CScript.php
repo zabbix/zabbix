@@ -675,7 +675,10 @@ class CScript extends CApiService {
 		}
 
 		if (array_key_exists('manualinput', $script) && $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-			$regex_validator = new CRegexValidator();
+			$regex_validator = new CRegexValidator([
+				'messageInvalid' => _('Regular expression must be a string'),
+				'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+			]);
 
 			if (array_key_exists('manualinput_validator_type', $script) &&
 					$script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
@@ -685,11 +688,24 @@ class CScript extends CApiService {
 
 				$regular_expression = '/'.str_replace('/', '\/', $script['manualinput_validator'] ?? '').'/';
 
-				if ($regex_validator->validate($script['manualinput_validator'] ?? '')
-						&& !preg_match($regular_expression, $default_input)) {
+				if ($script['manualinput_validator'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
+							_('Expression cannot be empty')
+						)
+					);
+				}
+				elseif (!$regex_validator->validate($script['manualinput_validator'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
+							$regex_validator->getError()
+						)
+					);
+				}
+				elseif (!preg_match($regular_expression, $default_input)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
-							_s('input does not match the provided pattern: %1$s',$script['manualinput_validator'])
+							_s('input does not match the provided pattern: %1$s', $script['manualinput_validator'])
 						)
 					);
 				}
@@ -1116,7 +1132,7 @@ class CScript extends CApiService {
 			'scriptid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'hostid' =>			['type' => API_ID],
 			'eventid' =>		['type' => API_ID],
-			'manualinput' =>	['type' => API_STRING_UTF8]
+			'manualinput' =>	['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {

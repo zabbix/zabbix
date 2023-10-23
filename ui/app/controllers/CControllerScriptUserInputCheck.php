@@ -30,7 +30,7 @@ class CControllerScriptUserInputCheck extends CController {
 		$fields = [
 			'manualinput' =>				'required|string',
 			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST, ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]),
-			'input_validator' =>			'db scripts.manualinput_validator|required|string',
+			'manualinput_validator' =>		'db scripts.manualinput_validator|required|string',
 			'test' =>						'in 1'
 		];
 
@@ -55,21 +55,45 @@ class CControllerScriptUserInputCheck extends CController {
 
 	protected function doAction(): void {
 		$manualinput = $this->getInput('manualinput');
+		$manualinput_validator = $this->getInput('manualinput_validator');
 		$output = [];
 
-		$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
-		$script['manualinput_validator'] = $this->getInput('input_validator');
+		if ($this->getInput('manualinput_validator_type') == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
+			$user_input_values = array_map('trim', explode(',', $manualinput_validator));
+			$manualinput_validator = implode(',', $user_input_values);
 
-		if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
-			$script['provided_manualinput'] = $manualinput;
+			// Check if provided manualinput value is one of dropdown values when executing the script.
+			if (!in_array($manualinput, $user_input_values)) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
+					_s('value must be one of %1$s', $manualinput_validator)
+				));
+			}
 		}
 		else {
-			$script['manualinput_default_value'] = $manualinput;
+			$regular_expression = '/'.str_replace('/', '\/', $manualinput_validator).'/';
+			$regex_validator = new CRegexValidator([
+				'messageInvalid' => _('Regular expression must be a string'),
+				'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+			]);
+
+			if (!$regex_validator->validate($manualinput_validator)) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
+					$regex_validator->getError())
+				);
+			}
+			elseif ($manualinput_validator === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
+					_('Expression cannot be empty')
+				));
+			}
+			elseif (!preg_match($regular_expression, trim($manualinput))) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
+					_s('input does not match the provided pattern: %1$s', $manualinput_validator)
+				));
+			}
 		}
 
-		$result = CScriptHelper::validateManualInput($script);
-
-		if ($result) {
+		if (!hasErrorMessages()) {
 			if ($this->hasInput('test')) {
 				$output['success']['messages'] = [_('User input has been successfully tested.')];
 				$output['success']['test'] = true;
