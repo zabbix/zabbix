@@ -605,4 +605,13 @@ out:
   token_type: ZBX_TOKEN_EXPRESSION_MACRO
   expression: '{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{?1 + 2'
   return: SUCCEED
+---
+test case: 'Success: {?count(//trap[1],#5,"str\\arg", 0)}'
+in:
+  expression: '{?count(//trap[1],#5,"str\\arg", 0)}'
+out:
+  token: '{?count(//trap[1],#5,"str\\arg", 0)}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: 'count(//trap[1],#5,"str\\arg", 0)'
+  return: SUCCEED
 ...
