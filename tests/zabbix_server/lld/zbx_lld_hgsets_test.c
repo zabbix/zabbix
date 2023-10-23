@@ -58,8 +58,6 @@ static zbx_mock_error_t	get_vector_elements_uint64(zbx_mock_handle_t object_memb
 		zbx_vector_uint64_append(elements, val);
 	}
 
-	zbx_vector_uint64_sort(elements, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	return error;
 }
 
@@ -116,8 +114,6 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_END_OF_VECTOR != error)
 		fail_msg("Cannot read \"hosts\" for input: %s", zbx_mock_error_string(error));
 
-	zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
 	lld_hgsets_make(&hosts, &hgsets, &del_hgsetids_act);
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("hgsets", &vector)))
@@ -167,16 +163,14 @@ void	zbx_mock_test_entry(void **state)
 
 	while (ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(vector, &element)))
 	{
-		zbx_uint64_t	hostid;
+		if (param_num == hosts.values_num)
+			fail_msg("Not enough \"hosts\" entries, param_num: %d", param_num);
+
+		host = hosts.values[param_num];
 
 		/* hostid */
-
-		hostid = zbx_mock_get_object_member_int(element, "hostid");
-
-		if (FAIL == (i = zbx_vector_ptr_bsearch(&hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			fail_msg("Missing expected hostid in actual results: " ZBX_FS_UI64, hostid);
-
-		host = hosts.values[i];
+		zbx_mock_assert_uint64_eq("host hostid", zbx_mock_get_object_member_uint64(element, "hostid"),
+				host->hostid);
 
 		/* hgsetid */
 		zbx_mock_assert_uint64_eq("host hgsetid", zbx_mock_get_object_member_uint64(element, "hgsetid"),

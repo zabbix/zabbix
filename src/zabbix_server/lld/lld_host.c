@@ -1288,8 +1288,6 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				/* host groups which are already added */
 				zbx_vector_uint64_remove(&host->new_groupids, i);
 			}
-
-			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HGSETID;
 		}
 		zbx_db_free_result(result);
 
@@ -1359,7 +1357,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 				if (ZBX_LLD_HGSET_OPT_INSERT == hgsets->values[k]->opt)
 				{
-					hgset->hgsetid = host->hgsetid_orig;
+					hgsets->values[k]->hgsetid = host->hgsetid_orig;
 					hgsets->values[k]->opt = ZBX_LLD_HGSET_OPT_REUSE;
 				}
 			}
@@ -1401,16 +1399,17 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		}
 	}
 
-	/* get ids for hgsets which are marked for insert */
-
 	zbx_vector_str_create(&hashes);
 
 	for (i = 0; i < hgsets->values_num; i++)
 	{
 		if (ZBX_LLD_HGSET_OPT_INSERT == hgsets->values[i]->opt)
 			zbx_vector_str_append(&hashes, hgsets->values[i]->hash_str);
+		else if (ZBX_LLD_HGSET_OPT_DELETE == hgsets->values[i]->opt)
+			zbx_vector_uint64_append(del_hgsetids, hgsets->values[i]->hgsetid);
 	}
 
+	/* get ids of existing hgsets which are marked for insert */
 	if (0 < hashes.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hgsetid,hash from hgset where");
@@ -1433,32 +1432,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 	zbx_vector_str_destroy(&hashes);
 
-	/* validate update flag */
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (0 == host->hostid || 0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
-			continue;
-
-		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID) && host->hgset->hgsetid == host->hgsetid_orig)
-		{
-			host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HGSETID;
-		}
-		else if (0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID) &&
-				host->hgset->hgsetid != host->hgsetid_orig)
-		{
-			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HGSETID;
-		}
-	}
-
 	/* get hgset ids to be deleted */
-
-	for (i = 0; i < hgsets->values_num; i++)
-	{
-		if (ZBX_LLD_HGSET_OPT_DELETE == hgsets->values[i]->opt && 0 != hgsets->values[i]->hgsetid)
-			zbx_vector_uint64_append(del_hgsetids, hgsets->values[i]->hgsetid);
-	}
 
 	if (0 < del_hgsetids->values_num)
 	{
