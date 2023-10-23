@@ -292,13 +292,15 @@
 		}
 
 		#post(curl, data) {
+			const action = curl.getArgument('action');
+
 			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({...this.token, ...data})
 			})
 				.then((response) => response.json())
-				.then((response) => this.elementSuccess({detail: response}))
+				.then((response) => this.elementSuccess({detail: {action, ...response}}))
 				.catch(() => {
 					clearMessages();
 
@@ -327,7 +329,7 @@
 					postMessageDetails('success', response.success.messages);
 				}
 
-				if (response.success.action === 'delete') {
+				if (response.success.action === 'delete' && response.action !== 'item.delete') {
 					// Items template or host were removed, redirect to list of items.
 					let list_url = new Curl('zabbix.php');
 
