@@ -18,7 +18,6 @@
 **/
 
 #include "vmware_shmem.h"
-#include "vmware.h"
 #include "vmware_perfcntr.h"
 #include "zbxshmem.h"
 
@@ -1067,7 +1066,7 @@ static zbx_hash_t	vmware_cust_query_hash_func(const void *data)
 	return ZBX_DEFAULT_HASH_ALGO(&cust_query->query_type, sizeof(cust_query->query_type), seed);
 }
 
-void	vmware_shmem_hashset_create_perf_entities_counter_queries(zbx_vmware_service_t *service)
+void	vmware_shmem_service_hashset_create(zbx_vmware_service_t *service)
 {
 #define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
@@ -1079,6 +1078,10 @@ void	vmware_shmem_hashset_create_perf_entities_counter_queries(zbx_vmware_servic
 
 	zbx_hashset_create_ext(&service->cust_queries, 100, vmware_cust_query_hash_func, vmware_cust_query_compare_func,
 			NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
+
+	zbx_hashset_create_ext(&service->eventlog.evt_severities, 100, ZBX_DEFAULT_STRING_PTR_HASH_FUNC,
+			ZBX_DEFAULT_STR_COMPARE_FUNC, NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+			__vm_shmem_free_func);
 #undef ZBX_VMWARE_COUNTERS_INIT_SIZE
 }
 
@@ -1135,6 +1138,49 @@ zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
 	return (zbx_vmware_tag_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_tag_t));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies events severity vector into shared memory hashset          *
+ *                                                                            *
+ * Parameters: dst - [IN] the destination hashset                             *
+ *             src - [IN] the source vector                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src)
+{
+	int	i;
+
+	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	for (i = 0; i < src->values_num; i++)
+	{
+		zbx_vmware_key_value_t	*es_dst, *es_src = &src->values[i];
+
+		es_dst = (zbx_vmware_key_value_t *)zbx_hashset_insert(dst, es_src, sizeof(zbx_vmware_key_value_t));
+
+		/* check if the event type was inserted - copy severity only for inserted event types */
+		if (es_dst->key == es_src->key)
+		{
+			es_dst->key = vmware_shared_strdup(es_src->key);
+			es_dst->value = vmware_shared_strdup(es_src->value);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store zbx_vmware_key_value_t  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_shmem_vmware_key_value_free(zbx_vmware_key_value_t *value)
+{
+	vmware_shared_strfree(value->key);
+	vmware_shared_strfree(value->value);
+}
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 /******************************************************************************

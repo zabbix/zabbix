@@ -821,7 +821,7 @@ func (m *Manager) PerformTask(
 	key string,
 	timeout time.Duration,
 	clientID uint64,
-) (result string, err error) {
+) (string, error) {
 	var lastLogsize uint64
 	var mtime int
 
@@ -843,22 +843,21 @@ func (m *Manager) PerformTask(
 		time.Now(),
 	)
 
-	select {
-	case r := <-w:
-		if r.Error == nil {
-			if r.Value != nil {
-				result = *r.Value
-			} else {
-				// single metric requests do not support empty values, return error instead
-				err = errors.New("No values have been gathered yet.")
-			}
+	var result string
+
+	r := <-w
+	if r.Error == nil {
+		if r.Value != nil {
+			result = *r.Value
 		} else {
-			err = r.Error
+			// single metric requests do not support empty values, return error instead
+			return "", errors.New("No values have been gathered yet.")
 		}
-	case <-time.After(timeout):
-		err = fmt.Errorf("Timeout occurred while gathering data.")
+	} else {
+		return "", r.Error
 	}
-	return
+
+	return result, nil
 }
 
 func (m *Manager) FinishTask(task performer) {

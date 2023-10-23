@@ -133,4 +133,6 @@ func init() {
 		"logrt", "Log file monitoring with log rotation support.",
 		"log.count", "Count of matched lines in log file monitoring.",
 		"logrt.count", "Count of matched lines in log file monitoring with log rotation support.")
+
+	impl.SetHandleTimeout(true)
 }
