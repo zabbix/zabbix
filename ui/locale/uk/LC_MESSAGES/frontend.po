@@ -21670,6 +21670,10 @@ msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datast
 msgstr ""
 
 #: include/classes/data/CItemData.php:1890
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
 msgstr ""
 

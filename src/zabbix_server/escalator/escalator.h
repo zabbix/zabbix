@@ -30,6 +30,7 @@ typedef struct
 	int			config_timeout;
 	int			config_trapper_timeout;
 	const char		*config_source_ip;
+	int			*config_forks;
 }
 zbx_thread_escalator_args;
 

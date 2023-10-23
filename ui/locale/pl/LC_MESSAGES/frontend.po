@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 13:43+0300\n"
+"POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-10-16 08:25+0000\n"
 "Last-Translator: Paweł Seledec <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -21667,6 +21667,10 @@ msgstr "Tablica tagów magazynu danych VMware, \"url\" - adres URL usługi VMwar
 #: include/classes/data/CItemData.php:1848
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
 msgstr "Statystyki zapisu magazynu danych VMware, \"url\" - URL usługi VMware, \"datastore\" - nazwa magazynu danych, \"mode\"- opóźnienie/maksymalne opóźnienie - średnia albo maksimum"
+
+#: include/classes/data/CItemData.php:1890
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
