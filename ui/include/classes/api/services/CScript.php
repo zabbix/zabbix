@@ -1278,6 +1278,11 @@ class CScript extends CApiService {
 						if (strpos($script['url'], '{') !== false) {
 							$macros_data[$hostid][$scriptid]['url'] = $script['url'];
 						}
+
+						if (array_key_exists('manualinput_prompt', $script)
+								&& strpos($script['manualinput_prompt'], '{') !== false) {
+							$macros_data[$hostid][$scriptid]['manualinput_prompt'] = $script['manualinput_prompt'];
+						}
 					}
 				}
 			}
@@ -1296,7 +1301,7 @@ class CScript extends CApiService {
 						$size = count($scripts_by_host[$hostid]);
 						$scripts_by_host[$hostid][$size] = $script;
 
-						// Set confirmation and URL with resolved macros.
+						// Set confirmation, URL and manualinput prompt with resolved macros.
 						if (array_key_exists($hostid, $macros_data)
 								&& array_key_exists($scriptid, $macros_data[$hostid])) {
 							$macro_values = $macros_data[$hostid][$scriptid];
@@ -1307,6 +1312,12 @@ class CScript extends CApiService {
 
 							if (strpos($script['url'], '{') !== false) {
 								$scripts_by_host[$hostid][$size]['url'] = $macro_values['url'];
+							}
+
+							if (array_key_exists('manualinput_prompt', $script)
+									&& strpos($script['manualinput_prompt'], '{') !== false) {
+								$scripts_by_host[$hostid][$size]['manualinput_prompt'] =
+									$macro_values['manualinput_prompt'];
 							}
 						}
 					}
@@ -1445,6 +1456,12 @@ class CScript extends CApiService {
 								if (strpos($script['url'], '{') !== false) {
 									$macros_data[$eventid][$scriptid]['url'] = $script['url'];
 								}
+
+								if (array_key_exists('manualinput_prompt', $script)
+										&& strpos($script['manualinput_prompt'], '{') !== false) {
+									$macros_data[$eventid][$scriptid]['manualinput_prompt'] =
+										$script['manualinput_prompt'];
+								}
 							}
 						}
 					}
@@ -1470,7 +1487,7 @@ class CScript extends CApiService {
 								$size = count($scripts_by_events[$eventid]);
 								$scripts_by_events[$eventid][$size] = $script;
 
-								// Set confirmation and URL with resolved macros.
+								// Set confirmation, URL and manualinput prompt with resolved macros.
 								if (array_key_exists($eventid, $macros_data)
 										&& array_key_exists($scriptid, $macros_data[$eventid])) {
 									$macro_values = $macros_data[$eventid][$scriptid];
@@ -1482,6 +1499,12 @@ class CScript extends CApiService {
 
 									if (strpos($script['url'], '{') !== false) {
 										$scripts_by_events[$eventid][$size]['url'] = $macro_values['url'];
+									}
+
+									if (array_key_exists('manualinput_prompt', $script)
+											&& strpos($script['manualinput_prompt'], '{') !== false) {
+										$scripts_by_events[$eventid][$size]['manualinput_prompt'] =
+											$macro_values['manualinput_prompt'];
 									}
 								}
 

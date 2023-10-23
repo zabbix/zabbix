@@ -2643,7 +2643,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
 	 *             ),
 	 *             61 => array(
-	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?'
+	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
+	 *                 'manualinput' => 'Execute script for {HOST.HOST}?'
 	 *             )
 	 *         )
 	 *     )
@@ -2656,7 +2657,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid=10084'
 	 *             ),
 	 *             61 => array (
-	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?'
+	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
+	 *                 'manualinput' => 'Execute script for Zabbix server?'
 	 *             )
 	 *         )
 	 *     )
@@ -2785,7 +2787,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *                 'url' => 'http://zabbix/ui/triggers.php?context=host&filter_hostids[]={HOST.ID1}&filter_hostids[]={HOST.ID2}&filter_set=1'
 	 *             ),
 	 *             61 => array(
-	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?'
+	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
+	 *                 'manualinput' => 'Execute script for {HOST.HOST}?'
 	 *             )
 	 *         )
 	 *     )
@@ -2798,7 +2801,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *                 'url' => 'http://zabbix/ui/triggers.php?context=host&filter_hostids[]=10084&filter_hostids[]=10134&filter_set=1'
 	 *             ),
 	 *             61 => array (
-	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?'
+	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
+	 *                 'manualinput' => 'Execute script for Zabbix server?'
 	 *             )
 	 *         )
 	 *     )
