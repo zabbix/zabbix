@@ -1,8 +1,8 @@
 Changes for 5.0.39rc1
 
-New features:
-
 Bug fixes:
+...G...PS. [ZBX-23542] fixed memory leaks when using certificate-based encryption in Zabbix agent and Zabbix agent 2 (akozlovs, Andris)
+........S. [ZBX-23064] simplified trend synchronization queries to improve performance (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.38
@@ -2857,8 +2857,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 
 --------------------------------------------------------------------------------
 Changes for 4.0.50rc1
-
-New features:
 
 Bug fixes:
 
