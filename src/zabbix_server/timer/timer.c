@@ -23,6 +23,7 @@
 #include "dbcache.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "service_protocol.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 
@@ -340,6 +341,22 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 	zbx_vector_uint64_destroy(&eventids);
 }
 
+static void     service_delete_redundant_alarms(const zbx_vector_uint64_t *eventids)
+{
+        unsigned char   *data = NULL;
+        size_t          data_alloc = 0, data_offset = 0;
+        int             i;
+
+        for (i = 0; i < eventids->values_num; i++)
+                zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
+
+        if (NULL == data)
+                return;
+
+        zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, (zbx_uint32_t)data_offset);
+        zbx_free(data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create/update event suppress data to reflect latest maintenance   *
@@ -351,11 +368,13 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 static void	db_update_event_suppress_data(int *suppressed_num)
 {
 	zbx_vector_ptr_t	event_queries, event_data;
+	zbx_vector_uint64_t	s_eventids;
 
 	*suppressed_num = 0;
 
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_data);
+	zbx_vector_uint64_create(&s_eventids);
 
 	db_get_query_events(&event_queries, &event_data);
 
@@ -463,6 +482,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 							(int)query->maintenances.values[k].second);
 
 					(*suppressed_num)++;
+					zbx_vector_uint64_append(&s_eventids, query->eventid);
 				}
 			}
 		}
@@ -498,6 +518,8 @@ cleanup:
 
 		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 		zbx_vector_uint64_destroy(&maintenanceids);
+
+		service_delete_redundant_alarms(&s_eventids);
 	}
 
 	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)event_suppress_data_free);
@@ -505,6 +527,8 @@ cleanup:
 
 	zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	zbx_vector_ptr_destroy(&event_queries);
+
+	zbx_vector_uint64_destroy(&s_eventids);
 }
 
 /******************************************************************************
