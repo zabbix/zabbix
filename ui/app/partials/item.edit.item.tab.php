@@ -724,11 +724,11 @@ if ($data['source'] === 'item' && $data['config']['hk_history_global']
 }
 
 $formgrid->addItem([
-	(new CLabel([_('History storage period'), $hint], 'history'))->setAsteriskMark(),
+	(new CLabel([_('History'), $hint], 'history'))->setAsteriskMark(),
 	new CFormField([
 		(new CRadioButtonList('history_mode', (int) $item['history_mode']))
-			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+			->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 			->setReadonly($item['discovered'])
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -757,13 +757,13 @@ if ($data['source'] === 'item' && $data['config']['hk_trends_global']
 
 $formgrid
 	->addItem([
-		(new CLabel([_('Trend storage period'), $hint], 'trends'))
+		(new CLabel([_('Trends'), $hint], 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
 			(new CRadioButtonList('trends_mode', (int) $item['trends_mode']))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setReadonly($item['discovered'])
 				->setModern(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

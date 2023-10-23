@@ -494,14 +494,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								[
 									'fields' => [
 										'Object' => 'Item prototype',
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "History storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "History": a time unit is expected.'
 						]
 					]
 				]
@@ -519,14 +519,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								[
 									'fields' => [
 										'Object' => 'Item prototype',
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "Trend storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "Trends": a time unit is expected.'
 						]
 					]
 				]
@@ -587,12 +587,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Condition' => ['operator' => 'does not match', 'value' => 'item_pattern'],
 										'Create enabled' => 'No',
 										'Discover' => 'No',
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => '500d'
 										],
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => '200d'
 										]
 									],
@@ -874,8 +874,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Object' => 'Item prototype',
 										'Create enabled' => null,
 										'Discover' => null,
-										'History storage period' => null,
-										'Trend storage period' => null
+										'History' => null,
+										'Trends' => null
 									],
 									'Update interval' => null
 								]
@@ -1336,14 +1336,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
 									'fields' => [
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "History storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "History": a time unit is expected.'
 						]
 					]
 				]
@@ -1360,14 +1360,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
 									'fields' => [
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => ''
 										]
 									]
 								]
 							],
-							'error' => 'Incorrect value for field "Trend storage period": a time unit is expected.'
+							'error' => 'Incorrect value for field "Trends": a time unit is expected.'
 						]
 					]
 				]
@@ -1475,12 +1475,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'fields' => [
 										'Create enabled' => 'No',
 										'Discover' => 'No',
-										'History storage period' => [
-											'ophistory_history_mode' => 'Storage period',
+										'History' => [
+											'ophistory_history_mode' => 'Store up to',
 											'ophistory_history' => '500d'
 										],
-										'Trend storage period' => [
-											'optrends_trends_mode' => 'Storage period',
+										'Trends' => [
+											'optrends_trends_mode' => 'Store up to',
 											'optrends_trends' => '200d'
 										]
 									],
@@ -1643,8 +1643,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 //								['type' => 'Scheduling', 'delay' => 'wd1-5h9-18']
 //							]
 //						],
-						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
-						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep trends']
+						'History' => ['ophistory_history_mode' => 'Do not store'],
+						'Trends' => ['optrends_trends_mode' => 'Do not store']
 					],
 					[
 						'Object' => 'Trigger prototype',

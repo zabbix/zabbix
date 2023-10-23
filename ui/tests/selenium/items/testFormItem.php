@@ -674,14 +674,14 @@ class testFormItem extends CLegacyWebTest {
 			);
 		}
 
-		$this->assertEquals(255, $form->getField('History storage period')->getAttribute('maxlength'));
+		$this->assertEquals(255, $form->getField('History')->getAttribute('maxlength'));
 
 		if (!isset($itemid)) {
 			$this->zbxTestAssertElementValue('history', '90d');
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->assertEquals(255, $form->getField('Trend storage period')->getAttribute('maxlength'));
+			$this->assertEquals(255, $form->getField('Trend')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
 				$this->zbxTestAssertElementValue('trends', '365d');
 			}
@@ -2103,7 +2103,7 @@ class testFormItem extends CLegacyWebTest {
 		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		$form->getLabel('History storage period')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue']", 'Overridden by global housekeeping settings (99d)');
-		$form->getLabel('Trend storage period')->query("xpath:span[@class='js-hint']/button")->one()->click();
+		$form->getLabel('Trend')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');

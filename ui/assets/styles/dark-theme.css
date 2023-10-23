@@ -2186,6 +2186,12 @@ button {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+@page {
+  margin: 10px; }
+@media print {
+  .dashboard-page {
+    margin: 10px;
+    break-after: page; } }
 .diff {
   padding: 4px;
   background: #0e1012; }

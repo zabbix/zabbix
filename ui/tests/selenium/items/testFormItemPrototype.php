@@ -880,7 +880,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->assertEquals(255, $form->getField('Trend storage period')->getAttribute('maxlength'));
+			$this->assertEquals(255, $form->getField('Trend')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
 				$this->zbxTestAssertElementValue('trends', '365d');
 			}
