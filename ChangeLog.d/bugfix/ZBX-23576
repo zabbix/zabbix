@@ -1,0 +1,1 @@
+........S. [ZBX-23576] fixed group condition in calculated item in case when there is template group with same name as host group (vso)
