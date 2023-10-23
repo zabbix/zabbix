@@ -20,7 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup alerts
@@ -29,7 +29,14 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testPageReportsActionLog extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	public static function prepareInsertActionsData() {
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
