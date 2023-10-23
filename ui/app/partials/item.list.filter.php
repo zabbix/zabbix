@@ -25,11 +25,11 @@
  */
 
 $filter = (new CFilter())->setResetUrl((new CUrl())->setArgument('action', $data['action']));
-$filter_columns = [new CFormGrid(), new CFormGrid(), new CFormGrid()];
+$filter_columns = [new CFormList(), new CFormList(), new CFormList()];
 
 // First column.
 $filter_columns[0]
-	->addItem([
+	->addRow(
 		new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'), 'filter_groupids__ms'),
 		new CFormField(
 			(new CMultiSelect([
@@ -48,8 +48,8 @@ $filter_columns[0]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hostids__ms'),
 		new CFormField(
 			(new CMultiSelect([
@@ -71,23 +71,23 @@ $filter_columns[0]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel(_('Name')),
 		new CFormField(
 			(new CTextBox('filter_name', $data['filter_data']['filter_name']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel(_('Key')),
 		new CFormField(
 			(new CTextBox('filter_key', $data['filter_data']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
-	]);
+	);
 
 if ($data['filter_data']['ms_hosts']) {
-	$filter_columns[0]->addItem([
+	$filter_columns[0]->addRow(
 		new CLabel(_('Value mapping'), 'filter_valuemapids__ms'),
 		new CFormField(
 			(new CMultiSelect([
@@ -107,7 +107,7 @@ if ($data['filter_data']['ms_hosts']) {
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
-	]);
+	);
 }
 else {
 	foreach ($data['filter_data']['filter_valuemapids'] as $filter_valuemapid) {
@@ -137,42 +137,42 @@ $info_type_select = (new CSelect('filter_value_type'))
 	]));
 
 $filter_columns[1]
-	->addItem([
+	->addRow(
 		new CLabel(_('Type'), $type_select->getFocusableElementId()),
 		new CFormField($type_select)
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel(_('Type of information'), $info_type_select->getFocusableElementId()),
 		new CFormField($info_type_select)
-	])
-	->addItem([
+	)
+	->addRow(
 		(new CLabel(_('SNMP OID'), 'filter_snmp_oid'))->setId('js-filter-snmp-oid-label'),
 		(new CFormField(
 			(new CTextBox('filter_snmp_oid', $data['filter_data']['filter_snmp_oid'], '', 255))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		))->setId('js-filter-snmp-oid-field')
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel(_('History')),
 		new CFormField(
 			(new CTextBox('filter_history', $data['filter_data']['filter_history']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel(_('Trends')),
 		new CFormField(
 			(new CTextBox('filter_trends', $data['filter_data']['filter_trends']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
-	])
-	->addItem([
+	)
+	->addRow(
 		(new CLabel(_('Update interval'), 'filter_delay'))->setId('js-filter-delay-label'),
 		(new CFormField(
 			(new CTextBox('filter_delay', $data['filter_data']['filter_delay']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		))->setId('js-filter-delay-field')
-	]);
+	);
 
 // Third column.
 $tags = $data['filter_data']['filter_tags'];
@@ -181,7 +181,7 @@ if (!$tags) {
 	$tags[] = ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''];
 }
 
-$filter_columns[2]->addItem([
+$filter_columns[2]->addRow(
 	new CLabel(_('Tags')),
 	new CFormField(
 		CTagFilterFieldHelper::getTagFilterField([
@@ -189,10 +189,10 @@ $filter_columns[2]->addItem([
 			'tags' => $tags
 		])
 	)
-]);
+);
 
 if ($data['context'] === 'host') {
-	$filter_columns[2]->addItem([
+	$filter_columns[2]->addRow(
 		new CLabel(_('State')),
 		new CFormField(
 			(new CRadioButtonList('filter_state', (int) $data['filter_data']['filter_state']))
@@ -201,11 +201,11 @@ if ($data['context'] === 'host') {
 				->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
 				->setModern()
 		)
-	]);
+	);
 }
 
 $filter_columns[2]
-	->addItem([
+	->addRow(
 		new CLabel(_('Status')),
 		new CFormField(
 			(new CRadioButtonList('filter_status', (int) $data['filter_data']['filter_status']))
@@ -215,8 +215,8 @@ $filter_columns[2]
 				->setModern()
 				->setEnabled($data['filter_data']['filter_state'] == -1)
 		)
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel(_('Triggers')),
 		new CFormField(
 			(new CRadioButtonList('filter_with_triggers', (int) $data['filter_data']['filter_with_triggers']))
@@ -225,8 +225,8 @@ $filter_columns[2]
 				->addValue(_('No'), 0)
 				->setModern()
 		)
-	])
-	->addItem([
+	)
+	->addRow(
 		new CLabel(_('Inherited')),
 		new CFormField(
 			(new CRadioButtonList('filter_inherited', (int) $data['filter_data']['filter_inherited']))
@@ -235,10 +235,10 @@ $filter_columns[2]
 				->addValue(_('No'), 0)
 				->setModern()
 		)
-	]);
+	);
 
 if ($data['context'] === 'host') {
-	$filter_columns[2]->addItem([
+	$filter_columns[2]->addRow(
 		new CLabel(_('Discovered')),
 		new CFormField(
 			(new CRadioButtonList('filter_discovered', (int) $data['filter_data']['filter_discovered']))
@@ -247,7 +247,7 @@ if ($data['context'] === 'host') {
 				->addValue(_('No'), ZBX_FLAG_DISCOVERY_NORMAL)
 				->setModern()
 		)
-	]);
+	);
 }
 
 $subfilters_table = (new CTableInfo())
