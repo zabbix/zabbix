@@ -1232,33 +1232,33 @@ class testPageProblems extends CWebTest {
 					$this->assertFalse($cell->query('xpath:.//button[contains(@class, "zi-alert-with-content")]')->exists());
 				}
 				else {
-					$cell->query('tag:button')->one()->waitUntilClickable()->click();
-					$description_dialog = $dialog->one()->waitUntilVisible();
+					$cell->query('tag:button')->waitUntilClickable()->one()->click();
+					$description_dialog = $dialog->waitUntilVisible()->one();
 					$this->assertEquals($description, $description_dialog->getText());
-					$description_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
+					$description_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 					$description_dialog->waitUntilNotPresent();
 				}
 			}
 		}
 
-//		if (array_key_exists('check_actions', $data)) {
-//			foreach ($data['check_actions'] as $i => $action) {
-//				$cell = $table->getRow($i)->getColumn('Actions');
-//				$tick = $cell->query('xpath:.//span[@title="Acknowledged"]');
-//
-//				if (!$action) {
-//					$this->assertFalse($tick->exists());
-//				}
-//				else {
-//					$this->assertTrue($tick->exists());
-//					$cell->query('tag:button')->waitUntilClickable()->one()->click();
-//					$action_dialog = $dialog->one()->waitUntilVisible();
-//					$this->assertTableData($action, 'xpath://div[@class="overlay-dialogue"]//table');
-//					$action_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
-//					$action_dialog->waitUntilNotPresent();
-//				}
-//			}
-//		}
+		if (array_key_exists('check_actions', $data)) {
+			foreach ($data['check_actions'] as $i => $action) {
+				$cell = $table->getRow($i)->getColumn('Actions');
+				$tick = $cell->query('xpath:.//span[@title="Acknowledged"]');
+
+				if (!$action) {
+					$this->assertFalse($tick->exists());
+				}
+				else {
+					$this->assertTrue($tick->exists());
+					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
+					$action_dialog = $dialog->waitUntilVisible()->one();
+					$this->assertTableData($action, 'xpath://div[@class="overlay-dialogue"]//table');
+					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+					$action_dialog->waitUntilNotPresent();
+				}
+			}
+		}
 
 		if (array_key_exists('check_trigger_dependency', $data)) {
 			foreach ($data['check_trigger_dependency'] as $i => $dependency) {
