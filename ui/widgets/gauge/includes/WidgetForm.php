@@ -113,6 +113,10 @@ class WidgetForm extends CWidgetForm {
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
+		if (!$this->getFieldValue('show')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+		}
+
 		if ($errors) {
 			return $errors;
 		}
@@ -193,6 +197,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_SCALE,
 						Widget::SHOW_VALUE_ARC
 					])
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))

@@ -50,11 +50,15 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 	public function setValue($value): self {
 		$this->value = $value === self::EMPTY_VALUE ? [] : (array) $value;
 
+		sort($this->value);
+
 		return $this;
 	}
 
 	public function setDefault($value): self {
 		$this->default = (array) $value;
+
+		sort($this->default);
 
 		return $this;
 	}
