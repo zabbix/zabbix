@@ -152,6 +152,8 @@
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=128"/>
 			<arg line="--with-openssl"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -343,6 +345,8 @@
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=128"/>
 			<arg line="--with-openssl"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>

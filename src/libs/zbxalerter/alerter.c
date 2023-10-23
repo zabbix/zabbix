@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alerter.h"
+#include "zbxalerter.h"
+#include "alerter_defs.h"
 
 #include "alerter_protocol.h"
 #include "zbxlog.h"
@@ -35,11 +36,13 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
+ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
+
 static zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute script alert type                                         *
+ * Purpose: executes script alert type                                        *
  *                                                                            *
  * Parameters: command       - [IN] command for execution                     *
  *             error         - [OUT] error string if function fails           *
@@ -156,11 +159,10 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 {
 	zbx_uint64_t	alertid, mediatypeid, eventid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
-			*inreplyto;
+			*inreplyto, error[MAX_STRING_LEN];
 	unsigned short	smtp_port;
 	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
 	int		ret;
-	char		error[MAX_STRING_LEN];
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &sendto, &subject, &message,
 			&smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
@@ -195,9 +197,8 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
 {
 	zbx_uint64_t	alertid;
-	char		*sendto, *message, *gsm_modem;
+	char		*sendto, *message, *gsm_modem, error[MAX_STRING_LEN];
 	int		ret;
-	char		error[MAX_STRING_LEN];
 
 	zbx_alerter_deserialize_sms(ipc_message->data, &alertid, &sendto, &message, &gsm_modem);
 
@@ -221,9 +222,8 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
 {
 	zbx_uint64_t	alertid;
-	char		*command;
+	char		*command, error[MAX_STRING_LEN];
 	int		ret;
-	char		error[MAX_STRING_LEN];
 
 	zbx_alerter_deserialize_exec(ipc_message->data, &alertid, &command);
 
@@ -245,9 +245,9 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
 		const char *config_source_ip)
 {
-	char			*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
-	int			script_bin_sz, ret, timeout;
-	unsigned char		debug;
+	char		*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
+	int		script_bin_sz, ret, timeout;
+	unsigned char	debug;
 
 	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params, &debug);
 
