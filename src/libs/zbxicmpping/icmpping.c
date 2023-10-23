@@ -137,7 +137,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 		return FAIL;
 	}
 
-	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", config_icmpping->get_tmpdir(), progname);
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", config_icmpping->get_tmpdir(),
+			config_icmpping->get_progname());
 
 	mode = umask(077);
 	fd = mkstemp(filename);
