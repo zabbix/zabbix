@@ -7,7 +7,7 @@ libzbxalerter_a_SOURCES = \
 	alert_manager.c \
 	alert_syncer.c \
 	alerter.c \
-	alerter.h \
+	alerter_defs.h \
 	alerter_protocol.c \
 	alerter_protocol.h
 

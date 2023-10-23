@@ -21,6 +21,7 @@
 
 #include "zbxexpression.h"
 #include "../server.h"
+
 #include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -45,6 +46,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxalerter.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
