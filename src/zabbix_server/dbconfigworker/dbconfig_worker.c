@@ -34,12 +34,11 @@
 #define ZBX_DBCONFIG_WORKER_DELAY	1
 #define ZBX_DBCONFIG_BATCH_SIZE		1000
 
-static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
+static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			deleted = 0;
 	zbx_dc_um_handle_t	*um_handle;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -136,8 +135,6 @@ static int	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, 
 		*macro_used = *processed_num;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return deleted;
 }
 
 ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
