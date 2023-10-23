@@ -65,7 +65,8 @@ if ($data['test']) {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'script_userinput_popup.submitTestForm();',
-			'class' => 'userinput-submit'
+			'class' => 'userinput-submit',
+			'enabled' => $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
 		]
 	];
 }
@@ -86,7 +87,7 @@ $form
 			'test' => $data['test'],
 			'input_type' => $data['manualinput_validator_type'],
 			'default_input' => $data['manualinput_default_value'],
-			'manualinput_validator' => $data['manualinput_validator']
+			'input_validator' => $data['manualinput_validator']
 		]).');'))->setOnDocumentReady()
 	);
 

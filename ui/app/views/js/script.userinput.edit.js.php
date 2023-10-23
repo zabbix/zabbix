@@ -42,10 +42,6 @@ window.script_userinput_popup = new class {
 		this.input_type = input_type;
 		this.input_validator = input_validator;
 		this.default_input = default_input;
-
-		if (input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_LIST ?> && test) {
-			document.querySelector('.userinput-submit').disabled = true;
-		}
 	}
 
 	submitTestForm() {
@@ -53,7 +49,7 @@ window.script_userinput_popup = new class {
 		const fields = getFormFields(this.form);
 
 		fields.manualinput_validator_type = this.input_type;
-		fields.input_validator = this.input_validator;
+		fields.manualinput_validator = this.input_validator;
 		fields.manualinput_default_value = this.default_input;
 
 		if (this.is_test) {
@@ -70,7 +66,7 @@ window.script_userinput_popup = new class {
 		const fields = getFormFields(this.form);
 
 		fields.manualinput_validator_type = this.input_type;
-		fields.input_validator = this.input_validator;
+		fields.manualinput_validator = this.input_validator;
 		fields.manualinput_default_value = this.default_input;
 
 		const curl = new Curl('zabbix.php');
