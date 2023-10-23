@@ -33,7 +33,6 @@ void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_alloc,
 		const zbx_vector_uint64_t ids);
 void	zbx_dbconfig_worker_deserialize_ids(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_uint64_t *ids);
-void	zbx_dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 void	zbx_dbconfig_worker_send_ids(const zbx_vector_uint64_t *hostids);
 
 typedef struct

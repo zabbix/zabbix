@@ -236,4 +236,3 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
-

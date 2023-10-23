@@ -23,7 +23,7 @@
 #include "zbxalgo.h"
 
 
-void	zbx_dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
+static void	dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
 
@@ -54,7 +54,7 @@ void	zbx_dbconfig_worker_send_ids(const zbx_vector_uint64_t *hostids)
 		size_t		data_alloc = 0, data_offset = 0;
 
 		zbx_dbconfig_worker_serialize_ids(&data, &data_alloc, &data_offset, *hostids);
-		zbx_dbconfig_worker_send(ZBX_IPC_DBCONFIG_WORKER_REQUEST, data, data_offset);
+		dbconfig_worker_send(ZBX_IPC_DBCONFIG_WORKER_REQUEST, data, data_offset);
 
 		free(data);
 	}
