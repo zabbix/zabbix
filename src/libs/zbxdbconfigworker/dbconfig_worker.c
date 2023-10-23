@@ -59,3 +59,4 @@ void	zbx_dbconfig_worker_send_ids(const zbx_vector_uint64_t *hostids)
 		free(data);
 	}
 }
+
