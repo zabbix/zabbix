@@ -47,8 +47,9 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	*/
 	public function testPageItemPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
+		$context = (str_contains($data['name'], '001')) ? 'template' : 'host';
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
-				$data['parent_itemid'].'&context=host');
+				$data['parent_itemid'].'&context='.$context);
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
@@ -77,9 +78,10 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	public function testPageItemPrototypes_SimpleDelete($data) {
 		$itemid = $data['itemid'];
 		$drule = $data['d_name'];
+		$context = (str_contains($data['name'], '001')) ? 'template' : 'host';
 
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
-				$data['parent_itemid'].'&context=host');
+				$data['parent_itemid'].'&context='.$context);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('itemids_'.$itemid);
 		$this->query('button:Delete')->one()->click();
@@ -115,11 +117,12 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$druleid = $rule['parent_itemid'];
 		$drule = $rule['d_name'];
 		$hostid = $rule['hostid'];
+		$context = (str_contains($rule['name'], '001')) ? 'template' : 'host';
 
 		$itemids = CDBHelper::getAll('select itemid from item_discovery where parent_itemid='.$druleid);
 		$itemids = zbx_objectValues($itemids, 'itemid');
 
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$druleid.'&context=host');
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$druleid.'&context='.$context);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->query('button:Delete')->one()->click();
