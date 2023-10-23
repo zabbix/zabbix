@@ -46,6 +46,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxalerter.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
