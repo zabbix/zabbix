@@ -134,27 +134,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$primary_label = $this->fields_values['primary_label'];
 			$secondary_label = $this->fields_values['secondary_label'];
 
-			$options = [
-				'item_value_options' => [
-					'decimals' => 4,
-					'small_scientific' => false,
-					'zero_as_zero' => false
-				]
-			];
-
 			if ($item['value'] !== null) {
 				if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
 					[[
 						'primary_label' => $primary_label
 					]] = CMacrosResolverHelper::resolveLabels([$item + [
 						'primary_label' => $primary_label
-					]], 'primary_label', $options);
+					]], 'primary_label');
 
 					[[
 						'secondary_label' => $secondary_label
 					]] = CMacrosResolverHelper::resolveLabels([$item + [
 						'secondary_label' => $secondary_label
-					]], 'secondary_label', $options);
+					]], 'secondary_label');
 				}
 
 				$cells[] = [

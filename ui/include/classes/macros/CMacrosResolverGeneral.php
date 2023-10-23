@@ -1089,11 +1089,10 @@ class CMacrosResolverGeneral {
 	 * @param string $macros[<itemid>][<key>][<token>]['function']
 	 * @param array  $macros[<itemid>][<key>][<token>]['parameters']
 	 * @param array  $macro_values
-	 * @param array  $options Item value formatting options.
 	 *
 	 * @return array
 	 */
-	protected function getItemValueMacrosByItemid(array $macros, array $macro_values, array $options = []) {
+	protected function getItemValueMacrosByItemid(array $macros, array $macro_values) {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -1152,9 +1151,7 @@ class CMacrosResolverGeneral {
 								}
 							}
 							else {
-								$macro_value = formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid],
-									false, $options
-								);
+								$macro_value = formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid]);
 							}
 
 							$macro_values[$key][$token] = $macro_value;
