@@ -101,8 +101,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$item_tags_exist = array_key_exists('item_tags', $this->fields_values);
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'units', 'value_type'],
-			'selectHosts' => !$this->isTemplateDashboard() ? ['name'] : null,
+			'output' => ['itemid', 'hostid', 'name', 'units', 'value_type'],
+			'selectHosts' => ['name'],
 			'webitems' => true,
 			'hostids' => $hostids,
 			'evaltype' => $item_tags_exist ? $this->fields_values['evaltype_item'] : null,
@@ -157,7 +157,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'value' => $item['value'],
 					'is_numeric' => $item['value_type'] == ITEM_VALUE_TYPE_FLOAT
 						|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64,
-					'is_binary_units' => isBinaryUnits($item['units'])
+					'is_binary_units' => isBinaryUnits($item['units']),
+					'hint_text' => $item['hosts'][0]['name'].': '.$item['name'].': '.
+						formatHistoryValue($item['value'], $item)
 				];
 			}
 		}
