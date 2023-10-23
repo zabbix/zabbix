@@ -30,6 +30,9 @@ class Widget extends CWidget {
 
 	public function getTranslationStrings(): array {
 		return [
+			'class.svghoneycomb.js' => [
+				'No data' => _('No data')
+			],
 			'class.widget.js' => [
 				'Actions' => _('Actions'),
 				'Download image' => _('Download image')

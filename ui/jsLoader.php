@@ -409,10 +409,7 @@ $translate_strings = [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
-	'class.csvgauge.js' => [
-		'No data' => _('No data')
-	],
-	'class.csvghoneycomb.js' => [
+	'class.csvggauge.js' => [
 		'No data' => _('No data')
 	],
 	'common.js' => [
