@@ -133,17 +133,15 @@ static char	*generate_data_source(const char *sql)
 			break;
 	}
 
-	if (ptr_ds == data_source)
-	{
-		zbx_free(data_source);	/* failed to generate data_source */
-	}
-	else
+	if (ptr_ds != data_source)
 	{
 		if (' ' == *(ptr_ds - 1))
 			ptr_ds--;
 
 		*ptr_ds = '\0';
 	}
+	else
+		zbx_free(data_source);	/* failed to generate data_source */
 
 	return data_source;
 }

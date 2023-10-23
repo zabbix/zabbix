@@ -1,5 +1,5 @@
 ---
-test case: Remove host from host group, reuse existing hgset
+test case: Reuse existing hgset from db
 in:
   hosts:
     - hostid: 1
@@ -11,14 +11,14 @@ in:
         - 2
 out:
   hgsets:
-    - hgsetid: 1
-      hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+    - hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+      hgsetid: 1
       opt: ZBX_LLD_HGSET_OPT_DELETE
       hgroupids:
         - 1
         - 2
-    - hgsetid: 2
-      hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 2
       opt: ZBX_LLD_HGSET_OPT_REUSE
       hgroupids:
         - 2
@@ -32,4 +32,110 @@ db data:
   hgset:
     - [2, 'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35']
   host_hgset: []
+---
+test case: Reuse existing hgset from vector
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 1
+      old_groupids:
+        - 1
+        - 2
+      res_groupids:
+        - 1
+        - 2
+        - 3
+    - hostid: 2
+      hgsetid_orig: 2
+      old_groupids:
+        - 2
+      res_groupids:
+        - 1
+        - 2
+out:
+  hgsets:
+    - hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+      hgsetid: 1
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 1
+        - 2
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 2
+      opt: ZBX_LLD_HGSET_OPT_DELETE
+      hgroupids:
+        - 2
+    - hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      hgsetid: 0
+      opt: ZBX_LLD_HGSET_OPT_INSERT
+      hgroupids:
+        - 1
+        - 2
+        - 3
+  hosts:
+    - hostid: 1
+      hgsetid: 0
+      hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      update_hgsetid: yes
+    - hostid: 2
+      hgsetid: 1
+      update_hgsetid: yes
+  del_hgsetids:
+    - 2
+db data:
+  hgset: []
+  host_hgset: []
+---
+test case: Keep hgset which is used by some other hosts
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 1
+      old_groupids:
+        - 1
+        - 2
+      res_groupids:
+        - 1
+        - 2
+        - 3
+    - hostid: 2
+      hgsetid_orig: 2
+      old_groupids:
+        - 2
+      res_groupids:
+        - 1
+        - 2
+out:
+  hgsets:
+    - hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+      hgsetid: 1
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 1
+        - 2
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 2
+      opt: ZBX_LLD_HGSET_OPT_DELETE
+      hgroupids:
+        - 2
+    - hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      hgsetid: 0
+      opt: ZBX_LLD_HGSET_OPT_INSERT
+      hgroupids:
+        - 1
+        - 2
+        - 3
+  hosts:
+    - hostid: 1
+      hgsetid: 0
+      hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      update_hgsetid: yes
+    - hostid: 2
+      hgsetid: 1
+      update_hgsetid: yes
+  del_hgsetids: []
+db data:
+  hgset: []
+  host_hgset:
+    - [2]
 ...

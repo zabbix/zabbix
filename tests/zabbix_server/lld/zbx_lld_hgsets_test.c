@@ -182,6 +182,13 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_uint64_eq("host hgsetid", zbx_mock_get_object_member_uint64(element, "hgsetid"),
 				host->hgset->hgsetid);
 
+		/* hash_str (checked only if hgsetid==0) */
+		if (0 == host->hgset->hgsetid)
+		{
+			zbx_mock_assert_str_eq("host hash_str",
+					zbx_mock_get_object_member_string(element, "hash_str"), host->hgset->hash_str);
+		}
+
 		/* flag */
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID))
 		{
