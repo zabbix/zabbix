@@ -31,7 +31,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/omeid/go-yarn"
 
-	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
 
@@ -62,13 +61,22 @@ type MyConn struct {
 // ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
 	connectionsMux sync.Mutex
-	connections    map[uri.URI]*MyConn
+	connections    map[connKey]*MyConn
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
 	Destroy        context.CancelFunc
 	queryStorage   yarn.Yarn
 	log            log.Logger
+}
+
+type connKey struct {
+	uri        uri.URI
+	rawUri     string
+	tlsConnect string
+	tlsCA      string
+	tlsCert    string
+	tlsKey     string
 }
 
 // Query wraps DB.QueryRowContext.
@@ -109,17 +117,19 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 	c.connectionsMux.Lock()
 	defer c.connectionsMux.Unlock()
 
-	conn := c.get(uri)
+	ck := createConnKey(uri, params)
+
+	conn := c.get(ck)
 	if conn != nil {
 		return conn, nil
 	}
 
-	conn, err := c.create(uri, params)
+	conn, err := c.create(ck)
 	if err != nil {
 		return nil, err
 	}
 
-	c.connections[uri] = conn
+	c.connections[ck] = conn
 
 	return conn, nil
 }
@@ -131,7 +141,7 @@ func NewConnManager(
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[uri.URI]*MyConn),
+		connections:    make(map[connKey]*MyConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -155,11 +165,11 @@ func (c *ConnManager) closeUnused() {
 	c.connectionsMux.Lock()
 	defer c.connectionsMux.Unlock()
 
-	for uri, conn := range c.connections {
+	for ck, conn := range c.connections {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.client.Close()
-			delete(c.connections, uri)
-			log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
+			delete(c.connections, ck)
+			log.Debugf("[%s] Closed unused connection: %s", pluginName, ck.uri.Addr())
 		}
 	}
 }
@@ -193,8 +203,8 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI, params map[string]string) (*MyConn, error) {
-	details, err := getTLSDetails(params)
+func (c *ConnManager) create(ck connKey) (*MyConn, error) {
+	details, err := getTLSDetails(ck)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +214,7 @@ func (c *ConnManager) create(uri uri.URI, params map[string]string) (*MyConn, er
 		return nil, err
 	}
 
-	config, err := getMySQLConfig(uri, tlsConfig, c.connectTimeout, c.callTimeout)
+	config, err := getMySQLConfig(ck.uri, tlsConfig, c.connectTimeout, c.callTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -216,14 +226,14 @@ func (c *ConnManager) create(uri uri.URI, params map[string]string) (*MyConn, er
 
 	client := sql.OpenDB(connector)
 
-	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
+	log.Debugf("[%s] Created new connection: %s", pluginName, ck.uri.Addr())
 
 	return &MyConn{client: client, lastTimeAccess: time.Now(), queryStorage: &c.queryStorage}, nil
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri uri.URI) *MyConn {
-	if conn, ok := c.connections[uri]; ok {
+func (c *ConnManager) get(ck connKey) *MyConn {
+	if conn, ok := c.connections[ck]; ok {
 		conn.updateAccessTime()
 
 		return conn
@@ -302,24 +312,36 @@ func (c *ConnManager) getRequiredTLSConfig(details *tlsconfig.Details) (*tls.Con
 	return &tls.Config{Certificates: clientCerts, InsecureSkipVerify: true}, nil
 }
 
-func getTLSDetails(params map[string]string) (*tlsconfig.Details, error) {
-	var (
-		validateCA     = true
-		validateClient = false
-		tlsType        = params[tlsConnectParam]
-	)
-
+func createConnKey(uri uri.URI, params map[string]string) connKey {
+	tlsType := params[tlsConnectParam]
 	if tlsType == "" {
 		tlsType = disable
 	}
 
+	return connKey{
+		uri:        uri,
+		rawUri:     params[uriParam],
+		tlsConnect: tlsType,
+		tlsCA:      params[tlsCAParam],
+		tlsCert:    params[tlsCertParam],
+		tlsKey:     params[tlsKeyParam],
+	}
+}
+
+func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
+	var (
+		validateCA     = true
+		validateClient = false
+		tlsType        = ck.tlsConnect
+	)
+
 	details := tlsconfig.NewDetails(
-		params[metric.SessionParam],
-		tlsType,
-		params[tlsCAParam],
-		params[tlsCertParam],
-		params[tlsKeyParam],
-		params[uriParam],
+		"",
+		ck.tlsConnect,
+		ck.tlsCA,
+		ck.tlsCert,
+		ck.tlsKey,
+		ck.rawUri,
 		disable,
 		require,
 		verifyCa,
