@@ -172,7 +172,31 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		double	time_now = zbx_time();
+		double	time_now;
+
+
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+		zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+		if (NULL != message)
+		{
+			switch (message->code)
+			{
+				case ZBX_IPC_DBCONFIG_WORKER_REQUEST:
+					zbx_dbconfig_worker_deserialize_ids(message->data, message->size, &hostids);
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
+
+			zbx_ipc_message_free(message);
+		}
+
+		if (NULL != client)
+			zbx_ipc_client_release(client);
+
+		time_now = zbx_time();
 
 		zbx_update_env(get_process_type_string(process_type), time_now);
 
@@ -196,27 +220,6 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, idle]",
 					get_process_type_string(process_type), processed_num, updated_num, sec);
 		}
-
-		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-		zbx_ipc_service_recv(&service, &timeout, &client, &message);
-		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-		if (NULL != message)
-		{
-			switch (message->code)
-			{
-				case ZBX_IPC_DBCONFIG_WORKER_REQUEST:
-					zbx_dbconfig_worker_deserialize_ids(message->data, message->size, &hostids);
-					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-			}
-
-			zbx_ipc_message_free(message);
-		}
-
-		if (NULL != client)
-			zbx_ipc_client_release(client);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
