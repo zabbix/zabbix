@@ -34,6 +34,8 @@ ZBX_PTR_VECTOR_DECL(service, DB_SERVICE *)
 #define ZBX_IPC_SERVICE_SERVICE_PARENT_LIST	5
 #define ZBX_IPC_SERVICE_EVENT_SEVERITIES	6
 #define ZBX_IPC_SERVICE_RELOAD_CACHE		7
+#define ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS	8
+#define ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS	9
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response);

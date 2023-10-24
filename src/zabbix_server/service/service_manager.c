@@ -233,10 +233,12 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = DBselect("select p.eventid,p.clock,p.severity,t.tag,t.value,p.ns"
+	result = DBselect("select p.eventid,p.clock,p.severity,t.tag,t.value,p.ns,es.eventid"
 			" from problem p"
 			" left join problem_tag t"
 				" on p.eventid=t.eventid"
+			" left join event_suppress es"
+				" on p.eventid=es.eventid"
 			" where p.source=%d"
 				" and p.object=%d"
 				" and r_eventid is null"
@@ -269,6 +271,11 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			tag->value = zbx_strdup(NULL, row[4]);
 			zbx_vector_ptr_append(&event->tags, tag);
 		}
+
+		if (FAIL == DBis_null(row[5]))
+			event->suppressed = 1;
+		else
+			event->suppressed = 0;
 	}
 	DBfree_result(result);
 
@@ -2478,7 +2485,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 	zbx_vector_uint64_t	service_problemids;
 	zbx_hashset_t		service_updates;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(1, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&alarms);
 	zbx_vector_ptr_create(&service_problems_new);
@@ -2486,6 +2493,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 	zbx_hashset_create(&service_updates, 100, service_update_hash_func, service_update_compare_func);
 
 	zbx_hashset_iter_reset(&manager->service_diffs, &iter);
+	zabbix_log(1, "%s(): service diffs = %i", __func__, manager->service_diffs.num_data);
 	while (NULL != (service_diff = (zbx_services_diff_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_service_t	service_local = {.serviceid = service_diff->serviceid}, *service;
@@ -2561,8 +2569,21 @@ static void	db_update_services(zbx_service_manager_t *manager)
 		for (i = 0; i < service->service_problems.values_num; i++)
 		{
 			zbx_service_problem_t	*service_problem;
+			zbx_event_t		*event, event_local, **ptr;
 
 			service_problem = (zbx_service_problem_t *)service->service_problems.values[i];
+			event = &event_local;
+
+			if (NULL != (ptr = zbx_hashset_search(&manager->problem_events, &event)))
+			{
+				event_local.eventid = service_problem->eventid;
+				event = *ptr;
+				zabbix_log(1, "flush, eventid = %i, event suppressed = %i", event->eventid, event->suppressed);
+				if (event->suppressed == 1)
+				{
+					continue;
+				}
+			}
 
 			if (service_problem->severity > status)
 			{
@@ -2688,6 +2709,64 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 		recover_services_problem(service_manager, event);
 
 		zbx_hashset_remove_direct(&service_manager->problem_events, ptr);
+	}
+
+	db_update_services(service_manager);
+	zbx_hashset_clear(&service_manager->service_diffs);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_service_manager_t *service_manager, int suppressed)
+{
+	int		i;
+	zbx_timespec_t	ts;
+
+	zabbix_log(1, "In %s() events_num:%d, suppress = %i", __func__, eventids->values_num, suppressed);
+
+	zbx_timespec(&ts);
+
+	for (i = 0; i < eventids->values_num; i++)
+	{
+		zbx_event_t			event_local, *event = &event_local, **pevent;
+		zbx_service_problem_index_t	*pi, pi_local;
+		zbx_services_diff_t	*services_diff, services_diff_local;
+
+		event_local.eventid = eventids->values[i];
+
+		if (NULL == (pevent = (zbx_event_t **)zbx_hashset_search(&service_manager->problem_events, &event)))
+			continue;
+
+		(*pevent)->suppressed = suppressed;
+
+		pi_local.eventid = eventids->values[i];
+
+		if (NULL == (pi = zbx_hashset_search(&service_manager->service_problems_index, &pi_local)))
+			continue;
+
+		zabbix_log(1, " handling eventid %i", eventids->values[i]);
+		for (int j = 0; j < pi->services.values_num; j++)
+		{
+			zbx_service_t	*service = (zbx_service_t *)pi->services.values[j];
+			services_diff_local.serviceid = service->serviceid;
+
+			zabbix_log(1, " handling eventid %i, service %i", eventids->values[i], j+1);
+
+			if (NULL == (services_diff = zbx_hashset_search(&service_manager->service_diffs, &services_diff_local)))
+			{
+				zabbix_log(1, "  not found service diff");
+				zbx_vector_ptr_create(&services_diff_local.service_problems);
+				zbx_vector_ptr_create(&services_diff_local.service_problems_recovered);
+				services_diff_local.flags = ZBX_FLAG_SERVICE_RECALCULATE;
+				zbx_hashset_insert(&service_manager->service_diffs, &services_diff_local, sizeof(services_diff_local));
+			}
+			else
+			{
+				zabbix_log(1, "  found service diff");
+				services_diff->flags = ZBX_FLAG_SERVICE_RECALCULATE;
+			}
+		}
+
 	}
 
 	db_update_services(service_manager);
@@ -2986,9 +3065,11 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 
 	for (i = 0; i < event_severities.values_num; i++)
 	{
+		int			index;
 		zbx_event_severity_t		*es = (zbx_event_severity_t *)event_severities.values[i];
 		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local, **pevent;
 		zbx_service_problem_index_t	*pi, pi_local;
+		zbx_services_diff_t	services_diff_local, *service_diff;
 
 		/* update event severity in problem cache */
 
@@ -3398,6 +3479,15 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					zbx_service_deserialize_ids(message->data, message->size, &eventids);
 					process_deleted_problems(&eventids, &service_manager);
 					problems_delete_num += events.values_num;
+					break;
+				case ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS:
+					zbx_service_deserialize_ids(message->data, message->size, &eventids);
+					process_problem_suppression(&eventids, &service_manager, 0);
+					zabbix_log(1, "svcman unsuppress ipc received");
+					break;
+				case ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS:
+					zbx_service_deserialize_ids(message->data, message->size, &eventids);
+					process_problem_suppression(&eventids, &service_manager, 1);
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE:
 					process_rootcause(message, &service_manager, client);

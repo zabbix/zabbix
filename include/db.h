@@ -802,6 +802,7 @@ typedef struct
 	int			severity;
 
 	zbx_vector_ptr_t	tags;
+	int			suppressed;
 }
 zbx_event_t;
 
