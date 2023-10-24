@@ -1538,13 +1538,15 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 				if (data.params.manualinput === '1') {
 					item.clickCallback = () => openManualinputDialogue(item, data);
 				}
-
-				if (data.params.manualinput == 0 && data.params.confirmation !== '') {
+				else if (data.params.manualinput == 0 && data.params.confirmation !== '') {
 					item.url = data.params.url;
 
 					item.clickCallback = function() {
 						return confirm(data.params.confirmation);
 					}
+				}
+				else {
+					item.clickCallback = () => window.open(data.params.url, '_blank');
 				}
 			}
 
