@@ -309,6 +309,13 @@
 			}, {once: true});
 		}
 
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.#openTemplatePopup(template_data);
+		}
+
 		#openTemplatePopup(template_data) {
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
