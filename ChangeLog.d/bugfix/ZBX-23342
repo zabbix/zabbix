@@ -1,0 +1,1 @@
+...G...... [ZBX-23342] fixed Zabbix agent 2 mysql plugin connection not taking into account tls parameters (esneiders)
