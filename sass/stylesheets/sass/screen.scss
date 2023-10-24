@@ -995,12 +995,6 @@ form {
 	word-break: break-word;
 }
 
-.overflow-table {
-	overflow-x: auto;
-	position: relative;
-	@extend %webkit-hor-scrollbar;
-}
-
 // Timeline in table view.
 .timeline-date {
 	text-align: right;
@@ -4598,6 +4592,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar {
 		width: 9px;
+		height: 9px;
 	}
 
 	&::-webkit-scrollbar-track {
@@ -4608,15 +4603,6 @@ $browser-logos: (
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color, $scrollbar-thumb-color-darken);
 	}
-}
-
-// TODO: Legacy
-%webkit-hor-scrollbar {
-	&::-webkit-scrollbar {
-		height: 9px;
-	}
-
-	@extend %webkit-scrollbar;
 }
 
 %cursor-drag {
