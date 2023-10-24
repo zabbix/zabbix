@@ -3,26 +3,26 @@
 This plugin provides native Zabbix solution to monitor Oracle Database (multi-model database management system).
 It can monitor several Oracle instances simultaneously; remote or local to Zabbix agent.
 The plugin keeps connections in an open state to reduce network congestion, latency, CPU and
-memory usage. It is highly recommended to use in conjunction with the official
-[Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2)
+memory usage. It is highly recommended to use in conjunction with the official 
+[Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2) 
 You can extend it or create your own template to cater specific needs.
 
 ## Requirements
 
-- Zabbix Agent 2
-- Go >= 1.18 (required only to build from source)
-- Oracle Instant Client >= 12
+* Zabbix Agent 2
+* Go >= 1.18 (required only to build from source)
+* Oracle Instant Client >= 12
 
 ## Supported versions
 
-- Oracle Database 12c2
-- Oracle Database 18c
-- Oracle Database 19c
+* Oracle Database 12c2
+* Oracle Database 18c
+* Oracle Database 19c
 
 ## Installation
 
 1. [Install Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html).
-2. Create an Oracle DB user and grant permissions.
+2. Create an Oracle DB user and grant permissions. 
 
 ```
 CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
@@ -50,52 +50,50 @@ GRANT SELECT ON V_$SGASTAT TO zabbix_mon;
 GRANT SELECT ON V_$SYSMETRIC TO zabbix_mon;
 GRANT SELECT ON V_$SYSTEM_PARAMETER TO zabbix_mon;
 ```
-
-3. Make sure a TNS Listener and an Oracle instance are available for the connection.
+3. Make sure a TNS Listener and an Oracle instance are available for the connection.  
 
 ## Configuration
 
 To configure plugins, Zabbix agent 2 configuration file is used.
 
-**Plugins.Oracle.CallTimeout** — the maximum time in seconds for waiting when a request has to be done.
-_Default value:_ equals the global Timeout configuration parameter.
-_Limits:_ 1-30
+**Plugins.Oracle.CallTimeout** — the maximum time in seconds for waiting when a request has to be done.  
+*Default value:* equals the global Timeout configuration parameter.  
+*Limits:* 1-30
 
-**Plugins.Oracle.ConnectTimeout** — the maximum time in seconds for waiting when a connection has to be established.
-_Default value:_ equals the global Timeout configuration parameter.
-_Limits:_ 1-30
+**Plugins.Oracle.ConnectTimeout** — the maximum time in seconds for waiting when a connection has to be established.  
+*Default value:* equals the global Timeout configuration parameter.  
+*Limits:* 1-30
 
-**Plugins.Oracle.CustomQueriesPath** — the full pathname of a directory containing _.sql_ files with custom queries.
-_Default value:_ — the feature is disabled by default.
+**Plugins.Oracle.CustomQueriesPath** — the full pathname of a directory containing *.sql* files with custom queries.  
+*Default value:* —  the feature is disabled by default.
 
 **Plugins.Oracle.KeepAlive** — sets the time for waiting before unused connections will be closed.
-_Default value:_ 300 sec.
-_Limits:_ 60-900
+*Default value:* 300 sec.  
+*Limits:* 60-900
 
 ### Configuring connection
 
 The connection can be configured using either key parameters or named sessions.
 
-_Notes_:
-
-- You can leave any connection parameter value empty; in this case the default, hard-coded value, will be used.
-- Embedded URI credentials (e.g. user credentials) are not supported and will be ignored. It is not possible to override the credentials this way:
-
-      oracle.ping[tcp://USER:password@127.0.0.1/XE] — WRONG
-
+*Notes*:  
+* You can leave any connection parameter value empty; in this case the default, hard-coded value, will be used.
+* Embedded URI credentials (e.g. user credentials) are not supported and will be ignored. It is not possible to override the credentials this way: 
+  
+      oracle.ping[tcp://USER:password@127.0.0.1/XE] — WRONG  
+  
   The correct way is:
-
+    
       oracle.ping[tcp://127.0.0.1,USER,password,XE]
+      
+* The only supported URI network schema is "tcp".
+Examples of valid URIs:
 
-- The only supported URI network schema is "tcp".
-  Examples of valid URIs:
-
-      - tcp://127.0.0.1:1521
-      - tcp://localhost
-      - localhost
-
-- Usernames are supported only if written in uppercase characters.
-
+    - tcp://127.0.0.1:1521
+    - tcp://localhost
+    - localhost
+    
+* Usernames are supported only if written in uppercase characters.
+      
 #### Using key parameters
 
 Common parameters for all the keys are: [ConnString][User][Password][Service] where `ConnString` can be either a URI or a session name.
@@ -103,24 +101,24 @@ Common parameters for all the keys are: [ConnString][User][Password][Service] wh
 User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator
 e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 If you use `ConnString` as a session name, you can skip the rest of the connection parameters.
-
+ 
 #### Using named sessions
 
 Named sessions allow to define specific parameters for each Oracle instance. Currently, there are only four supported parameters: `Uri`, `User`, `Password` and `Service`.
 This option to store the credentials is slightly more secure way compared to item keys or macros.
 
-For example, if you have two Oracle instances: "Oracle12" and "Oracle19", you should add the following options to the agent configuration file:
+For example, if you have two Oracle instances: "Oracle12" and "Oracle19", you should add the following options to the agent configuration file:   
 
     Plugins.Oracle.Sessions.Oracle12.Uri=tcp://192.168.1.1:1521
     Plugins.Oracle.Sessions.Oracle12.User=<USERFORORACLE12>
     Plugins.Oracle.Sessions.Oracle12.Password=<PasswordForOracle12>
     Plugins.Oracle.Sessions.Oracle12.Service=orcl
-
+        
     Plugins.Oracle.Sessions.Oracle19.Uri=tcp://192.168.1.2:1521
     Plugins.Oracle.Sessions.Oracle19.User=<USERFORORACLE19>
     Plugins.Oracle.Sessions.Oracle19.Password=<PasswordForOracle19>
     Plugins.Oracle.Sessions.Oracle19.Service=orcl
-
+        
 Then you will be able to use these names as the first parameter (ConnString) in keys instead of URIs.
 For example:
 
@@ -133,25 +131,25 @@ Note: session names are case-sensitive.
 
 **oracle.diskgroups.stats[\<commonParams\>,\<diskgroup\>]** — returns Automatic Storage Management (ASM) disk groups statistics.
 
-_Parameters:_
+*Parameters:*  
 `diskgroup` (optional) — the name of the diskgroup.
 
 **oracle.diskgroups.discovery[\<commonParams\>]** — returns the list of ASM disk groups in LLD format.
 
 **oracle.archive.info[\<commonParams\>,\<destination\>]** — returns archive logs statistics.
-_Parameters:_
+*Parameters:*  
 `destination` (optional) — the name of the destination.
 
 **oracle.archive.discovery[\<commonParams\>]** — returns the list of archive logs in LLD format.
 
 **oracle.cdb.info[\<commonParams\>,\<database\>]** — returns the Container Databases (CDBs) info.
-_Parameters:_
+*Parameters:*  
 `database` (optional) — the name of the database.
 
 **oracle.custom.query[\<commonParams\>,queryName[,args...]]** — returns the result of a custom query.
 
-_Parameters:_
-`queryName` (required) — the name of a custom query (must be equal to the name of an _sql_ file without an extension).
+*Parameters:*  
+`queryName` (required) — the name of a custom query (must be equal to the name of an *sql* file without an extension).
 `args` (optional) — one or more arguments to pass to a query.
 
 **oracle.datafiles.stats[\<commonParams\>]** — returns the data files statistics.
@@ -163,44 +161,43 @@ _Parameters:_
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
 **oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
-_Parameters:_
+*Parameters:*  
 `database` (optional) — the name of the database.
 
 **oracle.pdb.discovery[\<commonParams\>]** — returns the list of PDBs in LLD format.
 
-**oracle.pga.stats[\<commonParams\>]** — returns the Program Global Area (PGA) statistics.
+**oracle.pga.stats[\<commonParams\>]** — returns the Program Global Area (PGA) statistics.  
 
-**oracle.ping[\<commonParams\>]** — performs a simple ping to check if the connection is alive or not.
+**oracle.ping[\<commonParams\>]** —  performs a simple ping to check if the connection is alive or not.
 
-_Returns:_
-
+*Returns:*
 - "1" if a connection is alive.
 - "0" if a connection is broken (if there is any error presented including authorization and configuration issues).
 
-**oracle.proc.stats[\<commonParams\>]** — returns the processes' statistics.
+**oracle.proc.stats[\<commonParams\>]** — returns the processes' statistics. 
 
 **oracle.redolog.info[\<commonParams\>]** — returns the log file information from the control file.
 
-**oracle.sga.stats[\<commonParams\>]** — returns the System Global Area (SGA) statistics.
+**oracle.sga.stats[\<commonParams\>]** —  returns the System Global Area (SGA) statistics.
 
 **oracle.sessions.stats[\<commonParams\>,[lockMaxTime]]** — returns the sessions' statistics.
 
-_Parameters:_
+*Parameters:*    
 `lockMaxTime` (optional) — the maximum duration of the session lock in seconds to count the session as locked prolongedly.
-Default: 600 seconds.
+Default: 600 seconds.    
 
-**oracle.sys.metrics[\<commonParams\>[,duration]]** — returns a set of the system metric values.
+**oracle.sys.metrics[\<commonParams\>[,duration]]** —  returns a set of the system metric values.
 
-_Parameters:_
+*Parameters:*  
 Duration (optional) — capturing interval in seconds of the system metric values.
-Possible values:
-60 — long duration (default).
-15 — short duration.
+Possible values:  
+60 — long duration (default).  
+15 — short duration.  
 
 **oracle.sys.params[\<commonParams\>]** — returns a set of the system parameter values.
 
-**oracle.ts.stats[\<commonParams\>,\<tablespace\>,\<type\>]** — returns the tablespace statistics.
-_Parameters:_
+**oracle.ts.stats[\<commonParams\>,\<tablespace\>,\<type\>]** — returns the tablespace statistics. 
+*Parameters:*  
 `tablespace` (optional) — the name of the tablespace.
 `type` (optional) — the type of the tablespace.
 
@@ -208,52 +205,52 @@ _Parameters:_
 
 **oracle.user.info[\<commonParams\>[,username]]** — returns the user information.
 
-**oracle.version[\<commonParams\>]** — returns the database server version information.
+**oracle.version[\<commonParams\>[,username]]** — returns the database server information.
 
-_Parameters:_
+*Parameters:*  
 Username (optional) — the username for which the information is required. Usernames written in lowercase characters are not supported.
 Default: the current user.
 
 ## Custom queries
 
-It is possible to extend the functionality of the plugin using user-defined queries. In order to do it, you should place all your queries in a specified directory in `Plugins.Oracle.CustomQueriesPath` (there is no default path) as it is for _.sql_ files.
+It is possible to extend the functionality of the plugin using user-defined queries. In order to do it, you should place all your queries in a specified directory in `Plugins.Oracle.CustomQueriesPath` (there is no default path) as it is for *.sql* files.
 For example, you can have a following tree:
 
-    /etc/zabbix/oracle/sql/
+    /etc/zabbix/oracle/sql/  
     ├── long_tx.sql
-    ├── payment.sql
+    ├── payment.sql    
     └── top_proc.sql
-
+     
 Then, you should set `Plugins.Oracle.CustomQueriesPath=/etc/zabbix/oracle/sql`.
-
+     
 Finally, when the queries are located in the right place, you can execute them:
 
-    oracle.custom.query[<commonParams>,top_proc]
+    oracle.custom.query[<commonParams>,top_proc]  
     oracle.custom.query[<commonParams>,long_tx,600]
-
-You can pass as many parameters to a query as you need.
-The syntax for the placeholder parameters uses ":#" where "#" is an index number of the parameter.
-For example:
+          
+You can pass as many parameters to a query as you need.   
+The syntax for the placeholder parameters uses ":#" where "#" is an index number of the parameter. 
+For example: 
 
 ```
 /* payment.sql */
 
-SELECT
-    amount
-FROM
-    payment
+SELECT 
+    amount 
+FROM 
+    payment 
 WHERE
     user = :1
     AND service_id = :2
     AND date = :3
-```
+``` 
 
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
 ## Current limitations
 
-- The System Identifier (SID) connection method is not supported.
-- Only usernames written in uppercase characters are supported.
+* The System Identifier (SID) connection method is not supported.
+* Only usernames written in uppercase characters are supported.
 
 ## Troubleshooting
 
