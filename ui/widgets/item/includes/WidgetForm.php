@@ -80,6 +80,10 @@ class WidgetForm extends CWidgetForm {
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
+		if ($errors) {
+			return $errors;
+		}
+
 		$show = $this->getFieldValue('show');
 
 		if (!$show) {

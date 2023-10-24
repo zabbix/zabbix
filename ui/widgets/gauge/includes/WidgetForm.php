@@ -113,13 +113,10 @@ class WidgetForm extends CWidgetForm {
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
-		if (!$this->getFieldValue('show')) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
-		}
-
 		if ($errors) {
 			return $errors;
 		}
+
 
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
@@ -135,6 +132,10 @@ class WidgetForm extends CWidgetForm {
 
 		if ($min >= $max) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _s('value must be greater than "%1$s"', $min));
+		}
+
+		if (!$this->getFieldValue('show')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
 		}
 
 		$min_threshold = null;

@@ -40,7 +40,7 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setValidationRules(['type' => API_INTS32]);
+			->setValidationRules(['type' => API_INTS32, 'in' => implode(',', array_keys($this->values)), 'uniq' => true]);
 	}
 
 	public function getValues(): array {
