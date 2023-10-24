@@ -109,7 +109,7 @@ class testDashboardPieChartWidget extends CWebTest
 	 *
 	 * @dataProvider getLayoutData
 	 */
-	public function testDashboardPieChartWidget_LayoutEdit($data) {
+	public function testDashboardPieChartWidget_Layout($data) {
 		// Open the correct form.
 		if ($data['action'] === 'create') {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
@@ -125,7 +125,92 @@ class testDashboardPieChartWidget extends CWebTest
 		}
 
 		$dialog = COverlayDialogElement::find()->one();
-		$form->highlight();
+		$this->assertEquals($data['header_text'], $dialog->getTitle());
+
+		// Check Help button.
+		$help_button = $dialog->query('xpath:.//*[@title="Help"]')->one();
+		$this->assertTrue($help_button->isClickable());
+		$version = substr(ZABBIX_VERSION, 0, 3);
+		$this->assertEquals(
+				'https://www.zabbix.com/documentation/'.$version.'/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart',
+				$help_button->getAttribute('href')
+		);
+
+		// Check Close button.
+		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
+
+		// Check main (generic) fields.
+		$this->assertLabels(['Type', 'Name', 'Refresh interval', 'Show header'], $form);
+
+		foreach(['id:type', 'id:name', 'id:rf_rate', 'id:show_header'] as $selector) {
+			$input = $form->query($selector)->one();
+
+			if ($selector === 'id:show_header') {
+				// Checkboxes are hidden.
+				$this->assertTrue($input->isEnabled());
+				$this->assertTrue($input->asCheckbox()->isChecked());
+			}
+			else {
+				$this->assertTrue($input->isClickable());
+			}
+		}
+
+		// Check tabs.
+		$this->assertEquals(['Data set', 'Displaying options', 'Time period', 'Legend'], $form->getTabs());
+
+		// Check Item pattern.
+		$this->assertLabels(['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'], $form);
+		$this->assertTrue($form->query('xpath:.//li[@data-set="0"]//button[@title="Delete"]')->one()->isClickable());
+
+		foreach(['id:ds_0_hosts_',
+				'id:ds_0_items_',
+				'name:ds[0][aggregate_function]',
+				'name:ds[0][dataset_aggregation]',
+				'name:ds[0][data_set_label]'] as $selector) {
+			$this->assertTrue($form->query($selector)->one()->isClickable());
+		}
+
+		$hints = [
+			'label-ds_{id}_aggregate_function' => 'Aggregates each item in the data set.',
+			'label-ds_{id}_dataset_aggregation' => 'Aggregates the whole data set.',
+			'ds_{id}_data_set_label' => 'Also used as legend label for aggregated data sets.',
+		];
+
+		foreach ($hints as $selector => $expected_hint) {
+			$selector = str_replace('{id}', '0', $selector);
+			$this->assertEquals($expected_hint, $this->query('xpath://label[@for='.CXPathHelper::escapeQuotes($selector).
+					']/button')->one()->getAttribute('data-hintbox-contents'));
+		}
+
+		// Check Add data set buttons.
+		foreach (['id:dataset-add', 'id:dataset-menu'] as $selector) {
+			$this->assertTrue($form->query($selector)->one()->isClickable());
+		}
+
+		// Check Item list.
+		$this->addNewDataSet(self::TYPE_ITEM_LIST, $form);
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		$this->assertEquals(2, $form->query('id:tab_data_set')->one()->getAttribute('data-indicator-value'));
+		$this->assertLabels(['Data set #2', 'Aggregation function', 'Data set aggregation', 'Data set label'], $form);
+
+		foreach(['name:ds[1][aggregate_function]',
+					'name:ds[1][dataset_aggregation]',
+					'name:ds[1][data_set_label]'] as $selector) {
+			$this->assertTrue($form->query($selector)->one()->isClickable());
+		}
+
+		foreach ($hints as $selector => $expected_hint) {
+			$selector = str_replace('{id}', '1', $selector);
+			$this->assertEquals($expected_hint, $this->query('xpath://label[@for='.CXPathHelper::escapeQuotes($selector).
+				']/button')->one()->getAttribute('data-hintbox-contents'));
+		}
+
+		// Displaying options tab.
+		$form->selectTab('Displaying options');
+
+
+
 	}
 
 	public function getCreateData() {
@@ -442,6 +527,19 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 	}
 
+
+	/**
+	 * Checks that given labels exist in a form.
+	 *
+	 * @param array $labels           labels to assert
+	 * @param CFormElement $form      form that these labels should exist in.
+	 */
+	protected function assertLabels($labels, $form) {
+		foreach ($labels as $label) {
+			$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->exists());
+		}
+	}
+
 	/**
 	 * Resets the dashboard and creates a single Pie chart widget.
 	 *
@@ -498,7 +596,7 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @param CWidgetElement $widget    widget element to wait
 	 */
 	protected function waitForWidgetToLoad($widget) {
-		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+		$widget->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$widget->getContent()->query('class:svg-pie-chart')->waitUntilVisible();
 	}
 
@@ -565,7 +663,7 @@ class testDashboardPieChartWidget extends CWebTest
 
 				// Open the next data set, if it exists.
 				if ($i !== $last) {
-					$form->query('xpath://li[contains(@class, "list-accordion-item")]['.
+					$form->query('xpath:.//li[contains(@class, "list-accordion-item")]['.
 						($i + 2).']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
 					$form->invalidate();
 				}
@@ -610,7 +708,7 @@ class testDashboardPieChartWidget extends CWebTest
 		$remake = CTestArrayHelper::get($fields, 'remake_data_set');
 
 		if ($delete || $remake) {
-			$form->query('xpath://button[@title="Delete"]')->one()->click();
+			$form->query('xpath:.//button[@title="Delete"]')->one()->click();
 
 			if ($remake) {
 				$form->query('button:Add new data set')->one()->click();
@@ -643,7 +741,7 @@ class testDashboardPieChartWidget extends CWebTest
 	 */
 	protected function fillDatasets($data_sets, $form) {
 		// Count of data sets that already exist (needed for updating).
-		$count_sets = $form->query('xpath://li[contains(@class, "list-accordion-item")]')->all()->count();
+		$count_sets = $form->query('xpath:.//li[contains(@class, "list-accordion-item")]')->all()->count();
 
 		foreach ($data_sets as $i => $data_set) {
 			$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
@@ -652,13 +750,13 @@ class testDashboardPieChartWidget extends CWebTest
 			// Special case: the first Data set is of type Item list.
 			$deleted_first_set = false;
 			if ($i === 0 && $type === self::TYPE_ITEM_LIST && $count_sets === 1) {
-				$form->query('xpath://button[@title="Delete"]')->one()->click();
+				$form->query('xpath:.//button[@title="Delete"]')->one()->click();
 				$deleted_first_set = true;
 			}
 
 			// Open the Data set or create a new one.
 			if ($i + 1 < $count_sets) {
-				$form->query('xpath://li[contains(@class, "list-accordion-item")]['.
+				$form->query('xpath:.//li[contains(@class, "list-accordion-item")]['.
 						($i + 1).']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
 			}
 			else if ($i !== 0 || $deleted_first_set) {
@@ -682,7 +780,7 @@ class testDashboardPieChartWidget extends CWebTest
 				foreach ($data_set['items'] as $item) {
 					$table->findRow('Name', $item['name'])->select();
 				}
-				$dialog->query('xpath://div[@class="overlay-dialogue-footer"]//button[text()="Select"]')->one()->click();
+				$dialog->query('xpath:.//div[@class="overlay-dialogue-footer"]//button[text()="Select"]')->one()->click();
 				$dialog->waitUntilNotVisible();
 			}
 
@@ -718,11 +816,11 @@ class testDashboardPieChartWidget extends CWebTest
 	protected function remapDataSet($data_set, $number) {
 		// Key - selector mapping.
 		$mapping = [
-			'host' => 'xpath://div[@id="ds_'.$number.'_hosts_"]/..',
-			'item' => 'xpath://div[@id="ds_'.$number.'_items_"]/..',
-			'color' => 'xpath://input[@id="ds_'.$number.'_color"]/..',
-			'il_color' => 'xpath://input[@id="items_'.$number.'_{id}_color"]/..',
-			'il_type' => 'xpath://z-select[@id="items_'.$number.'_{id}_type"]'
+			'host' => 'xpath:.//div[@id="ds_'.$number.'_hosts_"]/..',
+			'item' => 'xpath:.//div[@id="ds_'.$number.'_items_"]/..',
+			'color' => 'xpath:.//input[@id="ds_'.$number.'_color"]/..',
+			'il_color' => 'xpath:.//input[@id="items_'.$number.'_{id}_color"]/..',
+			'il_type' => 'xpath:.//z-select[@id="items_'.$number.'_{id}_type"]'
 		];
 
 		// Exchange the keys for the actual selectors and clear the old key.
