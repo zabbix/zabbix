@@ -908,7 +908,7 @@ zabbix_export:
               key: 'kube.cronjob.completion.failed[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number of job has failed its execution.'
+              description: 'Number of jobs the execution of which has failed.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -931,7 +931,7 @@ zabbix_export:
               key: 'kube.cronjob.completion.succeeded[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number of job has completed its execution.'
+              description: 'Number of jobs the execution of which has been completed.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -982,7 +982,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: unixtime
-              description: 'Next time the cronjob should be scheduled. The time after lastScheduleTime, or after the cron job''s creation time if it''s never been scheduled. Use this to determine if the job is delayed.'
+              description: 'Next time the cronjob should be scheduled. The time after lastScheduleTime or after the cron job''s creation time if it''s never been scheduled. Use this to determine if the job is delayed.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1059,7 +1059,7 @@ zabbix_export:
               key: 'kube.cronjob.status_failed[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of pods which reached Phase Failed and the reason for failure.'
+              description: 'The number of pods which reached the Failed phase and the reason for failure.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1082,7 +1082,7 @@ zabbix_export:
               key: 'kube.cronjob.status_succeeded[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of pods which reached Phase Succeeded.'
+              description: 'The number of pods which reached the Succeeded phase.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1158,7 +1158,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of nodes running a daemon pod but are not supposed to.'
+              description: 'The number of nodes that run a daemon pod but are not supposed to.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1206,7 +1206,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of nodes running at least one daemon pod and are supposed to.'
+              description: 'The number of nodes that run at least one daemon pod and are supposed to.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1356,7 +1356,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of available replicas that mismatch the desired number of replicas.'
+              description: 'The number of available replicas not matching the desired number of replicas.'
               preprocessing:
                 - type: PROMETHEUS_TO_JSON
                   parameters:
@@ -1649,7 +1649,7 @@ zabbix_export:
               key: 'kube.job.completion.failed[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number of job has failed its execution.'
+              description: 'Number of jobs the execution of which has failed.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1672,7 +1672,7 @@ zabbix_export:
               key: 'kube.job.completion.succeeded[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number of job has completed its execution.'
+              description: 'Number of jobs the execution of which has been completed.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1695,7 +1695,7 @@ zabbix_export:
               key: 'kube.job.status_failed[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of pods which reached Phase Failed and the reason for failure.'
+              description: 'The number of pods which reached the Failed phase and the reason for failure.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1718,7 +1718,7 @@ zabbix_export:
               key: 'kube.job.status_succeeded[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of pods which reached Phase Succeeded.'
+              description: 'The number of pods which reached the Succeeded phase.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1901,7 +1901,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The allocatable ephemeral-storage of a node that is available for scheduling.'
+              description: 'The allocatable ephemeral storage of a node that is available for scheduling.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1926,7 +1926,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The ephemeral-storage capacity of a node.'
+              description: 'The ephemeral storage capacity of a node.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1951,7 +1951,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The Memory resources of a node that are available for scheduling.'
+              description: 'The memory resources of a node that are available for scheduling.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1976,7 +1976,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The capacity for Memory resources of a node.'
+              description: 'The capacity for memory resources of a node.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -2000,7 +2000,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The Pods resources of a node that are available for scheduling.'
+              description: 'The pods resources of a node that are available for scheduling.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -2024,7 +2024,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The capacity for Pods resources of a node.'
+              description: 'The capacity for pods resources of a node.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -2251,7 +2251,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of requested cpu cores by a container.'
+              description: 'The number of requested CPU cores by a container.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -3274,7 +3274,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of ready replicas that mismatch the desired number of replicas.'
+              description: 'The number of ready replicas not matching the desired number of replicas.'
               preprocessing:
                 - type: PROMETHEUS_TO_JSON
                   parameters:
@@ -3461,7 +3461,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of ready replicas that mismatch the number of replicas.'
+              description: 'The number of ready replicas not matching the number of replicas.'
               preprocessing:
                 - type: PROMETHEUS_TO_JSON
                   parameters:
@@ -3958,7 +3958,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 98a6d7ba3a4049d693f5471819ee4b2e
                   expression: 'count(/Kubernetes cluster state by HTTP/openshift.route.status[{#NAMESPACE}/{#NAME}],2m,,0)>=2'
-                  name: 'OpenShift: Route [{#NAME}] with issue: Status has false'
+                  name: 'OpenShift: Route [{#NAME}] with issue: Status is false'
                   priority: WARNING
                   tags:
                     - tag: scope
