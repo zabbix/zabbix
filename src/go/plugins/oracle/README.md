@@ -205,11 +205,11 @@ Possible values:
 
 **oracle.user.info[\<commonParams\>[,username]]** — returns the user information.
 
-**oracle.version[\<commonParams\>[,username]]** — returns the database server information.
-
 *Parameters:*  
 Username (optional) — the username for which the information is required. Usernames written in lowercase characters are not supported.
 Default: the current user.
+
+**oracle.version[\<commonParams\>[,username]]** — returns the database server information.
 
 ## Custom queries
 
