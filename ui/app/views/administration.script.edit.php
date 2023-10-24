@@ -355,30 +355,30 @@ $form_grid
 			)
 		])
 		->addItem([
-			(new CLabel(_('Default input string'), 'manualinput_default_value'))->setId('default-input-label'),
-			(new CFormField([
+			new CLabel(_('Default input string'), 'manualinput_default_value'),
+			new CFormField([
 				(new CTextBox('manualinput_default_value', $data['manualinput_default_value'], false,
 					DB::getFieldLength('scripts', 'manualinput_default_value'))
 				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			]))->setId('default-input-field')
+			])
 		])
 		->addItem([
-			(new CLabel(_('Dropdown options'), 'dropdown_options'))->setId('dropdown-options-label'),
-			(new CFormField([
+			new CLabel(_('Dropdown options'), 'dropdown_options'),
+			new CFormField([
 				(new CTextBox('dropdown_options', $dropdown_options, false,
 					DB::getFieldLength('scripts', 'manualinput_validator'))
 				)
 					->setAttribute('placeholder', 'comma-separated list')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			]))->setId('dropdown-options-field')
+			])
 		])
 		->addItem([
-			(new CLabel(_('Input validation rule'), 'manualinput_validator'))->setId('input-validation-label'),
-			(new CFormField([
+			new CLabel(_('Input validation rule'), 'manualinput_validator'),
+			new CFormField([
 				(new CTextBox('manualinput_validator', $validation_rule, false,
 					DB::getFieldLength('scripts', 'manualinput_validator'))
 				)->setAttribute('placeholder', 'regular expression')
-			]))->setId('input-validation-field')
+			])
 		])
 		->addItem([
 			(new CLabel(_('Enable confirmation'), 'enable_confirmation')),
@@ -393,7 +393,7 @@ $form_grid
 					DB::getFieldLength('scripts', 'confirmation'))
 				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
-				(new CButton('test-confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
+				(new CButton('test_confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 			])
 		])
 	);

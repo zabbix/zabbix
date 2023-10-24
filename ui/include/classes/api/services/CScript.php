@@ -639,12 +639,30 @@ class CScript extends CApiService {
 	/**
 	 * Validates manualinput fields and updates the Script array based on manualinput or database values.
 	 *
-	 * @param array  $script     [IN/OUT] Script data.
-	 * @param array  $db_script  [IN] Script data retrieved from database.
+	 * @param array       $script     [IN/OUT] Script data.
+	 * @param array|null  $db_script  [IN] Script data from database.
+	 *
+	 * $script = [
+	 *     'scope' =>                      (int)     Script scope.
+	 *     'manualinput' =>                (int)     Script manualinput.
+	 *     'manualinput_prompt' =>         (string)  Script manualinput prompt text (exists if manualinput = 1).
+	 *     'manualinput_validator_type' => (int)     Script manualinput validator type (exists if manualinput = 1).
+	 *     'manualinput_validator' =>      (string)  Script manualinput validator (exists if manualinput = 1).
+	 *     'manualinput_default_value' =>  (string)  Script manualinput default value (exists if manualinput = 1 and
+	 *                                               manualinput_validator_type = 0).
+	 * ]
+	 *
+	 * $db_script = [
+	 *     'manualinput' =>                (int)     Script manualinput.
+	 *     'manualinput_prompt' =>         (string)  Script manualinput prompt text.
+	 *     'manualinput_validator_type' => (int)     Script manualinput validator type.
+	 *     'manualinput_validator' =>      (string)  Script manualinput validator.
+	 *     'manualinput_default_value' =>  (string)  Script manualinput default value.
+	 * ]
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateManualInput(array &$script, array $db_script = null): void {
+	protected function validateManualInput(array &$script, ?array $db_script = null): void {
 		if ($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
 			if ($db_script) {
 				if (!array_key_exists('manualinput', $script)) {
@@ -715,7 +733,7 @@ class CScript extends CApiService {
 			if (array_key_exists('manualinput_validator_type', $script)
 					&& $script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
 					&& array_key_exists('manualinput_validator', $script)) {
-				$manualinput_validator = array_map('trim', explode(",", $script['manualinput_validator'] ?? ''));
+				$manualinput_validator = array_map('trim', explode(',', $script['manualinput_validator'] ?? ''));
 
 				if (array_unique($manualinput_validator) !== $manualinput_validator) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,

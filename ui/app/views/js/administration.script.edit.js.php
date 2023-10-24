@@ -110,7 +110,7 @@ window.script_edit_popup = new class {
 		this.form.querySelector('#test_user_input').addEventListener('click', () => this.#openManualinputTestPopup());
 
 		// Test confirmation button.
-		this.form.querySelector('#test-confirmation').addEventListener('click', (e) =>
+		this.form.querySelector('#test_confirmation').addEventListener('click', (e) =>
 			executeScript(null, this.form.querySelector('#confirmation').value, e.target)
 		);
 
@@ -470,16 +470,20 @@ window.script_edit_popup = new class {
 	}
 
 	#updateManualinputFields(test_user_input, input_prompt, validator) {
-		const input_type_string = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
+		const is_input_type_string = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
 
-		this.form.querySelector('#default-input-label').style.display = input_type_string ? '' : 'none';
-		this.form.querySelector('#default-input-field').style.display = input_type_string ? '' : 'none';
+		this.form.querySelector('label[for=manualinput_default_value]').style.display = is_input_type_string
+			? ''
+			: 'none';
+		this.form.querySelector('#manualinput_default_value').parentNode.style.display = is_input_type_string
+			? ''
+			: 'none';
 
-		this.form.querySelector('#input-validation-label').style.display = input_type_string ? '' : 'none';
-		this.form.querySelector('#input-validation-field').style.display = input_type_string ? '' : 'none';
+		this.form.querySelector('label[for=manualinput_validator]').style.display = is_input_type_string ? '' : 'none';
+		this.form.querySelector('#manualinput_validator').parentNode.style.display = is_input_type_string ? '' : 'none';
 
-		this.form.querySelector('#dropdown-options-label').style.display = input_type_string ? 'none' : '';
-		this.form.querySelector('#dropdown-options-field').style.display = input_type_string ? 'none' : '';
+		this.form.querySelector('label[for=dropdown_options]').style.display = is_input_type_string ? 'none' : '';
+		this.form.querySelector('#dropdown_options').parentNode.style.display = is_input_type_string ? 'none' : '';
 
 		if (this.user_input_checked) {
 			document.querySelector(`label[for="${validator.name}"]`).classList
@@ -490,12 +494,9 @@ window.script_edit_popup = new class {
 				.remove(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 		}
 
-		const updateTestUserInput = () => {
-			test_user_input.disabled = !(
-				input_prompt.value.trim() !== '' && validator.value.trim() !== ''
-				&& this.user_input_checked
-			);
-		};
+		const updateTestUserInput = () => test_user_input.disabled = !(
+			input_prompt.value.trim() !== '' && validator.value.trim() !== '' && this.user_input_checked
+		);
 
 		input_prompt.onkeyup = updateTestUserInput;
 		validator.onkeyup = updateTestUserInput;
@@ -516,7 +517,7 @@ window.script_edit_popup = new class {
 		}
 
 		const confirmation = this.form.querySelector('#confirmation');
-		const test_confirmation = this.form.querySelector('#test-confirmation');
+		const test_confirmation = this.form.querySelector('#test_confirmation');
 
 		if (this.confirmation) {
 			document.querySelector('label[for="confirmation"]').classList

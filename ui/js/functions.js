@@ -556,7 +556,8 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 				confirmation = confirmation.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
 
 				showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
-					e.detail.data.manualinput);
+					e.detail.data.manualinput
+				);
 			}
 		});
 	}

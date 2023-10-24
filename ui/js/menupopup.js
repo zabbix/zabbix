@@ -1538,7 +1538,7 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 				if (data.params.manualinput === '1') {
 					item.clickCallback = () => openManualinputDialogue(item, data);
 				}
-				else if (data.params.manualinput == 0 && data.params.confirmation !== '') {
+				else if (data.params.manualinput === '0' && data.params.confirmation !== '') {
 					item.url = data.params.url;
 
 					item.clickCallback = function() {
