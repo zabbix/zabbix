@@ -240,17 +240,18 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]'))
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
-			->addStyle('max-width:100px;width:100%;display: none;');
+			->addStyle('max-width:100px;width:100%;')
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 	}
 	else {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]'))
 			->setAdaptiveWidth(100)
 			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
-			->addStyle('display: none;');
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]'))
 			->setAdaptiveWidth(110)
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
-			->addStyle('display: none;');
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule']))
 			->setAdaptiveWidth(100)
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
