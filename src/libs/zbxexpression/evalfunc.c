@@ -707,7 +707,7 @@ static int	evaluate_LOGEVENTID(zbx_variant_t *value, const zbx_dc_evaluate_item_
 		goto out;
 	}
 
-	if (2 < (nparams = zbx_num_param(parameters)))
+	if (2 < (nparams = zbx_function_param_parse_count(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -804,7 +804,7 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, const zbx_dc_evaluate_item_t
 		goto out;
 	}
 
-	if (2 < (nparams = zbx_num_param(parameters)))
+	if (2 < (nparams = zbx_function_param_parse_count(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -892,7 +892,7 @@ static int	evaluate_LOGSEVERITY(zbx_variant_t *value, const zbx_dc_evaluate_item
 		goto out;
 	}
 
-	if (1 < zbx_num_param(parameters))
+	if (1 < zbx_function_param_parse_count(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1088,7 +1088,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 	zbx_history_record_vector_create(&values);
 
-	if (3 < (nparams = zbx_num_param(parameters)))
+	if (3 < (nparams = zbx_function_param_parse_count(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1588,7 +1588,7 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, const zbx_dc_evaluate_item
 		goto out;
 	}
 
-	if (2 != zbx_num_param(parameters))
+	if (2 != zbx_function_param_parse_count(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1686,7 +1686,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 
 	zbx_history_record_vector_create(&values);
 
-	if (2 < (num = zbx_num_param(parameters)))
+	if (2 < (num = zbx_function_param_parse_count(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1873,7 +1873,7 @@ static int	evaluate_FUZZYTIME(zbx_variant_t *value, const zbx_dc_evaluate_item_t
 		goto out;
 	}
 
-	if (1 < zbx_num_param(parameters))
+	if (1 < zbx_function_param_parse_count(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2617,7 +2617,7 @@ static int	evaluate_FIRST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 	zbx_history_record_vector_create(&values);
 
-	if (1 != zbx_num_param(parameters))
+	if (1 != zbx_function_param_parse_count(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2738,7 +2738,7 @@ static int	evaluate_MONO(zbx_variant_t *value, const zbx_dc_evaluate_item_t *ite
 		goto out;
 	}
 
-	num = zbx_num_param(parameters);
+	num = zbx_function_param_parse_count(parameters);
 
 	if (1 > num || 2 < num )
 	{
@@ -2880,7 +2880,7 @@ static int	evaluate_RATE(zbx_variant_t *value, const zbx_dc_evaluate_item_t *ite
 		goto out;
 	}
 
-	if (1 != zbx_num_param(parameters))
+	if (1 != zbx_function_param_parse_count(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -3081,7 +3081,7 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, const zbx_dc_evaluate_item
 
 	zbx_history_record_vector_create(&values);
 
-	nparams = zbx_num_param(parameters);
+	nparams = zbx_function_param_parse_count(parameters);
 	if (1 > nparams || 2 < nparams)
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
