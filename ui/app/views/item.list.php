@@ -185,7 +185,7 @@ foreach ($data['items'] as $item) {
 					'backurl' => $list_url
 				])
 			),
-		$data['hostid'] != 0 ? null : $item['hosts'][0]['host'],
+		$data['hostid'] != 0 ? null : $item['hosts'][0]['name'],
 		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$item['triggers']
 			? [
