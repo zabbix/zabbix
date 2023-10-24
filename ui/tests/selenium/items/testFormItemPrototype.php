@@ -891,7 +891,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleId('interval_add');
 		}
 
-		$this->zbxTestTextPresent('History storage period');
+		$this->zbxTestTextPresent('History');
 		$this->zbxTestAssertVisibleId('history');
 		$this->zbxTestAssertAttribute("//input[@id='history']", 'maxlength', 255);
 		$this->zbxTestAssertElementValue('history', '90d');
@@ -900,7 +900,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->zbxTestTextPresent('Trend storage period');
+			$this->zbxTestTextPresent('Trends');
 			$this->zbxTestAssertVisibleId('trends');
 			$this->zbxTestAssertAttribute("//input[@id='trends']", 'maxlength', 255);
 			if (!isset($itemid)) {
@@ -908,7 +908,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextNotVisible('Trend storage period');
+			$this->zbxTestTextNotVisible('Trends');
 			$this->zbxTestAssertNotVisibleId('trends');
 		}
 

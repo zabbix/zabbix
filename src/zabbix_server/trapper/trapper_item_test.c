@@ -204,7 +204,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_HTTPAGENT:
-			item.timeout = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout");
+			db_string_from_json(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig, sizeof(item.timeout_orig));
 			break;
 	}
 
@@ -422,7 +422,6 @@ out:
 	zbx_free(item.privatekey);
 	zbx_free(item.password);
 	zbx_free(item.jmx_endpoint);
-	zbx_free(item.timeout);
 	zbx_free(item.url);
 	zbx_free(item.query_fields);
 	zbx_free(item.posts);

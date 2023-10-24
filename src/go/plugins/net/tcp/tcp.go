@@ -106,15 +106,7 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 		address = net.JoinHostPort(params[0], port)
 	}
 
-	var tcpTimeout time.Duration
-
-	if timeout >= 2 {
-		tcpTimeout = time.Duration(timeout-1)*time.Second
-	} else {
-		tcpTimeout = time.Duration(timeout)*time.Second
-	}
-
-	if _, err := net.DialTimeout("tcp", address, tcpTimeout); err != nil {
+	if _, err := net.DialTimeout("tcp", address, time.Duration(timeout)*time.Second); err != nil {
 		return 0, nil
 	}
 	return 1, nil
