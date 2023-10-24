@@ -85,20 +85,17 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	itemid, hostid;
-			const char	*name_resolved_current;
+			zbx_uint64_t	hostid;
 			char		*name_resolved_new;
 
 			(*processed_num)++;
 
-			ZBX_STR2UINT64(itemid, row[0]);
 			ZBX_STR2UINT64(hostid, row[1]);
 			name_resolved_new = zbx_strdup(NULL, row[2]);
-			name_resolved_current = row[3];
 
 			(void)zbx_dc_expand_user_macros(um_handle, &name_resolved_new, &hostid, 1, NULL);
 
-			if (0 != strcmp(name_resolved_current, name_resolved_new))
+			if (0 != strcmp(row[3], name_resolved_new))
 			{
 				char	*name_resolved_esc;
 
@@ -106,8 +103,8 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_rtname set"
 						" name_resolved='%s',name_resolved_upper=upper('%s')"
-						" where itemid=" ZBX_FS_UI64 ";\n",
-						name_resolved_esc, name_resolved_esc, itemid);
+						" where itemid=%s;\n",
+						name_resolved_esc, name_resolved_esc, row[0]);
 				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 				zbx_free(name_resolved_esc);
@@ -173,7 +170,6 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		double	time_now;
-
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		zbx_ipc_service_recv(&service, &timeout, &client, &message);
