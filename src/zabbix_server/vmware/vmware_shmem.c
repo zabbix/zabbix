@@ -1142,8 +1142,8 @@ zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
  *                                                                            *
  * Purpose: copies events severity vector into shared memory hashset          *
  *                                                                            *
- * Parameters: dst - [IN] the destination hashset                             *
- *             src - [IN] the source vector                                   *
+ * Parameters: dst - [IN] destination hashset                                 *
+ *             src - [IN] source vector                                       *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src)
