@@ -2181,6 +2181,12 @@ button {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+@page {
+  margin: 10px; }
+@media print {
+  .dashboard-page {
+    margin: 10px;
+    break-after: page; } }
 .diff {
   padding: 4px;
   background: #ebeef0; }
@@ -5073,6 +5079,7 @@ form.is-loading {
   .table-forms td {
     position: relative; }
   .table-forms .table-forms-td-left {
+    position: relative;
     display: table-cell;
     padding: 5px 0;
     text-align: right;
@@ -5086,6 +5093,10 @@ form.is-loading {
       .table-forms .table-forms-td-left label .btn-icon,
       .table-forms .table-forms-td-left label .icon {
         margin-left: 5px; }
+    .table-forms .table-forms-td-left .checkbox-radio {
+      right: 0;
+      margin-right: 0;
+      margin-left: 0; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;

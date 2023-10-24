@@ -37,7 +37,7 @@ window.condition_popup = new class {
 	}
 
 	_loadViews() {
-		if (this.form.querySelector('#condition-type').value == <?= CONDITION_TYPE_SERVICE ?>) {
+		if (this.form.querySelector('#condition-type').value == <?= ZBX_CONDITION_TYPE_SERVICE ?>) {
 			$('#service-new-condition')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => this.selectServices());

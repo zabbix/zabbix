@@ -42,7 +42,7 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 }
 
 func (pc *passiveCheck) handleCheck(data []byte, timeout uint32) {
-	// the timeout is one minute to allow agent connections safely execute
+	// the timeout is one minute to allow see any timeout problem with passive checks
 	const timeoutForSinglePassiveChecks = time.Minute
 	var checkTimeout time.Duration
 

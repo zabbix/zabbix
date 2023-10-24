@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ALERTER_PROTOCOL_H
 #define ZABBIX_ALERTER_PROTOCOL_H
 
-#include "alerter.h"
+#include "zbxalerter.h"
 
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
@@ -36,10 +36,10 @@ typedef struct
 
 	int			location;
 
-	/* the number of currently processing alerts */
+	/* number of currently processing alerts */
 	int			alerts_num;
 
-	/* the number of alert objects for this media type */
+	/* number of alert objects for this media type */
 	int			refcount;
 
 	/* alert pool queue */
@@ -73,6 +73,8 @@ typedef struct
 }
 zbx_am_mediatype_t;
 
+ZBX_PTR_VECTOR_DECL(am_mediatype_ptr, zbx_am_mediatype_t *)
+
 typedef struct
 {
 	zbx_uint64_t	mediaid;
@@ -80,6 +82,8 @@ typedef struct
 	char		*sendto;
 }
 zbx_am_media_t;
+
+ZBX_PTR_VECTOR_DECL(am_media_ptr, zbx_am_media_t *)
 
 /* media type data */
 typedef struct
@@ -112,6 +116,8 @@ typedef struct
 }
 zbx_am_db_mediatype_t;
 
+ZBX_PTR_VECTOR_DECL(am_db_mediatype_ptr, zbx_am_db_mediatype_t *)
+
 /* alert data */
 typedef struct
 {
@@ -132,6 +138,8 @@ typedef struct
 }
 zbx_am_db_alert_t;
 
+ZBX_PTR_VECTOR_DECL(am_db_alert_ptr, zbx_am_db_alert_t *)
+
 /* alert status update data */
 typedef struct
 {
@@ -145,6 +153,8 @@ typedef struct
 	char		*error;
 }
 zbx_am_result_t;
+
+ZBX_PTR_VECTOR_DECL(am_result_ptr, zbx_am_result_t *)
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype);
 void	zbx_am_db_alert_free(zbx_am_db_alert_t *alert);
