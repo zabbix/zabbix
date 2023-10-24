@@ -2686,10 +2686,6 @@ z-select,
   .z-select[disabled] .focusable {
     pointer-events: none; }
 
-div.dashboard-grid-widget-slareport .date-vertical {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg); }
-
 .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
   border: 1px solid #dfe4e7; }
 
@@ -2887,7 +2883,11 @@ form.is-loading {
   .list-table td .icon-depend-up,
   .list-table td .icon-depend-down,
   .list-table td .icon-ackn {
-    margin: 0 4px -3px 0; }
+    margin-bottom: -3px; }
+    .list-table td .icon-depend-up:not(:first-of-type),
+    .list-table td .icon-depend-down:not(:first-of-type),
+    .list-table td .icon-ackn:not(:first-of-type) {
+      margin-left: 4px; }
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
     color: #1f2c33; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup,
@@ -3024,8 +3024,12 @@ form.is-loading {
       border-top-color: #768d99; }
     .list-table thead th .treeview span {
       margin: 0; }
-    .list-table thead th .vertical {
+    .list-table thead th .text-vertical {
+      max-height: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       writing-mode: vertical-lr;
+      line-height: 22px;
       transform: rotate(180deg); }
     .list-table thead th a {
       display: block;
@@ -3067,9 +3071,6 @@ form.is-loading {
       color: #768d99; }
   .list-table tbody th {
     text-align: left; }
-  .list-table .vertical_rotation_inner {
-    transform: rotate(270deg);
-    white-space: nowrap; }
   .list-table .list-table-footer {
     border-bottom: 0;
     color: #768d99;
