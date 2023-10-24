@@ -667,6 +667,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		GETSHORT(q_len, msg_ptr);
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
 
+		if (msg_ptr + q_len >= msg_end)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response: record overflow."));
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
+		}
+
 		switch (q_type)
 		{
 			case T_A:
