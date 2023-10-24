@@ -31,12 +31,10 @@
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 
-#define ZBX_DBCONFIG_WORKER_DELAY	1
-#define ZBX_DBCONFIG_BATCH_SIZE		1000
-
 static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
 {
+#define ZBX_DBCONFIG_BATCH_SIZE	1000
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_dc_um_handle_t	*um_handle;
@@ -135,27 +133,24 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 		*macro_used = *processed_num;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef ZBX_DBCONFIG_BATCH_SIZE
 }
 
 ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 {
-#define DBCONFIG_WORKER_FLUSH_DELAY_SEC		1
+#define ZBX_DBCONFIG_WORKER_DELAY		1
 	zbx_ipc_service_t	service;
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	int			processed_num = 0, updated_num = 0, macro_used = 1;
-	int			delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
-	double			sec = 0, time_flush;
+	double			sec = 0;
 	zbx_timespec_t		timeout = {ZBX_DBCONFIG_WORKER_DELAY, 0};
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_vector_uint64_t	hostids;
-
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 				server_num, get_process_type_string(process_type), process_num);
@@ -165,13 +160,10 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_DBCONFIG_WORKER, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start connector manager service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start %s service: %s", get_process_type_string(process_type), error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
-	/* initialize statistics */
-	time_flush = zbx_time();
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -180,13 +172,17 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		if (delay < zbx_time() - time_flush && 0 != hostids.values_num)
+		double	time_now = zbx_time();
+
+		zbx_update_env(get_process_type_string(process_type), time_now);
+
+		if (0 != hostids.values_num)
 		{
 			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, syncing]",
 					get_process_type_string(process_type), processed_num, updated_num, sec);
 			processed_num = 0;
 			updated_num = 0;
-			sec = zbx_time();
+			sec = time_now;
 
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -195,9 +191,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 
 			zbx_vector_uint64_clear(&hostids);
 
-			time_flush = zbx_time();
-			sec = time_flush - sec;
-			delay = DBCONFIG_WORKER_FLUSH_DELAY_SEC;
+			sec = zbx_time() - sec;
 
 			zbx_setproctitle("%s [synced %d, updated %d item names in " ZBX_FS_DBL " sec, idle]",
 					get_process_type_string(process_type), processed_num, updated_num, sec);
@@ -206,8 +200,6 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (NULL != message)
 		{
@@ -231,5 +223,5 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 	zbx_ipc_service_close(&service);
 
 	exit(EXIT_SUCCESS);
-#undef STAT_INTERVAL
+#undef ZBX_DBCONFIG_WORKER_DELAY
 }
