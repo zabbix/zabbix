@@ -22,7 +22,7 @@
 
 #include "../server.h"
 #include "../db_lengths.h"
-#include "../alerter/alerter.h"
+#include "zbxalerter.h"
 
 #include "zbxcrypto.h"
 #include "zbxexpression.h"

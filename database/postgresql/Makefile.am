@@ -10,14 +10,14 @@ data.sql: $(top_srcdir)/create/src/data.tmpl $(top_srcdir)/create/src/templates.
 
 schema.sql: $(top_srcdir)/create/src/schema.tmpl $(top_srcdir)/create/bin/gen_schema.pl
 	$(top_srcdir)/create/bin/gen_schema.pl $(DATABASE) > schema.sql || (rm -rf schema.sql && exit 1)
+
+clean: clean-recursive
+	rm -f schema.sql data.sql
 endif
 
 EXTRA_DIST = \
 	data.sql \
 	images.sql \
 	schema.sql
-
-clean: clean-recursive
-	rm -f schema.sql data.sql
 
 .PHONY: clean

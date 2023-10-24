@@ -1391,12 +1391,12 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves a property value from xml node                          *
+ * Purpose: retrieves a property value from XML node                          *
  *                                                                            *
- * Parameters: node - [IN] the XML node                                       *
- *             name - [IN] the XML XPath                                      *
+ * Parameters: node - [IN] XML node                                           *
+ *             name - [IN] XML XPath                                          *
  *                                                                            *
- * Return: The allocated value string or NULL if the xml data does not        *
+ * Return: The allocated value string or NULL if the XML data does not        *
  *         contain the value specified by name.                               *
  *                                                                            *
  ******************************************************************************/
@@ -1410,6 +1410,7 @@ char	*zbx_xml_node_read_prop(xmlNode *node, const char *name)
 
 	value = zbx_strdup(NULL, (const char *)attr_value);
 	xmlFree(attr_value);
+
 	return value;
 }
 
