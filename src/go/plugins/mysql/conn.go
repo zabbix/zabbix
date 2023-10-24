@@ -332,7 +332,6 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 	var (
 		validateCA     = true
 		validateClient = false
-		tlsType        = ck.tlsConnect
 	)
 
 	details := tlsconfig.NewDetails(
@@ -348,7 +347,7 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 		verifyFull,
 	)
 
-	if tlsType == disable || tlsType == require {
+	if ck.tlsConnect == disable || ck.tlsConnect == require {
 		validateCA = false
 	}
 
