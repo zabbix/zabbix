@@ -1033,7 +1033,6 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 	if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
 	{
 		int			i, params = 0;
-		zbx_vector_ptr_t	hist_func_params;
 
 		for (i = (int)token->opt; i < ctx->stack.values_num; i++)
 		{
