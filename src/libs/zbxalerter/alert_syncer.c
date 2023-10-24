@@ -925,6 +925,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	double				time_cleanup = 0,  time_watchdog = 0;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -948,7 +949,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		double	sec1, sec2, time_cleanup = 0, time_watchdog = 0;
+		double	sec1, sec2;
 		int	alerts_num, nextcheck, results_num;
 
 		zbx_sleep_loop(info, sleeptime);
