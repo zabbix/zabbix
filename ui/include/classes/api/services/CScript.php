@@ -651,7 +651,7 @@ class CScript extends CApiService {
 					$script['manualinput'] = $db_script['manualinput'];
 				}
 
-				if ($db_script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
+				if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 					if (!array_key_exists('manualinput_prompt', $script)) {
 						$script['manualinput_prompt'] = $db_script['manualinput_prompt'];
 					}
