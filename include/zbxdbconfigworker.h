@@ -29,8 +29,7 @@
 #define ZBX_IPC_SERVICE_DBCONFIG_WORKER		"config"
 #define ZBX_IPC_DBCONFIG_WORKER_REQUEST		1
 
-void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_vector_uint64_t ids);
+void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_offset, const zbx_vector_uint64_t *ids);
 void	zbx_dbconfig_worker_deserialize_ids(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_uint64_t *ids);
 void	zbx_dbconfig_worker_send_ids(const zbx_vector_uint64_t *hostids);

@@ -21,26 +21,17 @@
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 
-void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_vector_uint64_t ids)
+void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_offset, const zbx_vector_uint64_t *ids)
 {
 	zbx_uint32_t	data_len = 0, vector_uint64_len;
-	unsigned char	*ptr;
 
 	zbx_serialize_prepare_vector_uint64_len(data_len, ids, vector_uint64_len);
 
-	if (NULL == *data)
-		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
-	while (data_len > *data_alloc - *data_offset)
-	{
-		*data_alloc *= 2;
-		*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
-	}
-	ptr = *data + *data_offset;
-	*data_offset += data_len;
+	*data_offset = data_len;
 
-	zbx_serialize_vector_uint64(ptr, ids, vector_uint64_len);
+	zbx_serialize_vector_uint64(*data, ids, vector_uint64_len);
 }
 
 void	zbx_dbconfig_worker_deserialize_ids(const unsigned char *data, zbx_uint32_t size,
