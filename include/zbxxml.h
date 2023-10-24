@@ -55,6 +55,7 @@ int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlD
 int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num);
 int	zbx_xml_node_read_num(xmlDoc *xdoc, xmlNode *node, const char *xpath, int *num);
 char	*zbx_xml_node_read_value(xmlDoc *xdoc, xmlNode *node, const char *xpath);
+char	*zbx_xml_node_read_prop(xmlNode *node, const char *name);
 char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath);
 xmlNode	*zbx_xml_node_get(xmlDoc *xdoc, xmlNode *node, const char *xpath);
 xmlNode	*zbx_xml_doc_get(xmlDoc *xdoc, const char *xpath);

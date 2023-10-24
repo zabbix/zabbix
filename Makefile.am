@@ -64,33 +64,24 @@ dbschema_mysql:
 	cd database/mysql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_oracle:
 	cd database/oracle && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
-
-export tsdb_wcompr_dir = tsdb_history_pk_upgrade_with_compression
-export tsdb_nocompr_dir = tsdb_history_pk_upgrade_no_compression
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) timescaledb.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_uint.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_log.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_str.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_text.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_uint.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_log.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_str.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_text.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
+
+dbschema_timescaledb:
+	cd database/postgresql/timescaledb && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \
@@ -101,7 +92,7 @@ dbschema_c:
 	cd src/libs/zbxdbschema && \
 	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
-dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c
+dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_timescaledb dbschema_sqlite3 dbschema_c
 endif
 
 gettext:

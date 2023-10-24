@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
 /**
  * Test the mass update of items.
  *
+ * @onBefore prepareItemTagsPreprocessingData
+ *
  * @backup items, interface
  */
 class testPageMassUpdateItems extends testMassUpdateItems {
@@ -456,17 +458,12 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 		]);
 	}
 
-	/**
-	 * @onBeforeOnce prepareItemTagsPreprocessingData
-	 */
 	public function testPageMassUpdateItems_Cancel() {
 		$this->executeMassUpdateCancel();
 	}
 
 	/**
 	 * @dataProvider getCommonTagsChangeData
-	 *
-	 * @depends testPageMassUpdateItems_Cancel
 	 */
 	public function testPageMassUpdateItems_ChangeTags($data) {
 		$this->executeItemsTagsMassUpdate($data);
@@ -474,8 +471,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 
 	/**
 	 * @dataProvider getCommonPreprocessingChangeData
-	 *
-	 * @depends testPageMassUpdateItems_Cancel
 	 */
 	public function testPageMassUpdateItems_ChangePreprocessing($data) {
 		$this->executeItemsPreprocessingMassUpdate($data);

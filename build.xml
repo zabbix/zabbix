@@ -152,6 +152,8 @@
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=128"/>
 			<arg line="--with-openssl"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -242,7 +244,7 @@
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="-c 'create extension if not exists timescaledb cascade;'"/>
 		</exec>
-		<exec executable="psql" input="database/postgresql/timescaledb.sql" failonerror="on">
+		<exec executable="psql" input="database/postgresql/timescaledb/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
@@ -343,6 +345,8 @@
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=128"/>
 			<arg line="--with-openssl"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>

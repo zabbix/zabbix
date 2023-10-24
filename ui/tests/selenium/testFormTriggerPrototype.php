@@ -262,15 +262,14 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
-			switch ($data['constructor']) {
-				case 'open':
-					$this->zbxTestClickButtonText('Expression constructor');
-					break;
-				case 'open_close':
-					$this->zbxTestClickButtonText('Expression constructor');
-					$this->zbxTestClickButtonText('Close expression constructor');
-					$this->page->waitUntilReady();
-					break;
+			$this->zbxTestClickButtonText('Expression constructor');
+			// Wait for expression constructor to open, textarea is disabled and its id has changed to 'expr_temp'.
+			$dialog->query('id:expr_temp')->waitUntilVisible();
+
+			if ($data['constructor'] === 'open_close') {
+				$this->zbxTestClickButtonText('Close expression constructor');
+				// Wait until expression constructor closes, textarea is enabled and its id has changed to 'expression'.
+				$dialog->query('id:expression')->waitUntilVisible();
 			}
 		}
 
