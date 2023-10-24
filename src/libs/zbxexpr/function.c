@@ -493,7 +493,8 @@ void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, s
 			ZBX_BACKSLASH_ESC_ON, param_pos, length, sep_pos);
 }
 
-int	zbx_function_param_parse_count(const char *expr) {
+int	zbx_function_param_parse_count(const char *expr)
+{
 	int		ret = 0;
 	size_t		param_pos, length, sep_pos, params_len = strlen(expr);
 	const char	*ptr;
