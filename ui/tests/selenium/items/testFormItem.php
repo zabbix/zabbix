@@ -681,9 +681,9 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->assertEquals(255, $form->getField('Trend')->getAttribute('maxlength'));
+			$this->assertEquals(255, $form->getField('Trends')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('trends', '365d');
+				$this->assertEquals('365d', $form->getField('Trends')->getValue());
 			}
 		}
 		else {
@@ -1009,8 +1009,7 @@ class testFormItem extends CLegacyWebTest {
 					'delay' => '-30',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-//						'Field "Update interval" is not correct: a time unit is expected'
-						'Invalid parameter "/1/delay": a time unit is expected.'
+						'Incorrect value for field "delay": a time unit is expected'
 					]
 				]
 			],
@@ -1723,8 +1722,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-telnet-agent-error',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/username": cannot be empty.',
-						'Incorrect value for field "Executed script": cannot be empty.'
+						'Invalid parameter "/1/username": cannot be empty.'
 					]
 				]
 			],
@@ -1904,12 +1902,8 @@ class testFormItem extends CLegacyWebTest {
 		// Check hidden update and custom interval for mqtt.get key.
 		if (CTestArrayHelper::get($data, 'type') === 'Zabbix agent (active)'
 				&& substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
-			$this->zbxTestTextNotVisible('Update interval');
-			$this->zbxTestAssertNotVisibleId('js-item-delay-label');
-			$this->zbxTestAssertNotVisibleId('js-item-delay-field');
-			$this->zbxTestTextNotVisible('Custom intervals');
-			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
-			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
+			$this->assertFalse($form->getField('Update interval')->isDisplayed());
+			$this->assertFalse($form->getField('Custom intervals')->isDisplayed());
 		}
 
 		$itemFlexFlag = true;
@@ -2034,20 +2028,12 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestAssertNotVisibleId('interfaceid');
 					// Check hidden update and custom interval for mqtt.get key.
 					if (substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
-						$this->zbxTestTextNotVisible('Update interval');
-						$this->zbxTestAssertNotVisibleId('js-item-delay-label');
-						$this->zbxTestAssertNotVisibleId('js-item-delay-field');
-						$this->zbxTestTextNotVisible('Custom intervals');
-						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
-						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
+						$this->assertFalse($form->getField('Update interval')->isDisplayed());
+						$this->assertFalse($form->getField('Custom intervals')->isDisplayed());
 					}
 					else {
-						$this->zbxTestTextVisible('Update interval');
-						$this->zbxTestAssertVisibleId('js-item-delay-label');
-						$this->zbxTestAssertVisibleId('js-item-delay-field');
-						$this->zbxTestTextVisible('Custom intervals');
-						$this->zbxTestAssertVisibleId('js-item-flex-intervals-label');
-						$this->zbxTestAssertVisibleId('js-item-flex-intervals-field');
+						$this->assertTrue($form->getField('Update interval')->isDisplayed());
+						$this->assertTrue($form->getField('Custom intervals')->isDisplayed());
 					}
 					break;
 				default:
@@ -2101,9 +2087,9 @@ class testFormItem extends CLegacyWebTest {
 		$this->filterEntriesAndOpenItems();
 		$this->zbxTestClickLinkTextWait($this->item);
 		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
-		$form->getLabel('History storage period')->query("xpath:span[@class='js-hint']/button")->one()->click();
+		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue']", 'Overridden by global housekeeping settings (99d)');
-		$form->getLabel('Trend')->query("xpath:span[@class='js-hint']/button")->one()->click();
+		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');

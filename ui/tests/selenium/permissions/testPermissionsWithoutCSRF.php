@@ -166,7 +166,6 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
-					'incorrect_request' => true,
 					'overlay' => 'item_update'
 				]
 			],
@@ -175,7 +174,6 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
-					'incorrect_request' => true,
 					'overlay' => 'create'
 				]
 			],

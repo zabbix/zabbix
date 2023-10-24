@@ -131,7 +131,7 @@ class testItemTypeSelection extends CWebTest {
 					],
 					'hint' => true,
 					'hint_text' => 'This type of information may not match the key.',
-					'automatic_type' => 'Text'
+					'type' => 'Log'
 				]
 			]
 		];
@@ -217,13 +217,13 @@ class testItemTypeSelection extends CWebTest {
 			$form->invalidate();
 			$this->assertEquals($data['fields']['Type of information'], $form->getField('Type of information')->getValue());
 
-			// Check that type changes to automatic when preprocessing is cleared.
+			// Check that type is the same when preprocessing is cleared.
 			$form->selectTab('Preprocessing');
 			$form->query('xpath:.//li[@data-step="0"]')->waitUntilPresent()->one()->query('button:Remove')
 					->waitUntilClickable()->one()->click();
 
 			$form->selectTab(($prototype) ? 'Item prototype' : 'Item');
-			$this->assertEquals($data['automatic_type'], $form->getField('Type of information')->getValue());
+			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
 
 			// Check saved form.
 			$form->submit();
@@ -231,7 +231,7 @@ class testItemTypeSelection extends CWebTest {
 			$this->page->open($link)->waitUntilReady();
 			$this->query('link:'.$data['fields']['Name'])->one()->click();
 			$form->invalidate();
-			$this->assertEquals($data['automatic_type'], $form->getField('Type of information')->getValue());
+			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
 		}
 		else {
 			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());

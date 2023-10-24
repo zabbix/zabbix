@@ -872,21 +872,21 @@ class testFormItemPrototype extends CLegacyWebTest {
 			);
 		}
 
-		$this->assertEquals(255, $form->getField('History storage period')->getAttribute('maxlength'));
-		$this->assertEquals('90d', $form->getField('History storage period')->getAttribute('value'));
+		$this->assertEquals(255, $form->getField('History')->getAttribute('maxlength'));
+		$this->assertEquals('90d', $form->getField('History')->getAttribute('value'));
 
 		if (!isset($itemid)) {
-			$this->assertEquals('90d', $form->getField('History storage period')->getAttribute('value'));
+			$this->assertEquals('90d', $form->getField('History')->getAttribute('value'));
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->assertEquals(255, $form->getField('Trend')->getAttribute('maxlength'));
+			$this->assertEquals(255, $form->getField('Trends')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('trends', '365d');
+				$this->assertEquals('365d', $form->getField('Trends')->getValue());
 			}
 		}
 		else {
-			$this->assertFalse($form->query('id:trends')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Trends')->isDisplayed());
 		}
 
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
@@ -1130,7 +1130,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'delay' => '-30',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": a time unit is expected.'
+						'Incorrect value for field "delay": a time unit is expected'
 					]
 				]
 			],
@@ -1879,7 +1879,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
 						'Invalid parameter "/1/username": cannot be empty.'
-//						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -1893,7 +1892,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
 						'Invalid parameter "/1/username": cannot be empty.'
-//						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],

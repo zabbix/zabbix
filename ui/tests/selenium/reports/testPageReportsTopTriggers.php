@@ -1262,8 +1262,7 @@ class testPageReportsTopTriggers extends CWebTest {
 				],
 				'CONFIGURATION' => [
 					'Trigger' => 'menu-popup-item',
-					'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
-						'&backurl=zabbix.php%3Faction%3Dtoptriggers.list'
+					'Items' => ['Linux: Number of processes' => 'menu-popup-item'
 					]
 				]
 			],
@@ -1278,7 +1277,7 @@ class testPageReportsTopTriggers extends CWebTest {
 				],
 				'CONFIGURATION' => [
 					'Host' => 'zabbix.php?action=host.edit&hostid=10084',
-					'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
@@ -1319,9 +1318,16 @@ class testPageReportsTopTriggers extends CWebTest {
 				if (is_array($link)) {
 					foreach ($link as $menu_level2 => $attribute) {
 						// Check 2-level menu links.
+						if (str_contains($attribute, 'menu-popup-item')) {
+							$this->assertEquals($attribute, $popup->getItem($menu_level1)->query('xpath:./../ul//a')
+									->one()->getAttribute('class')
+							);
+						}
+						else {
 						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
 						$this->assertEquals($menu_level2, $item_link->getText());
 						$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
+						}
 					}
 				}
 				else {

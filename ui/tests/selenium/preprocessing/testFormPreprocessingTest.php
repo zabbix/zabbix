@@ -39,6 +39,7 @@ class testFormPreprocessingTest extends CWebTest {
 	const HOST_ID = 40001;		//'Simple form test host'
 
 	private static $key;
+	private static $name;
 
 	public $change_types = [
 		'Discard unchanged with heartbeat',
@@ -508,7 +509,6 @@ class testFormPreprocessingTest extends CWebTest {
 
 		// Test all steps right away after adding.
 		$this->query('button:Test all steps')->waitUntilPresent()->one()->click();
-
 		$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$table = $dialog->query('id:preprocessing-steps')->asTable()->waitUntilPresent()->one();
 
@@ -520,9 +520,8 @@ class testFormPreprocessingTest extends CWebTest {
 		$form->submit();
 
 		// Assert right steps order after item saving.
-		$item_name = CDBHelper::getValue('SELECT name FROM items WHERE key_='.zbx_dbstr(self::$key));
 		$this->page->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
-		$this->query('link', $item_name)->one()->click();
+		$this->query('link', self::$name)->one()->click();
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($preprocessing);
 	}
@@ -532,8 +531,9 @@ class testFormPreprocessingTest extends CWebTest {
 		$this->query('button:Create item')->one()->click();
 		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		self::$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key'.time();
+		self::$name = 'Test name'.time();
 
-		$form->fill(['Name' => 'Test name', 'Key' => self::$key]);
+		$form->fill(['Name' => self::$name, 'Key' => self::$key]);
 		$form->selectTab('Preprocessing');
 
 		return $form;
