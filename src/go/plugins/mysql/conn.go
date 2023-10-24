@@ -121,8 +121,12 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 
 	conn := c.get(ck)
 	if conn != nil {
+		c.log.Tracef("connection found for host: %s", uri.Host())
+
 		return conn, nil
 	}
+
+	c.log.Tracef("creating new connection for host: %s", uri.Host())
 
 	conn, err := c.create(ck)
 	if err != nil {
