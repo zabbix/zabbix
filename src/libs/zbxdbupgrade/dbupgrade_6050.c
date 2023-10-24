@@ -20,6 +20,7 @@
 #include "dbupgrade.h"
 
 #include "zbxdbschema.h"
+#include "zbxvariant.h"
 #include "zbxexpr.h"
 #include "zbxeval.h"
 #include "zbxalgo.h"
@@ -1796,12 +1797,12 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 	for (token_num = hist_param_tokens.values_num - 1; token_num >= 0; token_num--)
 	{
 		char	*str = NULL, *subst;
-		int	quoted, str_len;
-		size_t	str_alloc = 0, str_offset = 0;
+		int	quoted;
+		size_t	str_alloc = 0, str_offset = 0, str_len;
 
 		token = hist_param_tokens.values[token_num];
 
-		str_len = (int)(token->loc.r - token->loc.l) + 1;
+		str_len = token->loc.r - token->loc.l + 1;
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ctx.expression + token->loc.l, str_len);
 
 		subst = zbx_function_param_unquote_dyn_compat(str, str_len, &quoted);
