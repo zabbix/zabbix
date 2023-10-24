@@ -200,14 +200,13 @@ class testPageItems extends CLegacyWebTest {
 		$form->fill($data['filter_options']);
 		$form->submit();
 		$this->page->waitUntilReady();
-
 		// Item create button disabled and breadcrumbs not exist.
 		$this->assertFalse($this->query('button:Create item (select host first)')->one()->isEnabled());
 		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
 		// Check results in table.
-		$table = $this->query('name:items')->one()->query('class:list-table')->asTable()->one();
+		$table = $this->query('name:item_list')->one()->query('class:list-table')->asTable()->one();
 		foreach ($table->getRows() as $i => $row) {
-			$get_host = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
+			$get_host = $row->getColumn('Name')->query('class:js-update-item')->one()->getText();
 			$get_group = $row->getColumn('Host')->getText();
 			foreach ($data['result'][$i] as $group => $host) {
 				$this->assertEquals($host, $get_host);

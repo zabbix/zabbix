@@ -61,13 +61,13 @@ class testMassUpdateItems extends CWebTest{
 			'name' => 'delay',
 			'class' => 'CElement',
 			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
-					'not(contains(@style,"display: none"))]|./textarea[@name]'
+					'not(contains(@class,"display-none"))]|./textarea[@name]'
 		],
 		'Period' => [
 			'name' => 'period',
 			'class' => 'CElement',
 			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
-					'not(contains(@style,"display: none"))]|./textarea[@name]'
+					'not(contains(@class,"display-none"))]|./textarea[@name]'
 		]
 	];
 
