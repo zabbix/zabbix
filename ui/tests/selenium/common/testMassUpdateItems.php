@@ -1245,12 +1245,13 @@ class testMassUpdateItems extends CWebTest{
 					break;
 
 				case 'Update interval':
-					$container_table = $form->query('id:update_interval')->asTable()->one();
-					$container_table->getRow(0)->getColumn(1)->query('id:delay')->one()->fill($value['Delay']);
+					$update_interval_field = $form->getField('Update interval');
+					$update_interval_field->query('id:delay')->waitUntilVisible()->one()->fill($value['Delay']);
 
 					if (array_key_exists('Custom intervals', $value)) {
-						$container_table->getRow(1)->getColumn(1)->query('id:custom_intervals')->asMultifieldTable(
-								['mapping' => self::INTERVAL_MAPPING])->one()->fill($value['Custom intervals']);
+						$update_interval_field->query('id:custom_intervals')
+							->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()
+							->fill($value['Custom intervals']);
 					}
 					break;
 
