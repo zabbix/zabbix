@@ -86,32 +86,32 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_t	hostid;
-			char		*name_resolved_new;
+			char		*name;
 
 			(*processed_num)++;
 
 			ZBX_STR2UINT64(hostid, row[1]);
-			name_resolved_new = zbx_strdup(NULL, row[2]);
+			name = zbx_strdup(NULL, row[2]);
 
-			(void)zbx_dc_expand_user_macros(um_handle, &name_resolved_new, &hostid, 1, NULL);
+			(void)zbx_dc_expand_user_macros(um_handle, &name, &hostid, 1, NULL);
 
-			if (0 != strcmp(row[3], name_resolved_new))
+			if (0 != strcmp(row[3], name))
 			{
-				char	*name_resolved_esc;
+				char	*name_esc;
 
-				name_resolved_esc = zbx_db_dyn_escape_string(name_resolved_new);
+				name_esc = zbx_db_dyn_escape_string(name);
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_rtname set"
 						" name_resolved='%s',name_resolved_upper=upper('%s')"
 						" where itemid=%s;\n",
-						name_resolved_esc, name_resolved_esc, row[0]);
+						name_esc, name_esc, row[0]);
 				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
-				zbx_free(name_resolved_esc);
+				zbx_free(name_esc);
 				(*updated_num)++;
 			}
 
-			zbx_free(name_resolved_new);
+			zbx_free(name);
 		}
 		zbx_db_free_result(result);
 	}
