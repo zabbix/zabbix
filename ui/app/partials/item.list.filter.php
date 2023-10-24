@@ -73,14 +73,14 @@ $filter_columns[0]
 		)
 	)
 	->addRow(
-		new CLabel(_('Name')),
+		new CLabel(_('Name'), 'filter_name'),
 		new CFormField(
 			(new CTextBox('filter_name', $data['filter_data']['filter_name']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
 	)
 	->addRow(
-		new CLabel(_('Key')),
+		new CLabel(_('Key'), 'filter_key'),
 		new CFormField(
 			(new CTextBox('filter_key', $data['filter_data']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
@@ -153,14 +153,14 @@ $filter_columns[1]
 		))->setId('js-filter-snmp-oid-field')
 	)
 	->addRow(
-		new CLabel(_('History')),
+		new CLabel(_('History'), 'filter_history'),
 		new CFormField(
 			(new CTextBox('filter_history', $data['filter_data']['filter_history']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		)
 	)
 	->addRow(
-		new CLabel(_('Trends')),
+		new CLabel(_('Trends'), 'filter_trends'),
 		new CFormField(
 			(new CTextBox('filter_trends', $data['filter_data']['filter_trends']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -193,7 +193,7 @@ $filter_columns[2]->addRow(
 
 if ($data['context'] === 'host') {
 	$filter_columns[2]->addRow(
-		new CLabel(_('State')),
+		new CLabel(_('State'), 'filter_state'),
 		new CFormField(
 			(new CRadioButtonList('filter_state', (int) $data['filter_data']['filter_state']))
 				->addValue(_('All'), -1)
@@ -206,7 +206,7 @@ if ($data['context'] === 'host') {
 
 $filter_columns[2]
 	->addRow(
-		new CLabel(_('Status')),
+		new CLabel(_('Status'), 'filter_status'),
 		new CFormField(
 			(new CRadioButtonList('filter_status', (int) $data['filter_data']['filter_status']))
 				->addValue(_('All'), -1)
@@ -217,7 +217,7 @@ $filter_columns[2]
 		)
 	)
 	->addRow(
-		new CLabel(_('Triggers')),
+		new CLabel(_('Triggers'), 'filter_with_triggers'),
 		new CFormField(
 			(new CRadioButtonList('filter_with_triggers', (int) $data['filter_data']['filter_with_triggers']))
 				->addValue(_('All'), -1)
@@ -227,7 +227,7 @@ $filter_columns[2]
 		)
 	)
 	->addRow(
-		new CLabel(_('Inherited')),
+		new CLabel(_('Inherited'), 'filter_inherited'),
 		new CFormField(
 			(new CRadioButtonList('filter_inherited', (int) $data['filter_data']['filter_inherited']))
 				->addValue(_('All'), -1)
@@ -239,7 +239,7 @@ $filter_columns[2]
 
 if ($data['context'] === 'host') {
 	$filter_columns[2]->addRow(
-		new CLabel(_('Discovered')),
+		new CLabel(_('Discovered'), 'filter_discovered'),
 		new CFormField(
 			(new CRadioButtonList('filter_discovered', (int) $data['filter_data']['filter_discovered']))
 				->addValue(_('All'), -1)
