@@ -53,7 +53,7 @@ class CFrontendSetup {
 	/**
 	 * Default language, used by checkLocaleSet() check.
 	 */
-	private $default_lang = false;
+	private $default_lang = '';
 
 	/**
 	 * Set default language, used by checkLocaleSet() check.
