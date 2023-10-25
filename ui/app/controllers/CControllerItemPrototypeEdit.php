@@ -63,7 +63,8 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		$item = $this->hasInput('clone') ? $this->getClone($host) : $this->getItemPrototype($host);
 		$item['context'] = $this->getInput('context');
 		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
-		$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
+		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited_timeouts)
+			? $inherited_timeouts[$item['type']] : '';
 
 		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
 			$item['timeout'] = $item['inherited_timeout'];

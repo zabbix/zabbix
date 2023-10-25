@@ -172,8 +172,8 @@ class CControllerItemList extends CControllerItem {
 			$values = [];
 
 			foreach ($subfilter['values'] as $value => $count) {
-				$label = $subfilter['labels'][$value] ?? $value;
-				$sort = $subfilter['sort'][$value] ?? $label;
+				$label = array_key_exists($value, $subfilter['labels']) ? $subfilter['labels'][$value] : $value;
+				$sort = array_key_exists($value, $subfilter['sort']) ? $subfilter['sort'][$value] : $label;
 				$values[] = [
 					'value' => $value,
 					'count' => $count,

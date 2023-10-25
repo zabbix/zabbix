@@ -262,7 +262,9 @@ if ($data['context'] === 'template') {
 	unset($buttons['execute'], $buttons['clearhistory']);
 }
 
-$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'items_'.($data['hostid'] ?? 0)));
+$form->addItem(new CActionButtonList('action', 'itemids', $buttons,
+	'items_'.(array_key_exists('hostid', $data) ? $data['hostid'] : 0))
+);
 
 (new CHtmlPage())
 	->setTitle(_('Items'))
