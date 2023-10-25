@@ -59,53 +59,14 @@ window.widget_honeycomb_form = new class {
 	#updateForm(trigger = null) {
 		const primary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY ?>}`);
 		const secondary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY ?>}`);
-		const is_primary_size_custom = this.#form
-			.querySelector('[name="primary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
-		const is_secondary_size_custom = this.#form
-			.querySelector('[name="secondary_label_size_type"]:checked').value == <?= WidgetForm::SIZE_CUSTOM ?>;
 
 		if ([primary_show, secondary_show].filter((checkbox) => checkbox.checked && !checkbox.disabled).length === 0) {
 			trigger.checked = true;
 			this.#updateForm(trigger);
 		}
 
-		for (const element of this.#form.querySelectorAll('.fields-group-primary-label')) {
-			element.style.display = primary_show.checked ? '' : 'none';
-
-			for (const input of element.querySelectorAll('input, textarea')) {
-				if (input.id === 'primary_label_custom_size') {
-					input.style.display = is_primary_size_custom && primary_show.checked ? '' : 'none';
-					input.nextSibling.nodeValue = is_primary_size_custom && primary_show.checked ? '%' : '';
-					input.disabled = !is_primary_size_custom || !primary_show.checked;
-				}
-				else {
-					input.disabled = !primary_show.checked;
-				}
-			}
-		}
-
-		if (document.activeElement === document.getElementById('primary_label_size_type_1')) {
-			document.getElementById('primary_label_custom_size').focus();
-		}
-
-		for (const element of this.#form.querySelectorAll('.fields-group-secondary-label')) {
-			element.style.display = secondary_show.checked ? '' : 'none';
-
-			for (const input of element.querySelectorAll('input, textarea')) {
-				if (input.id === 'secondary_label_custom_size') {
-					input.style.display = is_secondary_size_custom && secondary_show.checked ? '' : 'none';
-					input.nextSibling.nodeValue = is_secondary_size_custom && secondary_show.checked ? '%' : '';
-					input.disabled = !is_secondary_size_custom || !secondary_show.checked;
-				}
-				else {
-					input.disabled = !secondary_show.checked;
-				}
-			}
-		}
-
-		if (document.activeElement === document.getElementById('secondary_label_size_type_1')) {
-			document.getElementById('secondary_label_custom_size').focus();
-		}
+		this.#updateLabelFields('primary', primary_show);
+		this.#updateLabelFields('secondary', secondary_show)
 
 		const filled_thresholds_count = this.#countFilledThresholds();
 
@@ -122,5 +83,53 @@ window.widget_honeycomb_form = new class {
 		}
 
 		return count;
+	}
+
+	#updateLabelFields(type, show) {
+		const is_label_size_custom = this.#form
+			.querySelector(`[name="${type}_label_size_type"]:checked`).value == <?= WidgetForm::SIZE_CUSTOM ?>;
+		const is_label_type_value = this.#form
+			.querySelector(`[name="${type}_label_type"]:checked`).value == <?= WidgetForm::LABEL_TYPE_VALUE ?>;
+		const units_show = document.getElementById(`${type}_label_units_show`);
+
+		for (const element of this.#form.querySelectorAll(`.fields-group-${type}-label, .js-${type}-value-field`)) {
+			if (element.classList.contains(`js-${type}-value-field`)) {
+				element.style.display = is_label_type_value && show.checked ? '' : 'none';
+			}
+			else {
+				element.style.display = show.checked ? '' : 'none';
+			}
+
+			for (const input of element.querySelectorAll('input, textarea, z-select')) {
+				if (input.id === `${type}_label_custom_size`) {
+					input.style.display = is_label_size_custom && show.checked ? '' : 'none';
+					input.nextSibling.nodeValue = is_label_size_custom && show.checked ? '%' : '';
+					input.disabled = !is_label_size_custom || !show.checked;
+				}
+
+				if (input.id === `${type}_label`) {
+					input.style.display = !is_label_type_value && show.checked ? '' : 'none';
+					input.disabled = is_label_type_value || !show.checked;
+				}
+				else if (element.classList.contains(`js-${type}-value-field`)) {
+					if (input.id === `${type}_label_units` || input.id === `${type}_label_units_pos`) {
+						input.disabled = !is_label_type_value || !show.checked || !units_show.checked;
+					}
+					else {
+						input.disabled = !is_label_type_value || !show.checked;
+					}
+				}
+				else {
+					input.disabled = !show.checked;
+				}
+			}
+		}
+
+		this.#form.querySelector(`.fields-group-${type}-label > button`)
+			.style.display = !is_label_type_value && show.checked ? '' : 'none';
+
+		if (document.activeElement === document.getElementById(`${type}_label_size_type_1`)) {
+			document.getElementById(`${type}_label_custom_size`).focus();
+		}
 	}
 }

@@ -16,7 +16,7 @@ form.dashboard-widget-honeycomb {
 		&.fields-group-primary-label,
 		&.fields-group-secondary-label {
 			display: grid;
-			grid-template-columns: minmax(25px, max-content) 1fr minmax(70px, max-content) 15px minmax(90px, max-content) 38px;
+			grid-template-columns: minmax(90px, max-content) 1fr max-content minmax(120px, max-content);
 			align-items: center;
 			column-gap: 10px;
 			row-gap: 5px;
@@ -28,12 +28,28 @@ form.dashboard-widget-honeycomb {
 			.custom_size_input {
 				margin-right: 5px;
 			}
+
+			hr {
+				grid-column: 1 / -1;
+				margin: 0;
+				width: 100%;
+				border: solid $table-border-color;
+				border-width: 1px 0 0 0;
+			}
 		}
 
 		&.fields-group-primary-label,
 		&.fields-group-secondary-label {
 			.form-field:nth-child(1) {
 				grid-column: 1 / -1;
+			}
+
+			.field-fluid {
+				grid-column: 2 / -1;
+			}
+
+			.units {
+				text-align: right;
 			}
 		}
 

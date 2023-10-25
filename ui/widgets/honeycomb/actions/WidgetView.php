@@ -125,28 +125,101 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$history = Manager::History()->getLastValues($items, 1, $history_period);
+		$show = array_flip($this->fields_values['show']);
 
 		foreach ($items as &$item) {
 			$item['value'] = array_key_exists($item['itemid'], $history)
 				? $history[$item['itemid']][0]['value']
 				: null;
 
-			$primary_label = $this->fields_values['primary_label'];
-			$secondary_label = $this->fields_values['secondary_label'];
-
 			if ($item['value'] !== null) {
-				if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
-					[[
-						'primary_label' => $primary_label
-					]] = CMacrosResolverHelper::resolveLabels([$item + [
-						'primary_label' => $primary_label
-					]], 'primary_label');
+				$original_units = $item['units'];
+				$primary_label = '';
+				$secondary_label = '';
 
-					[[
-						'secondary_label' => $secondary_label
-					]] = CMacrosResolverHelper::resolveLabels([$item + [
-						'secondary_label' => $secondary_label
-					]], 'secondary_label');
+				if (array_key_exists(WidgetForm::SHOW_PRIMARY, $show)) {
+					if ($this->fields_values['primary_label_type'] == WidgetForm::LABEL_TYPE_VALUE) {
+						if ($this->fields_values['primary_label_units_show'] == WidgetForm::UNITS_ON) {
+							if ($this->fields_values['primary_label_units'] !== '') {
+								$item['units'] = $this->fields_values['primary_label_units'];
+							}
+						}
+						else {
+							$item['units'] = '';
+						}
+
+						$formatted_primary_value = formatHistoryValueRaw($item['value'], $item, false, [
+							'decimals' => $this->fields_values['primary_label_decimal_places'],
+							'decimals_exact' => true,
+							'small_scientific' => false,
+							'zero_as_zero' => false
+						]);
+
+						$item['units'] = $original_units;
+
+						if ($this->fields_values['primary_label_units_show'] == WidgetForm::UNITS_ON) {
+							$primary_label =
+								$this->fields_values['primary_label_units_pos'] == WidgetForm::UNITS_POSITION_BEFORE
+									? $formatted_primary_value['units'].' '.$formatted_primary_value['value']
+									: $formatted_primary_value['value'].' '.$formatted_primary_value['units'];
+						}
+						else {
+							$primary_label = $formatted_primary_value['value'];
+						}
+					}
+					else {
+						$primary_label = $this->fields_values['primary_label'];
+
+						if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
+							[[
+								'primary_label' => $primary_label
+							]] = CMacrosResolverHelper::resolveLabels([$item + ['primary_label' => $primary_label
+								]], 'primary_label');
+						}
+					}
+				}
+
+				if (array_key_exists(WidgetForm::SHOW_SECONDARY, $show)) {
+					if ($this->fields_values['secondary_label_type'] == WidgetForm::LABEL_TYPE_VALUE) {
+						if ($this->fields_values['secondary_label_units_show'] == WidgetForm::UNITS_ON) {
+							if ($this->fields_values['secondary_label_units'] !== '') {
+								$item['units'] = $this->fields_values['secondary_label_units'];
+							}
+						}
+						else {
+							$item['units'] = '';
+						}
+
+						$formatted_secondary_value = formatHistoryValueRaw($item['value'], $item, false, [
+							'decimals' => $this->fields_values['secondary_label_decimal_places'],
+							'decimals_exact' => true,
+							'small_scientific' => false,
+							'zero_as_zero' => false
+						]);
+
+						$item['units'] = $original_units;
+
+						if ($this->fields_values['secondary_label_units_show'] == WidgetForm::UNITS_ON) {
+							$secondary_label =
+								$this->fields_values['secondary_label_units_pos'] == WidgetForm::UNITS_POSITION_BEFORE
+									? $formatted_secondary_value['units'].' '.$formatted_secondary_value['value']
+									: $formatted_secondary_value['value'].' '.$formatted_secondary_value['units'];
+						}
+						else {
+							$secondary_label = $formatted_secondary_value['value'];
+						}
+					}
+					else {
+						$secondary_label = $this->fields_values['secondary_label'];
+
+						if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
+							[[
+								'secondary_label' => $secondary_label
+							]] = CMacrosResolverHelper::resolveLabels([$item + [
+									'secondary_label' => $secondary_label
+								]], 'secondary_label');
+						}
+					}
 				}
 
 				$cells[] = [
