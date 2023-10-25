@@ -25,7 +25,7 @@ class CWidgetFieldCheckboxList {
 	#empty_input_element;
 
 	/**
-	 * @type {Array}
+	 * @type {Array<HTMLInputElement>}
 	 */
 	#checkboxes;
 
