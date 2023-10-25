@@ -1499,7 +1499,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
 							"r.proxyid")))
 					{
-						zbx_uint64_t	proxyid;
+						zbx_uint64_t	proxyid = 0;
 
 						ZBX_DBROW2UINT64(proxyid, replace_to);
 
@@ -1514,7 +1514,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
 							"r.proxyid")))
 					{
-						zbx_uint64_t	proxyid;
+						zbx_uint64_t	proxyid = 0;
 
 						ZBX_DBROW2UINT64(proxyid, replace_to);
 
@@ -1601,7 +1601,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
 							"proxyid")))
 					{
-						zbx_uint64_t	proxyid;
+						zbx_uint64_t	proxyid = 0;
 
 						ZBX_DBROW2UINT64(proxyid, replace_to);
 
@@ -1616,7 +1616,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
 							"proxyid")))
 					{
-						zbx_uint64_t	proxyid;
+						zbx_uint64_t	proxyid = 0;
 
 						ZBX_DBROW2UINT64(proxyid, replace_to);
 
