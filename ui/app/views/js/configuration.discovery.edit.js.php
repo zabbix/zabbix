@@ -183,7 +183,7 @@ window.drule_edit_popup = new class {
 
 			if (typeof input.name_source === 'undefined') {
 				const checked_name_source = document.querySelector('[name="name_source"]:checked:not([data-id])');
-				input.name_source = checked_name_source  === null
+				input.name_source = checked_name_source === null
 					? '<?= ZBX_DISCOVERY_UNSPEC ?>'
 					: checked_name_source.value;
 			}
@@ -282,8 +282,25 @@ window.drule_edit_popup = new class {
 		else {
 			this.#addRadioButtonValues(input);
 
-			input.host_source = row.children[0].querySelector('input[name*="host_source"]').value;
-			input.name_source = row.children[0].querySelector('input[name*="name_source"]').value;
+			const setInputSource = (field, default_value) => {
+				const checked_source = document.querySelector(`input[name="${field}"]:checked`);
+
+				if (typeof checked_source.dataset.id !== 'undefined') {
+					if (checked_source.dataset.id === input.dcheckid) {
+						input[field] = '<?= ZBX_DISCOVERY_VALUE ?>';
+					}
+					else {
+						input[field] = default_value;
+					}
+				}
+				else {
+					input[field] = checked_source.value;
+				}
+			};
+
+			setInputSource('host_source', '<?= ZBX_DISCOVERY_DNS ?>');
+			setInputSource('name_source', '<?= ZBX_DISCOVERY_UNSPEC ?>');
+
 			delete input.uniqueness_criteria;
 		}
 	}
