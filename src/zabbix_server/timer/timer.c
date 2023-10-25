@@ -208,7 +208,6 @@ static void	db_remove_expired_event_suppress_data(int now)
 	DBexecute("delete from event_suppress where suppress_until<%d", now);
 	DBcommit();
 
-	zabbix_log(1, "timer sent %i eventids for unsuppression", eventids.values_num);
 	service_send_suppression_data(&eventids, 0);
 
 	zbx_vector_uint64_destroy(&eventids);
@@ -528,7 +527,6 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 			if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 				goto cleanup;
 		}
-		zabbix_log(1, "timer2 sent %i eventids for unsuppression", eventids.values_num);
 		service_send_suppression_data(&eventids, 0);
 
 		zbx_vector_uint64_destroy(&eventids);
