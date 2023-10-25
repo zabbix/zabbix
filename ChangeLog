@@ -13,6 +13,7 @@ New features:
 .........T [ZBXNEXT-7097] added item and trigger for monitoring PostgreSQL version into PostgreSQL by ODBC and PostgreSQL by Zabbix agent 2 templates (akotsegubov)
 
 Bug fixes:
+...G...PS. [ZBX-23404] fixed Zabbix agent crashes on HP-UX 11.23 (Andris)
 ........S. [ZBX-23576] fixed group condition in calculated item in case when there is template group with same name as host group (vso)
 ........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 ...G...... [ZBX-23173] fixed memory leak in agent 2 for Windows Events processing on MS Windows (akozlovs, Andris, esneiders, MVekslers)
