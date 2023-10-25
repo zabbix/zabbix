@@ -75,7 +75,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 			switch (CTestArrayHelper::get($field_pair, 'action', 'add')) {
 				case 'add':
-					if (!$this->zbxTestElementPresentId($id_part.'_name_'.$i-1)) {
+					if (!$this->zbxTestElementPresentId($id_part.'_'.($i-1).'_name')) {
 						COverlayDialogElement::find()->one()->waitUntilReady()
 								->query('xpath://div[contains(@id, "'.$element_id.'")]//button[@class="btn-link element-table-add"]')
 								->one()->click();
@@ -83,12 +83,12 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					// break is not missing here.
 				case 'update':
 					if (array_key_exists('name', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_name_'.$i-1));
-						$this->zbxTestInputType($id_part.'_name_'.$i-1, $field_pair['name']);
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_'.($i-1).'_name'));
+						$this->zbxTestInputType($id_part.'_'.($i-1).'_name', $field_pair['name']);
 					}
 					if (array_key_exists('value', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_value_'.$i-1));
-						$this->zbxTestInputType($id_part.'_value_'.$i-1, $field_pair['value']);
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_'.($i-1).'_value'));
+						$this->zbxTestInputType($id_part.'_'.($i-1).'_value', $field_pair['value']);
 					}
 					break;
 
@@ -107,11 +107,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		foreach ($rows as $i => $parsed_query) {
 			$i += (!$this->zbxTestElementPresentId('query_fields_name_0') ? 1 : 0);
-			$name = $this->zbxTestGetValue("//input[@id='query_fields_name_".$i."']");
+			$name = $this->zbxTestGetValue("//input[@id='query_fields_".$i."_name']");
 			$this->assertEquals($parsed_query['name'], $name);
 
 			if (array_key_exists('value', $parsed_query)) {
-				$value = $this->zbxTestGetValue("//input[@id='query_fields_value_".$i."']");
+				$value = $this->zbxTestGetValue("//input[@id='query_fields_".$i."_value']");
 				$this->assertEquals($value, $parsed_query['value']);
 			}
 		}
@@ -393,8 +393,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'error_details' => [
 						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "key": cannot be empty.',
-//						'Incorrect value for field "URL": cannot be empty.'
+						'Incorrect value for field "key": cannot be empty.'
 					],
 					'check_db' => false,
 					'error' => 'Cannot add item'
@@ -669,8 +668,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error_details' => [
 						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "key": cannot be empty.',
-//						'Incorrect value for field "URL": cannot be empty.'
+						'Incorrect value for field "key": cannot be empty.'
 					]
 				]
 			],
@@ -1023,8 +1021,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// Take a screenshot to test draggable object position of query and headers fields.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($dialog->query('id:js-item-query-fields-field')->one(), 'Query fields');
-			$this->assertScreenshot($dialog->query('id:js-item-headers-field')->one(), 'Headers fields');
+			$this->assertScreenshot($dialog->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($dialog->query('id:headers-table')->one(), 'Headers fields');
 		}
 
 		// Check query fields after url parse.
