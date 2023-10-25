@@ -2512,7 +2512,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 		}
 
 		if ((service_diff->flags & ZBX_FLAG_SERVICE_RECALCULATE) &&
-				(0 == service_diff->flags & ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS))
+				(0 == (service_diff->flags & ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS)))
 		{
 			for (i = 0; i < service->service_problems.values_num; i++)
 			{
@@ -2592,7 +2592,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 			{
 				status = service_problem->severity;
 
-				if (0 == service_diff->flags & ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS)
+				if (0 == (service_diff->flags & ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS))
 					ts = service_problem->ts;
 			}
 		}
@@ -2722,7 +2722,8 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_service_manager_t *service_manager, int suppressed)
+static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_service_manager_t *service_manager,
+		int suppressed)
 {
 	int		i;
 
@@ -2753,16 +2754,22 @@ static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_servi
 			zbx_service_t	*service = (zbx_service_t *)pi->services.values[j];
 			services_diff_local.serviceid = service->serviceid;
 
-			if (NULL == (services_diff = zbx_hashset_search(&service_manager->service_diffs, &services_diff_local)))
+			if (NULL == (services_diff = zbx_hashset_search(&service_manager->service_diffs,
+					&services_diff_local)))
 			{
 				zbx_vector_ptr_create(&services_diff_local.service_problems);
 				zbx_vector_ptr_create(&services_diff_local.service_problems_recovered);
-				services_diff_local.flags |= (ZBX_FLAG_SERVICE_RECALCULATE | ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS);
-				zbx_hashset_insert(&service_manager->service_diffs, &services_diff_local, sizeof(services_diff_local));
+
+				services_diff_local.flags |= (ZBX_FLAG_SERVICE_RECALCULATE |
+						ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS);
+
+				zbx_hashset_insert(&service_manager->service_diffs, &services_diff_local,
+						sizeof(services_diff_local));
 			}
 			else
 			{
-				services_diff->flags = (ZBX_FLAG_SERVICE_RECALCULATE | ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS);
+				services_diff->flags = (ZBX_FLAG_SERVICE_RECALCULATE |
+						ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS);
 			}
 		}
 
@@ -3062,11 +3069,9 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 
 	for (i = 0; i < event_severities.values_num; i++)
 	{
-		int			index;
 		zbx_event_severity_t		*es = (zbx_event_severity_t *)event_severities.values[i];
 		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local, **pevent;
-		zbx_service_problem_index_t	*pi, pi_local;
-		zbx_services_diff_t	services_diff_local, *service_diff;
+		zbx_service_problem_index_t     *pi, pi_local;
 
 		/* update event severity in problem cache */
 
