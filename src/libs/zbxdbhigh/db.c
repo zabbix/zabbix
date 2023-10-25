@@ -2989,8 +2989,22 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 #ifdef HAVE_ORACLE
 	for (i = 0; i < self->fields.values_num; i++)
 	{
+		char	*field_prefix, *field_suffix;
+
+		if (0 != (self->table->fields[i].flags & ZBX_UPPER))
+		{
+			field_prefix = "upper(";
+			field_suffix = ")";
+		}
+		else
+		{
+			field_prefix = "";
+			field_suffix = "";
+		}
+
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
-		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ":%d", i + 1);
+		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, "%s:%d%s",
+				field_prefix, i + 1, field_suffix);
 	}
 	zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ')');
 
