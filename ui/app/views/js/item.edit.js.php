@@ -295,7 +295,7 @@ window.item_edit_form = new class {
 		this.overlay.setLoading();
 
 		PopUp(this.actions.form, {clone: 1, ...this.#getFormFields()}, {
-			dialogueid: 'item-edit',
+			dialogueid: this.overlay.dialogueid,
 			dialogue_class: 'modal-popup-large'
 		});
 	}
@@ -783,7 +783,7 @@ window.item_edit_form = new class {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 
 		const overlay = PopUp(parameters.action, parameters, {
-			dialogueid: 'item-form',
+			dialogueid: this.overlay.dialogueid,
 			dialogue_class: 'modal-popup-large'
 		});
 
