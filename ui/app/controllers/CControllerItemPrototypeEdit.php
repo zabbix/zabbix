@@ -90,7 +90,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'inherited_timeouts' => $inherited_timeouts,
 			'interface_types' => itemTypeInterface(),
 			'value_type_keys' => $value_type_keys,
-			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
+			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 			'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES,
 			'can_edit_source_timeouts' => $host['proxyid']
 				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
