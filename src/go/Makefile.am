@@ -75,19 +75,89 @@ install-zabbix.com/cmd/zabbix_web_service:
 
 install-exec-local: ${INSTALL_TARGETS}
 
-sbom.json:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" cyclonedx-gomod mod \
-		   -output-version 1.4 \
-		   -licenses -assert-licenses -json -output "$@"
+sbom-ms.json:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/mock_server \
+		-licenses -assert-licenses \
+		-json \
+		-output-version 1.4 \
+		-output "$@"
 
-# cyclonedx-gomod mod defaults to xml as the output format if the -json flag is not given
+# cyclonedx-gomod defaults to xml as the output format if the -json flag is not given
 # there is no way to specify this explicitly
-sbom.xml:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" cyclonedx-gomod mod \
-		   -output-version 1.4 \
-		   -licenses -assert-licenses -output "$@"
+sbom-ms.xml:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/mock_server \
+		-licenses -assert-licenses \
+		-output-version 1.4 \
+		-output "$@"
 
-sbom: sbom.json
+sbom-ms: sbom-ms.json
+
+sbom-za2.json:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_agent2 \
+		-licenses -assert-licenses \
+		-json \
+		-output-version 1.4 \
+		-output "$@"
+
+# cyclonedx-gomod defaults to xml as the output format if the -json flag is not given
+# there is no way to specify this explicitly
+sbom-za2.xml:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_agent2 \
+		-licenses -assert-licenses \
+		-output-version 1.4 \
+		-output "$@"
+
+sbom-za2: sbom-za2.json
+
+sbom-zws.json:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_web_service \
+		-licenses -assert-licenses \
+		-json \
+		-output-version 1.4 \
+		-output "$@"
+
+# cyclonedx-gomod defaults to xml as the output format if the -json flag is not given
+# there is no way to specify this explicitly
+sbom-zws.xml:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_web_service \
+		-licenses -assert-licenses \
+		-output-version 1.4 \
+		-output "$@"
+
+sbom-zws: sbom-zws.json
+
+sbom-apps: sbom-ms sbom-za2 sbom-zws
+
+sbom-mod.json:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod mod \
+		-licenses -assert-licenses \
+		-json \
+		-output-version 1.4 \
+		-output "$@"
+
+sbom-mod.xml:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod mod \
+		-licenses -assert-licenses \
+		-output-version 1.4 \
+		-output "$@"
+
+sbom-mod: sbom-mod.json
+
+sbom: sbom-apps sbom-mod
 
 check:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
