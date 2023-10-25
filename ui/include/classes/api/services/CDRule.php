@@ -873,7 +873,7 @@ class CDRule extends CApiService {
 			'SELECT a.name,c.value'.
 			' FROM actions a,conditions c'.
 			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.CONDITION_TYPE_DRULE.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_DRULE.
 				' AND '.dbConditionString('c.value', $druleids),
 			1
 		);
@@ -890,7 +890,7 @@ class CDRule extends CApiService {
 			' FROM actions a,conditions c,dchecks dc'.
 			' WHERE a.actionid=c.actionid'.
 				' AND '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
-				' AND c.conditiontype='.CONDITION_TYPE_DCHECK.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
 				' AND '.dbConditionString('dc.druleid', $druleids),
 			1
 		);
@@ -921,7 +921,7 @@ class CDRule extends CApiService {
 		$dbActions = DBselect(
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
-			' WHERE c.conditiontype='.CONDITION_TYPE_DCHECK.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
 				' AND '.dbConditionString('c.value', $dCheckIds).
 			' ORDER BY c.actionid'
 		);
@@ -938,7 +938,7 @@ class CDRule extends CApiService {
 			]);
 
 			DB::delete('conditions', [
-				'conditiontype' => CONDITION_TYPE_DCHECK,
+				'conditiontype' => ZBX_CONDITION_TYPE_DCHECK,
 				'value' => $dCheckIds
 			]);
 		}

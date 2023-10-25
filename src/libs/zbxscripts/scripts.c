@@ -425,7 +425,7 @@ out:
 }
 
 static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		const char *config_source_ip, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -463,6 +463,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	item.key = zbx_dsprintf(item.key, "system.run[%s%s]", param, NULL == result ? ",nowait" : "");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
+	item.timeout = config_timeout;
 
 	zbx_init_agent_result(&agent_result);
 
@@ -502,12 +503,12 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 				error, max_error_len);
 	}
 
-	return passive_command_send_and_result_fetch(host, command, result, config_source_ip, error,
+	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip, error,
 			max_error_len);
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
-		const char *config_source_ip, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
@@ -570,6 +571,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 #endif
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	item.params = zbx_strdup(item.params, script->command);
+	item.timeout = config_timeout;
 
 	zbx_init_agent_result(&agent_result);
 
@@ -907,7 +909,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			ret = zbx_execute_script_on_terminal(host, script, result, config_source_ip,
+			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, config_source_ip,
 					error, max_error_len);
 			break;
 		default:

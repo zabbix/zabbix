@@ -7,7 +7,7 @@ The template to monitor AWS Cost Explorer by HTTP via Zabbix, which works withou
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the Cost Explorer API calls to list and retrieve metrics.
-For more information, please refer to the (Cost Explorer pricing)[https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/] page.
+For more information, please refer to the [Cost Explorer pricing](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/) page.
 
 
 ## Requirements
