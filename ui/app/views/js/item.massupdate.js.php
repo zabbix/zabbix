@@ -155,11 +155,11 @@
 			}
 
 			const row = event.target.closest('.form_row');
-			const is_flexiable = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
+			const flexible = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
 
-			row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !is_flexiable);
-			row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, is_flexiable);
-			row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !is_flexiable);
+			row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
+			row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
+			row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		});
 
 	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
