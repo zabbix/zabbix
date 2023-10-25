@@ -433,6 +433,18 @@ window.item_edit_form = new class {
 
 					break;
 
+				case 'delay_flex':
+					for (const [i, custom_interval] of Object.entries(fields.delay_flex)) {
+						fields.delay_flex[i] = {
+							type: custom_interval.type,
+							delay: custom_interval.delay.trim(),
+							schedule: custom_interval.schedule.trim(),
+							period: custom_interval.period.trim()
+						}
+					}
+
+					break;
+
 				case 'tags':
 					fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 						if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
