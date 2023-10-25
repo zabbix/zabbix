@@ -849,6 +849,7 @@ class CSVGHoneycomb {
 		const scale_popped = 1.3;
 
 		this.#elements.popped_cell
+			.datum(cell.datum())
 			.html(cell.html())
 			.style('display', 'block')
 			.attr('transform', `translate(${this.#popped_translate_x} ${this.#popped_translate_y})`)
@@ -875,6 +876,7 @@ class CSVGHoneycomb {
 			.style('filter', `drop-shadow(0 0 ${this.#radius_outer / 5}px transparent)`)
 			.attr('transform', `translate(${this.#popped_translate_x} ${this.#popped_translate_y})`)
 			.html('')
+			.datum(null)
 			.style('display', 'none');
 	};
 
