@@ -117,7 +117,6 @@ class WidgetForm extends CWidgetForm {
 			return $errors;
 		}
 
-
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
 			'with_time_suffix' => true,
