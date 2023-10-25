@@ -3285,6 +3285,7 @@ svg {
 
 	&.ui-sortable-disabled {
 		.drag-icon {
+			cursor: default;
 			color: $btn-icon-disabled-color;
 		}
 	}

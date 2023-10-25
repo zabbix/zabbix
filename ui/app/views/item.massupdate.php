@@ -25,9 +25,7 @@
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get(
-		$data['prototype'] ? 'itemprototype' : 'item'
-	)))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
 	->setId('massupdate-form')
 	->setName('massupdate-form')
 	->addVar('ids', $data['ids'])
@@ -242,17 +240,18 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]'))
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
-			->addStyle('max-width:100px;width:100%;display: none;');
+			->addStyle('max-width:100px;width:100%;')
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 	}
 	else {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]'))
 			->setAdaptiveWidth(100)
 			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
-			->addStyle('display: none;');
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]'))
 			->setAdaptiveWidth(110)
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
-			->addStyle('display: none;');
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule']))
 			->setAdaptiveWidth(100)
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
@@ -506,7 +505,7 @@ $tabs = (new CTabView())
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php', $data)));
+$form->addItem(new CJsScript($this->readJsFile('item.massupdate.js.php', $data)));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/item.preprocessing.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemtest.js.php')));

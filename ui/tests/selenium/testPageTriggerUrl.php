@@ -52,8 +52,8 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => '',
-						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
+						'Trigger' => 'menu-popup-item',
+						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
@@ -69,8 +69,8 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => '',
-						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
+						'Trigger' => 'menu-popup-item',
+						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
 						'URL name for menu' => 'tr_events.php?triggerid=100032&eventid=9000',
@@ -178,12 +178,18 @@ class testPageTriggerUrl extends CWebTest {
 			if (is_array($links)) {
 				$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
 				$this->assertEquals(array_keys($links), [$item_link->getText()]);
-				$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
+				$this->assertStringContainsString(array_values($links)[0], str_contains(array_values($links)[0], 'menu-popup-item')
+						? $item_link->getAttribute('class')
+						: $item_link->getAttribute('href')
+				);
 			}
 			else {
 				// Check 1-level menu links.
 				if ($links !== '') {
-					$this->assertStringContainsString($links, $trigger_popup->getItem($menu)->getAttribute('href'));
+					$this->assertStringContainsString($links, ($links === 'menu-popup-item')
+							? $trigger_popup->getItem($menu)->getAttribute('class')
+							: $trigger_popup->getItem($menu)->getAttribute('href')
+					);
 				}
 			}
 		}

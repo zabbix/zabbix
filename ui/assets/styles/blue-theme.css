@@ -6738,6 +6738,7 @@ svg {
 .ui-sortable .td-drag-icon {
   width: 12px; }
 .ui-sortable.ui-sortable-disabled .drag-icon {
+  cursor: default;
   color: #ced6da; }
 
 #expressions_list .ui-sortable-helper {

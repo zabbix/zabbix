@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateItem extends CController {
+class CControllerItemMassupdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -377,7 +377,8 @@ class CControllerPopupMassupdateItem extends CController {
 		if ($data['prototype']) {
 			$data['parent_discoveryid'] = $this->getInput('parent_discoveryid', 0);
 			$data += [
-				'location_url' => (new CUrl('disc_prototypes.php'))
+				'location_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
 					->setArgument('context', $this->getInput('context'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->getUrl(),
@@ -387,7 +388,8 @@ class CControllerPopupMassupdateItem extends CController {
 		}
 		else {
 			$data += [
-				'location_url' => (new CUrl('items.php'))
+				'location_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'item.list')
 					->setArgument('context', $this->getInput('context'))
 					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
