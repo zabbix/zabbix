@@ -106,7 +106,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		COverlayDialogElement::find()->one()->waitUntilready()->query('button:Parse')->one()->click();
 
 		foreach ($rows as $i => $parsed_query) {
-			$i += (!$this->zbxTestElementPresentId('query_fields_name_0') ? 1 : 0);
+			$i += (!$this->zbxTestElementPresentId('query_fields_0_name') ? 1 : 0);
 			$name = $this->zbxTestGetValue("//input[@id='query_fields_".$i."_name']");
 			$this->assertEquals($parsed_query['name'], $name);
 

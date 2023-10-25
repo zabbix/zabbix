@@ -1034,7 +1034,7 @@ class testFormTags extends CWebTest {
 		$this->query('button:Cancel')->one()->click();
 
 		// Select object and copy to target.
-		$table_name = ($object === 'item') ? 'items' : 'trigger_form';
+		$table_name = ($object === 'item') ? 'item_list' : 'trigger_form';
 		$table = $this->query('xpath://form[@name='.CXPathHelper::escapeQuotes($table_name).']/table')
 				->asTable()->waitUntilReady()->one();
 		$table->findRow('Name', $this->clone_name)->select();
