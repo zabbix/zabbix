@@ -70,8 +70,8 @@ class CControllerItemCreate extends CControllerItem {
 	}
 
 	protected function getInputForApi(): array {
-		$input = parent::getInputForApi();
-
+		$input = $this->getFormValues();
+		$input = CItemHelper::convertFormInputForApi($input);
 		$input['hosts'] = API::Host()->get([
 			'output' => ['hostid', 'status'],
 			'hostids' => [$this->getInput('hostid')],

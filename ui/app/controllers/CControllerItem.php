@@ -194,11 +194,11 @@ abstract class CControllerItem extends CController {
 	}
 
 	/**
-	 * Get form input data to be sent to API.
+	 * Get form fields value normalized.
 	 *
-	 * @return array
+	 * @return array form fields data.
 	 */
-	protected function getInputForApi(): array {
+	protected function getFormValues(): array {
 		$unchecked_values = [
 			'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
 			'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
@@ -209,7 +209,8 @@ abstract class CControllerItem extends CController {
 		];
 		$input = $unchecked_values + CItemHelper::getDefaults();
 		$this->getInputs($input, array_keys($input));
+		$input = CItemHelper::normalizeFormData($input);
 
-		return CItemHelper::convertFormInputForApi($input);
+		return $input;
 	}
 }

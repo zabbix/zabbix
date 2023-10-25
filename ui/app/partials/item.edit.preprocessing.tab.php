@@ -24,6 +24,16 @@
  * @var array    $data
  */
 
+
+$preprocessing = [];
+
+foreach ($data['preprocessing'] as $step) {
+	$preprocessing[] = $step + [
+		'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+		'error_handler_params' => ''
+	];
+}
+
 $formgrid = (new CFormGrid())
 	->setId('item_preproc_list')
 	->addItem([
@@ -35,7 +45,7 @@ $formgrid = (new CFormGrid())
 				_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
 			])
 		]),
-		new CFormField(getItemPreprocessing($data['preprocessing'], $data['readonly'], $data['preprocessing_types']))
+		new CFormField(getItemPreprocessing($preprocessing, $data['readonly'], $data['preprocessing_types']))
 	])
 	->addItem([
 		(new CLabel(_('Type of information'), 'label-value-type-steps'))

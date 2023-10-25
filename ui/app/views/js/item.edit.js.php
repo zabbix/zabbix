@@ -99,6 +99,12 @@ window.item_edit_form = new class {
 	}
 
 	initForm(field_switches) {
+		const updateSortOrder = function() {
+			let index = 0;
+
+			this.querySelectorAll('[name$="[sortorder]"]').forEach(node => node.value = index++);
+		}
+
 		new CViewSwitcher('allow_traps', 'change', field_switches.for_traps);
 		new CViewSwitcher('authtype', 'change', field_switches.for_authtype);
 		new CViewSwitcher('http_authtype', 'change', field_switches.for_http_auth_type);
@@ -141,12 +147,14 @@ window.item_edit_form = new class {
 		});
 		jQuery('#query-fields-table').dynamicRows({
 			sortable: true,
+			sortableOptions: {update: updateSortOrder},
 			template: '#query-field-row-tmpl',
 			rows: this.form_data.query_fields,
 			allow_empty: true
 		}).sortable({disabled: this.form_readonly});
 		jQuery('#headers-table').dynamicRows({
 			sortable: true,
+			sortableOptions: {update: updateSortOrder},
 			template: '#item-header-row-tmpl',
 			rows: this.form_data.headers,
 			allow_empty: true
@@ -284,13 +292,12 @@ window.item_edit_form = new class {
 	}
 
 	clone() {
-		const el = document.createElement('input');
+		this.overlay.setLoading();
 
-		el.type = 'hidden';
-		el.name = 'clone';
-		el.value = 1;
-		this.form.appendChild(el);
-		reloadPopup(this.form, this.actions.form);
+		PopUp('item.edit', {clone: 1, ...this.#getFormFields()}, {
+			dialogueid: 'item-edit',
+			dialogue_class: 'modal-popup-large'
+		});
 	}
 
 	create() {
@@ -409,12 +416,12 @@ window.item_edit_form = new class {
 
 				case 'query_fields':
 				case 'headers':
-					for (const [i, value] of Object.entries(fields[key].name)) {
-						fields[key].name[i] = value.trim();
-					}
-
-					for (const [i, value] of Object.entries(fields[key].value)) {
-						fields[key].value[i] = value.trim();
+					for (const [i, param] of Object.entries(fields.parameters)) {
+						fields.parameters[i] = {
+							name: param.name.trim(),
+							value: param.value.trim(),
+							sortorder: param.sortorder
+						}
 					}
 
 					break;
@@ -444,6 +451,10 @@ window.item_edit_form = new class {
 
 					break;
 			}
+		}
+
+		if (fields.preprocessing) {
+			fields.preprocessing = Object.entries(fields.preprocessing).map(p => p[1]);
 		}
 
 		return fields;
@@ -511,6 +522,10 @@ window.item_edit_form = new class {
 	#isTestableItem() {
 		const key = this.field.key.value;
 		const type = parseInt(this.field.type.value, 10);
+
+		if (key.trim() === '') {
+			return false;
+		}
 
 		return type == ITEM_TYPE_SIMPLE
 			? key.substr(0, 7) !== 'vmware.' && key.substr(0, 8) !== 'icmpping'

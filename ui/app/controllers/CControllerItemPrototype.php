@@ -211,11 +211,11 @@ abstract class CControllerItemPrototype extends CController {
 	}
 
 	/**
-	 * Get form input data to be sent to API.
+	 * Get form fields value normalized.
 	 *
-	 * @return array
+	 * @return array form fields data.
 	 */
-	protected function getInputForApi(): array {
+	protected function getFormValues(): array {
 		$unchecked_values = [
 			'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
 			'discover' => ZBX_PROTOTYPE_NO_DISCOVER,
@@ -227,7 +227,8 @@ abstract class CControllerItemPrototype extends CController {
 		];
 		$input = $unchecked_values + CItemPrototypeHelper::getDefaults();
 		$this->getInputs($input, array_keys($input));
+		$input = CItemPrototypeHelper::normalizeFormData($input);
 
-		return CItemPrototypeHelper::convertFormInputForApi($input);
+		return $input;
 	}
 }

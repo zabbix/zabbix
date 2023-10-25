@@ -70,8 +70,8 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 	}
 
 	protected function getInputForApi(): array {
-		$input = parent::getInputForApi();
-
+		$input = $this->getFormValues();
+		$input = CItemPrototypeHelper::convertFormInputForApi($input);
 		[$lld_rule] = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
 			'selectHosts' => ['status'],

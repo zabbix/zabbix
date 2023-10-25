@@ -40,20 +40,13 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 */
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
-
-		if (!array_key_exists('parent_items', $item)) {
-			$item['parent_items'] = makeItemTemplatesHtml(
-				$item['itemid'],
-				getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
-				ZBX_FLAG_DISCOVERY_PROTOTYPE,
-				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-			);
-		}
-
-		if (array_key_exists('discoveryRule', $item)) {
-			$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
-		}
-
+		$item['parent_items'] = makeItemTemplatesHtml(
+			$item['itemid'],
+			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+		$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => true
@@ -85,24 +78,6 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Convert form submitted data to be ready to send to API for update or create operation.
-	 *
-	 * @param array $input  Array of form input fields.
-	 */
-	public static function convertFormInputForApi(array $input): array {
-		$input = parent::convertFormInputForApi($input);
-
-		if ($input['delay_flex']) {
-			$custom_intervals = $input['delay_flex'];
-			// isValidCustomIntervals is used to filter out custom intervals with empty value, not for validation.
-			isValidCustomIntervals($custom_intervals, true);
-			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
-		}
-
-		return $input;
 	}
 
 	/**

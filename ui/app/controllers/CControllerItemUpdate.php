@@ -70,8 +70,8 @@ class CControllerItemUpdate extends CControllerItem {
 	}
 
 	protected function getInputForApi(): array {
-		$input = parent::getInputForApi();
-
+		$input = $this->getFormValues();
+		$input = CItemHelper::convertFormInputForApi($input);
 		[$db_item] = API::Item()->get([
 			'output' => ['templateid', 'flags'],
 			'selectHosts' => ['status'],
