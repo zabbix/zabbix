@@ -593,6 +593,39 @@ final class CItemData {
 	 * @return array
 	 */
 	public static function fieldSwitchingConfiguration(array $data): array {
+		if ($data['is_discovery_rule']) {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey'
+				]
+			];
+		}
+		else {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PASSWORD => [
+					'js-item-password-label',
+					'js-item-password-field',
+					'password'
+				],
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey',
+					'js-item-passphrase-label',
+					'js-item-passphrase-field',
+					'passphrase'
+				]
+			];
+		}
+
 		return [
 			// Ids to toggle when the field 'type' is changed.
 			'for_type' => [
@@ -890,24 +923,7 @@ final class CItemData {
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.
-			'for_authtype' => [
-				ITEM_AUTHTYPE_PASSWORD => [
-					'js-item-password-label',
-					'js-item-password-field',
-					'password'
-				],
-				ITEM_AUTHTYPE_PUBLICKEY => [
-					'js-item-private-key-label',
-					'js-item-private-key-field',
-					'privatekey',
-					'js-item-public-key-label',
-					'js-item-public-key-field',
-					'publickey',
-					'js-item-passphrase-label',
-					'js-item-passphrase-field',
-					'passphrase'
-				]
-			],
+			'for_authtype' => $for_authtype,
 			'for_http_auth_type' => [
 				ZBX_HTTP_AUTH_BASIC => [
 					'js-item-http-username-label',
