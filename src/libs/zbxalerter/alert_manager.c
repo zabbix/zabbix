@@ -2300,9 +2300,10 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 							(((zbx_thread_args_t *)args)->args);
 	zbx_am_t			manager;
 	char				*error = NULL;
-	double				time_stat;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	double				time_stat, time_idle = 0;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num,
+					time_ping = 0, time_watchdog = 0, time_mediatype = 0;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
@@ -2332,9 +2333,8 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
 		zbx_am_alerter_t	*alerter;
-		int			ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, time_ping = 0,
-					time_mediatype = 0;
-		double			time_idle = 0, time_now, sec;
+		int			ret, sent_num = 0, failed_num = 0, now;
+		double			time_now, sec;
 
 		zbx_timespec_t		timeout = {1, 0};
 		const char		*scripts_path = alert_manager_args_in->get_scripts_path_cb_arg();
