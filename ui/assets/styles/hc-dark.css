@@ -2432,6 +2432,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       .filter-container.tabfilter-container nav li button {
         vertical-align: middle;
         margin-top: 0; }
+        .filter-container.tabfilter-container nav li button.btn-time-left:disabled, .filter-container.tabfilter-container nav li button.btn-time-right:disabled {
+          opacity: .25; }
   .filter-container.tabfilter-container .tabfilter-item-label {
     display: inline-block;
     border-radius: 2px;
