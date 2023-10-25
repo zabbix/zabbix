@@ -294,7 +294,7 @@ window.item_edit_form = new class {
 	clone() {
 		this.overlay.setLoading();
 
-		PopUp('item.edit', {clone: 1, ...this.#getFormFields()}, {
+		PopUp(this.actions.form, {clone: 1, ...this.#getFormFields()}, {
 			dialogueid: 'item-edit',
 			dialogue_class: 'modal-popup-large'
 		});
