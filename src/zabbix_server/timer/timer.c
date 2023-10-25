@@ -412,7 +412,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 		zbx_event_suppress_query_t	*query;
 		zbx_event_suppress_data_t	*data;
 		zbx_vector_uint64_pair_t	del_event_maintenances;
-		zbx_vector_uint64_t		maintenanceids;
+		zbx_vector_uint64_t		maintenanceids, eventids;
 		zbx_uint64_pair_t		pair;
 
 		zbx_vector_uint64_create(&maintenanceids);
@@ -512,7 +512,6 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 			}
 		}
 
-		zbx_vector_uint64_t	eventids;
 		zbx_vector_uint64_create(&eventids);
 		for (i = 0; i < del_event_maintenances.values_num; i++)
 		{
