@@ -56,9 +56,23 @@ zabbix.com/cmd/zabbix_web_service:
 
 build: ${TARGETS}
 
-clean:
-	go clean ./...
-	rm -f bin/zabbix_agent2 bin/mock_server
+clean: clean-go-build clean-sbom
+
+clean-go-build:
+	-go clean ./...
+	-rm -f bin/mock_server
+	-rm -f bin/zabbix_agent2
+	-rm -f bin/zabbix_web_service
+
+clean-sbom:
+	-rm -f sbom-ms.json
+	-rm -f sbom-ms.xml
+	-rm -f sbom-mod.json
+	-rm -f sbom-mod.xml
+	-rm -f sbom-za2.json
+	-rm -f sbom-za2.xml
+	-rm -f sbom-zws.json
+	-rm -f sbom-zws.xml
 
 install-zabbix.com/cmd/zabbix_agent2:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
