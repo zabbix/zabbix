@@ -569,6 +569,9 @@ class CSVGHoneycomb {
 			.attr('data-hintbox-track-mouse', 1)
 			.attr('data-hintbox-delay', 0)
 			.on('mouseleave', () => this.#popInCell());
+
+		this.#elements.popped_cell_simple = null;
+		this.#elements.popped_cell_static = null;
 	}
 
 	/**
@@ -896,8 +899,8 @@ class CSVGHoneycomb {
 			return;
 		}
 
-		const clicked_on_popped_cell = e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED}`);
 		const clicked_cell = e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL}`);
+		const clicked_on_popped_cell = !!e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED}`);
 		const clicked_on_other_cell = clicked_cell && this.#elements.popped_cell?.node() !== clicked_cell;
 
 		if (clicked_on_popped_cell) {
