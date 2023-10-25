@@ -191,7 +191,11 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->addNewDataSet(self::TYPE_ITEM_LIST, $form);
 		$this->page->waitUntilReady();
 		$form->invalidate();
-		$this->assertEquals(2, $form->query('id:tab_data_set')->one()->getAttribute('data-indicator-value'));
+
+		foreach (['data-indicator' => 'count', 'data-indicator-value' => 2] as $attribute => $expected_value) {
+			$this->assertEquals($expected_value, $form->query('id:tab_data_set')->one()->getAttribute($attribute));
+		}
+
 		$this->assertLabels(['Data set #2', 'Aggregation function', 'Data set aggregation', 'Data set label'], $form);
 
 		foreach(['name:ds[1][aggregate_function]',
@@ -203,14 +207,84 @@ class testDashboardPieChartWidget extends CWebTest
 		foreach ($hints as $selector => $expected_hint) {
 			$selector = str_replace('{id}', '1', $selector);
 			$this->assertEquals($expected_hint, $this->query('xpath://label[@for='.CXPathHelper::escapeQuotes($selector).
-				']/button')->one()->getAttribute('data-hintbox-contents'));
+					']/button')->one()->getAttribute('data-hintbox-contents'));
 		}
 
 		// Displaying options tab.
 		$form->selectTab('Displaying options');
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		$this->assertLabels(['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than '], $form);
 
+		foreach (['Auto', 'History', 'Trends'] as $label) {
+			$this->assertTrue($form->getField('History data selection')->
+					query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one()->isClickable());
+		}
 
+		foreach (['Pie', 'Doughnut'] as $label) {
+			$this->assertTrue($form->getField('Draw')->
+					query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one()->isClickable());
+		}
 
+		$this->assertRangeLayout('Space between sectors', 'space', $form, ['min' => '0', 'max' => '10', 'step' => '1', 'value' => '1']);
+
+		foreach (['merge' => true, 'merge_percent' => false, 'merge_color' => false] as $id => $enabled) {
+			$this->assertTrue($form->query('id', $id)->one()->isEnabled($enabled));
+		}
+
+		$form->fill(['id:merge' => true]);
+		$form->invalidate();
+		foreach (['data-indicator' => 'mark', 'data-indicator-value' => 1] as $attribute => $expected_value) {
+			$this->assertEquals($expected_value, $form->query('id:tab_displaying_options')->one()->getAttribute($attribute));
+		}
+
+		foreach (['merge_percent', 'merge_color'] as $id) {
+			$this->assertTrue($form->query('id', $id)->one()->isEnabled());
+		}
+
+		$form->fill(['Draw' => 'Doughnut']);
+		$this->page->waitUntilReady();
+		$form->invalidate();
+
+		foreach(['Size', 'Decimal places', 'Units', 'Bold', 'Color'] as $label) {
+			$this->assertTrue($form->getField($label)->isEnabled(false));
+		}
+
+		$form->fill(['Show total value' => true]);
+
+		foreach(['Size', 'Decimal places', 'Bold', 'Color'] as $label) {
+			$this->assertTrue($form->getField($label)->isEnabled());
+		}
+
+		// Time period tab.
+		$form->selectTab('Time period');
+		$this->page->waitUntilReady();
+		$form->invalidate();
+
+		foreach (['Dashboard', 'Widget', 'Custom'] as $label) {
+			$this->assertTrue($form->getField('Time period')->
+					query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one()->isClickable());
+		}
+
+		// Legend tab.
+		$form->selectTab('Legend');
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		$this->assertLabels(['Show legend', 'Show aggregation function', 'Number of rows', 'Number of columns'], $form);
+		$this->assertTrue($form->getField('Show legend')->isEnabled());
+		$this->assertTrue($form->getField('Show legend')->isChecked());
+		$this->assertTrue($form->getField('Show aggregation function')->isEnabled());
+		$this->assertTrue($form->getField('Show aggregation function')->isChecked(false));
+
+		$this->assertRangeLayout('Number of rows', 'legend_lines', $form, ['min' => '1', 'max' => '10', 'step' => '1', 'value' => '1']);
+		$this->assertRangeLayout('Number of columns', 'legend_columns', $form, ['min' => '1', 'max' => '4', 'step' => '1', 'value' => '4']);
+
+		// Check footer buttons.
+		$footer = $dialog->query('class:overlay-dialogue-footer')->one();
+
+		foreach([$data['primary_button_text'], 'Cancel'] as $button) {
+			$this->assertTrue($footer->query('button', $button)->one()->isClickable());
+		}
 	}
 
 	public function getCreateData() {
@@ -527,6 +601,25 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 	}
 
+	/**
+	 * Asserts that a range/slider input is displayed as expected.
+	 *
+	 * @param $label              label of the range input
+	 * @param $input_id           id for the input field right next to the slider
+	 * @param $form               parent form
+	 * @param $expected_values    the attribute values expected
+	 */
+	protected function assertRangeLayout($label, $input_id, $form, $expected_values) {
+		$range = $form->getField($label)->query('xpath:.//input[@type="range"]')->one();
+		foreach ($expected_values as $attribute => $expected_value) {
+			$this->assertEquals($expected_value, $range->getAttribute($attribute));
+		}
+
+		$input = $form->getField($label)->query('id', $input_id)->one();
+		$this->assertTrue($input->isClickable());
+		$this->assertEquals($expected_values['value'], $input->getValue());
+	}
+
 
 	/**
 	 * Checks that given labels exist in a form.
@@ -536,7 +629,13 @@ class testDashboardPieChartWidget extends CWebTest
 	 */
 	protected function assertLabels($labels, $form) {
 		foreach ($labels as $label) {
-			$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->exists());
+			try {
+				$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->exists());
+			}
+			catch (PHPUnit\Framework\ExpectationFailedException $e) {
+				// Throw a more detailed error.
+				throw new Exception("Failed to find label: ".$label);
+			}
 		}
 	}
 
