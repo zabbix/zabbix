@@ -1641,7 +1641,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
 				thread_args.args = &snmptrapper_args;
-				zbx_thread_start(snmptrapper_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_snmptrapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 				thread_args.args = &proxy_poller_args;

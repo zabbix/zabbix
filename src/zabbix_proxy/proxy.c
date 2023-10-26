@@ -1711,7 +1711,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
 				thread_args.args = &snmptrapper_args;
-				zbx_thread_start(snmptrapper_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_snmptrapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
 				zbx_thread_start(zbx_selfmon_thread, &thread_args, &threads[i]);

@@ -66,7 +66,7 @@ static void	DBget_lastsize(void)
 	zbx_db_commit();
 }
 
-static void	DBupdate_lastsize(void)
+static void	db_update_lastsize(void)
 {
 	zbx_db_begin();
 	zbx_db_execute("update globalvars set snmp_lastsize=%lld", (long long int)trap_lastsize);
@@ -436,7 +436,7 @@ static int	read_traps(const char *config_snmptrap_file)
 	{
 		buffer[nbytes + offset] = '\0';
 		trap_lastsize += nbytes;
-		DBupdate_lastsize();
+		db_update_lastsize();
 		parse_traps(0);
 	}
 out:
@@ -461,7 +461,7 @@ static void	close_trap_file(void)
 
 	trap_fd = -1;
 	trap_lastsize = 0;
-	DBupdate_lastsize();
+	db_update_lastsize();
 }
 
 /******************************************************************************
@@ -584,7 +584,7 @@ static int	get_latest_data(const char *config_snmptrap_file)
  * Purpose: SNMP trap reader's entry point                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(snmptrapper_thread, args)
+ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 {
 	double			sec;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
