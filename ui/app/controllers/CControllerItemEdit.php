@@ -200,11 +200,18 @@ class CControllerItemEdit extends CControllerItem {
 
 			if ($item['valuemap'] && $this->getInput('templateid', 0)) {
 				$host_valuemap = API::ValueMap()->get([
-					'output' => ['valuemapid'],
+					'output' => ['valuemapid', 'name', 'hostid'],
 					'search' => ['name' => $item['valuemap']['name']],
 					'filter' => ['hostid' => $host['hostid']]
 				]);
-				$item['valuemap']['valuemapid'] = $host_valuemap ? $host_valuemap[0]['valuemapid'] : 0;
+
+				if ($host_valuemap) {
+					$item['valuemap'] = reset($host_valuemap);
+					$item['valuemapid'] = $item['valuemap']['valuemapid'];
+				}
+				else {
+					$item['valuemapid'] = 0;
+				}
 			}
 		}
 
