@@ -5,6 +5,8 @@
 
 This template is designed for the effortless deployment of HPE iLO monitoring by Zabbix via iLO RESTful API and doesn't require any external scripts.
 
+For more details about HPE Redfish services refer to the [`official documentation`](https://servermanagementportal.ext.hpe.com/docs/redfishservices/).
+
 ## Requirements
 
 Zabbix version: 6.0 and higher.
