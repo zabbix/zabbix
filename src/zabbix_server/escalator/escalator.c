@@ -1430,7 +1430,7 @@ fail:
 						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
 					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
-							config_trapper_timeout, config_source_ip, config_forks, 
+							config_trapper_timeout, config_source_ip, config_forks,
 							program_type, NULL, error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
@@ -1927,7 +1927,8 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
 					execute_commands(event, NULL, NULL, NULL, service, action->actionid,
 							operationid, escalation->esc_step,
 							ZBX_MACRO_TYPE_MESSAGE_NORMAL, default_timezone, config_timeout,
-							config_trapper_timeout, config_source_ip, config_forks, program_type);
+							config_trapper_timeout, config_source_ip, config_forks,
+							program_type);
 					break;
 			}
 		}
@@ -1988,6 +1989,7 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
  *             config_forks           - [IN]                                  *
+ *             program_type           - [IN]                                  *
  *                                                                            *
  * Comments: Action recovery operations have a single escalation step, so     *
  *           alerts created by escalation recovery operations must have       *
@@ -2062,6 +2064,7 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
  *             config_forks           - [IN]                                  *
+ *             program_type           - [IN]                                  *
  *                                                                            *
  * Comments: Action update operations have a single escalation step, so       *
  *           alerts created by escalation update operations must have         *
@@ -2522,6 +2525,7 @@ static void	escalation_cancel(zbx_db_escalation *escalation, const zbx_db_action
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
  *             config_forks           - [IN]                                  *
+ *             program_type           - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute(zbx_db_escalation *escalation, const zbx_db_action *action, zbx_db_event *event,
@@ -2552,6 +2556,7 @@ static void	escalation_execute(zbx_db_escalation *escalation, const zbx_db_actio
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
  *             config_forks           - [IN]                                  *
+ *             program_type           - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(zbx_db_escalation *escalation, const zbx_db_action *action, zbx_db_event *event,
@@ -2584,6 +2589,7 @@ static void	escalation_recover(zbx_db_escalation *escalation, const zbx_db_actio
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
  *             config_forks           - [IN]                                  *
+ *             program_type           - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_action *action,
@@ -2642,6 +2648,7 @@ static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_a
  *             config_trapper_timeout - [IN]                                  *
  *             config_source_ip       - [IN]                                  *
  *             config_forks           - [IN]                                  *
+ *             program_type           - [IN]                                  *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_update(zbx_db_escalation *escalation, const zbx_db_action *action,
@@ -2984,7 +2991,7 @@ static void	service_role_clean(zbx_service_role_t *role)
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalation_ptr_t *escalations,
 		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *problem_eventids, zbx_vector_uint64_t *actionids,
 		const char *default_timezone, int config_timeout, int config_trapper_timeout,
-		const char *config_source_ip, int *config_forks, nsigned char program_type)
+		const char *config_source_ip, int *config_forks, unsigned char program_type)
 {
 	int					ret;
 	zbx_vector_uint64_t			escalationids, symptom_eventids;
@@ -3201,14 +3208,16 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			}
 
 			escalation_acknowledge(escalation, action, event, r_event, default_timezone, &service_roles,
-					config_timeout, config_trapper_timeout, config_source_ip, config_forks, program_type);
+					config_timeout, config_trapper_timeout, config_source_ip, config_forks,
+					program_type);
 		}
 		else if (NULL != r_event)
 		{
 			if (0 == escalation->esc_step)
 			{
 				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
-						config_timeout, config_trapper_timeout, config_source_ip, config_forks, program_type);
+						config_timeout, config_trapper_timeout, config_source_ip, config_forks,
+						program_type);
 			}
 			else
 			{
@@ -3222,7 +3231,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			if (ESCALATION_STATUS_ACTIVE == escalation->status)
 			{
 				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
-						config_timeout, config_trapper_timeout, config_source_ip, config_forks, program_type);
+						config_timeout, config_trapper_timeout, config_source_ip, config_forks,
+						program_type);
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
@@ -3371,6 +3381,7 @@ out:
  *             config_trapper_timeout - [IN]                                   *
  *             config_source_ip       - [IN]                                   *
  *             config_forks           - [IN]                                   *
+ *             program_type           - [IN]                                   *
  *                                                                             *
  * Return value: count of deleted escalations                                  *
  *                                                                             *
@@ -3555,7 +3566,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 							(((zbx_thread_args_t *)args)->args);
 	int				sleeptime = -1, escalations_count = 0,
 					old_escalations_count = 0;
-	double				sec, total_sec = 0.0, old_total_sec = 0.0;
+	double				total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
