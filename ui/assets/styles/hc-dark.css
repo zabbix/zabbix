@@ -3501,8 +3501,6 @@ section {
 
 .svg-honeycomb .svg-honeycomb-cell path {
   fill: #335463; }
-.svg-honeycomb .svg-honeycomb-cell-popped {
-  transition: filter 0.2s; }
 .svg-honeycomb .svg-honeycomb-label {
   fill: #eeeeee;
   text-anchor: middle; }

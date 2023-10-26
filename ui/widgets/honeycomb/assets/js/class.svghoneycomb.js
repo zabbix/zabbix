@@ -858,11 +858,20 @@ class CSVGHoneycomb {
 		this.#elements.popped_cell
 			.datum(cell.datum())
 			.html(cell.html())
-			.style('display', 'block')
-			.attr('transform', `translate(${this.#popped_translate_x} ${this.#popped_translate_y})`)
-			.style('filter', `drop-shadow(0 0 ${this.#radius_outer / 5}px rgba(0, 0, 0, .3))`)
-			.attr('transform', `translate(${this.#popped_translate_x} ${this.#popped_translate_y}) scale(${scale_popped})`)
-			.attr('data-hintbox-contents', d => d.hint_text);
+			.attr('data-hintbox-contents', d => d.hint_text)
+			.attr('transform',
+				`translate(${this.#popped_translate_x} ${this.#popped_translate_y}) scale(${scale_popped})`
+			)
+			.style('display', 'block');
+
+		this.#elements.popped_cell
+			.select('path')
+			.transition()
+			.duration(200)
+			.ease(d3.easeLinear)
+			.styleTween('filter', () =>
+				(t) => `drop-shadow(0 0 ${this.#radius_outer / 5}px rgba(0, 0, 0, ${0.5 * t}))`
+			);
 
 		this.#elements.popped_cell
 			.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL}`)
@@ -881,12 +890,11 @@ class CSVGHoneycomb {
 	 */
 	#popInCell() {
 		this.#elements.popped_cell
-			.style('filter', `drop-shadow(0 0 ${this.#radius_outer / 5}px transparent)`)
-			.attr('transform', `translate(${this.#popped_translate_x} ${this.#popped_translate_y})`)
+			.style('display', 'none')
+			.attr('transform', '')
 			.attr('data-hintbox-contents', '')
 			.html('')
-			.datum(null)
-			.style('display', 'none');
+			.datum(null);
 
 		this.#elements.popped_cell_simple = null;
 		this.#elements.popped_cell_static = null;
