@@ -311,7 +311,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
-			$result = $this->unsetExtraFields($result, ['name_upper']);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
@@ -361,12 +360,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
-
-		if ($upcased_index !== false) {
-			unset($sqlParts['select'][$upcased_index]);
-		}
 
 		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
 				|| $this->outputIsRequested('error', $options['output'])))
