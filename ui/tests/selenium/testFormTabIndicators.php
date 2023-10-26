@@ -22,6 +22,7 @@
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/behaviors/CPreprocessingBehavior.php';
 
 /**
  * @dataSource Services
@@ -31,7 +32,14 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormTabIndicators extends CWebTest {
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CPreprocessingBehavior::class];
+	}
 
 	public function getTabData() {
 		return [
@@ -217,7 +225,8 @@ class testFormTabIndicators extends CWebTest {
 			// Item configuration form tab data.
 			[
 				[
-					'url' => 'items.php?form=create&context=host&hostid=10084',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]=10084',
+					'create_button' => 'Create item',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -244,7 +253,8 @@ class testFormTabIndicators extends CWebTest {
 			// Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=42275&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
+					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[

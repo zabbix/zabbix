@@ -282,6 +282,12 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 				while ('.' != *(ptr + 1) && '\0' != *(ptr + 1))
 					ptr++;
 			}
+			else if (ZBX_SNMP_TYPE_STRING == p->type)
+			{
+				while ('\0' != *(ptr + 1) &&
+						('\n' != *ptr || '.' != *(ptr + 1) || 0 == isdigit(*(ptr + 2))))
+					ptr++;
+			}
 
 			len = (size_t)(ptr - start);
 		}
@@ -289,25 +295,37 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 		p->value = zbx_malloc(NULL, len + 1);
 		memcpy(p->value, start, len);
 		(p->value)[len] = '\0';
-		zbx_remove_chars(p->value, "\n");
-		zbx_rtrim(p->value, " ");
+
+		if (ZBX_SNMP_TYPE_HEX == p->type || ZBX_SNMP_TYPE_BITS == p->type)
+		{
+			zbx_remove_chars(p->value, "\n");
+			zbx_rtrim(p->value, " ");
+		}
 
 		return len;
 	}
 	else
 	{
 		char	*out;
+		int	escape = 0;
 
 		ptr++;
-		while ('"' != *ptr)
+
+		while ('"' != *ptr || 0 != escape)
 		{
 			if ('\0' == *ptr)
 				return 0;
-			if ('\\' == *ptr)
+
+			if (0 == escape)
 			{
-				if ('\0' == *(++ptr))
-					return 0;
+				if ('\\' == *ptr)
+					escape = 1;
 			}
+			else
+			{
+				escape = 0;
+			}
+
 			ptr++;
 		}
 
@@ -320,11 +338,11 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 			if ('\\' == *ptr)
 			{
 				ptr++;
-				continue;
 			}
 			*out++ = *ptr++;
 		}
 		*out = '\0';
+
 		return len;
 	}
 }
@@ -376,6 +394,13 @@ reparse_type:
 				goto eol;
 			}
 
+			if (0 == strcmp(type, "NULL") && ('\n' == *data || '\0' == *data))
+			{
+				p->type = ZBX_SNMP_TYPE_UNDEFINED;
+
+				goto eol;
+			}
+
 			*error = strdup("invalid value type format");
 			goto out;
 		}
@@ -400,6 +425,10 @@ reparse_type:
 		else if (0 == strcmp(type, "BITS"))
 		{
 			p->type = ZBX_SNMP_TYPE_BITS;
+		}
+		else if (0 == strcmp(type, "STRING"))
+		{
+			p->type = ZBX_SNMP_TYPE_STRING;
 		}
 		else
 			p->type = ZBX_SNMP_TYPE_UNDEFINED;
@@ -955,7 +984,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 					sizeof(zbx_snmp_value_pair_t));
 
 			output_value->oid = zbx_strdup(NULL, param_field.field_name);
-			output_value->value = zbx_strdup(NULL, p.value);
+			output_value->value = NULL == p.value ? NULL : zbx_strdup(NULL, p.value);
 
 			if (NULL == (oobj_cached = zbx_hashset_search(&grouped_prefixes, &oobj_local)))
 			{
@@ -988,7 +1017,10 @@ skip:
 	}
 
 	if (NULL != *errmsg)
+	{
 		ret = FAIL;
+		goto out;
+	}
 
 	if (0 < grouped_prefixes.num_data)
 	{

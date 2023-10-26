@@ -508,7 +508,7 @@ window.operation_popup = new class {
 			return;
 		}
 		else {
-			if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
+			if (input.conditiontype == <?= ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 				if (input.value == 1) {
 					input.name = <?= json_encode(_('Event is acknowledged')) ?> + ' ';
 				}

@@ -1977,8 +1977,15 @@ AC_CONFIG_FILES([
 	include/Makefile
 	database/Makefile
 	database/mysql/Makefile
+	database/mysql/option-patches/Makefile
 	database/oracle/Makefile
+	database/oracle/option-patches/Makefile
 	database/postgresql/Makefile
+	database/postgresql/option-patches/Makefile
+	database/postgresql/timescaledb/Makefile
+	database/postgresql/timescaledb/option-patches/Makefile
+	database/postgresql/timescaledb/option-patches/with-compression/Makefile
+	database/postgresql/timescaledb/option-patches/without-compression/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
@@ -2072,6 +2079,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxvault/Makefile
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
+	src/libs/zbxalerter/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2092,7 +2100,6 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
-	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/diag/Makefile

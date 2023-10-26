@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	alerter \
 	dbconfig \
 	diag \
 	discoverer \
@@ -56,7 +55,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
-	alerter/libzbxalerter.a \
+	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
 	pinger/libzbxpinger.a \

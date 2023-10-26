@@ -22,7 +22,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
+	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \

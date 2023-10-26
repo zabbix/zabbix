@@ -20,8 +20,9 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup dashboard
@@ -30,17 +31,17 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
  */
 class testDashboardTopTriggersWidget extends CWebTest {
 
-	use TableTrait;
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
 		];
 	}
 
@@ -695,7 +696,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data,'tags')) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
@@ -1416,9 +1416,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				],
 				'CONFIGURATION' => [
 					'Trigger' => 'menu-popup-item',
-					'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
-						'&backurl=zabbix.php%3Faction%3Ddashboard.view'
-					]
+					'Items' => ['Linux: Number of processes' => 'menu-popup-item']
 				]
 			],
 			'host_menu' => [
@@ -1432,7 +1430,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				],
 				'CONFIGURATION' => [
 					'Host' => 'zabbix.php?action=host.edit&hostid=10084',
-					'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
@@ -1475,7 +1473,10 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						// Check 2-level menu links.
 						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
 						$this->assertEquals($menu_level2, $item_link->getText());
-						$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
+						$this->assertStringContainsString($attribute, str_contains($attribute, 'menu-popup-item')
+							? $item_link->getAttribute('class')
+							: $item_link->getAttribute('href')
+						);
 					}
 				}
 				else {
