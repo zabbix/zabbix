@@ -61,8 +61,8 @@ class WidgetForm extends CWidgetForm {
 	private const SIZE_PERCENT_MIN = 1;
 	private const SIZE_PERCENT_MAX = 100;
 
-	private const PRIMARY_SIZE_DEFAULT = 5;
-	private const SECONDARY_SIZE_DEFAULT = 10;
+	private const PRIMARY_SIZE_DEFAULT = 20;
+	private const SECONDARY_SIZE_DEFAULT = 30;
 
 	private const VALUE_DECIMALS_DEFAULT = 2;
 	private const VALUE_DECIMALS_MAX = 6;
@@ -127,12 +127,10 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('primary_label_type', _('Primary label'), [
+				(new CWidgetFieldRadioButtonList('primary_label_type', _('Type'), [
 					self::LABEL_TYPE_TEXT => _('Text'),
 					self::LABEL_TYPE_VALUE => _('Value')
-				]))
-					->setDefault(self::LABEL_TYPE_TEXT)
-					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				]))->setDefault(self::LABEL_TYPE_TEXT)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('primary_label_decimal_places', _('Decimal places'),
@@ -142,9 +140,9 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
-				(new CWidgetFieldTextArea('primary_label'))
+				(new CWidgetFieldTextArea('primary_label', _('Text')))
 					->setDefault('{HOST.NAME}')
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('primary_label_size_type', null, [
@@ -164,10 +162,10 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('primary_label_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('primary_label_units_show', null, _('Units')))->setDefault(self::UNITS_ON)
+				(new CWidgetFieldCheckBox('primary_label_units_show'))->setDefault(self::UNITS_ON)
 			)
 			->addField(
-				(new CWidgetFieldTextBox('primary_label_units'))
+				new CWidgetFieldTextBox('primary_label_units', _('Units'))
 			)
 			->addField(
 				(new CWidgetFieldSelect('primary_label_units_pos', _('Position'), [
@@ -176,12 +174,10 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::UNITS_POSITION_AFTER)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('secondary_label_type', _('Secondary label'), [
+				(new CWidgetFieldRadioButtonList('secondary_label_type', _('Type'), [
 					self::LABEL_TYPE_TEXT => _('Text'),
 					self::LABEL_TYPE_VALUE => _('Value')
-				]))
-					->setDefault(self::LABEL_TYPE_VALUE)
-					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				]))->setDefault(self::LABEL_TYPE_VALUE)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('secondary_label_decimal_places', _('Decimal places'),
@@ -191,9 +187,9 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
-				(new CWidgetFieldTextArea('secondary_label'))
+				(new CWidgetFieldTextArea('secondary_label', _('Text')))
 					->setDefault('{{ITEM.LASTVALUE}.fmtnum(2)}')
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('secondary_label_size_type', null, [
@@ -213,10 +209,10 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('secondary_label_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('secondary_label_units_show', null, _('Units')))->setDefault(self::UNITS_ON)
+				(new CWidgetFieldCheckBox('secondary_label_units_show'))->setDefault(self::UNITS_ON)
 			)
 			->addField(
-				(new CWidgetFieldTextBox('secondary_label_units'))
+				(new CWidgetFieldTextBox('secondary_label_units', _('Units')))
 			)
 			->addField(
 				(new CWidgetFieldSelect('secondary_label_units_pos', _('Position'), [

@@ -92,32 +92,14 @@ window.widget_honeycomb_form = new class {
 			.querySelector(`[name="${type}_label_type"]:checked`).value == <?= WidgetForm::LABEL_TYPE_VALUE ?>;
 		const units_show = document.getElementById(`${type}_label_units_show`);
 
-		for (const element of this.#form.querySelectorAll(`.fields-group-${type}-label, .js-${type}-value-field`)) {
-			if (element.classList.contains(`js-${type}-value-field`)) {
-				element.style.display = is_label_type_value && show.checked ? '' : 'none';
-			}
-			else {
-				element.style.display = show.checked ? '' : 'none';
-			}
+		for (const element of this.#form.querySelectorAll(`.fields-group-${type}-label`)) {
+			element.style.display = show.checked ? '' : 'none';
 
-			for (const input of element.querySelectorAll('input, textarea, z-select')) {
+			for (const input of element.querySelectorAll('input, textarea')) {
 				if (input.id === `${type}_label_custom_size`) {
 					input.style.display = is_label_size_custom && show.checked ? '' : 'none';
 					input.nextSibling.nodeValue = is_label_size_custom && show.checked ? '%' : '';
 					input.disabled = !is_label_size_custom || !show.checked;
-				}
-
-				if (input.id === `${type}_label`) {
-					input.style.display = !is_label_type_value && show.checked ? '' : 'none';
-					input.disabled = is_label_type_value || !show.checked;
-				}
-				else if (element.classList.contains(`js-${type}-value-field`)) {
-					if (input.id === `${type}_label_units` || input.id === `${type}_label_units_pos`) {
-						input.disabled = !is_label_type_value || !show.checked || !units_show.checked;
-					}
-					else {
-						input.disabled = !is_label_type_value || !show.checked;
-					}
 				}
 				else {
 					input.disabled = !show.checked;
@@ -125,8 +107,24 @@ window.widget_honeycomb_form = new class {
 			}
 		}
 
-		this.#form.querySelector(`.fields-group-${type}-label > button`)
-			.style.display = !is_label_type_value && show.checked ? '' : 'none';
+		for (const element of this.#form.querySelectorAll(`.js-${type}-text-field`)) {
+			element.style.display = !is_label_type_value && show.checked ? '' : 'none';
+		}
+
+		document.getElementById(`${type}_label`).disabled = is_label_type_value || !show.checked;
+
+		for (const element of this.#form.querySelectorAll(`.js-${type}-value-field`)) {
+			element.style.display = is_label_type_value && show.checked ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input, z-select')) {
+				if (input.id === `${type}_label_units` || input.id === `${type}_label_units_pos`) {
+					input.disabled = !is_label_type_value || !show.checked || !units_show.checked;
+				}
+				else {
+					input.disabled = !is_label_type_value || !show.checked;
+				}
+			}
+		}
 
 		if (document.activeElement === document.getElementById(`${type}_label_size_type_1`)) {
 			document.getElementById(`${type}_label_custom_size`).focus();

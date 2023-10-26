@@ -66,38 +66,8 @@ $form
 	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
-			->addField(
-				(new CWidgetFieldRadioButtonListView($data['fields']['primary_label_type']))
-					->setFieldHint(
-						makeHelpIcon([
-							_('Supported macros:'),
-							(new CList([
-								'{HOST.*}',
-								'{ITEM.*}',
-								'{INVENTORY.*}',
-								_('User macros')
-							]))->addClass(ZBX_STYLE_LIST_DASHED)
-						])
-					)
-				->addRowClass('fields-group-primary-label')
-			)
 			->addFieldsGroup(
 				getPrimaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-primary-label')
-			)
-			->addField(
-				(new CWidgetFieldRadioButtonListView($data['fields']['secondary_label_type']))
-					->setFieldHint(
-						makeHelpIcon([
-							_('Supported macros:'),
-							(new CList([
-								'{HOST.*}',
-								'{ITEM.*}',
-								'{INVENTORY.*}',
-								_('User macros')
-							]))->addClass(ZBX_STYLE_LIST_DASHED)
-						])
-					)
-					->addRowClass('fields-group-secondary-label')
 			)
 			->addFieldsGroup(
 				getSecondaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-secondary-label')
@@ -120,15 +90,37 @@ function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): C
 	$label_size_type_field = $form->registerField(
 		new CWidgetFieldRadioButtonListView($fields['primary_label_size_type'])
 	);
+	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['primary_label_units_show']));
+	$units_field = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['primary_label_units']))->setAdaptiveWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	);
 
-	return (new CWidgetFieldsGroupView(''))
+	return (new CWidgetFieldsGroupView(_('Primary label')))
+		->addField(
+			(new CWidgetFieldRadioButtonListView($fields['primary_label_type']))
+				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 		->addField(
 			(new CWidgetFieldTextAreaView($fields['primary_label']))
-				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)
+				->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
+				->setFieldHint(
+					makeHelpIcon([
+						_('Supported macros:'),
+						(new CList([
+							'{HOST.*}',
+							'{ITEM.*}',
+							'{INVENTORY.*}',
+							_('User macros')
+						]))->addClass(ZBX_STYLE_LIST_DASHED)
+					])
+				)
+				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 85)
+				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+				->addRowClass('js-primary-text-field')
 		)
 		->addField(
 			(new CWidgetFieldIntegerBoxView($fields['primary_label_decimal_places']))
-				->addClass('field-fluid')
+				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addRowClass('js-primary-value-field')
 		)
 		->addItem([
@@ -145,21 +137,17 @@ function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): C
 			new CWidgetFieldCheckBoxView($fields['primary_label_bold'])
 		)
 		->addField(
-			(new CWidgetFieldColorView($fields['primary_label_color']))
+			new CWidgetFieldColorView($fields['primary_label_color'])
 		)
 		->addItem(
 			(new CTag('hr'))->addClass('js-primary-value-field')
 		)
-		->addField(
-			(new CWidgetFieldCheckBoxView($fields['primary_label_units_show']))
-				->addClass('units')
-				->addRowClass('js-primary-value-field')
-		)
-		->addField(
-			(new CWidgetFieldTextBoxView($fields['primary_label_units']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->addRowClass('js-primary-value-field')
-		)
+		->addItem([
+			(new CDiv([$units_show_field->getView(), $units_field->getLabel()]))
+				->addClass('units-show')
+				->addClass('js-primary-value-field'),
+			(new CFormField($units_field->getView()))->addClass('js-primary-value-field')
+		])
 		->addField(
 			(new CWidgetFieldSelectView($fields['primary_label_units_pos']))->addRowClass('js-primary-value-field')
 		);
@@ -170,15 +158,37 @@ function getSecondaryLabelFieldsGroupView(CWidgetFormView $form, array $fields):
 	$label_size_type_field = $form->registerField(
 		new CWidgetFieldRadioButtonListView($fields['secondary_label_size_type'])
 	);
+	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['secondary_label_units_show']));
+	$units_field = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['secondary_label_units']))->setAdaptiveWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	);
 
-	return (new CWidgetFieldsGroupView(''))
+	return (new CWidgetFieldsGroupView(_('Secondary label')))
+		->addField(
+			(new CWidgetFieldRadioButtonListView($fields['secondary_label_type']))
+				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 		->addField(
 			(new CWidgetFieldTextAreaView($fields['secondary_label']))
-				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)
+				->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
+				->setFieldHint(
+					makeHelpIcon([
+						_('Supported macros:'),
+						(new CList([
+							'{HOST.*}',
+							'{ITEM.*}',
+							'{INVENTORY.*}',
+							_('User macros')
+						]))->addClass(ZBX_STYLE_LIST_DASHED)
+					])
+				)
+				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 85)
+				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+				->addRowClass('js-secondary-text-field')
 		)
 		->addField(
 			(new CWidgetFieldIntegerBoxView($fields['secondary_label_decimal_places']))
-				->addClass('field-fluid')
+				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addRowClass('js-secondary-value-field')
 		)
 		->addItem([
@@ -195,21 +205,17 @@ function getSecondaryLabelFieldsGroupView(CWidgetFormView $form, array $fields):
 			new CWidgetFieldCheckBoxView($fields['secondary_label_bold'])
 		)
 		->addField(
-			(new CWidgetFieldColorView($fields['secondary_label_color']))->addClass('field-fluid')
+			new CWidgetFieldColorView($fields['secondary_label_color'])
 		)
 		->addItem(
 			(new CTag('hr'))->addClass('js-secondary-value-field')
 		)
-		->addField(
-			(new CWidgetFieldCheckBoxView($fields['secondary_label_units_show']))
-				->addClass('units')
-				->addRowClass('js-secondary-value-field')
-		)
-		->addField(
-			(new CWidgetFieldTextBoxView($fields['secondary_label_units']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->addRowClass('js-secondary-value-field')
-		)
+		->addItem([
+			(new CDiv([$units_show_field->getView(), $units_field->getLabel()]))
+				->addClass('units-show')
+				->addClass('js-secondary-value-field'),
+			(new CFormField($units_field->getView()))->addClass('js-secondary-value-field')
+		])
 		->addField(
 			(new CWidgetFieldSelectView($fields['secondary_label_units_pos']))->addRowClass('js-secondary-value-field')
 		);
