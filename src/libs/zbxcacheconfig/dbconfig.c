@@ -15380,7 +15380,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand user macros in the specified text value                    *
+ * Purpose: expand user and func macros in the specified text value           *
  *                                                                            *
  * Parameters: um_cache    - [IN] the user macro cache                        *
  *             text        - [IN/OUT] the text value with macros to expand    *
@@ -15390,10 +15390,10 @@ out:
  *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, unsigned char env, char **error)
+int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error)
 {
-	/* wrap the passed user macro cache into user macro handle structure */
+	/* wrap the passed user macro and func macro cache into user macro handle structure */
 	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache, .macro_env = env, .prev = NULL};
 
 	return zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, error);

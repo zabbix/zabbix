@@ -168,7 +168,6 @@ macro_functions_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxexpression
 
-
 evaluate_function_SOURCES = \
 	evaluate_function.c \
 	$(COMMON_SRC_FILES)

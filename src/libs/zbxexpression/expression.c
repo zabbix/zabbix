@@ -2814,7 +2814,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		pos++;
 	}
 
-
 	zbx_vc_flush_stats();
 
 	zbx_free(user_username);

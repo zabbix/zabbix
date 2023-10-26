@@ -55,7 +55,7 @@ out:
   expression: '123.46'
   return: SUCCEED
 ---
-test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)}'
+test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)} 1'
 in:
   macro_value: '1697177104'
   expression: '{{$USERMACRO}.fmttime(%H:%M:%S)}'
@@ -63,7 +63,7 @@ out:
   expression: '09:05:04'
   return: SUCCEED
 ---
-test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)}'
+test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)} 2'
 in:
   macro_value: '2023-10-13T09:05:04'
   expression: '{{$USERMACRO}.fmttime(%H:%M:%S)}'
@@ -71,7 +71,7 @@ out:
   expression: '09:05:04'
   return: SUCCEED
 ---
-test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)}'
+test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)} 3'
 in:
   macro_value: '2023-10-13T09:05:04+0200'
   expression: '{{$USERMACRO}.fmttime(%H:%M:%S)}'

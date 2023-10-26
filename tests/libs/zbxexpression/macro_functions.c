@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-
 #include "zbxexpression.h"
 
 #include "zbxmocktest.h"
@@ -63,7 +61,6 @@ void	__wrap_zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle)
 int	__wrap_zbx_db_trigger_get_all_hostids(const zbx_db_trigger *trigger, const zbx_vector_uint64_t **hostids)
 {
 	ZBX_UNUSED(trigger);
-	ZBX_UNUSED(hostids);
 	*hostids = &test_hostids;
 
 	return SUCCEED;
