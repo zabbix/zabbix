@@ -1380,7 +1380,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_hostname, config_proxydata_frequency};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
-								zbx_config_log_remote_commands, config_hostname};
+								zbx_config_log_remote_commands, config_hostname,
+								get_config_forks};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],

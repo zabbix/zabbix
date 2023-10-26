@@ -574,7 +574,7 @@ static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
  *                                                                            *
  * Purpose: process acknowledgments for alerts sending                        *
  *                                                                            *
- * Return value: The number of successfully processed tasks                   *
+ * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
