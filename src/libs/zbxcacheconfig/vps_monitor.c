@@ -33,16 +33,12 @@ static zbx_mutex_t	vps_lock = ZBX_MUTEX_NULL;
  ******************************************************************************/
 int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error)
 {
-	int	ret = FAIL;
-
-	if (SUCCEED != (ret = zbx_mutex_create(&vps_lock, ZBX_MUTEX_VPS_MONITOR, error)))
-		goto out;
+	if (SUCCEED != zbx_mutex_create(&vps_lock, ZBX_MUTEX_VPS_MONITOR, error))
+		return FAIL;
 
 	memset(monitor, 0, sizeof(zbx_vps_monitor_t));
 
-	ret = SUCCEED;
-out:
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
