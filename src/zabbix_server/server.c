@@ -35,7 +35,7 @@
 #include "zbxnix.h"
 #include "zbxcomms.h"
 
-#include "alerter/alerter.h"
+#include "zbxalerter.h"
 #include "zbxdbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"

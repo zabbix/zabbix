@@ -757,7 +757,7 @@ void	zbx_http_context_destroy(zbx_http_context_t *context)
 int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url,
 		const char *query_fields, char *headers, const char *posts, unsigned char retrieve_mode,
 		const char *http_proxy, unsigned char follow_redirects,
-		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
+		int timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
 		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
@@ -765,7 +765,7 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 {
 	CURLcode		err;
 	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], *headers_ptr, *line;
-	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
+	int			ret = NOTSUPPORTED, found = FAIL;
 	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_ndjson[] = {"Content-Type: application/x-ndjson"};
@@ -828,13 +828,7 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		goto clean;
 	}
 
-	if (FAIL == zbx_is_time_suffix(timeout, &timeout_seconds, (int)strlen(timeout)))
-	{
-		*error = zbx_dsprintf(NULL, "Invalid timeout: %s", timeout);
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_TIMEOUT, (long)timeout_seconds)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_TIMEOUT, (long)timeout)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify timeout: %s", curl_easy_strerror(err));
 		goto clean;

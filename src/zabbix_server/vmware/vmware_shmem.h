@@ -58,6 +58,9 @@ void	vmware_shmem_cust_query_clean(zbx_vmware_cust_query_t *cust_query);
 void	vmware_shared_tag_free(zbx_vmware_tag_t *value);
 void	vmware_shared_entity_tags_free(zbx_vmware_entity_tags_t *value);
 void	vmware_shmem_service_free(zbx_vmware_service_t *service);
+void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src);
+void	zbx_shmem_vmware_key_value_free(zbx_vmware_key_value_t *value);
+
 zbx_vmware_event_t		*vmware_shmem_event_dup(const zbx_vmware_event_t *src);
 zbx_vmware_diskextent_t		*vmware_shmem_diskextent_dup(const zbx_vmware_diskextent_t *src);
 zbx_vmware_resourcepool_t	*vmware_shmem_resourcepool_dup(const zbx_vmware_resourcepool_t *src);
@@ -68,8 +71,7 @@ zbx_vmware_dev_t		*vmware_shmem_dev_dup(const zbx_vmware_dev_t *src);
 zbx_vmware_vm_t			*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src);
 zbx_vmware_data_t		*vmware_shmem_data_dup(zbx_vmware_data_t *src);
 zbx_vmware_service_t		*vmware_shmem_vmware_service_malloc(void);
-void				vmware_shmem_hashset_create_perf_entities_counter_queries(zbx_vmware_service_t
-					*service);
+void				vmware_shmem_service_hashset_create(zbx_vmware_service_t *service);
 zbx_vector_custquery_param_t	*vmware_shmem_custquery_malloc(void);
 zbx_vmware_job_t		*vmware_shmem_vmware_job_malloc(void);
 void				vmware_shmem_vmware_job_free(zbx_vmware_job_t *job);
