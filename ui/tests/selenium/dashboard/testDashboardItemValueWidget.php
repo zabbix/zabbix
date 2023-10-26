@@ -1,5 +1,4 @@
 <?php
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -209,16 +208,17 @@ class testDashboardItemValueWidget extends CWebTest {
 	 */
 	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
-		if ($form->getField('Type') !== 'Item value') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
-		}
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		$dialog = $dashboard->edit()->addWidget();
+		$form = $dialog->asForm();
+		$this->assertEquals('Add widget', $dialog->getTitle());
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 
 		// Check default values with default Advanced configuration (false).
 		$default_values = [
 			'Name' => '',
 			'Refresh interval' => 'Default (1 minute)',
+			'Item' => '',
 			'id:show_header' => true,
 			'id:show_1' => true,
 			'id:show_2' => true,
@@ -227,7 +227,6 @@ class testDashboardItemValueWidget extends CWebTest {
 			'Advanced configuration' => false,
 			'id:override_hostid_ms' => ''
 		];
-
 		foreach ($default_values as $field => $value) {
 			$this->assertEquals($value, $form->getField($field)->getValue());
 		}
@@ -314,37 +313,166 @@ class testDashboardItemValueWidget extends CWebTest {
 					'id:desc_v_pos' => 'Bottom',
 					'id:desc_size' => 15,
 					'id:desc_bold' => false,
-					'id:decimal_places' => 2,
+					'Decimal places' => 2,
 					'id:decimal_size' => 35,
 					'id:value_h_pos' => 'Center',
 					'id:value_v_pos' => 'Middle',
 					'id:value_size' => 45,
 					'id:value_bold' => true,
 					'id:units' => '',
-					'id:units_pos' => 'After value',
+					'Position' => 'After value',
 					'id:units_size' => 35,
-					'id:units_bold' => true
+					'id:units_bold' => true,
+					'Aggregation function' => 'not used',
+					'Time period' => 'Dashboard',
+					'id:time_period_reference' => '',
+					'id:time_period_from' => 'now-1h',
+					'id:time_period_to' => 'now',
+					'History data' => 'Auto'
 				];
 
 				foreach ($default_values_advanced as $field => $value) {
 					$this->assertEquals($value, $form->getField($field)->getValue());
 				}
 
-				// Check fields' lengths.
-				$field_lenghts = [
-					'Name' =>  255,
-					'id:description' => 2048,
-					'id:desc_size' => 3,
-					'id:decimal_places' => 2,
-					'id:decimal_size' => 3,
-					'id:value_size' => 3,
-					'id:units' => 255,
-					'id:units_size' => 3
+				// Check Thresholds table.
+				$thresholds_container = $form->getFieldContainer('Thresholds');
+				$this->assertEquals(['', 'Threshold', 'Action'], $thresholds_container->asTable()->getHeadersText());
+				$thresholds_icon = $form->getLabel('Thresholds')->query('xpath:.//button[@data-hintbox]')->one();
+				$this->assertTrue($thresholds_icon->isVisible());
+				$thresholds_container->query('button:Add')->one()->waitUntilClickable()->click();
+				$this->assertEquals('', $form->getField('id:thresholds_0_threshold')->getValue());
+				$this->assertEquals(2, $thresholds_container->query('button', ['Add', 'Remove'])->all()
+						->filter(CElementFilter::CLICKABLE)->count()
+				);
+
+				// Check Thresholds warning icon text.
+				$thresholds_icon->click();
+				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+				$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
+				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+				$hint_dialog->waitUntilNotPresent();
+
+				// Check required fields with selected widget time period.
+				$form->fill(['Aggregation function' => 'min', 'Time period' => 'Widget']);
+				$this->assertEquals(['Item', 'Show', 'Description', 'Widget'], $form->getRequiredLabels());
+
+				// Check warning and hintbox message.
+				$warning_visibility = [
+					'Aggregation function' => [
+						'not used' => false,
+						'min' => true,
+						'max' => true,
+						'avg' => true,
+						'count' => false,
+						'sum' => true,
+						'first' => false,
+						'last' => false
+					],
+					'History data' => [
+						'Auto' => false,
+						'History' => false,
+						'Trends' => true
+					]
 				];
 
-				foreach ($field_lenghts as $field => $length) {
-					$this->assertEquals($length, $form->getField($field)->getAttribute('maxlength'));
+				foreach ($warning_visibility as $warning_label => $options) {
+					$hint_text = ($warning_label === 'History data')
+						? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+						: 'With this setting only numeric items will be displayed.';
+					$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+
+					foreach ($options as $option => $visible) {
+						$form->fill([$warning_label => $option]);
+						$this->assertTrue($warning_button->isVisible($visible));
+
+						if ($visible) {
+							$warning_button->click();
+
+							// Check hintbox text.
+							$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+							$this->assertEquals($hint_text, $hint_dialog->getText());
+
+							// Close the hintbox.
+							$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+							$hint_dialog->waitUntilNotPresent();
+						}
+
+						if ($warning_label === 'Aggregation function' && $option !== 'not used') {
+							$this->assertTrue($form->getLabel('Time period')->isDisplayed());
+						}
+					}
 				}
+
+				// Check attributes.
+				$inputs = [
+					'Name' => [
+						'maxlength' => 255,
+						'placeholder' => 'default'
+					],
+					'id:itemid_ms' => [
+						'placeholder' => 'type here to search'
+					],
+					'id:description' => [
+						'maxlength' => 2048
+					],
+					'id:desc_size' => [
+						'maxlength' => 3
+					],
+					'id:decimal_places' => [
+						'maxlength' => 2
+					],
+					'id:decimal_size' => [
+						'maxlength' => 3
+					],
+					'id:value_size' => [
+						'maxlength' => 3
+					],
+					'id:units' => [
+						'maxlength' => 255
+					],
+					'id:units_size' => [
+						'maxlength' => 3
+					],
+					'id:time_size' => [
+						'maxlength' => 3
+					],
+					'id:thresholds_0_threshold' => [
+						'maxlength' => 255
+					],
+					'xpath:.//input[@id="thresholds_0_color"]/..' => [
+						'color' => 'FF465C'
+					],
+					'id:time_period_from' => [
+						'maxlength' => 255,
+						'placeholder' => 'YYYY-MM-DD hh:mm:ss'
+					],
+					'id:time_period_to' => [
+						'maxlength' => 255,
+						'placeholder' => 'YYYY-MM-DD hh:mm:ss'
+					],
+					// Widget multiselect field relative xpath.
+					'xpath://div[@id="time_period_reference"]//input[@placeholder="type here to search"]' => [
+						'placeholder' => 'type here to search'
+					],
+					'id:override_hostid_ms' => [
+						'placeholder' => 'type here to search'
+					]
+				];
+				foreach ($inputs as $field => $attributes) {
+					foreach ($attributes as $attribute => $value) {
+						if ($attribute === 'color') {
+							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
+						}
+						else {
+							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
+						}
+					}
+				}
+
+				// Check required fields with selected Custom time period.
+				$form->fill(['Aggregation function' => 'min', 'Time period' => 'Custom']);
+				$this->assertEquals(['Item', 'Show', 'Description', 'From', 'To'], $form->getRequiredLabels());
 
 				// Check fields editability depending on "Show" checkboxes.
 				$config_editability = [
@@ -364,6 +492,11 @@ class testDashboardItemValueWidget extends CWebTest {
 						}
 					}
 				}
+
+				// Check if footer buttons are present and clickable.
+				$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
+						->filter(CElementFilter::CLICKABLE)->asText()
+				);
 			}
 		}
 	}
@@ -1270,11 +1403,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
-
-		if ($form->getField('Type')->getValue() !== 'Item value') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
-		}
-
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		$form->fill($data['fields']);
 
 		if (!array_key_exists('numeric', $data)) {
@@ -1317,11 +1446,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
-
-		if ($form->getField('Type')->getValue() !== 'Item value') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
-		}
-
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		$form->fill($data['fields']);
 		$this->getThresholdTable()->fill($data['thresholds']);
 

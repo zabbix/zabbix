@@ -193,7 +193,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			'History data' => ['Auto' => false, 'History' => false, 'Trends' => true]
 		];
 
-		// Check warning and hintbox message, as well as Aggregation interval, Min/Max and Thresholds fields visibility.
+		// Check warning and hintbox message, as well as Aggregation function, Min/Max and Thresholds fields visibility.
 		foreach ($warning_visibility as $warning_label => $options) {
 			$hint_text = ($warning_label === 'History data')
 				? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
