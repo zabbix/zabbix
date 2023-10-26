@@ -910,7 +910,10 @@ class CSVGHoneycomb {
 				this.#elements.honeycomb_cells.on('mouseenter', null);
 				this.#elements.popped_cell.on('mouseleave', null);
 
-				// TODO: BROADCAST
+				const hostid = this.#elements.popped_cell.datum().hostid;
+				const itemid = this.#elements.popped_cell.datum().itemid;
+
+				this.#svg.node().dispatchEvent(new CustomEvent('cell.pop.out', {detail: {hostid, itemid}}));
 			}
 			else {
 				this.#popInCell();
@@ -920,6 +923,8 @@ class CSVGHoneycomb {
 
 				this.#elements.honeycomb_cells.on('mouseenter', (e) => this.#popOutCell(e.target));
 				this.#elements.popped_cell.on('mouseleave', () => this.#popInCell());
+
+				this.#svg.node().dispatchEvent(new CustomEvent('cell.pop.in'));
 			}
 		}
 		else if (clicked_on_other_cell) {
@@ -932,6 +937,11 @@ class CSVGHoneycomb {
 
 			this.#elements.honeycomb_cells.on('mouseenter', null);
 			this.#elements.popped_cell.on('mouseleave', null);
+
+			const hostid = this.#elements.popped_cell.datum().hostid;
+			const itemid = this.#elements.popped_cell.datum().itemid;
+
+			this.#svg.node().dispatchEvent(new CustomEvent('cell.pop.out', {detail: {hostid, itemid}}));
 		}
 		else {
 			this.#popInCell();
@@ -940,6 +950,8 @@ class CSVGHoneycomb {
 
 			this.#elements.honeycomb_cells.on('mouseenter', (e) => this.#popOutCell(e.target));
 			this.#elements.popped_cell.on('mouseleave', () => this.#popInCell());
+
+			this.#svg.node().dispatchEvent(new CustomEvent('cell.pop.in'));
 		}
 	};
 

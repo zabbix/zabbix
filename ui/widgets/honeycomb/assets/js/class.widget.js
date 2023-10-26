@@ -61,6 +61,14 @@ class CWidgetHoneycomb extends CWidget {
 			this._body.prepend(this.#honeycomb.getSVGElement());
 
 			this.#honeycomb.setSize(super._getContentsSize());
+
+			this.#honeycomb.getSVGElement().addEventListener('cell.pop.out',
+				(e) => this.broadcast({_hostid: e.detail.hostid, _itemid: e.detail.itemid})
+			);
+
+			this.#honeycomb.getSVGElement().addEventListener('cell.pop.in',
+				() => this.broadcast({_hostid: null, _itemid: null})
+			);
 		}
 
 		this.#honeycomb.setValue({
