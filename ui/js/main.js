@@ -871,6 +871,8 @@ function getConditionFormula(conditions, evalType) {
 	 * - counter 				- number to start row enumeration from
 	 * - dataCallback			- function to generate the data passed to the template
 	 * - remove_next_sibling	- remove also next element
+	 * - sortable				- enable jQuery UI sortable initialization
+	 * - sortableOptions		- additional options to pass to jQuery UI sortable initialization
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
@@ -881,6 +883,10 @@ function getConditionFormula(conditions, evalType) {
 	 * @param options
 	 */
 	$.fn.dynamicRows = function(options) {
+		if ('dynamicRows' in $(this).data()) {
+			return $(this).data('dynamicRows');
+		}
+
 		options = $.extend({}, {
 			template: '',
 			row: '.form_row',
@@ -894,15 +900,82 @@ function getConditionFormula(conditions, evalType) {
 			rows: [],
 			dataCallback: function(data) {
 				return {};
-			}
+			},
+			sortable: false,
+			sortableOptions: {}
 		}, options);
+
+		if (options.sortable) {
+			options.sortableOptions = $.extend({}, {
+				disabled: false,
+				items: options.row,
+				axis: 'y',
+				containment: 'parent',
+				cursor: 'grabbing',
+				handle: '.drag-icon',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				helper: function(e, ui) {
+					for (let td of ui.find('>td')) {
+						const $td = jQuery(td);
+						$td.attr('width', $td.width());
+					}
+
+					// When dragging element on safari, it jumps out of the table.
+					if (SF) {
+						// Move back draggable element to proper position.
+						ui.css('left', (ui.offset().left - 2) + 'px');
+					}
+
+					return ui;
+				},
+				start: function(e, ui) {
+					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				},
+				stop: function(e, ui) {
+					ui.item.find('>td').removeAttr('style');
+					ui.item.removeAttr('style');
+				}
+			}, options.sortableOptions);
+		}
 
 		return this.each(function() {
 			var table = $(this);
 
 			// If options.remove_next_sibling is true, counter counts each row making the next index twice as large (bug).
 			table.data('dynamicRows', {
-				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
+				counter: (options.counter !== null) ? options.counter : $(options.row, table).length,
+				addRows: (rows) => {
+					const local_options = $.extend({}, options, {
+						dataCallback: (data) => options.dataCallback($.extend(data, rows.shift()))
+					});
+					const beforeRow = (options['beforeRow'] !== null)
+						? $(options['beforeRow'], table)
+						: $(options.add, table).closest('tr');
+
+					table.trigger('beforeadd.dynamicRows', options);
+
+					while (rows.length > 0) {
+						addRow(table, beforeRow, local_options);
+					}
+
+					table.trigger('afteradd.dynamicRows', options);
+					table.trigger('change');
+
+					return table;
+				},
+				removeRows: (filter) => {
+					for (const row of $(options.row, table)) {
+						if (filter === undefined || filter(row)) {
+							removeRow(table, row, options);
+						}
+					}
+
+					table.trigger('afterremove.dynamicRows', options);
+					table.trigger('change');
+
+					return table;
+				}
 			});
 
 			// add buttons
@@ -917,6 +990,10 @@ function getConditionFormula(conditions, evalType) {
 
 				if (!options.allow_empty) {
 					$(options.remove, table).attr('disabled', false);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 
 				table.trigger('afteradd.dynamicRows', options);
@@ -934,6 +1011,10 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', true);
 
 					table.trigger('afteradd.dynamicRows', options);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 			});
 
@@ -954,6 +1035,22 @@ function getConditionFormula(conditions, evalType) {
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');
 				initRows(table, before_row, options);
+			}
+
+			if (options.sortable) {
+				table
+					.sortable(options.sortableOptions)
+					.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
+						const drag_icons = table[0].querySelectorAll(options.sortableOptions.handle);
+						const disabled = drag_icons.length < 2;
+
+						for (const drag_icon of drag_icons) {
+							drag_icon.classList.toggle('disabled', disabled);
+						}
+
+						table.sortable({disabled});
+					})
+					.trigger('afteradd.dynamicRows');
 			}
 		});
 	};

@@ -25,9 +25,7 @@
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get(
-		$data['prototype'] ? 'itemprototype' : 'item'
-	)))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
 	->setId('massupdate-form')
 	->setName('massupdate-form')
 	->addVar('ids', $data['ids'])
@@ -54,7 +52,7 @@ $item_form_list = (new CFormList('item-form-list'))
 // Append hosts interface select to form list.
 if ($data['single_host_selected'] && $data['context'] === 'host') {
 	$item_form_list->addRow(
-		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
+		(new CVisibilityBox('visible[interfaceid]', 'interface-field', _('Original')))
 			->setLabel(_('Host interface'))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
 		(new CDiv([
@@ -66,7 +64,7 @@ if ($data['single_host_selected'] && $data['context'] === 'host') {
 				->addClass(ZBX_STYLE_RED)
 				->setId('interface_not_defined')
 				->addStyle('display: none;')
-		]))->setId('interfaceDiv'),
+		]))->setId('interface-field'),
 		'interface_row'
 	);
 }
@@ -198,7 +196,7 @@ $item_form_list
 $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
-		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-div', _('Original')))
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-field', _('Original')))
 			->setLabel([
 				_('Preprocessing steps'),
 				makeHelpIcon([
@@ -214,7 +212,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 				->setModern(true)
 				->addStyle('margin-bottom: 10px;'),
 			getItemPreprocessing([], false, $data['preprocessing_types'])
-		]))->setId('preprocessing-div')
+		]))->setId('preprocessing-field')
 	);
 
 $custom_intervals = (new CTable())
@@ -242,17 +240,18 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]'))
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
-			->addStyle('max-width:100px;width:100%;display: none;');
+			->addStyle('max-width:100px;width:100%;')
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 	}
 	else {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]'))
 			->setAdaptiveWidth(100)
 			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
-			->addStyle('display: none;');
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]'))
 			->setAdaptiveWidth(110)
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
-			->addStyle('display: none;');
+			->addClass(ZBX_STYLE_DISPLAY_NONE);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule']))
 			->setAdaptiveWidth(100)
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
@@ -269,26 +268,15 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-// Prepare Update interval for form list.
-$update_interval = (new CTable())
-	->setId('update_interval')
-	->addRow([
-		_('Delay'),
-		new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
-	])
-	->addRow(
-		(new CRow([
-			(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
-			new CCol($custom_intervals)
-		]))
-	);
-
 // Append update interval to form list.
 $item_form_list
 	// Append delay to form list.
 	->addRow(
 		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
-		$update_interval
+		(new CFormList('update_interval'))
+			->addClass(ZBX_STYLE_TABLE_SUBFORMS)
+			->addRow(_('Delay'), (new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
+			->addRow(_('Custom intervals'), $custom_intervals)
 	)
 	// Append timeout to form list.
 	->addRow(
@@ -308,7 +296,7 @@ $item_form_list
 	)
 	// Append history to form list.
 	->addRow(
-		(new CVisibilityBox('visible[history]', 'history_div', _('Original')))
+		(new CVisibilityBox('visible[history]', 'history-field', _('Original')))
 			->setLabel(_('History')),
 		(new CDiv([
 			(new CRadioButtonList('history_mode', ITEM_STORAGE_CUSTOM))
@@ -321,11 +309,11 @@ $item_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('history_div')
+			->setId('history-field')
 	)
 	// Append trends to form list.
 	->addRow(
-		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trends')),
+		(new CVisibilityBox('visible[trends]', 'trends-field', _('Original')))->setLabel(_('Trends')),
 		(new CDiv([
 			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
 				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
@@ -337,7 +325,7 @@ $item_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('trends_div')
+			->setId('trends-field')
 	);
 
 // Append status to form list.
@@ -369,26 +357,25 @@ $item_form_list->addRow(
 // Append value map select when only one host or template is selected.
 if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data['discovered_host'])) {
 	$item_form_list->addRow(
-		(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
-		(new CDiv([
-			(new CMultiSelect([
-				'name' => 'valuemapid',
-				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-				'multiple' => false,
-				'data' => [],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-						'srcfld1' => 'valuemapid',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'valuemapid',
-						'hostids' => [$data['hostid']],
-						'context' => $data['context'],
-						'editable' => true
-					]
+		(new CVisibilityBox('visible[valuemapid]', 'valuemapid-field', _('Original')))->setLabel(_('Value mapping')),
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
+			'multiselect_id' => 'valuemapid-field',
+			'multiple' => false,
+			'data' => [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => [$data['hostid']],
+					'context' => $data['context'],
+					'editable' => true
 				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('valuemapid_div')
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 }
 
@@ -407,10 +394,13 @@ $item_form_list->addRow(
 // Append master item select to form list.
 if ($data['single_host_selected']) {
 	if (!$data['prototype']) {
-		$master_item = (new CDiv([
+		$item_form_list->addRow(
+			(new CVisibilityBox('visible[master_itemid]', 'master-item-field', _('Original')))
+				->setLabel(_('Master item')),
 			(new CMultiSelect([
 				'name' => 'master_itemid',
 				'object_name' => 'items',
+				'multiselect_id' => 'master-item-field',
 				'multiple' => false,
 				'data' => [],
 				'popup' => [
@@ -425,60 +415,57 @@ if ($data['single_host_selected']) {
 				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(true)
-		]))->setId('master_item');
+				->setAriaRequired()
+		);
 	}
 	else {
-		$master_item = [
-			(new CTextBox('master_itemname', '', true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(),
-			(new CVar('master_itemid', '', 'master_itemid'))
-		];
-
-		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$master_item[] = (new CButton('button', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->removeId()
-			->setAttribute('data-hostid', $data['hostid'])
-			->onClick('
-				PopUp("popup.generic", {
-					srctbl: "items",
-					srcfld1: "itemid",
-					srcfld2: "name",
-					dstfrm: "'.$form->getName().'",
-					dstfld1: "master_itemid",
-					dstfld2: "master_itemname",
-					only_hostid: this.dataset.hostid,
-					normal_only: 1
-				}, {dialogue_class: "modal-popup-generic"});
-			');
-
-		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$master_item[] = (new CButton('button', _('Select prototype')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->removeId()
-			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-			->onClick('
-				PopUp("popup.generic", {
-					srctbl: "item_prototypes",
-					srcfld1: "itemid",
-					srcfld2: "name",
-					dstfrm: "'.$form->getName().'",
-					dstfld1: "master_itemid",
-					dstfld2: "master_itemname",
-					parent_discoveryid: this.dataset.parent_discoveryid
-				}, {dialogue_class: "modal-popup-generic"});
-			');
+		$item_form_list->addRow(
+			(new CVisibilityBox('visible[master_itemid]', 'master_item-field', _('Original')))
+				->setLabel(_('Master item')),
+			(new CDiv([
+				(new CVar('master_itemname')),
+				[
+					(new CTextBox('master_itemname', '', true))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired(),
+					(new CVar('master_itemid', '', 'master_itemid')),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('button', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->removeId()
+						->setAttribute('data-hostid', $data['hostid'])
+						->onClick('
+							PopUp("popup.generic", {
+								srctbl: "items",
+								srcfld1: "itemid",
+								srcfld2: "name",
+								dstfrm: "'.$form->getName().'",
+								dstfld1: "master_itemid",
+								dstfld2: "master_itemname",
+								only_hostid: this.dataset.hostid,
+								normal_only: 1
+							}, {dialogue_class: "modal-popup-generic"});
+						'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('button', _('Select prototype')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->removeId()
+						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+						->onClick('
+							PopUp("popup.generic", {
+								srctbl: "item_prototypes",
+								srcfld1: "itemid",
+								srcfld2: "name",
+								dstfrm: "'.$form->getName().'",
+								dstfld1: "master_itemid",
+								dstfld2: "master_itemname",
+								parent_discoveryid: this.dataset.parent_discoveryid
+							}, {dialogue_class: "modal-popup-generic"});
+						')
+				]
+			]))->setId('master_item-field')
+		);
 	}
-
-	$item_form_list->addRow(
-		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
-		(new CDiv([
-			(new CVar('master_itemname')),
-			$master_item
-		]))->setId('master_item')
-	);
 }
 
 // Append description to form list.
@@ -494,7 +481,7 @@ $item_form_list->addRow(
  */
 $tags_form_list = (new CFormList('tags-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -505,7 +492,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass('tags-table')
-		]))->setId('tags-div')
+		]))->setId('tags-field')
 	);
 
 $tabs = (new CTabView())
@@ -518,7 +505,7 @@ $tabs = (new CTabView())
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php', $data)));
+$form->addItem(new CJsScript($this->readJsFile('item.massupdate.js.php', $data)));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/item.preprocessing.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemtest.js.php')));

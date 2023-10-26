@@ -1190,29 +1190,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								}
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_'],
-											(new CUrl('disc_prototypes.php'))
-												->setArgument('form', 'update')
-												->setArgument('itemid', $function['itemid'])
-												->setArgument('parent_discoveryid', $function['parent_itemid'])
-												->setArgument('context', $options['context'])
-										))
-											->addClass(ZBX_STYLE_LINK_ALT)
+										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->onClick('view.editItemPrototype(this, '.json_encode([
+												'context' => $options['context'],
+												'itemid' => $function['itemid'],
+												'parent_discoveryid' => $function['parent_itemid']
+											]).')')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_'],
-											(new CUrl('items.php'))
-												->setArgument('form', 'update')
-												->setArgument('itemid', $function['itemid'])
-												->setArgument('context', $options['context'])
-										))
-											->addClass(ZBX_STYLE_LINK_ALT)
-											->setAttribute('data-itemid', $function['itemid'])
+										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->onClick('view.editItem(this, '.json_encode([
+												'context' => $options['context'],
+												'itemid' => $function['itemid']
+											]).')')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}

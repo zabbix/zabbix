@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerItemMassCheckNow extends CController {
+class CControllerItemExecuteNow extends CController {
 
 	/*
 	 * @var array  List of selected items from API stored in this item cache variable.
