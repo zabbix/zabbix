@@ -182,6 +182,9 @@ class testDashboardPieChartWidget extends CWebTest
 					']/button')->one()->getAttribute('data-hintbox-contents'));
 		}
 
+		// Screenshot Item pattern.
+		$this->screenshotLayout($dialog, 'piechart_item_pattern', $data['action']);
+
 		// Check Add data set buttons.
 		foreach (['id:dataset-add', 'id:dataset-menu'] as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isClickable());
@@ -209,6 +212,9 @@ class testDashboardPieChartWidget extends CWebTest
 			$this->assertEquals($expected_hint, $this->query('xpath://label[@for='.CXPathHelper::escapeQuotes($selector).
 					']/button')->one()->getAttribute('data-hintbox-contents'));
 		}
+
+		// Screenshot Item list.
+		$this->screenshotLayout($dialog, 'piechart_item_list', $data['action']);
 
 		// Displaying options tab.
 		$form->selectTab('Displaying options');
@@ -256,6 +262,9 @@ class testDashboardPieChartWidget extends CWebTest
 			$this->assertTrue($form->getField($label)->isEnabled());
 		}
 
+		// Screenshot Displaying options.
+		$this->screenshotLayout($dialog, 'piechart_displaying_options', $data['action']);
+
 		// Time period tab.
 		$form->selectTab('Time period');
 		$this->page->waitUntilReady();
@@ -265,6 +274,9 @@ class testDashboardPieChartWidget extends CWebTest
 			$this->assertTrue($form->getField('Time period')->
 					query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one()->isClickable());
 		}
+
+		// Screenshot Time period.
+		$this->screenshotLayout($dialog, 'piechart_time_period', $data['action']);
 
 		// Legend tab.
 		$form->selectTab('Legend');
@@ -278,6 +290,9 @@ class testDashboardPieChartWidget extends CWebTest
 
 		$this->assertRangeLayout('Number of rows', 'legend_lines', $form, ['min' => '1', 'max' => '10', 'step' => '1', 'value' => '1']);
 		$this->assertRangeLayout('Number of columns', 'legend_columns', $form, ['min' => '1', 'max' => '4', 'step' => '1', 'value' => '4']);
+
+		// Screenshot Legend.
+		$this->screenshotLayout($dialog, 'piechart_legend', $data['action']);
 
 		// Check footer buttons.
 		$footer = $dialog->query('class:overlay-dialogue-footer')->one();
@@ -599,6 +614,23 @@ class testDashboardPieChartWidget extends CWebTest
 
 		// Check total Widget count.
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+	}
+
+	/**
+	 * Take screenshot of the edit form, but only in the 'create' test to avoid excessive screenshots.
+	 *
+	 * @param $dialog
+	 * @param $id
+	 * @param $action
+	 */
+	protected function screenshotLayout($dialog, $id, $action) {
+		if ($action !== 'create') {
+			return;
+		}
+
+		// Screenshot Item pattern.
+		$this->page->removeFocus();
+		$this->assertScreenshot($dialog, $id);
 	}
 
 	/**
