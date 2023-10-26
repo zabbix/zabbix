@@ -2,6 +2,7 @@
 
 DIST_SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \
@@ -193,6 +194,7 @@ endif
 
 SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxcommon \

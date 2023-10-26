@@ -2080,6 +2080,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxvault/Makefile
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
+	src/libs/zbxalerter/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2100,7 +2101,6 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
-	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/diag/Makefile

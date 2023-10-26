@@ -63,13 +63,6 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 	return size * nmemb;
 }
 
-typedef struct
-{
-	char	*key;
-	char	*value;
-}
-zbx_vmware_key_value_t;
-ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
 ZBX_PTR_VECTOR_IMPL(vmware_key_value, zbx_vmware_key_value_t)
 
 /******************************************************************************
@@ -77,7 +70,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_key_value, zbx_vmware_key_value_t)
  * Purpose: frees resources allocated to store zbx_vmware_key_value_t         *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_key_value_free(zbx_vmware_key_value_t value)
+void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value)
 {
 	zbx_str_free(value.key);
 	zbx_str_free(value.value);
@@ -943,7 +936,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 	ret = SUCCEED;
 clean:
 	zbx_vector_vmware_tag_clear_ext(&tags, vmware_tag_free);
-	zbx_vector_vmware_key_value_clear_ext(&categories, vmware_key_value_free);
+	zbx_vector_vmware_key_value_clear_ext(&categories, zbx_vmware_key_value_free);
 	zbx_vector_vmware_tag_destroy(&tags);
 	zbx_vector_vmware_key_value_destroy(&categories);
 	curl_slist_free_all(headers);
