@@ -694,6 +694,7 @@ form {
 	}
 
 	.table-forms-td-left {
+		position: relative;
 		display: table-cell;
 		padding: 5px 0;
 		text-align: right;
@@ -710,6 +711,12 @@ form {
 			.icon {
 				margin-left: 5px;
 			}
+		}
+
+		.checkbox-radio {
+			right: 0;
+			margin-right: 0;
+			margin-left: 0;
 		}
 	}
 
@@ -765,6 +772,11 @@ form {
 		.wrap-multiple-controls {
 			display: flex;
 		}
+	}
+
+	.table-subforms {
+		margin-top: -5px;
+		margin-bottom: -5px;
 	}
 
 	h4 {
@@ -3273,6 +3285,7 @@ svg {
 
 	&.ui-sortable-disabled {
 		.drag-icon {
+			cursor: default;
 			color: $btn-icon-disabled-color;
 		}
 	}

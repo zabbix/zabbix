@@ -808,8 +808,10 @@ header {
     white-space: nowrap; }
     header .header-controls label {
       line-height: 24px; }
-    header .header-controls .radio-list-control label {
-      line-height: 1.2; }
+    header .header-controls .radio-list-control {
+      vertical-align: top; }
+      header .header-controls .radio-list-control label {
+        line-height: 1.2; }
     header .header-controls .zi-star,
     header .header-controls .zi-star-filled {
       padding: 0;
@@ -2179,6 +2181,12 @@ button {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+@page {
+  margin: 10px; }
+@media print {
+  .dashboard-page {
+    margin: 10px;
+    break-after: page; } }
 .diff {
   padding: 4px;
   background: #ebeef0; }
@@ -5071,6 +5079,7 @@ form.is-loading {
   .table-forms td {
     position: relative; }
   .table-forms .table-forms-td-left {
+    position: relative;
     display: table-cell;
     padding: 5px 0;
     text-align: right;
@@ -5084,6 +5093,10 @@ form.is-loading {
       .table-forms .table-forms-td-left label .btn-icon,
       .table-forms .table-forms-td-left label .icon {
         margin-left: 5px; }
+    .table-forms .table-forms-td-left .checkbox-radio {
+      right: 0;
+      margin-right: 0;
+      margin-left: 0; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
@@ -5109,6 +5122,9 @@ form.is-loading {
         padding-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
+  .table-forms .table-subforms {
+    margin-top: -5px;
+    margin-bottom: -5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -6722,6 +6738,7 @@ svg {
 .ui-sortable .td-drag-icon {
   width: 12px; }
 .ui-sortable.ui-sortable-disabled .drag-icon {
+  cursor: default;
   color: #ced6da; }
 
 #expressions_list .ui-sortable-helper {

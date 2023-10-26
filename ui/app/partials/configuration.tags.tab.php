@@ -35,120 +35,11 @@ if (!$data['readonly']) {
 
 // form list
 $form_grid = (new CFormGrid())->setId('tagsFormList');
-
-$table = (new CTable())
-	->addClass('tags-table')
-	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setHeader([
-		_('Name'),
-		_('Value'),
-		'',
-		$show_inherited_tags ? _('Parent templates') : null
-	]);
-
-$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-
-// fields
-foreach ($data['tags'] as $i => $tag) {
-	$tag += ['type' => ZBX_PROPERTY_OWN];
-
-	if ($with_automatic) {
-		$tag += ['automatic' => ZBX_TAG_MANUAL];
-	}
-
-	$readonly = $data['readonly']
-		|| ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED)
-		|| ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC);
-
-	$tag_input = (new CTextAreaFlexible('tags['.$i.'][tag]', $tag['tag'], ['readonly' => $readonly]))
-		->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-		->setAttribute('placeholder', _('tag'));
-
-	$tag_cell = [$tag_input];
-
-	if ($show_inherited_tags) {
-		$tag_cell[] = new CVar('tags['.$i.'][type]', $tag['type']);
-	}
-
-	if ($with_automatic) {
-		$tag_cell[] = new CVar('tags['.$i.'][automatic]', $tag['automatic']);
-	}
-
-	$value_input = (new CTextAreaFlexible('tags['.$i.'][value]', $tag['value'], ['readonly' => $readonly]))
-		->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-		->setAttribute('placeholder', _('value'));
-
-	$actions = [];
-
-	if ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
-		switch ($data['source']) {
-			case 'host':
-				$actions[] = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
-				break;
-		}
-	}
-	elseif ($show_inherited_tags && ($tag['type'] & ZBX_PROPERTY_INHERITED) != 0) {
-		$actions[] = (new CButton('tags['.$i.'][disable]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-disable')
-			->setEnabled(!$readonly);
-	}
-	else {
-		$actions[] = (new CButton('tags['.$i.'][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-			->setEnabled(!$readonly);
-	}
-
-	$row = [
-		(new CCol($tag_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($actions))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass(ZBX_STYLE_TOP)
-	];
-
-	if ($show_inherited_tags) {
-		$template_list = [];
-
-		if (array_key_exists('parent_templates', $tag)) {
-			CArrayHelper::sort($tag['parent_templates'], ['name']);
-
-			foreach ($tag['parent_templates'] as $templateid => $template) {
-				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
-					$template_link = (new CLink($template['name']))->setAttribute('data-templateid', $templateid);
-
-					($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype')
-						? $template_link->addClass('js-edit-template')
-						: $template_link->onClick('view.editTemplate(event, this.dataset.templateid);');
-
-					$template_list[] = $template_link;
-				}
-				else {
-					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
-				}
-
-				$template_list[] = ', ';
-			}
-
-			array_pop($template_list);
-		}
-
-		$row[] = $template_list;
-	}
-
-	$table->addRow($row, 'form_row');
-}
-
-// buttons
-$table->setFooter(new CCol(
-	(new CButton('tag_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-add')
-		->setEnabled(!$data['readonly'])
-));
+$table = new CPartial('tags.list.html', $data);
 
 if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
+	$label = null;
+
 	switch ($data['source']) {
 		case 'trigger':
 		case 'trigger_prototype':
@@ -162,8 +53,10 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 			break;
 
 		case 'item':
+			$label = new CLabel(_('Tags'));
+			$table = (new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
-			$on_change = 'this.form.submit()';
+			$on_change = null;
 			break;
 	}
 
@@ -175,6 +68,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 				->setModern()
 		)
 	);
+	$form_grid->addItem($label);
 }
 
 if ($field_label) {

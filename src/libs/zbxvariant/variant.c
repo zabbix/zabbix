@@ -260,7 +260,14 @@ static int	variant_to_ui64(zbx_variant_t *value)
 	zbx_del_zeros(buffer);
 
 	if (SUCCEED != zbx_is_uint64(buffer, &value_ui64))
-		return FAIL;
+	{
+		double	dbl;
+
+		if (SUCCEED != zbx_is_double(buffer, &dbl))
+			return FAIL;
+
+		value_ui64 = (zbx_uint64_t)dbl;
+	}
 
 	zbx_variant_clear(value);
 	zbx_variant_set_ui64(value, value_ui64);

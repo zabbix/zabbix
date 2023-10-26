@@ -68,7 +68,8 @@ class CMaintenanceHelper {
 				return zbx_date2str(DATE_TIME_FORMAT, $timeperiod['start_date']);
 
 			case TIMEPERIOD_TYPE_DAILY:
-				return _n('At %1$s every day', 'At %1$s every %2$s days', $formatted_start_time, $timeperiod['every']);
+				return _n('At %1$s every %2$s day', 'At %1$s every %2$s days', $formatted_start_time,
+					$timeperiod['every']);
 
 			case TIMEPERIOD_TYPE_WEEKLY:
 				$week_days = '';
@@ -82,7 +83,7 @@ class CMaintenanceHelper {
 					}
 				}
 
-				return _n('At %1$s %2$s of every week', 'At %1$s %2$s of every %3$s weeks', $formatted_start_time,
+				return _n('At %1$s %2$s of every %3$s week', 'At %1$s %2$s of every %3$s weeks', $formatted_start_time,
 					$week_days, $timeperiod['every']
 				);
 

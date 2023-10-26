@@ -1668,9 +1668,53 @@ static int	DBpatch_6050139(void)
 	return ret;
 }
 
+static int	DBpatch_6050140(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050141(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050142(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050143(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #define BACKSLASH_MATCH_PATTERN	"\\\\"
 
-static int	DBpatch_6050140(void)
+static int	DBpatch_6050144(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1820,7 +1864,7 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 	return SUCCEED;
 }
 
-static int	DBpatch_6050141(void)
+static int	DBpatch_6050145(void)
 {
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
@@ -1980,44 +2024,44 @@ clean:
 
 #undef BACKSLASH_MATCH_PATTERN
 
-static int	DBpatch_6050142(void)
+static int	DBpatch_6050146(void)
 {
 	return fix_expression_macro_escaping("scripts", "scriptid", "command", "script");
 }
 
-static int	DBpatch_6050143(void)
+static int	DBpatch_6050147(void)
 {
 	return fix_expression_macro_escaping("script_param", "script_paramid", "value", "script parameter");
 }
 
-static int	DBpatch_6050144(void)
+static int	DBpatch_6050148(void)
 {
 	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "message",
 			"media type message");
 }
 
-static int	DBpatch_6050145(void)
+static int	DBpatch_6050149(void)
 {
 	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "subject",
 			"media type subject");
 }
 
-static int	DBpatch_6050146(void)
+static int	DBpatch_6050150(void)
 {
 	return fix_expression_macro_escaping("opmessage", "operationid", "message", "action operation message");
 }
 
-static int	DBpatch_6050147(void)
+static int	DBpatch_6050151(void)
 {
 	return fix_expression_macro_escaping("opmessage", "operationid", "subject", "action operation subject");
 }
 
-static int	DBpatch_6050148(void)
+static int	DBpatch_6050152(void)
 {
 	return fix_expression_macro_escaping("triggers", "triggerid", "event_name", "event name of the trigger");
 }
 
-static int	DBpatch_6050149(void)
+static int	DBpatch_6050153(void)
 {
 	return fix_expression_macro_escaping("triggers", "triggerid", "description", "name of the trigger");
 }
@@ -2176,5 +2220,9 @@ DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
 DBPATCH_ADD(6050148, 0, 1)
 DBPATCH_ADD(6050149, 0, 1)
+DBPATCH_ADD(6050150, 0, 1)
+DBPATCH_ADD(6050151, 0, 1)
+DBPATCH_ADD(6050152, 0, 1)
+DBPATCH_ADD(6050153, 0, 1)
 
 DBPATCH_END()

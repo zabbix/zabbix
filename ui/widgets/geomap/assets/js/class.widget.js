@@ -532,7 +532,9 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	onEdit() {
-		this._map.severityFilterControl.close();
-		this._map.severityFilterControl.disable();
+		if (this._map !== null) {
+			this._map.severityFilterControl.close();
+			this._map.severityFilterControl.disable();
+		}
 	}
 }
