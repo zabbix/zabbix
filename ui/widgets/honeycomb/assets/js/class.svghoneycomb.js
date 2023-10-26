@@ -887,6 +887,9 @@ class CSVGHoneycomb {
 			.html('')
 			.datum(null)
 			.style('display', 'none');
+
+		this.#elements.popped_cell_simple = null;
+		this.#elements.popped_cell_static = null;
 	};
 
 	/**
@@ -899,41 +902,8 @@ class CSVGHoneycomb {
 			return;
 		}
 
-		const clicked_cell = e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL}`);
-		const clicked_on_popped_cell = !!e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED}`);
-		const clicked_on_other_cell = clicked_cell && this.#elements.popped_cell?.node() !== clicked_cell;
-
-		if (clicked_on_popped_cell) {
-			if (this.#elements.popped_cell_static === null) {
-				this.#elements.popped_cell_static = this.#elements.popped_cell_simple;
-
-				this.#elements.honeycomb_cells.on('mouseenter', null);
-				this.#elements.popped_cell.on('mouseleave', null);
-
-				const hostid = this.#elements.popped_cell.datum().hostid;
-				const itemid = this.#elements.popped_cell.datum().itemid;
-
-				this.#svg.node().dispatchEvent(new CustomEvent('cell.pop.out', {detail: {hostid, itemid}}));
-			}
-			else {
-				this.#popInCell();
-
-				this.#elements.popped_cell_simple = null;
-				this.#elements.popped_cell_static = null;
-
-				this.#elements.honeycomb_cells.on('mouseenter', (e) => this.#popOutCell(e.target));
-				this.#elements.popped_cell.on('mouseleave', () => this.#popInCell());
-
-				this.#svg.node().dispatchEvent(new CustomEvent('cell.pop.in'));
-			}
-		}
-		else if (clicked_on_other_cell) {
-			this.#elements.popped_cell_simple = d3.select(clicked_cell);
-
-			this.#popInCell();
-			this.#popOutCell(clicked_cell);
-
-			this.#elements.popped_cell_static = d3.select(clicked_cell);
+		const processClickOnCell = () => {
+			this.#elements.popped_cell_static = this.#elements.popped_cell_simple;
 
 			this.#elements.honeycomb_cells.on('mouseenter', null);
 			this.#elements.popped_cell.on('mouseleave', null);
@@ -942,11 +912,23 @@ class CSVGHoneycomb {
 			const itemid = this.#elements.popped_cell.datum().itemid;
 
 			this.#svg.node().dispatchEvent(new CustomEvent('cell.pop.out', {detail: {hostid, itemid}}));
-		}
-		else {
-			this.#popInCell();
+		};
 
-			this.#elements.popped_cell_static = null;
+		const clicked_cell = e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL}`);
+		const clicked_on_popped_cell = !!e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED}`);
+		const clicked_on_other_cell = clicked_cell && this.#elements.popped_cell?.node() !== clicked_cell;
+
+		if (clicked_on_popped_cell && this.#elements.popped_cell_static === null) {
+			processClickOnCell();
+		}
+		else if (clicked_on_other_cell) {
+			this.#popInCell();
+			this.#popOutCell(clicked_cell);
+
+			processClickOnCell();
+		}
+		else if (this.#elements.popped_cell_static !== null) {
+			this.#popInCell();
 
 			this.#elements.honeycomb_cells.on('mouseenter', (e) => this.#popOutCell(e.target));
 			this.#elements.popped_cell.on('mouseleave', () => this.#popInCell());
