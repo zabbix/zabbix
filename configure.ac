@@ -2051,6 +2051,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
@@ -2118,7 +2119,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_server/rtc/Makefile
 	src/zabbix_server/service/Makefile
-	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile

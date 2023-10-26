@@ -22,8 +22,12 @@
 
 #include "zbxthreads.h"
 
-extern char		*CONFIG_SNMPTRAP_FILE;
+typedef struct
+{
+	const char	*config_snmptrap_file;
+}
+zbx_thread_snmptrapper_args;
 
-ZBX_THREAD_ENTRY(snmptrapper_thread, args);
+ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args);
 
 #endif
