@@ -29,9 +29,13 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 class testDashboardPieChartWidget extends CWebTest
 {
 	protected static $dashboardid;
+	protected static $screenshot_host_id;
+	protected static $screenshot_host_items;
 	protected const TYPE_ITEM_PATTERN = 'Item pattern';
 	protected const TYPE_ITEM_LIST = 'Item list';
-	protected const HOST_NAME = 'Host for Pie charts';
+	protected const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
+	protected const HOST_NAME_SCREENSHOTS = 'Host for Pie chart screenshots';
+
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -51,7 +55,7 @@ class testDashboardPieChartWidget extends CWebTest
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
 				' VALUES (99999,1,\'web.dashboard.last_widget_type\',\'piechart\',3)');
 
-		// Create a dashboard for creating widgets.
+		// Create a Dashboard for creating widgets.
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Pie chart dashboard',
 			'auto_start' => 0,
@@ -62,27 +66,67 @@ class testDashboardPieChartWidget extends CWebTest
 		// Create a host for Pie chart testing.
 		$response = CDataHelper::createHosts([
 			[
-				'host' => self::HOST_NAME,
+				'host' => self::HOST_NAME_ITEM_LIST,
+				'groups' => [['groupid' => '6']]
+			],
+			[
+				'host' => self::HOST_NAME_SCREENSHOTS,
 				'groups' => [['groupid' => '6']]
 			]
 		]);
-		$host_id = $response['hostids'][self::HOST_NAME];
+		$host_id = $response['hostids'][self::HOST_NAME_ITEM_LIST];
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => $host_id,
 				'name' => 'item-1',
 				'key_' => 'key-1',
-				'type' => 2, // Zabbix trapper.
-				'value_type' => 3 // Unint.
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			[
 				'hostid' => $host_id,
 				'name' => 'item-2',
 				'key_' => 'key-2',
-				'type' => 2, // Zabbix trapper.
-				'value_type' => 3 // Unint.
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]
 		]);
+
+		self::$screenshot_host_id = $response['hostids'][self::HOST_NAME_SCREENSHOTS];
+		$response = CDataHelper::call('item.create', [
+			[
+				'hostid' => self::$screenshot_host_id,
+				'name' => 'item-1',
+				'key_' => 'key-1',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			[
+				'hostid' => self::$screenshot_host_id,
+				'name' => 'item-2',
+				'key_' => 'key-2',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			[
+				'hostid' => self::$screenshot_host_id,
+				'name' => 'item-3',
+				'key_' => 'key-3',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			[
+				'hostid' => self::$screenshot_host_id,
+				'name' => 'item-4',
+				'key_' => 'key-4',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
+		]);
+		self::$screenshot_host_items = [];
+		foreach([0, 1, 2, 3] as $id) {
+			self::$screenshot_host_items['item-'.($id + 1)] = $response['itemids'][$id];
+		}
 	}
 
 	public function getLayoutData() {
@@ -316,7 +360,7 @@ class testDashboardPieChartWidget extends CWebTest
 					'fields' => [
 						'Data set' => [
 							'type' => self::TYPE_ITEM_LIST,
-							'host' => self::HOST_NAME,
+							'host' => self::HOST_NAME_ITEM_LIST,
 							'items' => [
 								['name' =>'item-1']
 							]
@@ -344,7 +388,7 @@ class testDashboardPieChartWidget extends CWebTest
 							],
 							[
 								'type' => self::TYPE_ITEM_LIST,
-								'host' => self::HOST_NAME,
+								'host' => self::HOST_NAME_ITEM_LIST,
 								'Aggregation function' => 'max',
 								'Data set aggregation' => 'none',
 								'Data set label' => 'Label 2',
@@ -616,6 +660,83 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 	}
 
+	public function getChartScreenshotsData() {
+		return [
+			// No data.
+			[
+				[
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => '1', 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => '1', 'value' => 'item-1']
+					],
+					'item_data' => []
+				]
+			],
+			// One item, minimum fields.
+			[
+				[
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => '1', 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => '1', 'value' => 'item-1']
+					],
+					'item_data' => [
+						'item-1' => [
+							['value' => 99]
+						]
+					]
+				]
+			],
+		];
+	}
+
+	/**
+	 * Generate different Pie charts and assert the result with a screenshot.
+	 *
+	 * @dataProvider getChartScreenshotsData
+	 */
+	public function testDashboardPieChartWidget_ChartScreenshots($data) {
+		// Transform data provider data for creating the widget with API.
+
+		// Delete item history data in DB.
+		foreach ([1, 2, 3, 4] as $id) {
+			CDataHelper::removeItemData(self::$screenshot_host_items['item-'.$id]);
+		}
+
+		// Set the new item history data.
+		foreach($data['item_data'] as $item_key => $item_data) {
+			// One item may have more than one history record.
+			foreach ($item_data as $record) {
+				// Always minus 10 seconds for safety.
+				$time = time() - 10 + CTestArrayHelper::get($record, 'time');
+				CDataHelper::addItemData(self::$screenshot_host_items[$item_key], $record['value'], $time);
+			}
+		}
+
+		// Create the dashboard and widget.
+		CDataHelper::call('dashboard.update',
+			[
+				'dashboardid' => self::$dashboardid,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'name' => CTestArrayHelper::get($data, 'widget_name', ''),
+								'type' => 'piechart',
+								'width' => 12,
+								'height' => 8,
+								'fields' => $data['widget_fields']
+							]
+						]
+					]
+				]
+			]
+		);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+
+		//sleep(5);
+	}
+
 	/**
 	 * Take screenshot of the edit form, but only in the 'create' test to avoid excessive screenshots.
 	 *
@@ -687,21 +808,9 @@ class testDashboardPieChartWidget extends CWebTest
 								'name' => $widget_name,
 								'type' => 'piechart',
 								'fields' => [
-									[
-										'type' => '1',
-										'name' => 'ds.0.hosts.0',
-										'value' => 'Test Host'
-									],
-									[
-										'type' => '1',
-										'name' => 'ds.0.items.0',
-										'value' => 'Test Items'
-									],
-									[
-										'type' => '1',
-										'name' => 'ds.0.color',
-										'value' => 'FF465C'
-									],
+									['name' => 'ds.0.hosts.0', 'type' => '1', 'value' => 'Test Host'],
+									['name' => 'ds.0.items.0', 'type' => '1', 'value' => 'Test Items'],
+									['name' => 'ds.0.color', 'type' => '1', 'value' => 'FF465C'],
 								]
 							]
 						]
