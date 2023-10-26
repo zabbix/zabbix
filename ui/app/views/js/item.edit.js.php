@@ -225,7 +225,7 @@ window.item_edit_form = new class {
 					}
 
 					if (url.pairs.length) {
-						const dynamic_rows = jQuery('#query-fields-table').dynamicRows();
+						const dynamic_rows = jQuery('#query-fields-table').data('dynamicRows');
 
 						dynamic_rows.addRows(url.pairs);
 						dynamic_rows.removeRows(row => [].filter.call(
