@@ -460,19 +460,13 @@ static void	results_free(zbx_discoverer_results_t *result)
 	zbx_free(result);
 }
 
-static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck, const char *ip,
-		unsigned char *need_resolve, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
+static void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 {
 	const char		*start;
-	zbx_uint64_t		checks_count = 0;
-	zbx_vector_portrange_t	port_ranges;
 
-	zbx_vector_portrange_create(&port_ranges);
-
-	for (start = dcheck->ports; '\0' != *start;)
+	for (start = ports; '\0' != *start;)
 	{
 		char		*comma, *last_port;
-		int		port;
 		zbx_range_t	r;
 
 		if (NULL != (comma = strchr(start, ',')))
@@ -488,50 +482,7 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *
 		else
 			r.from = r.to = atoi(start);
 
-		zbx_vector_portrange_append(&port_ranges, r);
-
-		for (port = r.from; port <= r.to; port++)
-		{
-			zbx_discoverer_task_t	task_local, *task;
-			int		i;
-
-			if (0 == *queue_capacity)
-				return checks_count;
-
-			for (i = 0; i < port_ranges.values_num -1; i++)
-			{
-				if (port >= port_ranges.values[i].from && port <= port_ranges.values[i].to)
-					break;
-			}
-
-			if (i != port_ranges.values_num -1)	/* skipping port from overlapping ranges */
-				continue;
-
-			task_local.addr_type = DISCOVERY_ADDR_IP;
-			task_local.addr.ip = (char *)ip;
-			task_local.port = (unsigned short)port;
-
-			if (NULL == (task = zbx_hashset_search(tasks, &task_local)))
-			{
-				task_local.addr.ip = zbx_strdup(NULL, ip);
-				task_local.unique_dcheckid = drule->unique_dcheckid;
-				task_local.resolve_dns = *need_resolve;
-
-				if (1 == *need_resolve)
-					*need_resolve = 0;
-
-				zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
-				zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
-				zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
-			}
-			else
-			{
-				zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck);
-			}
-
-			(*queue_capacity)--;
-			checks_count++;
-		}
+		zbx_vector_portrange_append(ranges, r);
 
 		if (NULL != comma)
 		{
@@ -540,6 +491,47 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *
 		}
 		else
 			break;
+	}
+}
+
+static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck, const char *ip,
+		unsigned char *need_resolve, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
+{
+	int			port = 0;
+	zbx_uint64_t		checks_count = 0;
+	zbx_vector_portrange_t	port_ranges;
+
+	zbx_vector_portrange_create(&port_ranges);
+	dcheck_port_ranges_get(dcheck->ports, &port_ranges);
+
+	while (SUCCEED == zbx_portrange_uniq_next(port_ranges.values, port_ranges.values_num, &port))
+	{
+		zbx_discoverer_task_t	task_local, *task;
+
+		task_local.addr_type = DISCOVERY_ADDR_IP;
+		task_local.addr.ip = (char *)ip;
+		task_local.port = (unsigned short)port;
+
+		if (NULL == (task = zbx_hashset_search(tasks, &task_local)))
+		{
+			task_local.addr.ip = zbx_strdup(NULL, ip);
+			task_local.unique_dcheckid = drule->unique_dcheckid;
+			task_local.resolve_dns = *need_resolve;
+
+			if (1 == *need_resolve)
+				*need_resolve = 0;
+
+			zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
+			zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
+			zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
+		}
+		else
+		{
+			zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck);
+		}
+
+		(*queue_capacity)--;
+		checks_count++;
 	}
 
 	zbx_vector_portrange_destroy(&port_ranges);
@@ -1503,6 +1495,61 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_
 			hr_dst->num_data);
 }
 
+static void	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max)
+{
+	zbx_vector_portrange_t	port_ranges;
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " dchecks:%d worker_max:%d", log_worker_id,
+			__func__, druleid, task->dchecks.values_num, worker_max);
+
+	if (DISCOVERY_ADDR_RANGE != task->addr_type)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "range checks failed with error: address type is out of range");
+		return;
+	}
+
+
+	zbx_vector_portrange_create(&port_ranges);
+	*ip = '\0';
+
+	while (SUCCEED == zbx_iprange_uniq_next(task->addr.ipranges->values, task->addr.ipranges->values_num,
+			ip, sizeof(ip)))
+	{
+//		zbx_discoverer_results_t	cmp, *dst, *src;
+		int				i, port;
+//		zbx_uint64_t 			hostcheck_count;
+		zbx_dc_dcheck_t			*dcheck;
+
+		for (i = 0; i < task->dchecks.values_num; i++)
+		{
+			dcheck = task->dchecks.values[i];
+			dcheck_port_ranges_get(dcheck->ports, &port_ranges);
+			port = 0;
+
+			while (SUCCEED == zbx_portrange_uniq_next(port_ranges.values, port_ranges.values_num, &port))
+			{
+				switch (dcheck->type)
+				{
+				case SVC_SNMPv1:
+				case SVC_SNMPv2c:
+				case SVC_SNMPv3:
+					//discover_snmp(dcheck, ip, port, &result);
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_WARNING, "dcheck is not supported:%u", dcheck->type);
+				}
+			}
+
+			zbx_vector_portrange_clear(&port_ranges);
+		}
+	}
+
+	zbx_vector_portrange_destroy(&port_ranges);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+}
+
 static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
@@ -1671,8 +1718,10 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			if (DISCOVERY_ADDR_IP == task->addr_type)
 				discoverer_net_check_common(druleid, task);
-			else
+			else if (SVC_ICMPPING == task->dchecks.values[0]->type)
 				discoverer_net_check_icmp(druleid, task, worker_max);
+			else
+				discoverer_net_check_range(druleid, task, worker_max);
 
 			discoverer_task_free(task);
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_IDLE);

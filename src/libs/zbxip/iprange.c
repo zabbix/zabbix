@@ -480,8 +480,8 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
  *             ip       - [IN/OUT] string with current address from IP range  *
  *             len      - [IN] size of string buffer for ip address           *
  *                                                                            *
- * Return value: string with next IP address was returned successfully        *
- *               NULL    - no more addresses in specified ranges              *
+ * Return value: SUCCEED - next IP address was in specified range             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len)
@@ -522,6 +522,7 @@ int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip
 
 	return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if IP address is in specified range                        *
@@ -582,4 +583,58 @@ zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange)
 		volume -= 2;
 
 	return volume;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets next unique port value from specified range                  *
+ *                                                                            *
+ * Parameters: ranges - [IN] array of port ranges                             *
+ *             num    - [IN] size of port ranges array                        *
+ *             port   - [IN/OUT] port with current value from port range      *
+ *                                                                            *
+ * Return value: SUCCEED - next port value was in specified range             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_portrange_uniq_next(const zbx_range_t *ranges, const int num, int *port)
+{
+	static ZBX_THREAD_LOCAL int	idx, current_port;
+	int				i;
+
+	if (0 == num)
+		return FAIL;
+
+	if (0 == *port)
+	{
+		idx = 0;
+		current_port = ranges[idx].from;
+		*port = current_port;
+		return SUCCEED;
+	}
+
+	if (num == idx)
+		return FAIL;
+
+	do
+	{
+		if (++current_port > ranges[idx].to)
+		{
+			if (++idx == num)
+				return FAIL;
+
+			current_port = ranges[idx].from;
+		}
+
+		for (i = 0; i < idx; i++)
+		{
+			if (current_port >= ranges[i].from && current_port <= ranges[i].to)
+				break;
+		}
+	}
+	while (i != idx);	/* skipping port from overlapping port ranges */
+
+	*port  = current_port;
+
+	return SUCCEED;
 }

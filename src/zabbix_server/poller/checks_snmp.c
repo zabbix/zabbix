@@ -3196,7 +3196,6 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 				SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot process event base"));
 				errcodes[j] = CONFIG_ERROR;
 			}
-
 		}
 
 		evdns_base_free(dnsbase, 0);

@@ -65,6 +65,7 @@ int	zbx_iprange_parse(zbx_iprange_t *iprange, const char *address);
 void	zbx_iprange_first(const zbx_iprange_t *iprange, int *address);
 int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address);
 int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len);
+int	zbx_portrange_uniq_next(const zbx_range_t *ranges, const int num, int *port);
 
 int	zbx_iprange_validate(const zbx_iprange_t *iprange, const int *address);
 zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange);
