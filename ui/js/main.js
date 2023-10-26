@@ -883,10 +883,6 @@ function getConditionFormula(conditions, evalType) {
 	 * @param options
 	 */
 	$.fn.dynamicRows = function(options) {
-		if ('dynamicRows' in $(this).data()) {
-			return $(this).data('dynamicRows');
-		}
-
 		options = $.extend({}, {
 			template: '',
 			row: '.form_row',
