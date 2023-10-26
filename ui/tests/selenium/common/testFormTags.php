@@ -977,7 +977,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$this->query(($object === 'item') ? 'name:item_list' : 'xpath://table[@class="list-table"]')->asTable()->one()
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()
 				->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
@@ -1162,7 +1162,14 @@ class testFormTags extends CWebTest {
 			$field_name = (strpos($object, 'prototype') !== false) ? str_replace(' prototype', '', $object) : $object;
 		}
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
-		$this->page->waitUntilReady();
+
+		if ($object === 'web scenario') {
+			$this->page->waitUntilReady();
+		}
+		else {
+			COverlayDialogElement::find()->one()->waitUntilReady();
+		}
+
 		$tags_table->checkValue($this->prepareAllTags($data['tags'], $parent_tags));
 
 		// Check disabled inherited tags from host or template on created element.
@@ -1221,7 +1228,14 @@ class testFormTags extends CWebTest {
 			$field_name = (strpos($object, 'prototype') !== false) ? str_replace(' prototype', '', $object) : $object;
 		}
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
-		$this->page->waitUntilReady();
+
+		if ($object === 'web scenario') {
+			$this->page->waitUntilReady();
+		}
+		else {
+			COverlayDialogElement::find()->one()->waitUntilReady();
+		}
+
 		$tags_table->checkValue($this->prepareAllTags($data['tags'], array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS)));
 
 		// Check empty column "Parent templates" except for inherited unique template tags.

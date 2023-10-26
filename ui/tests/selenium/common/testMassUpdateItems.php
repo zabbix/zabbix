@@ -1458,17 +1458,11 @@ class testMassUpdateItems extends CWebTest{
 							break;
 
 						case 'Master item':
-							if ($prototypes) {
-								$this->assertEquals(self::HOST_NAME.': '.$value['value'],
-										$form->query('xpath://input[@id="master_itemname"]')->one()->getValue()
-								);
-							}
-							else {
-								$this->assertEquals([self::HOST_NAME.': '.$value['value']],
-										$form->query('xpath://*[@id="master_itemid"]/..')->asMultiselect()->one()->getValue()
-								);
-							}
+							$this->assertEquals([self::HOST_NAME.': '.$value['value']],
+									$form->query('xpath://*[@id="master_itemid"]/..')->asMultiselect()->one()->getValue()
+							);
 							break;
+
 						case 'Value mapping':
 							$this->assertEquals([$value['value']],
 									$form->query('xpath://*[@id="'.$value['id'].'"]/..')->asMultiselect()->one()->getValue()
