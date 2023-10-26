@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 13:43+0300\n"
+"POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-09-27 08:09+0000\n"
 "Last-Translator: tomass.olups <tomass.olups@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -13646,6 +13646,14 @@ msgstr "Novo host"
 msgid "New host group"
 msgstr "Novo grupo de hosts"
 
+#: app/views/item.edit.php:218
+msgid "New item"
+msgstr ""
+
+#: app/views/item.prototype.edit.php:191
+msgid "New item prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
@@ -21490,6 +21498,10 @@ msgstr "Matriz de tags do datastore da VMware, \"url\" - URL do serviço da VMwa
 #: include/classes/data/CItemData.php:1848
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
 msgstr "Estatísticas de gravação do armazenamento de dados da VMware, \"url\" - URL do serviço da VMware, \"datastore\" - nome do armazenamento de dados, \"mode\" - latência/maxlatência - média ou máxima"
+
+#: include/classes/data/CItemData.php:1890
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"

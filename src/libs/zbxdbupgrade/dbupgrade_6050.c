@@ -1666,6 +1666,50 @@ static int	DBpatch_6050139(void)
 
 static int	DBpatch_6050140(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050141(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050142(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050143(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050144(void)
+{
 	const zbx_db_table_t	table =
 			{"item_rtname", "itemid", 0,
 				{
@@ -1680,14 +1724,14 @@ static int	DBpatch_6050140(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050141(void)
+static int	DBpatch_6050145(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_rtname", 1, &field);
 }
 
-static int	DBpatch_6050142(void)
+static int	DBpatch_6050146(void)
 {
 	if (ZBX_DB_OK <= zbx_db_execute("insert into item_rtname (itemid,name_resolved,name_resolved_upper)"
 			" select i.itemid,i.name,i.name_upper from"
@@ -1702,27 +1746,27 @@ static int	DBpatch_6050142(void)
 	return FAIL;
 }
 
-static int	DBpatch_6050143(void)
+static int	DBpatch_6050147(void)
 {
 	return DBdrop_index("items", "items_9");
 }
 
-static int	DBpatch_6050144(void)
+static int	DBpatch_6050148(void)
 {
 	return DBdrop_field("items", "name_upper");
 }
 
-static int	DBpatch_6050145(void)
+static int	DBpatch_6050149(void)
 {
 	return DBdrop_trigger("items_name_upper_insert", "items");
 }
 
-static int	DBpatch_6050146(void)
+static int	DBpatch_6050150(void)
 {
 	return DBdrop_trigger("items_name_upper_update", "items");
 }
 
-static int	DBpatch_6050147(void)
+static int	DBpatch_6050151(void)
 {
 	return DBdrop_function("items_name_upper_upper");
 }
@@ -1879,5 +1923,9 @@ DBPATCH_ADD(6050144, 0, 1)
 DBPATCH_ADD(6050145, 0, 1)
 DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
+DBPATCH_ADD(6050148, 0, 1)
+DBPATCH_ADD(6050149, 0, 1)
+DBPATCH_ADD(6050150, 0, 1)
+DBPATCH_ADD(6050151, 0, 1)
 
 DBPATCH_END()

@@ -19,7 +19,7 @@
 
 #include "report_writer.h"
 
-#include "../alerter/alerter.h"
+#include "zbxalerter.h"
 #include "report_protocol.h"
 
 #include "zbxalgo.h"

@@ -423,6 +423,18 @@
 			this.openHostPopup({hostid});
 		},
 
+		editItem(target, data) {
+			clearMessages();
+
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
 		openHostPopup(host_data) {
 			clearMessages();
 
