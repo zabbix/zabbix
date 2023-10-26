@@ -196,23 +196,19 @@ class CControllerItemEdit extends CControllerItem {
 				'output' => ['valuemapid', 'name', 'hostid'],
 				'valuemapids' => [$item['valuemapid']]
 			]);
-			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
+			$valuemap = $valuemap ? reset($valuemap) : [];
 
-			if ($item['valuemap'] && $this->getInput('templateid', 0)) {
-				$host_valuemap = API::ValueMap()->get([
+			if ($valuemap && $valuemap['hostid'] != $host['hostid']) {
+				$valuemap = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name', 'hostid'],
-					'search' => ['name' => $item['valuemap']['name']],
+					'search' => ['name' => $valuemap['name']],
 					'filter' => ['hostid' => $host['hostid']]
 				]);
-
-				if ($host_valuemap) {
-					$item['valuemap'] = reset($host_valuemap);
-					$item['valuemapid'] = $item['valuemap']['valuemapid'];
-				}
-				else {
-					$item['valuemapid'] = 0;
-				}
+				$valuemap = $valuemap ? reset($valuemap) : [];
 			}
+
+			$item['valuemap'] = $valuemap;
+			$item['valuemapid'] = $valuemap ? $valuemap['valuemapid'] : 0;
 		}
 
 		if ($item['master_itemid']) {
