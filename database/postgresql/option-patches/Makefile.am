@@ -6,11 +6,11 @@ all: $(PATCHES)
 
 history_pk_prepare.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
 	$(top_srcdir)/create/bin/gen_history_pk.pl postgresql > $@
-endif
-
-EXTRA_DIST = $(PATCHES)
 
 clean:
 	rm -f history_pk_prepare.sql
+endif
+
+EXTRA_DIST = $(PATCHES)
 
 .PHONY: all clean

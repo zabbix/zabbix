@@ -91,7 +91,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers and graphs are not linked to the template anymore
-		$this->zbxTestClickXpathWait("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]");
+		$this->zbxTestClickXpathWait("//a[contains(@href,'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D=".$hostid."')]");
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
@@ -149,7 +149,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
-		$this->zbxTestClickXpathWait("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]");
+		$this->zbxTestClickXpathWait("//a[contains(@href,'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D=".$hostid."')]");
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent($template.':');
 

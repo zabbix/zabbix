@@ -448,7 +448,7 @@ function saveItemTestInputs() {
 	input_values.macros = macros;
 
 	<?php if ($data['step_obj'] == -2): ?>
-		$test_obj = jQuery('.tfoot-buttons');
+		$test_obj = jQuery('.overlay-dialogue-footer');
 	<?php elseif ($data['step_obj'] == -1): ?>
 		$test_obj = jQuery('.preprocessing-list-foot', jQuery('#preprocessing'));
 	<?php else: ?>

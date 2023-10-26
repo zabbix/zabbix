@@ -359,8 +359,7 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('description');
 		$this->zbxTestAssertAttribute("//textarea[@id='description']", 'rows', 7);
 
-		$form = $this->query('id:trigger-form')->asForm(['normalized' => true])->one();
-		$entry_name = $form->getField('id:url_name');
+		$entry_name = $dialog->asForm()->getField('Menu entry name');
 
 		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
 			$this->assertEquals($value, $entry_name->getAttribute($attribute));

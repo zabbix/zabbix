@@ -198,7 +198,7 @@ func GetCounterDouble(path string) (value *float64, err error) {
 	if err = win32.PdhCollectQueryData(query); err != nil {
 		return
 	}
-	return win32.PdhGetFormattedCounterValueDouble(counter)
+	return win32.PdhGetFormattedCounterValueDouble(counter, 2)
 }
 
 func GetCounterInt64(path string) (value *int64, err error) {

@@ -313,6 +313,16 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
 		editHost(hostid) {
 			const host_data = {hostid};
 

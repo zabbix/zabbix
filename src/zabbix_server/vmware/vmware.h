@@ -346,10 +346,20 @@ typedef struct
 {
 	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
 	unsigned char	skip_old;	/* skip old event log records */
+#define ZBX_VMWARE_EVTLOG_SEVERITY_ERR		"error"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_WARN		"warning"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_INFO		"info"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_USER		"user"
+	unsigned char	severity;	/* bitmask for the event query filter */
+	zbx_hashset_t	evt_severities;	/* severity for event types */
 	unsigned char	oom;		/* no enough memory to store new events */
 	zbx_uint64_t	req_sz;		/* memory size required to store events */
 }
 zbx_vmware_eventlog_state_t;
+
+#define ZBX_VMWARE_EVTLOG_SEVERITIES								\
+		ZBX_VMWARE_EVTLOG_SEVERITY_ERR, ZBX_VMWARE_EVTLOG_SEVERITY_WARN,		\
+		ZBX_VMWARE_EVTLOG_SEVERITY_INFO, ZBX_VMWARE_EVTLOG_SEVERITY_USER
 
 /* the vmware event data */
 typedef struct
@@ -703,6 +713,15 @@ ZBX_HTTPPAGE;
 /* cURL specific attribute to prevent the use of "Expect" directive */
 /* according to RFC 7231/5.1.1 if xml request is larger than 1k */
 #define ZBX_XML_HEADER3		"Expect:"
+
+typedef struct
+{
+	char	*key;
+	char	*value;
+}
+zbx_vmware_key_value_t;
+ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
+void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
 
 char	*vmware_shared_strdup(const char *str);
 void	vmware_shared_strfree(char *str);

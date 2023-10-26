@@ -20,7 +20,7 @@
 #ifndef ZABBIX_REPORT_PROTOCOL_H
 #define ZABBIX_REPORT_PROTOCOL_H
 
-#include "../alerter/alerter.h"
+#include "zbxalerter.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 

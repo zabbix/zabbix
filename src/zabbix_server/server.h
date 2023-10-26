@@ -19,13 +19,6 @@
 
 #ifndef ZABBIX_SERVER_H
 #define ZABBIX_SERVER_H
-/* media type statuses */
-#define MEDIA_TYPE_STATUS_ACTIVE	0
-#define MEDIA_TYPE_STATUS_DISABLED	1
-
-/* media statuses */
-#define MEDIA_STATUS_ACTIVE	0
-#define MEDIA_STATUS_DISABLED	1
 
 /* normal and recovery operations */
 #define ZBX_OPERATION_MODE_NORMAL	0
