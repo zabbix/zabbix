@@ -103,7 +103,7 @@ void	zbx_mock_test_entry(void **state)
 	time_new = time(&time_new);
 	localtime_r(&time_new, &ltm);
 	returned_value = zbx_malloc(returned_value, FMTTIME_INPUT_SIZE);
-	zbx_snprintf(returned_value, FMTTIME_INPUT_SIZE, "%.4d-%.2d-%.2dT%.2d:%.2d:%.2d%s", ltm.tm_year + 1900,
+	zbx_snprintf(returned_value, FMTTIME_INPUT_SIZE, "%.4d-%.2d-%.2dT%.2d:%.2d:%.2d", ltm.tm_year + 1900,
 			ltm.tm_mon + 1, ltm.tm_mday, ltm.tm_hour, ltm.tm_min, ltm.tm_sec);
 
 	returned_ret = zbx_calculate_macro_function(macro_expr, &token, &returned_value);
