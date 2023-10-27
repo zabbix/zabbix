@@ -24,10 +24,13 @@ package smart
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"zabbix.com/pkg/zbxcmd"
 )
+
+var nonAlphanumericRegex = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 
 func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 	path := "smartctl"
@@ -56,4 +59,8 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 	}
 
 	return []byte(out), nil
+}
+
+func clearString(str string) string {
+	return nonAlphanumericRegex.ReplaceAllString(str, "")
 }

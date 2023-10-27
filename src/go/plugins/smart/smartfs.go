@@ -448,7 +448,7 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	defer r.wg.Done()
 
 	for name := range r.names {
-		devices, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j", name), false)
+		devices, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j", clearString(name)), false)
 		if err != nil {
 			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 			return
@@ -510,7 +510,7 @@ runner:
 				name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
 			}
 
-			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
+			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", clearString(name)), false)
 			if err != nil {
 				r.plugin.Tracef(
 					"stopped looking for RAID devices of %s type, err: %s",
@@ -581,7 +581,7 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 
 		name := fmt.Sprintf("%s -d %s", raid.name, raid.rType)
 
-		device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
+		device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", clearString(name)), false)
 		if err != nil {
 			r.plugin.Tracef(
 				"failed to get megaraid device with name %s, %s", name, err.Error(),
