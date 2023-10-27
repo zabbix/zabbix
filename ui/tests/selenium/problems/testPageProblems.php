@@ -419,7 +419,7 @@ class testPageProblems extends CWebTest {
 					'check_actions' => [
 						[
 							[
-								'Time' => '2018-08-07 08:05:35 AM',
+								'Time' => '2018-08-07 08:05:35',
 								'User/Recipient' => 'Admin (Zabbix Administrator)',
 								'Action' => '',
 								'Message/Command' => '',
@@ -473,7 +473,7 @@ class testPageProblems extends CWebTest {
 						false,
 						[
 							[
-								'Time' => '2018-08-07 08:05:35 AM',
+								'Time' => '2018-08-07 08:05:35',
 								'User/Recipient' => 'Admin (Zabbix Administrator)',
 								'Action' => '',
 								'Message/Command' => '',
@@ -1363,10 +1363,13 @@ class testPageProblems extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Check table contents before filtering. Show timeline is true by default, that's why there is one additional row.
-		$start_rows_count = $table->getRows()->count() - 1;
+		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
+		$form->fill(['id:show_timeline_0' => false]);
+		$form->submit();
+		$table->waitUntilReloaded();
+		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
-		$start_contents = $table->getRows()->asText();
+		$start_contents = $this->getTableColumnData('Problem');
 
 		// Filter some problems.
 		$form->invalidate();
@@ -1385,9 +1388,13 @@ class testPageProblems extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 
-		$reset_count = $table->getRows()->count() - 1;
+		$form->fill(['id:show_timeline_0' => false]);
+		$form->submit();
+		$table->waitUntilReloaded();
+
+		$reset_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_count);
 		$this->assertTableStats($reset_count);
-		$this->assertEquals($start_contents, $table->getRows()->asText());
+		$this->assertEquals($start_contents, $this->getTableColumnData('Problem'));
 	}
 }
