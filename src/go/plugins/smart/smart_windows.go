@@ -24,6 +24,7 @@ package smart
 
 import (
 	"fmt"
+	"os/exec"
 	"time"
 
 	"zabbix.com/pkg/zbxcmd"
@@ -37,6 +38,11 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 
 	var out string
 	var err error
+
+	_, err = exec.LookPath(path)
+	if err != nil {
+		return nil, err
+	}
 
 	executable := fmt.Sprintf("%s %s", path, args)
 
