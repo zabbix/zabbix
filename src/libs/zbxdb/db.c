@@ -400,11 +400,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-#if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
-	bool		mysql_reconnect = 1;
-#else
-	my_bool		mysql_reconnect = 1;
-#endif
 	int		err_no = 0;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
@@ -1505,7 +1500,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			err_no = (int)mysql_errno(conn);
 
-			if (0 < mysql_err_cnt++ || 0 < txn_level && 0 == txn_begin ||
+			if (0 < mysql_err_cnt++ || (0 < txn_level && 0 == txn_begin) ||
 					FAIL  == is_inhibited_mysql_error(err_no))
 			{
 				errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
@@ -1533,7 +1528,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				{
 					err_no = (int)mysql_errno(conn);
 
-					if (0 < mysql_err_cnt++ || 0 < txn_level && 0 == txn_begin ||
+					if (0 < mysql_err_cnt++ || (0 < txn_level && 0 == txn_begin) ||
 							FAIL  == is_inhibited_mysql_error(err_no))
 					{
 						errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
@@ -1695,7 +1690,7 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 		{
 			int err_no = (int)mysql_errno(conn);
 
-			if (0 < mysql_err_cnt++ || 0 < txn_level && 0 == txn_begin ||
+			if (0 < mysql_err_cnt++ || (0 < txn_level && 0 == txn_begin) ||
 					FAIL  == is_inhibited_mysql_error(err_no))
 				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
