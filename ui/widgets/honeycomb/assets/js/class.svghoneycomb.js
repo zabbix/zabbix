@@ -340,24 +340,27 @@ class CSVGHoneycomb {
 	 * Adjust size of honeycomb.
 	 */
 	#adjustSize() {
-		let honeycomb_width = this.#radius_inner * 2 * this.#column_count
-			+ this.#cells_gap * this.#column_count
-			- this.#cells_gap;
+		const getHoneycombSize = () => {
+			let width = this.#radius_inner * 2 * this.#column_count
+				+ this.#cells_gap * this.#column_count
+				- this.#cells_gap;
 
-		if (this.#row_count > 1 && this.#cells_data_structured[1]?.length === this.#column_count) {
-			// Take into account width of half cell of even rows.
-			honeycomb_width += this.#radius_inner + this.#cells_gap / 2;
-		}
+			if (this.#row_count > 1 && this.#cells_data_structured[1]?.length === this.#column_count) {
+				// Take into account width of half cell of even rows.
+				width += this.#radius_inner + this.#cells_gap / 2;
+			}
 
-		let honeycomb_height = this.#radius_outer * 2 * this.#row_count
-			- this.#radius_outer / 2 * (this.#row_count - 1)
-			+ this.#cells_gap * this.#row_count
-			- this.#cells_gap;
+			let height = this.#radius_outer * 2 * this.#row_count
+				- this.#radius_outer / 2 * (this.#row_count - 1)
+				+ this.#cells_gap * this.#row_count
+				- this.#cells_gap;
 
-		let box_width = honeycomb_width;
-		let box_height = honeycomb_height;
+			return {width, height};
+		};
 
-		this.#scale = Math.min(this.#width / box_width, this.#height / box_height);
+		let honeycomb_size = getHoneycombSize();
+
+		this.#scale = Math.min(this.#width / honeycomb_size.width, this.#height / honeycomb_size.height);
 
 		// Offset for pop out.
 		const scale_offset = this.#radius_outer * this.#scale / 0.4 / 10000;
@@ -374,26 +377,26 @@ class CSVGHoneycomb {
 
 				let cells_gap_new = cell_min_radius_outer / 10;
 
-				let row_count_new = Math.floor(this.#height / (cell_min_radius_outer * 2 + cells_gap_new / 2));
-				if (row_count_new < 1) {
-					row_count_new = 1;
+				this.#row_count = Math.floor(this.#height / (cell_min_radius_outer * 2 + cells_gap_new / 2));
+				if (this.#row_count < 1) {
+					this.#row_count = 1;
 				}
 
-				let col_count_new = Math.floor(this.#width / ((cell_min_radius_inner * 2 + cells_gap_new / 2) + cell_min_radius_inner + cells_gap_new / 2));
-				if (col_count_new < 1) {
-					col_count_new = 1;
+				this.#column_count = Math.floor(this.#width / ((cell_min_radius_inner * 2 + cells_gap_new / 2) + cell_min_radius_inner + cells_gap_new / 2));
+				if (this.#column_count < 1) {
+					this.#column_count = 1;
 				}
 
-				const cell_count_new = row_count_new * col_count_new;
-				const cells_data_structured_new = [];
+				const cell_count = this.#row_count * this.#column_count;
+				this.#cells_data_structured = [];
 
-				for (let i = 0; i < cell_count_new; i += col_count_new) {
-					const row = this.#cells_data.slice(i, i + col_count_new);
-					cells_data_structured_new.push(row);
+				for (let i = 0; i < cell_count; i += this.#column_count) {
+					const row = this.#cells_data.slice(i, i + this.#column_count);
+					this.#cells_data_structured.push(row);
 				}
 
-				if (this.#cells_data.length > cell_count_new) {
-					cells_data_structured_new[row_count_new - 1][col_count_new - 1] = {
+				if (this.#cells_data.length > cell_count) {
+					this.#cells_data_structured[this.#row_count - 1][this.#column_count - 1] = {
 						itemid: 'other',
 						primary_label: '',
 						secondary_label: ''
@@ -402,7 +405,7 @@ class CSVGHoneycomb {
 
 				this.#elements.honeycomb_container.html('');
 
-				this.#drawCells(cells_data_structured_new);
+				this.#drawCells(this.#cells_data_structured);
 
 				const font_size = 1000;
 				const position_y = font_size / 2;
@@ -420,31 +423,16 @@ class CSVGHoneycomb {
 					.attr('transform', `translate(0 ${position_y})`)
 					.style('font-size', `${font_size}px`);
 
-				honeycomb_width = this.#radius_inner * 2 * col_count_new
-					+ this.#cells_gap * col_count_new
-					- this.#cells_gap;
-
-				if (row_count_new > 1 && cells_data_structured_new[1]?.length === col_count_new) {
-					// Take into account width of half cell of even rows
-					honeycomb_width += this.#radius_inner + this.#cells_gap / 2;
-				}
-
-				honeycomb_height = this.#radius_outer * 2 * row_count_new
-					- this.#radius_outer / 2 * (row_count_new - 1)
-					+ this.#cells_gap * row_count_new
-					- this.#cells_gap;
-
-				box_width = honeycomb_width;
-				box_height = honeycomb_height;
+				honeycomb_size = getHoneycombSize();
 			}
 		}
 
 		const position_start_x = this.#radius_inner * this.#scale;
-		const position_centered_x = this.#width / 2 - box_width * this.#scale / 2;
+		const position_centered_x = this.#width / 2 - honeycomb_size.width * this.#scale / 2;
 		const x = position_start_x + position_centered_x;
 
 		const position_start_y = this.#radius_outer * this.#scale;
-		const position_centered_y = this.#height / 2 - box_height * this.#scale / 2;
+		const position_centered_y = this.#height / 2 - honeycomb_size.height * this.#scale / 2;
 		const y = position_start_y + position_centered_y;
 
 		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${this.#scale})`);
