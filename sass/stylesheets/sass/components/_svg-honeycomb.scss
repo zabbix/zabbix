@@ -13,9 +13,12 @@
 		fill: $honeycomb-cell-no-data-color;
 	}
 
-	.svg-honeycomb-cell-no-data text,
-	.svg-honeycomb-cell-other text {
+	.svg-honeycomb-cell-no-data text {
 		text-anchor: middle;
+		fill: $honeycomb-label-no-data-color;
+	}
+
+	.svg-honeycomb-cell-other-ellipsis circle {
 		fill: $honeycomb-label-no-data-color;
 	}
 }

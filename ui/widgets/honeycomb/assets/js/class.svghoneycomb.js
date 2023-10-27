@@ -27,6 +27,7 @@ class CSVGHoneycomb {
 	static ZBX_STYLE_CELL_NO_DATA =				'svg-honeycomb-cell-no-data';
 	static ZBX_STYLE_CELL_POPPED =				'svg-honeycomb-cell-popped';
 	static ZBX_STYLE_CELL_OTHER =				'svg-honeycomb-cell-other';
+	static ZBX_STYLE_CELL_OTHER_ELLIPSIS =		'svg-honeycomb-cell-other-ellipsis';
 	static ZBX_STYLE_LABEL =					'svg-honeycomb-label';
 	static ZBX_STYLE_LABEL_PRIMARY =			'svg-honeycomb-label-primary';
 	static ZBX_STYLE_LABEL_SECONDARY =			'svg-honeycomb-label-secondary';
@@ -790,8 +791,6 @@ class CSVGHoneycomb {
 	 * Draw "other" cell that indicates that all cells do not fit in available space in widget.
 	 */
 	#drawOtherCell() {
-		const font_size = 1000;
-
 		const other = this.#svg
 			.select(`.${CSVGHoneycomb.ZBX_STYLE_CELL_OTHER}`);
 
@@ -799,10 +798,20 @@ class CSVGHoneycomb {
 			.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL}`)
 			.remove();
 
-		other
-			.append('svg:text')
-			.text('...')
-			.style('font-size', `${font_size}px`);
+		const radius = this.#radius_inner / 10;
+		const offset = radius * 4;
+
+		const ellipsis = other
+			.append('svg:g')
+			.attr('class', CSVGHoneycomb.ZBX_STYLE_CELL_OTHER_ELLIPSIS)
+			.attr('transform', `translate(${-offset} 0)`);
+
+		for (let i = 0; i < 3; i++) {
+			ellipsis
+				.append('svg:circle')
+				.attr('r', radius)
+				.attr('cx', offset * i);
+		}
 	}
 
 	/**

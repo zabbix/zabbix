@@ -3507,9 +3507,10 @@ section {
 .svg-honeycomb .svg-honeycomb-cell-no-data path,
 .svg-honeycomb .svg-honeycomb-cell-other path {
   fill: #111111; }
-.svg-honeycomb .svg-honeycomb-cell-no-data text,
-.svg-honeycomb .svg-honeycomb-cell-other text {
+.svg-honeycomb .svg-honeycomb-cell-no-data text {
   text-anchor: middle;
+  fill: #cacaca; }
+.svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
   fill: #cacaca; }
 
 .filter-container.tabfilter-container {
