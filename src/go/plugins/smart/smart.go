@@ -59,7 +59,7 @@ type Plugin struct {
 var impl Plugin
 
 // Allow only alphanumeric, hyphens and underscores, but dis-allow hyphens and underscores at the end of the string
-var cleanRegex = regexp.MustCompile(`^[A-Za-z0-9]([A-Za-z0-9_-]*[A-Za-z0-9])?$`)
+var cleanRegex = regexp.MustCompile(`[^a-zA-Z0-9 -_]+`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -145,9 +145,12 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
+	fmt.Println("p", params)
+
 	for k, v := range params {
 		params[k] = clearString(v)
 	}
+	fmt.Println("p clean", params)
 
 	switch len(params) {
 	case twoParameters:
