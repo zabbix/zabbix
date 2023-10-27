@@ -407,21 +407,7 @@ class CSVGHoneycomb {
 
 				this.#drawCells(this.#cells_data_structured);
 
-				const font_size = 1000;
-				const position_y = font_size / 2;
-
-				const other = this.#svg
-					.select(`.${CSVGHoneycomb.ZBX_STYLE_CELL_OTHER}`);
-
-				other
-					.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL}`)
-					.remove();
-
-				other
-					.append('svg:text')
-					.text('...')
-					.attr('transform', `translate(0 ${position_y})`)
-					.style('font-size', `${font_size}px`);
+				this.#drawOtherCell();
 
 				honeycomb_size = getHoneycombSize();
 			}
@@ -813,6 +799,25 @@ class CSVGHoneycomb {
 		adjust_labels_width(primary, 'primary_label');
 		adjust_labels_width(secondary, 'secondary_label');
 	};
+
+	/**
+	 * Draw "other" cell that indicates that all cells do not fit in available space in widget.
+	 */
+	#drawOtherCell() {
+		const font_size = 1000;
+
+		const other = this.#svg
+			.select(`.${CSVGHoneycomb.ZBX_STYLE_CELL_OTHER}`);
+
+		other
+			.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL}`)
+			.remove();
+
+		other
+			.append('svg:text')
+			.text('...')
+			.style('font-size', `${font_size}px`);
+	}
 
 	/**
 	 * Pop out (enlarge) cell from its initial position.
