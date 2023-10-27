@@ -6889,6 +6889,8 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_strpool_replace(found, &connector->ssl_key_password, row[17]);
 		ZBX_STR2UCHAR(connector->status, row[18]);
 		ZBX_STR2UCHAR(connector->tags_evaltype, row[19]);
+		connector->item_value_type = atoi(row[20]);
+		dc_strpool_replace(found, &connector->attempt_delay, row[21]);
 	}
 
 	/* remove deleted connectors */
@@ -6908,6 +6910,7 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_strpool_release(connector->ssl_cert_file);
 		dc_strpool_release(connector->ssl_key_file);
 		dc_strpool_release(connector->ssl_key_password);
+		dc_strpool_release(connector->attempt_delay);
 
 		zbx_hashset_remove_direct(&config->connectors, connector);
 	}

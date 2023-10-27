@@ -86,6 +86,7 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_free(connector->ssl_key_file_orig);
 	zbx_free(connector->ssl_key_password);
 	zbx_free(connector->ssl_key_password_orig);
+	zbx_free(connector->attempt_delay);
 	zbx_list_destroy(&connector->data_point_link_queue);
 	zbx_hashset_destroy(&connector->data_point_links);
 }

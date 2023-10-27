@@ -828,6 +828,7 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 				continue;
 
 			connector_filter_dest = connector_filters_history;
+			connector_filter.item_value_type = dc_connector->item_value_type;
 		}
 		else
 			connector_filter_dest = connector_filters_events;
@@ -963,6 +964,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 					dc_connector->ssl_key_password);
 			connector->ssl_key_password = zbx_strdup(connector->ssl_key_password,
 					dc_connector->ssl_key_password);
+			connector->attempt_delay = zbx_strdup(connector->attempt_delay, dc_connector->attempt_delay);
 		}
 
 		*connector_revision = config->revision.connector;

@@ -60,15 +60,24 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
+#define ATTEMPT_DELAY_MAX	10
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200";
 	zbx_http_context_t	context;
-	int			ret, timeout_seconds;
+	int			ret, timeout_seconds, attempt_delay_sec;
 
 	zbx_http_context_create(&context);
 
 	if (FAIL == zbx_is_time_suffix(connector.timeout, &timeout_seconds, (int)strlen(connector.timeout)))
 	{
 		error = zbx_dsprintf(NULL, "Invalid timeout: %s", connector.timeout);
+		ret = FAIL;
+		goto skip;
+	}
+
+	if (FAIL == zbx_is_time_suffix(connector.attempt_delay, &attempt_delay_sec,
+			(int)strlen(connector.attempt_delay)) || 10 < attempt_delay_sec)
+	{
+		error = zbx_dsprintf(NULL, "Invalid attempt delay: %s", connector.attempt_delay);
 		ret = FAIL;
 		goto skip;
 	}
@@ -81,7 +90,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 			HTTP_STORE_RAW, config_source_ip, &error)))
 	{
 		long		response_code;
-		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context);
+		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_delay_sec, 1);
 
 		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code,
 				&out, &error)))
@@ -132,6 +141,7 @@ skip:
 	}
 
 	zbx_http_context_destroy(&context);
+#undef ATTEMPT_DELAY_MAX
 #else
 	ZBX_UNUSED(config_source_ip);
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");
@@ -149,6 +159,7 @@ skip:
 	zbx_free(connector.ssl_cert_file);
 	zbx_free(connector.ssl_key_file);
 	zbx_free(connector.ssl_key_password);
+	zbx_free(connector.attempt_delay);
 
 	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_CONNECTOR_RESULT, NULL, 0))
 	{

@@ -896,6 +896,8 @@ typedef struct
 	int				status;
 	int				tags_evaltype;
 	zbx_vector_dc_connector_tag_t	tags;
+	int				item_value_type;
+	const char			*attempt_delay;
 }
 zbx_dc_connector_t;
 

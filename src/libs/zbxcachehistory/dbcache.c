@@ -1263,6 +1263,41 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
+static int	match_item_value_type_by_mask(int mask, zbx_history_sync_item_t *item)
+{
+#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT	0x01
+#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR	0x02
+#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG	0x04
+#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64	0x08
+#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT	0x10
+	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT) && item->value_type == ITEM_VALUE_TYPE_FLOAT) {
+		return SUCCEED;
+	}
+
+	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR) && item->value_type == ITEM_VALUE_TYPE_STR) {
+		return SUCCEED;
+	}
+
+	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG) && item->value_type == ITEM_VALUE_TYPE_LOG) {
+		return SUCCEED;
+	}
+
+	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64) && item->value_type == ITEM_VALUE_TYPE_UINT64) {
+		return SUCCEED;
+	}
+
+	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT) && item->value_type == ITEM_VALUE_TYPE_TEXT) {
+		return SUCCEED;
+	}
+
+	return FAIL;
+#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT
+#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR
+#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG
+#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64
+#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: export history                                                    *
@@ -1321,7 +1356,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
-				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
+				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].item_value_type,
+						item) && SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
 						&connector_filters->values[k].connector_tags, &item_info->item_tags))
 				{
 					zbx_vector_uint64_append(&connector_object.ids,
@@ -1335,7 +1371,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 		zbx_json_clean(&json);
 
-		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
