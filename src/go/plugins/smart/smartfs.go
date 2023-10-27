@@ -451,6 +451,7 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 		err := clearString(name)
 		if err != nil {
 			r.err <- zbxerr.ErrorCannotFetchData.Wrap(err)
+
 			return
 		}
 
