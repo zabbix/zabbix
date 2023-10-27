@@ -60,6 +60,7 @@ class CControllerTriggerDelete extends CController {
 
 		if ($result) {
 			$output['success']['title'] = _n('Trigger deleted', 'Triggers deleted', $triggers_count);
+			$output['success']['action'] = 'delete';
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');

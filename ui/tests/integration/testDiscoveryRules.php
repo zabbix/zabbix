@@ -114,12 +114,12 @@ class testDiscoveryRules extends CIntegrationTest {
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_DRULE,
+						'conditiontype' => ZBX_CONDITION_TYPE_DRULE,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$discoveryRuleId
 					],
 					[
-						'conditiontype' => CONDITION_TYPE_DSTATUS,
+						'conditiontype' => ZBX_CONDITION_TYPE_DSTATUS,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => DOBJECT_STATUS_UP
 					]

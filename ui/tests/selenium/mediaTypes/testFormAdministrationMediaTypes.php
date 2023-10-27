@@ -176,7 +176,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		foreach ($session_settings as $setting => $visible) {
 			$concurrent_sessions->fill($setting);
-			$maxsessions = $concurrent_sessions->query('xpath:./../../input[@id="maxsessions"]')->one();
+			$maxsessions = $form->getFieldContainer('Concurrent sessions')->query('id:maxsessions')->one();
 			$this->assertTrue($maxsessions->isVisible($visible));
 
 			if ($visible) {

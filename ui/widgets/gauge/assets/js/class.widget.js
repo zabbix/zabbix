@@ -68,8 +68,8 @@ class CWidgetGauge extends CWidget {
 
 		const value_data = {
 			value: response.value,
-			value_text: response.value_text,
-			units_text: response.units_text
+			value_text: response.value_text || null,
+			units_text: response.units_text || null
 		};
 
 		if (this.gauge !== null) {
