@@ -1244,6 +1244,52 @@ class testPageProblems extends CWebTest {
 						['Problem' => '1_trigger_Not_classified']
 					]
 				]
+			],
+			// #38 Unacknowledged.
+			[
+				[
+					'fields' => [
+						'Severity' => 'Warning',
+						'Acknowledgement status' => 'Unacknowledged',
+						'id:show_timeline_0' => false
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority'],
+						['Problem' => 'First test trigger with tag priority'],
+						['Problem' => '1_trigger_Warning']
+					]
+				]
+			],
+			// #39 Acknowledged.
+			[
+				[
+					'fields' => [
+						'Acknowledgement status' => 'Acknowledged',
+						'id:show_timeline_0' => false
+					],
+					'result' => [
+						['Problem' => '4_trigger_Average'],
+						['Problem' => '3_trigger_Average'],
+						['Problem' => '2_trigger_Information']
+					]
+				]
+			],
+			// #40 Acknowledged by me.
+			[
+				[
+					'fields' => [
+						'Acknowledgement status' => 'Acknowledged',
+						'id:acknowledged_by_me_0' => true,
+						'id:show_timeline_0' => false
+					],
+					'result' => [
+						['Problem' => '3_trigger_Average'],
+						['Problem' => '2_trigger_Information']
+					]
+				]
 			]
 		];
 	}
@@ -1252,7 +1298,7 @@ class testPageProblems extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageProblems_Filter($data) {
-		$this->page->login()->open('zabbix.php?action=problem.view&show_timeline=0&filter_reset=1&sort=clock&sortorder=ASC');
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
