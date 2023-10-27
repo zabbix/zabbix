@@ -490,6 +490,101 @@ final class CItemData {
 	}
 
 	/**
+	 * Returns sets of elements (DOM IDs) to set visible, disabled, when a 'parent' field value is changed.
+	 *
+	 * @return array
+	 */
+	public static function filterSwitchingConfiguration(): array {
+		$all_item_types = -1;
+
+		return [
+			'for_type' => [
+				$all_item_types => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_CALCULATED => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_DB_MONITOR => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_DEPENDENT => [],
+				ITEM_TYPE_EXTERNAL => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_HTTPAGENT => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_INTERNAL => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_IPMI => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_JMX => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SCRIPT => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SIMPLE => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SNMP => [
+					'js-filter-snmp-oid-label',
+					'js-filter-snmp-oid-field',
+					'filter_snmp_oid',
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SNMPTRAP => [],
+				ITEM_TYPE_SSH => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_TELNET => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_TRAPPER => [],
+				ITEM_TYPE_ZABBIX => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_ZABBIX_ACTIVE => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				]
+			]
+		];
+	}
+
+	/**
 	 * Returns sets of elements (DOM IDs, default field values, dependent option values) to set visible,
 	 * disabled, or set value of, when a 'parent' field value is changed.
 	 *
@@ -498,6 +593,39 @@ final class CItemData {
 	 * @return array
 	 */
 	public static function fieldSwitchingConfiguration(array $data): array {
+		if ($data['is_discovery_rule']) {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey'
+				]
+			];
+		}
+		else {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PASSWORD => [
+					'js-item-password-label',
+					'js-item-password-field',
+					'password'
+				],
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey',
+					'js-item-passphrase-label',
+					'js-item-passphrase-field',
+					'passphrase'
+				]
+			];
+		}
+
 		return [
 			// Ids to toggle when the field 'type' is changed.
 			'for_type' => [
@@ -795,16 +923,7 @@ final class CItemData {
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.
-			'for_authtype' => [
-				ITEM_AUTHTYPE_PUBLICKEY => [
-					'js-item-private-key-label',
-					'js-item-private-key-field',
-					'privatekey',
-					'js-item-public-key-label',
-					'js-item-public-key-field',
-					'publickey'
-				]
-			],
+			'for_authtype' => $for_authtype,
 			'for_http_auth_type' => [
 				ZBX_HTTP_AUTH_BASIC => [
 					'js-item-http-username-label',

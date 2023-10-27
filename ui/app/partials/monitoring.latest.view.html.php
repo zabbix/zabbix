@@ -307,10 +307,10 @@ foreach ($data['items'] as $itemid => $item) {
 $button_list = [
 	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph'), 'attributes' => ['data-required' => 'graph']],
 	GRAPH_TYPE_NORMAL => ['name' => _('Display graph'), 'attributes' => ['data-required' => 'graph']],
-	'item.masscheck_now' => [
+	'item.execute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
-			->onClick('view.massCheckNow(this);')
 			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massexecute-item')
 			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	]

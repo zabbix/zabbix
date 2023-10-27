@@ -46,22 +46,19 @@ $form = (new CForm())
  */
 $trigger_form_list = (new CFormList('trigger-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[priority]', 'priority-div', _('Original')))
+		(new CVisibilityBox('visible[priority]', 'priority', _('Original')))
 			->setLabel(_('Severity'))
 			->setAttribute('autofocus', 'autofocus'),
-		(new CDiv(
-			new CSeverity('priority', 0)
-		))->setId('priority-div')
+		(new CSeverity('priority'))->setId('priority')
 	)
 	->addRow(
-		(new CVisibilityBox('visible[manual_close]', 'manual-close-div', _('Original')))
+		(new CVisibilityBox('visible[manual_close]', 'manual-close', _('Original')))
 			->setLabel(_('Allow manual close')),
-		(new CDiv(
-			(new CRadioButtonList('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED))
-				->addValue(_('No'), ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
-				->addValue(_('Yes'), ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-				->setModern(true)
-		))->setId('manual-close-div')
+		(new CRadioButtonList('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED))
+			->setId('manual-close')
+			->addValue(_('No'), ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+			->addValue(_('Yes'), ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			->setModern(true)
 	);
 
 /*
@@ -69,7 +66,7 @@ $trigger_form_list = (new CFormList('trigger-form-list'))
  */
 $tags_form_list = (new CFormList('tags-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -80,7 +77,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass('tags-table')
-		]))->setId('tags-div')
+		]))->setId('tags-field')
 	);
 
 /*
@@ -171,9 +168,9 @@ if ($data['context'] === 'template') {
 }
 
 $dependencies_form_list->addRow(
-	(new CVisibilityBox('visible[dependencies]', 'dependencies-div', _('Original')))
+	(new CVisibilityBox('visible[dependencies]', 'dependencies-field', _('Original')))
 		->setLabel(_('Replace dependencies')),
-	(new CDiv([$dependencies_table, new CHorList($buttons)]))->setId('dependencies-div')
+	(new CDiv([$dependencies_table, new CHorList($buttons)]))->setId('dependencies-field')
 );
 
 // Append tabs to the form.
