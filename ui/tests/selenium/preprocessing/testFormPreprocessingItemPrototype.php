@@ -78,7 +78,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Prometheus to JSON LLD macro in parameter 1 ',
+						'Name' => 'Prometheus to JSON LLD macro in parameter 1',
 						'Key' => 'json-parameter-macro-1[{#KEY}]'
 					],
 					'preprocessing' => [
