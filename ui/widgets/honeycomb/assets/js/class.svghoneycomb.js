@@ -360,7 +360,7 @@ class CSVGHoneycomb {
 		this.#scale = Math.min(this.#width / box_width, this.#height / box_height);
 
 		// Offset for pop out.
-		const scale_offset = this.#radius_outer * this.#scale / 1.3 / 10000;
+		const scale_offset = this.#radius_outer * this.#scale / 0.4 / 10000;
 
 		this.#scale -= scale_offset;
 
@@ -870,7 +870,7 @@ class CSVGHoneycomb {
 			.duration(200)
 			.ease(d3.easeLinear)
 			.styleTween('filter', () =>
-				(t) => `drop-shadow(0 0 ${this.#radius_outer / 5}px rgba(0, 0, 0, ${0.5 * t}))`
+				(t) => `drop-shadow(0 0 ${this.#radius_outer / 10}px rgba(0, 0, 0, ${0.5 * t}))`
 			);
 
 		this.#elements.popped_cell
