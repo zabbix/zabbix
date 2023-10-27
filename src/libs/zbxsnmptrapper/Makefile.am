@@ -3,8 +3,7 @@
 noinst_LIBRARIES = libzbxsnmptrapper.a
 
 libzbxsnmptrapper_a_SOURCES = \
-	snmptrapper.c \
-	snmptrapper.h
+	snmptrapper.c
 
 libzbxsnmptrapper_a_CFLAGS = \
 	$(TLS_CFLAGS)
