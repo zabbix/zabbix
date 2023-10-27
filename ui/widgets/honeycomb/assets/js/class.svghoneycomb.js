@@ -917,12 +917,14 @@ class CSVGHoneycomb {
 
 		const clicked_cell = e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL}`);
 		const clicked_on_popped_cell = !!e.target.closest(`.${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED}`);
-		const clicked_on_other_cell = clicked_cell && this.#elements.popped_cell?.node() !== clicked_cell;
+		const clicked_on_another_cell = clicked_cell
+			&& this.#elements.popped_cell?.node() !== clicked_cell
+			&& !clicked_cell.classList.contains(CSVGHoneycomb.ZBX_STYLE_CELL_OTHER);
 
 		if (clicked_on_popped_cell && this.#elements.popped_cell_static === null) {
 			processClickOnCell();
 		}
-		else if (clicked_on_other_cell) {
+		else if (clicked_on_another_cell) {
 			this.#popInCell();
 			this.#popOutCell(clicked_cell);
 
