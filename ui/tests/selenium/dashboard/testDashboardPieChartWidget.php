@@ -660,14 +660,14 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 	}
 
-	public function getChartScreenshotsData() {
+	public function getPieChartDisplayData() {
 		return [
 			// No data.
 			[
 				[
 					'widget_fields' => [
-						['name' => 'ds.0.hosts.0', 'type' => '1', 'value' => self::HOST_NAME_SCREENSHOTS],
-						['name' => 'ds.0.items.0', 'type' => '1', 'value' => 'item-1']
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1']
 					],
 					'item_data' => []
 				]
@@ -676,13 +676,41 @@ class testDashboardPieChartWidget extends CWebTest
 			[
 				[
 					'widget_fields' => [
-						['name' => 'ds.0.hosts.0', 'type' => '1', 'value' => self::HOST_NAME_SCREENSHOTS],
-						['name' => 'ds.0.items.0', 'type' => '1', 'value' => 'item-1']
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1']
 					],
 					'item_data' => [
 						'item-1' => [
 							['value' => 99]
 						]
+					],
+					'expected_sectors' => [
+						'item-1' => ['value' => '99', 'color' => 'rgb(255, 70, 92)']
+					]
+				]
+			],
+			// Two items, small values.
+			[
+				[
+					'widget_name' => 'Two items',
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-3'],
+						['name' => 'ds.0.items.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-4'],
+						['name' => 'legend_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1]
+					],
+					'item_data' => [
+						'item-3' => [
+							['value' => 0.0000004]
+						],
+						'item-4' => [
+							['value' => 0.0000001]
+						]
+					],
+					'expected_legend_function' => 'last',
+					'expected_sectors' => [
+						'item-3' => ['value' => '0.0000004', 'color' => 'rgb(255, 70, 92)'],
+						'item-4' => ['value' => '0.0000001', 'color' => 'rgb(255, 197, 219)']
 					]
 				]
 			],
@@ -690,11 +718,11 @@ class testDashboardPieChartWidget extends CWebTest
 	}
 
 	/**
-	 * Generate different Pie charts and assert the result with a screenshot.
+	 * Generate different Pie charts and assert the display.
 	 *
-	 * @dataProvider getChartScreenshotsData
+	 * @dataProvider getPieChartDisplayData
 	 */
-	public function testDashboardPieChartWidget_ChartScreenshots($data) {
+	public function testDashboardPieChartWidget_PieChartDisplay($data) {
 		// Transform data provider data for creating the widget with API.
 
 		// Delete item history data in DB.
@@ -712,7 +740,7 @@ class testDashboardPieChartWidget extends CWebTest
 			}
 		}
 
-		// Create the dashboard and widget.
+		// Recreate the dashboard and create the widget.
 		CDataHelper::call('dashboard.update',
 			[
 				'dashboardid' => self::$dashboardid,
@@ -733,8 +761,47 @@ class testDashboardPieChartWidget extends CWebTest
 		);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$widget = $dashboard->getWidgets()->first();
+		$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilReady()->all()->asArray();
 
-		//sleep(5);
+		// Assert expected sectors.
+		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item => $expected_sector) {
+			// The name that should be shown in the legend and in the hintbox.
+			$legend_name = self::HOST_NAME_SCREENSHOTS.': '.$item;
+
+			// If the aggregation function is shown in the legend.
+			if (CTestArrayHelper::get($data, 'expected_legend_function')) {
+				$legend_name = CTestArrayHelper::get($data, 'expected_legend_function').'('.$legend_name.')';
+			}
+
+			// Check if any of the sectors matches the expected sector.
+			foreach ($sectors as $sector) {
+				$hintbox_html = $sector->getAttribute('data-hintbox-contents');
+
+				// Find matching sector by inspecting the 'data-hintbox-contents'.
+				if (strpos($hintbox_html, $legend_name)) {
+					// Assert hintbox value.
+					$matches = [];
+					preg_match('/<span class="svg-pie-chart-hintbox-value">(.*?)<\/span>/', $hintbox_html, $matches);
+					$this->assertEquals($expected_sector['value'], $matches[1]);
+
+					// Assert hintbox legend color.
+					preg_match('/background-color: (.*?);/', $hintbox_html, $matches);
+					$this->assertEquals($expected_sector['color'], $matches[1]);
+
+					// Assert sector fill color.
+					preg_match('/fill: (.*?);/', $sector->getAttribute('style'), $matches);
+					$this->assertEquals($expected_sector['color'], $matches[1]);
+
+					// Match successful check the next expected sector.
+					continue 2;
+				}
+			}
+
+			// Fail test if no match found.
+			throw new Exception('Expected sector for '.$item.' not found.');
+		}
 	}
 
 	/**
@@ -808,9 +875,9 @@ class testDashboardPieChartWidget extends CWebTest
 								'name' => $widget_name,
 								'type' => 'piechart',
 								'fields' => [
-									['name' => 'ds.0.hosts.0', 'type' => '1', 'value' => 'Test Host'],
-									['name' => 'ds.0.items.0', 'type' => '1', 'value' => 'Test Items'],
-									['name' => 'ds.0.color', 'type' => '1', 'value' => 'FF465C'],
+									['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
+									['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Items'],
+									['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF465C'],
 								]
 							]
 						]
