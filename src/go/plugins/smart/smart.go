@@ -22,6 +22,7 @@ package smart
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -56,6 +57,8 @@ type Plugin struct {
 }
 
 var impl Plugin
+
+var nonAlphanumericRegex = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -429,6 +432,10 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	}
 
 	return ssdType
+}
+
+func clearString(str string) string {
+	return nonAlphanumericRegex.ReplaceAllString(str, "")
 }
 
 func init() {
