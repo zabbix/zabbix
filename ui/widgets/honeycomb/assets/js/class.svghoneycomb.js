@@ -369,7 +369,10 @@ class CSVGHoneycomb {
 					this.#row_count = 1;
 				}
 
-				this.#column_count = Math.floor(this.#width / ((cell_min_radius_inner * 2 + cells_gap_new / 2) + cell_min_radius_inner + cells_gap_new / 2));
+				this.#column_count = Math.floor(
+					this.#width
+					/ ((cell_min_radius_inner * 2 + cells_gap_new / 2) + cell_min_radius_inner + cells_gap_new / 2)
+				);
 				if (this.#column_count < 1) {
 					this.#column_count = 1;
 				}
@@ -410,8 +413,10 @@ class CSVGHoneycomb {
 
 		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${this.#scale})`);
 
-		const labels_primary = this.#elements.honeycomb_container.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY}`);
-		const labels_secondary = this.#elements.honeycomb_container.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_SECONDARY}`);
+		const labels_primary = this.#elements.honeycomb_container
+			.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY}`);
+		const labels_secondary = this.#elements.honeycomb_container
+			.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_SECONDARY}`);
 
 		const check_labels_height = (labels, font_size) => {
 			const node = labels.node();
@@ -434,14 +439,16 @@ class CSVGHoneycomb {
 
 		this.#positionLabels(labels_primary, labels_secondary);
 
-		if ((labels_primary.node() && isVisible(labels_primary.node())) && (!labels_secondary.node() || !isVisible(labels_secondary.node()))) {
+		if ((labels_primary.node() && isVisible(labels_primary.node()))
+				&& (!labels_secondary.node() || !isVisible(labels_secondary.node()))) {
 			let label_primary_position_y = this.#label_primary_font_size / 2;
 			label_primary_position_y -= this.#label_primary_font_size / 2 * (this.#label_primary_line_count - 1);
 
 			labels_primary.attr('transform', `translate(0 ${label_primary_position_y})`);
 		}
 
-		if ((!labels_primary.node() || !isVisible(labels_primary.node())) && (labels_secondary.node() && isVisible(labels_secondary.node()))) {
+		if ((!labels_primary.node() || !isVisible(labels_primary.node()))
+				&& (labels_secondary.node() && isVisible(labels_secondary.node()))) {
 			let label_secondary_position_y = this.#label_secondary_font_size / 2;
 			label_secondary_position_y -= this.#label_secondary_font_size / 2 * (this.#label_secondary_line_count - 1);
 
@@ -550,7 +557,9 @@ class CSVGHoneycomb {
 
 				return result;
 			})
-			.attr('transform', (d, index) => `translate(${(this.#radius_inner * 2 * index) + (this.#cells_gap * index)} 0)`)
+			.attr('transform', (d, index) =>
+				`translate(${(this.#radius_inner * 2 * index) + (this.#cells_gap * index)} 0)`
+			)
 			.on('mouseenter', (e) => this.#popOutCell(e.target));
 
 		this.#elements.honeycomb_cells
@@ -586,7 +595,8 @@ class CSVGHoneycomb {
 					else if (value >= curr[threshold_type] && value < next?.[threshold_type]) {
 						if (apply_interpolation) {
 							// Position [0..1] of cell value between two adjacent thresholds
-							const position = (value - curr[threshold_type]) / (next[threshold_type] - curr[threshold_type]);
+							const position = (value - curr[threshold_type])
+								/ (next[threshold_type] - curr[threshold_type]);
 
 							const colorRgb = d3.interpolateRgb(`#${curr.color}`, `#${next.color}`)(position);
 
@@ -703,15 +713,19 @@ class CSVGHoneycomb {
 				this.#label_primary_font_size = this.#config.primary_label.size * 10;
 			}
 			else {
-				this.#label_primary_font_size = getAutoLabelSize(primary, 'primary_label', CSVGHoneycomb.LABEL_PRIMARY_SIZE_DEFAULT);
+				this.#label_primary_font_size = getAutoLabelSize(
+					primary,
+					'primary_label',
+					CSVGHoneycomb.LABEL_PRIMARY_SIZE_DEFAULT
+				);
 			}
 
 			if (this.#config.secondary_label.show) {
 				label_primary_position_y = -this.#radius_outer / 2 + this.#label_primary_font_size;
 			}
 			else {
-				label_primary_position_y = this.#label_primary_font_size / 2;
-				label_primary_position_y -= this.#label_primary_font_size / 2 * (this.#label_primary_line_count - 1);
+				label_primary_position_y = this.#label_primary_font_size / 2
+					- this.#label_primary_font_size / 2 * (this.#label_primary_line_count - 1);
 			}
 
 			primary
@@ -727,17 +741,23 @@ class CSVGHoneycomb {
 			if (this.#config.secondary_label.is_custom_size) {
 				this.#label_secondary_font_size = this.#config.secondary_label.size * 10;
 
-				if (this.#config.primary_label.show && this.#config.primary_label.size + this.#config.secondary_label.size > 100) {
+				if (this.#config.primary_label.show
+						&& this.#config.primary_label.size + this.#config.secondary_label.size > 100) {
 					this.#label_secondary_font_size = (100 - this.#config.primary_label.size) * 10;
 				}
 			}
 			else {
-				this.#label_secondary_font_size = getAutoLabelSize(secondary, 'secondary_label', CSVGHoneycomb.LABEL_SECONDARY_SIZE_DEFAULT);
+				this.#label_secondary_font_size = getAutoLabelSize(
+					secondary,
+					'secondary_label',
+					CSVGHoneycomb.LABEL_SECONDARY_SIZE_DEFAULT
+				);
 			}
 
 			if (this.#config.primary_label.show) {
-				label_secondary_position_y = this.#radius_outer / 2;
-				label_secondary_position_y -= this.#label_secondary_font_size / 2 * (this.#label_secondary_line_count - 1);
+				label_secondary_position_y = this.#radius_outer / 2
+					- this.#label_secondary_font_size / 2 * (this.#label_secondary_line_count - 1);
+
 			}
 			else {
 				label_secondary_position_y = this.#label_secondary_font_size / 2;
@@ -760,8 +780,12 @@ class CSVGHoneycomb {
 			if (total_height < this.#radius_outer) {
 				const offset = (this.#radius_outer - total_height) / 3;
 
-				primary.attr('transform', `translate(0 ${label_primary_position_y + offset / this.#label_primary_line_count / 2})`);
-				secondary.attr('transform', `translate(0 ${label_secondary_position_y - offset / this.#label_secondary_line_count / 2})`);
+				primary.attr('transform',
+					`translate(0 ${label_primary_position_y + offset / this.#label_primary_line_count / 2})`
+				);
+				secondary.attr('transform',
+					`translate(0 ${label_secondary_position_y - offset / this.#label_secondary_line_count / 2})`
+				);
 			}
 		}
 
