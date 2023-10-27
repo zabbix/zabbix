@@ -155,20 +155,6 @@ class CSVGHoneycomb {
 	#elements = {};
 
 	/**
-	 * X value of transform translate attribute of popped cell.
-	 *
-	 * @type {number}
-	 */
-	#popped_translate_x = 0;
-
-	/**
-	 * Y value of transform translate attribute of popped cell.
-	 *
-	 * @type {number}
-	 */
-	#popped_translate_y = 0;
-
-	/**
 	 * Line count of primary label.
 	 *
 	 * @type {number}
@@ -825,35 +811,32 @@ class CSVGHoneycomb {
 	 * @param {Element} target  Cell element to pop out.
 	 */
 	#popOutCell(target) {
-		const cell = d3.select(target);
-
-		if (cell.classed(CSVGHoneycomb.ZBX_STYLE_CELL_OTHER)) {
+		if (target.classList.contains(CSVGHoneycomb.ZBX_STYLE_CELL_OTHER)) {
 			return;
 		}
 
-		this.#elements.popped_cell_simple = cell;
+		this.#elements.popped_cell_simple = d3.select(target);
 
-		const row = d3.select(target.closest(`.${CSVGHoneycomb.ZBX_STYLE_ROW}`));
-
-		const row_matrix = row.node().transform.baseVal[0].matrix;
+		const row = target.closest(`.${CSVGHoneycomb.ZBX_STYLE_ROW}`);
+		const row_matrix = row.transform.baseVal[0].matrix;
 		const row_translate_x = row_matrix.e;
 		const row_translate_y = row_matrix.f;
 
-		const cell_matrix = cell.node().transform.baseVal[0].matrix;
+		const cell_matrix = target.transform.baseVal[0].matrix;
 		const cell_translate_x = cell_matrix.e;
 		const cell_translate_y = cell_matrix.f;
 
-		this.#popped_translate_x = row_translate_x + cell_translate_x;
-		this.#popped_translate_y = row_translate_y + cell_translate_y;
+		const popped_translate_x = row_translate_x + cell_translate_x;
+		const popped_translate_y = row_translate_y + cell_translate_y;
 
 		const scale_popped = 1.3;
 
 		this.#elements.popped_cell
-			.datum(cell.datum())
-			.html(cell.html())
+			.datum(this.#elements.popped_cell_simple.datum())
+			.html(this.#elements.popped_cell_simple.html())
 			.attr('data-hintbox-contents', d => d.hint_text)
 			.attr('transform',
-				`translate(${this.#popped_translate_x} ${this.#popped_translate_y}) scale(${scale_popped})`
+				`translate(${popped_translate_x} ${popped_translate_y}) scale(${scale_popped})`
 			)
 			.style('display', 'block');
 
