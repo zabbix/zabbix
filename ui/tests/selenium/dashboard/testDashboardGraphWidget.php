@@ -19,8 +19,8 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup widget, profiles
@@ -29,15 +29,17 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGraphWidget extends CWebTest {
 
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
 	}
 
 	/*
@@ -1881,7 +1883,6 @@ class testDashboardGraphWidget extends CWebTest {
 				case 'Problems':
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
 					if (array_key_exists('tags', $data['Problems'])) {
-						$this->setTagSelector('id:tags_table_tags');
 						$this->setTags($data['Problems']['tags']);
 					}
 					break;

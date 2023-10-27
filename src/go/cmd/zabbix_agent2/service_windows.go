@@ -56,6 +56,7 @@ var (
 
 	fatalStopChan chan bool
 	startChan     chan bool
+	stopChan      = make(chan bool)
 )
 
 func loadOSDependentFlags() {
@@ -166,7 +167,9 @@ func validateExclusiveFlags() error {
 	}
 
 	if svcMultipleAgentFlag && count == 0 && !winServiceRun {
-		return errors.New("multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information")
+		return errors.New(
+			"multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information",
+		)
 	}
 
 	return nil
@@ -286,7 +289,6 @@ func getAgentPath() (p string, err error) {
 
 	if i.Mode().IsDir() {
 		return p, fmt.Errorf("incorrect path to executable '%s'", p)
-
 	}
 
 	return
@@ -310,8 +312,10 @@ func svcInstall(conf string) error {
 		return errors.New("service already exists")
 	}
 
-	s, err = m.CreateService(serviceName, exepath, mgr.Config{StartType: mgr.StartAutomatic, DisplayName: serviceName,
-		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf)}, "-c", conf, "-f=false")
+	s, err = m.CreateService(serviceName, exepath, mgr.Config{
+		StartType: mgr.StartAutomatic, DisplayName: serviceName,
+		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf),
+	}, "-c", conf, "-f=false")
 	if err != nil {
 		return fmt.Errorf("failed to create service: %s", err.Error())
 	}
@@ -434,7 +438,11 @@ func runService() {
 
 type winService struct{}
 
-func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
+func (ws *winService) Execute(
+	args []string,
+	r <-chan svc.ChangeRequest,
+	changes chan<- svc.Status,
+) (ssec bool, errno uint32) {
 	changes <- svc.Status{State: svc.StartPending}
 	select {
 	case <-startChan:

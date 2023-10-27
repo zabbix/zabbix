@@ -6762,6 +6762,10 @@ msgstr "Bewaking van gebeurtenislogboeken. Retourneert logboek"
 msgid "Event name"
 msgstr "Evenement naam"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Evenement label paar"
