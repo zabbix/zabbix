@@ -17,10 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "config.h"
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-
 #include "vmware_hv.h"
 #include "vmware_shmem.h"
 #include "vmware_internal.h"
@@ -33,7 +29,9 @@
 #	include <libxml/xpath.h>
 #endif
 
-#define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)			\
 	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
