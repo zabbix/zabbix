@@ -9,7 +9,6 @@ SUBDIRS = \
 	httppoller \
 	pinger \
 	poller \
-	snmptrapper \
 	timer \
 	trapper \
 	escalator \
@@ -66,7 +65,7 @@ zabbix_server_LDADD = \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
-	snmptrapper/libzbxsnmptrapper.a \
+	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
