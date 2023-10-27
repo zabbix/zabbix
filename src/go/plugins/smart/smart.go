@@ -141,6 +141,10 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
+	for k, v := range params {
+		params[k] = clearString(v)
+	}
+
 	switch len(params) {
 	case twoParameters:
 		return p.diskGetSingle(params[firstParameter], params[secondParameter])
