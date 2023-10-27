@@ -30,7 +30,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 
-void     zbx_ack_task_free(zbx_ack_task_t *ack_task)
+void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
 {
 	zbx_free(ack_task);
 }

@@ -21,7 +21,7 @@
 
 #include "zbxipcservice.h"
 
-void     zbx_event_severity_free(zbx_event_severity_t *event_severity)
+void	zbx_event_severity_free(zbx_event_severity_t *event_severity)
 {
 	zbx_free(event_severity);
 }

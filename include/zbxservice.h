@@ -46,7 +46,7 @@ typedef struct
 }
 zbx_event_severity_t;
 
-void     zbx_event_severity_free(zbx_event_severity_t *event_severity);
+void	zbx_event_severity_free(zbx_event_severity_t *event_severity);
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
 		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags);

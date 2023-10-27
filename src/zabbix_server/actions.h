@@ -35,7 +35,7 @@ typedef struct
 }
 zbx_ack_task_t;
 
-void     zbx_ack_task_free(zbx_ack_task_t *ack_task);
+void	zbx_ack_task_free(zbx_ack_task_t *ack_task);
 ZBX_PTR_VECTOR_DECL(ack_task, zbx_ack_task_t *)
 
 typedef struct
