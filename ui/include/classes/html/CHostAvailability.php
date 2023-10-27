@@ -81,6 +81,8 @@ class CHostAvailability extends CTag {
 			INTERFACE_AVAILABLE_FALSE => _('Not available')
 		];
 
+		CArrayHelper::sort($interfaces, ['interface']);
+
 		foreach ($interfaces as $interface) {
 			$interface_tag = new CDiv($interface['interface']);
 
@@ -102,27 +104,16 @@ class CHostAvailability extends CTag {
 
 	public function toString($destroy = true) {
 		foreach ($this->type_interfaces as $type => $interfaces) {
+			if (!$interfaces || !array_key_exists($type, static::LABELS)) {
+				continue;
+			}
+
 			// Add active checks to agent interfaces.
 			if ($type == INTERFACE_TYPE_AGENT) {
 				$interfaces = array_merge($interfaces, $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
 			}
 
-			if (!$interfaces || !array_key_exists($type, static::LABELS)) {
-				continue;
-			}
-
-			CArrayHelper::sort($interfaces, ['interface']);
-			$available = array_column($interfaces, 'available');
-			$status = in_array(INTERFACE_AVAILABLE_UNKNOWN, $available)
-				? INTERFACE_AVAILABLE_UNKNOWN
-				: INTERFACE_AVAILABLE_TRUE;
-
-			if (in_array(INTERFACE_AVAILABLE_FALSE, $available)) {
-				$status = (in_array(INTERFACE_AVAILABLE_UNKNOWN, $available)
-						|| in_array(INTERFACE_AVAILABLE_TRUE, $available))
-					? INTERFACE_AVAILABLE_MIXED
-					: INTERFACE_AVAILABLE_FALSE;
-			}
+			$status = getInterfaceAvailabilityStatus($interfaces);
 
 			$this->addItem((new CSpan(static::LABELS[$type]))
 				->addClass(static::COLORS[$status])

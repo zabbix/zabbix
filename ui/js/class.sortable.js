@@ -119,9 +119,9 @@ class CSortable extends CBaseComponent {
 	}
 
 	/**
-	 * Get list of items.
+	 * Get list element.
 	 *
-	 * @returns {HTMLCollection}
+	 * @returns {HTMLUListElement}
 	 */
 	getList() {
 		return this._list;

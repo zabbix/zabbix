@@ -151,6 +151,7 @@ typedef struct
 	ZBX_DC_MASTERITEM	*master_item;
 
 	zbx_vector_ptr_t	tags;
+	const char		*timeout;
 }
 ZBX_DC_ITEM;
 
@@ -289,7 +290,6 @@ ZBX_DC_CALCITEM;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*timeout;
 	const char	*url;
 	const char	*query_fields;
 	const char	*status_codes;
@@ -318,7 +318,6 @@ typedef struct
 {
 	zbx_uint64_t		itemid;
 	const char		*script;
-	const char		*timeout;
 	zbx_vector_ptr_t	params;
 }
 ZBX_DC_SCRIPTITEM;
@@ -485,6 +484,9 @@ typedef struct
 #endif
 	const char			*address;
 	const char			*port;
+
+	unsigned char			custom_timeouts;
+	zbx_config_item_type_timeouts_t	item_timeouts;
 }
 ZBX_DC_PROXY;
 
@@ -619,6 +621,8 @@ typedef struct
 
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
+
+	zbx_config_item_type_timeouts_t	item_timeouts;
 }
 ZBX_DC_CONFIG_TABLE;
 

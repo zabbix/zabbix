@@ -48,6 +48,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxsysinfo.h"
 
 /******************************************************************************
  *                                                                            *
@@ -302,8 +303,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = get_value_agent(item, config_comms->config_timeout, config_comms->config_source_ip,
-					result);
+			res = get_value_agent(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -314,7 +314,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
-			res = get_value_db(item, config_comms->config_timeout, result);
+			res = get_value_db(item, result);
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
@@ -323,19 +323,18 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			/* external checks use their own timeouts */
-			res = get_value_external(item, config_comms->config_timeout, result);
+			res = get_value_external(item, result);
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			res = get_value_ssh(item, config_comms->config_timeout, config_comms->config_source_ip, result);
+			res = get_value_ssh(item, config_comms->config_source_ip, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			res = get_value_telnet(item, config_comms->config_timeout, config_comms->config_source_ip,
-					result);
+			res = get_value_telnet(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
@@ -443,7 +442,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		unsigned char expand_macros)
 {
 	int			i;
-	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX];
+	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
 	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -493,6 +492,31 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 		switch (items[i].type)
 		{
+			case ITEM_TYPE_ZABBIX:
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+			case ITEM_TYPE_SIMPLE:
+			case ITEM_TYPE_EXTERNAL:
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+			case ITEM_TYPE_SNMP:
+			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_HTTPAGENT:
+				ZBX_STRDUP(timeout, items[i].timeout_orig);
+				break;
+		}
+
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_ZABBIX:
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (ZBX_MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+				break;
 			case ITEM_TYPE_SNMP:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
@@ -531,18 +555,20 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
+					zbx_free(timeout);
 					continue;
 				}
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
 				break;
 			case ITEM_TYPE_SCRIPT:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
-
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON,
-						NULL, 0);
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].script_params,
 						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
@@ -586,6 +612,10 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
 				break;
 			case ITEM_TYPE_JMX:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -608,7 +638,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_HTTPAGENT:
 				if (ZBX_MACRO_EXPAND_YES == expand_macros)
 				{
-					ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
 					ZBX_STRDUP(items[i].url, items[i].url_orig);
 					ZBX_STRDUP(items[i].status_codes, items[i].status_codes_orig);
 					ZBX_STRDUP(items[i].http_proxy, items[i].http_proxy_orig);
@@ -620,8 +649,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					ZBX_STRDUP(items[i].query_fields, items[i].query_fields_orig);
 
 					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].timeout,
+							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &timeout,
 							ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
 							&items[i].host, &items[i], NULL, NULL, NULL, NULL, NULL,
 							&items[i].url, ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
@@ -631,6 +661,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot encode URL into punycode"));
 					errcodes[i] = CONFIG_ERROR;
+					zbx_free(timeout);
 					continue;
 				}
 
@@ -638,6 +669,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 					errcodes[i] = CONFIG_ERROR;
+					zbx_free(timeout);
 					continue;
 				}
 
@@ -652,6 +684,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						{
 							SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
 							errcodes[i] = CONFIG_ERROR;
+							zbx_free(timeout);
 							continue;
 						}
 						break;
@@ -692,7 +725,29 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
+			case ITEM_TYPE_EXTERNAL:
+				if (ZBX_MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+				break;
 		}
+
+		if (NULL != timeout)
+		{
+			int	timeout_sec = 0;
+
+			if (FAIL == zbx_validate_item_timeout(timeout, &timeout_sec, error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+			}
+			else
+				items[i].timeout = timeout_sec;
+		}
+		zbx_free(timeout);
 	}
 
 	zbx_free(port);
@@ -724,8 +779,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout,
-				config_comms->config_source_ip);
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -766,7 +820,6 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].snmp_oid);
 				break;
 			case ITEM_TYPE_HTTPAGENT:
-				zbx_free(items[i].timeout);
 				zbx_free(items[i].url);
 				zbx_free(items[i].query_fields);
 				zbx_free(items[i].status_codes);
@@ -776,9 +829,6 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].ssl_key_password);
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
-				break;
-			case ITEM_TYPE_SCRIPT:
-				zbx_free(items[i].timeout);
 				break;
 			case ITEM_TYPE_SSH:
 				zbx_free(items[i].publickey);

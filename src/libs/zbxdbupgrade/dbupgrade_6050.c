@@ -22,6 +22,7 @@
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
+#include "zbxregexp.h"
 
 /*
  * 7.0 development database patches
@@ -1023,6 +1024,689 @@ static int	DBpatch_6050099(void)
 	return DBadd_foreign_key("group_discovery", 2, &field);
 }
 
+static int	DBpatch_6050100(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'piechart','widgets/piechart',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050101(void)
+{
+	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050102(void)
+{
+	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050103(void)
+{
+	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050104(void)
+{
+	const zbx_db_field_t	field = {"timeout_external_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050105(void)
+{
+	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050106(void)
+{
+	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050107(void)
+{
+	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050108(void)
+{
+	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050109(void)
+{
+	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050110(void)
+{
+	int	timeout;
+
+	timeout = DBget_config_timeout();
+
+	if (ZBX_DB_OK > zbx_db_execute("update config"
+			" set timeout_zabbix_agent='%ds',"
+				"timeout_simple_check='%ds',"
+				"timeout_snmp_agent='%ds',"
+				"timeout_external_check='%ds',"
+				"timeout_db_monitor='%ds',"
+				"timeout_http_agent='%ds',"
+				"timeout_ssh_agent='%ds',"
+				"timeout_telnet_agent='%ds',"
+				"timeout_script='%ds'",
+			timeout, timeout, timeout, timeout, timeout, timeout, timeout, timeout, timeout))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050111(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update items set timeout='' where type not in (%d,%d)", ITEM_TYPE_HTTPAGENT,
+			ITEM_TYPE_SCRIPT))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050112(void)
+{
+	const zbx_db_field_t	field = {"timeout", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_6050113(void)
+{
+	const zbx_db_field_t	field = {"custom_timeouts", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050114(void)
+{
+	const zbx_db_field_t	field = {"timeout_zabbix_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050115(void)
+{
+	const zbx_db_field_t	field = {"timeout_simple_check", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050116(void)
+{
+	const zbx_db_field_t	field = {"timeout_snmp_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050117(void)
+{
+	const zbx_db_field_t	field = {"timeout_external_check", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050118(void)
+{
+	const zbx_db_field_t	field = {"timeout_db_monitor", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050119(void)
+{
+	const zbx_db_field_t	field = {"timeout_http_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050120(void)
+{
+	const zbx_db_field_t	field = {"timeout_ssh_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050121(void)
+{
+	const zbx_db_field_t	field = {"timeout_telnet_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050122(void)
+{
+	const zbx_db_field_t	field = {"timeout_script", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050123(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update item_preproc set params='-1' where type=26"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050124(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name in ('source_type','reference')"
+				" and widgetid in (select widgetid from widget where type='map')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050125(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='sysmapid._reference',value_str=CONCAT(value_str,'._mapid')"
+			" where name='filter_widget_reference'"
+				" and widgetid in (select widgetid from widget where type='map')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050126(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set type='1',name='override_hostid._reference',value_int=0,value_str='DASHBOARD._hostid'"
+			" where type=0"
+				" and name='dynamic'"
+				" and value_int=1"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050127(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+			"select w.widgetid,wf_from.value_str,wf_to.value_str"
+			" from widget w"
+			" left join widget_field wf_from"
+				" on w.widgetid=wf_from.widgetid"
+					" and (wf_from.name='time_from' or wf_from.name is null)"
+			" left join widget_field wf_to"
+				" on w.widgetid=wf_to.widgetid"
+					" and (wf_to.name='time_to' or wf_to.name is null)"
+			" where w.type='svggraph' and exists ("
+				"select null"
+				" from widget_field wf2"
+				" where wf2.widgetid=w.widgetid"
+					" and wf2.name='graph_time'"
+			")");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		if (SUCCEED == zbx_db_is_null(row[1]))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "time_period.from", "now-1h");
+
+		if (SUCCEED == zbx_db_is_null(row[2]))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "time_period.to", "now");
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050128(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='time_period.from'"
+			" where name='time_from'"
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050129(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='time_period.to'"
+			" where name='time_to'"
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050130(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name='graph_time'"
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050131(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='date_period.from'"
+			" where name='date_from'"
+				" and widgetid in (select widgetid from widget where type='slareport')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050132(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='date_period.to'"
+			" where name='date_to'"
+				" and widgetid in (select widgetid from widget where type='slareport')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050133(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	zbx_regexp_t	*regex1 = NULL, *regex2 = NULL;
+	char		*error = NULL, *replace_to = NULL, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = FAIL;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_regexp_compile_ext("^([a-z]+)\\.([a-z_]+)\\.(\\d+)\\.(\\d+)$", &regex1, 0, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "internal error, invalid regular expression: %s", error);
+		goto out;
+	}
+
+	if (FAIL == zbx_regexp_compile_ext("^([a-z]+)\\.([a-z_]+)\\.(\\d+)$", &regex2, 0, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "internal error, invalid regular expression: %s", error);
+		goto out;
+	}
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = zbx_db_select("select widget_fieldid,name from widget_field where name like '%%.%%.%%'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widget_fieldid;
+		char		*replace_from;
+
+		ZBX_STR2UINT64(widget_fieldid, row[0]);
+		replace_from = row[1];
+
+		if (SUCCEED != zbx_mregexp_sub_precompiled(
+						replace_from,
+						regex1,
+						"\\1.\\3.\\2.\\4",
+						0,	/* no output limit */
+						&replace_to)
+				&& SUCCEED != zbx_mregexp_sub_precompiled(
+						replace_from,
+						regex2,
+						"\\1.\\3.\\2",
+						0,	/* no output limit */
+						&replace_to))
+		{
+			continue;
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update widget_field"
+				" set name='%s'"
+				" where widget_fieldid=" ZBX_FS_UI64 ";\n",
+				replace_to, widget_fieldid);
+
+		zbx_free(replace_to);
+
+		if (SUCCEED != zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "internal error, cannot execute multiple SQL \"update\" operations");
+			zbx_db_free_result(result);
+
+			goto out;
+		}
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		zbx_db_execute("%s", sql);
+
+	ret = SUCCEED;
+out:
+	if (NULL != regex1)
+		zbx_regexp_free(regex1);
+	if (NULL != regex2)
+		zbx_regexp_free(regex2);
+
+	zbx_free(sql);
+	zbx_free(error);
+	zbx_free(replace_to);
+
+	return ret;
+}
+
+#define REFERENCE_LEN	5
+#define FIRST_LETTER	'A'
+#define TOTAL_LETTERS	26
+
+static char	*create_widget_reference(const zbx_vector_str_t *references)
+{
+	static char	buf[REFERENCE_LEN + 1];
+	static int	next_index;
+
+	while (1)
+	{
+		int	i, index = next_index++;
+
+		for (i = REFERENCE_LEN - 1; i >= 0; i--)
+		{
+			buf[i] = FIRST_LETTER + index % TOTAL_LETTERS;
+			index /= TOTAL_LETTERS;
+		}
+
+		if (FAIL == zbx_vector_str_search(references, buf, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			return buf;
+	}
+}
+
+#undef TOTAL_LETTERS
+#undef FIRST_LETTER
+#undef REFERENCE_LEN
+
+static int	DBpatch_6050134(void)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_db_insert_t		db_insert;
+	zbx_vector_str_t	references;
+	int			ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_str_create(&references);
+
+	result = zbx_db_select("select distinct value_str from widget_field where name='reference' order by value_str");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_vector_str_append(&references, zbx_strdup(NULL, row[0]));
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_str_sort(&references, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
+			NULL);
+
+	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "reference",
+				create_widget_reference(&references));
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_str_clear_ext(&references, zbx_str_free);
+	zbx_vector_str_destroy(&references);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050135(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050136(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.trigger_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050137(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050138(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.trigger_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050139(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select wf.widgetid from widget_field wf,widget w"
+			" where wf.name='interface_type' and w.type='hostavail' and w.widgetid=wf.widgetid"
+			" group by wf.widgetid having count(wf.name)=1");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "name", "type", "value_int",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, "only_totals", 0, 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050140(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050141(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050142(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050143(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1127,6 +1811,49 @@ DBPATCH_ADD(6050096, 0, 1)
 DBPATCH_ADD(6050097, 0, 1)
 DBPATCH_ADD(6050098, 0, 1)
 DBPATCH_ADD(6050099, 0, 1)
-
+DBPATCH_ADD(6050100, 0, 1)
+DBPATCH_ADD(6050101, 0, 1)
+DBPATCH_ADD(6050102, 0, 1)
+DBPATCH_ADD(6050103, 0, 1)
+DBPATCH_ADD(6050104, 0, 1)
+DBPATCH_ADD(6050105, 0, 1)
+DBPATCH_ADD(6050106, 0, 1)
+DBPATCH_ADD(6050107, 0, 1)
+DBPATCH_ADD(6050108, 0, 1)
+DBPATCH_ADD(6050109, 0, 1)
+DBPATCH_ADD(6050110, 0, 1)
+DBPATCH_ADD(6050111, 0, 1)
+DBPATCH_ADD(6050112, 0, 1)
+DBPATCH_ADD(6050113, 0, 1)
+DBPATCH_ADD(6050114, 0, 1)
+DBPATCH_ADD(6050115, 0, 1)
+DBPATCH_ADD(6050116, 0, 1)
+DBPATCH_ADD(6050117, 0, 1)
+DBPATCH_ADD(6050118, 0, 1)
+DBPATCH_ADD(6050119, 0, 1)
+DBPATCH_ADD(6050120, 0, 1)
+DBPATCH_ADD(6050121, 0, 1)
+DBPATCH_ADD(6050122, 0, 1)
+DBPATCH_ADD(6050123, 0, 1)
+DBPATCH_ADD(6050124, 0, 1)
+DBPATCH_ADD(6050125, 0, 1)
+DBPATCH_ADD(6050126, 0, 1)
+DBPATCH_ADD(6050127, 0, 1)
+DBPATCH_ADD(6050128, 0, 1)
+DBPATCH_ADD(6050129, 0, 1)
+DBPATCH_ADD(6050130, 0, 1)
+DBPATCH_ADD(6050131, 0, 1)
+DBPATCH_ADD(6050132, 0, 1)
+DBPATCH_ADD(6050133, 0, 1)
+DBPATCH_ADD(6050134, 0, 1)
+DBPATCH_ADD(6050135, 0, 1)
+DBPATCH_ADD(6050136, 0, 1)
+DBPATCH_ADD(6050137, 0, 1)
+DBPATCH_ADD(6050138, 0, 1)
+DBPATCH_ADD(6050139, 0, 1)
+DBPATCH_ADD(6050140, 0, 1)
+DBPATCH_ADD(6050141, 0, 1)
+DBPATCH_ADD(6050142, 0, 1)
+DBPATCH_ADD(6050143, 0, 1)
 
 DBPATCH_END()

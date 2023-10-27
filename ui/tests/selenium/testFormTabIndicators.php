@@ -22,6 +22,7 @@
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/behaviors/CPreprocessingBehavior.php';
 
 /**
  * @dataSource Services
@@ -31,7 +32,14 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormTabIndicators extends CWebTest {
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CPreprocessingBehavior::class];
+	}
 
 	public function getTabData() {
 		return [
@@ -217,7 +225,8 @@ class testFormTabIndicators extends CWebTest {
 			// Item configuration form tab data.
 			[
 				[
-					'url' => 'items.php?form=create&context=host&hostid=10084',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]=10084',
+					'create_button' => 'Create item',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -244,7 +253,8 @@ class testFormTabIndicators extends CWebTest {
 			// Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=42275&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
+					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -271,8 +281,9 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger configuration form tab data.
 			[
 				[
-					'url' => 'triggers.php?hostid=40001&context=host&form=create',
-					'form' => 'name:triggersForm',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'create_button' => 'Create trigger',
+					'form' => 'id:trigger-edit',
 					'tabs' => [
 						[
 							'name' => 'Tags',
@@ -305,8 +316,9 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger prototype configuration form tab data.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host&form=create',
-					'form' => 'name:triggersForm',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
+					'create_button' => 'Create trigger prototype',
+					'form' => 'id:trigger-edit',
 					'tabs' => [
 						[
 							'name' => 'Tags',
@@ -568,9 +580,9 @@ class testFormTabIndicators extends CWebTest {
 						[
 							'name' => 'Time period',
 							'entries' => [
-								'selector' => 'id:graph_time',
-								'value' => true,
-								'old_value' => false
+								'selector' => 'id:time_period_data_source',
+								'value' => 'Custom',
+								'old_value' => 'Dashboard'
 							],
 							'field_type' => 'general_field'
 						],
@@ -678,9 +690,6 @@ class testFormTabIndicators extends CWebTest {
 		elseif (CTestArrayHelper::get($data, 'create_button')) {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
-		}
-		elseif ($data['form'] === 'name:triggersForm') {
-			$form = $this->query($data['form'])->asForm(['normalized' => true])->one()->waitUntilVisible();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
@@ -952,10 +961,6 @@ class testFormTabIndicators extends CWebTest {
 						}
 						$overlay->submit();
 						$overlay->waitUntilNotVisible();
-					}
-
-					if (CTestArrayHelper::get($tab, 'name') !== 'Message templates') {
-						COverlayDialogElement::ensureNotPresent();
 					}
 				}
 				break;

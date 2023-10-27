@@ -49,23 +49,10 @@ class CControllerAuditLogList extends CController {
 			'to' =>						'range_time'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
-		}
-		else {
-			if ($this->hasInput('from') || $this->hasInput('to')) {
-				validateTimeSelectorPeriod(
-					$this->hasInput('from') ? $this->getInput('from') : null,
-					$this->hasInput('to') ? $this->getInput('to') : null
-				);
-			}
-
-			$this->from = $this->getInput('from', CProfile::get('web.auditlog.filter.from',
-				'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
-			));
-			$this->to = $this->getInput('to', CProfile::get('web.auditlog.filter.to', 'now'));
 		}
 
 		return $ret;
@@ -76,6 +63,11 @@ class CControllerAuditLogList extends CController {
 	}
 
 	protected function doAction(): void {
+		$this->from = $this->getInput('from', CProfile::get('web.auditlog.filter.from',
+			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
+		));
+		$this->to = $this->getInput('to', CProfile::get('web.auditlog.filter.to', 'now'));
+
 		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}

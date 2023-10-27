@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha5])
+AC_INIT([Zabbix],[7.0.0alpha8])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1977,8 +1977,15 @@ AC_CONFIG_FILES([
 	include/Makefile
 	database/Makefile
 	database/mysql/Makefile
+	database/mysql/option-patches/Makefile
 	database/oracle/Makefile
+	database/oracle/option-patches/Makefile
 	database/postgresql/Makefile
+	database/postgresql/option-patches/Makefile
+	database/postgresql/timescaledb/Makefile
+	database/postgresql/timescaledb/option-patches/Makefile
+	database/postgresql/timescaledb/option-patches/with-compression/Makefile
+	database/postgresql/timescaledb/option-patches/without-compression/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
@@ -2044,6 +2051,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
@@ -2071,6 +2079,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxvault/Makefile
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
+	src/libs/zbxalerter/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2091,7 +2100,6 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
-	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/diag/Makefile
@@ -2111,7 +2119,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_server/rtc/Makefile
 	src/zabbix_server/service/Makefile
-	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile
@@ -2350,7 +2357,7 @@ fi
 
 echo
 echo "***********************************************************"
-echo "*            Now run '${am_make} install'                 *"
+echo "*            Now run '${am_make} install'                       *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
 echo "*              <https://www.zabbix.com>                   *"

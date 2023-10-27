@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -27,7 +27,17 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 
-	use TagTrait;
+	/**
+	 * Attach TagBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
+	}
 
 	/**
 	 * Id of the dashboard that is created within this test specifically for the update scenario.
@@ -149,28 +159,28 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Another group to check Overview' => [
-							'Average' => "0 of 1"
+							'Average' => '0 of 1'
 						],
 						'Group to check Overview' => [
-							'Disaster' => "1\nof 1",
-							'High' => "1\nof 1",
-							'Average' => "1\nof 2",
-							'Warning' => "1\nof 1",
-							'Information' => "0 of 1",
-							'Not classified' => "1\nof 1"
+							'Disaster' => '1 of 1',
+							'High' => '1 of 1',
+							'Average' => '1 of 2',
+							'Warning' => '1 of 1',
+							'Information' => '0 of 1',
+							'Not classified' => '1 of 1'
 						],
 						'Group to check triggers filtering' => [
-							'Average' => "1\nof 1"
+							'Average' => '1 of 1'
 						],
 						'Host group for suppression' => [
-							'Average' => "1\nof 1"
+							'Average' => '1 of 1'
 						],
 						'Host group for tag permissions' => [
-							'Not classified' => "2\nof 2"
+							'Not classified' => '2 of 2'
 						],
 						'Zabbix servers' => [
-							'Average' => "1\nof 1",
-							'Warning' => "5\nof 5"
+							'Average' => '1 of 1',
+							'Warning' => '5 of 5'
 						]
 					]
 				]
@@ -223,12 +233,12 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Group to check Overview' => [
-							'Disaster' => "1\nof 1",
-							'High' => "1\nof 1",
-							'Average' => "1\nof 1",
-							'Warning' => "1\nof 1",
-							'Information' => "0 of 1",
-							'Not classified' => "1\nof 1"
+							'Disaster' => '1 of 1',
+							'High' => '1 of 1',
+							'Average' => '1 of 1',
+							'Warning' => '1 of 1',
+							'Information' => '0 of 1',
+							'Not classified' => '1 of 1'
 						]
 					]
 				]
@@ -244,7 +254,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Zabbix servers' => [
-							'Warning' => "1\nof 1"
+							'Warning' => '1 of 1'
 						]
 					]
 				]
@@ -409,12 +419,12 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 						'Exclude host groups' => ['Zabbix servers', 'Group to check triggers filtering']
 					],
 					'expected' => [
-						'Disaster' => "1\nof 1",
-						'High' => "1\nof 1",
-						'Average' => "1\nof 3",
-						'Warning' => "1\nof 1",
-						'Information' => "0 of 1",
-						'Not classified' => "3\nof 3"
+						'Disaster' => '1 of 1',
+						'High' => '1 of 1',
+						'Average' => '1 of 3',
+						'Warning' => '1 of 1',
+						'Information' => '0 of 1',
+						'Not classified' => '3 of 3'
 					]
 				]
 			],
@@ -640,19 +650,19 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Another group to check Overview' => [
-							'Average' => "0 of 1"
+							'Average' => '0 of 1'
 						],
 						'Group to check Overview' => [
-							'Average' => "1\nof 2"
+							'Average' => '1 of 2'
 						],
 						'Group to check triggers filtering' => [
-							'Average' => "1\nof 1"
+							'Average' => '1 of 1'
 						],
 						'Host group for suppression' => [
-							'Average' => "1\nof 1"
+							'Average' => '1 of 1'
 						],
 						'Zabbix servers' => [
-							'Average' => "1\nof 1"
+							'Average' => '1 of 1'
 						]
 					]
 				]
@@ -1498,7 +1508,6 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		if (CTestArrayHelper::get($data,'tags',false)) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 		$form->submit();

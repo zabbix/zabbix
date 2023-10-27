@@ -201,7 +201,7 @@ int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = execute_int(command, result)))
+	if (SYSINFO_RET_FAIL == (res = execute_int(command, result, request->timeout)))
 		return res;
 
 	if (1 < result->ui64)
@@ -232,7 +232,7 @@ int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = execute_int(command, result)))
+	if (SYSINFO_RET_FAIL == (res = execute_int(command, result, request->timeout)))
 		return res;
 
 	if (1 < result->ui64)

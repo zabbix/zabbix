@@ -35,7 +35,7 @@
 #include "zbxnix.h"
 #include "zbxcomms.h"
 
-#include "alerter/alerter.h"
+#include "zbxalerter.h"
 #include "zbxdbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
@@ -45,7 +45,6 @@
 #include "poller/poller.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
-#include "snmptrapper/snmptrapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
@@ -85,6 +84,7 @@
 #include "lld/lld_protocol.h"
 #include "zbxdiscovery.h"
 #include "zbxscripts.h"
+#include "zbxsnmptrapper.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -316,7 +316,7 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
-char	*CONFIG_SNMPTRAP_FILE		= NULL;
+char	*zbx_config_snmptrap_file	= NULL;
 
 char	*CONFIG_JAVA_GATEWAY		= NULL;
 int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
@@ -601,8 +601,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == zbx_config_dbhigh->config_dbhost)
 		zbx_config_dbhigh->config_dbhost = zbx_strdup(zbx_config_dbhigh->config_dbhost, "localhost");
 
-	if (NULL == CONFIG_SNMPTRAP_FILE)
-		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
+	if (NULL == zbx_config_snmptrap_file)
+		zbx_config_snmptrap_file = zbx_strdup(zbx_config_snmptrap_file, "/tmp/zabbix_traps.tmp");
 
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
@@ -840,7 +840,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"JavaGatewayPort",		&CONFIG_JAVA_GATEWAY_PORT,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
-		{"SNMPTrapperFile",		&CONFIG_SNMPTRAP_FILE,			TYPE_STRING,
+		{"SNMPTrapperFile",		&zbx_config_snmptrap_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"StartSNMPTrapper",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER],		TYPE_INT,
 			PARM_OPT,	0,			1},
@@ -1261,7 +1261,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
-	zbx_init_library_dbupgrade(get_program_type);
+	zbx_init_library_dbupgrade(get_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
@@ -1301,20 +1301,15 @@ int	main(int argc, char **argv)
 static void	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
-	int		result = SUCCEED;
+	int		ret;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
-	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
+	ret = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
 
-	if (SUCCEED == result)
-		zbx_db_extract_dbextension_info(&db_version_info);
+	if (SUCCEED == ret)
+		ret = zbx_db_check_extension(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 
-#ifdef HAVE_POSTGRESQL
-	if (SUCCEED == result)
-		result = zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
-#endif
-
-	if (SUCCEED == result)
+	if (SUCCEED == ret)
 	{
 		zbx_ha_mode_t	ha_mode;
 
@@ -1323,7 +1318,7 @@ static void	zbx_check_db(void)
 		else
 			ha_mode = ZBX_HA_MODE_STANDALONE;
 
-		if (SUCCEED != (result = zbx_db_check_version_and_upgrade(ha_mode)))
+		if (SUCCEED != (ret = zbx_db_check_version_and_upgrade(ha_mode)))
 			goto out;
 	}
 
@@ -1343,11 +1338,6 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
-#if defined(HAVE_POSTGRESQL)
-		if (0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-			zbx_tsdb_extract_compressed_chunk_flags(&db_version_info);
-#endif
-
 #ifdef HAVE_ORACLE
 		zbx_json_init(&db_version_info.tables_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1357,8 +1347,8 @@ static void	zbx_check_db(void)
 #endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
-		if (SUCCEED == result)
-			zbx_history_check_version(&db_version_json, &result);
+		if (SUCCEED == ret)
+			zbx_history_check_version(&db_version_json, &ret);
 
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
@@ -1366,7 +1356,7 @@ static void	zbx_check_db(void)
 
 	zbx_db_close();
 out:
-	if (SUCCEED != result)
+	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 				ZABBIX_VERSION, ZABBIX_REVISION);
@@ -1423,7 +1413,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							&events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
-							zbx_config_trapper_timeout, zbx_config_source_ip};
+							zbx_config_trapper_timeout, zbx_config_source_ip,
+							CONFIG_FORKS};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
 							zbx_config_source_ip, &events_cbs, config_proxyconfig_frequency,
@@ -1464,6 +1455,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};
+	zbx_thread_snmptrapper_args	snmptrapper_args = {zbx_config_snmptrap_file};
 
 	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -1664,7 +1656,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
-				zbx_thread_start(snmptrapper_thread, &thread_args, &threads[i]);
+				thread_args.args = &snmptrapper_args;
+				zbx_thread_start(zbx_snmptrapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 				thread_args.args = &proxy_poller_args;

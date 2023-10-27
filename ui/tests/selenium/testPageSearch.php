@@ -22,7 +22,7 @@
 use Facebook\WebDriver\Exception\TimeoutException;
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup hstgrp
@@ -31,7 +31,14 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  */
 class testPageSearch extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	protected $search_string = 'Test object';
 
@@ -51,8 +58,8 @@ class testPageSearch extends CWebTest {
 				['text' => 'Graphs', 'href' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D={id}&filter_set=1'],
 				['text' => 'Dashboards', 'href' => 'zabbix.php?action=host.dashboard.view&hostid={id}'],
 				['text' => 'Web', 'href' => 'zabbix.php?action=web.view&filter_hostids%5B%5D={id}&filter_set=1'],
-				['text' => 'Items', 'href' => 'items.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
-				['text' => 'Triggers', 'href' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
+				['text' => 'Items', 'href' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
+				['text' => 'Triggers', 'href' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Graphs', 'href' => 'graphs.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host']
@@ -80,8 +87,8 @@ class testPageSearch extends CWebTest {
 			'column_groups' => ['Template', 'Configuration'],
 			'columns' => [
 				['text' => 'Test object Template', 'href' => 'javascript:void(0)'],
-				['text' => 'Items', 'href' => 'items.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
-				['text' => 'Triggers', 'href' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
+				['text' => 'Items', 'href' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
+				['text' => 'Triggers', 'href' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Graphs', 'href' => 'graphs.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Dashboards', 'href' => 'zabbix.php?action=template.dashboard.list&templateid={id}'],
 				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],

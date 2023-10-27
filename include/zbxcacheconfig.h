@@ -192,7 +192,8 @@ typedef struct
 	char			password_orig[ZBX_ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			jmx_endpoint_orig[ZBX_ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
-	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX], *timeout;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
 	char			url_orig[ZBX_ITEM_URL_LEN_MAX], *url;
 	char			query_fields_orig[ZBX_ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
 	char			*posts;
@@ -668,6 +669,7 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	char		*snmpv3_contextname;
 	unsigned char	allow_redirect;
+	int		timeout;
 }
 zbx_dc_dcheck_t;
 
@@ -1162,7 +1164,7 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
 		int hostids_num, char **error);
 int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error);
+		int hostids_num, unsigned char env, char **error);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 
@@ -1300,5 +1302,39 @@ void	zbx_vps_monitor_add_written(zbx_uint64_t values_num);
 int	zbx_vps_monitor_capped(void);
 void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats);
 const char	*zbx_vps_monitor_status(void);
+
+typedef struct
+{
+	const char	*agent;
+	const char	*simple;
+	const char	*snmp;
+	const char	*external;
+	const char	*odbc;
+	const char	*http;
+	const char	*ssh;
+	const char	*telnet;
+	const char	*script;
+}
+zbx_config_item_type_timeouts_t;
+
+#define ZBX_ITEM_TYPE_TIMEOUT_LEN	255
+#define ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX	(ZBX_ITEM_TYPE_TIMEOUT_LEN + 1)
+
+typedef struct
+{
+	char	agent[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	simple[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	snmp[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	external[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	odbc[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	http[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	ssh[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+}
+zbx_dc_item_type_timeouts_t;
+
+void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts);
+char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
 
 #endif

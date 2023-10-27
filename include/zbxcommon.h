@@ -178,6 +178,8 @@ extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 #define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
 #define ZBX_FLAG_DISCOVERY_CREATED	0x04
 
+#define ZBX_GROUP_TYPE_HOST		0
+
 #define ZBX_HOST_PROT_INTERFACES_INHERIT	0
 #define ZBX_HOST_PROT_INTERFACES_CUSTOM		1
 
@@ -594,8 +596,14 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
+#if defined(__hpux)
+int	zbx_hpux_vsnprintf_is_c99(void);
+#endif
+
 /* used by log */
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
+
+int	zbx_vsnprintf_check_len(const char *fmt, va_list args);
 
 /* used by log */
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
@@ -712,8 +720,9 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_STR_REPLACE			25
 #define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
 #define ZBX_PREPROC_XML_TO_JSON			27
-#define ZBX_PREPROC_SNMP_WALK_TO_VALUE		28
+#define ZBX_PREPROC_SNMP_WALK_VALUE		28
 #define ZBX_PREPROC_SNMP_WALK_TO_JSON		29
+#define ZBX_PREPROC_SNMP_GET_VALUE		30
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0

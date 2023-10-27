@@ -18,8 +18,10 @@
 **/
 
 #include "checks_agent.h"
+#include "../sysinfo.h"
 
 #include "zbxsysinfo.h"
+#include "zbxjson.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
@@ -59,7 +61,6 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
  * Parameters: item             - [IN] item we are interested in              *
- *             timeout          - [IN]                                        *
  *             config_source_ip - [IN]                                        *
  *             result           - [OUT]                                       *
  *                                                                            *
@@ -73,7 +74,7 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_source_ip, AGENT_RESULT *result)
+int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
@@ -114,17 +115,24 @@ int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_s
 			goto out;
 	}
 
-	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout,
-			item->host.tls_connect, tls_arg1, tls_arg2))
+	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
+			item->timeout + 1, item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
 
-		if (SUCCEED != zbx_tcp_send(&s, item->key))
+		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)item->timeout,
+				ZBX_TCP_PROTOCOL, 0))
+		{
 			ret = NETWORK_ERROR;
+		}
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
+		{
 			ret = SUCCEED;
+		}
 		else if (SUCCEED != zbx_socket_check_deadline(&s))
+		{
 			ret = TIMEOUT_ERROR;
+		}
 		else
 			ret = NETWORK_ERROR;
 	}

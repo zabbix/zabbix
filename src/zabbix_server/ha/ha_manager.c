@@ -253,13 +253,16 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 		return;
 
 	va_start(args, fmt);
-	len = (size_t)vsnprintf(NULL, 0, fmt, args) + 1;
+
+	/* zbx_vsnprintf_check_len() cannot return negative result */
+	len = (size_t)zbx_vsnprintf_check_len(fmt, args) + 1;
+
 	va_end(args);
 
 	info->error = (char *)zbx_malloc(info->error, len);
 
 	va_start(args, fmt);
-	vsnprintf(info->error, len, fmt, args);
+	zbx_vsnprintf(info->error, len, fmt, args);
 	va_end(args);
 
 	info->ha_status = ZBX_NODE_STATUS_ERROR;

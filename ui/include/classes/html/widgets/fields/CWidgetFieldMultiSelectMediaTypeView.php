@@ -23,12 +23,16 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectMediaType;
 
 class CWidgetFieldMultiSelectMediaTypeView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectMediaType $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectMediaType $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {
 		return 'media_types';
+	}
+
+	protected function getObjectLabels(): array {
+		return ['object' => _('Media type'), 'objects' => _('Media types')];
 	}
 
 	protected function getPopupParameters(): array {

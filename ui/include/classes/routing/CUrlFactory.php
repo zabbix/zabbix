@@ -29,10 +29,6 @@ class CUrlFactory {
 	 * @var array
 	 */
 	protected static $contextConfigs = [
-		'disc_prototypes.php' => [
-			'remove' => ['itemid'],
-			'add' => ['hostid', 'parent_discoveryid']
-		],
 		'graphs.php' => [
 			'remove' => ['graphid'],
 			'add' => ['hostid', 'parent_discoveryid']
@@ -48,19 +44,8 @@ class CUrlFactory {
 		'httpconf.php' => [
 			'remove' => ['httptestid']
 		],
-		'items.php' => [
-			'remove' => ['itemid']
-		],
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']
-		],
-		'trigger_prototypes.php' => [
-			'remove' =>  ['triggerid'],
-			'add' => ['parent_discoveryid', 'hostid']
-		],
-		'triggers.php' => [
-			'remove' => ['triggerid'],
-			'add' => ['hostid']
 		],
 		'__default' => [
 			'remove' => ['cancel', 'form', 'delete']
