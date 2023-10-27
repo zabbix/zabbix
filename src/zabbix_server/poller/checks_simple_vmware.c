@@ -304,6 +304,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 			break;
 		case ZBX_VMWARE_UNIT_JOULE:
 		case ZBX_VMWARE_UNIT_MEGAHERTZ:
+		case ZBX_VMWARE_UNIT_NANOSECOND:
 		case ZBX_VMWARE_UNIT_MICROSECOND:
 		case ZBX_VMWARE_UNIT_MILLISECOND:
 		case ZBX_VMWARE_UNIT_NUMBER:

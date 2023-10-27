@@ -623,7 +623,7 @@ if (hasRequest('form')) {
 
 	// Add default values for new condition.
 	$data['new_condition'] += [
-		'conditiontype'	=> CONDITION_TYPE_TRIGGER_NAME,
+		'conditiontype'	=> CONDITION_TYPE_EVENT_NAME,
 		'operator'		=> CONDITION_OPERATOR_LIKE,
 		'value'			=> ''
 	];

@@ -3493,6 +3493,7 @@ form.is-loading {
   .table-forms .trigger-list .drag-icon {
     top: 1px; }
   .table-forms .table-forms-td-left {
+    position: relative;
     display: table-cell;
     padding: 5px 0;
     text-align: right;
@@ -3503,6 +3504,10 @@ form.is-loading {
       display: block;
       height: 24px;
       line-height: 24px; }
+    .table-forms .table-forms-td-left .checkbox-radio {
+      right: 0;
+      margin-right: 0;
+      margin-left: 0; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
@@ -3613,9 +3618,7 @@ textarea {
   font-size: 1em;
   padding: 4px 5px;
   margin: 0;
-  min-height: 24px;
-  overflow: auto;
-  resize: vertical; }
+  overflow: auto; }
   textarea[readonly]:focus {
     border-color: #000000; }
 

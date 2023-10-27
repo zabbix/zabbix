@@ -71,7 +71,8 @@ $link_templates = (new CTable())
 
 $template_tab->addRow(
 	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Link templates')),
+		->setLabel(_('Link templates'))
+		->setAttribute('autofocus', 'autofocus'),
 	(new CDiv($link_templates))
 		->setId('linked-templates-div')
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -79,9 +80,7 @@ $template_tab->addRow(
 
 $template_tab
 	->addRow(
-		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
-			->setLabel(_('Host groups'))
-			->setAttribute('autofocus', 'autofocus'),
+		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))->setLabel(_('Host groups')),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
