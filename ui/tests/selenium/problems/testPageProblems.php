@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 /**
  * @backup profiles, users
  *
- * @onBefore changeRefreshInterval
+ * @onBefore prepareProblemsData
  */
 class testPageProblems extends CWebTest {
 
@@ -45,12 +45,59 @@ class testPageProblems extends CWebTest {
 		];
 	}
 
-	/**
-	 * Change refresh interval so Problems page doesn't refresh automatically,
-	 * and popup dialogs don't disappear.
-	 */
-	public function changeRefreshInterval() {
+	public function prepareProblemsData() {
+		/**
+		 * Change refresh interval so Problems page doesn't refresh automatically,
+		 * and popup dialogs don't disappear.
+		 */
 		DBexecute('UPDATE users SET refresh=999 WHERE username='.zbx_dbstr('Admin'));
+
+		// Create hostgroup for hosts with items triggers.
+		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Page']]);
+		$groupid = $hostgroups['groupids'][0];
+
+		// Create host for items and triggers.
+		$hosts = CDataHelper::call('host.create', [
+			'host' => 'Host for Problems Page',
+			'groups' => [['groupid' => $groupid]]
+		]);
+		$hostid = $hosts['hostids'][0];
+
+		// Create item on previously created host.
+		$items = CDataHelper::call('item.create',[
+			'hostid' => $hostid,
+			'name' => 'Age problem item',
+			'key_' => 'trap',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		]);
+		$itemid = $items['itemids'][0];
+
+		// Create trigger based on item.
+		$triggers = CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Trigger for Age problem',
+				'expression' => 'last(/Host for Problems Page/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			]
+		]);
+		$triggerid = $triggers['triggerids'][0];
+
+		// Create event.
+		CDataHelper::addItemData($itemid, 0);
+
+		$time = time();
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (200100, 0, 0, '.
+				zbx_dbstr($triggerid).', '.$time.', 0, 1, '.zbx_dbstr('Trigger for Age problem').', '.TRIGGER_SEVERITY_AVERAGE.')'
+		);
+
+		// Create problem.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (200100, 0, 0, '.
+				zbx_dbstr($triggerid).', '.$time.', 0, '.zbx_dbstr('Trigger for Age problem').', '.TRIGGER_SEVERITY_AVERAGE.')'
+		);
+
+		// Change trigger's state to Problem.
+		DBexecute('UPDATE triggers SET value = 1 WHERE description ='.zbx_dbstr('Trigger for icon test'));
 	}
 
 	public function testPageProblems_Layout() {
@@ -721,6 +768,7 @@ class testPageProblems extends CWebTest {
 						]
 					],
 					'result' => [
+						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -927,7 +975,7 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'' => '',
-							'Time' => '2020-10-23 12:33:48 PM',
+							'Time' => '2020-10-23 15:33:48',
 							'' => '',
 							'' => '',
 							'Severity' => 'Average',
@@ -937,7 +985,6 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => "Test trigger to check tag filter on problem page\navg(/Test host/proc.num,5m)>100",
 							'Operational data' => '*UNKNOWN*',
-							'Duration' => '3y',
 							'Update' => 'Update',
 							'Actions' => '',
 							'Tags' => 'TagSer: abcDat'
@@ -1139,7 +1186,7 @@ class testPageProblems extends CWebTest {
 							'Problem' => 'Trigger_for_suppression'
 						]
 					],
-					'check_suppressed' => "Suppressed till: 09:17 AM\nMaintenance: Maintenance for suppression test"
+					'check_suppressed' => "Suppressed till: 12:17\nMaintenance: Maintenance for suppression test"
 				]
 			],
 			// #34 Show timeline.
@@ -1167,7 +1214,9 @@ class testPageProblems extends CWebTest {
 						'id:age_state_0' => true,
 						'name:age' => 999
 					],
-					'result' => []
+					'result' => [
+						['Problem' => 'Trigger for Age problem']
+					]
 				]
 			],
 			// #36 History.
@@ -1176,7 +1225,9 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Show' => 'History'
 					],
-					'result' => []
+					'result' => [
+						['Problem' => 'Trigger for Age problem']
+					]
 				]
 			],
 			// #37 Problems.
