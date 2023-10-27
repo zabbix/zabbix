@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-10-19 13:56+0000\n"
+"PO-Revision-Date: 2023-10-25 21:47+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -19454,7 +19454,7 @@ msgstr "A função de usuário com ID \"%1$s\" não está disponível."
 #: include/classes/helpers/CMenuHelper.php:297
 #: include/classes/helpers/CRoleHelper.php:426
 msgid "User roles"
-msgstr "Papéis de utilizador"
+msgstr "Funções de usuário"
 
 #: app/views/administration.housekeeping.edit.php:108
 msgid "User sessions"
@@ -19480,7 +19480,7 @@ msgstr "Tipo de usuário"
 #: app/controllers/CControllerUserUnblock.php:65
 msgid "User unblocked"
 msgid_plural "Users unblocked"
-msgstr[0] "Utilizador desbloqueado"
+msgstr[0] "Usuário desbloqueado"
 msgstr[1] "Usuários desbloqueados"
 
 #: app/controllers/CControllerUserProfileUpdate.php:118
