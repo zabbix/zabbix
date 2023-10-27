@@ -452,8 +452,6 @@ class CSVGHoneycomb {
 		const labels_primary = this.#elements.honeycomb_container.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY}`);
 		const labels_secondary = this.#elements.honeycomb_container.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_SECONDARY}`);
 
-		this.#positionLabels(labels_primary, labels_secondary);
-
 		const check_labels_height = (labels, font_size) => {
 			const node = labels.node();
 
@@ -473,26 +471,7 @@ class CSVGHoneycomb {
 		check_labels_height(labels_primary, this.#label_primary_font_size);
 		check_labels_height(labels_secondary, this.#label_secondary_font_size);
 
-		const available_cell_width = this.#radius_inner * 2 - this.#radius_inner / 10;
-
-		const adjust_labels_width = (labels, data_attribute) => {
-			labels
-				.each((d, index_label, nodes) => {
-					const lines = d[data_attribute].split('\r\n');
-
-					d3.select(nodes[index_label])
-						.selectAll('tspan')
-						.each((d, index_line, nodes) => {
-							nodes[index_line].textContent = lines[index_line];
-							while (nodes[index_line].getBBox().width > available_cell_width) {
-								nodes[index_line].textContent = `${nodes[index_line].textContent.slice(0, -4)}...`;
-							}
-						});
-				});
-		};
-
-		adjust_labels_width(labels_primary, 'primary_label');
-		adjust_labels_width(labels_secondary, 'secondary_label');
+		this.#positionLabels(labels_primary, labels_secondary);
 
 		if ((labels_primary.node() && isVisible(labels_primary.node())) && (!labels_secondary.node() || !isVisible(labels_secondary.node()))) {
 			let label_primary_position_y = this.#label_primary_font_size / 2;
@@ -824,6 +803,27 @@ class CSVGHoneycomb {
 				secondary.attr('transform', `translate(0 ${label_secondary_position_y - offset / this.#label_secondary_line_count / 2})`);
 			}
 		}
+
+		const available_cell_width = this.#radius_inner * 2 - this.#radius_inner / 10;
+
+		const adjust_labels_width = (labels, data_attribute) => {
+			labels
+				?.each((d, index_label, nodes) => {
+					const lines = d[data_attribute].split('\r\n');
+
+					d3.select(nodes[index_label])
+						.selectAll('tspan')
+						.each((d, index_line, nodes) => {
+							nodes[index_line].textContent = lines[index_line];
+							while (nodes[index_line].getBBox().width > available_cell_width) {
+								nodes[index_line].textContent = `${nodes[index_line].textContent.slice(0, -4)}...`;
+							}
+						});
+				});
+		};
+
+		adjust_labels_width(primary, 'primary_label');
+		adjust_labels_width(secondary, 'secondary_label');
 	};
 
 	/**
