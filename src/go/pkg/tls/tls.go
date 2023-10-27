@@ -1087,12 +1087,12 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 		var cSubject, cIssuer *C.char
 		if cfg.ServerCertIssuer != "" {
 			cIssuer = C.CString(cfg.ServerCertIssuer)
-			log.Tracef("Calling C function \"free()\"")
-			defer C.free(unsafe.Pointer(cSubject))
+			log.Tracef("Calling C function \"free(cIssuer)\"")
+			defer C.free(unsafe.Pointer(cIssuer))
 		}
 		if cfg.ServerCertSubject != "" {
 			cSubject = C.CString(cfg.ServerCertSubject)
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cSubject)\"")
 			defer C.free(unsafe.Pointer(cSubject))
 		}
 		log.Tracef("Calling C function \"tls_validate_issuer_and_subject()\"")

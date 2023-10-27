@@ -394,6 +394,122 @@ static int	DBpatch_6000020(void)
 {
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
+
+static int	DBpatch_6000021(void)
+{
+	return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
+}
+
+static int	DBpatch_6000022(void)
+{
+	return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000023(void)
+{
+	return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
+}
+
+static int	DBpatch_6000024(void)
+{
+	return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
+}
+
+static int	DBpatch_6000025(void)
+{
+	return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
+}
+
+static int	DBpatch_6000026(void)
+{
+	return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
+}
+
+static int	DBpatch_6000027(void)
+{
+	return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
+}
+
+static int	DBpatch_6000028(void)
+{
+	return DBcreate_index("hosts", "hosts_7", "templateid", 0);
+}
+
+static int	DBpatch_6000029(void)
+{
+	return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
+}
+
+static int	DBpatch_6000030(void)
+{
+	return DBcreate_index("report", "report_2", "userid", 0);
+}
+
+static int	DBpatch_6000031(void)
+{
+	return DBcreate_index("report", "report_3", "dashboardid", 0);
+}
+
+static int	DBpatch_6000032(void)
+{
+	return DBcreate_index("report_user", "report_user_2", "userid", 0);
+}
+
+static int	DBpatch_6000033(void)
+{
+	return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
+}
+
+static int	DBpatch_6000034(void)
+{
+	return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000035(void)
+{
+	return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
+}
+
+static int	DBpatch_6000036(void)
+{
+	return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
+}
+
+static int	DBpatch_6000037(void)
+{
+	return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
+}
+
+static int	DBpatch_6000038(void)
+{
+	return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
+}
+
+static int	DBpatch_6000039(void)
+{
+	return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000040(void)
+{
+	return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000041(void)
+{
+	return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
+}
+
+static int	DBpatch_6000042(void)
+{
+	return DBcreate_index("task", "task_2", "proxy_hostid", 0);
+}
+
+static int	DBpatch_6000043(void)
+{
+	return DBcreate_index("users", "users_3", "roleid", 0);
+}
+
 #endif
 
 DBPATCH_START(6000)
@@ -421,5 +537,28 @@ DBPATCH_ADD(6000017, 0, 0)
 DBPATCH_ADD(6000018, 0, 0)
 DBPATCH_ADD(6000019, 0, 0)
 DBPATCH_ADD(6000020, 0, 0)
+DBPATCH_ADD(6000021, 0, 0)
+DBPATCH_ADD(6000022, 0, 0)
+DBPATCH_ADD(6000023, 0, 0)
+DBPATCH_ADD(6000024, 0, 0)
+DBPATCH_ADD(6000025, 0, 0)
+DBPATCH_ADD(6000026, 0, 0)
+DBPATCH_ADD(6000027, 0, 0)
+DBPATCH_ADD(6000028, 0, 0)
+DBPATCH_ADD(6000029, 0, 0)
+DBPATCH_ADD(6000030, 0, 0)
+DBPATCH_ADD(6000031, 0, 0)
+DBPATCH_ADD(6000032, 0, 0)
+DBPATCH_ADD(6000033, 0, 0)
+DBPATCH_ADD(6000034, 0, 0)
+DBPATCH_ADD(6000035, 0, 0)
+DBPATCH_ADD(6000036, 0, 0)
+DBPATCH_ADD(6000037, 0, 0)
+DBPATCH_ADD(6000038, 0, 0)
+DBPATCH_ADD(6000039, 0, 0)
+DBPATCH_ADD(6000040, 0, 0)
+DBPATCH_ADD(6000041, 0, 0)
+DBPATCH_ADD(6000042, 0, 0)
+DBPATCH_ADD(6000043, 0, 0)
 
 DBPATCH_END()

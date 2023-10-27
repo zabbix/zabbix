@@ -2078,6 +2078,10 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr "히스토리를 정리할 수 없습니다"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "그래프 프로토타입을 복제할 수 없습니다."
@@ -3657,6 +3661,14 @@ msgstr "히스토리를 삭제"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "히스토리와 트렌드를 삭제"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6659,6 +6671,10 @@ msgstr "이벤트 로그의 감시. 로그 값을 리턴."
 msgid "Event name"
 msgstr ""
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "이벤트 태그의 짝"
@@ -7870,6 +7886,10 @@ msgstr "행을 강조표시"
 #: jsLoader.php:372
 msgid "History"
 msgstr "이력"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -22193,6 +22213,10 @@ msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "수치"
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

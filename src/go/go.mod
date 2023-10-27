@@ -3,7 +3,7 @@ module zabbix.com
 go 1.19
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20230727113532-2c7d8a9c8fbe
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20231017084106-a7a9dc3e4609
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/Microsoft/go-winio v0.6.1
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
@@ -13,7 +13,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/go-ole/go-ole v1.2.4
-	github.com/go-sql-driver/mysql v1.5.0
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/goburrow/modbus v0.1.0
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.20.1

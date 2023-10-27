@@ -2129,6 +2129,10 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr ""
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr ""
@@ -3810,6 +3814,14 @@ msgstr ""
 #: include/views/configuration.item.edit.php:1068
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
+msgstr ""
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
 msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
@@ -6824,6 +6836,10 @@ msgstr ""
 msgid "Event name"
 msgstr ""
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr ""
@@ -8040,6 +8056,10 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:64 items.php:259
 #: jsLoader.php:372
 msgid "History"
+msgstr ""
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
@@ -22461,6 +22481,10 @@ msgstr ""
 
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127

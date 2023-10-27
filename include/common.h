@@ -110,7 +110,7 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_ZBX_DNSNAME_LEN	255	/* maximum host DNS name length from RFC 1035 (without terminating '\0') */
-#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
+#define MAX_EXECUTE_OUTPUT_LEN	(16 * ZBX_MEBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
@@ -353,7 +353,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_GROUP		0
 #define CONDITION_TYPE_HOST			1
 #define CONDITION_TYPE_TRIGGER			2
-#define CONDITION_TYPE_TRIGGER_NAME		3
+#define CONDITION_TYPE_EVENT_NAME		3
 #define CONDITION_TYPE_TRIGGER_SEVERITY		4
 /* #define CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define CONDITION_TYPE_TIME_PERIOD		6
@@ -1233,6 +1233,10 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
+#if defined(__hpux)
+int	zbx_hpux_vsnprintf_is_c99(void);
+#endif
+
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
@@ -1476,6 +1480,9 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 #define ZBX_PSK_FOR_AUTOREG		0x02				/* PSK can be used for host autoregistration */
 #define ZBX_PSK_FOR_PROXY		0x04				/* PSK is configured on proxy */
 
+#define ZBX_BACKSLASH_ESC_OFF		0
+#define ZBX_BACKSLASH_ESC_ON		1
+
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
@@ -1483,6 +1490,11 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
 		char *error, int max_error_len);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
+
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos);
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);

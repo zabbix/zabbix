@@ -181,7 +181,7 @@ class CActionCondValidator extends CValidator {
 				}
 				// break; is not missing here
 
-			case CONDITION_TYPE_TRIGGER_NAME:
+			case CONDITION_TYPE_EVENT_NAME:
 			case CONDITION_TYPE_HOST_NAME:
 			case CONDITION_TYPE_HOST_METADATA:
 			case CONDITION_TYPE_EVENT_TAG:

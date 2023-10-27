@@ -1057,6 +1057,7 @@ class CScript extends CApiService {
 			foreach ($result as $scriptid => &$row) {
 				$row['actions'] = [];
 			}
+			unset($row);
 
 			$action_scriptids = [];
 

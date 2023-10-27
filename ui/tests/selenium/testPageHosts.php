@@ -19,20 +19,28 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
 
 /**
  * @dataSource TagFilter, WebScenarios
  */
 class testPageHosts extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
+	}
+
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
-
-	use TagTrait;
-	use TableTrait;
 
 	public static function allHosts() {
 		return CDBHelper::getDataProvider(
@@ -51,10 +59,12 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
 		$filter->submit();
+		$table->waitUntilReloaded();
 
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextPresent('Simple form test host');
