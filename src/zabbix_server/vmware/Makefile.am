@@ -8,6 +8,8 @@ libzbxvmware_a_SOURCES = \
 	vmware_stats.c \
 	vmware_perfcntr.c \
 	vmware_perfcntr.h \
+	vmware_service_cfglists.c \
+	vmware_service_cfglists.h \
 	vmware_hv.c \
 	vmware_hv.h \
 	vmware_rest.c \

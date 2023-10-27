@@ -21,6 +21,7 @@
 #include "vmware_internal.h"
 #include "vmware_perfcntr.h"
 #include "vmware_shmem.h"
+#include "vmware_service_cfglists.h"
 #include "vmware_hv.h"
 
 #include "zbxxml.h"
@@ -180,9 +181,6 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_DS_INFO_EXTENT()									\
-		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
@@ -1834,73 +1832,6 @@ static int	vmware_service_refresh_datastore_info(CURL *easyhandle, const char *i
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves a list of vmware service datastore diskextents          *
- *                                                                            *
- * Parameters: doc        - [IN] XML document                                 *
- *             diskextents  - [OUT] list of vmware diskextents                *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_t *diskextents)
-{
-	xmlXPathContext		*xpathCtx;
-	xmlXPathObject		*xpathObj;
-	xmlNodeSetPtr		nodeset;
-	int			i, ret = FAIL;
-
-	if (NULL == doc)
-		return ret;
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *) ZBX_XPATH_DS_INFO_EXTENT(), xpathCtx)))
-		goto out;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto out;
-
-	nodeset = xpathObj->nodesetval;
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		char			*value;
-		zbx_vmware_diskextent_t	*diskextent;
-		xmlNode			*xn = nodeset->nodeTab[i];
-
-		if (NULL == (value = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("diskName"))))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get diskName.", __func__);
-			continue;
-		}
-
-		diskextent = (zbx_vmware_diskextent_t *)zbx_malloc(NULL, sizeof(zbx_vmware_diskextent_t));
-		diskextent->diskname = value;
-
-		if (NULL != (value = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("partition"))))
-		{
-			diskextent->partitionid = (unsigned int) atoi(value);
-			zbx_free(value);
-		}
-		else
-			diskextent->partitionid = 0;
-
-		zbx_vector_vmware_diskextent_append(diskextents, diskextent);
-	}
-
-	zbx_vector_vmware_diskextent_sort(diskextents, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
-
-	ret = SUCCEED;
-out:
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
 
 	return ret;
 }
