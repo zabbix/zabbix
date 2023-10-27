@@ -57,7 +57,8 @@ type Plugin struct {
 
 var impl Plugin
 
-var nonAlphanumericRegex = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
+// Allow only alphanumeric, hyphens and underscores, but dis-allow hyphens and underscores at the end of the string
+var cleanRegex = regexp.MustCompile(`^[A-Za-z0-9]([A-Za-z0-9_-]*[A-Za-z0-9])?$`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -434,7 +435,7 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 }
 
 func clearString(str string) string {
-	return nonAlphanumericRegex.ReplaceAllString(str, "")
+	return cleanRegex.ReplaceAllString(str, "")
 }
 
 func init() {
