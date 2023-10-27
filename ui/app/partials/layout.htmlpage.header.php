@@ -111,5 +111,3 @@ if ($scripts) {
 }
 
 $page_header->show();
-
-echo '<body>';

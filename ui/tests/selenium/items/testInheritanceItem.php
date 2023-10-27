@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -32,6 +33,13 @@ class testInheritanceItem extends CLegacyWebTest {
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	// returns list of items from a template
 	public static function update() {
@@ -51,8 +59,10 @@ class testInheritanceItem extends CLegacyWebTest {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('items.php?form=update&context=host&itemid='.$data['itemid']);
-		$this->zbxTestClickWait('update');
+		$this->page->login()->open('zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=15001&context=host');
+		$this->query('link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$data['itemid']))->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilready()->getFooter()->query('button:Update')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('Item updated');
 
@@ -88,15 +98,17 @@ class testInheritanceItem extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItem_SimpleCreate($data) {
-		$this->zbxTestLogin('items.php?form=create&context=host&hostid='.$this->templateid);
-
-		$this->zbxTestInputTypeWait('name', $data['name']);
-		$this->zbxTestInputType('key', $data['key']);
-
-		$this->zbxTestClickWait('add');
+		$this->page->login()->open('zabbix.php?action=item.list&filter_set=1&filter_hostids[0]='.$this->templateid.'&context=template');
+		$this->query('button:Create item')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
+		$form->getField('Name')->fill($data['name']);
+		$form->getField('Key')->fill($data['key']);
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				COverlayDialogElement::ensureNotPresent();
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestTextPresent('Item added');
@@ -137,8 +149,7 @@ class testInheritanceItem extends CLegacyWebTest {
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestTextNotPresent('Item added');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
-				$this->zbxTestTextPresent($data['errors']);
+				$this->assertMessage(TEST_BAD, 'Cannot add item', $data['errors']);
 				break;
 		}
 	}

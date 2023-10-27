@@ -3047,7 +3047,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_hostgroup_t	*group;
 
-	if (NULL == (result = zbx_db_select("select groupid,name from hstgrp")))
+	if (NULL == (result = zbx_db_select("select groupid,name from hstgrp where type=%d", ZBX_GROUP_TYPE_HOST)))
 		return FAIL;
 
 	dbsync_prepare(sync, 2, NULL);

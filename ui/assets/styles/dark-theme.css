@@ -2186,6 +2186,12 @@ button {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+@page {
+  margin: 10px; }
+@media print {
+  .dashboard-page {
+    margin: 10px;
+    break-after: page; } }
 .diff {
   padding: 4px;
   background: #0e1012; }
@@ -5124,6 +5130,9 @@ form.is-loading {
         padding-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
+  .table-forms .table-subforms {
+    margin-top: -5px;
+    margin-bottom: -5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -6737,6 +6746,7 @@ svg {
 .ui-sortable .td-drag-icon {
   width: 12px; }
 .ui-sortable.ui-sortable-disabled .drag-icon {
+  cursor: default;
   color: #3d4b53; }
 
 #expressions_list .ui-sortable-helper {

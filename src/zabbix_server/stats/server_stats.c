@@ -19,16 +19,17 @@
 
 #include "zabbix_stats.h"
 
+#include "../lld/lld_protocol.h"
+#include "../ha/ha.h"
+
 #include "zbxcacheconfig.h"
 #include "zbxcachevalue.h"
-#include "../lld/lld_protocol.h"
 #include "zbxtrends.h"
 #include "zbxconnector.h"
-#include "../ha/ha.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get program type (server) specific internal statistics            *
+ * Purpose: gets program type (server) specific internal statistics           *
  *                                                                            *
  * Parameters: json         - [IN/OUT]                                        *
  *             arg          - [IN] anonymous argument provided by register    *

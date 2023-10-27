@@ -60,14 +60,14 @@ class testMassUpdateItems extends CWebTest{
 		'Interval' => [
 			'name' => 'delay',
 			'class' => 'CElement',
-			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
-					'not(contains(@style,"display: none"))]|./textarea[@name]'
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@class) or '.
+					'not(contains(@class, "display-none"))]|./textarea[@name]'
 		],
 		'Period' => [
 			'name' => 'period',
 			'class' => 'CElement',
-			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
-					'not(contains(@style,"display: none"))]|./textarea[@name]'
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@class) or '.
+					'not(contains(@class, "display-none"))]|./textarea[@name]'
 		]
 	];
 
@@ -227,8 +227,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '3599']
 						]
 					],
@@ -246,8 +246,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '1']
 						]
 					],
@@ -265,8 +265,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '']
 						]
 					],
@@ -284,8 +284,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '25y']
 						]
 					],
@@ -303,8 +303,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '']
 						]
 					],
@@ -322,8 +322,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '86399']
 						]
 					],
@@ -341,8 +341,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '1']
 						]
 					],
@@ -360,8 +360,8 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '25y']
 						]
 					],
@@ -773,12 +773,12 @@ class testMassUpdateItems extends CWebTest{
 								]
 							]
 						],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '400d']
 						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Do not keep trends']
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Do not store']
 						],
 						'Value mapping' => ['id' => 'valuemapid', 'value' => 'Reference valuemap'],
 						'Description' => ['id' => 'description', 'value' => 'New mass updated description']
@@ -795,12 +795,12 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '0']
 						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '0']
 						]
 					]
@@ -816,12 +816,12 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '3600']
 						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '86400']
 						]
 					]
@@ -837,12 +837,12 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '9125d']
 						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '9125d']
 						]
 					]
@@ -858,12 +858,12 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '219000h']
 						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '219000h']
 						]
 					]
@@ -879,12 +879,12 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'history', 'value' => '13140000m']
 						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '13140000m']
 						]
 					]
@@ -1084,11 +1084,11 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'SNMP trap'],
 						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Do not keep history']
+						'History' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Do not store']
 						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+						'Trends' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Store up to'],
 							'input' => ['id' => 'trends', 'value' => '99d']
 						]
 					],
@@ -1207,7 +1207,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
-						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI']
+						'Master item' => ['id' => 'master-item-field', 'value' => '7_IPMI']
 					],
 					'expected_tags' => [
 						'15_Calculated' => [
@@ -1291,25 +1291,25 @@ class testMassUpdateItems extends CWebTest{
 					break;
 
 				case 'Update interval':
-					$container_table = $form->query('id:update_interval')->asTable()->one();
-					$container_table->getRow(0)->getColumn(1)->query('id:delay')->one()->fill($value['Delay']);
+					$update_interval_field = $form->getField('Update interval');
+					$update_interval_field->query('id:delay')->waitUntilVisible()->one()->fill($value['Delay']);
 
 					if (array_key_exists('Custom intervals', $value)) {
-						$container_table->getRow(1)->getColumn(1)->query('id:custom_intervals')->asMultifieldTable(
-								['mapping' => self::INTERVAL_MAPPING])->one()->fill($value['Custom intervals']
-						);
+						$update_interval_field->query('id:custom_intervals')
+								->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()
+								->fill($value['Custom intervals']);
 					}
 					break;
 
-				case 'History storage period':
-				case 'Trend storage period':
+				case 'History':
+				case 'Trends':
 					$form->query('id', $value['radio']['id'])->one()->asSegmentedRadio()->fill($value['radio']['value']);
 
 					if (array_key_exists('input', $value)) {
 						$form->query('id', $value['input']['id'])->one()->fill($value['input']['value']);
 					}
 
-					if ($value['radio']['value'] === 'Do not keep history') {
+					if ($value['radio']['value'] === 'Do not store' && $value['radio']['id'] === 'history_mode') {
 						$this->assertFalse($form->query('id:history')->one()->isVisible());
 					}
 					break;
@@ -1369,9 +1369,11 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
-				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$form = $overlay->asForm();
 
 				foreach ($data['change'] as $field => $value) {
 					switch ($field) {
@@ -1392,14 +1394,14 @@ class testMassUpdateItems extends CWebTest{
 						case 'User name':
 						case 'Password':
 						case 'Log time format':
-						case 'Timeout':
+						case 'id:timeout':
 							$this->assertEquals($value['value'], $form->getField($field)->getValue());
 							break;
 
-						case 'History storage period':
-						case 'Trend storage period':
+						case 'History':
+						case 'Trends':
 							if (CTestArrayHelper::get($value, 'input.value', 'null') === '0') {
-								$this->assertEquals('Do not keep '.$value['input']['id'],
+								$this->assertEquals('Do not store',
 										$form->query('id',$value['radio']['id'])->one()->asSegmentedRadio()->getValue()
 								);
 							}
@@ -1408,7 +1410,7 @@ class testMassUpdateItems extends CWebTest{
 										$form->query('id', $value['radio']['id'])->one()->asSegmentedRadio()->getValue()
 								);
 
-								if ($value['radio']['value'] === 'Do not keep history') {
+								if ($value['radio']['value'] === 'Do not store' && $value['radio']['id'] === 'history_mode') {
 									$this->assertFalse($form->query('id:history')->one()->isVisible());
 								}
 
@@ -1437,8 +1439,8 @@ class testMassUpdateItems extends CWebTest{
 									unset($interval['action'], $interval['index']);
 								}
 								unset($interval);
-								$this->assertEquals($value['Custom intervals'], $form->query('id:delayFlexTable')
-										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()->getValue()
+								$this->assertEquals($value['Custom intervals'], $form->getField('Custom intervals')
+										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->getValue()
 								);
 							}
 							break;
@@ -1450,23 +1452,17 @@ class testMassUpdateItems extends CWebTest{
 							}
 							unset($header);
 
-							$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
+							$this->assertEquals($value, $form->query('xpath:.//div[@id="js-item-headers-field"]//table')
 									->asMultifieldTable()->one()->getValue()
 							);
 							break;
 
 						case 'Master item':
-							if ($prototypes) {
-								$this->assertEquals(self::HOST_NAME.': '.$value['value'],
-										$form->query('xpath://input[@id="master_itemname"]')->one()->getValue()
-								);
-							}
-							else {
-								$this->assertEquals([self::HOST_NAME.': '.$value['value']],
-										$form->query('xpath://*[@id="master_itemid"]/..')->asMultiselect()->one()->getValue()
-								);
-							}
+							$this->assertEquals([self::HOST_NAME.': '.$value['value']],
+									$form->query('xpath://*[@id="master_itemid"]/..')->asMultiselect()->one()->getValue()
+							);
 							break;
+
 						case 'Value mapping':
 							$this->assertEquals([$value['value']],
 									$form->query('xpath://*[@id="'.$value['id'].'"]/..')->asMultiselect()->one()->getValue()
@@ -1487,7 +1483,7 @@ class testMassUpdateItems extends CWebTest{
 					$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($data['expected_tags'][$name]);
 				}
 
-				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$overlay->getFooter()->query('button:Cancel')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -1798,7 +1794,8 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 				// TODO: not stable test testPageMassUpdateItems_ChangePreprocessing#8 on Jenkins, failed to properly waitUntilReady for page
 				try {
 					$table->query('link', $name)->one()->waitUntilClickable()->click();
@@ -1806,10 +1803,11 @@ class testMassUpdateItems extends CWebTest{
 				catch (ElementClickInterceptedException $e) {
 					$table->query('link', $name)->one()->waitUntilClickable()->click();
 				}
-				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$form = $overlay->asForm();
 				$form->selectTab('Preprocessing');
 				$this->assertPreprocessingSteps($data['Preprocessing steps']);
-				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -2241,9 +2239,11 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
-				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$form = $overlay->asForm();
 				$form->selectTab('Tags');
 
 				$expected = $data['Tags']['tags'];
@@ -2272,7 +2272,7 @@ class testMassUpdateItems extends CWebTest{
 				$expected_tags = array_key_exists('expected_tags', $data) ? $data['expected_tags'][$name] : $expected;
 				$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
 
-				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -2311,12 +2311,13 @@ class testMassUpdateItems extends CWebTest{
 	 */
 	private function openMassUpdateForm($prototypes, $data) {
 		$link = ($prototypes)
-			? 'disc_prototypes.php?parent_discoveryid='.self::RULEID.'&context=host'
-			: 'items.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
+			? 'zabbix.php?action=item.prototype.list&parent_discoveryid='.self::RULEID.'&context=host'
+			: 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
 		$this->page->login()->open($link);
 
 		// Get item table.
-		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+		$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
+		$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
 		$table->findRows('Name', $data)->select();
 
 		// Open mass update form.
