@@ -85,7 +85,9 @@
 #include "zbxdiscovery.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
+#ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
+#endif
 
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_server";

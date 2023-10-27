@@ -51,6 +51,7 @@ extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
  *             config_source_ip              - [IN]                                   *
  *             config_enable_remote_commands - [IN]                                   *
  *             config_log_remote_commands    - [IN]                                   *
+ *             program_type                  - [IN]                                   *
  *                                                                                    *
  * Return value: SUCCEED - remote command was executed                                *
  *               FAIL    - otherwise                                                  *

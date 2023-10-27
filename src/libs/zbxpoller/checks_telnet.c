@@ -21,6 +21,10 @@
 
 #include "zbxsysinfo.h"
 #include "telnet_run.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {

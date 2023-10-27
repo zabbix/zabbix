@@ -18,6 +18,7 @@
 **/
 
 #include "zbxpoller.h"
+#include "zbxcomms.h"
 
 #include "ssh_run.h"
 

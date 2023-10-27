@@ -31,7 +31,9 @@
 #include "zbx_availability_constants.h"
 #include "zbx_scripts_constants.h"
 #include "zbxpoller.h"
+#ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
+#endif
 #include "zbxalgo.h"
 #include "zbxavailability.h"
 #include "zbxcacheconfig.h"

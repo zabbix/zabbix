@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXPOLLER_POLLER_H
 #define ZABBIX_ZBXPOLLER_POLLER_H
 
+#include "zbxcacheconfig.h"
+
 int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, int timeout,
 		const char *config_source_ip);
 

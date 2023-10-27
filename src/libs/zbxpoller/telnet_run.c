@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxpoller.h"
-
 #include "telnet_run.h"
+#include "zbxcomms.h"
 
 /*
  * Example: telnet.run["ls /"]

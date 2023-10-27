@@ -624,6 +624,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  *             config_unavailable_delay   - [IN]                                   *
  *             config_unreachable_period  - [IN]                                   *
  *             config_unreachable_delay   - [IN]                                   *
+ *             program_type               - [IN]                                   *
  *                                                                                 *
  * Return value: number of items processed                                         *
  *                                                                                 *

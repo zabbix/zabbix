@@ -66,10 +66,6 @@
 #define ZBX_ALERT_MESSAGE_ERR_USR	1
 #define ZBX_ALERT_MESSAGE_ERR_MSG	2
 
-#define ZBX_ROLE_RULE_TYPE_INT		0
-#define ZBX_ROLE_RULE_TYPE_STR		1
-#define ZBX_ROLE_RULE_TYPE_SERVICEID	3
-
 #define ZBX_SERVICES_RULE_PREFIX	"services."
 
 typedef struct
