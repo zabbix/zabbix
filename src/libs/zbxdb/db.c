@@ -350,6 +350,19 @@ static int	is_recoverable_mysql_error(int err_no)
 
 	return FAIL;
 }
+
+static int	is_inhibited_mysql_error(int err_no)
+{
+	switch (err_no)
+	{
+		case CR_SERVER_GONE_ERROR:
+		case CR_SERVER_LOST:
+		case ER_CLIENT_INTERACTION_TIMEOUT:
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
 #elif defined(HAVE_POSTGRESQL)
 static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult *pg_result)
 {
@@ -1487,7 +1500,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			err_no = (int)mysql_errno(conn);
 
-			if (0 < mysql_err_cnt++)
+			if (0 < mysql_err_cnt++ || FAIL == is_inhibited_mysql_error(err_no))
 			{
 				errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
 				zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
@@ -1514,7 +1527,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				{
 					err_no = (int)mysql_errno(conn);
 
-					if (0 < mysql_err_cnt++)
+					if (0 < mysql_err_cnt++ || FAIL == is_inhibited_mysql_error(err_no))
 					{
 						errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
 						zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
@@ -1675,7 +1688,7 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 		{
 			int err_no = (int)mysql_errno(conn);
 
-			if (0 < mysql_err_cnt++)
+			if (0 < mysql_err_cnt++ || FAIL == is_inhibited_mysql_error(err_no))
 				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			zbx_db_free_result(result);
