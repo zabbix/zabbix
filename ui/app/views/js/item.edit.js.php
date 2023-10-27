@@ -535,10 +535,6 @@ window.item_edit_form = new class {
 		const key = this.field.key.value;
 		const type = parseInt(this.field.type.value, 10);
 
-		if (key.trim() === '') {
-			return false;
-		}
-
 		return type == ITEM_TYPE_SIMPLE
 			? key.substr(0, 7) !== 'vmware.' && key.substr(0, 8) !== 'icmpping'
 			: this.testable_item_types.indexOf(type) != -1;
