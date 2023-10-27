@@ -46,6 +46,8 @@ typedef struct
 }
 zbx_event_severity_t;
 
+void     zbx_event_severity_free(zbx_event_severity_t *event_severity);
+
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
 		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags);
 void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events);
@@ -62,7 +64,11 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 zbx_uint32_t	zbx_service_serialize_parentids(unsigned char **data, const zbx_vector_uint64_t *ids);
 void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uint64_t *ids);
 
-zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const zbx_vector_ptr_t *event_severities);
-void	zbx_service_deserialize_event_severities(const unsigned char *data, zbx_vector_ptr_t *event_severities);
+ZBX_PTR_VECTOR_DECL(event_severity, zbx_event_severity_t *)
+
+zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data,
+		const zbx_vector_event_severity_t *event_severities);
+void	zbx_service_deserialize_event_severities(const unsigned char *data,
+		zbx_vector_event_severity_t *event_severities);
 
 #endif /* ZABBIX_ZBXSERVICE_H */
