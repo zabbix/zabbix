@@ -80,6 +80,7 @@ static MYSQL			*conn = NULL;
 static int			mysql_err_cnt = 0;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
+static int			txn_begin = 0;	/* transaction begin statement is executed */
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -1023,7 +1024,9 @@ int	zbx_db_begin_basic(void)
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
 		assert(0);
 	}
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 1;
+#endif
 	txn_level++;
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -1035,7 +1038,9 @@ int	zbx_db_begin_basic(void)
 
 	if (ZBX_DB_DOWN == rc)
 		txn_level--;
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 0;
+#endif
 	return rc;
 }
 
@@ -1500,7 +1505,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			err_no = (int)mysql_errno(conn);
 
-			if (0 < mysql_err_cnt++ || FAIL == is_inhibited_mysql_error(err_no))
+			if (0 < mysql_err_cnt++ || 0 < txn_level && 0 == txn_begin ||
+					FAIL  == is_inhibited_mysql_error(err_no))
 			{
 				errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
 				zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
@@ -1527,7 +1533,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				{
 					err_no = (int)mysql_errno(conn);
 
-					if (0 < mysql_err_cnt++ || FAIL == is_inhibited_mysql_error(err_no))
+					if (0 < mysql_err_cnt++ || 0 < txn_level && 0 == txn_begin ||
+							FAIL  == is_inhibited_mysql_error(err_no))
 					{
 						errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
 						zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
@@ -1688,7 +1695,8 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 		{
 			int err_no = (int)mysql_errno(conn);
 
-			if (0 < mysql_err_cnt++ || FAIL == is_inhibited_mysql_error(err_no))
+			if (0 < mysql_err_cnt++ || 0 < txn_level && 0 == txn_begin ||
+					FAIL  == is_inhibited_mysql_error(err_no))
 				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			zbx_db_free_result(result);
