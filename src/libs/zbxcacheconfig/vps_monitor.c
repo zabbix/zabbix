@@ -152,25 +152,9 @@ void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
 void	zbx_vps_monitor_add_written(zbx_uint64_t values_num)
 {
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
-	time_t			now;
-
-	now = time(NULL);
 
 	zbx_mutex_lock(vps_lock);
-
-	while (monitor->last_hist != now)
-	{
-		monitor->history[vps_history_inc(&monitor->history_tail)] = monitor->total_values_num;
-
-		if (monitor->history_tail == monitor->history_head)
-			vps_history_inc(&monitor->history_head);
-
-		monitor->last_hist++;
-	}
-
 	monitor->total_values_num += values_num;
-	monitor->history[monitor->history_tail] += values_num;
-
 	zbx_mutex_unlock(vps_lock);
 }
 
@@ -212,44 +196,12 @@ void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats)
 
 	zbx_mutex_lock(vps_lock);
 	stats->overcommit = monitor->overcommit;
+	stats->written_num = monitor->total_values_num;
 	zbx_mutex_unlock(vps_lock);
 
 	/* preconfigured values, cannot change without restarting server */
 	stats->values_limit = monitor->values_limit / ZBX_VPS_FLUSH_PERIOD;
 	stats->overcommit_limit = monitor->overcommit_limit;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get average vps fro the last minute                               *
- *                                                                            *
- ******************************************************************************/
-double	zbx_vps_get_avg(void)
-{
-	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
-	double			avg;
-
-	zbx_mutex_lock(vps_lock);
-
-	if (monitor->history_tail != monitor->history_head)
-	{
-		int		last = monitor->history_tail, period;
-		zbx_uint64_t	diff;
-
-		vps_history_dec(&last);
-		diff = monitor->history[last] - monitor->history[monitor->history_head];
-
-		if (0 > (period = last - monitor->history_head))
-			period += VPS_HISTORY_SIZE;
-
-		avg = (double)diff / period;
-	}
-	else
-		avg = 0.0;
-
-	zbx_mutex_unlock(vps_lock);
-
-	return avg;
 }
 
 /******************************************************************************

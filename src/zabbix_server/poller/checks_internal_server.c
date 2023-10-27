@@ -268,22 +268,6 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		SET_TEXT_RESULT(result, nodes);
 	}
-	else if (0 == strcmp(param1, "vps"))
-	{
-		if (2 < nparams)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			goto out;
-		}
-
-		if (NULL != (param2 = get_rparam(request, 1)) && 0 != strcmp(param2, "avg"))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-			goto out;
-		}
-
-		SET_DBL_RESULT(result, zbx_vps_get_avg());
-	}
 	else if (0 == strcmp(param1, "nvps"))
 	{
 		if (2 != nparams)
@@ -303,22 +287,33 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		zbx_vps_monitor_get_stats(&stats);
 		SET_UI64_RESULT(result, stats.values_limit);
 	}
-	else if (0 == strcmp(param1, "limiter"))
+	else if (0 == strcmp(param1, "vps"))
 	{
+		zbx_vps_monitor_stats_t	stats;
+
+		zbx_vps_monitor_get_stats(&stats);
+
 		param2 = get_rparam(request, 1);
 
 		if (2 == nparams)
 		{
-			if (0 != strcmp(param2, "active"))
+			if (0 == strcmp(param2, "status"))
+			{
+				zbx_uint64_t	value = (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0);
+				SET_UI64_RESULT(result, value);
+			}
+			else if (0 == strcmp(param2, "limit"))
+			{
+				SET_UI64_RESULT(result, stats.values_limit);
+			}
+			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 				goto out;
 			}
 
-			zbx_uint64_t	value = (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0);
-
-			SET_UI64_RESULT(result, value);
-			goto done;
+			ret = SUCCEED;
+			goto out;
 		}
 
 		if (3 != nparams)
@@ -326,15 +321,17 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
 		}
+		else if (0 == strcmp(param2, "written"))
+		{
+			SET_UI64_RESULT(result, stats.written_num);
+			ret = SUCCEED;
+			goto out;
+		}
 		else if (0 != strcmp(param2, "overcommit"))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			goto out;
 		}
-
-		zbx_vps_monitor_stats_t	stats;
-
-		zbx_vps_monitor_get_stats(&stats);
 
 		param2 = get_rparam(request, 2);
 
@@ -346,7 +343,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		{
 			SET_DBL_RESULT(result, (double)stats.overcommit * 100 / stats.overcommit_limit);
 		}
-		else if (0 == strcmp(param2, "total"))
+		else if (0 == strcmp(param2, "limit"))
 		{
 			SET_UI64_RESULT(result, stats.overcommit_limit);
 		}
@@ -361,8 +358,9 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		ret = FAIL;
 		goto out;
 	}
-done:
+
 	ret = SUCCEED;
+
 out:
 	return ret;
 }

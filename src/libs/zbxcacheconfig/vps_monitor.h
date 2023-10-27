@@ -34,11 +34,6 @@ typedef struct
 
 	time_t		last_flush;
 	time_t		last_hist;
-
-	zbx_uint64_t	history[VPS_HISTORY_SIZE];
-	int		history_tail;
-	int		history_head;
-
 } zbx_vps_monitor_t;
 
 int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error);
