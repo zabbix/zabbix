@@ -710,77 +710,49 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 				break;
 			case T_NS:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response: cannot expand name server name."));
-					return SYSINFO_RET_FAIL;
-				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 			case T_CNAME:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response: cannot expand canonical name."));
-					return SYSINFO_RET_FAIL;
-				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 			case T_MB:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response: cannot expand mailbox name."));
-					return SYSINFO_RET_FAIL;
-				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 			case T_MD:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response:"
-							" cannot expand mail destination name."));
-					return SYSINFO_RET_FAIL;
-				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 			case T_MF:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response:"
-							" cannot expand mail forwarder name."));
-					return SYSINFO_RET_FAIL;
-				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 			case T_MG:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response: cannot expand mail group name."));
-					return SYSINFO_RET_FAIL;
-				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 			case T_MR:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response:"
-							" cannot expand renamed mailbox name."));
-					return SYSINFO_RET_FAIL;
-				}
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-				break;
 			case T_PTR:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL,
-							"Cannot decode DNS response: cannot expand PTR name."));
+#define ERR_MSG_PREFIX	"Cannot decode DNS response: cannot expand "
+					const char	*err_msg = NULL;
+
+					switch (q_type)
+					{
+						case T_NS:
+							err_msg = ERR_MSG_PREFIX "name server name.";
+							break;
+						case T_CNAME:
+							err_msg = ERR_MSG_PREFIX "canonical name.";
+							break;
+						case T_MB:
+							err_msg = ERR_MSG_PREFIX "mailbox name.";
+							break;
+						case T_MD:
+							err_msg = ERR_MSG_PREFIX "mail destination name.";
+							break;
+						case T_MF:
+							err_msg = ERR_MSG_PREFIX "mail forwarder name.";
+							break;
+						case T_MG:
+							err_msg = ERR_MSG_PREFIX "mail group name.";
+							break;
+						case T_MR:
+							err_msg = ERR_MSG_PREFIX "renamed mailbox name.";
+							break;
+						case T_PTR:
+							err_msg = ERR_MSG_PREFIX "PTR name.";
+							break;
+					}
+
+					SET_MSG_RESULT(result, zbx_strdup(NULL, err_msg));
 					return SYSINFO_RET_FAIL;
+#undef ERR_MSG_PREFIX
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
