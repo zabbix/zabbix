@@ -419,7 +419,7 @@ class testPageProblems extends CWebTest {
 					'check_actions' => [
 						[
 							[
-								'Time' => '2018-08-07 08:05:35',
+								'Time' => '2018-08-07 11:05:35',
 								'User/Recipient' => 'Admin (Zabbix Administrator)',
 								'Action' => '',
 								'Message/Command' => '',
@@ -427,7 +427,7 @@ class testPageProblems extends CWebTest {
 								'Info' => ''
 							],
 							[
-								'Time' => '2018-08-06 11:42:06 AM',
+								'Time' => '2018-08-06 14:42:06',
 								'User/Recipient' => '',
 								'Action' => '',
 								'Message/Command' => '',
@@ -473,7 +473,7 @@ class testPageProblems extends CWebTest {
 						false,
 						[
 							[
-								'Time' => '2018-08-07 08:05:35',
+								'Time' => '2018-08-07 11:05:35',
 								'User/Recipient' => 'Admin (Zabbix Administrator)',
 								'Action' => '',
 								'Message/Command' => '',
@@ -481,7 +481,7 @@ class testPageProblems extends CWebTest {
 								'Info' => ''
 							],
 							[
-								'Time' => '2018-08-06 11:42:06 AM',
+								'Time' => '2018-08-06 14:42:06',
 								'User/Recipient' => '',
 								'Action' => '',
 								'Message/Command' => '',
