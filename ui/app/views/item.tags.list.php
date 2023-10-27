@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -17,13 +18,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SNMPTRAPPER_H
-#define ZABBIX_SNMPTRAPPER_H
 
-#include "zbxthreads.h"
+/**
+ * @var CView $this
+ * @var array $data
+ */
 
-extern char		*CONFIG_SNMPTRAP_FILE;
+if (!$data['tags']) {
+	$data['tags'][] = ['tag' => '', 'value' => '', 'type' => ZBX_PROPERTY_OWN];
+}
 
-ZBX_THREAD_ENTRY(snmptrapper_thread, args);
+$output = [
+	'body' => (new CPartial('tags.list.html', $data))->getOutput()
+];
 
-#endif
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

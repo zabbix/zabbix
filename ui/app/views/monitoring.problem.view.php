@@ -31,6 +31,8 @@ if ($data['action'] === 'problem.view') {
 	$this->addJsFile('class.tabfilter.js');
 	$this->addJsFile('class.tabfilteritem.js');
 	$this->addJsFile('class.tagfilteritem.js');
+	$this->addJsFile('items.js');
+	$this->addJsFile('multilineinput.js');
 
 	$this->enableLayoutModes();
 	$web_layout_mode = $this->getLayoutMode();
