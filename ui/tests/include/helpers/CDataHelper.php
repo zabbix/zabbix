@@ -389,20 +389,20 @@ class CDataHelper extends CAPIHelper {
 		}
 
 		// Set correct history table where to insert data.
-		$history_table = static::getItemDataTable($itemid);
+		$suffix = static::getItemDataTableSuffix($itemid);
 
 		foreach (array_values($values) as $key => $value) {
 			// If value is an array, it means that we are dealing with trend data, which is inserted in differently.
 			if (is_array($value)) {
 				$clock = is_array($time) ? $time[$key] : $time;
-				DBexecute('INSERT INTO trends'.$suffixes[$value_type].' (itemid, clock, num, value_min, value_avg,'.
+				DBexecute('INSERT INTO trends'.$suffix.' (itemid, clock, num, value_min, value_avg,'.
 						' value_max) VALUES ('.zbx_dbstr($itemid).', '.zbx_dbstr($clock).', '.zbx_dbstr($value['num']).
 						', '.zbx_dbstr($value['min']).', '.zbx_dbstr($value['avg']).', '.zbx_dbstr($value['max']).')'
 				);
 			}
 			else {
 				$clock = is_array($time) ? $time[$key] : $time;
-				DBexecute('INSERT INTO history'.$suffixes[$value_type].' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).
+				DBexecute('INSERT INTO history'.$suffix.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).
 						', '.zbx_dbstr($clock).', '.zbx_dbstr($value).')'
 				);
 			}
@@ -415,7 +415,7 @@ class CDataHelper extends CAPIHelper {
 	 * @param string $itemid		item id
 	 */
 	public static function removeItemData($itemid) {
-		DBexecute('DELETE FROM '.self::getItemDataTable($itemid).' WHERE itemid='.zbx_dbstr($itemid));
+		DBexecute('DELETE FROM history'.self::getItemDataTableSuffix($itemid).' WHERE itemid='.zbx_dbstr($itemid));
 	}
 
 	/**
@@ -423,7 +423,7 @@ class CDataHelper extends CAPIHelper {
 	 *
 	 * @param string $itemid		item id
 	 */
-	public static function getItemDataTable($itemid) {
+	public static function getItemDataTableSuffix($itemid) {
 		// Check item value type to set correct history table.
 		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
 		$suffixes = ['', '_str', '_log', '_uint', '_text'];
@@ -432,6 +432,6 @@ class CDataHelper extends CAPIHelper {
 			throw new Exception('Unsupported item value type: '.$value_type);
 		}
 
-		return 'history'.$suffixes[$value_type];
+		return $suffixes[$value_type];
 	}
 }
