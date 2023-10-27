@@ -314,7 +314,7 @@ out:
   result: SUCCEED
   value: 2
 ---
-test case: Expression 'count(last_foreach(/*/key),"regexp","a\\\"b")' - DBG
+test case: Expression 'count(last_foreach(/*/key),"regexp",".\\\"b")' - DBG
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
   expression: 'count(last_foreach(/*/key),"regexp",".\\\"b")'
