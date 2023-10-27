@@ -35,8 +35,8 @@ void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
 	zbx_free(ack_task);
 }
 
-ZBX_PTR_VECTOR_IMPL(ack_task, zbx_ack_task_t *)
-ZBX_PTR_VECTOR_IMPL(db_action_ptr, zbx_db_action*)
+ZBX_PTR_VECTOR_IMPL(ack_task_ptr, zbx_ack_task_t *)
+ZBX_PTR_VECTOR_IMPL(db_action_ptr, zbx_db_action *)
 
 /******************************************************************************
  *                                                                            *
@@ -3343,7 +3343,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
  * Parameters: ack_tasks        - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_actions_by_acknowledgments(const zbx_vector_ack_task_t *ack_tasks)
+int	process_actions_by_acknowledgments(const zbx_vector_ack_task_ptr_t *ack_tasks)
 {
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];

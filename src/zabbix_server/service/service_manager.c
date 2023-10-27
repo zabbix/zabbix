@@ -2935,7 +2935,7 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
  * Purpose: update service_problem table with the changed event severities    *
  *                                                                            *
  ******************************************************************************/
-static int	db_update_service_problems(const zbx_vector_event_severity_t *event_severities)
+static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *event_severities)
 {
 	int	txn_rc;
 	char	*sql = NULL;
@@ -2978,12 +2978,12 @@ static int	db_update_service_problems(const zbx_vector_event_severity_t *event_s
  ******************************************************************************/
 static void	process_event_severities(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager)
 {
-	zbx_vector_event_severity_t	event_severities;
+	zbx_vector_event_severity_ptr_t	event_severities;
 	int				severities_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%u" , __func__, message->size);
 
-	zbx_vector_event_severity_create(&event_severities);
+	zbx_vector_event_severity_ptr_create(&event_severities);
 
 	zbx_service_deserialize_event_severities(message->data, &event_severities);
 	severities_num = event_severities.values_num;
@@ -3023,8 +3023,8 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 
 	db_update_services(service_manager);
 out:
-	zbx_vector_event_severity_clear_ext(&event_severities, zbx_event_severity_free);
-	zbx_vector_event_severity_destroy(&event_severities);
+	zbx_vector_event_severity_ptr_clear_ext(&event_severities, zbx_event_severity_free);
+	zbx_vector_event_severity_ptr_destroy(&event_severities);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() severities_num:%d", __func__, severities_num);
 }

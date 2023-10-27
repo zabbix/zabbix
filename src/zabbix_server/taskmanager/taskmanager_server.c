@@ -536,11 +536,11 @@ fail:
  * Purpose: notifies service manager about problem severity changes           *
  *                                                                            *
  ******************************************************************************/
-static void	notify_service_manager(const zbx_vector_ack_task_t *ack_tasks)
+static void	notify_service_manager(const zbx_vector_ack_task_ptr_t *ack_tasks)
 {
-	zbx_vector_event_severity_t	event_severities;
+	zbx_vector_event_severity_ptr_t	event_severities;
 
-	zbx_vector_event_severity_create(&event_severities);
+	zbx_vector_event_severity_ptr_create(&event_severities);
 
 	for (int i = 0; i < ack_tasks->values_num; i++)
 	{
@@ -553,7 +553,7 @@ static void	notify_service_manager(const zbx_vector_ack_task_t *ack_tasks)
 			es = (zbx_event_severity_t *)zbx_malloc(NULL, sizeof(zbx_event_severity_t));
 			es->eventid = ack_task->eventid;
 			es->severity = ack_task->new_severity;
-			zbx_vector_event_severity_append(&event_severities, es);
+			zbx_vector_event_severity_ptr_append(&event_severities, es);
 		}
 	}
 
@@ -567,8 +567,8 @@ static void	notify_service_manager(const zbx_vector_ack_task_t *ack_tasks)
 		zbx_free(data);
 	}
 
-	zbx_vector_event_severity_clear_ext(&event_severities, zbx_event_severity_free);
-	zbx_vector_event_severity_destroy(&event_severities);
+	zbx_vector_event_severity_ptr_clear_ext(&event_severities, zbx_event_severity_free);
+	zbx_vector_event_severity_ptr_destroy(&event_severities);
 }
 
 /******************************************************************************
@@ -580,19 +580,19 @@ static void	notify_service_manager(const zbx_vector_ack_task_t *ack_tasks)
  ******************************************************************************/
 static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
-	zbx_db_row_t		row;
-	zbx_db_result_t		result;
-	int			processed_num = 0;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_ack_task_t	ack_tasks;
-	zbx_ack_task_t		*ack_task;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
+	int				processed_num = 0;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_vector_ack_task_ptr_t	ack_tasks;
+	zbx_ack_task_t			*ack_task;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, ack_taskids->values_num);
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_ack_task_create(&ack_tasks);
+	zbx_vector_ack_task_ptr_create(&ack_tasks);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity,a.action"
@@ -629,13 +629,13 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 		ZBX_STR2UINT64(ack_task->taskid, row[2]);
 		ack_task->old_severity = atoi(row[3]);
 		ack_task->new_severity = atoi(row[4]);
-		zbx_vector_ack_task_append(&ack_tasks, ack_task);
+		zbx_vector_ack_task_ptr_append(&ack_tasks, ack_task);
 	}
 	zbx_db_free_result(result);
 
 	if (0 < ack_tasks.values_num)
 	{
-		zbx_vector_ack_task_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_ack_task_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		processed_num = process_actions_by_acknowledgments(&ack_tasks);
 
 		notify_service_manager(&ack_tasks);
@@ -649,8 +649,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 
 	zbx_free(sql);
 
-	zbx_vector_ack_task_clear_ext(&ack_tasks, zbx_ack_task_free);
-	zbx_vector_ack_task_destroy(&ack_tasks);
+	zbx_vector_ack_task_ptr_clear_ext(&ack_tasks, zbx_ack_task_free);
+	zbx_vector_ack_task_ptr_destroy(&ack_tasks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
 

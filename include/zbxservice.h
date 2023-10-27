@@ -64,11 +64,11 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 zbx_uint32_t	zbx_service_serialize_parentids(unsigned char **data, const zbx_vector_uint64_t *ids);
 void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uint64_t *ids);
 
-ZBX_PTR_VECTOR_DECL(event_severity, zbx_event_severity_t *)
+ZBX_PTR_VECTOR_DECL(event_severity_ptr, zbx_event_severity_t *)
 
 zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data,
-		const zbx_vector_event_severity_t *event_severities);
+		const zbx_vector_event_severity_ptr_t *event_severities);
 void	zbx_service_deserialize_event_severities(const unsigned char *data,
-		zbx_vector_event_severity_t *event_severities);
+		zbx_vector_event_severity_ptr_t *event_severities);
 
 #endif /* ZABBIX_ZBXSERVICE_H */
