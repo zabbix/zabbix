@@ -77,6 +77,7 @@ static int		db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
+static int			mysql_err_cnt = 0;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
 #elif defined(HAVE_ORACLE)
@@ -337,6 +338,7 @@ static int	is_recoverable_mysql_error(int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
+		case ER_CLIENT_INTERACTION_TIMEOUT:
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
@@ -561,15 +563,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 		ret = ZBX_DB_FAIL;
 	}
 
-	/* The RECONNECT option setting is placed here, AFTER the connection	*/
-	/* is made, due to a bug in MySQL versions prior to 5.1.6 where it	*/
-	/* reset the options value to the default, regardless of what it was	*/
-	/* set to prior to the connection. MySQL allows changing connection	*/
-	/* options on an open connection, so setting it here is safe.		*/
-
-	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
-
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
@@ -599,6 +592,7 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error(err_no))
 		ret = ZBX_DB_DOWN;
 
+	mysql_err_cnt = ZBX_DB_OK == ret ? 0 : mysql_err_cnt + 1;
 #elif defined(HAVE_ORACLE)
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -1492,8 +1486,12 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		if (0 != mysql_query(conn, sql))
 		{
 			err_no = (int)mysql_errno(conn);
-			errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-			zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+
+			if (0 < mysql_err_cnt++)
+			{
+				errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
+				zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+			}
 
 			ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
@@ -1515,8 +1513,12 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				if (0 < (status = mysql_next_result(conn)))
 				{
 					err_no = (int)mysql_errno(conn);
-					errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-					zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+
+					if (0 < mysql_err_cnt++)
+					{
+						errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
+						zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+					}
 
 					ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
@@ -1671,10 +1673,10 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		if (0 != mysql_query(conn, sql) || NULL == (result->result = mysql_store_result(conn)))
 		{
-			int err_no;
+			int err_no = (int)mysql_errno(conn);
 
-			err_no = (int)mysql_errno(conn);
-			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
+			if (0 < mysql_err_cnt++)
+				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			zbx_db_free_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (zbx_db_result_t)ZBX_DB_DOWN : NULL);
