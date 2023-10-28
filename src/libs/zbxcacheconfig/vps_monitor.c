@@ -170,7 +170,7 @@ int	zbx_vps_monitor_capped(void)
 {
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
-	if (0 == monitor->values_limit)
+	if (0 == monitor->values_limit || monitor->values_num < monitor->values_limit)
 		return FAIL;
 
 	int	ret;
