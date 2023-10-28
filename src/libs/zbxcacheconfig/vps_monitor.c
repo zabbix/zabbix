@@ -43,6 +43,16 @@ int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: destroy VPS monitor                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	vps_monitor_destroy()
+{
+	zbx_mutex_destroy(&vps_lock);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: increment VPS monitor history cursor                              *
  *                                                                            *
  ******************************************************************************/
@@ -77,16 +87,16 @@ int	vps_history_dec(int *cr)
  *           no locking is needed.                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vps_monitor_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit)
+void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit)
 {
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
 	monitor->last_flush = time(NULL);
 	monitor->last_hist = monitor->last_flush;
 
-	monitor->values_limit = nvps_limit * ZBX_VPS_FLUSH_PERIOD;
-	monitor->overcommit_limit = overcommit_limit * nvps_limit / 100;
-	monitor->overcommit = overcommit_limit * nvps_limit / 100;
+	monitor->values_limit = vps_limit * ZBX_VPS_FLUSH_PERIOD;
+	monitor->overcommit_limit = overcommit_limit * vps_limit / 100;
+	monitor->overcommit = overcommit_limit * vps_limit / 100;
 }
 
 /******************************************************************************

@@ -1296,7 +1296,7 @@ typedef struct
 }
 zbx_vps_monitor_stats_t;
 
-void	zbx_vps_monitor_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit);
+void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit);
 void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num);
 void	zbx_vps_monitor_add_written(zbx_uint64_t values_num);
 int	zbx_vps_monitor_capped(void);

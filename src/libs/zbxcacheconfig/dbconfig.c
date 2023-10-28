@@ -8594,6 +8594,8 @@ void	zbx_free_configuration_cache(void)
 
 	UNLOCK_CACHE;
 
+	vps_monitor_destroy(&config->vps_monitor);
+
 	zbx_shmem_destroy(config_mem);
 	config_mem = NULL;
 	zbx_rwlock_destroy(&config_history_lock);
