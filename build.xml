@@ -68,7 +68,9 @@
 	</target>
 
 	<target name="show-browser-info">
-		<exec executable="ui/tests/browser.php" failonerror="on"/>
+		<exec executable="php" failonerror="on">
+			<arg line="ui/tests/browser.php"/>
+		</exec>
 	</target>
 
 	<target name="create-saml-configs">
