@@ -361,7 +361,7 @@ static char	*zbx_config_webservice_url	= NULL;
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
 static int	config_vps_limit		= 0;
-static int	config_vps_overcommit_limit	= 100;
+static int	config_vps_overcommit_limit	= 0;
 
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
@@ -1043,9 +1043,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"VPSLimit",			&config_vps_limit,	TYPE_INT,
-			PARM_OPT,	0,			100000},
+			PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,	TYPE_INT,
-			PARM_OPT,	50,			1000},
+			PARM_OPT,	0,			ZBX_MEBIBYTE},
 	{NULL}
 	};
 

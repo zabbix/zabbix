@@ -66,7 +66,7 @@ void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit)
 	monitor->last_flush = time(NULL);
 
 	monitor->values_limit = vps_limit * ZBX_VPS_FLUSH_PERIOD;
-	monitor->overcommit_limit = overcommit_limit * vps_limit / 100;
+	monitor->overcommit_limit = overcommit_limit;
 	monitor->overcommit = 0;
 }
 
