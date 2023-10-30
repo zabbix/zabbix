@@ -46,7 +46,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	protected static $dashboardid;
 	protected static $time;
 	protected static $acktime;
-	protected static $triggerids;
 	protected static $cause_problemid;
 	protected static $symptom_problemid;
 	protected static $symptom_problemid2;
@@ -178,7 +177,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 				'priority' => TRIGGER_SEVERITY_WARNING
 			]
 		]);
-		self::$triggerids = CDataHelper::getIds('description');
 
 		foreach (array_values($problem_itemids) as $itemid) {
 			CDataHelper::addItemData($itemid, 0);
@@ -190,7 +188,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Create events and problems.
 		self::$time = time();
-		foreach (self::$triggerids as $name => $id) {
+		foreach (CDataHelper::getIds('description') as $name => $id) {
 			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 		}
 
