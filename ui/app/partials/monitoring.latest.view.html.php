@@ -257,7 +257,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
-				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
 			$item_delay = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -307,10 +307,10 @@ foreach ($data['items'] as $itemid => $item) {
 $button_list = [
 	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph'), 'attributes' => ['data-required' => 'graph']],
 	GRAPH_TYPE_NORMAL => ['name' => _('Display graph'), 'attributes' => ['data-required' => 'graph']],
-	'item.masscheck_now' => [
+	'item.execute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
-			->onClick('view.massCheckNow(this);')
 			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massexecute-item')
 			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	]

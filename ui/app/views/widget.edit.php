@@ -26,4 +26,17 @@
  * @var array $data
  */
 
-(new CWidgetFormView($data))->show();
+use Zabbix\Widgets\CWidgetField;
+
+$form = new CWidgetFormView($data);
+
+/** @var CWidgetField $field */
+foreach ($this->data['fields'] as $name => $field) {
+	$field_view = $field::DEFAULT_VIEW;
+
+	if ($field_view !== null) {
+		$form->addField(new $field_view($field));
+	}
+}
+
+$form->show();

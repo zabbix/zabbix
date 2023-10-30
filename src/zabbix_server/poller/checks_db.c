@@ -30,14 +30,13 @@
  * Purpose: retrieve data from database                                       *
  *                                                                            *
  * Parameters: item           - [IN] item we are interested in                *
- *             config_timeout - [IN]                                          *
  *             result         - [OUT] check result                            *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result)
+int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST		request;
 	const char		*dsn, *connection = NULL;
@@ -94,10 +93,10 @@ int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *re
 		goto out;
 	}
 
-	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, config_timeout,
+	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, item->timeout,
 			&error)))
 	{
-		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, &error)))
+		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, item->timeout, &error)))
 		{
 			char	*text = NULL;
 

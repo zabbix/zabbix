@@ -161,19 +161,14 @@ if ($data['vendor']) {
 }
 
 // Tags tab.
-$tags_tab = (new CFormGrid)
-	->addItem([
-		new CLabel(_('Tags')),
-		new CFormField(
-			new CPartial('configuration.tags.tab', [
-				'source' => 'template',
-				'tags' => $data['tags'],
-				'readonly' => $data['readonly'],
-				'tabs_id' => 'template-tabs',
-				'tags_tab_id' => 'template-tags-tab',
-				'with_label' => true
-			]))
-	]);
+$tags_tab = new CPartial('configuration.tags.tab', [
+	'source' => 'template',
+	'tags' => $data['tags'],
+	'readonly' => $data['readonly'],
+	'tabs_id' => 'template-tabs',
+	'tags_tab_id' => 'template-tags-tab',
+	'field_label' => _('Tags')
+]);
 
 $form->addItem(
 	(new CTemplateTag('tag-row-tmpl'))

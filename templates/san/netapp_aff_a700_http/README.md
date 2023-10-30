@@ -36,7 +36,7 @@ This template has been tested on:
 |{$URL}|<p>AFF700 cluster URL address.</p>||
 |{$USERNAME}|<p>AFF700 user name.</p>||
 |{$PASSWORD}|<p>AFF700 user password.</p>||
-|{$HTTP.AGENT.TIMEOUT}|<p>The HTTP agent timeout to wait for a response from AFF700.</p>|`3s`|
+|{$HTTP.AGENT.TIMEOUT}|<p>The HTTP agent timeout to wait for a response from AFF700.</p>|`5s`|
 
 ### Items
 

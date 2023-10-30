@@ -47,6 +47,7 @@ void	zbx_mock_test_entry(void **state)
 		memset((void*)&item, 0, sizeof(item));
 		item.interface.addr = (char *)zbx_mock_get_parameter_string("in.item.interface");
 		item.key = (char *)zbx_mock_get_parameter_string("in.item.key");
+		item.timeout = 3;
 
 		returned_code = zbx_get_value_ssh_test_run(&item, &error);
 		if (SUCCEED != returned_code && NULL != error)
@@ -61,6 +62,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		item.interface.addr = (char *)zbx_mock_get_parameter_string("in.item.interface");
 		item.key = (char *)zbx_mock_get_parameter_string("in.item.key");
+		item.timeout = 3;
 
 		returned_code = zbx_get_value_telnet_test_run(&item, &error);
 		if (SUCCEED != returned_code && NULL != error)

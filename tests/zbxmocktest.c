@@ -19,9 +19,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxnum.h"
 #include "zbxtypes.h"
-#include "zbxlog.h"
 
 /* unresolved symbols needed for linking */
 
@@ -88,10 +86,7 @@ void	set_config_forks(unsigned char process_type, int forks)
 	CONFIG_FORKS[process_type] = forks;
 }
 
-int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
-int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 
@@ -108,8 +103,6 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-
-char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
 char	*CONFIG_JAVA_GATEWAY		= NULL;
 int	CONFIG_JAVA_GATEWAY_PORT	= 0;

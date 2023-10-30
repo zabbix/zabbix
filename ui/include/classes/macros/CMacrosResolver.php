@@ -936,8 +936,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if (array_key_exists($data['f_num'], $functionids)) {
 				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
 					'token' => $token,
-					'function' => $data['function'],
-					'parameters' => $data['parameters']
+					'macrofunc' => $data['macrofunc']
 				];
 			}
 		}
@@ -1191,29 +1190,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								}
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_'],
-											(new CUrl('disc_prototypes.php'))
-												->setArgument('form', 'update')
-												->setArgument('itemid', $function['itemid'])
-												->setArgument('parent_discoveryid', $function['parent_itemid'])
-												->setArgument('context', $options['context'])
-										))
-											->addClass(ZBX_STYLE_LINK_ALT)
+										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->onClick('view.editItemPrototype(this, '.json_encode([
+												'context' => $options['context'],
+												'itemid' => $function['itemid'],
+												'parent_discoveryid' => $function['parent_itemid']
+											]).')')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_'],
-											(new CUrl('items.php'))
-												->setArgument('form', 'update')
-												->setArgument('itemid', $function['itemid'])
-												->setArgument('context', $options['context'])
-										))
-											->addClass(ZBX_STYLE_LINK_ALT)
-											->setAttribute('data-itemid', $function['itemid'])
+										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->onClick('view.editItem(this, '.json_encode([
+												'context' => $options['context'],
+												'itemid' => $function['itemid']
+											]).')')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
@@ -1797,11 +1793,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
 	 * @param array $columns
-	 * @param array $items
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	public function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
+	public function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
@@ -1817,36 +1813,36 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$matched_macros = self::extractMacros($columns, $types);
 
-		foreach ($items as $key => $item) {
-			$macro_values[$key] = [];
+		foreach ($hostids as $hostid) {
+			$macro_values[$hostid] = [];
 
 			foreach ($matched_macros['macros']['host'] as $token) {
 				if ($token === '{HOST.ID}') {
-					$macro_values[$key][$token] = $item['hostid'];
+					$macro_values[$hostid][$token] = $hostid;
 				}
 				else {
-					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['host'][$item['hostid']][$key] = true;
+					$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$hostid][$hostid] = true;
 				}
 			}
 
 			foreach ($matched_macros['macros']['interface'] as $token) {
-				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['interface'][$item['itemid']][$key] = true;
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$hostid][$hostid] = true;
 			}
 
 			foreach ($matched_macros['macros']['inventory'] as $token) {
-				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['inventory'][$item['hostid']][$key] = true;
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$hostid][$hostid] = true;
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
-		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 
 		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
@@ -1860,8 +1856,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($columns as $column => $value) {
 			$data[$column] = [];
 
-			foreach ($items as $key => $item) {
-				$data[$column][$key] = strtr($value, $macro_values[$key]);
+			foreach ($hostids as $hostid) {
+				$data[$column][$hostid] = strtr($value, $macro_values[$hostid]);
 			}
 		}
 

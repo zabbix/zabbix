@@ -167,6 +167,7 @@ class testDataCollection extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
 
 		$this->reloadConfigurationCache();
+		sleep(5);
 
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],
@@ -425,5 +426,94 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(400, $response['result'][0]['value']);
+	}
+
+	/**
+	 * Test not-supported check in preprocessing.
+	 *
+	 * @required-components server
+	 */
+	public function testDataCollection_preprocNotsupportedCheck() {
+		$response = $this->call('host.create', [
+			[
+				'host' => 'ssh_host',
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+				],
+				'groups' => [['groupid' => 4]],
+				'status' => HOST_STATUS_MONITORED
+			]
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		$hostid = $response['result']['hostids'][0];
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+
+		$response = $this->call('host.get', [
+			'output' => ['host'],
+			'selectInterfaces' => ['interfaceid'],
+			'hostids' => $hostid
+		]);
+		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
+		$interfaceid = $response['result'][0]['interfaces'][0]['interfaceid'];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'ssh',
+			'key_' => 'ssh.run[]',
+			'type' => ITEM_TYPE_SSH,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '5s',
+			'interfaceid'  => $interfaceid,
+			'username' => 'test',
+			'params' => 'echo test',
+			'preprocessing' => [[
+				'params' => "0\na",
+				'type' => 26,
+				'error_handler' => 3,
+				'error_handler_params' => '111'
+			],[
+				'params' => "1\na",
+				'type' => 26,
+				'error_handler' => 3,
+				'error_handler_params' => '222'
+			],[
+				'params' => "0\nb",
+				'type' => 26,
+				'error_handler' => 2,
+				'error_handler_params' => '333'
+			],[
+				'params' => "-1",
+				'type' => 26,
+				'error_handler' => 2,
+				'error_handler_params' => '444'
+			]]
+		]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$itemid = $response['result']['itemids'][0];
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'itemids' => [$itemid]
+		], 60, 1);
+
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(1, count($response['result']));
+		$this->assertArrayHasKey('value', $response['result'][0]);
+		$this->assertEquals(444, $response['result'][0]['value']);
 	}
 }

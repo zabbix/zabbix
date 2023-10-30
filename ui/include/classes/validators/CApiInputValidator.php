@@ -87,6 +87,9 @@ class CApiInputValidator {
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
+			case API_ESCAPED_STRING_UTF8:
+				return self::validateEscapedStringUtf8($rule, $data, $path, $error);
+
 			case API_STRINGS_UTF8:
 				return self::validateStringsUtf8($rule, $data, $path, $error);
 
@@ -295,6 +298,7 @@ class CApiInputValidator {
 			case API_COND_FORMULA:
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
+			case API_ESCAPED_STRING_UTF8:
 			case API_INT32:
 			case API_INT32_RANGES:
 			case API_UINT64:
@@ -679,6 +683,36 @@ class CApiInputValidator {
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Escaped string validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']       (optional) API_NOT_EMPTY
+	 * @param string $rule['characters']  (optional) 'characters' option for CEscapedStringParser.
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEscapedStringUtf8($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$escaped_string_parser = new CEscapedStringParser(array_intersect_key($rule, array_flip(['characters'])));
+
+		if ($escaped_string_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $escaped_string_parser->getError());
+
 			return false;
 		}
 
@@ -4148,8 +4182,18 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
+					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'characters' => 'nrts'],
+					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '', 'characters' => 'nrts']
+				]];
+				break;
+
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX]), 'flags' => API_REQUIRED],
+					'2' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => '1', 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+								['else' => true, 'type' => API_UNEXPECTED]
+					]]
 				]];
 				break;
 
@@ -4172,6 +4216,12 @@ class CApiInputValidator {
 						$index =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
 					];
 				}
+				break;
+
+			case ZBX_PREPROC_SNMP_GET_VALUE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
+				]];
 				break;
 		}
 

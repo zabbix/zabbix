@@ -552,14 +552,14 @@ class CMacrosResolverHelper {
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
 	 * @param array $columns
-	 * @param array $items
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	public static function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
+	public static function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
 		self::init();
 
-		return self::$macrosResolver->resolveWidgetTopHostsTextColumns($columns, $items);
+		return self::$macrosResolver->resolveWidgetTopHostsTextColumns($columns, $hostids);
 	}
 
 	/**

@@ -193,6 +193,7 @@ import (
 	"errors"
 	"time"
 	"unsafe"
+
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/tls"
 
@@ -232,25 +233,55 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	var tlsConfig *tls.Config
 	var err error
-	var ctlsConfig C.zbx_config_tls_t;
-	var ctlsConfig_p *C.zbx_config_tls_t;
+	var ctlsConfig C.zbx_config_tls_t
+	var ctlsConfig_p *C.zbx_config_tls_t
 
 	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
-		result := &EventLogResult{
+		res := &EventLogResult{
 			Ts:    time.Now(),
 			Error: err,
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, res)
+
+		log.Tracef("Calling C function \"free_eventlog_result()\"")
+		C.free_eventlog_result(result)
 
 		return
 	}
-	if (nil != tlsConfig) {
+
+	if nil != tlsConfig {
+		cPSKIdentity := (C.CString)(tlsConfig.PSKIdentity)
+		cPSKKey := (C.CString)(tlsConfig.PSKKey)
+		cCAFile := (C.CString)(tlsConfig.CAFile)
+		cCRLFile := (C.CString)(tlsConfig.CRLFile)
+		cCertFile := (C.CString)(tlsConfig.CertFile)
+		cKeyFile := (C.CString)(tlsConfig.KeyFile)
+		cServerCertIssuer := (C.CString)(tlsConfig.ServerCertIssuer)
+		cServerCertSubject := (C.CString)(tlsConfig.ServerCertSubject)
+
+		defer func() {
+			log.Tracef("Calling C function \"free(cPSKIdentity)\"")
+			C.free(unsafe.Pointer(cPSKIdentity))
+			log.Tracef("Calling C function \"free(cPSKKey)\"")
+			C.free(unsafe.Pointer(cPSKKey))
+			log.Tracef("Calling C function \"free(cCAFile)\"")
+			C.free(unsafe.Pointer(cCAFile))
+			log.Tracef("Calling C function \"free(cCRLFile)\"")
+			C.free(unsafe.Pointer(cCRLFile))
+			log.Tracef("Calling C function \"free(cCertFile)\"")
+			C.free(unsafe.Pointer(cCertFile))
+			log.Tracef("Calling C function \"free(cKeyFile)\"")
+			C.free(unsafe.Pointer(cKeyFile))
+			log.Tracef("Calling C function \"free(cServerCertIssuer)\"")
+			C.free(unsafe.Pointer(cServerCertIssuer))
+			log.Tracef("Calling C function \"free(cServerCertSubject)\"")
+			C.free(unsafe.Pointer(cServerCertSubject))
+		}()
+
 		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
 		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
-			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
-			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
-			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),
-			(C.CString)(tlsConfig.ServerCertSubject));
+			cPSKIdentity, cPSKKey, cCAFile, cCRLFile, cCertFile, cKeyFile, cServerCertIssuer,
+			cServerCertSubject)
 		ctlsConfig_p = &ctlsConfig
 	}
 
@@ -261,11 +292,21 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	var cerrmsg *C.char
 	log.Tracef("Calling C function \"process_eventlog_check()\"")
+
+	cSourceIP := (C.CString)(agent.Options.SourceIP)
+	cHostname := (C.CString)(agent.Options.Hostname)
+
+	defer func() {
+		log.Tracef("Calling C function \"free(cSourceIP)\"")
+		C.free(unsafe.Pointer(cSourceIP))
+		log.Tracef("Calling C function \"free(cHostname)\"")
+		C.free(unsafe.Pointer(cHostname))
+	}()
+
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
 		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
 		C.zbx_process_value_func_t(procValueFunc), &clastLogsizeSent, ctlsConfig_p,
-		(C.int)(agent.Options.Timeout), (C.CString)(agent.Options.SourceIP),
-		(C.CString)(agent.Options.Hostname), (C.int)(agent.Options.BufferSend),
+		(C.int)(agent.Options.Timeout), cSourceIP, cHostname, (C.int)(agent.Options.BufferSend),
 		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_eventlog_max_lines_per_second), &cerrmsg)
 
 	// add cached results

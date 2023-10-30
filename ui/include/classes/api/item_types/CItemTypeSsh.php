@@ -29,7 +29,7 @@ class CItemTypeSsh extends CItemType {
 	 * @inheritDoc
 	 */
 	const FIELD_NAMES = ['interfaceid', 'authtype', 'username', 'publickey', 'privatekey', 'password', 'params',
-		'delay'
+		'timeout', 'delay'
 	];
 
 	/**
@@ -50,6 +50,7 @@ class CItemTypeSsh extends CItemType {
 			]],
 			'password' =>		self::getCreateFieldRule('password', $item),
 			'params' =>			self::getCreateFieldRule('params', $item),
+			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -72,6 +73,7 @@ class CItemTypeSsh extends CItemType {
 			]],
 			'password' =>		self::getUpdateFieldRule('password', $db_item),
 			'params' =>			self::getUpdateFieldRule('params', $db_item),
+			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
@@ -94,6 +96,7 @@ class CItemTypeSsh extends CItemType {
 			]],
 			'password' =>		self::getUpdateFieldRuleInherited('password', $db_item),
 			'params' =>			self::getUpdateFieldRuleInherited('params', $db_item),
+			'timeout' =>		self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -110,6 +113,7 @@ class CItemTypeSsh extends CItemType {
 			'privatekey' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'password' =>		self::getUpdateFieldRuleDiscovered('password'),
 			'params' =>			self::getUpdateFieldRuleDiscovered('params'),
+			'timeout' =>		self::getUpdateFieldRuleDiscovered('timeout'),
 			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}

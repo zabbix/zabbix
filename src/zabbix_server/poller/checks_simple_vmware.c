@@ -24,8 +24,10 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include"../vmware/vmware.h"
+#include "../vmware/vmware_perfcntr.h"
 #include "zbxxml.h"
 #include "zbxsysinfo.h"
+#include "zbxparam.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
@@ -373,6 +375,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 			SET_UI64_RESULT(result, perfvalue->value * 1000000);
 			break;
 		case ZBX_VMWARE_UNIT_JOULE:
+		case ZBX_VMWARE_UNIT_NANOSECOND:
 		case ZBX_VMWARE_UNIT_MICROSECOND:
 		case ZBX_VMWARE_UNIT_MILLISECOND:
 		case ZBX_VMWARE_UNIT_NUMBER:
@@ -1053,17 +1056,86 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts a single value of VMware event log level from string to  *
+ *          bitmask                                                           *
+ *                                                                            *
+ * Parameters: level         - [IN]                                           *
+ *             severity_mask - [OUT]                                          *
+ *                                                                            *
+ * Return value: SUCCEED - if no errors were detected                         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	severity_to_mask(const char *level, unsigned char *severity_mask)
+{
+	size_t			i;
+	static const char	*levels[] = {ZBX_VMWARE_EVTLOG_SEVERITIES};
+
+	for (i = 0; i < ARRSIZE(levels); i++)
+	{
+		if (0 == strcmp(level, levels[i]))
+			break;
+	}
+
+	*severity_mask = (unsigned char)(1 << i);
+
+	return (i < ARRSIZE(levels)) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts VMware event log level severity to bitmask               *
+ *                                                                            *
+ * Parameters: severity - [IN]  event severity value from item parameter,     *
+ *                              which might contain multiple severity levels  *
+ *             mask     - [OUT] result of conversion                          *
+ *             error    - [OUT] error message in case of an error             *
+ *                                                                            *
+ * Return value: SUCCEED - if no errors were detected                         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	evt_severities_to_mask(const char *severity, unsigned char *mask, char **error)
+{
+	int	i;
+
+	*mask = 0;
+
+	for (i = 1; i <= zbx_num_param(severity); i++)
+	{
+		unsigned char	level_mask;
+		char		*level;
+
+		if (NULL == (level = zbx_get_param_dyn(severity, i, NULL)))
+			continue;
+
+		if (SUCCEED != severity_to_mask(level, &level_mask))
+		{
+			*error = zbx_dsprintf(*error, "Invalid event severity level \"%s\".", level);
+			zbx_free(level);
+			return FAIL;
+		}
+
+		*mask |= level_mask;
+		zbx_free(level);
+	}
+
+	return SUCCEED;
+}
+
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_vector_ptr_t *add_results)
 {
-	const char		*url, *skip;
-	unsigned char		skip_old;
+	const char		*url, *skip, *severity_str;
+	unsigned char		skip_old, severity = 0;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 < request->nparam || 0 == request->nparam)
+	if (3 < request->nparam || 0 == request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -1085,10 +1157,25 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		goto out;
 	}
 
+	if (3 == request->nparam && NULL != (severity_str = get_rparam(request, 2)) && '\0' != *severity_str)
+	{
+		char	*error = NULL;
+
+		if (FAIL == evt_severities_to_mask(severity_str, &severity, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid third parameter. %s", error));
+			zbx_free(error);
+			goto out;
+		}
+	}
+
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
+
+	if (severity != service->eventlog.severity)
+		service->eventlog.severity = severity;
 
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
 			(0 != skip_old && 0 != service->eventlog.last_key ))
@@ -4327,6 +4414,46 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addarray(&json_data, "tags");
 			vmware_tags_uuid_json(&service->data_tags, vm->uuid, &json_data, NULL);
 			zbx_json_close(&json_data);
+			zbx_json_addarray(&json_data, "net_if");
+
+			for (i = 0; i < vm->devs.values_num; i++)
+			{
+				zbx_vmware_dev_t	*dev;
+
+				dev = (zbx_vmware_dev_t *)vm->devs.values[i];
+
+				if (ZBX_VMWARE_DEV_TYPE_NIC != dev->type)
+					continue;
+
+				zbx_json_addobject(&json_data, NULL);
+				zbx_json_addstring(&json_data, "ifname", ZBX_NULL2EMPTY_STR(dev->instance),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdesc", ZBX_NULL2EMPTY_STR(dev->label),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifmac", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFMAC]), ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifconnected", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED]), ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json_data, "iftype", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFTYPE]), ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifbackingdevice", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdvswitch_uuid", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdvswitch_portgroup", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdvswitch_port", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addraw(&json_data, "ifip", NULL == dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS] ?
+						"[]" : dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS]);
+				zbx_json_close(&json_data);
+			}
+
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 	}
@@ -4649,6 +4776,8 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]), ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDVSWITCH.PORT}", ZBX_NULL2EMPTY_STR(
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT]), ZBX_JSON_TYPE_STRING);
+	zbx_json_addraw(j, "ifip", NULL == dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS] ? "[]" :
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS]);
 }
 
 static void	check_vcenter_vm_discovery_disk_props_cb(struct zbx_json *j, zbx_vmware_dev_t *dev)

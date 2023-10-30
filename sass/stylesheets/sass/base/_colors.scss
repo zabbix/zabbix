@@ -278,12 +278,6 @@ $multiselect-disabled-bg-color: $disabled-bg-color;
 $multiselect-item-disabled-color: $disabled-item-color;
 $multiselect-item-disabled-bg-color: $disabled-item-bg-color;
 
-// Host status.
-$host-avail-true-bg-color: $alt-light-green !default;
-$host-avail-false-bg-color: $alt-red !default;
-$host-avail-unknown-bg-color: $alt-blue-grey !default;
-$host-avail-total-bg-color: transparent !default;
-
 // Preloader.
 $preloader-bg-color: $body-bg-color !default;
 $preloader-color: #ccd5d9 !default;
@@ -325,6 +319,9 @@ $gauge-empty-color: #ebebeb !default;
 $gauge-fill-color: #0275b8 !default;
 $gauge-needle-fill-color: #1f2c33 !default;
 $gauge-needle-stroke-color: #1f2c33 !default;
+
+// Pie chart.
+$pie-chart-arc-no-data-color: #ebebeb !default;
 
 // Timeline.
 $timeline-color: #aad7f0;

@@ -2,6 +2,7 @@
 
 DIST_SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \
@@ -60,6 +61,7 @@ DIST_SUBDIRS = \
 	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxsysinfo \
 	zbxstats \
 	zbxstr \
@@ -117,6 +119,7 @@ SERVER_SUBDIRS = \
 	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -167,6 +170,7 @@ PROXY_SUBDIRS = \
 	zbxexpression \
 	zbxscripts \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -183,6 +187,7 @@ endif
 
 SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxcommon \
