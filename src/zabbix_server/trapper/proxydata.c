@@ -151,14 +151,7 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 		goto reply;
 	}
 
-	if (SUCCEED == zbx_vps_monitor_capped())
-	{
-		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
-		error = zbx_strdup(error, "data collection has been paused");
-		goto reply;
-	}
-
-	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)))
+	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)) || SUCCEED == zbx_vps_monitor_capped())
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
 		ret = proxy_data_no_history(jp);
