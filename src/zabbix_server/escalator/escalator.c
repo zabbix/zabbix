@@ -66,8 +66,6 @@
 #define ZBX_ALERT_MESSAGE_ERR_USR	1
 #define ZBX_ALERT_MESSAGE_ERR_MSG	2
 
-#define ZBX_SERVICES_RULE_PREFIX	"services."
-
 typedef struct
 {
 	zbx_uint64_t	userid;
