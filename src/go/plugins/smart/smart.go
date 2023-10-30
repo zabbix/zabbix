@@ -58,7 +58,7 @@ type Plugin struct {
 
 var impl Plugin
 
-var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 -_/\\]*$`)
+var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -439,7 +439,7 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 
 func clearString(str string) error {
 	if !cleanRegex.MatchString(str) {
-		return zbxerr.New(fmt.Sprintf(" '%s' string contain dis-allowed characters", str))
+		return zbxerr.New(fmt.Sprintf("invalid characters found in parameter '%s'", str))
 	}
 
 	return nil
