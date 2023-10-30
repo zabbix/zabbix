@@ -600,6 +600,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 		}
 		else
 		{
+			sec = 0;
 			itc = 0;
 			sleeptime = POLLER_DELAY;
 		}
