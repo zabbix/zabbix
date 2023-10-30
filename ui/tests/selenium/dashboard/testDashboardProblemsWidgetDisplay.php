@@ -46,9 +46,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	protected static $dashboardid;
 	protected static $time;
 	protected static $acktime;
-	protected static $triggerids;
-	protected static $eventid_for_widget_text;
-	protected static $eventid_for_widget_unsigned;
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -134,7 +131,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
-		self::$triggerids = CDataHelper::getIds('description');
 
 		foreach (array_values($itemids) as $itemid) {
 			CDataHelper::addItemData($itemid, 0);
@@ -142,37 +138,35 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Create events and problems.
 		self::$time = time();
-		foreach (self::$triggerids as $name => $id) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, self::$time);
+		foreach (CDataHelper::getIds('description') as $name => $id) {
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 		}
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
+		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.
 				zbx_dbstr('Trigger for widget 1 char')
 		);
 
 		// Get event ids.
-		self::$eventid_for_widget_text = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Trigger for widget text')
-		);
-		self::$eventid_for_widget_unsigned = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Trigger for widget 2 unsigned')
-		);
+		$eventids = [];
+		foreach (['Trigger for widget text', 'Trigger for widget 2 unsigned'] as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
+		}
 
 		// Suppress the problem: 'Trigger for widget text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until)'.
-				'VALUES (100990, '.self::$eventid_for_widget_text.', NULL, 0)'
+				'VALUES (100990, '.$eventids['Trigger for widget text'].', NULL, 0)'
 		);
 
 		// Acknowledge the problem: 'Trigger for widget 2 unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
-			'eventids' => self::$eventid_for_widget_unsigned,
+			'eventids' => $eventids['Trigger for widget 2 unsigned'],
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
 
 		$event = CDataHelper::call('event.get', [
-			'eventids' => self::$eventid_for_widget_unsigned,
+			'eventids' => $eventids['Trigger for widget 2 unsigned'],
 			'select_acknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');

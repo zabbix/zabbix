@@ -46,20 +46,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 				'Vilnius' => null,
 				'Oslo' => null,
 				'Bergen' => null
-			],
-			'itemids' => [
-				'Riga' => null,
-				'Tallin' => null,
-				'Vilnius' => null,
-				'Oslo' => null,
-				'Bergen' => null
-			],
-			'triggerids' => [
-				'Riga' => null,
-				'Tallin' => null,
-				'Vilnius' => null,
-				'Oslo' => null,
-				'Bergen' => null
 			]
 		];
 
@@ -110,13 +96,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			];
 		}
 
-		$items = CDataHelper::call('item.create', $items_data);
-
-		self::$cities['itemids']['Riga'] = $items['itemids'][0];
-		self::$cities['itemids']['Tallin'] = $items['itemids'][1];
-		self::$cities['itemids']['Vilnius'] = $items['itemids'][2];
-		self::$cities['itemids']['Oslo'] = $items['itemids'][3];
-		self::$cities['itemids']['Bergen'] = $items['itemids'][4];
+		CDataHelper::call('item.create', $items_data);
 
 		// Create triggers based on items.
 		$triggers_data = [];
