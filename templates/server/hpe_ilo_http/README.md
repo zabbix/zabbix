@@ -5,7 +5,7 @@
 
 This template is designed for the effortless deployment of HPE iLO monitoring by Zabbix via iLO RESTful API and doesn't require any external scripts.
 
-For more details about HPE Redfish services refer to the [`official documentation`](https://servermanagementportal.ext.hpe.com/docs/redfishservices/).
+For more details about HPE Redfish services, refer to the [`official documentation`](https://servermanagementportal.ext.hpe.com/docs/redfishservices/).
 
 ## Requirements
 
@@ -22,7 +22,7 @@ This template has been tested on:
 
 ## Setup
 
-1. Create the iLO user for monitoring (for example, `zbx_monitor`). The user will only need to have the `Login` privilege, which can be assigned manually, or by assigning the `ReadOnly` role to the user.
+1. Create the iLO user for monitoring (for example, `zbx_monitor`). The user will only need to have the `Login` privilege, which can be assigned manually or by assigning the `ReadOnly` role to the user.
 2. Set the iLO API endpoint URL in the `{$ILO.URL}` macro in the format `<scheme>://<host>[:port]/` (port is optional).
 3. Set the name of the user that you created in step 1 in the `{$ILO.USER}` macro.
 4. Set the password of the user that you created in step 1 in the `{$ILO.PASSWORD}` macro.
@@ -77,7 +77,7 @@ This template has been tested on:
 |HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Status|<p>The overall health state from the view of this computer system. Possible values:</p><p></p><p>0 - "OK", the computer system is in normal condition;</p><p>1 - "Warning", the computer system is in condition that requires attention;</p><p>2 - "Critical", the computer system is in critical condition that requires immediate attention;</p><p>10 - "Unknown", the computer system is in unknown condition.</p>|Dependent item|hpe.ilo.computer_system.status[{#SYSTEM_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Status.HealthRollup`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: CPU utilization, in %|<p>Current CPU utilization of the computer system in percentage.</p>|Dependent item|hpe.ilo.computer_system.usage.cpu_util[{#SYSTEM_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Oem.Hpe.SystemUsage.CPUUtil`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: I/O bus utilization, in %|<p>Current I/O bus utilization of the computer system in percentage.</p>|Dependent item|hpe.ilo.computer_system.usage.io_bus_util[{#SYSTEM_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Oem.Hpe.SystemUsage.IOBusUtil`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Memory bus utilization, in %|<p>Current machineemory bus utilization of the computer system in percentage.</p>|Dependent item|hpe.ilo.computer_system.usage.memory_bus_util[{#SYSTEM_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Oem.Hpe.SystemUsage.MemoryBusUtil`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Memory bus utilization, in %|<p>Current memory bus utilization of the computer system in percentage.</p>|Dependent item|hpe.ilo.computer_system.usage.memory_bus_util[{#SYSTEM_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Oem.Hpe.SystemUsage.MemoryBusUtil`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Trigger prototypes for HPE iLO: Computer systems discovery
 
@@ -171,7 +171,7 @@ This template has been tested on:
 |HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Model|<p>The model name of the drive.</p>|Dependent item|hpe.ilo.drive.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Model`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Capacity|<p>The capacity of the drive.</p>|Dependent item|hpe.ilo.drive.capacity[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CapacityBytes`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Predicted media life left, in %|<p>The percentage of reads and writes that are predicted to still be available for the drive.</p>|Dependent item|hpe.ilo.drive.predicted_life_left[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.PredictedMediaLifeLeftPercent`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Status indicator|<p>Status of drive. Possible values:</p><p></p><p>0 - "OK", the drive is ok;</p><p>1 - "Fail", the drive has failed;</p><p>2 - "Rebuild", the drive is being rebuild;</p><p>3 - "PredictiveFailureAnalysis", the drive is still working but predicted to fail soon;</p><p>4 - "Hotspare", the drive is marked to be automatically rebuilt and used as a replacement for a failed drive;</p><p>5 - "InACriticalArray", the array that this drive is a part of is degraded;</p><p>6 - "InAFailedArray	", the array that this drive is a part of is failed;</p><p>10 - "Unknown", the drive status is unknown.</p>|Dependent item|hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StatusIndicator`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Status indicator|<p>Status of drive. Possible values:</p><p></p><p>0 - "OK", the drive is ok;</p><p>1 - "Fail", the drive has failed;</p><p>2 - "Rebuild", the drive is being rebuilt;</p><p>3 - "PredictiveFailureAnalysis", the drive is still working but predicted to fail soon;</p><p>4 - "Hotspare", the drive is marked to be automatically rebuilt and used as a replacement for a failed drive;</p><p>5 - "InACriticalArray", the array that this drive is a part of is degraded;</p><p>6 - "InAFailedArray	", the array that this drive is a part of is failed;</p><p>10 - "Unknown", the drive status is unknown.</p>|Dependent item|hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StatusIndicator`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for HPE iLO: Drives discovery
 
