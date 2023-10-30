@@ -272,16 +272,16 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	zbx_db_row_t		row;
+	zbx_tm_task_t		*task = NULL;
 	int			ret = FAIL, data_type;
 	char			*info = NULL;
 	zbx_uint64_t		parent_taskid;
+	double			t;
 
 	zbx_db_result_t		result = zbx_db_select("select parent_taskid,data,type"
 				" from task_data"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
-	double			t;
-	zbx_tm_task_t		*task;
 
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
