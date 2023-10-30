@@ -48,7 +48,7 @@
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
-#include "taskmanager/taskmanager.h"
+#include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
 #include "zbxconnector.h"
@@ -1398,10 +1398,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_max_concurrent_checks_per_poller};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 							&events_cbs, listen_sock, config_startup_time,
-							config_proxydata_frequency};
+							config_proxydata_frequency, get_config_forks};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
-							CONFIG_FORKS};
+							get_config_forks};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
 							zbx_config_source_ip, &events_cbs, config_proxyconfig_frequency,
