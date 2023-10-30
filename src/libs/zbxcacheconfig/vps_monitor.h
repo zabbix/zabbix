@@ -37,7 +37,7 @@ typedef struct
 } zbx_vps_monitor_t;
 
 int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error);
-void	vps_monitor_destroy();
+void	vps_monitor_destroy(void);
 int	vps_history_inc(int *cr);
 int	vps_history_dec(int *cr);
 

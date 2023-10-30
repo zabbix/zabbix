@@ -46,7 +46,7 @@ int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error)
  * Purpose: destroy VPS monitor                                               *
  *                                                                            *
  ******************************************************************************/
-void	vps_monitor_destroy()
+void	vps_monitor_destroy(void)
 {
 	zbx_mutex_destroy(&vps_lock);
 }

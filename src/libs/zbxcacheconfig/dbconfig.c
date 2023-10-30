@@ -215,7 +215,7 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 				if (0 == strcmp(arg1, "vps"))
 				{
 					ret = SUCCEED;
-					goto  clean;
+					goto clean;
 				}
 
 				if (2 == request.nparam)
@@ -8594,7 +8594,7 @@ void	zbx_free_configuration_cache(void)
 
 	UNLOCK_CACHE;
 
-	vps_monitor_destroy(&config->vps_monitor);
+	vps_monitor_destroy();
 
 	zbx_shmem_destroy(config_mem);
 	config_mem = NULL;
