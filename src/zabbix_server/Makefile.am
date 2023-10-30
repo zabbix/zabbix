@@ -72,7 +72,7 @@ zabbix_server_LDADD = \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
 	vmware/libzbxvmware.a \
-	taskmanager/libzbxtaskmanager.a \
+	taskmanager/libzbxtaskmanager_server.a \
 	connector/libconnector.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \

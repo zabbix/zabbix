@@ -28,8 +28,6 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 /******************************************************************************
  *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
@@ -230,6 +228,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *              config_timeout         - [IN]                                         *
  *              config_trapper_timeout - [IN]                                         *
  *              config_source_ip       - [IN]                                         *
+ *              get_config_forks       - [IN]                                         *
  *              result                 - [OUT] result of script execution             *
  *              debug                  - [OUT] debug data (optional)                  *
  *                                                                                    *
@@ -241,7 +240,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  **************************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
 		const char *clientip, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		char **result, char **debug)
+		zbx_get_config_forks_f get_config_forks, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
 	zbx_dc_host_t		host;
@@ -446,7 +445,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
-					config_trapper_timeout, config_source_ip, CONFIG_FORKS, result, error,
+					config_trapper_timeout, config_source_ip, get_config_forks, result, error,
 					sizeof(error), debug);
 		}
 		else
@@ -557,7 +556,7 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
  *                                                                            *
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout,
-		int config_trapper_timeout, const char *config_source_ip)
+		int config_trapper_timeout, const char *config_source_ip, zbx_get_config_forks_f get_config_forks)
 {
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
@@ -656,7 +655,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		*clientip = '\0';
 
 	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout,
-			config_trapper_timeout, config_source_ip, &result, &debug)))
+			config_trapper_timeout, config_source_ip, get_config_forks, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
