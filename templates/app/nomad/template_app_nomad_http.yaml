@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:16:27Z'
+  date: '2023-10-30T11:29:07Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -527,10 +527,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad by HTTP'
                         key: nomad.region
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   name: Servers
@@ -550,10 +550,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad by HTTP'
                         key: nomad.servers.count
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   name: Clients
@@ -573,10 +573,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad by HTTP'
                         key: nomad.clients.count
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
     - uuid: 44eac6a1abe34999b85ad6d0e40073fd
       template: 'HashiCorp Nomad Client by HTTP'
@@ -2470,10 +2470,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.running
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   'y': '5'
@@ -2492,10 +2492,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.complete
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   'y': '10'
@@ -2514,10 +2514,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.migrating
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '8'
@@ -2536,10 +2536,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.start
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '8'
@@ -2559,10 +2559,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.blocked
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '8'
@@ -2582,10 +2582,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.terminal
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -2604,10 +2604,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.pending
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -2627,10 +2627,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.restart
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -2650,10 +2650,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: nomad.client.allocations.failed
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
         - uuid: 9df94875bc944537860bad6bbe832ca8
           name: 'Job resources'
@@ -2672,9 +2672,6 @@ zabbix_export:
                       value:
                         host: 'HashiCorp Nomad Client by HTTP'
                         name: 'HashiCorp Nomad Client: Job [{#JOB.NAME}] task ["{#JOB.TASK.GROUP}"] namespace ["{#JOB.NAMESPACE}"] CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -2688,9 +2685,6 @@ zabbix_export:
                       value:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: 'nomad.client.allocs.cpu.allocated["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: INTEGER
                       name: source_type
                       value: '3'
@@ -2707,9 +2701,6 @@ zabbix_export:
                       value:
                         host: 'HashiCorp Nomad Client by HTTP'
                         name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] task ["{#JOB.TASK.GROUP}"] namespace ["{#JOB.NAMESPACE}"] memory utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -2723,9 +2714,6 @@ zabbix_export:
                       value:
                         host: 'HashiCorp Nomad Client by HTTP'
                         name: 'HashiCorp Nomad Client: Job [{#JOB.NAME}] task ["{#JOB.TASK.GROUP}"] namespace ["{#JOB.NAMESPACE}"] CPU throttling'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -2740,9 +2728,6 @@ zabbix_export:
                       value:
                         host: 'HashiCorp Nomad Client by HTTP'
                         key: 'nomad.client.allocs.cpu.total_ticks["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: INTEGER
                       name: source_type
                       value: '3'
@@ -2783,9 +2768,6 @@ zabbix_export:
                       value:
                         host: 'HashiCorp Nomad Client by HTTP'
                         name: 'HashiCorp Nomad Client: Disk ["{#DEV.NAME}"] usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'
@@ -2811,9 +2793,6 @@ zabbix_export:
                       value:
                         host: 'HashiCorp Nomad Client by HTTP'
                         name: 'HashiCorp Nomad Client: Disk ["{#DEV.NAME}"] utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 766a3c43981147bf85e9e157eb69c510
           name: 'Detection state'
@@ -6027,10 +6006,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.boltdb.txstats.cursor_count
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: GRAPH_CLASSIC
                   'y': '5'
@@ -6079,10 +6058,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.boltdb.txstats.node_count
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -6101,10 +6080,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.boltdb.txstats.node_deref
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
         - uuid: 5b6b8811398f48ebb4abb73620320211
           name: Cluster
@@ -6127,7 +6106,7 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.cluster_role
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
                       name: value_size
@@ -6159,10 +6138,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.leader.dispatch_num_logs
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '6'
@@ -6181,10 +6160,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.autopilot.state
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                     - type: INTEGER
                       name: value_size
@@ -6207,10 +6186,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.apply
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '12'
@@ -6229,10 +6208,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.autopilot.failure_tolerance
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -6252,10 +6231,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.applied_index
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '18'
@@ -6274,10 +6253,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.raft.fsm.autopilot
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
         - uuid: c7f515dd33ee4045b96ffc6d83cec12a
           name: Jobs
@@ -6300,10 +6279,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_status.running
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   'y': '5'
@@ -6322,10 +6301,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_summary.running
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   'y': '10'
@@ -6344,10 +6323,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_summary.queued
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   'y': '15'
@@ -6366,10 +6345,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.broker.total_ready
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   'y': '20'
@@ -6388,10 +6367,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.blocked_evals.total_blocked
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '6'
@@ -6411,10 +6390,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_summary.lost
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '6'
@@ -6434,10 +6413,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.blocked_evals.total_quota_limit
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '8'
@@ -6456,10 +6435,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_status.pending
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '8'
@@ -6479,10 +6458,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_summary.starting
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '8'
@@ -6502,10 +6481,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.broker.total_pending
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '12'
@@ -6525,10 +6504,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_summary.failed
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '12'
@@ -6548,10 +6527,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.blocked_evals.total_escaped
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -6570,10 +6549,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_status.dead
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -6593,10 +6572,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_summary.complete
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '16'
@@ -6616,10 +6595,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.broker.total_waiting
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '18'
@@ -6639,10 +6618,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.job_summary.unknown
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
                 - type: ITEM
                   x: '18'
@@ -6662,10 +6641,10 @@ zabbix_export:
                         host: 'HashiCorp Nomad Server by HTTP'
                         key: nomad.server.broker.total_unacked
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: show
+                      name: show.1
                       value: '4'
       valuemaps:
         - uuid: 9898b464447240919cf8e25016be687f
