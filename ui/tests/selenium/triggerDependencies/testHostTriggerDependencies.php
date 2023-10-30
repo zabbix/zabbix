@@ -30,7 +30,6 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 
 	protected static $hostids;
 	protected static $host_druleids;
-	protected static $host_trigger_protids;
 
 	public function prepareHostTriggersData() {
 		$templates = CDataHelper::call('template.create', [
@@ -56,7 +55,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 
 		$template_triggers = CDataHelper::call('trigger.create', [
 			[
-				'description' => 'trigger linked',
+				'description' => 'Trigger that linked',
 				'expression' => 'last(/Template that linked to host/everything_2)=0'
 			]
 		]);
@@ -230,7 +229,6 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $host_trigger_prot);
-		self::$host_trigger_protids = CDataHelper::getIds('description');
 	}
 
 	public static function getTriggerCreateData() {
@@ -239,7 +237,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				[
 					'name' => 'Simple trigger',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with everything' => [
 							'Host trigger everything'
 						]
@@ -253,7 +251,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				[
 					'name' => 'Two trigger dependencies',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with everything' => [
 							'Host trigger everything',
 							'Host trigger everything 2'
@@ -269,7 +267,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				[
 					'name' => 'Triggers from another hosts',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with linked template' => [
 							'Host trigger 2'
 						]
@@ -283,7 +281,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				[
 					'name' => 'Two triggers from different',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with linked template' => [
 							'Host trigger 2'
 						],
@@ -301,13 +299,13 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				[
 					'name' => 'Depends on linked trigger',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with linked template' => [
-							'trigger linked'
+							'Trigger that linked'
 						]
 					],
 					'result' => [
-						'Host with linked template: trigger linked'
+						'Host with linked template: Trigger that linked'
 					]
 				]
 			]
@@ -337,7 +335,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Host trigger update',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with everything' => [
 							'Host trigger update'
 						]
@@ -352,7 +350,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Host trigger update',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with everything' => [
 							'Host trigger with dependence'
 						]
@@ -386,13 +384,13 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				[
 					'expected' => TEST_BAD,
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with everything' => [
-							'trigger linked'
+							'Trigger that linked'
 						]
 					],
-					'error_message' => 'Trigger "trigger linked" cannot depend on the trigger "trigger linked", because'.
-							' a circular linkage ("trigger linked" -> "trigger linked") would occur.'
+					'error_message' => 'Trigger "Trigger that linked" cannot depend on the trigger "Trigger that linked", because'.
+							' a circular linkage ("Trigger that linked" -> "Trigger that linked") would occur.'
 				]
 			]
 		];
@@ -408,9 +406,9 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.
 				self::$hostids['Host with everything'].'&context=host'
 		)->waitUntilReady();
-		$this->query('link:trigger linked')->one()->click();
+		$this->query('link:Trigger that linked')->one()->click();
 		$this->page->waitUntilReady();
-		$this->triggerCreateUpdate($data, null, 'Trigger updated', 'Cannot update trigger', 'trigger linked');
+		$this->triggerCreateUpdate($data, null, 'Trigger updated', 'Cannot update trigger', 'Trigger that linked');
 	}
 
 	public static function getTriggerPrototypeCreateData() {
@@ -445,7 +443,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				[
 					'name' => 'Depends on trigger and trigger_prot',
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with everything' => [
 							'Host trigger everything'
 						]
@@ -548,7 +546,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 					'prototype_dependencies' => [
 						'trigger prototype linked{#KEY}'
 					],
-					'dependencies_for_host' => [
+					'dependencies' => [
 						'Host with everything' => [
 							'Host trigger everything'
 						]

@@ -30,7 +30,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 
 	protected static $templateids;
 	protected static $template_druleids;
-	protected static $template_trigger_protids;
 
 	public function prepareTemplateTriggersData() {
 		$templates = CDataHelper::call('template.create', [
@@ -116,7 +115,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 				'expression' => 'last(/Template with everything/everything)=0'
 			],
 			[
-				'description' => 'trigger linked',
+				'description' => 'Trigger that linked',
 				'expression' => 'last(/Template that linked to host/everything_2)=0'
 			],
 			[
@@ -218,7 +217,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $trigger_prot);
-		self::$template_trigger_protids = CDataHelper::getIds('description');
 
 		$hosts = CDataHelper::call('host.create', [
 			[
@@ -338,11 +336,11 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'name' => 'Triggers from another template',
 					'dependencies' => [
 						'Template that linked to host' => [
-							'trigger linked'
+							'Trigger that linked'
 						]
 					],
 					'result' => [
-						'Template that linked to host: trigger linked'
+						'Template that linked to host: Trigger that linked'
 					]
 				]
 			],
@@ -352,14 +350,14 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'name' => 'Two triggers from different',
 					'dependencies' => [
 						'Template that linked to host' => [
-							'trigger linked'
+							'Trigger that linked'
 						],
 						'Template with everything' => [
 							'trigger simple'
 						]
 					],
 					'result' => [
-						'Template that linked to host: trigger linked',
+						'Template that linked to host: Trigger that linked',
 						'Template with everything: trigger simple'
 					]
 				]
@@ -453,8 +451,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 	 */
 	public function testTemplateTriggerDependencies_TriggerCreate($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.
-				self::$templateids['Template with everything'].'&context=template'
-		)->waitUntilReady();
+				self::$templateids['Template with everything'].'&context=template')->waitUntilReady();
 		$this->query('button:Create trigger')->one()->click();
 		$this->page->waitUntilReady();
 

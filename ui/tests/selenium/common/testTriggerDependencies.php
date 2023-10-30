@@ -68,37 +68,23 @@ class testTriggerDependencies extends CWebTest {
 
 		// If expressions doesn't exist, then it is update scenario.
 		if (is_null($expression) && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
-			foreach ($this->query('id:dependency-table')->asTable()->one()->getRows() as $row) {
+			foreach ($form->getField('Dependencies')->asTable()->getRows() as $row) {
 				$row->query('button:Remove')->one()->click();
 			}
 		}
 
+		// Dependencies buttons.
 		$trigger_dependencies = [
-			'dependencies' => 'id:add-dep-template-trigger',
-			'host_dependencies' => 'id:add-dep-host-trigger',
-			'dependencies_for_host' => 'id:add-dep-trigger'
+			'dependencies' => 'Add',
+			'host_dependencies' => 'Add host trigger',
+			'prototype_dependencies' => 'Add prototype'
 		];
 
 		// Add dependencies.
-		foreach ($trigger_dependencies as $dependency_type => $selector) {
+		foreach ($trigger_dependencies as $dependency_type => $button) {
 			if (array_key_exists($dependency_type, $data)) {
-				$this->addDependence($data[$dependency_type], $selector);
+				$this->addDependence($data[$dependency_type], $button);
 			}
-		}
-
-		// Adding trigger prototype dependencies allowed only from same host.
-		if (array_key_exists('prototype_dependencies', $data)) {
-			$form->query('id:add-dep-trigger-prototype')->one()->click();
-			$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-
-			foreach ($data['prototype_dependencies'] as $trigger) {
-				// TODO: should be fixed after git-hook improvements in DEV-2396
-				$dialog->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($trigger)."]/../preceding-sibling::td/input")
-						->asCheckbox()->one()->check();
-			}
-
-			$dialog->query('button:Select')->one()->click();
-			$dialog->waitUntilNotVisible();
 		}
 
 		$form->submit();
@@ -124,7 +110,7 @@ class testTriggerDependencies extends CWebTest {
 	 */
 	protected function checkTrigger($data, $updated_trigger = null) {
 		// Trigger name where to check dependencies.
-		$trigger_name = (is_null($updated_trigger)) ? $data['name'] : $updated_trigger;
+		$trigger_name = is_null($updated_trigger) ? $data['name'] : $updated_trigger;
 
 		// Check that dependent triggers displayed on triggers list page.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -146,20 +132,29 @@ class testTriggerDependencies extends CWebTest {
 	 * Add trigger dependence - host trigger, simple trigger
 	 *
 	 * @param array $values			host/template name and trigger name.
-	 * @param string $selector		Add or Add host trigger - button selector.
+	 * @param string $button		Add or Add host trigger - button selector.
 	 */
-	protected function addDependence($values, $selector) {
+	protected function addDependence($values, $button) {
 		foreach ($values as $host_name => $triggers) {
-			$this->query($selector)->one()->click();
+			$this->query('id:dependenciesTab')->query('button', $button)->one()->click();
 			$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-			$dialog->query('id:generic-popup-form')->asMultiselect()->one()->fill(['Host' => $host_name]);
-			$dialog->waitUntilReady();
 
+			if ($button !== 'Add prototype') {
+				$dialog->query('id:generic-popup-form')->asMultiselect()->one()->fill(['Host' => $host_name]);
+				$dialog->waitUntilReady();
+			}
+			if (!is_array($triggers)) {
+				$triggers = [$triggers];
+			}
+
+			// Check-in triggers for dependence.
 			foreach ($triggers as $trigger) {
-				// TODO: should be fixed after git-hook improvements in DEV-2396, remove double quotes.
 				$dialog->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($trigger)."]/../preceding-sibling::td/input")
 						->asCheckbox()->one()->check();
 			}
+
+//			$dialog->asTable()->findRows('Name', $triggers)->select();
+//			sleep(10);
 
 			$dialog->getFooter()->query('button:Select')->one()->click();
 			$dialog->waitUntilNotVisible();
