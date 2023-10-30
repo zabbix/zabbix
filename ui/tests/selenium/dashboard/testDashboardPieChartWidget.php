@@ -30,7 +30,7 @@ class testDashboardPieChartWidget extends CWebTest
 {
 	protected static $dashboardid;
 	protected static $screenshot_host_id;
-	protected static $screenshot_host_items;
+	protected static $screenshot_host_item_ids;
 	protected const TYPE_ITEM_PATTERN = 'Item pattern';
 	protected const TYPE_ITEM_LIST = 'Item list';
 	protected const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
@@ -123,9 +123,9 @@ class testDashboardPieChartWidget extends CWebTest
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			]
 		]);
-		self::$screenshot_host_items = [];
+		self::$screenshot_host_item_ids = [];
 		foreach([0, 1, 2, 3] as $id) {
-			self::$screenshot_host_items['item-'.($id + 1)] = $response['itemids'][$id];
+			self::$screenshot_host_item_ids['item-'.($id + 1)] = intval($response['itemids'][$id]);
 		}
 	}
 
@@ -669,49 +669,148 @@ class testDashboardPieChartWidget extends CWebTest
 						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
 						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1']
 					],
-					'item_data' => []
+					'item_data' => [],
+					'screenshot_id' => 'no_data'
 				]
 			],
-			// One item, minimum fields.
+			// One item, custom data set name.
 			[
 				[
 					'widget_fields' => [
 						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
-						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1']
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1'],
+						['name' => 'ds.0.data_set_label', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'TEST SET 👌'],
+						['name' => 'ds.0.dataset_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
 					],
 					'item_data' => [
 						'item-1' => [
 							['value' => 99]
 						]
 					],
+					'expected_dataset_name' => 'TEST SET 👌',
 					'expected_sectors' => [
 						'item-1' => ['value' => '99', 'color' => 'rgb(255, 70, 92)']
-					]
+					],
+					'screenshot_id' => 'one_item'
 				]
 			],
-			// Two items, small values.
+			// Two items, data set aggregate function, very small item values.
 			[
 				[
-					'widget_name' => 'Two items',
+					'widget_name' => '2️⃣ items',
 					'widget_fields' => [
 						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
 						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-3'],
 						['name' => 'ds.0.items.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-4'],
+						['name' => 'ds.0.aggregate_function', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
 						['name' => 'legend_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1]
 					],
 					'item_data' => [
 						'item-3' => [
-							['value' => 0.0000004]
+							['value' => 0.00000000000000004]
 						],
 						'item-4' => [
-							['value' => 0.0000001]
+							['value' => 0.00000000000000001]
 						]
 					],
-					'expected_legend_function' => 'last',
+					'expected_legend_function' => 'max',
 					'expected_sectors' => [
-						'item-3' => ['value' => '0.0000004', 'color' => 'rgb(255, 70, 92)'],
-						'item-4' => ['value' => '0.0000001', 'color' => 'rgb(255, 197, 219)']
-					]
+						'item-3' => ['value' => '4E-17', 'color' => 'rgb(255, 70, 92)'],
+						'item-4' => ['value' => '1E-17', 'color' => 'rgb(255, 197, 219)']
+					],
+					'screenshot_id' => 'two_items'
+				]
+			],
+			// Four items, host and item pattern, mixed value types, custom color, hide legend and header.
+			[
+				[
+					'view_mode' => 1,
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Host for Pie chart screen*'],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-*'],
+						['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFA726'],
+						['name' => 'legend', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0]
+					],
+					'item_data' => [
+						'item-1' => [
+							['value' => 1]
+						],
+						'item-2' => [
+							['value' => 2]
+						],
+						'item-3' => [
+							['value' => 3.0]
+						],
+						'item-4' => [
+							['value' => 4.4]
+						]
+					],
+					'expected_sectors' => [
+						'item-1' => ['value' => '1', 'color' => 'rgb(191, 103, 0)'],
+						'item-2' => ['value' => '2', 'color' => 'rgb(255, 167, 38)'],
+						'item-3' => ['value' => '3', 'color' => 'rgb(255, 230, 101)'],
+						'item-4' => ['value' => '4.4', 'color' => 'rgb(255, 255, 165)']
+					],
+					'screenshot_id' => 'four_items'
+				]
+			],
+			// Data set type Item list, Total item, merging enabled, doughnut with total value, custom legend display.
+			[
+				[
+					'widget_fields' => [
+						// Items and their colors.
+						['name' => 'ds.0.dataset_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.itemids.0', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-1'],
+						['name' => 'ds.0.type.0', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'ds.0.color.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFEBEE'],
+						['name' => 'ds.0.itemids.1', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-2'],
+						['name' => 'ds.0.type.1', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'E53935'],
+						['name' => 'ds.0.itemids.2', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-3'],
+						['name' => 'ds.0.type.2', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.2', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546E7A'],
+						['name' => 'ds.0.itemids.3', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-4'],
+						['name' => 'ds.0.type.3', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.3', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546EAA'],
+						// Drawing and total value options.
+						['name' => 'draw_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'width', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 30],
+						['name' => 'total_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'value_size_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'value_size', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 30],
+						['name' => 'decimal_places', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'units_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '💚'],
+						['name' => 'value_bold', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'value_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '7CB342'],
+						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
+						['name' => 'merge', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'merge_percent', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 10],
+						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'B71C1C'],
+						['name' => 'legend_lines', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
+						['name' => 'legend_columns', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
+					],
+					'item_data' => [
+						'item-1' => [
+							['value' => 100]
+						],
+						'item-2' => [
+							['value' => 82]
+						],
+						'item-3' => [
+							['value' => 4]
+						],
+						'item-4' => [
+							['value' => 5]
+						]
+					],
+					'expected_total' => '100 💚',
+					'expected_sectors' => [
+						'item-1' => ['value' => '100 💚', 'color' => 'rgb(255, 235, 238)'],
+						'item-2' => ['value' => '82 💚', 'color' => 'rgb(229, 57, 53)'],
+						'Other' => ['value' => '9 💚', 'color' => 'rgb(183, 28, 28)']
+					],
+					'screenshot_id' => 'doughnut'
 				]
 			],
 		];
@@ -723,11 +822,9 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @dataProvider getPieChartDisplayData
 	 */
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
-		// Transform data provider data for creating the widget with API.
-
 		// Delete item history data in DB.
 		foreach ([1, 2, 3, 4] as $id) {
-			CDataHelper::removeItemData(self::$screenshot_host_items['item-'.$id]);
+			CDataHelper::removeItemData(self::$screenshot_host_item_ids['item-'.$id]);
 		}
 
 		// Set the new item history data.
@@ -736,7 +833,15 @@ class testDashboardPieChartWidget extends CWebTest
 			foreach ($item_data as $record) {
 				// Always minus 10 seconds for safety.
 				$time = time() - 10 + CTestArrayHelper::get($record, 'time');
-				CDataHelper::addItemData(self::$screenshot_host_items[$item_key], $record['value'], $time);
+				CDataHelper::addItemData(self::$screenshot_host_item_ids[$item_key], $record['value'], $time);
+			}
+		}
+
+		// Fill in the actual Item ids into the data set data (this only aplies to Item list data sets).
+		foreach ($data['widget_fields'] as $id => $field) {
+			if (preg_match('/^ds\.[0-9]\.itemids\.[0-9]$/', $field['name'])) {
+				$field['value'] = self::$screenshot_host_item_ids[$field['value']];
+				$data['widget_fields'][$id] = $field;
 			}
 		}
 
@@ -749,6 +854,7 @@ class testDashboardPieChartWidget extends CWebTest
 						'widgets' => [
 							[
 								'name' => CTestArrayHelper::get($data, 'widget_name', ''),
+								'view_mode' => CTestArrayHelper::get($data, 'view_mode', 0),
 								'type' => 'piechart',
 								'width' => 12,
 								'height' => 8,
@@ -770,9 +876,19 @@ class testDashboardPieChartWidget extends CWebTest
 			// The name that should be shown in the legend and in the hintbox.
 			$legend_name = self::HOST_NAME_SCREENSHOTS.': '.$item;
 
-			// If the aggregation function is shown in the legend.
+			// Special case - legend name includes aggregation function.
 			if (CTestArrayHelper::get($data, 'expected_legend_function')) {
 				$legend_name = CTestArrayHelper::get($data, 'expected_legend_function').'('.$legend_name.')';
+			}
+
+			// Special case - legend name set in UI.
+			if (CTestArrayHelper::get($data, 'expected_dataset_name')) {
+				$legend_name = $data['expected_dataset_name'];
+			}
+
+			// Special case - legend name is "Other" because sectors were merged.
+			if ($item === 'Other') {
+				$legend_name = 'Other: ';
 			}
 
 			// Check if any of the sectors matches the expected sector.
@@ -794,7 +910,7 @@ class testDashboardPieChartWidget extends CWebTest
 					preg_match('/fill: (.*?);/', $sector->getAttribute('style'), $matches);
 					$this->assertEquals($expected_sector['color'], $matches[1]);
 
-					// Match successful check the next expected sector.
+					// Match successful, continue to the next expected sector.
 					continue 2;
 				}
 			}
@@ -802,6 +918,18 @@ class testDashboardPieChartWidget extends CWebTest
 			// Fail test if no match found.
 			throw new Exception('Expected sector for '.$item.' not found.');
 		}
+
+		// Assert expected Total value.
+		if (CTestArrayHelper::get($data, 'expected_total')) {
+			$this->assertEquals($data['expected_total'], $widget->query('class:svg-pie-chart-total-value')->one()->getText());
+		}
+
+		// Wait for the sector animation to end before taking a screenshot (animation length 1 second).
+		sleep(2);
+
+		// Screenshot the widget.
+		$this->page->removeFocus();
+		$this->assertScreenshot($widget, 'piechart_display_'.$data['screenshot_id']);
 	}
 
 	/**
