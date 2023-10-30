@@ -321,10 +321,18 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
 		}
-		else if (0 == strcmp(param2, "written") && 0 == strcmp(param2, "total"))
+		else if (0 == strcmp(param2, "written"))
 		{
-			SET_UI64_RESULT(result, stats.written_num);
-			ret = SUCCEED;
+			param2 = get_rparam(request, 2);
+
+			if (0 == strcmp(param2, "total"))
+			{
+				SET_UI64_RESULT(result, stats.written_num);
+				ret = SUCCEED;
+			}
+			else
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+
 			goto out;
 		}
 		else if (0 != strcmp(param2, "overcommit"))
