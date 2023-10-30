@@ -339,7 +339,9 @@ static int	is_recoverable_mysql_error(int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
+#if LIBMYSQL_VERSION_ID >= 80024
 		case ER_CLIENT_INTERACTION_TIMEOUT:
+#endif
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
@@ -358,7 +360,9 @@ static int	is_inhibited_mysql_error(int err_no)
 	{
 		case CR_SERVER_GONE_ERROR:
 		case CR_SERVER_LOST:
+#if LIBMYSQL_VERSION_ID >= 80024
 		case ER_CLIENT_INTERACTION_TIMEOUT:
+#endif
 			return SUCCEED;
 	}
 
