@@ -49,17 +49,6 @@ static int	update_interface_availability(unsigned char **data, size_t *data_allo
 	return SUCCEED;
 }
 
-static int	interface_availability_by_item_type(unsigned char item_type, unsigned char interface_type)
-{
-	if ((ITEM_TYPE_ZABBIX == item_type && INTERFACE_TYPE_AGENT == interface_type) ||
-			(ITEM_TYPE_SNMP == item_type && INTERFACE_TYPE_SNMP == interface_type) ||
-			(ITEM_TYPE_JMX == item_type && INTERFACE_TYPE_JMX == interface_type) ||
-			(ITEM_TYPE_IPMI == item_type && INTERFACE_TYPE_IPMI == interface_type))
-		return SUCCEED;
-
-	return FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get interface availability data                                   *
@@ -113,6 +102,17 @@ static void	interface_set_availability(zbx_dc_interface_t *dc_interface, const z
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
 		*pdisable_until = availability->disable_until;
+}
+
+static int	interface_availability_by_item_type(unsigned char item_type, unsigned char interface_type)
+{
+	if ((ITEM_TYPE_ZABBIX == item_type && INTERFACE_TYPE_AGENT == interface_type) ||
+			(ITEM_TYPE_SNMP == item_type && INTERFACE_TYPE_SNMP == interface_type) ||
+			(ITEM_TYPE_JMX == item_type && INTERFACE_TYPE_JMX == interface_type) ||
+			(ITEM_TYPE_IPMI == item_type && INTERFACE_TYPE_IPMI == interface_type))
+		return SUCCEED;
+
+	return FAIL;
 }
 
 static const char	*item_type_agent_string(zbx_item_type_t item_type)
