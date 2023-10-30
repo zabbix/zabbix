@@ -351,7 +351,7 @@ check_fill:
  * Return value: IP as string                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)
+int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)
 {
 #ifdef HAVE_IPV6
 	if (ZBX_IPRANGE_V6 == type)
@@ -487,10 +487,6 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len)
 {
 	static ZBX_THREAD_LOCAL int	idx, ipaddress[8];
-	int				i;
-
-	if (0 == num)
-		return FAIL;
 
 	if ('\0' == *ip)
 	{
@@ -499,28 +495,54 @@ int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip
 		return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
 	}
 
-	if (num == idx)
+	if (FAIL == zbx_iprange_uniq_iter(ipranges, num, &idx, ipaddress))
+		return FAIL;
+
+	return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets next unique digital IP address from specified range          *
+ *                                                                            *
+ * Parameters: ipranges  - [IN] array of ipranges                             *
+ *             num       - [IN] size of ipranges array                        *
+ *             idx       - [IN/OUT] current index of ipranges                 *
+ *             ipaddress - [IN/OUT] current ip address from range             *
+ *                                                                            *
+ * Return value: SUCCEED - next IP address was in specified range             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx, int *ipaddress)
+{
+	int	i;
+
+	if (0 == num)
+		return FAIL;
+
+	if (num == *idx)
 		return FAIL;
 
 	do
 	{
-		if (FAIL == zbx_iprange_next(&ipranges[idx], ipaddress))
+		if (FAIL == zbx_iprange_next(&ipranges[*idx], ipaddress))
 		{
-			if (++idx == num)
+			if (++(*idx) == num)
 				return FAIL;
 
-			zbx_iprange_first(&ipranges[idx], ipaddress);
+			zbx_iprange_first(&ipranges[*idx], ipaddress);
 		}
 
-		for (i = 0; i < idx; i++)
+		for (i = 0; i < *idx; i++)
 		{
 			if (SUCCEED == zbx_iprange_validate(&ipranges[i], ipaddress))
 				break;
 		}
 	}
-	while (i != idx);	/* skipping ip from overlapping ipranges */
+	while (i != *idx);	/* skipping ip from overlapping ipranges */
 
-	return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+	return SUCCEED;
 }
 
 /******************************************************************************

@@ -24,8 +24,25 @@
 #include "zbxip.h"
 
 #define DISCOVERER_JOB_TASKS_INPROGRESS_MAX	1000
+#define DISCOVERER_JOB_TASKS_SKIP_LIMIT		-1
 
 ZBX_VECTOR_DECL(iprange, zbx_iprange_t)
+
+typedef struct
+{
+	struct
+	{
+		int	ipaddress[8];
+		int	index_ip;
+		int	port;
+		int	index_port;
+		int	dcheck_index;
+		int	count;
+	}
+	state;
+	zbx_vector_iprange_t	*ipranges;
+}
+zbx_task_range_t;
 
 typedef struct
 {
@@ -33,7 +50,7 @@ typedef struct
 	union
 	{
 		char			*ip;
-		zbx_vector_iprange_t	*ipranges;
+		zbx_task_range_t	*range;
 	}
 	addr;
 	unsigned short			port;

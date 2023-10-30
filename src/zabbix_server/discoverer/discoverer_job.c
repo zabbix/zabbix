@@ -58,13 +58,12 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 void	discoverer_task_clear(zbx_discoverer_task_t *task)
 {
 	if (DISCOVERY_ADDR_IP == task->addr_type)
-	{
 		zbx_free(task->addr.ip);
-	}
+	else
+		zbx_free(task->addr.range);
 
 	/* dcheck is stored in job->dcheck_common */
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
-
 }
 
 void	discoverer_task_free(zbx_discoverer_task_t *task)
