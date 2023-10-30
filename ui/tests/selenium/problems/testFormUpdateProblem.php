@@ -37,20 +37,17 @@ class testFormUpdateProblem extends CWebTest {
 	protected static $hostid;
 
 	/**
-	 * Ids of the triggers for problems.
-	 *
-	 * @var array
-	 */
-	protected static $triggerids;
-
-	/**
 	 * Time when acknowledge was created.
 	 *
 	 * @var string
 	 */
 	protected static $acktime;
-	protected static $eventid_for_unsigned;
-	protected static $eventid_for_text;
+
+	/**
+	 * Eventid for problem suppression.
+	 *
+	 * @var integer
+	 */
 	protected static $eventid_for_icon_test;
 
 	/**
@@ -139,41 +136,36 @@ class testFormUpdateProblem extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
-		self::$triggerids = CDataHelper::getIds('description');
 
 		// Create problems and events.
 		$time = time();
-		foreach (self::$triggerids as $name => $id) {
+		foreach (CDataHelper::getIds('description') as $name => $id) {
 			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, $time);
 		}
 
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
+		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.zbx_dbstr('Trigger for char'));
 
-		// Get eventid.
-		self::$eventid_for_text = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Trigger for text')
-		);
-		self::$eventid_for_unsigned = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Trigger for unsigned')
-		);
-		self::$eventid_for_icon_test = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Trigger for icon test')
-		);
+		$eventids = [];
+		foreach (['Trigger for text', 'Trigger for unsigned', 'Trigger for icon test'] as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
+		}
+
+		self::$eventid_for_icon_test = $eventids['Trigger for icon test'];
 
 		// Suppress the problem: 'Trigger for text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, '.
-				self::$eventid_for_text.', NULL, 0)'
+				$eventids['Trigger for text'].', NULL, 0)'
 		);
 
 		// Acknowledge the problem: 'Trigger for unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
-			'eventids' => self::$eventid_for_unsigned,
+			'eventids' => $eventids['Trigger for unsigned'],
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
 
 		$event = CDataHelper::call('event.get', [
-			'eventids' => self::$eventid_for_unsigned,
+			'eventids' => $eventids['Trigger for unsigned'],
 			'selectAcknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');

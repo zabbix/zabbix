@@ -191,33 +191,31 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Create events and problems.
 		self::$time = time();
 		foreach (self::$triggerids as $name => $id) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, self::$time);
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 		}
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
+		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.
 				zbx_dbstr('Trigger for widget 1 char')
 		);
 
 		// Get event ids.
-		self::$cause_problemid = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Cause problem')
-		);
-		self::$symptom_problemid = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Symptom problem')
-		);
-		self::$symptom_problemid2 = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Symptom problem 2')
-		);
-		self::$eventid_for_widget_text = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Trigger for widget text')
-		);
-		self::$eventid_for_widget_unsigned = CDBHelper::getValue('SELECT eventid FROM events WHERE name ='.
-				zbx_dbstr('Trigger for widget 2 unsigned')
-		);
+		$eventids = [];
+		$event_names = [
+			'Cause problem', 'Symptom problem', 'Symptom problem 2', 'Trigger for widget text', 'Trigger for widget 2 unsigned'
+		];
+		foreach ($event_names as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
+		}
+
+		self::$cause_problemid = $eventids['Cause problem'];
+		self::$symptom_problemid = $eventids['Symptom problem'];
+		self::$symptom_problemid2 = $eventids['Symptom problem 2'];
+		self::$eventid_for_widget_text = $eventids['Trigger for widget text'];
+		self::$eventid_for_widget_unsigned = $eventids['Trigger for widget 2 unsigned'];
 
 		// Set cause and symptoms.
-		DBexecute('UPDATE problem SET cause_eventid ='.self::$cause_problemid.' WHERE name IN ('.
+		DBexecute('UPDATE problem SET cause_eventid='.self::$cause_problemid.' WHERE name IN ('.
 				zbx_dbstr('Symptom problem').', '.zbx_dbstr('Symptom problem 2').')'
 		);
 		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.self::$symptom_problemid.', '.
