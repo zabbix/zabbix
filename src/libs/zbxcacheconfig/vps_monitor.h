@@ -22,8 +22,6 @@
 
 #include "zbxcommon.h"
 
-#define VPS_HISTORY_SIZE	(SEC_PER_MIN + 1)
-
 typedef struct
 {
 	zbx_uint64_t	total_values_num;
@@ -33,12 +31,9 @@ typedef struct
 	zbx_uint64_t	overcommit;
 
 	time_t		last_flush;
-	time_t		last_hist;
 } zbx_vps_monitor_t;
 
 int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error);
 void	vps_monitor_destroy(void);
-int	vps_history_inc(int *cr);
-int	vps_history_dec(int *cr);
 
 #endif

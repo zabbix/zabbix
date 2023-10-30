@@ -53,34 +53,6 @@ void	vps_monitor_destroy(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: increment VPS monitor history cursor                              *
- *                                                                            *
- ******************************************************************************/
-int	vps_history_inc(int *cr)
-{
-	if (VPS_HISTORY_SIZE == ++(*cr))
-		*cr = 0;
-
-	return *cr;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: decrement VPS monitor history cursor                              *
- *                                                                            *
- ******************************************************************************/
-int	vps_history_dec(int *cr)
-{
-	if (0 == *cr)
-		*cr = VPS_HISTORY_SIZE;
-
-	--(*cr);
-
-	return *cr;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: initialize VPS monitor                                            *
  *                                                                            *
  * Comments: This function is called before processes are spawned -           *
@@ -92,7 +64,6 @@ void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit)
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
 	monitor->last_flush = time(NULL);
-	monitor->last_hist = monitor->last_flush;
 
 	monitor->values_limit = vps_limit * ZBX_VPS_FLUSH_PERIOD;
 	monitor->overcommit_limit = overcommit_limit * vps_limit / 100;
