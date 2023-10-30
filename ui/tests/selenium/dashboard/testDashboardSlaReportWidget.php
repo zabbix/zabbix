@@ -2245,13 +2245,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		if (!array_key_exists('expected_periods', $data) && !array_key_exists('equivalent_timestamps', $data)) {
 			foreach (['From', 'To'] as $field) {
 				if (CTestArrayHelper::get($data['fields'], $field)) {
-					// Check if the string contains operations with months via regex.
-					if ((bool)preg_match('( \D (\d+ months|1 month))', $data['fields'][$field], $month_string)) {
-						$data['fields'][$field] = $this->convertDateWithMonthOperations($data['fields'][$field], $month_string[0]);
-					}
-					else {
-						$data['fields'][$field] = date('Y-m-d', strtotime($data['fields'][$field]));
-					}
+					// Convert date to YYY-MM-DD format with required corrections for date strings with specified months.
+					$data['fields'][$field] = $this->normalizeDate($data['fields'][$field]);
 				}
 			}
 		}
@@ -2288,41 +2283,46 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	 * months to get the resulting day and then month is calculated by its number in AD.
 	 *
 	 * @param string	$date_string	the string that needs to be converted to YYY-MM-DD format
-	 * @param string	$month_string	the part of the string that includes months related information
 	 *
 	 * @return string
 	 */
-	protected function convertDateWithMonthOperations($date_string, $month_string) {
-		// Replace months related operation with '' and get the timestamp to determine the day.
-		$temp_timestamp = strtotime(preg_replace('( \D (\d+ months|1 month))', '', $date_string));
-		$day = date('d', $temp_timestamp);
+	protected function normalizeDate($date_string) {
+		// Check if the string contains operations with months via regex.
+		if ((bool)preg_match('( \D (\d+ months|1 month))', $date_string, $month_string)) {
+			// Replace months related operation with '' and get the timestamp to determine the day.
+			$temp_timestamp = strtotime(preg_replace('( \D (\d+ months|1 month))', '', $date_string));
+			$day = date('d', $temp_timestamp);
 
-		// Get the number of month to be added (negative numbers included) to the reference timestamp.
-		$months_from_date = preg_replace('/ (months|month)/', '', $month_string);
+			// Get the number of month to be added (negative numbers included) to the reference timestamp.
+			$months_from_date = preg_replace('/ (months|month)/', '', $month_string[0]);
 
-		// Calculate the year and the month of the resulting date via month number in AD and combine with day.
-		$months_total = 12 * (int)date('Y', $temp_timestamp) + (int)date('m', $temp_timestamp) +
-				(float)str_replace(' ', '', $months_from_date);
-		$year = floor($months_total/12);
-		$month = $months_total - $year * 12;
+			// Calculate the year and the month of the resulting date via month number in AD and combine with day.
+			$months_total = 12 * (int)date('Y', $temp_timestamp) + (int)date('m', $temp_timestamp) +
+					(float)str_replace(' ', '', $months_from_date);
+			$year = floor($months_total/12);
+			$month = $months_total - $year * 12;
 
-		// In case there is no remaining months after division, then month is december and year should be reduced.
-		if ($month == 0) {
-			$month = 12;
-			$year--;
+			// In case there is no remaining months after division, then month is december and year should be reduced.
+			if ($month == 0) {
+				$month = 12;
+				$year--;
+			}
+
+			/**
+			 * Combine the year, month and day into a date.
+			 * If result date is invalid (like 2023-02-31) replace the day with last day of month.
+			 * date('Y-m-t', timestamp) returns the last day of the month of the defined timestamp.
+			 */
+			$date_part = $year.'-'.$month;
+			$date = (date('Y-m-d', strtotime($date_part.'-'.$day)) === $date_part.'-'.$day)
+				? $date_part.'-'.$day
+				: date('Y-m-t', strtotime($date_part));
+
+			return $date;
 		}
-
-		/**
-		 * Combine the year, month and day into a date.
-		 * If result date is invalid (like 2023-02-31) replace the day with last day of month.
-		 * date('Y-m-t', timestamp) returns the last day of the month of the defined timestamp.
-		 */
-		$date_part = $year.'-'.$month;
-		$date = (date('Y-m-d', strtotime($date_part.'-'.$day)) === $date_part.'-'.$day)
-			? $date_part.'-'.$day
-			: date('Y-m-t', strtotime($date_part));
-
-		return $date;
+		else {
+			return date('Y-m-d', strtotime($date_string));
+		}
 	}
 
 	/**
@@ -2358,13 +2358,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			$to_date = 'today';
 		}
 
-		// Check if the date string contains operations with months via regex and get the equivalent date accordingly.
-		if ((bool)preg_match('( \D (\d+ months|1 month))', $to_date, $month_string)) {
-			$to_date = $this->convertDateWithMonthOperations($to_date, $month_string[0]);
-		}
-		else {
-			$to_date = $to_date;
-		}
+		// Convert date to YYY-MM-DD format with required corrections for date strings with specified months.
+		$to_date = $this->normalizeDate($to_date);
 
 		switch ($data['reporting_period']) {
 			case 'Daily':
@@ -2381,7 +2376,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 				for ($i = 0; $i < $show_periods; $i++) {
 					$start = strtotime($date_string, strtotime($to_date.' '.-$i.' weeks'));
-					$end = strtotime(date('M-d', $start).' + 6 days');
+					$end = strtotime(date('Y-m-d', $start).' + 6 days');
 
 					$period_values[] = date('Y-m-d', $start).' – '.date('m-d', $end);
 				}
