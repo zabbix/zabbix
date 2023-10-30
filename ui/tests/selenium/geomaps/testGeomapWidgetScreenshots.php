@@ -266,16 +266,16 @@ class testGeomapWidgetScreenshots extends CWebTest {
 //					'Tile provider' => 'OpenStreetMap Mapnik'
 //				]
 //			],
-			[
-				[
-					'Tile provider' => 'Stamen Toner Lite'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'Stamen Terrain'
-				]
-			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Toner Lite'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Terrain'
+//				]
+//			],
 //			[
 //				[
 //					'Tile provider' => 'USGS US Topo'
@@ -350,6 +350,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();
 
+		// Some zoom widgets are excluded for 'Stamen Terrain', because images on screenshots are not stable.
 		$widgets = [
 			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',

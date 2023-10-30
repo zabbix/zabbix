@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup config, hstgrp, widget
@@ -30,20 +31,21 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardProblemsWidgetDisplay extends CWebTest {
 
-	use TableTrait;
-
-	private static $dashboardid;
-	private static $time;
-	protected static $acktime;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
+
+	private static $dashboardid;
+	private static $time;
+	protected static $acktime;
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
