@@ -200,14 +200,11 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 
 				zbx_init_agent_request(&request);
 
-				if (SUCCEED != zbx_parse_item_key(key, &request) || 1 > request.nparam ||
+				if (SUCCEED != zbx_parse_item_key(key, &request) || 2 > request.nparam ||
 						3 < request.nparam)
 				{
 					goto clean;
 				}
-
-				if (2 > request.nparam)
-					goto clean;
 
 				arg1 = get_rparam(&request, 0);
 				arg2 = get_rparam(&request, 1);
