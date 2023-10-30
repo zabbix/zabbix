@@ -74,14 +74,14 @@ void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit)
  *                                                                            *
  * Purpose: add number of collected values to the monitor                     *
  *                                                                            *
- * Comments: This function is called before processes are spawned -           *
- *           no locking is needed.                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
 {
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 	time_t			now;
+
+	if (0 == monitor->values_limit)
+		return;
 
 	now = time(NULL);
 
