@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testErrorsInFilterMultiselects.php';
 
 /**
@@ -25,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testErrorsInFilterMultiselects.php';
  */
 class testErrorsInFilterMultiselectsTemplates extends testErrorsInFilterMultiselects {
 
-	public $filter_labels = [
+	protected $filter_labels = [
 		'context_page' => ['Linked templates', 'Templates', 'Template groups'],
 		'object_page' => ['Templates', 'Templates', 'Template groups']
 	];

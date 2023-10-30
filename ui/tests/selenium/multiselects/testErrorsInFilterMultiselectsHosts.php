@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testErrorsInFilterMultiselects.php';
 
 /**
@@ -25,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testErrorsInFilterMultiselects.php';
  */
 class testErrorsInFilterMultiselectsHosts extends testErrorsInFilterMultiselects {
 
-	public $filter_labels = [
+	protected $filter_labels = [
 		'context_page' => ['Templates', 'Templates', 'Template groups'],
 		'object_page' => ['Hosts', 'Hosts', 'Host groups']
 	];
@@ -33,7 +34,7 @@ class testErrorsInFilterMultiselectsHosts extends testErrorsInFilterMultiselects
 	/**
 	 * @dataProvider getCheckDialogsData
 	 */
-	public function testErrorsInFilterMultiselectsTemplates_CheckDialogs($data) {
+	public function testErrorsInFilterMultiselectsHosts_CheckDialogs($data) {
 		$this->checkErrorInDialog($data, 'zabbix.php?action=host.list', 'Host', 'Zabbix servers',
 				'Template inheritance test host'
 		);

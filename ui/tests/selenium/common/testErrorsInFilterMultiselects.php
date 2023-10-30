@@ -23,7 +23,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 class testErrorsInFilterMultiselects extends CWebTest {
 
-	public $filter_labels;
+	protected $filter_labels;
 
 	public static function getCheckDialogsData() {
 		return [
