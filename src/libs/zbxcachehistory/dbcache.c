@@ -1263,7 +1263,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
-static int	match_item_value_type_by_mask(int mask, zbx_history_sync_item_t *item)
+static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
 {
 #define ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT	0x01
 #define ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR	0x02
