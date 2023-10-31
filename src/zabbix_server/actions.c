@@ -30,7 +30,13 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 
-ZBX_PTR_VECTOR_IMPL(db_action_ptr, zbx_db_action*)
+void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
+{
+	zbx_free(ack_task);
+}
+
+ZBX_PTR_VECTOR_IMPL(ack_task_ptr, zbx_ack_task_t *)
+ZBX_PTR_VECTOR_IMPL(db_action_ptr, zbx_db_action *)
 
 /******************************************************************************
  *                                                                            *
@@ -3334,10 +3340,10 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
  *                                                                            *
  * Purpose: process actions for each acknowledgment in the array              *
  *                                                                            *
- * Parameters: event_ack        - [IN] vector for eventid/ackid pairs         *
+ * Parameters: ack_tasks        - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
+int	process_actions_by_acknowledgments(const zbx_vector_ack_task_ptr_t *ack_tasks)
 {
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
@@ -3373,7 +3379,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 	for (int i = 0; i < ack_tasks->values_num; i++)
 	{
-		ack_task = (zbx_ack_task_t *)ack_tasks->values[i];
+		ack_task = ack_tasks->values[i];
 		zbx_vector_uint64_append(&eventids, ack_task->eventid);
 	}
 
@@ -3415,7 +3421,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 		while (knext < ack_tasks->values_num)
 		{
-			ack_task = (zbx_ack_task_t *)ack_tasks->values[knext];
+			ack_task = ack_tasks->values[knext];
 			if (ack_task->eventid != event->eventid)
 				break;
 			knext++;
@@ -3436,7 +3442,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 			for (int k = kcurr; k < knext; k++)
 			{
-				ack_task = (zbx_ack_task_t *)ack_tasks->values[k];
+				ack_task = ack_tasks->values[k];
 
 				ack_escalation = (zbx_ack_escalation_t *)zbx_malloc(NULL, sizeof(zbx_ack_escalation_t));
 				ack_escalation->taskid = ack_task->taskid;

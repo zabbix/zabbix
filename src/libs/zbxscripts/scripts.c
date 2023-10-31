@@ -330,7 +330,7 @@ out:
 }
 
 static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, int config_forks[], char *error, size_t max_error_len)
+		int config_timeout, zbx_get_config_forks_f get_config_forks, char *error, size_t max_error_len)
 {
 	int			ret = FAIL, completed = 0;
 	zbx_rc_command_t	cmd, *pcmd;
@@ -338,7 +338,7 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 > config_forks[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
+	if (2 > get_config_forks(ZBX_PROCESS_TYPE_TRAPPER) && NULL != result)
 	{
 		zbx_snprintf(error, max_error_len, "cannot execute remote command on active agent, at least two"
 				" trappers are required");
@@ -428,7 +428,8 @@ out:
 }
 
 static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, const char *config_source_ip, unsigned char program_type, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, unsigned char program_type, char *error,
+		size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -492,8 +493,8 @@ fail:
 }
 
 static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, const char *config_source_ip, int config_forks[], unsigned char program_type,
-		char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type, char *error, size_t max_error_len)
 {
 	zbx_dc_interface_t	interface;
 
@@ -503,12 +504,12 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
 			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
 	{
-		return active_command_send_and_result_fetch(host, command, result, config_timeout, config_forks,
+		return active_command_send_and_result_fetch(host, command, result, config_timeout, get_config_forks,
 				error, max_error_len);
 	}
 
-	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip, program_type, error,
-			max_error_len);
+	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip,
+			program_type, error, max_error_len);
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
@@ -840,7 +841,7 @@ out:
  *              config_timeout         - [IN]                                     *
  *              config_trapper_timeout - [IN]                                     *
  *              config_source_ip       - [IN]                                     *
- *              config_forks           - [IN]                                     *
+ *              get_config_forks       - [IN]                                     *
  *              result                 - [OUT] result of a script execution       *
  *              error                  - [OUT] error reported by the script       *
  *              max_error_len          - [IN] maximum error length                *
@@ -852,8 +853,9 @@ out:
  *                                                                                *
  **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
-		int config_timeout, int config_trapper_timeout, const char *config_source_ip, int config_forks[],
-		unsigned char program_type, char **result, char *error, size_t max_error_len, char **debug)
+		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
+		size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -872,7 +874,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
-							config_source_ip, config_forks, program_type, error,
+							config_source_ip, get_config_forks, program_type, error,
 							max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
@@ -890,7 +892,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
-			if (0 == config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER])
+			if (0 == get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER))
 			{
 				zbx_strlcpy(error, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.", max_error_len);
