@@ -17,15 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_agent.h"
-#include "../sysinfo.h"
+#include "zbxpoller.h"
 
+#include "zbxcacheconfig.h"
 #include "zbxsysinfo.h"
-#include "zbxjson.h"
-
-#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-extern unsigned char	program_type;
-#endif
+#include "zbxcomms.h"
 
 void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
 {
@@ -56,12 +52,14 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 	else
 		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s->buffer);
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
  * Parameters: item             - [IN] item we are interested in              *
  *             config_source_ip - [IN]                                        *
+ *             program_type     - [IN]                                        *
  *             result           - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
@@ -74,7 +72,8 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, unsigned char program_type,
+		AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
@@ -98,6 +97,7 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 		case ZBX_TCP_SEC_TLS_PSK:
 			tls_arg1 = item->host.tls_psk_identity;
 			tls_arg2 = item->host.tls_psk;
+			ZBX_UNUSED(program_type);
 			break;
 #else
 		case ZBX_TCP_SEC_TLS_CERT:

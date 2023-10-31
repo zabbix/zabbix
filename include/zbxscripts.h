@@ -22,6 +22,24 @@
 
 #include "zbxcacheconfig.h"
 
+typedef struct
+{
+	unsigned char	type;
+	unsigned char	execute_on;
+	char		*port;
+	unsigned char	authtype;
+	char		*username;
+	char		*password;
+	char		*publickey;
+	char		*privatekey;
+	char		*command;
+	char		*command_orig;
+	zbx_uint64_t	scriptid;
+	unsigned char	host_access;
+	int		timeout;
+}
+zbx_script_t;
+
 void	zbx_script_init(zbx_script_t *script);
 void	zbx_script_clean(zbx_script_t *script);
 int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid);
@@ -32,8 +50,8 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len);
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, char **result, char *error, size_t max_error_len,
-		char **debug);
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
+		size_t max_error_len, char **debug);
 zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_host_t *host, zbx_uint64_t alertid,
 		int now);
 int	zbx_init_remote_commands_cache(char **error);

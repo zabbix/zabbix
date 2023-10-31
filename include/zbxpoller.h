@@ -17,39 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SERVER_POLLER_H
-#define ZABBIX_SERVER_POLLER_H
+#ifndef ZABBIX_POLLER_H
+#define ZABBIX_POLLER_H
 
-#include "zbxthreads.h"
 #include "zbxcacheconfig.h"
-#include "zbxcomms.h"
+#include "module.h"
 
-typedef struct
-{
-	zbx_config_comms_args_t	*config_comms;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	unsigned char		poller_type;
-	int			config_startup_time;
-	int			config_unavailable_delay;
-	int			config_unreachable_period;
-	int			config_unreachable_delay;
-	int			config_max_concurrent_checks_per_poller;
-}
-zbx_thread_poller_args;
-
-ZBX_THREAD_ENTRY(poller_thread, args);
-
-ZBX_THREAD_ENTRY(async_poller_thread, args);
-
+void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
+		char *host, unsigned char **data, size_t *data_alloc, size_t *data_offset);
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
 		char *host, char *key_orig, unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		int unavailable_delay, int unreachable_period, int unreachable_delay, const char *error);
-void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
-		unsigned char expand_macros);
-void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
-		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, unsigned char program_type);
-void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
-void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
+
+void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result);
+
+int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
+int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, unsigned char program_type,
+		AGENT_RESULT *result);
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
+int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
+#endif
 
 #endif
