@@ -348,7 +348,7 @@ check_fill:
  *             ip      - [IN/OUT] string with current address from IP range   *
  *             len     - [IN] size of string buffer for ip address            *
  *                                                                            *
- * Return value: IP as string                                                 *
+ * Return value: SUCCEED                                                      *
  *                                                                            *
  ******************************************************************************/
 int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)

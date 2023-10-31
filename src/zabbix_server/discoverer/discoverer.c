@@ -28,25 +28,17 @@
 #include "zbxrtc.h"
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
-#include "../poller/checks_snmp.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbx_rtc_constants.h"
-#include "zbxtimekeeper.h"
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
+#include "discoverer_async.h"
 #include "zbxproxybuffer.h"
 #include "zbx_discoverer_constants.h"
-
-#include <event2/event.h>
-#include <event2/util.h>
-#include <event2/dns.h>
-#include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>
-#include <net-snmp/library/large_fd_set.h>
-
+#include "../poller/checks_snmp.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
@@ -56,70 +48,15 @@ static ZBX_THREAD_LOCAL int	log_worker_id;
 
 typedef struct
 {
-	zbx_uint64_t	dcheckid;
-	unsigned short	port;
-	char		value[ZBX_MAX_DISCOVERED_VALUE_SIZE];
-	int		status;
-}
-zbx_discoverer_dservice_t;
-
-ZBX_PTR_VECTOR_DECL(discoverer_services_ptr, zbx_discoverer_dservice_t*)
-
-typedef struct
-{
-	zbx_vector_discoverer_services_ptr_t	services;
-	zbx_uint64_t				druleid;
-	char					*ip;
-	char					*dnsname;
-	int					now;
-	zbx_uint64_t				unique_dcheckid;
-}
-zbx_discoverer_results_t;
-
-ZBX_PTR_VECTOR_DECL(discoverer_results_ptr, zbx_discoverer_results_t*)
-
-typedef struct
-{
 	zbx_uint64_t	druleid;
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_uint64_t	count;
 }
 zbx_discoverer_check_count_t;
 
-#define DISCOVERER_WORKER_INIT_NONE	0x00
-#define DISCOVERER_WORKER_INIT_THREAD	0x01
-
-typedef struct
-{
-	zbx_discoverer_queue_t	*queue;
-	pthread_t		thread;
-	int			worker_id;
-	int			stop;
-	int			flags;
-	zbx_timekeeper_t	*timekeeper;
-}
-zbx_discoverer_worker_t;
-
-ZBX_PTR_VECTOR_DECL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
-
 ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_discoverer_dservice_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_results_ptr, zbx_discoverer_results_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
-
-typedef struct
-{
-	int					workers_num;
-	zbx_discoverer_worker_t			*workers;
-	zbx_vector_discoverer_jobs_ptr_t	job_refs;
-	zbx_discoverer_queue_t			queue;
-
-	zbx_hashset_t				incomplete_checks_count;
-	zbx_hashset_t				results;
-	pthread_mutex_t				results_lock;
-
-	zbx_timekeeper_t			*timekeeper;
-}
-zbx_discoverer_manager_t;
 
 extern unsigned char			program_type;
 
@@ -127,10 +64,7 @@ extern unsigned char			program_type;
 #define ZBX_DISCOVERER_STARTUP_TIMEOUT	30
 
 static zbx_discoverer_manager_t		dmanager;
-static const char			*source_ip;
-static int				config_timeout;
 
-ZBX_VECTOR_DECL(portrange, zbx_range_t)
 ZBX_VECTOR_IMPL(portrange, zbx_range_t)
 
 static zbx_hash_t	discoverer_check_count_hash(const void *data)
@@ -279,9 +213,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 			service = "telnet";
 			break;
 		case SVC_AGENT:
-		case SVC_SNMPv1:
-		case SVC_SNMPv2c:
-		case SVC_SNMPv3:
 			break;
 		default:
 			ret = FAIL;
@@ -318,11 +249,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				}
 
 				break;
-			/* agent and SNMP checks */
 			case SVC_AGENT:
-			case SVC_SNMPv1:
-			case SVC_SNMPv2c:
-			case SVC_SNMPv3:
 				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
@@ -333,82 +260,20 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				item.interface.port = port;
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
+				item.type = ITEM_TYPE_ZABBIX;
 
-				switch (dcheck->type)
+				item.key = item.key_orig;
+				item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
+				item.timeout = dcheck->timeout;
+
+				if (SUCCEED == get_value_agent(&item, dmanager.source_ip, &result) &&
+						NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 				{
-					case SVC_SNMPv1:
-						item.snmp_version = ZBX_IF_SNMP_VERSION_1;
-						item.type = ITEM_TYPE_SNMP;
-						break;
-					case SVC_SNMPv2c:
-						item.snmp_version = ZBX_IF_SNMP_VERSION_2;
-						item.type = ITEM_TYPE_SNMP;
-						break;
-					case SVC_SNMPv3:
-						item.snmp_version = ZBX_IF_SNMP_VERSION_3;
-						item.type = ITEM_TYPE_SNMP;
-						break;
-					default:
-						item.type = ITEM_TYPE_ZABBIX;
-						break;
-				}
-
-				if (SVC_AGENT == dcheck->type)
-				{
-					item.key = item.key_orig;
-					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
-					item.timeout = dcheck->timeout;
-
-					if (SUCCEED == get_value_agent(&item, source_ip, &result) &&
-							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
-					{
-						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
-					}
-					else
-						ret = FAIL;
+					zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 				}
 				else
-#ifdef HAVE_NETSNMP
-				{
-					item.key = zbx_strdup(NULL, item.key_orig);
-					item.snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
-					item.snmp_oid = dcheck->key_;
-					item.timeout = dcheck->timeout;
-
-					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
-					{
-						item.snmpv3_securityname = zbx_strdup(NULL,
-								dcheck->snmpv3_securityname);
-						item.snmpv3_authpassphrase = zbx_strdup(NULL,
-								dcheck->snmpv3_authpassphrase);
-						item.snmpv3_privpassphrase = zbx_strdup(NULL,
-								dcheck->snmpv3_privpassphrase);
-
-						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
-
-						item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-						item.snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
-						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
-					}
-
-					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER,
-							source_ip) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
-					{
-						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
-					}
-					else
-						ret = FAIL;
-
-					zbx_free(item.key);
-					zbx_free(item.snmp_community);
-					zbx_free(item.snmpv3_securityname);
-					zbx_free(item.snmpv3_authpassphrase);
-					zbx_free(item.snmpv3_privpassphrase);
-					zbx_free(item.snmpv3_contextname);
-				}
-#else
 					ret = FAIL;
-#endif	/* HAVE_NETSNMP */
+
 				if (FAIL == ret && ZBX_ISSET_MSG(&result))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "discovery: item [%s] error: %s",
@@ -464,13 +329,13 @@ static void	results_clear(zbx_discoverer_results_t *result)
 	zbx_vector_discoverer_services_ptr_destroy(&result->services);
 }
 
-static void	results_free(zbx_discoverer_results_t *result)
+void	results_free(zbx_discoverer_results_t *result)
 {
 	results_clear(result);
 	zbx_free(result);
 }
 
-static void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
+void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 {
 	const char		*start;
 
@@ -1252,7 +1117,7 @@ static void	discoverer_job_remove(zbx_discoverer_job_t *job)
 	discoverer_job_free(job);
 }
 
-static zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port,
+zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port,
 		const zbx_uint64_t dcheckid)
 {
 	zbx_discoverer_dservice_t	*service;
@@ -1264,8 +1129,7 @@ static zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short po
 	return service;
 }
 
-static zbx_discoverer_results_t	*discovery_result_create(zbx_uint64_t druleid,
-		const zbx_uint64_t unique_dcheckid)
+zbx_discoverer_results_t	*discovery_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid)
 {
 	zbx_discoverer_results_t	*result;
 
@@ -1448,7 +1312,7 @@ static zbx_discoverer_results_t	*discover_results_host_reg(zbx_hashset_t *hr_dst
 	return dst;
 }
 
-static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src,
+void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src,
 		zbx_discoverer_task_t *task)
 {
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
@@ -1509,286 +1373,6 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() src:%d dst:%d", log_worker_id, __func__, vr_src->values_num,
 			hr_dst->num_data);
-}
-
-typedef struct
-{
-	int			processing;
-	int			config_timeout;
-	const char		*config_source_ip;
-	struct event_base	*base;
-	struct evdns_base	*dnsbase;
-}
-discovery_poller_config_t;
-
-typedef struct
-{
-	discovery_poller_config_t	*poller_config;
-	zbx_discoverer_results_t	*dresult;
-	zbx_uint64_t			dcheckid;
-}
-discovery_snmp_result_t;
-
-static void	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)
-{
-	char	*timeout;
-
-	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
-		exit(EXIT_FAILURE);
-	}
-
-	timeout = zbx_dsprintf(NULL, "%d", poller_config->config_timeout);
-
-	if (0 != evdns_base_set_option(poller_config->dnsbase, "timeout:", timeout))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot set timeout to asynchronous DNS library");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_free(timeout);
-}
-
-static void	discovery_async_poller_destroy(discovery_poller_config_t *poller_config)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	evdns_base_free(poller_config->dnsbase, 1);
-	event_base_free(poller_config->base);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	discovery_async_poller_init(discovery_poller_config_t *poller_config)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (NULL == (poller_config->base = event_base_new()))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize event base");
-		exit(EXIT_FAILURE);
-	}
-
-	poller_config->processing = 0;
-	poller_config->config_source_ip = source_ip;
-	poller_config->config_timeout = config_timeout;
-	discovery_async_poller_dns_init(poller_config);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-struct zbx_snmp_context
-{
-	void			*arg;
-	void			*arg_action;
-	zbx_dc_item_context_t	item;
-};
-
-static void	process_snmp_result(void *data)
-{
-	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
-	discovery_snmp_result_t	*snmp_result = (discovery_snmp_result_t *)snmp_context->arg;
-	char			**pvalue;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' ret:%s", __func__, snmp_context->item.key,
-			snmp_context->item.host, snmp_context->item.interface.addr,
-			zbx_result_string(snmp_context->item.ret));
-
-	snmp_result->poller_config->processing--;
-
-	if (SUCCEED == snmp_context->item.ret && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&snmp_context->item.result)))
-	{
-		zbx_discoverer_dservice_t	*service;
-
-		service = result_dservice_create(snmp_context->item.interface.port, snmp_result->dcheckid);
-		zbx_strlcpy_utf8(service->value, *pvalue, ZBX_MAX_DISCOVERED_VALUE_SIZE);
-		service->status = DOBJECT_STATUS_UP;
-		zbx_vector_discoverer_services_ptr_append(&snmp_result->dresult->services, service);
-
-		if (NULL ==  snmp_result->dresult->dnsname)
-		{
-			char	dns[ZBX_INTERFACE_DNS_LEN_MAX];
-
-			zbx_gethost_by_ip(snmp_result->dresult->ip, dns, sizeof(dns));
-			snmp_result->dresult->dnsname = zbx_strdup(NULL, dns);
-		}
-	}
-
-	zbx_free(snmp_result);
-	zbx_async_check_snmp_clean(snmp_context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	discover_snmp(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
-		char *ip, const int port, zbx_discoverer_results_t *dresult)
-{
-	zbx_dc_item_t		item;
-	AGENT_RESULT		result;
-	discovery_snmp_result_t	*snmp_result;
-
-	snmp_result = (discovery_snmp_result_t *) zbx_malloc(NULL, sizeof(discovery_snmp_result_t));
-	snmp_result->dresult = dresult;
-	snmp_result->poller_config = poller_config;
-	snmp_result->dcheckid = dcheck->dcheckid;
-
-	zbx_init_agent_result(&result);
-
-	memset(&item, 0, sizeof(zbx_dc_item_t));
-	zbx_strscpy(item.key_orig, dcheck->key_);
-
-	item.interface.useip = 1;
-	zbx_strscpy(item.interface.ip_orig, ip);
-	item.interface.addr = item.interface.ip_orig;
-	item.interface.port = port;
-
-	item.value_type = ITEM_VALUE_TYPE_STR;
-
-	switch (dcheck->type)
-	{
-		case SVC_SNMPv1:
-			item.snmp_version = ZBX_IF_SNMP_VERSION_1;
-			item.type = ITEM_TYPE_SNMP;
-			break;
-		case SVC_SNMPv2c:
-			item.snmp_version = ZBX_IF_SNMP_VERSION_2;
-			item.type = ITEM_TYPE_SNMP;
-			break;
-		case SVC_SNMPv3:
-			item.snmp_version = ZBX_IF_SNMP_VERSION_3;
-			item.type = ITEM_TYPE_SNMP;
-	}
-
-	item.key = zbx_strdup(NULL, item.key_orig);
-	item.snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
-	item.snmp_oid = dcheck->key_;
-	item.timeout = dcheck->timeout;
-
-	if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
-	{
-		item.snmpv3_securityname = zbx_strdup(NULL,
-				dcheck->snmpv3_securityname);
-		item.snmpv3_authpassphrase = zbx_strdup(NULL,
-				dcheck->snmpv3_authpassphrase);
-		item.snmpv3_privpassphrase = zbx_strdup(NULL,
-				dcheck->snmpv3_privpassphrase);
-
-		item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
-
-		item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-		item.snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
-		item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
-	}
-
-	zbx_set_snmp_bulkwalk_options();
-
-	if (FAIL == zbx_async_check_snmp(&item, &result, process_snmp_result, snmp_result, NULL,
-			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip))
-	{
-		zbx_free(snmp_result);
-	}
-	else
-		poller_config->processing++;
-
-	zbx_free(item.key);
-	zbx_free(item.snmp_community);
-	zbx_free(item.snmpv3_securityname);
-	zbx_free(item.snmpv3_authpassphrase);
-	zbx_free(item.snmpv3_privpassphrase);
-	zbx_free(item.snmpv3_contextname);
-}
-
-static void	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop)
-{
-	zbx_vector_discoverer_results_ptr_t	results;
-	zbx_vector_portrange_t			port_ranges;
-	discovery_poller_config_t		poller_config;
-	char					ip[ZBX_INTERFACE_IP_LEN_MAX];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " dchecks:%d worker_max:%d", log_worker_id,
-			__func__, druleid, task->dchecks.values_num, worker_max);
-
-	if (DISCOVERY_ADDR_RANGE != task->addr_type)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "range checks failed with error: address type is out of range");
-		return;
-	}
-
-	if (0 == worker_max)
-		worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
-
-	discovery_async_poller_init(&poller_config);
-	zbx_vector_discoverer_results_ptr_create(&results);
-	zbx_vector_portrange_create(&port_ranges);
-	*ip = '\0';
-
-	while (SUCCEED == zbx_iprange_uniq_iter(task->addr.range->ipranges->values,
-			task->addr.range->ipranges->values_num, &task->addr.range->state.index_ip,
-			task->addr.range->state.ipaddress) && 0 != task->addr.range->state.count && 0 == *stop)
-
-	{
-		zbx_discoverer_results_t	*result;
-		int				i;
-
-		(void)zbx_iprange_ip2str(task->addr.range->ipranges->values[task->addr.range->state.index_ip].type,
-				task->addr.range->state.ipaddress, ip, sizeof(ip));
-
-		result = discovery_result_create(druleid, task->unique_dcheckid);
-		result->ip = zbx_strdup(NULL, ip);
-		zbx_vector_discoverer_results_ptr_append(&results, result);
-
-		for (i = 0; i < task->dchecks.values_num && 0 != task->addr.range->state.count && 0 == *stop; i++)
-		{
-			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[i];
-
-			dcheck_port_ranges_get(dcheck->ports, &port_ranges);
-
-			while (SUCCEED == zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num,
-					&task->addr.range->state.index_port, &task->addr.range->state.port) &&
-					0 != task->addr.range->state.count && 0 == *stop)
-			{
-				switch (dcheck->type)
-				{
-				case SVC_SNMPv1:
-				case SVC_SNMPv2c:
-				case SVC_SNMPv3:
-#ifdef HAVE_NETSNMP
-					discover_snmp(&poller_config, dcheck, ip, task->addr.range->state.port, result);
-#else
-			errcodes[i] = NOTSUPPORTED;
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
-#endif
-					break;
-				default:
-					zabbix_log(LOG_LEVEL_WARNING, "dcheck is not supported:%u", dcheck->type);
-				}
-
-				while (worker_max == poller_config.processing)
-						event_base_loop(poller_config.base, EVLOOP_ONCE);
-
-				task->addr.range->state.count--;
-			}
-
-			task->addr.range->state.port = 0;
-			zbx_vector_portrange_clear(&port_ranges);
-		}
-	}
-
-	while (0 == *stop && 0 != poller_config.processing)
-		event_base_loop(poller_config.base, EVLOOP_ONCE);
-
-	pthread_mutex_lock(&dmanager.results_lock);
-	discover_results_merge(&dmanager.results, &results, task);
-	pthread_mutex_unlock(&dmanager.results_lock);
-
-	zbx_vector_portrange_destroy(&port_ranges);
-	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
-	zbx_vector_discoverer_results_ptr_destroy(&results);
-
-	discovery_async_poller_destroy(&poller_config);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
 }
 
 static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max)
@@ -1958,11 +1542,18 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_BUSY);
 
 			if (DISCOVERY_ADDR_IP == task->addr_type)
+			{
 				discoverer_net_check_common(druleid, task);
+			}
 			else if (SVC_ICMPPING == task->dchecks.values[0]->type)
+			{
 				discoverer_net_check_icmp(druleid, task, worker_max);
+			}
 			else
-				discoverer_net_check_range(druleid, task, worker_max, &worker->stop);
+			{
+				discoverer_net_check_range(druleid, task, worker_max, &worker->stop, &dmanager,
+						log_worker_id);
+			}
 
 			discoverer_task_free(task);
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_IDLE);
@@ -2074,13 +1665,16 @@ static void	discoverer_libs_destroy(void)
 #endif
 }
 
-static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int workers_num, char **error)
+static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread_discoverer_args *args_in,
+		char **error)
 {
 	int		i, err, ret = FAIL, started_num = 0;
 	time_t		time_start;
 	struct timespec	poll_delay = {0, 1e8};
 
 	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
+	manager->config_timeout = args_in->config_timeout;
+	manager->source_ip = args_in->config_source_ip;
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
 	{
@@ -2102,13 +1696,13 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 
 	zbx_vector_discoverer_jobs_ptr_create(&manager->job_refs);
 
-	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
+	manager->timekeeper = zbx_timekeeper_create(args_in->workers_num, NULL);
 
-	manager->workers_num = workers_num;
-	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)workers_num,
+	manager->workers_num = args_in->workers_num;
+	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)args_in->workers_num,
 			sizeof(zbx_discoverer_worker_t));
 
-	for (i = 0; i < workers_num; i++)
+	for (i = 0; i < args_in->workers_num; i++)
 	{
 		manager->workers[i].worker_id = i + 1;
 
@@ -2122,7 +1716,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	/* wait for threads to start */
 	time_start = time(NULL);
 
-	while (started_num != workers_num)
+	while (started_num != args_in->workers_num)
 	{
 		if (time_start + ZBX_DISCOVERER_STARTUP_TIMEOUT < time(NULL))
 		{
@@ -2255,9 +1849,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg);
 #endif
-	source_ip = discoverer_args_in->config_source_ip;
-	config_timeout = discoverer_args_in->config_timeout;
-
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -2269,7 +1860,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in->workers_num, &error))
+	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in, &error))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager: %s", error);
 		zbx_free(error);
@@ -2456,3 +2047,4 @@ out:
 
 	exit(EXIT_SUCCESS);
 }
+

@@ -23,10 +23,26 @@
 #include "zbxdiscovery.h"
 #include "zbxip.h"
 
-#define DISCOVERER_JOB_TASKS_INPROGRESS_MAX	1000
-#define DISCOVERER_JOB_TASKS_SKIP_LIMIT		-1
-
 ZBX_VECTOR_DECL(iprange, zbx_iprange_t)
+
+#define DISCOVERER_JOB_STATUS_QUEUED	0
+#define DISCOVERER_JOB_STATUS_WAITING	1
+#define DISCOVERER_JOB_STATUS_REMOVING	2
+
+typedef struct
+{
+	zbx_uint64_t			druleid;
+	zbx_list_t			tasks;
+	zbx_uint64_t			drule_revision;
+	int				workers_used;
+	int				workers_max;
+	unsigned char			status;
+	zbx_vector_dc_dcheck_ptr_t	*dchecks_common;
+	zbx_vector_iprange_t		*ipranges;
+}
+zbx_discoverer_job_t;
+
+ZBX_PTR_VECTOR_DECL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
 
 typedef struct
 {
@@ -63,22 +79,7 @@ typedef struct
 }
 zbx_discoverer_task_t;
 
-#define DISCOVERER_JOB_STATUS_QUEUED	0
-#define DISCOVERER_JOB_STATUS_WAITING	1
-#define DISCOVERER_JOB_STATUS_REMOVING	2
-
-typedef struct
-{
-	zbx_uint64_t			druleid;
-	zbx_list_t			tasks;
-	zbx_uint64_t			drule_revision;
-	int				workers_used;
-	int				workers_max;
-	unsigned char			status;
-	zbx_vector_dc_dcheck_ptr_t	*dchecks_common;
-	zbx_vector_iprange_t		*ipranges;
-}
-zbx_discoverer_job_t;
+ZBX_VECTOR_DECL(portrange, zbx_range_t)
 
 zbx_hash_t		discoverer_task_hash(const void *data);
 int			discoverer_task_compare(const void *d1, const void *d2);
