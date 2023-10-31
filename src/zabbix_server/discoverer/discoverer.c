@@ -328,7 +328,8 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				zbx_strscpy(item.key_orig, dcheck->key_);
 
 				item.interface.useip = 1;
-				item.interface.addr = ip;
+				zbx_strscpy(item.interface.ip_orig, ip);
+				item.interface.addr = item.interface.ip_orig;
 				item.interface.port = port;
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
@@ -602,6 +603,9 @@ static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 	switch(dcheck->type)
 	{
 	case SVC_ICMPPING:
+	case SVC_SNMPv1:
+	case SVC_SNMPv2c:
+	case SVC_SNMPv3:
 		return SUCCEED;
 	default:
 		return FAIL;
@@ -610,7 +614,7 @@ static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 
 static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, unsigned char *need_resolve,
 		zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks, zbx_vector_dc_dcheck_ptr_t *dchecks_common,
-		zbx_task_range_t *range)
+		zbx_vector_iprange_t *ipranges)
 {
 	int		i;
 	zbx_uint64_t	checks_count = 0;
@@ -656,7 +660,7 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 			{
 				task_local.addr.range = (zbx_task_range_t *)zbx_malloc(NULL, sizeof(zbx_task_range_t));
 				memset(task_local.addr.range, 0, sizeof(zbx_task_range_t));
-				task_local.addr.range->ipranges = range->ipranges;
+				task_local.addr.range->ipranges = ipranges;
 				task_local.addr.range->state.count = DISCOVERER_JOB_TASKS_SKIP_LIMIT;
 				task_local.unique_dcheckid = drule->unique_dcheckid;
 				task_local.resolve_dns = 0;
@@ -721,7 +725,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
  *                                                                            *
  ******************************************************************************/
 static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
-		zbx_hashset_t *check_counts, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_task_range_t *range)
+		zbx_hashset_t *check_counts, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
 {
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
 	int		i = 0;
@@ -730,7 +734,7 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zb
 
 	for (i = 0; '\0' != start[i]; start[i] == ',' ? i++ : *start++);
 
-	zbx_vector_iprange_reserve(range->ipranges, i);
+	zbx_vector_iprange_reserve(ipranges, i);
 
 	for (start = drule->iprange; '\0' != *start;)
 	{
@@ -762,7 +766,7 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zb
 			goto next;
 		}
 #endif
-		zbx_vector_iprange_append(range->ipranges, ipr);
+		zbx_vector_iprange_append(ipranges, ipr);
 next:
 		if (NULL != comma)
 		{
@@ -775,7 +779,7 @@ next:
 
 	*ip = '\0';
 
-	while (SUCCEED == zbx_iprange_uniq_next(range->ipranges->values, range->ipranges->values_num, ip, sizeof(ip)))
+	while (SUCCEED == zbx_iprange_uniq_next(ipranges->values, ipranges->values_num, ip, sizeof(ip)))
 	{
 		unsigned char	need_resolve = 1;
 		zbx_uint64_t	checks_count = 0;
@@ -785,11 +789,11 @@ next:
 		if (0 != drule->unique_dcheckid)
 		{
 			checks_count = process_checks(drule, ip, 1, &need_resolve, queue_capacity, tasks,
-					dchecks_common, range);
+					dchecks_common, ipranges);
 		}
 
 		checks_count += process_checks(drule, ip, 0, &need_resolve, queue_capacity, tasks, dchecks_common,
-				range);
+				ipranges);
 
 		if (0 == *queue_capacity)
 			goto out;
@@ -1088,7 +1092,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 		zbx_discoverer_job_t		*job, cmp;
 		zbx_dc_drule_t			*drule = drules.values[k];
 		zbx_vector_dc_dcheck_ptr_t	*dchecks_common;
-		zbx_task_range_t		range;
+		zbx_vector_iprange_t		*ipranges;
 
 		now = time(NULL);
 
@@ -1170,11 +1174,10 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 
 		dchecks_common = (zbx_vector_dc_dcheck_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_dc_dcheck_ptr_t));
 		zbx_vector_dc_dcheck_ptr_create(dchecks_common);
-		memset(&range, 0, sizeof(zbx_task_range_t));
-		range.ipranges = (zbx_vector_iprange_t *)zbx_malloc(NULL, sizeof(zbx_vector_iprange_t));
-		zbx_vector_iprange_create(range.ipranges);
+		ipranges = (zbx_vector_iprange_t *)zbx_malloc(NULL, sizeof(zbx_vector_iprange_t));
+		zbx_vector_iprange_create(ipranges);
 
-		process_rule(drule, &queue_capacity_local, &tasks, &drule_check_counts, dchecks_common, &range);
+		process_rule(drule, &queue_capacity_local, &tasks, &drule_check_counts, dchecks_common, ipranges);
 		zbx_hashset_iter_reset(&tasks, &iter);
 
 		if (0 == queue_capacity_local)
@@ -1192,14 +1195,14 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 			zbx_vector_dc_dcheck_ptr_destroy(dchecks_common);
 			zbx_free(dchecks_common);
 
-			zbx_vector_iprange_destroy(range.ipranges);
-			zbx_free(range.ipranges);
+			zbx_vector_iprange_destroy(ipranges);
+			zbx_free(ipranges);
 			goto next;
 		}
 
 		queue_checks_count = queue_capacity - queue_capacity_local;
 
-		job = discoverer_job_create(drule, dchecks_common, range.ipranges);
+		job = discoverer_job_create(drule, dchecks_common, ipranges);
 
 		while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 		{
@@ -1439,7 +1442,7 @@ static zbx_discoverer_results_t	*discover_results_host_reg(zbx_hashset_t *hr_dst
 		dst->ip = zbx_strdup(NULL, ip);
 		dst->now = (int)time(NULL);
 		dst->unique_dcheckid = unique_dcheckid;
-		dst->dnsname = NULL;
+		dst->dnsname = zbx_strdup(NULL, "");
 	}
 
 	return dst;
@@ -1609,8 +1612,6 @@ static void	process_snmp_result(void *data)
 
 			zbx_gethost_by_ip(snmp_result->dresult->ip, dns, sizeof(dns));
 			snmp_result->dresult->dnsname = zbx_strdup(NULL, dns);
-
-//			snmp_result->dresult->dnsname = zbx_strdup(NULL, snmp_context->item.host);
 		}
 	}
 
@@ -1638,7 +1639,8 @@ static void	discover_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	zbx_strscpy(item.key_orig, dcheck->key_);
 
 	item.interface.useip = 1;
-	item.interface.addr = ip;
+	zbx_strscpy(item.interface.ip_orig, ip);
+	item.interface.addr = item.interface.ip_orig;
 	item.interface.port = port;
 
 	item.value_type = ITEM_VALUE_TYPE_STR;
@@ -1727,7 +1729,7 @@ static void	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task
 
 	{
 		zbx_discoverer_results_t	*result;
-		int				i, port;
+		int				i;
 
 		(void)zbx_iprange_ip2str(task->addr.range->ipranges->values[task->addr.range->state.index_ip].type,
 				task->addr.range->state.ipaddress, ip, sizeof(ip));
@@ -1741,9 +1743,9 @@ static void	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task
 			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[i];
 
 			dcheck_port_ranges_get(dcheck->ports, &port_ranges);
-			port = 0;
 
-			while (SUCCEED == zbx_portrange_uniq_next(port_ranges.values, port_ranges.values_num, &port) &&
+			while (SUCCEED == zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num,
+					&task->addr.range->state.index_port, &task->addr.range->state.port) &&
 					0 != task->addr.range->state.count && 0 == *stop)
 			{
 				switch (dcheck->type)
@@ -1752,7 +1754,7 @@ static void	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task
 				case SVC_SNMPv2c:
 				case SVC_SNMPv3:
 #ifdef HAVE_NETSNMP
-					discover_snmp(&poller_config, dcheck, ip, port, result);
+					discover_snmp(&poller_config, dcheck, ip, task->addr.range->state.port, result);
 #else
 			errcodes[i] = NOTSUPPORTED;
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
@@ -1768,6 +1770,7 @@ static void	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task
 				task->addr.range->state.count--;
 			}
 
+			task->addr.range->state.port = 0;
 			zbx_vector_portrange_clear(&port_ranges);
 		}
 	}
