@@ -671,7 +671,6 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkSystemLocale() {
-
 		$result = true;
 		$current_locale = setlocale(LC_MONETARY, 0);
 
