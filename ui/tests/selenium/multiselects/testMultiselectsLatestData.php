@@ -23,14 +23,38 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 
 class testMultiselectsLatestData extends testMultiselectDialogs {
 
-	public function testMultiselectsLatestData_CheckDialogs() {
+	public static function getCheckDialogsData() {
+		return [
+			// #0.
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Zabbix servers'
+					]
+				]
+			],
+			// #1.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'ЗАББИКС Сервер'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckDialogsData
+	 */
+	public function testMultiselectsLatestData_CheckDialogs($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$multiselects = [['Host groups' => 'Host groups'], ['Hosts' => 'Hosts', 'Host group' => 'Host groups']];
 
 		// Check all multiselects in filter before the first multiselect is filled.
 		$this->checkMultiselectDialogs($filter_form, $multiselects);
-		$filter_form->fill(['Host groups' => 'Zabbix servers']);
+		$filter_form->fill($data['fields']);
 
 		// Check all multiselects in filter after the first multiselect is filled.
 		$this->checkMultiselectDialogs($filter_form, $multiselects);

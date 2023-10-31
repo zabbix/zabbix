@@ -38,7 +38,8 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 						['Proxy' => 'Proxies']
 					],
 					// Fill this filter to enable 'Proxy' multiselect.
-					'filter' => ['Monitored by' => 'Proxy']
+					'filter' => ['Monitored by' => 'Proxy'],
+					'fields' => [['Proxy' => 'Proxy for Actions']]
 				]
 			],
 			// #1.
@@ -48,7 +49,8 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 					'sub_object' => 'Items' ,
 					'multiselects' => [
 						['Value mapping' => 'Value mapping']
-					]
+					],
+					'fields' => [['Value mapping' => 'Template value mapping']]
 				]
 			],
 			// #2.
@@ -96,7 +98,8 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 					'sub_object' => 'Items' ,
 					'multiselects' => [
 						['Value mapping' => 'Value mapping']
-					]
+					],
+					'fields' => [['Value mapping' => 'Zabbix agent ping status']]
 				]
 			],
 			// #8.
@@ -143,11 +146,20 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 			$this->page->waitUntilReady();
 
 			// Add common multiselect fields to data provider.
-			$common_fields = ($data['object'] === 'Hosts')
+			$common_multiselects = ($data['object'] === 'Hosts')
 				? [['Host groups' => 'Host groups'], ['Hosts' => 'Hosts', 'Host group' => 'Host groups']]
 				: [['Template groups' => 'Template groups'], ['Templates' => 'Templates', 'Template group' => 'Template groups']];
 
-			$data['multiselects'] = array_merge(CTestArrayHelper::get($data, 'multiselects', []), $common_fields);
+			$data['multiselects'] = array_merge($common_multiselects, CTestArrayHelper::get($data, 'multiselects', []));
+
+			$common_fields = ($data['object'] === 'Hosts')
+				? [['Host groups' => 'Zabbix servers'], ['Hosts' => 'ЗАББИКС Сервер']]
+				: [['Template groups' => 'Templates'], ['Templates' => 'Zabbix agent']];
+		}
+		else {
+			$common_fields = ($data['object'] === 'Hosts')
+				? [['Host groups' => 'Zabbix servers'], ['Templates' => 'Zabbix agent']]
+				: [['Template groups' => 'Templates'], ['Linked templates' => 'Zabbix agent']];
 		}
 
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
@@ -157,18 +169,23 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 			$filter_form->fill($data['filter']);
 		}
 
-		// Check all multiselects in filter before the first multiselect is filled.
+		// Check all multiselects in filter before one of them is filled.
 		$this->checkMultiselectDialogs($filter_form, $data['multiselects']);
 
-		$fields = ($data['object'] === 'Hosts')
-			? ['Host groups' => 'Zabbix servers']
-			: ['Template groups' => 'Templates'];
+		// Fill multiselects one by one and check other multiselects after that.
+		$fields = array_merge($common_fields, CTestArrayHelper::get($data, 'fields', []));
 
-		$filter_form->fill($fields);
+		foreach ($fields as $field) {
+			// Fill filter to enable dependent multiselects.
+			if (array_key_exists('filter', $data)) {
+				$filter_form->fill($data['filter']);
+			}
 
-		// Check all multiselects in filter after the first multiselect is filled.
-		$this->checkMultiselectDialogs($filter_form, $data['multiselects']);
+			$filter_form->fill($field);
 
-		$filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
+			// Check all multiselects in filter after one multiselect is filled.
+			$this->checkMultiselectDialogs($filter_form, $data['multiselects']);
+			$filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
+		}
 	}
 }
