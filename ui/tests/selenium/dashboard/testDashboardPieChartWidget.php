@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -837,7 +838,7 @@ class testDashboardPieChartWidget extends CWebTest
 			}
 		}
 
-		// Fill in the actual Item ids into the data set data (this only aplies to Item list data sets).
+		// Fill in the actual Item ids into the data set data (this only applies to Item list data sets).
 		foreach ($data['widget_fields'] as $id => $field) {
 			if (preg_match('/^ds\.[0-9]\.itemids\.[0-9]$/', $field['name'])) {
 				$field['value'] = self::$screenshot_host_item_ids[$field['value']];
@@ -872,9 +873,9 @@ class testDashboardPieChartWidget extends CWebTest
 		$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilReady()->all()->asArray();
 
 		// Assert expected sectors.
-		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item => $expected_sector) {
+		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {
 			// The name that should be shown in the legend and in the hintbox.
-			$legend_name = self::HOST_NAME_SCREENSHOTS.': '.$item;
+			$legend_name = self::HOST_NAME_SCREENSHOTS.': '.$item_name;
 
 			// Special case - legend name includes aggregation function.
 			if (CTestArrayHelper::get($data, 'expected_legend_function')) {
@@ -887,7 +888,7 @@ class testDashboardPieChartWidget extends CWebTest
 			}
 
 			// Special case - legend name is "Other" because sectors were merged.
-			if ($item === 'Other') {
+			if ($item_name === 'Other') {
 				$legend_name = 'Other: ';
 			}
 
@@ -916,7 +917,7 @@ class testDashboardPieChartWidget extends CWebTest
 			}
 
 			// Fail test if no match found.
-			throw new Exception('Expected sector for '.$item.' not found.');
+			throw new Exception('Expected sector for '.$item_name.' not found.');
 		}
 
 		// Assert expected Total value.
