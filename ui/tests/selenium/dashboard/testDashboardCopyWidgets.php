@@ -358,6 +358,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Pie chart widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Top triggers widget',
 					'copy to' => 'another page'
 				]
@@ -413,6 +419,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Top triggers widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Pie chart widget',
 					'copy to' => 'another template'
 				]
 			]
