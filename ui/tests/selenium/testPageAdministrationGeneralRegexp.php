@@ -20,8 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup regexps
@@ -30,14 +30,15 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testPageAdministrationGeneralRegexp extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -106,7 +107,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		// Validate the dropdown menu under header.
 		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
-		$this->assertEquals(['GUI', 'Autoregistration', 'Images', 'Icon mapping', 'Regular expressions',
+		$this->assertEquals(['GUI', 'Autoregistration', 'Timeouts', 'Images', 'Icon mapping', 'Regular expressions',
 			'Trigger displaying options', 'Geographical maps', 'Modules', 'Connectors', 'Other'],
 			$popup_menu->getItems()->asText()
 		);

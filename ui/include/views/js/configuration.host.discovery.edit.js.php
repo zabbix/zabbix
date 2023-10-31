@@ -101,9 +101,10 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context}) {
+		init({form_name, counter, context, token}) {
 			this.form_name = form_name;
 			this.context = context;
+			this.token = token;
 
 			$('#conditions')
 				.dynamicRows({
@@ -175,6 +176,12 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				.on('click', 'button.element-table-add', () => {
 					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 				});
+
+			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-item`);
+
+			if (button instanceof Element) {
+				button.addEventListener('click', e => this.executeNow(e.target));
+			}
 		},
 
 		updateExpression() {
@@ -205,19 +212,22 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}
 		},
 
-		checkNow(button) {
+		executeNow(button) {
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
+			curl.setArgument('action', 'item.execute');
+
+			const data = {
+				...this.token,
+				itemids: [document.querySelector(`[name="${this.form_name}"] [name="itemid"]`).value],
+				discovery_rule: 1
+			};
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: [document.getElementById('itemid').value], discovery_rule: 1})
+				body: JSON.stringify(data)
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -290,6 +300,25 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit',
 				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+		},
+
+		editProxy(e, proxyid) {
+			e.preventDefault();
+			const proxy_data = {proxyid};
+
+			this.openProxyPopup(proxy_data);
+		},
+
+		openProxyPopup(proxy_data) {
+			const overlay = PopUp('popup.proxy.edit', proxy_data, {
+				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context)
 			);
 		},
 

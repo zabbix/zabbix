@@ -179,13 +179,15 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 		->setAttribute('data-hostid', $data['host']['hostid'])
 		->onClick('view.editHost({hostid: this.dataset.hostid});');
 	$itemsLink = new CLink(_('Items'),
-		(new CUrl('items.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'item.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 			->setArgument('context', 'host')
 	);
 	$triggersLink = new CLink(_('Triggers'),
-		(new CUrl('triggers.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'trigger.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 			->setArgument('context', 'host')

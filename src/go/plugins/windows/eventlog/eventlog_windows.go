@@ -151,4 +151,6 @@ var impl Plugin
 func init() {
 	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog", "Windows event log file monitoring.")
 	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog.count", "Windows event log file monitoring.")
+
+	impl.SetHandleTimeout(true)
 }

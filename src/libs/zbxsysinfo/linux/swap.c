@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)

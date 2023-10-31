@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 $this->includeJsFile('search.js.php');
 
 $sections = [];
@@ -117,7 +119,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$item_count = CViewHelper::showNum($host['items']);
 	$items_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? [new CLink(_('Items'), (new CUrl('items.php'))
+		? [new CLink(_('Items'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'item.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 			->setArgument('context', 'host')
@@ -128,7 +131,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$trigger_count = CViewHelper::showNum($host['triggers']);
 	$triggers_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+		? [new CLink(_('Triggers'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'trigger.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 			->setArgument('context', 'host')
@@ -293,7 +297,8 @@ if ($data['admin']) {
 			: [new CSpan($visible_name)];
 
 		$items_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink(_('Items'), (new CUrl('items.php'))
+			? [new CLink(_('Items'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 				->setArgument('context', 'template')
@@ -303,7 +308,8 @@ if ($data['admin']) {
 		$items_link = (new CCol($items_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 		$triggers_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+			? [new CLink(_('Triggers'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'trigger.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 				->setArgument('context', 'template')

@@ -240,7 +240,8 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// items
-			url = new Curl('items.php');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'item.list');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -252,7 +253,8 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// triggers
-			url = new Curl('triggers.php');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'trigger.list');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -514,14 +516,17 @@ function getMenuPopupMapElementTrigger(options) {
 		const item_urls = [];
 
 		for (const value of options.triggers) {
-			url = new Curl('triggers.php');
-			url.setArgument('form', 'update');
-			url.setArgument('triggerid', value.triggerid);
-			url.setArgument('context', 'host');
-
 			trigger_urls.push({
 				label: value.description,
-				url: url.getUrl()
+				clickCallback: function(e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
+
+					view.editTrigger({
+						triggerid: value.triggerid,
+						context: 'host'
+					});
+				}
 			});
 		}
 
@@ -532,17 +537,24 @@ function getMenuPopupMapElementTrigger(options) {
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('items.php');
-				url.setArgument('form', 'update');
-				url.setArgument('itemid', item.params.itemid);
-				url.setArgument('context', 'host');
-
-				item_urls.push({
-					label: item.name,
-					disabled: item.params.is_webitem,
-					url: url.getUrl()
-				});
-			}
+				if (item.params.is_webitem) {
+					item_urls.push({
+						label: item.name,
+						disabled: true
+					});
+				}
+				else {
+					item_urls.push({
+						label: item.name,
+						clickCallback: () => {
+							view.editItem(null, {
+								context: 'host',
+								itemid: item.params.itemid
+							});
+						}
+					});
+				}
+			};
 
 			config_urls.push({
 				label: t('Items'),
@@ -794,30 +806,38 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const config_urls = [];
 		const item_urls = [];
 
-		url = new Curl('triggers.php');
-		url.setArgument('form', 'update');
-		url.setArgument('triggerid', options.triggerid);
-		url.setArgument('context', 'host');
-		url.setArgument('backurl', options.backurl);
-
 		config_urls.push({
 			label: t('Trigger'),
-			url: url.getUrl()
+			clickCallback: function(e) {
+				e.preventDefault();
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.editTrigger({
+					triggerid: options.triggerid,
+					context: 'host'
+				});
+			}
 		});
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('items.php');
-				url.setArgument('form', 'update');
-				url.setArgument('itemid', item.params.itemid);
-				url.setArgument('context', 'host');
-				url.setArgument('backurl', options.backurl);
-
-				item_urls.push({
-					label: item.name,
-					disabled: item.params.is_webitem,
-					url: url.getUrl()
-				});
+				if (item.params.is_webitem) {
+					item_urls.push({
+						label: item.name,
+						disabled: true
+					});
+				}
+				else {
+					item_urls.push({
+						label: item.name,
+						clickCallback: () => {
+							view.editItem(null, {
+								context: 'host',
+								itemid: item.params.itemid
+							});
+						}
+					});
+				}
 			}
 
 			config_urls.push({
@@ -1050,16 +1070,14 @@ function getMenuPopupItem(options) {
 		};
 
 		if (options.isWriteable) {
-			url = new Curl('items.php');
-			url.setArgument('form', 'update');
-			url.setArgument('hostid', options.hostid);
-			url.setArgument('itemid', options.itemid);
-			url.setArgument('backurl', options.backurl);
-			url.setArgument('context', options.context);
-
 			config_urls.push({
 				label: t('Item'),
-				url: url.getUrl()
+				clickCallback: () => {
+					view.editItem(null, {
+						context: options.context,
+						itemid: options.itemid
+					});
+				}
 			});
 		}
 
@@ -1067,15 +1085,18 @@ function getMenuPopupItem(options) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
-				url = new Curl('triggers.php');
-				url.setArgument('form', 'update');
-				url.setArgument('triggerid', value.triggerid);
-				url.setArgument('backurl', options.backurl);
-				url.setArgument('context', options.context);
-
 				trigger_items.push({
 					label: value.description,
-					url: url.getUrl()
+					clickCallback: function(e) {
+						e.preventDefault();
+						jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
+
+						view.editTrigger({
+							triggerid: value.triggerid,
+							hostid: options.hostid,
+							context: options.context
+						});
+					}
 				});
 			}
 
@@ -1084,33 +1105,41 @@ function getMenuPopupItem(options) {
 
 		config_urls.push(config_triggers);
 
-		url = new Curl('triggers.php');
-		url.setArgument('form', 'create');
-		url.setArgument('hostid', options.hostid);
-		url.setArgument('description', options.name);
-		url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-		url.setArgument('backurl', options.backurl);
-		url.setArgument('context', options.context);
-
 		config_urls.push({
 			label: t('Create trigger'),
-			url: url.getUrl(),
-			disabled: options.binary_value_type
+			disabled: options.binary_value_type,
+			clickCallback: function(e) {
+				e.preventDefault();
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.editTrigger({
+					hostid: options.hostid,
+					name: options.name,
+					expression: 'func(/' + options.host + '/' + options.key + ')',
+					context: options.context
+				});
+			}
 		});
 
-		url = new Curl('items.php');
-		url.setArgument('form', 'create');
-		url.setArgument('hostid', options.hostid);
-		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
-		url.setArgument('master_itemid', options.itemid);
-		url.setArgument('backurl', options.backurl);
-		url.setArgument('context', options.context);
-
-		config_urls.push({
-			label: t('Create dependent item'),
-			url: url.getUrl(),
-			disabled: options.isDiscovery
-		});
+		if (options.isDiscovery) {
+			config_urls.push({
+				label: t('Create dependent item'),
+				disabled: true
+			});
+		}
+		else {
+			config_urls.push({
+				label: t('Create dependent item'),
+				clickCallback: () => {
+					view.editItem(null, {
+						context: options.context,
+						hostid: options.hostid,
+						master_itemid: options.itemid,
+						type: 18 // ITEM_TYPE_DEPENDENT
+					});
+				}
+			});
+		}
 
 		url = new Curl('host_discovery.php');
 		url.setArgument('form', 'create');
@@ -1133,20 +1162,22 @@ function getMenuPopupItem(options) {
 	}
 
 	if (options.context !== 'template') {
-		const execute = {
-			label: t('Execute now'),
-			disabled: !options.isExecutable
-		};
-
 		if (options.isExecutable) {
-			execute.clickCallback = function() {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+			actions.push({
+				label: t('Execute now'),
+				clickCallback: function() {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				view.checkNow(options.itemid);
-			};
+					view.executeNow(null, {itemids: [options.itemid]});
+				}
+			})
 		}
-
-		actions.push(execute);
+		else {
+			actions.push({
+				label: t('Execute now'),
+				disabled: true
+			});
+		}
 
 		sections.push({
 			label: t('Actions'),
@@ -1183,31 +1214,33 @@ function getMenuPopupItemPrototype(options) {
 
 	let url;
 
-	url = new Curl('disc_prototypes.php');
-	url.setArgument('form', 'update');
-	url.setArgument('parent_discoveryid', options.parent_discoveryid);
-	url.setArgument('itemid', options.itemid);
-	url.setArgument('context', options.context);
-
 	config_urls.push({
 		label: t('Item prototype'),
-		url: url.getUrl()
+		clickCallback: () => {
+			view.editItemPrototype(null, {
+				context: options.context,
+				itemid: options.itemid,
+				parent_discoveryid: options.parent_discoveryid
+			});
+		}
 	});
 
 	if (options.trigger_prototypes.length) {
 		const trigger_prototypes = [];
 
 		for (const value of options.trigger_prototypes) {
-			url = new Curl('trigger_prototypes.php');
-			url.setArgument('form', 'update');
-			url.setArgument('parent_discoveryid', options.parent_discoveryid);
-			url.setArgument('triggerid', value.triggerid)
-			url.setArgument('context', options.context);
-			url.setArgument('backurl', options.backurl);
-
 			trigger_prototypes.push({
 				label: value.description,
-				url: url.getUrl()
+				clickCallback: function(e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
+
+					view.editTriggerPrototype({
+						triggerid: value.triggerid,
+						parent_discoveryid: options.parent_discoveryid,
+						context: options.context
+					});
+				}
 			});
 		}
 
@@ -1218,29 +1251,32 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push(config_triggers);
 
-	url = new Curl('trigger_prototypes.php');
-	url.setArgument('parent_discoveryid', options.parent_discoveryid);
-	url.setArgument('form', 'create');
-	url.setArgument('description', options.name);
-	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-	url.setArgument('context', options.context);
-	url.setArgument('backurl', options.backurl);
-
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		url: url.getUrl()
-	});
+		clickCallback: function(e) {
+			e.preventDefault();
+			jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-	url = new Curl('disc_prototypes.php');
-	url.setArgument('form', 'create');
-	url.setArgument('parent_discoveryid', options.parent_discoveryid);
-	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
-	url.setArgument('master_itemid', options.itemid);
-	url.setArgument('context', options.context);
+			view.editTriggerPrototype({
+				parent_discoveryid: options.parent_discoveryid,
+				name: options.name,
+				hostid: options.hostid,
+				expression: 'func(/' + options.host + '/' + options.key + ')',
+				context: options.context
+			});
+		}
+	});
 
 	config_urls.push({
 		label: t('Create dependent item'),
-		url: url.getUrl()
+		clickCallback: () => {
+			view.editItemPrototype(null, {
+				context: options.context,
+				master_itemid: options.itemid,
+				parent_discoveryid: options.parent_discoveryid,
+				type: 18 // ITEM_TYPE_DEPENDENT
+			});
+		}
 	});
 
 	sections.push({
@@ -1382,6 +1418,7 @@ function getMenuPopupTriggerMacro(options) {
 				expressionInput.val(expression.string);
 
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+				document.getElementById('expr_temp').dispatchEvent(new Event('change'));
 			}
 		};
 	});
