@@ -245,6 +245,7 @@ class CRole extends CApiService {
 
 		$roles = array_column($roles, null, 'roleid');
 
+		self::updateUserUgSets($roles, $db_roles);
 		$this->updateRules($roles, $db_roles);
 
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_ROLE, $roles, $db_roles);
@@ -783,6 +784,49 @@ class CRole extends CApiService {
 		if (array_key_exists(self::$userData['roleid'], $role_types)
 				&& $role_types[self::$userData['roleid']] != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot change the user type of own role.'));
+		}
+	}
+
+	private function updateUserUgSets(array $roles, array $db_roles): void {
+		$role_indexes = [];
+
+		foreach ($roles as $i => $role) {
+			if (array_key_exists('type', $role) && $role['type'] != $db_roles[$role['roleid']]['type']
+					&& ($role['type'] == USER_TYPE_SUPER_ADMIN
+						|| $db_roles[$role['roleid']]['type'] == USER_TYPE_SUPER_ADMIN)) {
+				$role_indexes[$role['roleid']] = $i;
+			}
+		}
+
+		if (!$role_indexes) {
+			return;
+		}
+
+		$options = [
+			'output' => ['userid', 'username', 'roleid'],
+			'filter' => ['roleid' => array_keys($role_indexes)]
+		];
+		$result = DBselect(DB::makeSql('users', $options));
+
+		$users = [];
+		$db_users = [];
+
+		while ($row = DBfetch($result)) {
+			$users[] = [
+				'userid' => $row['userid'],
+				'role_type' => $roles[$role_indexes[$row['roleid']]]['type']
+			];
+
+			$db_users[$row['userid']] = [
+				'userid' => $row['userid'],
+				'username' => $row['username'],
+				'roleid' => $row['roleid'],
+				'role_type' => $db_roles[$row['roleid']]['type']
+			];
+		}
+
+		if ($users) {
+			CUser::updateFromRole($users, $db_users);
 		}
 	}
 

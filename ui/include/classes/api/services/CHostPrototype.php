@@ -2543,7 +2543,6 @@ class CHostPrototype extends CHostBase {
 				' AND '.dbConditionId('hd.parent_hostid', $hostids)
 		), 'hostid');
 
-		CHost::validateDeleteForce($discovered_hosts);
 		CHost::deleteForce($discovered_hosts);
 
 		DB::delete('interface', ['hostid' => $hostids]);
@@ -2618,8 +2617,7 @@ class CHostPrototype extends CHostBase {
 		), 'groupid');
 
 		if ($db_groups) {
-			CHostGroup::validateDeleteForce($db_groups);
-			CHostGroup::deleteForce($db_groups);
+			API::HostGroup()->deleteForce($db_groups);
 		}
 
 		DB::delete('group_discovery', ['parent_group_prototypeid' => $group_prototypeids]);
