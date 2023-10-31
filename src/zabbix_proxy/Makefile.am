@@ -28,7 +28,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_proxy.a \
-	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
+	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \
 	preproc/libpreproc_proxy.a \
@@ -41,7 +41,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_proxy.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
-	taskmanager/libzbxtaskmanager.a \
+	taskmanager/libzbxtaskmanager_proxy.a \
 	$(top_builddir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \

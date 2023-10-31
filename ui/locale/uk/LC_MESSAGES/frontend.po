@@ -13794,6 +13794,14 @@ msgstr ""
 msgid "New host group"
 msgstr ""
 
+#: app/views/item.edit.php:218
+msgid "New item"
+msgstr ""
+
+#: app/views/item.prototype.edit.php:191
+msgid "New item prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
@@ -21667,6 +21675,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1848
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1890
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1890
