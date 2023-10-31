@@ -1003,7 +1003,7 @@ class CSVGHoneycomb {
 		path += corners.map(c => `L${c.start}L${c.start_curve}C${c.handle_1} ${c.handle_2} ${c.end_curve}`);
 		path += 'Z';
 
-		return path;
+		return path.replaceAll(',', ' ');
 	}
 
 	/**
