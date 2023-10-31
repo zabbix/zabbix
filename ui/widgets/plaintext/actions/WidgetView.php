@@ -70,6 +70,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						'preservekeys' => true
 					]);
 				}
+
+				$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 			}
 
 			if (!$items) {
@@ -119,7 +121,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$item = reset($items);
 					$name = $this->isTemplateDashboard()
 						? $item['name']
-						: $host_name.NAME_DELIMITER.$item['name_resolved'];
+						: $host_name.NAME_DELIMITER.$item['name'];
 				}
 				elseif ($same_host && $items_count > 1) {
 					$name = $this->isTemplateDashboard()
@@ -131,7 +133,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
-			'items' => CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']),
+			'items' => $items,
 			'histories' => $histories,
 			'style' => $this->fields_values['style'],
 			'same_host' => $same_host,
