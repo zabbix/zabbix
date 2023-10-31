@@ -560,11 +560,8 @@ class testFormTags extends CWebTest {
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
-			if ($object === 'connector' || $object === 'template' || $object === 'trigger' || $object === 'item'
-					|| $object === 'host'
-					|| $object === 'service'
-					|| $object === 'trigger prototype'
-					|| $object === 'item prototype') {
+			if (in_array($object, ['connector', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype',
+				'host', 'service'])) {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -612,9 +609,7 @@ class testFormTags extends CWebTest {
 			// Check the results in form.
 			$this->checkTagFields($data, $object, $form);
 
-			if ($object === 'connector' || $object === 'template' || $object === 'trigger' || $object === 'item'
-					|| $object === 'trigger prototype'
-					|| $object === 'item prototype') {
+			if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype'])) {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -790,11 +785,8 @@ class testFormTags extends CWebTest {
 
 		$element->checkValue($tags);
 
-		if ($object === 'connector' || $object === 'template' || $object === 'trigger' || $object === 'item'
-				|| $object === 'host'
-				|| $object === 'service'
-				|| $object === 'trigger prototype'
-				|| $object === 'item prototype') {
+		if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype',
+				'host', 'service'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -824,32 +816,38 @@ class testFormTags extends CWebTest {
 				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 		}
 
-		if ($object === 'service') {
-			$this->page->open($this->link);
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-			$table->findRow('Name', $data['name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
-			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		}
-		elseif ($object === 'connector' || $object === 'trigger' || $object === 'trigger prototype'
-				|| $object === 'item prototype') {
-			$this->page->open($this->link);
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-			$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
-			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		}
-		elseif ($object === 'item') {
-			$this->page->open($this->link);
-			$table = $this->query('name:item_list')->asTable()->one()->waitUntilReady();
-			$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
-			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		}
-		elseif ($object === 'template') {
-			$this->page->open('zabbix.php?action=template.list&filter_name='.$data['name'].'&filter_set=1')->waitUntilReady();
-			$this->query('link', $data['name'])->one()->click();
-			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		}
-		else {
-			$this->page->open($this->saved_link.$id);
+		switch ($object) {
+			case 'service':
+				$this->page->open($this->link);
+				$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+				$table->findRow('Name', $data['name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+				break;
+
+			case 'trigger':
+			case 'trigger prototype':
+			case 'connector':
+			case 'item':
+			case 'item prototype':
+				$this->page->open($this->link);
+				$table = $this->query($object === 'item' ? 'name:item_list' : 'class:list-table')->asTable()->one()
+					->waitUntilReady();
+				$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+				break;
+
+			case 'template':
+				$this->page->open('zabbix.php?action=template.list&filter_name='.$data['name'].'&filter_set=1')
+					->waitUntilReady();
+				$this->query('link', $data['name'])->one()->click();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+				break;
+
+			case 'host':
+			case 'host prototype':
+			case 'web scenario':
+				$this->page->open($this->saved_link.$id);
+				break;
 		}
 
 		if ($object === 'host') {
@@ -928,11 +926,8 @@ class testFormTags extends CWebTest {
 		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
-		if ($object === 'connector' || $object === 'template' || $object === 'trigger' || $object === 'item'
-				|| $object === 'host'
-				|| $object === 'service'
-				|| $object === 'trigger prototype'
-				|| $object === 'item prototype') {
+		if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype',
+				'host', 'service'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 
@@ -1000,8 +995,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$new_form = ($object === 'trigger' || $object === 'trigger prototype' || $object === 'item'
-				|| $object === 'item prototype')
+		$new_form = (in_array($object, ['trigger', 'trigger prototype', 'item', 'item prototype']))
 				? COverlayDialogElement::find()->one()->waitUntilReady()->asForm()
 				: $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
 
@@ -1009,8 +1003,7 @@ class testFormTags extends CWebTest {
 		$element->invalidate();
 		$element->checkValue($tags);
 
-		if ($object === 'trigger' || $object === 'trigger prototype' || $object === 'item'
-				|| $object === 'item prototype') {
+		if (in_array($object, ['trigger', 'trigger prototype', 'item', 'item prototype'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -1175,8 +1168,7 @@ class testFormTags extends CWebTest {
 		// Check disabled inherited tags from host or template on created element.
 		$this->assertEquals($this->prepareInheritedTags($data['tags'], $parent_tags), $this->getInheritedTags());
 
-		if ($object === 'trigger' || $object === 'trigger prototype' || $object === 'item'
-				|| $object === 'item prototype') {
+		if (in_array($object, ['trigger', 'trigger prototype', 'item', 'item prototype'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}

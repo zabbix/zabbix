@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemGeneral.php';
@@ -332,7 +333,6 @@ class testFormItem extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormItem_CheckLayout($data) {
-
 		$context = array_key_exists('host', $data) ? 'host' : 'template';
 		$host_name = array_key_exists('host', $data) ? $data['host'] : $data['template'];
 
@@ -364,12 +364,8 @@ class testFormItem extends CLegacyWebTest {
 		$this->page->assertTitle('Configuration of items');
 		$this->page->assertHeader('Items');
 
-		if (isset($itemid)) {
-			$this->query('link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$itemid))->one()->click();
-		}
-		else {
-			$this->query('button:Create item')->one()->click();
-		}
+		$this->query(isset($itemid) ? 'link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$itemid) : 'button:Create item')
+				->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->page->assertTitle('Configuration of items');
@@ -2006,7 +2002,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->query('class:btn-overlay-close')->one()->click();
 			$this->page->waitUntilReady();
 			$this->query('xpath://form[@name="item_list"]/table[@class="list-table"]')->asTable()->one()
-				->query('link:'.$name)->one()->click();
+					->query('link', $name)->one()->click();
 			$dialog_check = COverlayDialogElement::find()->one()->waitUntilReady();
 			$check_form = $dialog_check->asForm();
 			$this->assertEquals($name, $check_form->getField('Name')->getValue());

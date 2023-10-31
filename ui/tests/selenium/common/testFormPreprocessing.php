@@ -2082,12 +2082,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 
-		if ($lld == true) {
-			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		}
-		else{
-			$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
-		}
+		$form = $lld
+			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
+			: COverlayDialogElement::find()->one()->waitUntilready()->asForm();
 
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
@@ -2120,6 +2117,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Take a screenshot to test draggable object position of preprocessing steps.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
+			// TODO: Added updateViewport due to not centered screenshot for an item's preprocessing
+			// which makes unclear if result is correct.
+			$this->page->updateViewport();
 			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'Preprocessing'.$this->link);
 		}
 
@@ -2847,20 +2847,17 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Open original item on host and get its' preprocessing steps.
 		$this->page->login()->open($link);
 
-		if ($item === 'Item' || $item === 'Item prototype') {
-			if ($item === 'Item') {
-			$item_name = CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? '15094' : '99102'));
-			}
-			else {
-			$item_name = CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? '15096' : '23804'));
-			}
+		if ($item === 'Discovery rule') {
+			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
+		else {
+			$item_name = ($item === 'Item')
+				? CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? $this->inherited_itemid : $this->clone_itemid))
+				: CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? $this->inherited_item_prototype : $this->clone_item_prototypeid));
 
 			$this->query('link', $item_name)->one()->click();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $dialog->asForm();
-		}
-		else {
-			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		}
 
 		if ($templated) {

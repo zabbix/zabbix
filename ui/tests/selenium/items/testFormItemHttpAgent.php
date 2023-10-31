@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -990,6 +991,13 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->processPairFields($data['headers'], 'headers');
 		}
 
+		// Take a screenshot to test draggable object position of query and headers fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($dialog->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($dialog->query('id:headers-table')->one(), 'Headers fields');
+		}
+
 		if (array_key_exists('request_type', $data)) {
 			$form->getField('id:post_type')->asSegmentedRadio()->select($data['request_type']);
 		}
@@ -1016,13 +1024,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// 4 is retrieve mode count.
 		for ($i = 0; $i < 4; $i++) {
 			$this->$check("//input[@id='retrieve_mode_".$i."'][@disabled]");
-		}
-
-		// Take a screenshot to test draggable object position of query and headers fields.
-		if (array_key_exists('screenshot', $data)) {
-			$this->page->removeFocus();
-			$this->assertScreenshot($dialog->query('id:query-fields-table')->one(), 'Query fields');
-			$this->assertScreenshot($dialog->query('id:headers-table')->one(), 'Headers fields');
 		}
 
 		// Check query fields after url parse.
@@ -1395,6 +1396,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				case 'delete':
 					$dialog->getFooter()->query('button:Delete')->one()->click();
 					$this->page->dismissAlert();
+					$dialog->close();
 					break;
 			}
 
