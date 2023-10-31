@@ -1042,7 +1042,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'state', 'description'],
+			'output' => ['itemid', 'hostid', 'name', 'name_resolved', 'key_', 'value_type', 'state', 'description'],
 			'itemids' => array_keys($macros),
 			'webitems' => true,
 			'preservekeys' => true
@@ -1057,7 +1057,7 @@ class CMacrosResolverGeneral {
 		unset($db_item);
 
 		$item_macros = ['{ITEM.DESCRIPTION}' => 'description_expanded', '{ITEM.DESCRIPTION.ORIG}' => 'description',
-			'{ITEM.KEY}' => 'key_expanded', '{ITEM.KEY.ORIG}' => 'key_', '{ITEM.NAME}' => 'name',
+			'{ITEM.KEY}' => 'key_expanded', '{ITEM.KEY.ORIG}' => 'key_', '{ITEM.NAME}' => 'name_resolved',
 			'{ITEM.NAME.ORIG}' => 'name', '{ITEM.STATE}' => 'state', '{ITEM.VALUETYPE}' => 'value_type'
 		];
 

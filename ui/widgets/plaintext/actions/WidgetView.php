@@ -49,7 +49,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			if ($this->fields_values['itemids']) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+					'output' => ['itemid', 'name_resolved', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'selectValueMap' => ['mappings'],
 					'itemids' => $this->fields_values['itemids'],
@@ -59,7 +59,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($items && $this->fields_values['override_hostid']) {
 					$items = API::Item()->get([
-						'output' => ['itemid', 'name', 'value_type', 'units', 'valuemapid'],
+						'output' => ['itemid', 'name_resolved', 'value_type', 'units', 'valuemapid'],
 						'selectHosts' => ['name'],
 						'selectValueMap' => ['mappings'],
 						'filter' => [
@@ -119,7 +119,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$item = reset($items);
 					$name = $this->isTemplateDashboard()
 						? $item['name']
-						: $host_name.NAME_DELIMITER.$item['name'];
+						: $host_name.NAME_DELIMITER.$item['name_resolved'];
 				}
 				elseif ($same_host && $items_count > 1) {
 					$name = $this->isTemplateDashboard()
@@ -131,7 +131,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
-			'items' => $items,
+			'items' => CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']),
 			'histories' => $histories,
 			'style' => $this->fields_values['style'],
 			'same_host' => $same_host,

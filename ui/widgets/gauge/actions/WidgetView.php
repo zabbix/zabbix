@@ -22,6 +22,7 @@
 namespace Widgets\Gauge\Actions;
 
 use API,
+	CArrayHelper,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CControllerDashboardWidgetView,
@@ -100,8 +101,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getItem(): ?array {
+		$resolve_macros = !$this->isTemplateDashboard() || $this->fields_values['override_hostid'];
+
 		$item_options = [
-			'output' => ['itemid', 'hostid', 'name', 'value_type', 'units'],
+			'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'value_type', 'units'],
 			'selectHosts' => !$this->isTemplateDashboard() ? ['name'] : null,
 			'selectValueMap' => ['mappings'],
 			'filter' => [
@@ -134,7 +137,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return null;
 		}
 
-		return $items[0];
+		return $resolve_macros ? CArrayHelper::renameKeys($items[0], ['name_resolved' => 'name']) : $items[0];
 	}
 
 	private function checkConfigForOverriddenItem(array $item): array {

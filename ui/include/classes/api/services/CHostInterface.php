@@ -1027,7 +1027,7 @@ class CHostInterface extends CApiService {
 
 	private function checkIfInterfaceHasItems(array $interfaceIds) {
 		$items = API::Item()->get([
-			'output' => ['name'],
+			'output' => ['name_resolved'],
 			'selectHosts' => ['name'],
 			'interfaceids' => $interfaceIds,
 			'preservekeys' => true,
@@ -1039,7 +1039,7 @@ class CHostInterface extends CApiService {
 			$host = reset($item['hosts']);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Interface is linked to item "%1$s" on "%2$s".', $item['name'], $host['name']));
+				_s('Interface is linked to item "%1$s" on "%2$s".', $item['name_resolved'], $host['name']));
 		}
 	}
 

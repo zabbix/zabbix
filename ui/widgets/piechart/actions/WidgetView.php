@@ -22,6 +22,7 @@
 namespace Widgets\PieChart\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CHousekeepingHelper,
@@ -165,7 +166,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
-				$ds_metrics = self::getMetricsSingleItemDS($data_set, $max_metrics, $override_hostid);
+				$ds_metrics = self::getMetricsSingleItemDS($data_set, $max_metrics, $templateid, $override_hostid);
 			}
 			else {
 				$ds_metrics = self::getMetricsPatternItemDS($data_set, $max_metrics, $templateid, $override_hostid);
@@ -179,7 +180,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
-	private static function getMetricsSingleItemDS(array $data_set, int $max_metrics, string $override_hostid): array {
+	private static function getMetricsSingleItemDS(array $data_set, int $max_metrics, string $templateid,
+			string $override_hostid): array {
 		$metrics = [];
 		$ds_items = [];
 
@@ -231,8 +233,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$items_db = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+		$resolve_macros = $templateid === '' || $override_hostid !== '';
+
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'history', 'trends', 'units',
+				'value_type'
+			],
 			'selectHosts' => ['name'],
 			'webitems' => true,
 			'filter' => [
@@ -243,12 +249,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'limit' => $max_metrics
 		]);
 
+		if ($resolve_macros) {
+			$db_items = CArrayHelper::renameObjectsKeys($db_items, ['name_resolved' => 'name']);
+		}
+
 		foreach ($ds_items as $itemid => $ds_item) {
-			if (array_key_exists($itemid, $items_db)) {
+			if (array_key_exists($itemid, $db_items)) {
 				$data_set['color'] = '#' . $ds_item['color'];
 				$data_set['type'] = $ds_item['type'];
 
-				$metrics[] = $items_db[$itemid] + ['options' => $data_set];
+				$metrics[] = $db_items[$itemid] + ['options' => $data_set];
 			}
 		}
 
@@ -286,23 +296,45 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $metrics;
 		}
 
-		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+		$options = [
+			'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
 			'hostids' => $hostids,
 			'filter' => [
 				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 			],
-			'search' => [
-				'name' => self::processPattern($data_set['items'])
-			],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true,
 			'sortfield' => 'name',
 			'sortorder' => ZBX_SORT_UP,
 			'limit' => $max_metrics
-		]);
+		];
+
+		$resolve_macros = $templateid === '' || $override_hostid !== '';
+
+		if ($resolve_macros) {
+			$options['output'][] = 'name_resolved';
+
+			if ($templateid === '') {
+				$options['search']['name_resolved'] = self::processPattern($data_set['items']);
+			}
+			else {
+				$options['search']['name'] = self::processPattern($data_set['items']);
+			}
+		}
+		else {
+			$options['output'][] = 'name';
+			$options['search']['name'] = self::processPattern($data_set['items']);
+		}
+
+		$items = API::Item()->get($options);
+
+		if ($resolve_macros) {
+			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+		}
+
+		CArrayHelper::sort($items, ['name']);
 
 		$colors = getColorVariations('#' . $data_set['color'], count($items));
 
@@ -422,12 +454,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE) {
+				$name = $templateid !== ''
+					? $metric['name']
+					: $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+
 				if ($legend_aggregation_show) {
-					$name = self::aggr_fnc2str($metric['options']['aggregate_function']).
-						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
-				}
-				else {
-					$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+					$name = self::aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')';
 				}
 			}
 			else {

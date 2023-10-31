@@ -65,7 +65,7 @@ class CSvgGraphHelper {
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load Data for each metric.
-		self::getMetricsData($metrics, $width);
+		self::getMetricsData($metrics, $width, $options['templateid'] === '');
 		// Load aggregated Data for each dataset.
 		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'],
 				$options['legend']['show_aggregation']);
@@ -139,15 +139,14 @@ class CSvgGraphHelper {
 				break;
 			}
 
+			$resolve_macros = $templateid === '' || $override_hostid !== '';
+
 			$options = [
-				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+				'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
 				'selectHosts' => ['name'],
 				'webitems' => true,
 				'filter' => [
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
-				],
-				'search' => [
-					'name' => self::processPattern($data_set['items'])
 				],
 				'searchWildcardsEnabled' => true,
 				'searchByAny' => true,
@@ -155,6 +154,21 @@ class CSvgGraphHelper {
 				'sortorder' => ZBX_SORT_UP,
 				'limit' => $max_metrics
 			];
+
+			if ($resolve_macros) {
+				$options['output'][] = 'name_resolved';
+
+				if ($templateid === '') {
+					$options['search']['name_resolved'] = self::processPattern($data_set['items']);
+				}
+				else {
+					$options['search']['name'] = self::processPattern($data_set['items']);
+				}
+			}
+			else {
+				$options['output'][] = 'name';
+				$options['search']['name'] = self::processPattern($data_set['items']);
+			}
 
 			if ($templateid === '') {
 				// Find hosts.
@@ -176,7 +190,7 @@ class CSvgGraphHelper {
 				$options['hostids'] = $override_hostid !== '' ? $override_hostid : $templateid;
 			}
 
-			$items = null;
+			$items = [];
 
 			if (array_key_exists('hostids', $options) && $options['hostids']) {
 				$items = API::Item()->get($options);
@@ -185,6 +199,12 @@ class CSvgGraphHelper {
 			if (!$items) {
 				continue;
 			}
+
+			if ($resolve_macros) {
+				$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+			}
+
+			CArrayHelper::sort($items, ['name']);
 
 			unset($data_set['itemids'], $data_set['items']);
 
@@ -242,8 +262,12 @@ class CSvgGraphHelper {
 				}
 			}
 
-			$items_db = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+			$resolve_macros = $templateid === '' || $override_hostid !== '';
+
+			$db_items = API::Item()->get([
+				'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'history', 'trends',
+					'units', 'value_type'
+				],
 				'selectHosts' => ['name'],
 				'webitems' => true,
 				'filter' => [
@@ -257,8 +281,10 @@ class CSvgGraphHelper {
 			$items = [];
 
 			foreach ($data_set['itemids'] as $itemid) {
-				if (array_key_exists($itemid, $items_db)) {
-					$items[] = $items_db[$itemid];
+				if (array_key_exists($itemid, $db_items)) {
+					$items[] = $resolve_macros
+						? CArrayHelper::renameKeys($db_items[$itemid], ['name_resolved' => 'name'])
+						: $db_items[$itemid];
 				}
 			}
 
@@ -556,7 +582,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select data to show in graph for each metric.
 	 */
-	private static function getMetricsData(array &$metrics, int $width): void {
+	private static function getMetricsData(array &$metrics, int $width, bool $prepend_host_name): void {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
 
@@ -565,7 +591,10 @@ class CSvgGraphHelper {
 				continue;
 			}
 
-			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+			if ($prepend_host_name) {
+				$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+			}
+
 			$metric['points'] = [];
 
 			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];

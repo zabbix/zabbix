@@ -734,8 +734,8 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 		$hostids = array_keys($db_hosts);
 	}
 
-	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'value_type', 'units', 'valuemapid'],
+	$db_items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
 		'selectValueMap' => ['mappings'],
 		'hostids' => $hostids,
@@ -745,7 +745,7 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 		'monitored' => true,
 		'webitems' => true,
 		'preservekeys' => true
-	]);
+	]), ['name_resolved' => 'name']);
 
 	CArrayHelper::sort($db_items, [
 		['field' => 'name', 'order' => ZBX_SORT_UP],

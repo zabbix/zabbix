@@ -22,6 +22,7 @@
 namespace Widgets\Item\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CMacrosResolverHelper,
@@ -89,7 +90,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		 */
 		if ($this->getInput('name', '') === '') {
 			if (!$this->isTemplateDashboard() || ($this->fields_values['override_hostid'] && $tmp_items)) {
-				$options['output'] = array_merge($options['output'], ['name']);
+				$options['output'][] = 'name_resolved';
 			}
 
 			if (!$this->isTemplateDashboard()) {
@@ -127,6 +128,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($items) {
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+			}
+
 			$item = $items[$itemid];
 
 			$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;

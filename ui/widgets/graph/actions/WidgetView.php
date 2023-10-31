@@ -22,6 +22,7 @@
 namespace Widgets\Graph\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CGraphDraw,
@@ -109,7 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name'],
+					'output' => ['itemid', 'name_resolved'],
 					'selectHosts' => ['name'],
 					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
@@ -119,7 +120,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'webitems' => true
 				]);
 
-				$item = reset($items);
+				$item = CArrayHelper::renameKeys(reset($items), ['name_resolved' => 'name']);
 				$resourceid = $items ? $item['itemid'] : null;
 
 				if ($resourceid === null) {
@@ -211,7 +212,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$items = API::Item()->get([
-					'output' => ['name', 'key_', 'delay', 'hostid'],
+					'output' => [$this->isTemplateDashboard() ? 'name' : 'name_resolved', 'key_', 'delay', 'hostid'],
 					'selectHosts' => ['name'],
 					'itemids' => $resourceid,
 					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
@@ -219,7 +220,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 				$item = reset($items);
 
-				if (!$item) {
+				if ($item) {
+					if (!$this->isTemplateDashboard()) {
+						$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+					}
+				}
+				else {
 					$is_resource_available = false;
 				}
 			}
@@ -334,6 +340,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 					->setArgument('legend', $this->fields_values['show_legend'] && $graph['show_legend'] ? 1 : 0)
 					->setArgument('from')
 					->setArgument('to');
+			}
+
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				$graph_src->setArgument('resolve_macros', 1);
 			}
 
 			$graph_src

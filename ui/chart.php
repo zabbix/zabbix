@@ -40,7 +40,8 @@ $fields = [
 	'batch' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
-	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
+	'resolve_macros' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	session_write_close();
@@ -49,13 +50,14 @@ if (!check_fields($fields)) {
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $itemIds = getRequest('itemids');
+$resolve_macros = getRequest('resolve_macros', 0);
 
 /*
  * Permissions
  */
 $items = API::Item()->get([
-	'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
-		'value_type', 'key_'
+	'output' => ['itemid', 'type', 'master_itemid', $resolve_macros ? 'name_resolved' : 'name', 'delay', 'units',
+		'hostid', 'history', 'trends', 'value_type', 'key_'
 	],
 	'selectHosts' => ['name', 'host'],
 	'itemids' => $itemIds,
@@ -66,6 +68,10 @@ foreach ($itemIds as $itemId) {
 	if (!isset($items[$itemId])) {
 		access_deny();
 	}
+}
+
+if ($resolve_macros) {
+	$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 }
 
 $hostNames = [];
