@@ -30,6 +30,7 @@ $trigger_form = (new CForm())
 	->setName('trigger_edit_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId())
+	->addVar('hostid', $data['hostid'])
 	->addVar('context', $data['context'])
 	->addVar('expr_temp', $data['expr_temp'], 'expr_temp')
 	->addVar('recovery_expr_temp', $data['recovery_expr_temp'], 'recovery_expr_temp');

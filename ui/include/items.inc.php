@@ -558,13 +558,15 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 				->setArgument('context', 'template');
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url = (new CUrl('disc_prototypes.php'))
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.prototype.list')
 				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 				->setArgument('context', 'template');
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url = (new CUrl('items.php'))
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
 				->setArgument('context', 'template');
@@ -602,23 +604,23 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->setArgument('context', 'template');
+				$name = new CLink($template['name'], $url);
 			}
 			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('disc_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.prototype.edit')
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setAttribute('data-context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl('items.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.edit')
+					->setAttribute('data-hostid', $parent_templates['links'][$itemid]['hostid'])
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-context', 'template');
 			}
-
-			$name = new CLink($template['name'], $url);
 		}
 		else {
 			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -1565,6 +1567,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 			'group' => _('SNMP'),
 			'name' => _('SNMP walk to JSON')
 		],
+		ZBX_PREPROC_SNMP_GET_VALUE => [
+			'group' => _('SNMP'),
+			'name' => _('SNMP get value')
+		],
 		ZBX_PREPROC_MULTIPLIER => [
 			'group' => _('Arithmetic'),
 			'name' => _('Custom multiplier')
@@ -1869,6 +1875,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:
+			case ZBX_PREPROC_SNMP_GET_VALUE:
 				$step['params'] = $step['params'][0];
 				break;
 
@@ -2468,7 +2475,8 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 			case 'timeout':
 				return ($input['type'] != ITEM_TYPE_SIMPLE || (strncmp($input['key_'], 'icmpping', 8) != 0
 						&& strncmp($input['key_'], 'vmware.', 7) != 0))
-					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'walk[', 5) == 0);
+					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'get[', 4) == 0
+						|| strncmp($input['snmp_oid'], 'walk[', 5) == 0);
 
 			case 'delay':
 				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;
@@ -2588,33 +2596,3 @@ function getInheritedTimeouts(string $proxyid): array {
 		]
 	];
 }
-
-/**
- * Prioritize ZBX_PREPROC_VALIDATE_NOT_SUPPORTED checks, with "match any error" being the last of them.
- *
- * @param array $steps
- *
- * @return array
- */
-function sortPreprocessingSteps(array $steps): array {
-	$ns_regex = [];
-	$ns_any = [];
-	$other = [];
-
-	foreach ($steps as $step) {
-		if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-			$other[] = $step;
-			continue;
-		}
-
-		if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
-			$ns_any[] = $step;
-		}
-		else {
-			$ns_regex[] = $step;
-		}
-	}
-
-	return array_merge($ns_regex, $ns_any, $other);
-}
-

@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup connector, profiles
@@ -30,21 +30,22 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormConnectors extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	private static $connector_sql = 'SELECT * FROM connector ORDER BY connectorid';
 	private static $default_connector = 'Default connector';
 	private static $update_connector = 'Update connector';
 	private static $delete_connector = 'Delete connector';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public static function prepareConnectorsData() {
 		CDataHelper::call('connector.create', [

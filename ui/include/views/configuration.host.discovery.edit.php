@@ -537,12 +537,29 @@ if ($data['display_interfaces']) {
 
 $item_tab
 	->addItem([
-		(new CLabel(_('SNMP OID'), 'snmp_oid'))
+		(new CLabel([
+			_('SNMP OID'),
+			makeHelpIcon([
+				_('Field requirements:'),
+				(new CList([
+					new CListItem([
+						(new CSpan('walk[OID1,OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+						' - ',
+						_('to retrieve a subtree')
+					]),
+					new CListItem([
+						(new CSpan('discovery[{#MACRO1},OID1,{#MACRO2},OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+						' - ',
+						_('(legacy) to retrieve a subtree in JSON')
+					])
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		], 'snmp_oid'))
 			->setAsteriskMark()
 			->setId('js-item-snmp-oid-label'),
 		(new CFormField((new CTextBox('snmp_oid', $data['snmp_oid'], $data['limited'], 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
+			->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 			->setAriaRequired()
 		))->setId('js-item-snmp-oid-field')
 	]);
@@ -1008,7 +1025,7 @@ if (!empty($data['itemid'])) {
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			)
-			->onClick('view.checkNow(this);');
+			->addClass('js-execute-item');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
@@ -1059,7 +1076,8 @@ $html_page->show();
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
 		'counter' => $data['counter'],
-		'context' => $data['context']
+		'context' => $data['context'],
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

@@ -61,6 +61,7 @@ int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
 #define ZBX_SNMP_OID_TYPE_WALK		3
+#define ZBX_SNMP_OID_TYPE_GET		4
 
 /* trigger is functional unless its expression contains disabled or not monitored items */
 #define TRIGGER_FUNCTIONAL_TRUE		0
@@ -310,7 +311,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 
 			return ZBX_POLLER_TYPE_AGENT;
 		case ITEM_TYPE_SNMP:
-			if (ZBX_SNMP_OID_TYPE_WALK == snmp_oid_type)
+			if (ZBX_SNMP_OID_TYPE_WALK == snmp_oid_type || ZBX_SNMP_OID_TYPE_GET == snmp_oid_type)
 			{
 				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
 					break;
@@ -382,8 +383,11 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 
 		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
-			if (ZBX_SNMP_OID_TYPE_WALK == snmpitem->snmp_oid_type)
+			if (ZBX_SNMP_OID_TYPE_WALK == snmpitem->snmp_oid_type ||
+					ZBX_SNMP_OID_TYPE_GET == snmpitem->snmp_oid_type)
+			{
 				return itemid;
+			}
 		}
 
 		if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &interfaceid))
@@ -2835,8 +2839,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 			if (SUCCEED == dc_strpool_replace(found, &snmpitem->snmp_oid, row[6]))
 			{
-				if (0 == strncmp(snmpitem->snmp_oid, "walk[", 5))
+				if (0 == strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+				else if (0 == strncmp(snmpitem->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_GET;
 				else if (NULL != strchr(snmpitem->snmp_oid, '{'))
 					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
 				else if (NULL != strchr(snmpitem->snmp_oid, '['))
@@ -9058,7 +9064,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
-	dst_item->timeout = NULL;
+	dst_item->timeout = 0;
 
 	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
 
@@ -9130,7 +9136,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
 				dst_item->snmp_max_repetitions = 0;
-				dst_item->timeout = NULL;
+				dst_item->timeout = 0;
 			}
 
 			dst_item->snmp_community = NULL;
@@ -9175,7 +9181,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->params = zbx_strdup(NULL, "");
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
-				dst_item->timeout = NULL;
+				dst_item->timeout = 0;
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -9200,7 +9206,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->privatekey_orig = '\0';
 				*dst_item->password_orig = '\0';
 				dst_item->params = zbx_strdup(NULL, "");
-				dst_item->timeout = NULL;
+				dst_item->timeout = 0;
 			}
 			dst_item->username = NULL;
 			dst_item->publickey = NULL;
@@ -9258,7 +9264,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->allow_traps = 0;
 				*dst_item->trapper_hosts = '\0';
 			}
-			dst_item->timeout = NULL;
+			dst_item->timeout = 0;
 			dst_item->url = NULL;
 			dst_item->query_fields = NULL;
 			dst_item->status_codes = NULL;
@@ -9298,7 +9304,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->script_params = zbx_strdup(NULL, "");
 			}
 
-			dst_item->timeout = NULL;
+			dst_item->timeout = 0;
 			break;
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems,
@@ -9313,7 +9319,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
 				dst_item->params = zbx_strdup(NULL, "");
-				dst_item->timeout = NULL;
+				dst_item->timeout = 0;
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -9329,7 +9335,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			{
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
-				dst_item->timeout = NULL;
+				dst_item->timeout = 0;
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -9368,7 +9374,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			break;
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_ZABBIX_ACTIVE:
-			dst_item->timeout = NULL;
+			dst_item->timeout = 0;
 
 			break;
 		default:
@@ -15096,7 +15102,7 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 		int	quoted;
 		char	*param;
 
-		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+		zbx_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
 		(void)zbx_dc_expand_user_macros(um_handle, &param, &hostid, 1, NULL);
@@ -15687,8 +15693,7 @@ void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *ne
 				dheck_out->uniq = dcheck->uniq;
 				dheck_out->type = dcheck->type;
 				dheck_out->allow_redirect = dcheck->allow_redirect;
-				dheck_out->timeout_str = NULL;
-				dheck_out->timeout_sec = 0;
+				dheck_out->timeout = 0;
 
 				if (SVC_SNMPv1 == dheck_out->type || SVC_SNMPv2c == dheck_out->type ||
 						SVC_SNMPv3 == dheck_out->type)

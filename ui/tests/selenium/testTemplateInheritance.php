@@ -108,6 +108,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Items')->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		$this->zbxTestInputTypeWait('name', $itemName);
 		$this->zbxTestInputType('key', $keyName);
@@ -120,7 +121,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($result) {
 			case TEST_GOOD:
@@ -342,6 +343,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
 		$this->zbxTestClickLinkTextWait('Item prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD item');
 		$this->zbxTestInputType('key', 'test-lld-item[{#KEY}]');
@@ -352,13 +355,14 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputType('history', '54d');
 		$this->zbxTestInputType('trends', '55d');
 		$this->zbxTestInputType('description', 'description');
-		$this->query('id:item-prototype-form')->asForm()->one()->getField('Value mapping')->fill('Template value mapping');
+		$form->getField('Value mapping')->fill('Template value mapping');
 		$this->zbxTestCheckboxSelect('status', false);
 		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->zbxTestClickWait('interval_add');
+		$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
+			->one()->click();
 
-		$this->zbxTestClickWait('add');
+		$dialog->getFooter()->query('button:Add')->one()->click();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
 		$this->zbxTestTextPresent('Test LLD item');
 
@@ -371,6 +375,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Item prototypes');
 		$this->zbxTestAssertElementText("//a[text()='Test LLD item']/parent::td", "$this->templateName: Test LLD item");
 		$this->zbxTestClickLinkTextWait('Test LLD item');
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		$this->zbxTestAssertElementValue('name', 'Test LLD item');
 		$this->zbxTestAssertElementValue('key', 'test-lld-item[{#KEY}]');
@@ -382,8 +387,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->assertEquals(['Template value mapping'], $this->query('id:item-prototype-form')->asForm()->one()->
-				getField('Value mapping')->getValue());
+		$this->assertEquals(['Template value mapping'], $overlay->asForm()->getField('Value mapping')->getValue());
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);

@@ -176,11 +176,6 @@ $house_keeper_tab = (new CFormList())
 				$timescaledb_error = _('Unable to retrieve TimescaleDB compression support status.');
 				break;
 
-			case ZBX_TIMESCALEDB_POSTGRES_TOO_OLD:
-				$timescaledb_error = _('Compression is not supported.').' '.
-					_('PostgreSQL database server version is too old.');
-				break;
-
 			case ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE:
 				$timescaledb_error = _('Compression is not supported.').' '.
 					_('Unable to retrieve TimescaleDB version.');

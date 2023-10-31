@@ -77,6 +77,11 @@ zbx_hash_t	zbx_default_string_hash_func(const void *data)
 	return ZBX_DEFAULT_STRING_HASH_ALGO(data, strlen((const char *)data), ZBX_DEFAULT_HASH_SEED);
 }
 
+zbx_hash_t	zbx_default_string_ptr_hash_func(const void *data)
+{
+	return zbx_default_string_hash_func(*((const char * const *)data));
+}
+
 zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data)
 {
 	const zbx_uint64_pair_t	*pair = (const zbx_uint64_pair_t *)data;

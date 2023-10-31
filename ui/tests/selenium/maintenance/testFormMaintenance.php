@@ -19,8 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -36,15 +36,16 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormMaintenance extends CLegacyWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	public $name = 'Test maintenance';
@@ -72,7 +73,7 @@ class testFormMaintenance extends CLegacyWebTest {
 				'fields' => [
 					'Period type' => 'Daily'
 				],
-				'result' => [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every day']]
+				'result' => [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day']]
 			],
 			[
 				'fields' => [
@@ -80,7 +81,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'Monday' => true,
 					'Sunday' => true
 				],
-				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Sunday of every week']]
+				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Sunday of every 1 week']]
 			],
 			[
 				'fields' => [
@@ -190,7 +191,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'Wednesday' => true,
 					'Friday' => true
 				],
-				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Wednesday, Friday, Sunday of every week']]
+				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Wednesday, Friday, Sunday of every 1 week']]
 			],
 			[
 				'schedule' => 'Monthly',

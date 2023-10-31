@@ -22,7 +22,11 @@
 
 package main
 
-func loadOSDependentFlags() {}
+import "git.zabbix.com/ap/plugin-support/zbxflag"
+
+const usageMessageExampleConfPath = `/etc/zabbix/zabbix_agent2.conf`
+
+func osDependentFlags() zbxflag.Flags { return zbxflag.Flags{} }
 
 func setServiceRun(fourground bool) {}
 
@@ -36,7 +40,7 @@ func eventLogErr(err error) error { return nil }
 
 func confirmService() {}
 
-func validateExclusiveFlags() error { return nil }
+func validateExclusiveFlags(args *Arguments) error { return nil }
 
 func handleWindowsService(conf string) error { return nil }
 

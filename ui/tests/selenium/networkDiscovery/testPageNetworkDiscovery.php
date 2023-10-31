@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup drules
@@ -30,15 +30,16 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testPageNetworkDiscovery extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -84,7 +85,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 		// Check if filter collapses/ expands.
 		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
-		$filter_tab->isExpanded();
+		$this->assertTrue($filter_tab->isExpanded());
 
 		// Check that filter is collapsing/expanding on click.
 		foreach ([false, true] as $status) {

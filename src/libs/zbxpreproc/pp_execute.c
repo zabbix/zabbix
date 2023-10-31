@@ -1005,6 +1005,30 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: execute 'snmp to value' step                                      *
+ *                                                                            *
+ * Parameters:  value  - [IN/OUT] value to process                            *
+ *              params - [IN] step parameters                                 *
+ *                                                                            *
+ * Result value: SUCCEED - the preprocessing step was executed successfully.  *
+ *               FAIL    - otherwise. The error message is stored in value.   *
+ *                                                                            *
+ ******************************************************************************/
+static int	pp_execute_snmp_get_to_value(zbx_variant_t *value, const char *params)
+{
+	char	*errmsg = NULL;
+
+	if (SUCCEED == item_preproc_snmp_get_to_value(value, params, &errmsg))
+		return SUCCEED;
+
+	zbx_variant_clear(value);
+	zbx_variant_set_error(value, errmsg);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute preprocessing step                                        *
  *                                                                            *
  * Parameters: ctx              - [IN] worker specific execution context      *
@@ -1122,11 +1146,14 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		case ZBX_PREPROC_STR_REPLACE:
 			ret = pp_execute_str_replace(value, params);
 			goto out;
-		case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+		case ZBX_PREPROC_SNMP_WALK_VALUE:
 			ret = pp_execute_snmp_to_value(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_SNMP_WALK_TO_JSON:
 			ret = pp_execute_snmp_to_json(value, params);
+			goto out;
+		case ZBX_PREPROC_SNMP_GET_VALUE:
+			ret = pp_execute_snmp_get_to_value(value, params);
 			goto out;
 		default:
 			zbx_variant_clear(value);
