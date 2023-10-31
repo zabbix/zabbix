@@ -162,6 +162,7 @@ require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselect.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
 
 // Network discovery.
 require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
@@ -448,6 +449,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testMultiselect');
 		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
 		$suite->addTestSuite('testMultiselectsLatestData');
+		$suite->addTestSuite('testMultiselectsProblems');
 
 		// Network discovery.
 		$suite->addTestSuite('testFormNetworkDiscovery');
