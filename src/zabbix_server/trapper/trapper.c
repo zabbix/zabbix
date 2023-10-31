@@ -1222,6 +1222,12 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			return FAIL;
 		}
 
+		if (SUCCEED == zbx_vps_monitor_capped())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot accept data: data collection has been paused.");
+			return FAIL;
+		}
+
 		memset(&av, 0, sizeof(zbx_agent_value_t));
 
 		if ('<' == *s)	/* XML protocol */
