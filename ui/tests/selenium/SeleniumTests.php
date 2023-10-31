@@ -159,9 +159,9 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
 // Multiselects.
-require_once dirname(__FILE__).'/multiselects/testErrorsInFilterMultiselectsHosts.php';
-require_once dirname(__FILE__).'/multiselects/testErrorsInFilterMultiselectsTemplates.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselect.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
 
 // Network discovery.
 require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
@@ -445,9 +445,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// Multiselects.
-		$suite->addTestSuite('testErrorsInFilterMultiselectsHosts');
-		$suite->addTestSuite('testErrorsInFilterMultiselectsTemplates');
 		$suite->addTestSuite('testMultiselect');
+		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
+		$suite->addTestSuite('testMultiselectsLatestData');
 
 		// Network discovery.
 		$suite->addTestSuite('testFormNetworkDiscovery');
