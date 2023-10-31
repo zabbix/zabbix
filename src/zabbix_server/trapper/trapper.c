@@ -35,7 +35,6 @@
 #include "trapper_request.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
-#include "zbxxml.h"
 #include "zbxcrypto.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
@@ -1008,98 +1007,6 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	return SUCCEED;
 }
 
-static int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len)
-{
-	int	ret = SUCCEED;
-	size_t	i;
-	char	*data_b64 = NULL;
-
-	assert(NULL != host && 0 != host_len);
-	assert(NULL != key && 0 != key_len);
-	assert(NULL != data && 0 != data_len);
-	assert(NULL != lastlogsize && 0 != lastlogsize_len);
-	assert(NULL != timestamp && 0 != timestamp_len);
-	assert(NULL != source && 0 != source_len);
-	assert(NULL != severity && 0 != severity_len);
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
-	{
-		zbx_base64_decode(data_b64, host, host_len - 1, &i);
-		host[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*host = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
-	{
-		zbx_base64_decode(data_b64, key, key_len - 1, &i);
-		key[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*key = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
-	{
-		zbx_base64_decode(data_b64, data, data_len - 1, &i);
-		data[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*data = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
-	{
-		zbx_base64_decode(data_b64, lastlogsize, lastlogsize_len - 1, &i);
-		lastlogsize[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*lastlogsize = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
-	{
-		zbx_base64_decode(data_b64, timestamp, timestamp_len - 1, &i);
-		timestamp[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*timestamp = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
-	{
-		zbx_base64_decode(data_b64, source, source_len - 1, &i);
-		source[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*source = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
-	{
-		zbx_base64_decode(data_b64, severity, severity_len - 1, &i);
-		severity[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*severity = '\0';
-
-	return ret;
-}
-
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
@@ -1202,75 +1109,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout);
-	}
-	else
-	{
-		char			value_dec[MAX_BUFFER_LEN], lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11],
-					source[ZBX_HISTORY_LOG_SOURCE_LEN_MAX], severity[11],
-					host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-					key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
-		zbx_agent_value_t	av;
-		zbx_host_key_t		hk = {host, key};
-		zbx_history_recv_item_t	item;
-		int			errcode;
-
-		if (ZBX_GIBIBYTE < bytes_received)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
-					ZBX_FS_UI64 " for XML protocol received from \"%s\"", bytes_received,
-					(zbx_uint64_t)ZBX_GIBIBYTE, sock->peer);
-			return FAIL;
-		}
-
-		memset(&av, 0, sizeof(zbx_agent_value_t));
-
-		if ('<' == *s)	/* XML protocol */
-		{
-			comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
-					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
-					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
-
-			av.value = value_dec;
-			if (SUCCEED != zbx_is_uint64(lastlogsize, &av.lastlogsize))
-				av.lastlogsize = 0;
-			av.timestamp = atoi(timestamp);
-			av.source = source;
-			av.severity = atoi(severity);
-		}
-		else
-		{
-			char	*pl, *pr;
-
-			pl = s;
-			if (NULL == (pr = strchr(pl, ':')))
-				return FAIL;
-
-			*pr = '\0';
-			zbx_strlcpy(host, pl, sizeof(host));
-			*pr = ':';
-
-			pl = pr + 1;
-			if (NULL == (pr = strchr(pl, ':')))
-				return FAIL;
-
-			*pr = '\0';
-			zbx_strlcpy(key, pl, sizeof(key));
-			*pr = ':';
-
-			av.value = pr + 1;
-			av.severity = 0;
-		}
-
-		zbx_timespec(&av.ts);
-
-		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
-			av.state = ITEM_STATE_NOTSUPPORTED;
-
-		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
-		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
-
-		if (SUCCEED != zbx_tcp_send_ext(sock, "OK", ZBX_CONST_STRLEN("OK"), 0, 0, config_comms->config_timeout))
-			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 	}
 
 	return ret;
