@@ -32,26 +32,31 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 	protected static $host_druleids;
 
 	public function prepareHostTriggersData() {
-		$templates = CDataHelper::call('template.create', [
+		$template_result = CDataHelper::createTemplates([
 			[
 				'host' => 'Template that linked to host',
-				'groups' => ['groupid' => 1]
+				'groups' => ['groupid' => 1],
+				'items' => [
+					[
+						'name' => 'template item for linking',
+						'key_' => 'everything_2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for linking',
+						'key_' => 'linked_drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			]
 		]);
-		$this->assertArrayHasKey('templateids', $templates);
-		$templateids = CDataHelper::getIds('host');
-
-		$template_items = CDataHelper::call('item.create', [
-			[
-				'name' => 'template item for linking',
-				'key_' => 'everything_2',
-				'hostid' => $templateids['Template that linked to host'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $template_items);
+		$templateids = $template_result['templateids'];
+		$template_druleids = $template_result['discoveryruleids'];
 
 		$template_triggers = CDataHelper::call('trigger.create', [
 			[
@@ -61,24 +66,12 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		]);
 		$this->assertArrayHasKey('triggerids', $template_triggers);
 
-		$drule = CDataHelper::call('discoveryrule.create', [
-			[
-				'name' => 'Drule for linking',
-				'key_' => 'linked_drule',
-				'hostid' => $templateids['Template that linked to host'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'delay' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $drule);
-		$template_druleids = CDataHelper::getIds('name');
-
 		$item_prot = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => 'Item prot for linking',
 				'key_' => 'linking_prot_[{#KEY}]',
 				'hostid' => $templateids['Template that linked to host'],
-				'ruleid' => $template_druleids['Drule for linking'],
+				'ruleid' => $template_druleids['Template that linked to host:linked_drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -98,40 +91,54 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		]);
 		$this->assertArrayHasKey('triggerids', $trigger_prot);
 
-		$hosts = CDataHelper::call('host.create', [
+		$host_result = CDataHelper::createHosts([
 			[
 				'host' => 'Host with linked template',
 				'templates' => ['templateid' => $templateids['Template that linked to host']],
-				'groups' => [['groupid' => 4]]
+				'groups' => [['groupid' => 4]],
+				'items' => [
+					[
+						'name' => 'Host item 2',
+						'key_' => 'host_item_2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for host with linking',
+						'key_' => 'host_linked_drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			],
 			[
 				'host' => 'Host with everything',
 				'templates' => ['templateid' => $templateids['Template that linked to host']],
-				'groups' => [['groupid' => 4]]
+				'groups' => [['groupid' => 4]],
+				'items' => [
+					[
+						'name' => 'Host item 1',
+						'key_' => 'host_item_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for host everything',
+						'key_' => 'host_everything_drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			]
 		]);
-		$this->assertArrayHasKey('hostids', $hosts);
-		self::$hostids = CDataHelper::getIds('host');
-
-		$host_items = CDataHelper::call('item.create', [
-			[
-				'name' => 'Host item 1',
-				'key_' => 'host_item_1',
-				'hostid' => self::$hostids['Host with everything'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0
-			],
-			[
-				'name' => 'Host item 2',
-				'key_' => 'host_item_2',
-				'hostid' => self::$hostids['Host with linked template'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $host_items);
+		self::$hostids = $host_result['hostids'];
+		self::$host_druleids = $host_result['discoveryruleids'];
 
 		$host_triggers = CDataHelper::call('trigger.create', [
 			[
@@ -165,31 +172,12 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			]
 		]);
 
-		$host_drule = CDataHelper::call('discoveryrule.create', [
-			[
-				'name' => 'Drule for host everything',
-				'key_' => 'host_everything_drule',
-				'hostid' => self::$hostids['Host with everything'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'delay' => 0
-			],
-			[
-				'name' => 'Drule for host with linking',
-				'key_' => 'host_linked_drule',
-				'hostid' => self::$hostids['Host with linked template'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'delay' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $host_drule);
-		self::$host_druleids = CDataHelper::getIds('name');
-
 		$host_item_prot = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => 'Host Item prot with everything',
 				'key_' => 'host_everything_prot_[{#KEY}]',
 				'hostid' => self::$hostids['Host with everything'],
-				'ruleid' => self::$host_druleids['Drule for host everything'],
+				'ruleid' => self::$host_druleids['Host with everything:host_everything_drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -198,7 +186,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 				'name' => 'Host Item prot for linking',
 				'key_' => 'host_linking_prot_[{#KEY}]',
 				'hostid' => self::$hostids['Host with linked template'],
-				'ruleid' => self::$host_druleids['Drule for host with linking'],
+				'ruleid' => self::$host_druleids['Host with linked template:host_linked_drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -468,7 +456,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 	 */
 	public function testHostTriggerDependencies_TriggerPrototypeCreate($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
-				self::$host_druleids['Drule for host everything'].'&context=host'
+				self::$host_druleids['Host with everything:host_everything_drule'].'&context=host'
 		)->waitUntilReady();
 		$this->query('button:Create trigger prototype')->one()->click();
 		$this->page->waitUntilReady();
@@ -506,7 +494,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 	 */
 	public function testHostTriggerDependencies_TriggerPrototypeUpdate($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
-				self::$host_druleids['Drule for host everything'].'&context=host'
+				self::$host_druleids['Host with everything:host_everything_drule'].'&context=host'
 		)->waitUntilReady();
 		$this->query('link:Host trigger prototype update{#KEY}')->one()->click();
 		$this->page->waitUntilReady();

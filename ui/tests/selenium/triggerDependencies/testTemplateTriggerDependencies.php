@@ -32,14 +32,48 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 	protected static $template_druleids;
 
 	public function prepareTemplateTriggersData() {
-		$templates = CDataHelper::call('template.create', [
+		$template_result = CDataHelper::createTemplates([
 			[
 				'host' => 'Template with everything',
-				'groups' => ['groupid' => 1]
+				'groups' => ['groupid' => 1],
+				'items' => [
+					[
+						'name' => 'template item for everything',
+						'key_' => 'everything',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for everything',
+						'key_' => 'everything_drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			],
 			[
 				'host' => 'Template that linked to host',
-				'groups' => ['groupid' => 1]
+				'groups' => ['groupid' => 1],
+				'items' => [
+					[
+						'name' => 'template item for linking',
+						'key_' => 'everything_2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for linking',
+						'key_' => 'linked_drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			],
 			[
 				'host' => 'Template with linked template',
@@ -47,11 +81,28 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			],
 			[
 				'host' => 'Template that linked to template',
-				'groups' => ['groupid' => 1]
+				'groups' => ['groupid' => 1],
+				'items' => [
+					[
+						'name' => 'template item for template',
+						'key_' => 'linked_temp',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for template',
+						'key_' => 'template_drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			]
 		]);
-		$this->assertArrayHasKey('templateids', $templates);
-		self::$templateids = CDataHelper::getIds('host');
+		self::$templateids = $template_result['templateids'];
+		self::$template_druleids = $template_result['discoveryruleids'];
 
 		$response = CDataHelper::call('template.update', [
 			[
@@ -72,34 +123,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			]
 		]);
 		$this->assertArrayHasKey('templateids', $response);
-
-		$template_items = CDataHelper::call('item.create', [
-			[
-				'name' => 'template item for everything',
-				'key_' => 'everything',
-				'hostid' => self::$templateids['Template with everything'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0
-			],
-			[
-				'name' => 'template item for linking',
-				'key_' => 'everything_2',
-				'hostid' => self::$templateids['Template that linked to host'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0
-			],
-			[
-				'name' => 'template item for template',
-				'key_' => 'linked_temp',
-				'hostid' => self::$templateids['Template that linked to template'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $template_items);
 
 		$template_triggers = CDataHelper::call('trigger.create', [
 			[
@@ -149,39 +172,12 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			]
 		]);
 
-
-		$drule = CDataHelper::call('discoveryrule.create', [
-			[
-				'name' => 'Drule for everything',
-				'key_' => 'everything_drule',
-				'hostid' => self::$templateids['Template with everything'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'delay' => 0
-			],
-			[
-				'name' => 'Drule for linking',
-				'key_' => 'linked_drule',
-				'hostid' => self::$templateids['Template that linked to host'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'delay' => 0
-			],
-			[
-				'name' => 'Drule for template',
-				'key_' => 'template_drule',
-				'hostid' => self::$templateids['Template that linked to template'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'delay' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $drule);
-		self::$template_druleids = CDataHelper::getIds('name');
-
 		$item_prot = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => 'Item prot with everything',
 				'key_' => 'everything_prot_[{#KEY}]',
 				'hostid' => self::$templateids['Template with everything'],
-				'ruleid' => self::$template_druleids['Drule for everything'],
+				'ruleid' => self::$template_druleids['Template with everything:everything_drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -190,7 +186,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 				'name' => 'Item prot for template',
 				'key_' => 'template_prot_[{#KEY}]',
 				'hostid' => self::$templateids['Template that linked to template'],
-				'ruleid' => self::$template_druleids['Drule for template'],
+				'ruleid' => self::$template_druleids['Template that linked to template:template_drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -218,27 +214,33 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		]);
 		$this->assertArrayHasKey('triggerids', $trigger_prot);
 
-		$hosts = CDataHelper::call('host.create', [
+		$host_result = CDataHelper::createHosts([
 			[
 				'host' => 'Host with everything',
 				'templates' => ['templateid' => self::$templateids['Template that linked to host']],
-				'groups' => [['groupid' => 4]]
-			]
-		]);
-		$this->assertArrayHasKey('hostids', $hosts);
-		$hostids = CDataHelper::getIds('host');
+				'groups' => [['groupid' => 4]],
+				'items' => [
+					[
+						'name' => 'Host item 1',
+						'key_' => 'host_item_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				],
+				'discoveryrules' => [
+					[
 
-		$host_items = CDataHelper::call('item.create', [
-			[
-				'name' => 'Host item 1',
-				'key_' => 'host_item_1',
-				'hostid' => $hostids['Host with everything'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0
+						'name' => 'Drule for host everything',
+						'key_' => 'host_everything_drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			]
 		]);
-		$this->assertArrayHasKey('itemids', $host_items);
+		$hostids = $host_result['hostids'];
+		$host_druleids = $host_result['discoveryruleids'];
 
 		$host_triggers = CDataHelper::call('trigger.create', [
 			[
@@ -252,24 +254,12 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		]);
 		$this->assertArrayHasKey('triggerids', $host_triggers);
 
-		$host_drule = CDataHelper::call('discoveryrule.create', [
-			[
-				'name' => 'Drule for host everything',
-				'key_' => 'host_everything_drule',
-				'hostid' => $hostids['Host with everything'],
-				'type' => ITEM_TYPE_TRAPPER,
-				'delay' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $host_drule);
-		$host_druleids = CDataHelper::getIds('name');
-
 		$host_item_prot = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => 'Host Item prot with everything',
 				'key_' => 'host_everything_prot_[{#KEY}]',
 				'hostid' => $hostids['Host with everything'],
-				'ruleid' => $host_druleids['Drule for host everything'],
+				'ruleid' => $host_druleids['Host with everything:host_everything_drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -638,7 +628,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 	 */
 	public function testTemplateTriggerDependencies_TriggerPrototypeCreate($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
-				self::$template_druleids['Drule for everything'].'&context=template'
+				self::$template_druleids['Template with everything:everything_drule'].'&context=template'
 		)->waitUntilReady();
 		$this->query('button:Create trigger prototype')->one()->click();
 		$this->page->waitUntilReady();
@@ -676,7 +666,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 	 */
 	public function testTemplateTriggerDependencies_TriggerPrototypeUpdate($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
-				self::$template_druleids['Drule for everything'].'&context=template'
+				self::$template_druleids['Template with everything:everything_drule'].'&context=template'
 		)->waitUntilReady();
 		$this->query('link:Template trigger prototype update{#KEY}')->one()->click();
 		$this->page->waitUntilReady();

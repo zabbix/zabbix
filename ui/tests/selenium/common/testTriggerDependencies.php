@@ -147,14 +147,11 @@ class testTriggerDependencies extends CWebTest {
 				$triggers = [$triggers];
 			}
 
-			// Check-in triggers for dependence.
+			// Check-in (add) triggers for dependence and submit
 			foreach ($triggers as $trigger) {
 				$dialog->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($trigger)."]/../preceding-sibling::td/input")
 						->asCheckbox()->one()->check();
 			}
-
-//			$dialog->asTable()->findRows('Name', $triggers)->select();
-//			sleep(10);
 
 			$dialog->getFooter()->query('button:Select')->one()->click();
 			$dialog->waitUntilNotVisible();
