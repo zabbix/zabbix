@@ -37,6 +37,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 						['Templates' => 'Templates', 'Template group' => 'Template groups'],
 						['Proxy' => 'Proxies']
 					],
+					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy']
 				]
 			],
@@ -151,7 +152,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 
-		// Fill this filter to enable 'Proxy' multiselect.
+		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {
 			$filter_form->fill($data['filter']);
 		}
