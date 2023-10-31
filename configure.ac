@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha7])
+AC_INIT([Zabbix],[7.0.0alpha8])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -2030,6 +2030,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxip/Makefile
 	src/libs/zbxipcservice/Makefile
+	src/libs/zbxipmi/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxkvs/Makefile
 	src/libs/zbxlog/Makefile
@@ -2041,6 +2042,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnum/Makefile
 	src/libs/zbxodbc/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpoller/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxproxybuffer/Makefile
@@ -2052,6 +2054,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
@@ -2110,7 +2113,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
-	src/zabbix_server/ipmi/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
@@ -2120,7 +2122,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_server/rtc/Makefile
 	src/zabbix_server/service/Makefile
-	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile

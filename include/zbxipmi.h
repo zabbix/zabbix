@@ -17,29 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXY_TASKMANAGER_H
-#define ZABBIX_PROXY_TASKMANAGER_H
+#ifndef ZABBIX_ZBXIPMI_H
+#define ZABBIX_ZBXIPMI_H
 
-#include "zbxtasks.h"
+#ifdef HAVE_OPENIPMI
 
-#include "zbxcomms.h"
-#include "zbxthreads.h"
-#include "zbxversion.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {
-	const zbx_config_comms_args_t	*config_comms;
-	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
-	int				config_startup_time;
-	int				config_enable_remote_commands;
-	int				config_log_remote_commands;
-	const char			*config_hostname;
+	int	config_timeout;
+	int	config_unavailable_delay;
+	int	config_unreachable_period;
+	int	config_unreachable_delay;
 }
-zbx_thread_taskmanager_args;
+zbx_thread_ipmi_manager_args;
 
-void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
-		zbx_proxy_compatibility_t compatibility);
+ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args);
+ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args);
 
-ZBX_THREAD_ENTRY(taskmanager_thread, args);
+int	zbx_ipmi_test_item(const zbx_dc_item_t *item, char **info);
 
-#endif /*ZABBIX_PROXY_TASKMANAGER_H*/
+int	zbx_ipmi_execute_command(const zbx_dc_host_t *host, const char *command, char *error, size_t max_error_len);
+
+#endif /* HAVE_OPENIPMI */
+
+#endif

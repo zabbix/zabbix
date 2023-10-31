@@ -17,16 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SSH_H
-#define ZABBIX_CHECKS_SSH_H
+#ifndef ZABBIX_ZBX_SCRIPTS_CONSTANTS_H
+#define ZABBIX_ZBX_SCRIPTS_CONSTANTS_H
 
-#include "module.h"
-#include "config.h"
+#define ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT	0
+#define ZBX_SCRIPT_TYPE_IPMI		1
+#define ZBX_SCRIPT_TYPE_SSH		2
+#define ZBX_SCRIPT_TYPE_TELNET		3
+#define ZBX_SCRIPT_TYPE_WEBHOOK		5
 
-#if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "zbxcacheconfig.h"
+#define ZBX_SCRIPT_SCOPE_ACTION		1
+#define ZBX_SCRIPT_SCOPE_HOST		2
+#define ZBX_SCRIPT_SCOPE_EVENT		4
 
-int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
-#endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
+#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
+#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
+#define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #endif

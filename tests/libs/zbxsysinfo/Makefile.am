@@ -45,13 +45,10 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/housekeeper/libzbxhousekeeper.a \
 	$(top_srcdir)/src/zabbix_server/timer/libzbxtimer.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
-	$(top_srcdir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
-	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
-	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -105,6 +102,10 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
+
+if HAVE_IPMI
+parse_item_key_LDADD += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
+endif
 
 parse_item_key_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 

@@ -17,14 +17,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_AGENT_H
-#define ZABBIX_CHECKS_AGENT_H
+#ifndef ZABBIX_SERVER_TASKMANAGER_H
+#define ZABBIX_SERVER_TASKMANAGER_H
 
-#include "module.h"
-#include "zbxcacheconfig.h"
-#include "zbxcomms.h"
+#include "zbxtasks.h"
+#include "zbxthreads.h"
+#include "zbxversion.h"
 
-int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
-void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result);
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
+		zbx_proxy_compatibility_t compatibility);
 
-#endif
+typedef struct
+{
+	int	config_timeout;
+	int	config_startup_time;
+}
+zbx_thread_taskmanager_args;
+
+ZBX_THREAD_ENTRY(taskmanager_thread, args);
+
+#endif /* ZABBIX_SERVER_TASKMANAGER */

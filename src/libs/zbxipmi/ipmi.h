@@ -17,23 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SERVER_TASKMANAGER_H
-#define ZABBIX_SERVER_TASKMANAGER_H
+#ifndef ZABBIX_IPMI_H
+#define ZABBIX_IPMI_H
 
-#include "zbxtasks.h"
-#include "zbxthreads.h"
-#include "zbxversion.h"
+#include "zbxcacheconfig.h"
+#include "zbxtypes.h"
+#include "config.h"
 
-void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
-		zbx_proxy_compatibility_t compatibility);
+#ifdef HAVE_OPENIPMI
 
-typedef struct
-{
-	int			config_timeout;
-	int			config_startup_time;
-}
-zbx_thread_taskmanager_args;
+int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error);
 
-ZBX_THREAD_ENTRY(taskmanager_thread, args);
+#endif
 
-#endif /* ZABBIX_SERVER_TASKMANAGER */
+#endif

@@ -17,12 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_TELNET_H
-#define ZABBIX_CHECKS_TELNET_H
+#ifndef ZABBIX_SNMPTRAPPER_H
+#define ZABBIX_SNMPTRAPPER_H
 
-#include "module.h"
-#include "zbxcacheconfig.h"
+#include "zbxthreads.h"
 
-int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
+typedef struct
+{
+	const char	*config_snmptrap_file;
+}
+zbx_thread_snmptrapper_args;
+
+ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args);
 
 #endif
