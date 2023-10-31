@@ -800,7 +800,7 @@ class CSVGHoneycomb {
 						.selectAll('tspan')
 						.each((d, index_line, nodes) => {
 							nodes[index_line].textContent = lines[index_line];
-							while (nodes[index_line].getBBox().width > available_cell_width) {
+							while (nodes[index_line].getComputedTextLength() > available_cell_width) {
 								nodes[index_line].textContent = `${nodes[index_line].textContent.slice(0, -4)}...`;
 							}
 						});
