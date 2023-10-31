@@ -23,21 +23,21 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 /**
  * @browsers chrome
  */
-class testMultiselect extends CWebTest {
+class testMultiselects extends CWebTest {
 
-	public function testMultiselect_SuggestExisting() {
+	public function testMultiselects_SuggestExisting() {
 		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
 				'Host groups', 'z', 'multiselect-suggest'
 		);
 	}
 
-	public function testMultiselect_SuggestNoMatches() {
+	public function testMultiselects_SuggestNoMatches() {
 		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
 				'Host groups', 'QQQ', 'multiselect-matches'
 		);
 	}
 
-	public function testMultiselect_SuggestCreateNew() {
+	public function testMultiselects_SuggestCreateNew() {
 		$this->checkSuggest('zabbix.php?action=host.edit', 'host-form', 'Host groups', 'QQQwww',
 				'multiselect-suggest'
 		);
@@ -61,7 +61,7 @@ class testMultiselect extends CWebTest {
 		);
 	}
 
-	public function testMultiselect_NotSuggestAlreadySelected() {
+	public function testMultiselects_NotSuggestAlreadySelected() {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->updateViewport();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -73,7 +73,7 @@ class testMultiselect extends CWebTest {
 		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(), [$element]);
 	}
 
-	public function testMultiselect_SuggestInOverlay() {
+	public function testMultiselects_SuggestInOverlay() {
 		$widget = 'Plain text';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.list');

@@ -159,7 +159,7 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
 // Multiselects.
-require_once dirname(__FILE__).'/multiselects/testMultiselect.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
@@ -446,7 +446,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// Multiselects.
-		$suite->addTestSuite('testMultiselect');
+		$suite->addTestSuite('testMultiselects');
 		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
 		$suite->addTestSuite('testMultiselectsLatestData');
 		$suite->addTestSuite('testMultiselectsProblems');
