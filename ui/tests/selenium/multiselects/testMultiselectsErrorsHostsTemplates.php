@@ -32,14 +32,16 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'Hosts',
-					'multiselects' => [
+					'checked_multiselects' => [
 						['Host groups' => 'Host groups'],
 						['Templates' => 'Templates', 'Template group' => 'Template groups'],
 						['Proxy' => 'Proxies']
 					],
 					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy'],
-					'fields' => [['Proxy' => 'Proxy for Actions']]
+					'filled_multiselects' => [
+						['Proxy' => 'Proxy for Actions']
+					]
 				]
 			],
 			// #1.
@@ -47,10 +49,12 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 				[
 					'object' => 'Hosts',
 					'sub_object' => 'Items' ,
-					'multiselects' => [
+					'checked_multiselects' => [
 						['Value mapping' => 'Value mapping']
 					],
-					'fields' => [['Value mapping' => 'Template value mapping']]
+					'filled_multiselects' => [
+						['Value mapping' => 'Template value mapping']
+					]
 				]
 			],
 			// #2.
@@ -85,7 +89,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'Templates',
-					'multiselects' => [
+					'checked_multiselects' => [
 						['Template groups' => 'Template groups'],
 						['Linked templates' => 'Templates', 'Template group' => 'Template groups']
 					]
@@ -96,10 +100,12 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 				[
 					'object' => 'Templates',
 					'sub_object' => 'Items' ,
-					'multiselects' => [
+					'checked_multiselects' => [
 						['Value mapping' => 'Value mapping']
 					],
-					'fields' => [['Value mapping' => 'Zabbix agent ping status']]
+					'filled_multiselects' => [
+						['Value mapping' => 'Zabbix agent ping status']
+					]
 				]
 			],
 			// #8.
@@ -150,7 +156,9 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 				? [['Host groups' => 'Host groups'], ['Hosts' => 'Hosts', 'Host group' => 'Host groups']]
 				: [['Template groups' => 'Template groups'], ['Templates' => 'Templates', 'Template group' => 'Template groups']];
 
-			$data['multiselects'] = array_merge($common_multiselects, CTestArrayHelper::get($data, 'multiselects', []));
+			$data['checked_multiselects'] = array_merge($common_multiselects,
+					CTestArrayHelper::get($data, 'checked_multiselects', [])
+			);
 
 			$common_fields = ($data['object'] === 'Hosts')
 				? [['Host groups' => 'Zabbix servers'], ['Hosts' => 'ЗАББИКС Сервер']]
@@ -170,10 +178,10 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 		}
 
 		// Check all multiselects in filter before one of them is filled.
-		$this->checkMultiselectDialogs($filter_form, $data['multiselects']);
+		$this->checkMultiselectDialogs($filter_form, $data['checked_multiselects']);
 
 		// Fill multiselects one by one and check other multiselects after that.
-		$fields = array_merge($common_fields, CTestArrayHelper::get($data, 'fields', []));
+		$fields = array_merge($common_fields, CTestArrayHelper::get($data, 'filled_multiselects', []));
 
 		foreach ($fields as $field) {
 			// Fill filter to enable dependent multiselects.
@@ -184,7 +192,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 			$filter_form->fill($field);
 
 			// Check all multiselects in filter after one multiselect is filled.
-			$this->checkMultiselectDialogs($filter_form, $data['multiselects']);
+			$this->checkMultiselectDialogs($filter_form, $data['checked_multiselects']);
 			$filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
 		}
 	}
