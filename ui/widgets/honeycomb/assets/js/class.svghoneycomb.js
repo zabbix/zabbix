@@ -773,7 +773,7 @@ class CSVGHoneycomb {
 
 		if (check_height) {
 			const check_labels_height = (labels, font_size) => {
-				const node = labels.node();
+				const node = labels?.node();
 
 				if (node) {
 					const correction = 1; // For floating point errors.
