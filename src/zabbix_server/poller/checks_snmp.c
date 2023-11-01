@@ -2514,7 +2514,6 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 
 		goto stop;
 	}
-	
 
 	/* initialization */
 	if (0 != event)

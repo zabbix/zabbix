@@ -85,7 +85,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 	struct event_base	*ev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	
+
 	ret = task->process_cb(what, task->data, &fd, task->address, task->error);
 
 	switch (ret)
@@ -100,7 +100,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			if (AF_INET == task->ai->ai_addr->sa_family)
 			{
 				const struct sockaddr_in	*sin = (const struct sockaddr_in *) (void *)task->ai->ai_addr;
-				
+
 				evdns_base_resolve_reverse(task->dnsbase, &sin->sin_addr, 0, async_reverse_dns_event,
 						task);
 			}
