@@ -972,8 +972,8 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $new_name)
-				->getColumn($column)->query('link', $column)->one()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()
+				->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
 			case 'trigger':
