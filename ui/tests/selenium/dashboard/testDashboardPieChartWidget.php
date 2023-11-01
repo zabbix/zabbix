@@ -297,13 +297,13 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
-		foreach(['Size', 'Decimal places', 'Units', 'Bold', 'Color'] as $label) {
+		foreach(['Size', 'Decimal places', 'Units', 'Bold', 'Colour'] as $label) {
 			$this->assertTrue($form->getField($label)->isEnabled(false));
 		}
 
 		$form->fill(['Show total value' => true]);
 
-		foreach(['Size', 'Decimal places', 'Bold', 'Color'] as $label) {
+		foreach(['Size', 'Decimal places', 'Bold', 'Colour'] as $label) {
 			$this->assertTrue($form->getField($label)->isEnabled());
 		}
 
@@ -419,7 +419,7 @@ class testDashboardPieChartWidget extends CWebTest
 							'id:units_show' => true,
 							'id:units' => 'GG',
 							'Bold' => true,
-							'Color' => '4FC3F7'
+							'Colour' => '4FC3F7'
 						],
 						'Time period' => [
 							'Time period' => 'Custom',
