@@ -141,6 +141,7 @@ final class CItemData {
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 			'mqtt.get[<broker_url>,topic,<username>,<password>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
@@ -1203,6 +1204,14 @@ final class CItemData {
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
 				'description' => _('Performs a DNS query. Returns character string with the required type of information'),
 				'value_type' => ITEM_VALUE_TYPE_STR,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.record',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.record'
+				]
+			],
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
+				'description' => _('Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.record',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.record'

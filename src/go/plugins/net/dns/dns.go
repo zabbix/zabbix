@@ -83,7 +83,6 @@ var dnsTypes = map[string]uint16{
 	"MINFO": dns.TypeMINFO,
 	"TXT":   dns.TypeTXT,
 	"AAAA":  dns.TypeAAAA,
-	"SRV":   dns.TypeSRV,
 }
 
 // Export -
@@ -93,11 +92,34 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return exportDns(params)
 	case "net.dns.record":
 		return exportDnsRecord(params)
+	case "net.dns.perf":
+		return exportDnsPerf(params)
 	default:
 		err = zbxerr.ErrorUnsupportedMetric
 
 		return
 	}
+}
+
+func exportDnsPerf(params []string) (result interface{}, err error) {
+	time_before := time.Now()
+
+	answer, err := getDNSAnswers(params)
+	if err != nil {
+		if errors.Is(err, zbxerr.ErrorCannotFetchData.Unwrap()) {
+			return 0, nil
+		}
+
+		return
+	}
+
+	if len(answer) < 1 {
+		return 0, nil
+	}
+
+	t := time.Now().Sub(time_before).Seconds()
+
+	return t, nil
 }
 
 func exportDns(params []string) (result interface{}, err error) {
@@ -133,6 +155,7 @@ func exportDnsRecord(params []string) (result interface{}, err error) {
 func parseAnswers(answers []dns.RR) string {
 	var out string
 	answersNum := len(answers)
+
 	for i, a := range answers {
 		out += fmt.Sprintf("%-20s", strings.TrimSuffix(a.Header().Name, "."))
 		out += fmt.Sprintf(" %-8s ", dns.Type(a.Header().Rrtype).String())
@@ -170,6 +193,7 @@ func parseAnswers(answers []dns.RR) string {
 			out += getAAAAString(rr)
 		case *dns.SRV:
 			out += getSRVString(rr)
+
 		}
 
 		if i != answersNum-1 {
@@ -181,6 +205,7 @@ func parseAnswers(answers []dns.RR) string {
 }
 
 func getDNSAnswers(params []string) ([]dns.RR, error) {
+	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
 	options, err := parseParamas(params)
 	if err != nil {
 		return nil, err
@@ -502,6 +527,7 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 func init() {
 	plugin.RegisterMetrics(&impl, "DNS",
 		"net.dns", "Checks if DNS service is up.",
+		"net.dns.perf", "Measures query time in seconds.",
 		"net.dns.record", "Performs a DNS query.",
 	)
 }
