@@ -435,6 +435,23 @@ class CSVGHoneycomb {
 
 			labels_secondary.attr('transform', `translate(0 ${label_secondary_position_y})`);
 		}
+
+		const available_cell_height = this.#radius_outer * this.#scale - this.#radius_outer * this.#scale / 10;
+
+		if ((labels_primary.node() && isVisible(labels_primary.node()))
+				&& (labels_secondary.node() || isVisible(labels_secondary.node()))) {
+			const label_primary_height = this.#label_primary_font_size * this.#scale;
+			const label_secondary_height = this.#label_secondary_font_size * this.#scale;
+
+			if (label_primary_height + label_secondary_height > available_cell_height) {
+				labels_primary.style('display', 'none');
+				labels_secondary.style('display', 'none');
+			}
+			else {
+				labels_primary.style('display', 'block');
+				labels_secondary.style('display', 'block');
+			}
+		}
 	}
 
 	/**
