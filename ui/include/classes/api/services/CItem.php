@@ -345,6 +345,14 @@ class CItem extends CItemGeneral {
 				);
 			}
 
+			if (array_key_exists('name_resolved', $options['filter']) && $options['filter']['name_resolved'] !== null) {
+				$this->dbFilter(
+					'item_rtname irn',
+					['filter' => ['name_resolved' => $options['filter']['name_resolved']]] + $options,
+					$sqlParts
+				);
+			}
+
 			$this->dbFilter('items i', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
@@ -1816,7 +1824,8 @@ class CItem extends CItemGeneral {
 		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('name_resolved', $options['output']))
-				|| (is_array($options['search']) && array_key_exists('name_resolved', $options['search']))) {
+				|| (is_array($options['search']) && array_key_exists('name_resolved', $options['search']))
+				|| (is_array($options['filter']) && array_key_exists('name_resolved', $options['filter']))) {
 			$sqlParts['left_join'][] = ['alias' => 'irn', 'table' => 'item_rtname', 'using' => 'itemid'];
 			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
