@@ -85,10 +85,8 @@
 #include "zbxdiscovery.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
-
 #ifdef HAVE_OPENIPMI
-#include "ipmi/ipmi_manager.h"
-#include "ipmi/ipmi_poller.h"
+#include "zbxipmi.h"
 #endif
 
 const char	*progname = NULL;
@@ -1667,10 +1665,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
 				thread_args.args = &ipmi_manager_args;
-				zbx_thread_start(ipmi_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_ipmi_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				zbx_thread_start(ipmi_poller_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_ipmi_poller_thread, &thread_args, &threads[i]);
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_ALERTMANAGER:
