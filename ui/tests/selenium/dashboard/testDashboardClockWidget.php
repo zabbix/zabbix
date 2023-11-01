@@ -338,6 +338,8 @@ class testDashboardClockWidget extends CWebTest {
 				}
 			}
 		}
+
+		$this->assertEquals(['Item', 'Show'], $form->getRequiredLabels());
 	}
 
 	/**
@@ -927,6 +929,23 @@ class testDashboardClockWidget extends CWebTest {
 					'Error message' => [
 						'Invalid parameter "Item": cannot be empty.'
 					]
+				],
+				// #29.
+				[
+					[
+						'expected' => TEST_BAD,
+						'second_page' => true,
+						'fields' => [
+							'Clock type' => 'Digital',
+							'id:show_1' => false,
+							'id:show_2' => false,
+							'id:show_3' => false,
+							'id:show_4' => false
+						],
+						'Error message' => [
+							'Invalid parameter "Show": at least one option must be selected.'
+						]
+					]
 				]
 			]
 		];
@@ -937,8 +956,6 @@ class testDashboardClockWidget extends CWebTest {
 	 *
 	 * @param array      $data      data provider
 	 * @param boolean    $update    true if update scenario, false if create
-	 *
-	 * @dataProvider getClockWidgetCommonData
 	 */
 	public function checkFormClockWidget($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
