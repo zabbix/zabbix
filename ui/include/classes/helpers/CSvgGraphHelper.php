@@ -67,8 +67,7 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'],
-				$options['legend']['show_aggregation']);
+		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'], $options['legend']['show_aggregation']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
