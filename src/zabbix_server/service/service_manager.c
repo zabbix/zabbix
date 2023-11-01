@@ -25,6 +25,7 @@
 #include "service_protocol.h"
 #include "service_actions.h"
 #include "zbxserialize.h"
+#include "zbxrtc.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -3344,6 +3345,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_service_manager_t	service_manager;
 	zbx_timespec_t		timeout = {1, 0};
 	int			service_cache_reload_requested = 0;
+	zbx_ipc_async_socket_t	rtc;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -3356,6 +3358,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				server_num, get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -3428,6 +3432,9 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				{
 					sync_service_problems(&service_manager.services,
 							&service_manager.service_problems_index);
+
+					zbx_rtc_notify_finished_sync(&rtc, ZBX_RTC_SERVICE_SYNC_NOTIFY,
+							get_process_type_string(process_type));
 				}
 			}
 			while (ZBX_DB_DOWN == DBcommit());

@@ -1012,6 +1012,7 @@ zbx_task_t;
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+#define ZBX_RTC_SERVICE_SYNC_NOTIFY		9998
 
 #define ZBX_IPC_RTC_MAX				9999
 
