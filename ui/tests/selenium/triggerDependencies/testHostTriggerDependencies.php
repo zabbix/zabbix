@@ -217,6 +217,9 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $host_trigger_prot);
+
+		// Add dependence to already discovered trigger for one special scenario.
+		DBexecute('INSERT INTO trigger_depends (triggerdepid, triggerid_down, triggerid_up) VALUES (99555, 100069, 100067)');
 	}
 
 	public static function getTriggerCreateData() {
@@ -566,5 +569,26 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$this->triggerCreateUpdate($data, null, 'Trigger prototype updated', 'Cannot update trigger prototype',
 				'trigger prototype linked update{#KEY}'
 		);
+	}
+
+	/**
+	 * Check that discovered trigger has only links (no buttons) in Dependencies tab.
+	 */
+	public function testHostTriggerDependencies_DiscoveredTrigger() {
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&'.
+				'filter_hostids%5B0%5D=99062&context=host'
+		)->waitUntilReady();
+		$this->query('link:Discovered trigger one')->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form->selectTab('Dependencies');
+
+		// Dependencies table.
+		$table = $form->query('id:dependency-table')->one();
+
+		// Check that discovered trigger doesn't have any Add buttons and can't add new dependencies.
+		$this->assertFalse($table->query('xpath:.//button[contains(text(), "Add")]')->exists());
+
+		// Check that link with discovered trigger exists in table.
+		$table->query('link:Host for triggers filtering: Trigger disabled with tags')->one()->isClickable();
 	}
 }
