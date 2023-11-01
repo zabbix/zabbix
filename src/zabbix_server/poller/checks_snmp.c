@@ -1176,7 +1176,7 @@ reduce_max_vars:
 			if (1 >= level && 1 < max_vars)
 				goto reduce_max_vars;
 
-			zbx_strlcpy(error, "no values received", max_error_len);
+			zbx_strlcpy(error, "No values received.", max_error_len);
 			ret = NOTSUPPORTED;
 			running = 0;
 			goto next;
