@@ -65,7 +65,7 @@ class CSvgGraphHelper {
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load Data for each metric.
-		self::getMetricsData($metrics, $width, $options['templateid'] === '');
+		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
 		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'],
 				$options['legend']['show_aggregation']);
@@ -580,7 +580,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select data to show in graph for each metric.
 	 */
-	private static function getMetricsData(array &$metrics, int $width, bool $prepend_host_name): void {
+	private static function getMetricsData(array &$metrics, int $width): void {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
 
@@ -589,9 +589,7 @@ class CSvgGraphHelper {
 				continue;
 			}
 
-			if ($prepend_host_name) {
-				$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
-			}
+			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
 
 			$metric['points'] = [];
 
