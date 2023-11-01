@@ -356,6 +356,12 @@ static int	is_recoverable_mysql_error(int err_no)
 
 static int	is_inhibited_mysql_error(int err_no)
 {
+	if (1 < mysql_err_cnt)
+		return FAIL;
+
+	if (0 < txn_level && 0 == txn_begin)
+		return FAIL;
+
 	switch (err_no)
 	{
 		case CR_SERVER_GONE_ERROR:
@@ -1503,13 +1509,11 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		if (0 != mysql_query(conn, sql))
 		{
 			err_no = (int)mysql_errno(conn);
+			errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
+			mysql_err_cnt++;
 
-			if (0 < mysql_err_cnt++ || (0 < txn_level && 0 == txn_begin) ||
-					FAIL  == is_inhibited_mysql_error(err_no))
-			{
-				errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
+			if (FAIL == is_inhibited_mysql_error(err_no))
 				zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
-			}
 
 			ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
@@ -1531,13 +1535,11 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				if (0 < (status = mysql_next_result(conn)))
 				{
 					err_no = (int)mysql_errno(conn);
+					errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
+					mysql_err_cnt++;
 
-					if (0 < mysql_err_cnt++ || (0 < txn_level && 0 == txn_begin) ||
-							FAIL  == is_inhibited_mysql_error(err_no))
-					{
-						errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
+					if (FAIL == is_inhibited_mysql_error(err_no))
 						zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
-					}
 
 					ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
@@ -1694,8 +1696,9 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 		{
 			int err_no = (int)mysql_errno(conn);
 
-			if (0 < mysql_err_cnt++ || (0 < txn_level && 0 == txn_begin) ||
-					FAIL  == is_inhibited_mysql_error(err_no))
+			mysql_err_cnt++;
+
+			if (FAIL == is_inhibited_mysql_error(err_no))
 				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			zbx_db_free_result(result);
