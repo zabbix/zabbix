@@ -45,7 +45,12 @@ class testDashboardItemValueWidget extends CWebTest {
 	protected static $dashboardid;
 	protected static $old_name = 'New widget';
 	protected static $threshold_widget = 'Widget with thresholds';
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+
+	/**
+	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
+	 * because it can change.
+	 */
+	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
@@ -219,7 +224,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'Name' => '',
 			'Refresh interval' => 'Default (1 minute)',
 			'Item' => '',
-			'id:show_header' => true,
+			'Show header' => true,
 			'id:show_1' => true,
 			'id:show_2' => true,
 			'id:show_3' => true,
@@ -507,16 +512,9 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Refresh interval' => '30 seconds',
-						'Item' => [
-							'values' => '',
-							'context' => [
-								'values' => '',
-								'context' => ''
-							]
-						]
+						'Refresh interval' => '30 seconds'
 					],
+					'item' => [],
 					'error' => ['Invalid parameter "Item": cannot be empty.']
 				]
 			],
@@ -524,8 +522,6 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true,
 						// Description size in % relative to the size of the widget.
 						'id:desc_size' => '0',
@@ -538,6 +534,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '0'
 					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -551,8 +550,6 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true,
 						// Description size in % relative to the size of the widget.
 						'id:desc_size' => '101',
@@ -565,6 +562,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '105'
 					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -578,8 +578,6 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true,
 						// Description size in % relative to the size of the widget.
 						'id:desc_size' => '-1',
@@ -592,6 +590,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '-5'
 					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -605,8 +606,6 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true,
 						// Description size in % relative to the size of the widget.
 						'id:desc_size' => 'aqua',
@@ -619,6 +618,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '_+(*'
 					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -632,24 +634,11 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true,
 						'id:decimal_places' => '-1'
 					],
-					'error' => [
-						'Invalid parameter "Decimal places": value must be one of 0-10.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
-						'id:decimal_places' => '99'
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Decimal places": value must be one of 0-10.'
@@ -660,10 +649,26 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+						'id:decimal_places' => '99'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Invalid parameter "Decimal places": value must be one of 0-10.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => ''
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Description": cannot be empty.'
@@ -674,9 +679,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '-']
@@ -690,9 +696,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => 'a']
@@ -706,9 +713,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1a%?']
@@ -722,9 +730,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1.79E+400']
@@ -738,9 +747,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1'],
@@ -755,9 +765,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1'],
@@ -772,9 +783,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1', 'color' => '']
@@ -788,9 +800,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1', 'color' => 'AABBCC'],
@@ -805,9 +818,10 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => 'a', 'color' => 'AABBCC']
@@ -819,16 +833,176 @@ class testDashboardItemValueWidget extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => [
-							'values' => 'Linux: Available memory',
-							'context' => [
-								'values' => 'ЗАББИКС Сервер',
-								'context' => 'Zabbix servers'
-							]
-						]
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-58s'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-63072002' // 2 years and 2 seconds.
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Maximum time period to display is 730 days.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => ''
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'a'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": a time is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_to' => 'now-59m-2s'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-4y',
+						'id:time_period_to' => 'now-1y'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Maximum time period to display is 730 days.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_to' => ''
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Invalid parameter "Time period/To": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom',
+						'id:time_period_to' => 'b'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Invalid parameter "Time period/To": a time is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'b',
+						'id:time_period_to' => 'b'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": a time is expected.',
+						'Invalid parameter "Time period/To": a time is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => '',
+						'id:time_period_to' => ''
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
 					]
 				]
 			],
@@ -836,10 +1010,21 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Any name',
-						'Refresh interval' => 'No refresh',
-						'Item' => 'Available memory in %'
+						'Refresh interval' => 'No refresh'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory'
 					]
 				]
 			],
@@ -847,16 +1032,8 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
 						'Name' => 'Имя виджета',
 						'Refresh interval' => '10 seconds',
-						'Item' => [
-							'values' => 'Master item',
-							'context' => [
-								'values' => 'Test item host',
-								'context' => 'Zabbix servers'
-							]
-						],
 						// Description checkbox.
 						'id:show_1' => true,
 						// Value checkbox.
@@ -879,6 +1056,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:time_v_pos' => 'Middle',
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '21'
+					],
+					'item' => [
+						'Test item host' => 'Master item'
 					]
 				]
 			],
@@ -886,11 +1066,9 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
-						'id:show_header' => false,
+						'Show header' => false,
 						'Name' => '#$%^&*()!@{}[]<>,.|',
 						'Refresh interval' => '10 minutes',
-						'Item' => 'Response code for step "step 1 of scenario 1" of scenario "Scenario for Update".',
 						// Description checkbox.
 						'id:show_1' => false,
 						// Value checkbox.
@@ -907,6 +1085,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '100',
 						'id:units_bold' => true
+					],
+					'item' => [
+						'Simple form test host' => 'Response code for step "step 1 of scenario 1" of scenario "Scenario for Update".'
 					]
 				]
 			],
@@ -914,10 +1095,8 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
 						'Name' => 'New Single Item Widget',
 						'Refresh interval' => '2 minutes',
-						'Item' => 'Http agent item form',
 						// Description checkbox.
 						'id:show_1' => true,
 						// Value checkbox.
@@ -961,6 +1140,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:time_size' => '13',
 						'id:time_bold' => true,
 						'Override host' => 'Dashboard'
+					],
+					'item' => [
+						'Host for different items types' => 'Http agent item form'
 					]
 				]
 			],
@@ -968,11 +1150,9 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
-						'id:show_header' => false,
+						'Show header' => false,
 						'Name' => 'Color pick',
 						'Refresh interval' => '10 minutes',
-						'Item' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".',
 						// Description checkbox.
 						'id:show_1' => true,
 						// Value checkbox.
@@ -996,6 +1176,9 @@ class testDashboardItemValueWidget extends CWebTest {
 						'xpath://button[@id="lbl_up_color"]/..' => '00FF00',
 						'xpath://button[@id="lbl_down_color"]/..' => 'FF0000',
 						'xpath://button[@id="lbl_updown_color"]/..' => '0000FF'
+					],
+					'item' => [
+						'Simple form test host' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".'
 					]
 				]
 			],
@@ -1003,11 +1186,12 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Name' => 'Item Widget with threshold',
 						'Refresh interval' => '1 minute',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '0.01']
@@ -1018,11 +1202,12 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Name' => 'One threshold with color',
 						'Refresh interval' => '2 minutes',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['color' => 'EF6C00', 'threshold' => '0.02']
@@ -1033,11 +1218,12 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'Name' => 'Thresholds',
-						'Refresh interval' => '2 minutes',
+						'Refresh interval' => '10 minutes',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '0.9999'],
@@ -1045,6 +1231,119 @@ class testDashboardItemValueWidget extends CWebTest {
 						['threshold' => '5K'],
 						['color' => 'FFEB3B', 'threshold' => '1G'],
 						['threshold' => '999999999999999']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Aggregation function "min"',
+						'Refresh interval' => '15 minutes',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Aggregation function "max" with custom "From"',
+						'Refresh interval' => '1 minute',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-30m'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Aggregation function "avg" with custom time period',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2d/d',
+						'id:time_period_to' => 'now-2d/d'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Aggregation function setup',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2h',
+						'id:time_period_to' => 'now-1h',
+						'History data' => 'History'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Aggregation function setup 2',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-5400',
+						'id:time_period_to' => 'now-1800',
+						'History data' => 'Trends'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Aggregation function setup 3',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1M',
+						'id:time_period_to' => 'now-1w',
+						'History data' => 'Auto'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Aggregation function setup 4',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2y',
+						'id:time_period_to' => 'now-1y'
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					]
 				]
 			]
@@ -1066,10 +1365,12 @@ class testDashboardItemValueWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'threshold_widget' => true,
 					'fields' => [
-						'Item' => 'Available memory in %',
 						'Name' => 'Widget with thresholds - update',
 						'Refresh interval' => '10 minutes',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'color' => 'AABBCC', 'threshold' => '1'],
@@ -1082,10 +1383,12 @@ class testDashboardItemValueWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'threshold_widget' => true,
 					'fields' => [
-						'Item' => 'Available memory in %',
 						'Name' => 'Widget with thresholds - remove',
 						'Refresh interval' => '10 minutes',
 						'Advanced configuration' => true
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
 						['action' => USER_ACTION_REMOVE, 'index' => 0],
@@ -1110,10 +1413,12 @@ class testDashboardItemValueWidget extends CWebTest {
 	 * @param boolean $update	updating is performed
 	 */
 	public function checkWidgetForm($data, $update = false) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid');
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		if ($expected === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -1123,6 +1428,8 @@ class testDashboardItemValueWidget extends CWebTest {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
+		$data['fields']['Item'][] = implode(array_values($data['item']));
 		$form->fill($data['fields']);
 
 		if ($update && !CTestArrayHelper::get($data['fields'], 'Name')) {
@@ -1133,20 +1440,26 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->getThresholdTable()->fill($data['thresholds']);
 		}
 
-		$values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
+		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid'));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			COverlayDialogElement::ensureNotPresent();
 
+			// Prepare data to check widget "Item" field, should be in the format "Host name: Item name".
+			$data['fields']['Item'] = [];
+			foreach ($data['item'] as $host => $item) {
+				$data['fields']['Item'][] = $host.': '. $item;
+			}
+
 			$header = CTestArrayHelper::get($data['fields'], 'Name')
-					? $data['fields']['Name']
-					: $data['fields']['Item']['context']['values'].': '.$data['fields']['Item']['values'];
+				? $data['fields']['Name']
+				: implode($data['fields']['Item']);
 
 			$dashboard->getWidget($header)->waitUntilReady();
 
@@ -1166,12 +1479,9 @@ class testDashboardItemValueWidget extends CWebTest {
 				$saved_form->checkValue(['Advanced configuration' => false]);
 				$saved_form->fill(['Advanced configuration' => true]);
 			}
-			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 
-			// As form is quite complex, show_header field should be checked separately.
-			if (array_key_exists('show_header', $data['fields'])) {
-				$saved_form->checkValue(['id:show_header' => $data['fields']['show_header']]);
-			}
+			$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+			$saved_form->checkValue($data['fields']);
 
 			// Check that widget is saved in DB for correct dashboard and correct dashboard page.
 			$this->assertEquals(1,
@@ -1269,7 +1579,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
 	 */
 	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -1290,8 +1600,8 @@ class testDashboardItemValueWidget extends CWebTest {
 
 		if ($cancel || !$save_dashboard) {
 			$form->fill([
-				'Name' => 'Widget to cancel',
-				'Item' => 'Available memory in %'
+				'Item' => 'Available memory in %',
+				'Name' => 'Widget to cancel'
 			]);
 		}
 
@@ -1320,11 +1630,13 @@ class testDashboardItemValueWidget extends CWebTest {
 
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
-			$this->assertEquals($values, $dashboard->getWidget(self::$old_name)->edit()->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+			$this->assertEquals($values, $dashboard->getWidget(self::$old_name)->edit()->getFields()
+					->filter(CElementFilter::VISIBLE)->asValues()
+			);
 		}
 
 		// Check that DB hash is not changed.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function testDashboardItemValueWidget_Delete() {
@@ -1344,49 +1656,349 @@ class testDashboardItemValueWidget extends CWebTest {
 		return [
 			[
 				[
+					'numeric' => false,
 					'fields' => [
-							'Item' => 'System description',
-							'Name' => 'Item Widget with type of information - characters',
-							'Advanced configuration' => true
-					]
+						'Item' => 'System description',
+						'Name' => 'Item Widget with type of information - characters',
+						'Advanced configuration' => true
+					],
+					'selector' => 'id:item-value-thresholds-warning',
+					'label' => 'Thresholds',
+					'warning_message' => 'This setting applies only to numeric data.'
 				]
 			],
 			[
 				[
+					'numeric' => false,
 					'fields' => [
-							'Item' => 'Get filesystems',
-							'Name' => 'Item Widget with type of information - text',
-							'Advanced configuration' => true
-					]
+						'Item' => 'Get filesystems',
+						'Name' => 'Item Widget with type of information - text',
+						'Advanced configuration' => true
+					],
+					'selector' => 'id:item-value-thresholds-warning',
+					'label' => 'Thresholds',
+					'warning_message' => 'This setting applies only to numeric data.'
 				]
 			],
 			[
 				[
+					'numeric' => false,
 					'fields' => [
-							'Item' => 'item_testPageHistory_CheckLayout_Log',
-							'Name' => 'Item Widget with type of information - log',
-							'Advanced configuration' => true
-					]
+						'Item' => 'item_testPageHistory_CheckLayout_Log',
+						'Name' => 'Item Widget with type of information - log',
+						'Advanced configuration' => true
+					],
+					'selector' => 'id:item-value-thresholds-warning',
+					'label' => 'Thresholds',
+					'warning_message' => 'This setting applies only to numeric data.'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'fields' => [
+						'Item' => 'System description',
+						'Name' => 'Type of information - characters & aggregation function - min',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function',
+					'warning_message' => 'With this setting only numeric items will be displayed.'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'fields' => [
+						'Item' => 'Get filesystems',
+						'Name' => 'Type of information - text & aggregation function - max',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function',
+					'warning_message' => 'With this setting only numeric items will be displayed.'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'fields' => [
+						'Item' => 'item_testPageHistory_CheckLayout_Log',
+						'Name' => 'Type of information - log & aggregation function - avg',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function',
+					'warning_message' => 'With this setting only numeric items will be displayed.'
+				]
+			],
+						[
+				[
+					'numeric' => false,
+					'fields' => [
+						'Item' => 'System description',
+						'Name' => 'Type of information - characters & aggregation function - sum',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function',
+					'warning_message' => 'With this setting only numeric items will be displayed.'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'fields' => [
+						'Item' => 'System description',
+						'Name' => 'Item Widget with type of information - characters',
+						'Advanced configuration' => true,
+						'History data' => 'Trends'
+					],
+					'selector' => 'id:history_warning',
+					'label' => 'History data',
+					'warning_message' => 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'fields' => [
+						'Item' => 'Get filesystems',
+						'Name' => 'Item Widget with type of information - text',
+						'Advanced configuration' => true,
+						'History data' => 'Trends'
+					],
+					'selector' => 'id:history_warning',
+					'label' => 'History data',
+					'warning_message' => 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'fields' => [
+						'Item' => 'item_testPageHistory_CheckLayout_Log',
+						'Name' => 'Item Widget with type of information - log',
+						'Advanced configuration' => true,
+						'History data' => 'Trends'
+					],
+					'selector' => 'id:history_warning',
+					'label' => 'History data',
+					'warning_message' => 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'any_type_of_information' => true,
+					'fields' => [
+						'Item' => 'Linux: Operating system',
+						'Name' => 'Type of information - characters & aggregation function - not used',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'not used'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'any_type_of_information' => true,
+					'fields' => [
+						'Item' => 'Linux: Operating system',
+						'Name' => 'Type of information - characters & aggregation function - count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'any_type_of_information' => true,
+					'fields' => [
+						'Item' => 'Zabbix server: Zabbix proxies stats',
+						'Name' => 'Type of information - text & aggregation function - first',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => false,
+					'any_type_of_information' => true,
+					'fields' => [
+						'Item' => 'item_testPageHistory_CheckLayout_Log',
+						'Name' => 'Type of information - log & aggregation function - last',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
 				]
 			],
 			[
 				[
 					'numeric' => true,
 					'fields' => [
-							'Item' => 'Free swap space',
-							'Name' => 'Item Widget with type of information - Numeric (unsigned)',
-							'Advanced configuration' => true
-					]
+						'Item' => 'Free swap space',
+						'Name' => 'Item Widget with type of information - Numeric (unsigned)',
+						'Advanced configuration' => true
+					],
+					'selector' => 'id:item-value-thresholds-warning',
+					'label' => 'Thresholds'
 				]
 			],
 			[
 				[
 					'numeric' => true,
 					'fields' => [
-							'Item' => 'Interrupts per second',
-							'Name' => 'Item Widget with type of information - Numeric (float)',
-							'Advanced configuration' => true
-					]
+						'Item' => 'Interrupts per second',
+						'Name' => 'Item Widget with type of information - Numeric (float)',
+						'Advanced configuration' => true
+					],
+					'selector' => 'id:item-value-thresholds-warning',
+					'label' => 'Thresholds'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Linux: Available memory',
+						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - not used',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'not used'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Free swap space',
+						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - min',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Interrupts per second',
+						'Name' => 'Type of information - Numeric (float) & aggregation function - max',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Free swap space',
+						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - avg',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Linux: Available memory in %',
+						'Name' => 'Type of information - Numeric (float) & aggregation function - count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Linux: Free swap space',
+						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - sum',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Interrupts per second',
+						'Name' => 'Type of information - Numeric (float) & aggregation function - first',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Linux: System local time',
+						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - last',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last'
+					],
+					'selector' => 'id:item_value_aggregate_warning',
+					'label' => 'Aggregation function'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Free swap space',
+						'Name' => 'Item Widget with type of information - Numeric (unsigned)',
+						'Advanced configuration' => true,
+						'History data' => 'Trends'
+					],
+					'selector' => 'id:history_warning',
+					'label' => 'History data'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Interrupts per second',
+						'Name' => 'Item Widget with type of information - Numeric (float)',
+						'Advanced configuration' => true,
+						'History data' => 'Trends'
+					],
+					'selector' => 'id:history_warning',
+					'label' => 'History data'
 				]
 			]
 		];
@@ -1398,7 +2010,6 @@ class testDashboardItemValueWidget extends CWebTest {
 	 * @dataProvider getWarningMessageData
 	 */
 	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
-		$warning = 'id:item-value-thresholds-warning';
 		$info = 'class:zi-i-warning';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -1406,27 +2017,28 @@ class testDashboardItemValueWidget extends CWebTest {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		$form->fill($data['fields']);
 
-		if (!array_key_exists('numeric', $data)) {
+		if ($data['numeric'] === true || array_key_exists('any_type_of_information', $data)) {
+			// Check that warning item is not displayed.
+			$form->query($data['selector'])->one()->waitUntilNotVisible();
+			$this->assertFalse($form->query($data['selector'])->one()->isVisible());
+
+			// Check that info icon is not displayed.
+			$this->assertFalse($form->getLabel($data['label'])->query($info)->one()->isVisible());
+		}
+		else {
 			// Check that warning item is displayed.
-			$this->assertTrue($form->query($warning)->one()->isVisible());
+			$this->assertTrue($form->query($data['selector'])->one()->isVisible());
 
 			// Check that info icon is displayed.
-			$this->assertTrue($form->getLabel('Thresholds')->query($info)->one()->isVisible());
+			$this->assertTrue($form->getLabel($data['label'])->query($info)->one()->isVisible());
 
 			// Check hint-box.
-			$form->query($warning)->one()->click();
+			$form->query($data['selector'])->one()->click();
 			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
-			$this->assertEquals('This setting applies only to numeric data.', $hint->getText());
+			$this->assertEquals($data['warning_message'], $hint->getText());
 
 			// Close the hint-box.
 			$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
-		}
-		else {
-			// Check that warning item is not displayed.
-			$this->assertFalse($form->query($warning)->one()->isVisible());
-
-			// Check that info icon is not displayed.
-			$this->assertFalse($form->getLabel('Thresholds')->query($info)->one()->isVisible());
 		}
 	}
 
