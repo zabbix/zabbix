@@ -193,4 +193,43 @@ class testFormAdministrationGeneral extends CWebTest {
 			$this->assertEquals($value, $config[$key]);
 		}
 	}
+
+	/**
+	 * Test for updating and checking simple configuration fields.
+	 *
+	 * @param array      $data		  Data provider
+	 */
+	public function executeUpdate($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM config');
+		}
+
+		// Open configuration page and fill with values.
+		$this->page->login()->open($this->config_link)->waitUntilReady();
+		$form = $this->query($this->form_selector)->waitUntilPresent()->asForm()->one();
+		$form->fill($data['fields']);
+		$form->submit()->waitUntilReloaded();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
+			$form->checkValue($data['fields']);
+
+			// Check DB configuration.
+			$db_values = [];
+			foreach ($data['db_check'] as $values => $value) {
+				$db_values[] = $values;
+			}
+
+			$this->assertEquals($data['db_check'],  CDBHelper::getRow('SELECT '.implode(', ', $db_values).' FROM config'));
+
+			// Reset back to default values.
+			$form->query('button:Reset defaults')->one()->click();
+			COverlayDialogElement::find()->waitUntilVisible()->one()->query('button:Reset defaults')->one()->click();
+			$form->submit()->waitUntilReloaded();
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['details']);
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
+		}
+	}
 }

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
@@ -99,7 +100,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		return [
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => false
@@ -113,7 +113,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => false
@@ -127,7 +126,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -142,7 +140,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -157,7 +154,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -172,7 +168,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -187,7 +182,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -202,7 +196,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -217,7 +210,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -232,7 +224,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -247,7 +238,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -262,7 +252,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -277,7 +266,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -292,7 +280,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -307,7 +294,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -322,7 +308,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -337,7 +322,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -352,7 +336,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -596,30 +579,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * @dataProvider getUpdateValueData
 	 */
 	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
-		}
-
-		$this->page->login()->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
-		$form = $this->query('id:audit-settings')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['fields']);
-		$form->submit()->waitUntilReloaded();
-
-		if ($data['expected'] === TEST_GOOD) {
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$form->checkValue($data['fields']);
-
-			// Check DB configuration.
-			$this->assertEquals($data['db_check'],  CDBHelper::getRow('SELECT auditlog_enabled, hk_audit_mode, hk_audit FROM config'));
-
-			// Reset back to default values.
-			$form->query('id:resetDefaults')->one()->click();
-			COverlayDialogElement::find()->waitUntilVisible()->one()->query('button:Reset defaults')->one()->click();
-			$form->submit()->waitUntilReloaded();
-		}
-		else {
-			$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
-		}
+		$this->executeUpdate($data);
 	}
 }

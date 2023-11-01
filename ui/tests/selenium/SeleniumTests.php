@@ -269,6 +269,7 @@ require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralTimeouts.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
@@ -552,6 +553,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testExpandExpressionMacros');
+		$suite->addTestSuite('testFormAdministrationGeneralTimeouts');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
