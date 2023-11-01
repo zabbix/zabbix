@@ -234,6 +234,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 				$output['prev_value'] = $this->getInput('value', '');
 				$output['prev_time'] = $this->getPrevTime();
 				$output['value'] = $result['result'];
+
+				if ($result['truncated']) {
+					$output['truncated_message'] = _s('First %1$s of %2$s shown.',
+						convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
+						convertUnits(['value' => $result['original_size'], 'units' => 'B'])
+					);
+				}
+
 				$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
 			}
 

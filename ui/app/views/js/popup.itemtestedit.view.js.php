@@ -32,21 +32,32 @@
  * @return {jQuery}
  */
 function makeStepResult(step) {
-	if (typeof step.error !== 'undefined') {
+	if ('error' in step) {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
+			{error: step.error || <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>}
 		));
 	}
-	else if (typeof step.result === 'undefined' || step.result === null) {
+
+	if ('result_htmlencoded' in step) {
+		step.result_htmlencoded = step.result;
+		step.result = $('<textarea/>').html(step.result).text();
+	}
+	else {
+		step.result_htmlencoded = step.result;
+	}
+
+	if (step.result === undefined || step.result === null) {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('No value')) ?>);
 	}
 	else if (step.result === '') {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
 	}
+	else if ('truncated_message' in step) {
+		return jQuery(new Template(jQuery('#preprocessing-step-result-truncated').html()).evaluate(step))
+			.css('display', 'inline-flex');
+	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
-		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
-			jQuery.extend({result: step.result})
-		));
+		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(step));
 	}
 	else {
 		return jQuery('<span>').text(step.result);
@@ -210,6 +221,10 @@ function itemGetValueTest(overlay) {
 			<?php endif ?>
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
+			jQuery('#value_truncated', $form)
+				.toggleClass('<?= ZBX_STYLE_DISPLAY_NONE ?>', ret.truncated_message === undefined)
+				.addClass('js-retrieved')
+				.attr('data-hintbox-contents', ret.truncated_message);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -309,6 +324,10 @@ function itemCompleteTest(overlay) {
 			}
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
+			jQuery('#value_truncated', $form)
+				.toggleClass('<?= ZBX_STYLE_DISPLAY_NONE ?>', ret.truncated_message === undefined)
+				.addClass('js-retrieved')
+				.attr('data-hintbox-contents', ret.truncated_message);
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
@@ -320,8 +339,11 @@ function itemCompleteTest(overlay) {
 
 			if (typeof ret.final !== 'undefined') {
 				var result = makeStepResult(ret.final);
+
 				if (result !== null) {
-					$result = jQuery(result).css('float', 'right');
+					$result = result
+						.css('float', 'right')
+						.css('display', 'inline-flex');
 				}
 
 				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
@@ -512,6 +534,8 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+				$('#value_truncated.js-retrieved').show();
+
 				$not_supported.prop('disabled', true);
 				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 
@@ -585,6 +609,7 @@ jQuery(document).ready(function($) {
 				$not_supported
 					.prop('disabled', false)
 					.trigger('change');
+				$('#value_truncated').hide();
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');

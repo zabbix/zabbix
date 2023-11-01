@@ -272,13 +272,18 @@ if ($data['is_item_testable']) {
 }
 
 $form_grid->addItem([
-	new CLabel(_('Value'), 'value'),
-	new CFormField(
+	new CLabel([
+		_('Value'),
+		makeWarningIcon('#{truncated_message}')
+			->setId('value_truncated')
+			->addClass(ZBX_STYLE_DISPLAY_NONE)
+	], 'value'),
+	new CFormField([
 		(new CMultilineInput('value', '', [
 			'disabled' => false,
 			'readonly' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	),
+	]),
 
 	new CLabel(_('Time'), 'time'),
 	new CFormField(
@@ -406,10 +411,21 @@ $form->addItem([
 		(new CDiv(
 			(new CSpan('#{result}'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->setHint('#{result}', 'hintbox-wrap')
+				->setHint('#{result_htmlencoded}', 'hintbox-wrap')
 		))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	),
+	(new CTemplateTag('preprocessing-step-result-truncated'))->addItem(
+		(new CDiv([
+			(new CDiv('#{result}'))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->setHint('#{result_htmlencoded}', 'hintbox-wrap')
+				->addStyle('max-width: '.(ZBX_TEXTAREA_STANDARD_WIDTH - 30).'px;'),
+			makeWarningIcon('#{truncated_message}')
+		]))
+			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	),
 	(new CTemplateTag('preprocessing-step-action-done'))->addItem(
 		(new CDiv([

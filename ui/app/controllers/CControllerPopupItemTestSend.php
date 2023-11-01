@@ -384,6 +384,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$preproc_test_data['value'] = $result['result'];
 					$output['value'] = $result['result'];
 					$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
+
+					if ($result['truncated']) {
+						$output['truncated_message'] = _s('First %1$s of %2$s shown.',
+							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
+							convertUnits(['value' => $result['output_size'], 'units' => 'B'])
+						);
+					}
 				}
 
 				if (array_key_exists('error', $result) && $result['error'] !== '') {
@@ -468,9 +475,24 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 								$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 							}
 						}
+						else {
+							if ($step['truncated']) {
+								$step['truncated_message'] = _s('First %1$s of %2$s shown.',
+									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
+									convertUnits(['value' => $step['output_size'], 'units' => 'B'])
+								);
+							}
+
+							if (is_string($step['result'])) {
+								$step['result'] = htmlspecialchars($step['result']);
+								$step['result_htmlencoded'] = true;
+							}
+						}
 					}
 
-					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params']);
+					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params'],
+						$step['truncated'], $step['output_size']
+					);
 
 					// Latest executed step due to the error or end of preprocessing.
 					$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
@@ -481,13 +503,24 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					error($result['error'] === '' ? _('<empty string>') : $result['error']);
 				}
 				elseif ($this->show_final_result) {
+					$final_result = [];
+
 					if (array_key_exists('result', $result)) {
-						$output['final'] = [
+						$final_result = [
 							'action' => _s('Result converted to %1$s',
 								itemValueTypeString($preproc_test_data['value_type'])
 							),
 							'result' => $result['result']
 						];
+
+						if (is_string($final_result['result'])) {
+							$final_result['result'] = htmlspecialchars($final_result['result']);
+							$final_result['result_htmlencoded'] = true;
+						}
+
+						if (array_key_exists('truncated_message', $output)) {
+							$final_result['truncated_message'] = $output['truncated_message'];
+						}
 
 						if ($valuemap) {
 							$output['mapped_value'] = CValueMapHelper::applyValueMap($preproc_test_data['value_type'],
@@ -496,7 +529,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						}
 					}
 					elseif (array_key_exists('error', $result)) {
-						$output['final'] = [
+						$final_result = [
 							'action' => ($test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR)
 								? _('Set error to')
 								: '',
@@ -504,14 +537,15 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						];
 					}
 
-					if ($output['final']['action'] !== '') {
-						$output['final']['action'] = (new CSpan($output['final']['action']))
+					if ($final_result['action'] !== '') {
+						$final_result['action'] = (new CSpan($final_result['action']))
 							->addClass(ZBX_STYLE_GREY)
 							->toString();
 					}
 				}
 
 				$output['steps'] = $preproc_test_data['steps'];
+				$output['final'] = $final_result;
 			}
 
 			if ($messages = get_and_clear_messages()) {
