@@ -115,6 +115,7 @@ class testTriggerDependencies extends CWebTest {
 		// Check that dependent triggers displayed on triggers list page.
 		$table = $this->query('class:list-table')->asTable()->one();
 
+		// TODO: rewrite foreach part after ZBX-23623 fix. Example can be checked in task comments.
 		foreach ($data['result'] as $result) {
 			$table->findRow('Name', $trigger_name, true)->getColumn('Name')->query('link:'.$result)->exists();
 		}
