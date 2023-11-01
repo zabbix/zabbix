@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class DataDisplayOnGraphs {
+class DataDisplayInGraphs {
 	/**
 	 * Create data for data display of graphs related tests.
 	 *
@@ -39,7 +39,7 @@ class DataDisplayOnGraphs {
 					]
 				],
 				'groups' => [
-					'groupid' => 4
+					'groupid' => 4 // Host group "Zabbix servers".
 				],
 				'status' => HOST_STATUS_MONITORED,
 				'items' => [
@@ -58,14 +58,14 @@ class DataDisplayOnGraphs {
 						'delay' => '1m'
 					],
 					[
-						'name' => 'Item for trend data display 1',
+						'name' => 'Item for trends data display 1',
 						'key_' => 'item_key_3',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
 						'delay' => '2h'
 					],
 					[
-						'name' => 'Item for trend data display 2',
+						'name' => 'Item for trends data display 2',
 						'key_' => 'item_key_4',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
@@ -97,7 +97,7 @@ class DataDisplayOnGraphs {
 		$pie1_itemid = $responce['itemids']['Host for data display on graphs:item_key_5'];
 		$pie2_itemid = $responce['itemids']['Host for data display on graphs:item_key_6'];
 
-		$graph_responce = CDataHelper::call('graph.create', [
+		CDataHelper::call('graph.create', [
 			[
 				'name' => 'History graph 1',
 				'width' => 800,
@@ -629,7 +629,7 @@ class DataDisplayOnGraphs {
 		CDataHelper::addItemData($pie2_itemid, 0.34);
 
 		// Create dashboards for Top host widget testing.
-		CDataHelper::call('dashboard.create', [
+		$dashboard_responce = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard to check data display in graphs',
 				'display_period' => 60,
@@ -2070,5 +2070,20 @@ class DataDisplayOnGraphs {
 				]
 			]
 		]);
+
+		$timestamps = [
+			'history_start' => '2023-08-07 12:58:00',
+			'history_end' => '2023-08-07 13:20:00',
+			'trends_start' => '2023-08-03 00:00:00',
+			'trends_end' => '2023-08-07 12:00:00',
+			'pie_start' => 'now-24h',
+			'pie_end' => 'now'
+		];
+
+		return [
+			'hostid' => $hostid,
+			'dashboardid' => $dashboard_responce['dashboardids'][0],
+			'timestamps' => $timestamps
+		];
 	}
 }
