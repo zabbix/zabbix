@@ -432,7 +432,15 @@ int	zbx_db_execute_once(const char *fmt, ...)
 	va_start(args, fmt);
 
 	rc = zbx_db_vexecute(fmt, args);
-
+#if defined(HAVE_MYSQL)
+	/* Simulate automatic reconnection feature, which is deprecated beginning with MySQL 8.0.34/8.1.0 */
+	if (ZBX_DB_DOWN == rc)
+	{
+		zbx_db_close();
+		zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+		rc = zbx_db_vexecute(fmt, args);
+	}
+#endif
 	va_end(args);
 
 	return rc;

@@ -355,6 +355,15 @@ static zbx_db_result_t	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
 
 	va_start(args, sql);
 	result = zbx_db_vselect(sql, args);
+#if defined(HAVE_MYSQL)
+	/* Simulate automatic reconnection feature, which is deprecated beginning with MySQL 8.0.34/8.1.0 */
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result)
+	{
+		zbx_db_close();
+		zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+		result = zbx_db_vselect(sql, args);
+	}
+#endif
 	va_end(args);
 
 	if (NULL == result)
@@ -385,6 +394,15 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
 
 	va_start(args, sql);
 	info->db_status = zbx_db_vexecute(sql, args);
+#if defined(HAVE_MYSQL)
+	/* Simulate automatic reconnection feature, which is deprecated beginning with MySQL 8.0.34/8.1.0 */
+	if (ZBX_DB_DOWN == info->db_status)
+	{
+		zbx_db_close();
+		zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+		info->db_status = zbx_db_vexecute(sql, args);
+	}
+#endif
 	va_end(args);
 
 	return ZBX_DB_OK <= info->db_status ? SUCCEED : FAIL;
