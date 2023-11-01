@@ -86,7 +86,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	
-	ret = task->process_cb(what, task->data, &fd, task->ip, task->error);
+	ret = task->process_cb(what, task->data, &fd, task->address, task->error);
 
 	switch (ret)
 	{
