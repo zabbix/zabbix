@@ -680,7 +680,7 @@ class testDashboardPieChartWidget extends CWebTest
 					'widget_fields' => [
 						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
 						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1'],
-						['name' => 'ds.0.data_set_label', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'TEST SET 👌'],
+						['name' => 'ds.0.data_set_label', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'TEST SET ☺'],
 						['name' => 'ds.0.dataset_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
 					],
 					'item_data' => [
@@ -688,7 +688,7 @@ class testDashboardPieChartWidget extends CWebTest
 							['value' => 99]
 						]
 					],
-					'expected_dataset_name' => 'TEST SET 👌',
+					'expected_dataset_name' => 'TEST SET ☺',
 					'expected_sectors' => [
 						'item-1' => ['value' => '99', 'color' => 'rgb(255, 70, 92)']
 					],
@@ -698,7 +698,7 @@ class testDashboardPieChartWidget extends CWebTest
 			// Two items, data set aggregate function, very small item values.
 			[
 				[
-					'widget_name' => '2️⃣ items',
+					'widget_name' => '2 items',
 					'widget_fields' => [
 						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
 						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-3'],
@@ -781,7 +781,7 @@ class testDashboardPieChartWidget extends CWebTest
 						['name' => 'value_size', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 30],
 						['name' => 'decimal_places', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
 						['name' => 'units_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-						['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '💚'],
+						['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '♥'],
 						['name' => 'value_bold', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'value_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '7CB342'],
 						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
@@ -805,11 +805,11 @@ class testDashboardPieChartWidget extends CWebTest
 							['value' => 5]
 						]
 					],
-					'expected_total' => '100 💚',
+					'expected_total' => '100 ♥',
 					'expected_sectors' => [
-						'item-1' => ['value' => '100 💚', 'color' => 'rgb(255, 235, 238)'],
-						'item-2' => ['value' => '82 💚', 'color' => 'rgb(229, 57, 53)'],
-						'Other' => ['value' => '9 💚', 'color' => 'rgb(183, 28, 28)']
+						'item-1' => ['value' => '100 ♥', 'color' => 'rgb(255, 235, 238)'],
+						'item-2' => ['value' => '82 ♥', 'color' => 'rgb(229, 57, 53)'],
+						'Other' => ['value' => '9 ♥', 'color' => 'rgb(183, 28, 28)']
 					],
 					'screenshot_id' => 'doughnut'
 				]
