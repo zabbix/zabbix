@@ -204,8 +204,6 @@ class CSvgGraphHelper {
 				$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 			}
 
-			CArrayHelper::sort($items, ['name']);
-
 			unset($data_set['itemids'], $data_set['items']);
 
 			// The bigger transparency level, the less visible the metric is.

@@ -334,8 +334,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 		}
 
-		CArrayHelper::sort($items, ['name']);
-
 		$colors = getColorVariations('#' . $data_set['color'], count($items));
 
 		unset($data_set['hosts'], $data_set['items'], $data_set['color']);
@@ -454,12 +452,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE) {
-				$name = $templateid !== ''
-					? $metric['name']
-					: $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
-
 				if ($legend_aggregation_show) {
-					$name = self::aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')';
+					$name = self::aggr_fnc2str($metric['options']['aggregate_function']).
+						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
+				}
+				else {
+					$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
 				}
 			}
 			else {

@@ -110,7 +110,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 			$hosts = array_column($item['hosts'], 'name', 'hostid');
 			$names[$item['itemid']] = $resolve_macros
 				? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_resolved']
-				: $item['name'];
+				: $hosts[$item['hostid']].NAME_DELIMITER.$item['name'];
 		}
 
 		return $names;
