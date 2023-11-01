@@ -172,6 +172,9 @@ struct zbx_snmp_context
 	char				*snmpv3_privpassphrase;
 	const char			*config_source_ip;
 	unsigned char			snmp_oid_type;
+	int				resolve_reverse_dns;
+	int				resolve_reverse_dns_initiated;
+	char				*reverse_dns;
 };
 
 typedef struct
@@ -2504,6 +2507,15 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
+	if (1 == snmp_context->resolve_reverse_dns_initiated)
+	{
+		if (NULL != addr)
+			snmp_context->reverse_dns = zbx_strdup(NULL, addr);
+
+		goto stop;
+	}
+	
+
 	/* initialization */
 	if (0 != event)
 	{
@@ -2615,6 +2627,13 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 
 					snmp_context->results = NULL;
 					snmp_context->item.ret = SUCCEED;
+
+					if (0 != snmp_context->resolve_reverse_dns)
+					{
+						task_ret = ZBX_ASYNC_TASK_RESOLVE_REVERSE;
+						snmp_context->resolve_reverse_dns_initiated = 1;
+					}
+
 					goto stop;
 				}
 			}
@@ -2673,6 +2692,7 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 	zbx_free(snmp_context->item.key);
 	zbx_free(snmp_context->item.key_orig);
 	zbx_free(snmp_context->results);
+	zbx_free(snmp_context->reverse_dns);
 	zbx_free_agent_result(&snmp_context->item.result);
 
 	zbx_vector_bulkwalk_context_clear_ext(&snmp_context->bulkwalk_contexts, snmp_bulkwalk_context_free);
@@ -2684,7 +2704,7 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip)
+		const char *config_source_ip, int resolve_reverse_dns)
 {
 	int			i, ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
@@ -2695,6 +2715,11 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 			item->host.host, item->interface.addr);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
+
+	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
+	snmp_context->resolve_reverse_dns_initiated = 0;
+	snmp_context->reverse_dns = NULL;
+
 	snmp_context->ssp = NULL;
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
@@ -3204,7 +3229,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		zbx_set_snmp_bulkwalk_options();
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
-				&snmp_result, NULL, snmp_result.base, dnsbase, config_source_ip)))
+				&snmp_result, NULL, snmp_result.base, dnsbase, config_source_ip, 0)))
 		{
 			if (1 == snmp_result.finished || -1 != event_base_dispatch(snmp_result.base))
 			{
