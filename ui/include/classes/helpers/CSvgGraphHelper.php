@@ -589,7 +589,6 @@ class CSvgGraphHelper {
 			}
 
 			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
-
 			$metric['points'] = [];
 
 			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
