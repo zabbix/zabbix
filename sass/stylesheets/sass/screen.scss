@@ -550,10 +550,11 @@ form {
 }
 
 .filter-container {
+	position: relative;
+	padding: 10px 0;
+	margin-bottom: 8px;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	padding: 10px 0;
-	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;

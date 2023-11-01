@@ -13,10 +13,10 @@
 
 	// All tab filters content container.
 	.tabfilter-content-container {
-		border: 1px solid $ui-border-color;
-		background-color: $ui-bg-color;
 		padding: 10px 0;
-		margin-bottom: 6px;
+		margin-bottom: 8px;
+		background-color: $ui-bg-color;
+		border: 1px solid $ui-border-color;
 
 		&.tabfilter-collapsed {
 			padding: 0 0 10px 0;
