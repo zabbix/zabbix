@@ -118,7 +118,7 @@ func exportDnsPerf(params []string) (result interface{}, err error) {
 		return 0, nil
 	}
 
-	t := time.Now().Sub(time_before).Seconds()
+	t := time.Since(time_before).Seconds()
 
 	return t, nil
 }
