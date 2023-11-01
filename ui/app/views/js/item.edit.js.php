@@ -605,6 +605,7 @@ window.item_edit_form = new class {
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 			});
 	}
 
