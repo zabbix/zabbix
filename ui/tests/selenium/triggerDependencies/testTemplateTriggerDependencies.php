@@ -441,7 +441,8 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 	 */
 	public function testTemplateTriggerDependencies_TriggerCreate($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.
-				self::$templateids['Template with everything'].'&context=template')->waitUntilReady();
+				self::$templateids['Template with everything'].'&context=template'
+		)->waitUntilReady();
 		$this->query('button:Create trigger')->one()->click();
 		$this->page->waitUntilReady();
 

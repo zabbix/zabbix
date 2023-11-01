@@ -306,8 +306,8 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 	 * @dataProvider getTriggerCreateData
 	 */
 	public function testHostTriggerDependencies_TriggerCreate($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.self::$hostids['Host with everything'].
-				'&context=host'
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.
+				self::$hostids['Host with everything'].'&context=host'
 		)->waitUntilReady();
 		$this->query('button:Create trigger')->one()->click();
 		$this->page->waitUntilReady();
