@@ -418,25 +418,6 @@ class CSVGHoneycomb {
 		const labels_secondary = this.#elements.honeycomb_container
 			.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_SECONDARY}`);
 
-		const check_labels_height = (labels, font_size) => {
-			const node = labels.node();
-
-			if (node) {
-				const correction = 1; // For floating point errors.
-				let height_actual = font_size * this.#scale + correction;
-
-				if (height_actual < CSVGHoneycomb.LABEL_HEIGHT_MIN) {
-					labels.style('display', 'none');
-				}
-				else {
-					labels.style('display', 'block');
-				}
-			}
-		};
-
-		check_labels_height(labels_primary, this.#label_primary_font_size);
-		check_labels_height(labels_secondary, this.#label_secondary_font_size);
-
 		this.#positionLabels(labels_primary, labels_secondary);
 
 		if ((labels_primary.node() && isVisible(labels_primary.node()))
@@ -665,10 +646,11 @@ class CSVGHoneycomb {
 	/**
 	 * Position primary and secondary labels in cell.
 	 *
-	 * @param {Selection} primary    Selection on primary labels.
-	 * @param {Selection} secondary  Selection on secondary labels.
+	 * @param {Selection} primary       Selection of primary labels.
+	 * @param {Selection} secondary     Selection of secondary labels.
+	 * @param {boolean}   check_height  Hide labels or not when smaller than limit.
 	 */
-	#positionLabels(primary, secondary) {
+	#positionLabels(primary, secondary, check_height = true) {
 		const getAutoLabelSize = (labels, data_attribute, default_size) => {
 			const lines_widths = [];
 
@@ -789,6 +771,27 @@ class CSVGHoneycomb {
 			}
 		}
 
+		if (check_height) {
+			const check_labels_height = (labels, font_size) => {
+				const node = labels.node();
+
+				if (node) {
+					const correction = 1; // For floating point errors.
+					let height_actual = font_size * this.#scale + correction;
+
+					if (height_actual < CSVGHoneycomb.LABEL_HEIGHT_MIN) {
+						labels.style('display', 'none');
+					}
+					else {
+						labels.style('display', 'block');
+					}
+				}
+			};
+
+			check_labels_height(primary, this.#label_primary_font_size);
+			check_labels_height(secondary, this.#label_secondary_font_size);
+		}
+
 		const available_cell_width = this.#radius_inner * 2 - this.#radius_inner / 10;
 
 		const adjust_labels_width = (labels, data_attribute) => {
@@ -891,7 +894,7 @@ class CSVGHoneycomb {
 
 		// Need to position in case if any label was hidden due to small height,
 		// because in popped cell both labels must be visible.
-		this.#positionLabels(labels_primary, labels_secondary);
+		this.#positionLabels(labels_primary, labels_secondary, false);
 	};
 
 	/**
