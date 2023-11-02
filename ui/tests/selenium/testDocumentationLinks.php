@@ -604,41 +604,58 @@ class testDocumentationLinks extends CWebTest {
 			// #54 Template items list view.
 			[
 				[
-					'url' => 'items.php?context=template',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=15000&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/items'
 				]
 			],
 			// #55 Template item create form.
 			[
 				[
-					'url' => 'items.php?form=create&hostid=15000&context=template',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=15000&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create item'
+						]
+					],
 					'doc_link' => '/en/manual/config/items/item#configuration'
 				]
 			],
 			// #56 Template item update form.
 			[
 				[
-					'url' => 'items.php?form=update&hostid=15000&itemid=15000&context=template',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=15000&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:itemInheritance'
+						]
+					],
 					'doc_link' => '/en/manual/config/items/item#configuration'
 				]
 			],
 			// #57 Template item test form.
 			[
 				[
-					'url' => 'items.php?form=update&hostid=15000&itemid=15000&context=template',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=15000&context=template',
 					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:itemInheritance'
+						],
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'button:Test'
 						]
 					],
+					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
 			// #58 Template item Mass update popup.
 			[
 				[
-					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=15000&context=template',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -813,41 +830,58 @@ class testDocumentationLinks extends CWebTest {
 			// #75 Template LLD item prototype list view.
 			[
 				[
-					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=15011&filter_set=1&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/item_prototypes'
 				]
 			],
 			// #76 Template LLD item prototype create form.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=15011&filter_set=1&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create item prototype'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
 			// #77 Template LLD item prototype edit form.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=update&parent_discoveryid=15011&itemid=15021&context=template',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=15011&filter_set=1&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:itemDiscovery'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
 			// #78 Template LLD item prototype test form.
 			[
 				[
-					'url' => 'items.php?form=update&hostid=40001&itemid=99102&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=15011&filter_set=1&context=template',
 					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:itemDiscovery'
+						],
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'button:Test'
 						]
 					],
+					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
 			// #79 Template LLD item prototype mass update popup.
 			[
 				[
-					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=15011&filter_set=1&context=template',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -1050,21 +1084,33 @@ class testDocumentationLinks extends CWebTest {
 			// #100 Host items list view.
 			[
 				[
-					'url' => 'items.php?context=host',
+					'url' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=40001&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/items'
 				]
 			],
 			// #101 Host item create form.
 			[
 				[
-					'url' => 'items.php?form=create&hostid=40001&context=host',
+					'url' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=40001&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create item'
+						]
+					],
 					'doc_link' => '/en/manual/config/items/item#configuration'
 				]
 			],
 			// #102 Host item update form.
 			[
 				[
-					'url' => 'items.php?form=update&hostid=40001&itemid=99102&context=host',
+					'url' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=40001&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testFormItem'
+						]
+					],
 					'doc_link' => '/en/manual/config/items/item#configuration'
 
 				]
@@ -1072,20 +1118,25 @@ class testDocumentationLinks extends CWebTest {
 			// #103 Host item test form.
 			[
 				[
-					'url' => 'items.php?form=update&hostid=40001&itemid=99102&context=host',
+					'url' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=40001&context=host',
 					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testFormItem'
+						],
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'button:Test'
 						]
 					],
+					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
 			// #104 Host item Mass update popup.
 			[
 				[
-					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'url' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=40001&context=host',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -1190,41 +1241,58 @@ class testDocumentationLinks extends CWebTest {
 			// #115 Host LLD item prototype list view.
 			[
 				[
-					'url' => 'disc_prototypes.php?parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/item_prototypes'
 				]
 			],
 			// #116 Host LLD item prototype create form.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=133800&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create item prototype'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
 			// #117 Host LLD item prototype edit form.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=update&parent_discoveryid=133800&itemid=23800&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=133800&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testFormItemPrototype1'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
 			// #118 Host LLD item prototype test form.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=update&parent_discoveryid=133800&itemid=23800&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=133800&context=host',
 					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testFormItemPrototype1'
+						],
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'button:Test'
 						]
 					],
+					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
 			// #119 Host LLD item prototype mass update popup.
 			[
 				[
-					'url' => 'disc_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=133800&context=host',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -2560,12 +2628,20 @@ class testDocumentationLinks extends CWebTest {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL($data['widget_type'])]);
 		}
 
+		if (array_key_exists('item_action', $data)) {
+			$test_overlay = COverlayDialogElement::find()->all()->last();
+		}
+
 		// Get the documentation link and compare it with expected result.
-		$link = $location->query('class', ['btn-icon zi-help', 'btn-icon zi-help-small'])->one();
+		$link = (array_key_exists('item_action', $data) ? $test_overlay : $location)
+			->query('class', ['btn-icon zi-help', 'btn-icon zi-help-small'])->one();
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 
 		// If the link was located in a popup - close this popup.
 		if ($dialog->isValid()) {
+			if (array_key_exists('item_action', $data)) {
+				$test_overlay->getFooter()->query('button:Cancel')->one()->click();
+			}
 			$location->close();
 		}
 

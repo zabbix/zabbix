@@ -13494,6 +13494,14 @@ msgstr "새 호스트"
 msgid "New host group"
 msgstr "새 호스트 그룹"
 
+#: app/views/item.edit.php:218
+msgid "New item"
+msgstr ""
+
+#: app/views/item.prototype.edit.php:191
+msgid "New item prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"

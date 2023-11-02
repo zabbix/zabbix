@@ -62,6 +62,8 @@ $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 

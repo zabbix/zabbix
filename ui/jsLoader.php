@@ -203,6 +203,8 @@ $translate_strings = [
 		'Another widget is used as data source.' => _('Another widget is used as data source.')
 	],
 	'functions.js' => [
+		'Error' => _('Error'),
+		'Ok' => _('Ok'),
 		'Cancel' => _('Cancel'),
 		'S_CLOSE' => _('Close'),
 		'Execute' => _('Execute'),
@@ -416,7 +418,8 @@ $translate_strings = [
 	'common.js' => [
 		'Cancel' => _('Cancel'),
 		'Ok' => _('Ok'),
-		'Unexpected server error.' => _('Unexpected server error.')
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'Any changes made in the current form will be lost.' => _('Any changes made in the current form will be lost.')
 	],
 	'component.z-select.js' => [
 		'All' => _('All')
