@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "discoverer.h"
 #include "discoverer_job.h"
 #include "discoverer_async.h"
 #include "zbxlog.h"
@@ -69,18 +68,18 @@ static void	discovery_async_poller_dns_init(discovery_poller_config_t *poller_co
 
 static void	discovery_async_poller_destroy(discovery_poller_config_t *poller_config)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
 
 	evdns_base_free(poller_config->dnsbase, 1);
 	event_base_free(poller_config->base);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
 }
 
 static void	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 		discovery_poller_config_t *poller_config)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
 
 	if (NULL == (poller_config->base = event_base_new()))
 	{
@@ -93,51 +92,42 @@ static void	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 	poller_config->config_timeout = dmanager->config_timeout;
 	discovery_async_poller_dns_init(poller_config);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
 }
-
-struct zbx_snmp_context
-{
-	void			*arg;
-	void			*arg_action;
-	zbx_dc_item_context_t	item;
-};
 
 static void	process_snmp_result(void *data)
 {
-	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
-	discovery_snmp_result_t	*snmp_result = (discovery_snmp_result_t *)snmp_context->arg;
+	discovery_snmp_result_t	*snmp_result = zbx_async_check_snmp_get_arg(data);
+	zbx_dc_item_context_t	*item = zbx_async_check_snmp_get_item_context(data);
 	char			**pvalue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' ret:%s", __func__, snmp_context->item.key,
-			snmp_context->item.host, snmp_context->item.interface.addr,
-			zbx_result_string(snmp_context->item.ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
 
 	snmp_result->poller_config->processing--;
 	snmp_result->dresult->processed_checks_per_ip++;
 
-	if (SUCCEED == snmp_context->item.ret && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&snmp_context->item.result)))
+	if (SUCCEED == item->ret && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&item->result)))
 	{
 		zbx_discoverer_dservice_t	*service;
 
-		service = result_dservice_create(snmp_context->item.interface.port, snmp_result->dcheckid);
+		service = result_dservice_create(item->interface.port, snmp_result->dcheckid);
 		zbx_strlcpy_utf8(service->value, *pvalue, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 		service->status = DOBJECT_STATUS_UP;
 		zbx_vector_discoverer_services_ptr_append(&snmp_result->dresult->services, service);
 
 		if (NULL ==  snmp_result->dresult->dnsname || '\0' == *snmp_result->dresult->dnsname)
 		{
-			char	dns[ZBX_INTERFACE_DNS_LEN_MAX];
-
-			zbx_gethost_by_ip(snmp_result->dresult->ip, dns, sizeof(dns));
-			snmp_result->dresult->dnsname = zbx_strdup(snmp_result->dresult->dnsname, dns);
+			snmp_result->dresult->dnsname = zbx_strdup(snmp_result->dresult->dnsname,
+					NULL == zbx_async_check_snmp_get_reverse_dns(data) ? "" :
+					zbx_async_check_snmp_get_reverse_dns(data));
 		}
 	}
 
 	zbx_free(snmp_result);
-	zbx_async_check_snmp_clean(snmp_context);
+	zbx_async_check_snmp_clean(data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
 }
 
 static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,

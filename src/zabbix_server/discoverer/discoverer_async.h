@@ -17,10 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DISCOVERY_ASYNC_H
-#define ZABBIX_DISCOVERY_ASYNC_H
+#ifndef ZABBIX_DISCOVERER_ASYNC_H
+#define ZABBIX_DISCOVERER_ASYNC_H
+
+#include "discoverer_int.h"
 
 int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		zbx_discoverer_manager_t *dmanager, int worker_id, char **error);
 
-#endif /* ZABBIX_DISCOVERY_ASYNC_H */
+#endif /* ZABBIX_DISCOVERER_ASYNC_H */

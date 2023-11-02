@@ -10,7 +10,8 @@ libzbxdiscoverer_a_SOURCES = \
 	discoverer_job.c \
 	discoverer_job.h \
 	discoverer_async.c \
-	discoverer_async.h
+	discoverer_async.h \
+	discoverer_int.h
 
 libzbxdiscoverer_a_CFLAGS = \
 	$(TLS_CFLAGS)

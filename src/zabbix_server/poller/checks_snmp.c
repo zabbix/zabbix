@@ -2679,6 +2679,11 @@ zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t 
 	return &snmp_context->item;
 }
 
+char	*zbx_async_check_snmp_get_reverse_dns(zbx_snmp_context_t *snmp_context)
+{
+	return snmp_context->reverse_dns;
+}
+
 void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context)
 {
 	return snmp_context->arg;
