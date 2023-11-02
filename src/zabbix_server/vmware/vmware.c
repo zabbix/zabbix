@@ -5364,16 +5364,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: read event data by id from xml and put to array of events         *
+ * Purpose: read event data by id from XML and put to array of events         *
  *                                                                            *
- * Parameters: events         - [IN/OUT] the array of parsed events           *
- *             xml_event      - [IN] the xml node and id of parsed event      *
- *             xdoc           - [IN] xml document with eventlog records       *
+ * Parameters: events         - [IN/OUT] array of parsed events               *
+ *             xml_event      - [IN] XML node and id of parsed event          *
+ *             xdoc           - [IN] XML document with eventlog records       *
  *             evt_severities - [IN] dictionary of severity for event types   *
  *             alloc_sz       - [OUT] allocated memory size for events        *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  ******************************************************************************/
 static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnode_t xml_event, xmlDoc *xdoc,
 		const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz)
@@ -5513,15 +5513,15 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
  *                                                                            *
  * Purpose: parse multiple events data                                        *
  *                                                                            *
- * Parameters: events         - [IN/OUT] the array of parsed events           *
- *             last_key       - [IN] the key of last parsed event             *
+ * Parameters: events         - [IN/OUT] array of parsed events               *
+ *             last_key       - [IN] key of last parsed event                 *
  *             is_prop        - [IN] read events from RetrieveProperties XML  *
- *             xdoc           - [IN] xml document with eventlog records       *
+ *             xdoc           - [IN] XML document with eventlog records       *
  *             eventlog       - [IN] VMware event log state                   *
  *             alloc_sz       - [OUT] allocated memory size for events        *
- *             node_count     - [OUT] count of xml event nodes                *
+ *             node_count     - [OUT] count of XML event nodes                *
  *                                                                            *
- * Return value: The count of events successfully parsed                      *
+ * Return value: Count of events successfully parsed                          *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, const int is_prop,
@@ -6481,16 +6481,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets the map of severity and event type                           *
+ * Purpose: gets map of severity and event type                               *
  *                                                                            *
- * Parameters: service        - [IN] the vmware service                       *
- *             easyhandle     - [IN] the CURL handle                          *
+ * Parameters: service        - [IN] vmware service                           *
+ *             easyhandle     - [IN] CURL handle                              *
  *             evt_severities - [IN/OUT] key-value vector with EventID and    *
  *                                       severity as value                    *
- *             error          - [OUT] the error message in case of failure    *
+ *             error          - [OUT] error message in case of failure        *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_evt_severity(zbx_vmware_service_t *service, CURL *easyhandle,
@@ -6581,19 +6581,21 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() evt_severities:%d", __func__, evt_severities->values_num);
+
 	return ret;
+#undef ZBX_POST_VMWARE_GET_EVT_SEVERITY
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: initializes vmware service object                                 *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             error        - [OUT] error message in the case of failure      *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  * Comments: While the service object can't be accessed from other processes  *
  *           during initialization it's still processed outside vmware locks  *
@@ -7464,14 +7466,14 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  *                                                                            *
  * Purpose: gets vmware service object                                        *
  *                                                                            *
- * Parameters: url      - [IN] the vmware service URL                         *
- *             username - [IN] the vmware service username                    *
- *             password - [IN] the vmware service password                    *
+ * Parameters: url      - [IN] VMware service URL                             *
+ *             username - [IN] VMware service username                        *
+ *             password - [IN] VMware service password                        *
  *                                                                            *
- * Return value: the requested service object or NULL if the object is not    *
- *               yet ready.                                                   *
+ * Return value: requested service object or NULL if the object is not yet    *
+ *               ready.                                                       *
  *                                                                            *
- * Comments: vmware lock must be locked with zbx_vmware_lock() function       *
+ * Comments: VMware lock must be locked with zbx_vmware_lock() function       *
  *           before calling this function.                                    *
  *           If the service list does not contain the requested service object*
  *           then a new object is created, marked as new, added to the list   *

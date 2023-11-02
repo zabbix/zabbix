@@ -1042,7 +1042,7 @@ function openMassupdatePopup(action, parameters = {}, {
 	}
 
 	switch (action) {
-		case 'popup.massupdate.item':
+		case 'item.massupdate':
 			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 0;
 			break;
@@ -1051,7 +1051,7 @@ function openMassupdatePopup(action, parameters = {}, {
 			parameters.context = form.querySelector('#form_context').value;
 			break;
 
-		case 'popup.massupdate.itemprototype':
+		case 'item.prototype.massupdate':
 		case 'trigger.prototype.massupdate':
 			parameters.parent_discoveryid = form.querySelector('#form_parent_discoveryid').value;
 			parameters.context = form.querySelector('#form_context').value;

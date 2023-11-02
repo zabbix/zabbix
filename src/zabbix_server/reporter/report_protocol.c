@@ -20,7 +20,7 @@
 #include "../zbxreport.h"
 #include "report_protocol.h"
 
-#include "../alerter/alerter.h"
+#include "zbxalerter.h"
 
 #include "zbxipcservice.h"
 #include "zbxjson.h"

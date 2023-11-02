@@ -177,6 +177,7 @@ int	__wrap_zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cach
 	ZBX_UNUSED(text);
 	ZBX_UNUSED(hostids);
 	ZBX_UNUSED(hostids_num);
+	ZBX_UNUSED(env);
 	ZBX_UNUSED(error);
 
 	return SUCCEED;
