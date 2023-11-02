@@ -22,11 +22,12 @@
 #include "zbxexpression.h"
 #include "trapper_auth.h"
 
-#include "../scripts/scripts.h"
+#include "zbxscripts.h"
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
+#include "zbx_scripts_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -216,28 +217,32 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	return SUCCEED;
 }
 
-/********************************************************************************
- *                                                                              *
- * Purpose: executing command                                                   *
- *                                                                              *
- * Parameters:  scriptid         - [IN] the id of a script to be executed       *
- *              hostid           - [IN] the host the script will be executed on *
- *              eventid          - [IN] the id of an event                      *
- *              user             - [IN] the user who executes the command       *
- *              clientip         - [IN] the IP of client                        *
- *              config_timeout   - [IN]                                         *
- *              config_source_ip - [IN]                                         *
- *              result           - [OUT] the result of a script execution       *
- *              debug            - [OUT] the debug data (optional)              *
- *                                                                              *
- * Return value:  SUCCEED - processed successfully                              *
- *                FAIL - an error occurred                                      *
- *                                                                              *
- * Comments: either 'hostid' or 'eventid' must be > 0, but not both             *
- *                                                                              *
- ********************************************************************************/
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: executing command                                                         *
+ *                                                                                    *
+ * Parameters:  scriptid               - [IN] id of script to be executed             *
+ *              hostid                 - [IN] host the script will be executed on     *
+ *              eventid                - [IN]                                         *
+ *              user                   - [IN] user who executes command               *
+ *              clientip               - [IN] IP of client                            *
+ *              config_timeout         - [IN]                                         *
+ *              config_trapper_timeout - [IN]                                         *
+ *              config_source_ip       - [IN]                                         *
+ *              get_config_forks       - [IN]                                         *
+ *              program_type           - [IN]                                         *
+ *              result                 - [OUT] result of script execution             *
+ *              debug                  - [OUT] debug data (optional)                  *
+ *                                                                                    *
+ * Return value:  SUCCEED - processed successfully                                    *
+ *                FAIL - an error occurred                                            *
+ *                                                                                    *
+ * Comments: either 'hostid' or 'eventid' must be > 0, but not both                   *
+ *                                                                                    *
+ **************************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
-		const char *clientip, int config_timeout, const char *config_source_ip, char **result, char **debug)
+		const char *clientip, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
 	zbx_dc_host_t		host;
@@ -416,7 +421,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
-		if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+		if (SUCCEED != zbx_db_fetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
 			goto fail;
 
 		for (i = 0; i < webhook_params.values_num; i++)
@@ -438,11 +443,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char	*poutput = NULL, *perror = NULL;
 		int		audit_res;
 
-		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+		if (0 == host.proxyid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout, config_source_ip,
-					result, error, sizeof(error), debug);
+			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
+					config_trapper_timeout, config_source_ip, get_config_forks, program_type, result, error,
+					sizeof(error), debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
@@ -453,7 +459,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			perror = error;
 
 		audit_res = zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid,
-				host.name, eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput,
+				host.name, eventid, host.proxyid, user->userid, user->username, clientip, poutput,
 				perror);
 
 		/* At the moment, there is no special processing of audit failures. */
@@ -552,7 +558,8 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
  *                                                                            *
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout,
-		const char *config_source_ip)
+		int config_trapper_timeout, const char *config_source_ip, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type)
 {
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
@@ -651,7 +658,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		*clientip = '\0';
 
 	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout,
-			config_source_ip, &result, &debug)))
+			config_trapper_timeout, config_source_ip, get_config_forks, program_type, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);

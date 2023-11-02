@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['scripts'] = ['class.tagfilteritem.js'];
+$page['scripts'] = ['class.tagfilteritem.js', 'items.js', 'multilineinput.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -187,7 +187,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	$result = deleteHistoryByHttpTestIds([getRequest('httptestid')]);
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
@@ -403,7 +403,7 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhist
 		uncheckTableRows(getRequest('hostid'));
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
@@ -690,7 +690,7 @@ else {
 	}
 
 	// Get host groups.
-	$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], $data['context']);
+	$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], $data['context']);
 
 	if ($data['context'] === 'host') {
 		$filter['hosts'] = $filter_hostids

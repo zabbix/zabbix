@@ -55,6 +55,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
+
 	zbxlib.SetMaxLinesPerSecond(p.options.MaxLinesPerSecond)
 }
 
@@ -132,4 +133,6 @@ func init() {
 		"logrt", "Log file monitoring with log rotation support.",
 		"log.count", "Count of matched lines in log file monitoring.",
 		"logrt.count", "Count of matched lines in log file monitoring with log rotation support.")
+
+	impl.SetHandleTimeout(true)
 }

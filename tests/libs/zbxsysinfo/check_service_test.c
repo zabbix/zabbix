@@ -26,6 +26,9 @@
 #include "../../../src/libs/zbxsysinfo/sysinfo.h"
 
 int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
+		int (*validate_func)(const char *), const char *sendtoclose, int *value_int);
+
+int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
 	ZBX_UNUSED(host);
@@ -71,6 +74,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_parse_item_key(key, &request);
 
 	returned_code = zbx_check_service_default_addr(&request, default_addr, &result, 0);
+
 	if (SUCCEED != returned_code && NULL != result.msg && '\0' != *(result.msg))
 		printf("check_service_test error: %s\n", result.msg);
 

@@ -340,7 +340,7 @@ window.correlation_edit_popup = new class {
 		this.#post(curl.getUrl(), {correlationids: [this.correlationid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

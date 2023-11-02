@@ -30,6 +30,14 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 
+void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
+{
+	zbx_free(ack_task);
+}
+
+ZBX_PTR_VECTOR_IMPL(ack_task_ptr, zbx_ack_task_t *)
+ZBX_PTR_VECTOR_IMPL(db_action_ptr, zbx_db_action *)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: compare events by objectid                                        *
@@ -574,7 +582,7 @@ static int	check_trigger_id_condition(const zbx_vector_db_event_t *esc_events, z
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check trigger name condition                                      *
+ * Purpose: check event name condition                                        *
  *                                                                            *
  * Parameters: esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] condition for matching, outputs          *
@@ -584,7 +592,7 @@ static int	check_trigger_id_condition(const zbx_vector_db_event_t *esc_events, z
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_name_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_event_name_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
 {
 	int	i;
 
@@ -902,8 +910,8 @@ static void	check_trigger_condition(const zbx_vector_db_event_t *esc_events, zbx
 		case ZBX_CONDITION_TYPE_TRIGGER:
 			ret = check_trigger_id_condition(esc_events, condition);
 			break;
-		case ZBX_CONDITION_TYPE_TRIGGER_NAME:
-			ret = check_trigger_name_condition(esc_events, condition);
+		case ZBX_CONDITION_TYPE_EVENT_NAME:
+			ret = check_event_name_condition(esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 			ret = check_trigger_severity_condition(esc_events, condition);
@@ -1218,7 +1226,7 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 					"select h.dhostid"
 					" from drules r,dhosts h"
 					" where r.druleid=h.druleid"
-						"%s r.proxy_hostid=" ZBX_FS_UI64
+						"%s r.proxyid=" ZBX_FS_UI64
 						" and",
 					operation_and,
 					condition_value);
@@ -1233,7 +1241,7 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 					" from drules r,dhosts h,dservices s"
 					" where r.druleid=h.druleid"
 						" and h.dhostid=s.dhostid"
-						"%s r.proxy_hostid=" ZBX_FS_UI64
+						"%s r.proxyid=" ZBX_FS_UI64
 						" and",
 					operation_and,
 					condition_value);
@@ -1917,7 +1925,7 @@ static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, z
 	get_object_ids(esc_events, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select autoreg_hostid,proxy_hostid"
+			"select autoreg_hostid,proxyid"
 			" from autoreg_host"
 			" where");
 
@@ -3261,7 +3269,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		int		j;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+					"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
 		for (j = 0; j < new_escalations.values_num; j++)
 		{
@@ -3332,10 +3340,10 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
  *                                                                            *
  * Purpose: process actions for each acknowledgment in the array              *
  *                                                                            *
- * Parameters: event_ack        - [IN] vector for eventid/ackid pairs         *
+ * Parameters: ack_tasks        - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
+int	process_actions_by_acknowledgments(const zbx_vector_ack_task_ptr_t *ack_tasks)
 {
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
@@ -3371,7 +3379,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 	for (int i = 0; i < ack_tasks->values_num; i++)
 	{
-		ack_task = (zbx_ack_task_t *)ack_tasks->values[i];
+		ack_task = ack_tasks->values[i];
 		zbx_vector_uint64_append(&eventids, ack_task->eventid);
 	}
 
@@ -3413,7 +3421,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 		while (knext < ack_tasks->values_num)
 		{
-			ack_task = (zbx_ack_task_t *)ack_tasks->values[knext];
+			ack_task = ack_tasks->values[knext];
 			if (ack_task->eventid != event->eventid)
 				break;
 			knext++;
@@ -3434,7 +3442,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 
 			for (int k = kcurr; k < knext; k++)
 			{
-				ack_task = (zbx_ack_task_t *)ack_tasks->values[k];
+				ack_task = ack_tasks->values[k];
 
 				ack_escalation = (zbx_ack_escalation_t *)zbx_malloc(NULL, sizeof(zbx_ack_escalation_t));
 				ack_escalation->taskid = ack_task->taskid;
@@ -3452,7 +3460,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-						"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+						"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
 		zbx_vector_ptr_sort(&ack_escalations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -3505,7 +3513,7 @@ out:
  * Comments: use 'free_db_action' function to release allocated memory        *
  *                                                                            *
  ******************************************************************************/
-void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions)
+void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_ptr_t *actions)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -3550,7 +3558,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 
-		zbx_vector_ptr_append(actions, action);
+		zbx_vector_db_action_ptr_append(actions, action);
 	}
 	zbx_db_free_result(result);
 
@@ -3563,7 +3571,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		int		index;
 
 		ZBX_STR2UINT64(actionid, row[0]);
-		if (FAIL != (index = zbx_vector_ptr_bsearch(actions, &actionid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL != (index = zbx_vector_db_action_ptr_bsearch(actions, (zbx_db_action *)&actionid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			action = (zbx_db_action *)actions->values[index];
 			action->recovery = ZBX_ACTION_RECOVERY_OPERATIONS;

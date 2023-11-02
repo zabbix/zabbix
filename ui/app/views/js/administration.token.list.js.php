@@ -69,8 +69,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.tokenSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.tokenSuccess, {once: true});
 		},
 
 		massDeleteToken(target, tokenids) {

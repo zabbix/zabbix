@@ -518,10 +518,9 @@ int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, co
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
-void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info);
+int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsupported);
 void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
-int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
@@ -750,14 +749,13 @@ typedef struct
 	char				*version_str;
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
-	int				lastaccess;
-	int				last_version_error_time;
+	time_t				lastaccess;
+	time_t				last_version_error_time;
 	int				proxy_delay;
 	int				more_data;
 	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
@@ -765,7 +763,6 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
-		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
 	zbx_uint64_t			flags;
@@ -903,7 +900,7 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_HOST_GROUP			0
 #define ZBX_CONDITION_TYPE_HOST				1
 #define ZBX_CONDITION_TYPE_TRIGGER			2
-#define ZBX_CONDITION_TYPE_TRIGGER_NAME			3
+#define ZBX_CONDITION_TYPE_EVENT_NAME			3
 #define ZBX_CONDITION_TYPE_TRIGGER_SEVERITY		4
 /* #define ZBX_CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define ZBX_CONDITION_TYPE_TIME_PERIOD			6
@@ -943,5 +940,8 @@ typedef struct
 	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
+
+#define PROXY_OPERATING_MODE_ACTIVE	0
+#define PROXY_OPERATING_MODE_PASSIVE	1
 
 #endif

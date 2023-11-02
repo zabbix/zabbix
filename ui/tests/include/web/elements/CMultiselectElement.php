@@ -196,7 +196,7 @@ class CMultiselectElement extends CElement {
 		$buttons = [];
 		$xpath = 'xpath:.//button';
 
-		foreach ($this->query($xpath)->waitUntilVisible()->all() as $button) {
+		foreach ($this->query($xpath)->all() as $button) {
 			$buttons[$button->getText()] = $button;
 		}
 
@@ -238,7 +238,7 @@ class CMultiselectElement extends CElement {
 			}
 
 			$content = CXPathHelper::escapeQuotes($value);
-			$prefix = '//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li';
+			$prefix = '//div[@data-opener='.$id.']/ul[contains(@class, "multiselect-suggest")]/li';
 			$query = $this->query('xpath', implode('|', [
 				$prefix.'[@data-label='.$content.']',
 				$prefix.'[contains(@data-label,'.$content.')]/span[contains(@class, "suggest-found") and text()='.$content.']',
@@ -371,5 +371,16 @@ class CMultiselectElement extends CElement {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get list of suggested values.
+	 *
+	 * @return array
+	 */
+	public function getSuggestionsText() {
+		$id = CXPathHelper::escapeQuotes($this->query('class:multiselect')->one()->getAttribute('id'));
+		return $this->query('xpath://div[@data-opener='.$id.']/ul[contains(@class, "multiselect-suggest")]')
+				->waitUntilVisible()->query('xpath:./li[not(@class="suggest-hover")]')->all()->asText();
 	}
 }

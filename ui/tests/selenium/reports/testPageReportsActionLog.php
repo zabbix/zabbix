@@ -20,7 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup alerts
@@ -29,7 +29,14 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testPageReportsActionLog extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	public static function prepareInsertActionsData() {
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
@@ -77,7 +84,8 @@ class testPageReportsActionLog extends CWebTest {
 		);
 
 		// Check data set values in input field.
-		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
+		$this->assertEquals('now-1h', $this->query('id:from')->one()->getValue());
+		$this->assertEquals('now', $this->query('id:to')->one()->getValue());
 
 		// Press to display filter.
 		$this->query('id:ui-id-2')->one()->click();
@@ -683,8 +691,9 @@ class testPageReportsActionLog extends CWebTest {
 				$time_tab->one()->click();
 			}
 
-			$form->fill($data['time']);
-			$form->query('button:Apply')->one()->click();
+			$this->query('id:from')->one()->fill($data['time']['id:from']);
+			$this->query('id:to')->one()->fill($data['time']['id:to']);
+			$this->query('id:apply')->one()->click();
 			$this->page->waitUntilReady();
 		}
 

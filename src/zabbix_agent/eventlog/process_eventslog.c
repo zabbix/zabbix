@@ -50,7 +50,7 @@ static void	zbx_get_message_files(const wchar_t *szLogName, const wchar_t *szSou
 {
 	wchar_t	buf[MAX_PATH];
 	HKEY	hKey = NULL;
-	DWORD	szData;
+	DWORD	szData = 0;
 
 	/* Get path to message dll */
 	StringCchPrintf(buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), szLogName, szSourceName);
@@ -481,44 +481,47 @@ static int	seek_eventlog(HANDLE *eventlog_handle, zbx_uint64_t FirstID, DWORD Re
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose:  processes Event Log file in batch                                *
- *                                                                            *
- * Parameters: addrs            - [IN] vector for passing server and port     *
- *                                     where to send data                     *
- *             agent2_result    - [IN] address of buffer where to store       *
- *                                     matching log records (used only in     *
- *                                     Agent2)                                *
- *             eventlog_name    - [IN]                                        *
- *             regexps          - [IN] set of regexp rules for Event Log test *
- *             pattern          - [IN] regular expression or global regular   *
- *                                     expression name (@<global regexp       *
- *                                     name>).                                *
- *             key_severity     - [IN] severity of logged data sources        *
- *             key_source       - [IN] name of logged data source             *
- *             key_logeventid   - [IN] application-specific identifier for    *
- *                                     event                                  *
- *             rate             - [IN] threshold of records count at a time   *
- *             process_value_cb - [IN] callback function for sending data to  *
- *                                     server                                 *
- *             config_tls       - [IN]                                        *
- *             config_timeout   - [IN]                                        *
- *             config_source_ip - [IN]                                        *
- *             config_hostname  - [IN]                                        *
- *             metric           - [IN/OUT] parameters for Event Log process   *
- *             lastlogsize_sent - [OUT] position of last record sent to       *
- *                                      server                                *
- *             error            - [OUT] error message in case of failure      *
- *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose:  processes Event Log file in batch                                  *
+ *                                                                              *
+ * Parameters: addrs              - [IN] vector for passing server and port     *
+ *                                       where to send data                     *
+ *             agent2_result      - [IN] address of buffer where to store       *
+ *                                       matching log records (used only in     *
+ *                                       Agent2)                                *
+ *             eventlog_name      - [IN]                                        *
+ *             regexps            - [IN] set of regexp rules for Event Log test *
+ *             pattern            - [IN] regular expression or global regular   *
+ *                                       expression name (@<global regexp       *
+ *                                       name>).                                *
+ *             key_severity       - [IN] severity of logged data sources        *
+ *             key_source         - [IN] name of logged data source             *
+ *             key_logeventid     - [IN] application-specific identifier for    *
+ *                                       event                                  *
+ *             rate               - [IN] threshold of records count at a time   *
+ *             process_value_cb   - [IN] callback function for sending data to  *
+ *                                       server                                 *
+ *             config_tls         - [IN]                                        *
+ *             config_timeout     - [IN]                                        *
+ *             config_source_ip   - [IN]                                        *
+ *             config_hostname    - [IN]                                        *
+ *             config_buffer_send - [IN]                                        *
+ *             config_buffer_size - [IN]                                        *
+ *             metric             - [IN/OUT] parameters for Event Log process   *
+ *             lastlogsize_sent   - [OUT] position of last record sent to       *
+ *                                        server                                *
+ *             error              - [OUT] error message in case of failure      *
+ *                                                                              *
+ * Return value: SUCCEED or FAIL                                                *
+ *                                                                              *
+ ********************************************************************************/
 int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char
 		*eventlog_name, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
 		const char *key_source, const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		const char *config_hostname, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
+		const char *config_hostname, int config_buffer_send, int config_buffer_size,
+		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 #define EVT_LOG_ITEM 0
 #define EVT_LOG_COUNT_ITEM 1
@@ -774,7 +777,8 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 								metric->key_orig, value, ITEM_STATE_NORMAL,
 								&lastlogsize, NULL, &timestamp, source, &severity,
 								&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT,
-								config_tls, config_timeout, config_source_ip);
+								config_tls, config_timeout, config_source_ip, config_buffer_send,
+								config_buffer_size);
 
 						if (SUCCEED == send_err)
 						{
@@ -829,7 +833,8 @@ finish:
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
 		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
-				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
+				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip,
+				config_buffer_send, config_buffer_size);
 
 		if (SUCCEED == send_err)
 		{

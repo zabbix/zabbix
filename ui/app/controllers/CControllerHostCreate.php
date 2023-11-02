@@ -68,7 +68,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			$host = [
 				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-				'proxy_hostid' => $this->getInput('proxy_hostid', 0),
+				'proxyid' => $this->getInput('proxyid', 0),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
 				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 				'tags' => $this->processTags($this->getInput('tags', [])),

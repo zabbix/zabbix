@@ -21,7 +21,7 @@
 #include "../sysinfo.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
-#       include <sys/utsname.h>
+#	include <sys/utsname.h>
 #endif
 
 int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)

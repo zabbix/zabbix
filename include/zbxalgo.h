@@ -38,6 +38,7 @@ typedef zbx_hash_t (*zbx_hash_func_t)(const void *data);
 
 zbx_hash_t	zbx_default_ptr_hash_func(const void *data);
 zbx_hash_t	zbx_default_string_hash_func(const void *data);
+zbx_hash_t	zbx_default_string_ptr_hash_func(const void *data);
 zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 
 #define ZBX_DEFAULT_HASH_SEED		0
@@ -45,6 +46,7 @@ zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 #define ZBX_DEFAULT_PTR_HASH_FUNC		zbx_default_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_HASH_FUNC		zbx_hash_splittable64
 #define ZBX_DEFAULT_STRING_HASH_FUNC		zbx_default_string_hash_func
+#define ZBX_DEFAULT_STRING_PTR_HASH_FUNC	zbx_default_string_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC	zbx_default_uint64_pair_hash_func
 
 typedef int (*zbx_compare_func_t)(const void *d1, const void *d2);
@@ -348,6 +350,7 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ #
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_VECTOR_DECL(uint32, zbx_uint32_t)
+ZBX_VECTOR_DECL(int32, int)
 ZBX_PTR_VECTOR_DECL(str, char *)
 ZBX_PTR_VECTOR_DECL(ptr, void *)
 ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)

@@ -42,9 +42,9 @@ type Plugin struct {
 
 var impl Plugin
 
-func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
+func (p *Plugin) Watch(items []*plugin.Item, ctx plugin.ContextProvider) {
 	p.manager.Lock()
-	p.manager.Update(ctx.ClientID(), ctx.Output(), requests)
+	p.manager.Update(ctx.ClientID(), ctx.Output(), items)
 	p.manager.Unlock()
 }
 

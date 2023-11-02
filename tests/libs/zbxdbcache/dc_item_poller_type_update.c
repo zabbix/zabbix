@@ -36,6 +36,12 @@
 #include "dbconfig.h"
 #include "dc_item_poller_type_update_test.h"
 
+#define ZBX_SNMP_OID_TYPE_NORMAL	0
+#define ZBX_SNMP_OID_TYPE_DYNAMIC	1
+#define ZBX_SNMP_OID_TYPE_MACRO		2
+#define ZBX_SNMP_OID_TYPE_WALK		3
+#define ZBX_SNMP_OID_TYPE_GET		4
+
 /* defines from dbconfig.c */
 #define ZBX_ITEM_COLLECTED		0x01
 #define ZBX_HOST_UNREACHABLE		0x02
@@ -230,15 +236,28 @@ void	zbx_mock_test_entry(void **state)
 					sizeof(ZBX_DC_SNMPITEM), &found);
 
 			if (0 == found)
+			{
 				snmpitem->snmp_oid = NULL;
+			}
 
 			snmpitem->snmp_oid = zbx_strdup((char *)snmpitem->snmp_oid, snmp_oid);
+
+			if (0 == strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+			else if (0 == strncmp(snmpitem->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_GET;
+			else if (NULL != strchr(snmpitem->snmp_oid, '{'))
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+			else if (NULL != strchr(snmpitem->snmp_oid, '['))
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
+			else
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
 		}
 
 		if (PROXY == test_config.monitored)
 		{
-			while (0 == host.proxy_hostid)
-				host.proxy_hostid = rand();
+			while (0 == host.proxyid)
+				host.proxyid = rand();
 		}
 
 		zbx_snprintf(buffer, sizeof(buffer), "host is monitored %s and is %sreachable, item type is %d, "

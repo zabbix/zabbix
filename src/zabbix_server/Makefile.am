@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	alerter \
 	dbconfig \
 	diag \
 	discoverer \
@@ -10,15 +9,12 @@ SUBDIRS = \
 	httppoller \
 	pinger \
 	poller \
-	snmptrapper \
 	timer \
 	trapper \
 	escalator \
 	proxypoller \
 	vmware \
 	taskmanager \
-	ipmi \
-	scripts \
 	stats \
 	preproc \
 	connector \
@@ -58,7 +54,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
-	alerter/libzbxalerter.a \
+	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
 	pinger/libzbxpinger.a \
@@ -69,16 +65,16 @@ zabbix_server_LDADD = \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
-	snmptrapper/libzbxsnmptrapper.a \
+	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
 	vmware/libzbxvmware.a \
-	taskmanager/libzbxtaskmanager.a \
-	scripts/libzbxscripts.a \
+	taskmanager/libzbxtaskmanager_server.a \
 	connector/libconnector.a \
 	service/libservice.a \
+	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
@@ -165,9 +161,10 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
 	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
-	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a
+	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
+	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a
 if HAVE_IPMI
-zabbix_server_LDADD += ipmi/libipmi.a
+zabbix_server_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a
 endif
 
 zabbix_server_LDADD += $(SERVER_LIBS)

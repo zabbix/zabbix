@@ -26,7 +26,8 @@ $change_container = new CDiv(new CPartial('configuration.valuemap', [
 	'context' => $data['context'],
 	'valuemaps' => [],
 	'readonly' => false,
-	'form' => 'massupdate'
+	'form' => 'massupdate',
+	'table_id' => 'valuemap-table'
 ]));
 
 $update_existing = (new CDiv(
@@ -84,7 +85,7 @@ $remove_all_container = (new CDiv())->addItem((new CDiv(
 
 $form_list = (new CFormList('valuemap-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[valuemaps]', 'valuemap-div', _('Original')))
+		(new CVisibilityBox('visible[valuemaps]', 'valuemap-field', _('Original')))
 			->setLabel(_('Value mapping'))
 			->setChecked(array_key_exists('valuemaps', $data['visible'])),
 		(new CDiv([
@@ -102,7 +103,7 @@ $form_list = (new CFormList('valuemap-form-list'))
 			$rename_container->setAttribute('data-type', ZBX_ACTION_RENAME),
 			$remove_container->setAttribute('data-type', ZBX_ACTION_REMOVE),
 			$remove_all_container->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL)
-		]))->setId('valuemap-div')
+		]))->setId('valuemap-field')
 	);
 
 $form_list->show();

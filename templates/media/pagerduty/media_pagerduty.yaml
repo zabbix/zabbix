@@ -160,8 +160,26 @@ zabbix_export:
             }
             else if ((params.eventvalue == 1) && (params.eventupdate == 1) && (params.eventack == 'Yes'))
                 fields.event_action = 'acknowledge';
-            else if (params.eventvalue == 0)
+            else if (params.eventvalue == 0) {
                 fields.event_action = 'resolve';
+                fields.payload = {
+                    summary: params.eventname,
+                    source: (params.event_source === '1') ? 'Discovery' : params.hostname + ' : ' + params.hostip,
+                    severity: severityMapping[params.severity],
+                };
+
+                if (params.event_source === '0') {
+                    fields.payload.custom_details = {
+                        'Event date': params.eventdate,
+                        'Event time': params.eventtime,
+                        'Trigger description': params.triggerdesc,
+                        'Trigger opdata': params.triggeropdata,
+                        'Event tags': params.eventtags,
+                        'Event host': params.hostname,
+                        'Event host ip': params.hostip
+                    };
+                }
+            }
             else
                 throw 'incorrect values. Update message without ack will not be sent.';
         

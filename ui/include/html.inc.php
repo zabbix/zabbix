@@ -302,7 +302,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 	if ($is_template) {
 		$template = new CSpan(
-			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
+			(new CLink($db_host['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'template.edit')
+				->setArgument('templateid', $db_host['templateid'])
+			))
+				->setAttribute('data-templateid', $db_host['templateid'])
+				->onClick('view.editTemplate(event, this.dataset.templateid);')
 		);
 
 		if ($current_element === '') {
@@ -310,7 +315,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		}
 
 		$list->addItem(new CBreadcrumbs([
-			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
+			new CSpan(new CLink(_('All templates'), (new CUrl('zabbix.php'))->setArgument('action', 'template.list'))),
 			$template
 		]));
 
@@ -374,7 +379,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// items
 		$items = new CSpan([
 			new CLink(_('Items'),
-				(new CUrl('items.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
@@ -389,7 +395,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// triggers
 		$triggers = new CSpan([
 			new CLink(_('Triggers'),
-				(new CUrl('triggers.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
@@ -488,7 +495,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// item prototypes
 		$item_prototypes = new CSpan([
 			new CLink(_('Item prototypes'),
-				(new CUrl('disc_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -502,7 +510,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// trigger prototypes
 		$trigger_prototypes = new CSpan([
 			new CLink(_('Trigger prototypes'),
-				(new CUrl('trigger_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -858,6 +867,10 @@ function getAdministrationGeneralSubmenu(): array {
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
 
+	$timeouts_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'timeouts.edit')
+		->getUrl();
+
 	$image_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'image.list')
 		->getUrl();
@@ -895,6 +908,7 @@ function getAdministrationGeneralSubmenu(): array {
 			'items' => array_filter([
 				$gui_url            => _('GUI'),
 				$autoreg_url        => _('Autoregistration'),
+				$timeouts_url       => _('Timeouts'),
 				$image_url          => _('Images'),
 				$iconmap_url        => _('Icon mapping'),
 				$regex_url          => _('Regular expressions'),

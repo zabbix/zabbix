@@ -78,7 +78,7 @@ linters-settings:
     # switch
     default-signifies-exhaustive: true
   funlen:
-    lines: 100
+    lines: 120
     statements: 70
   gci:
     # put imports beginning with prefix after 3rd-party packages;
@@ -253,5 +253,14 @@ issues:
       linters:
         - gomnd
     - path: pkg/zbxlib/logfile.go
+      linters:
+       - nlreturn
+    - path: plugins/vfs/file/encoding
+      linters:
+       - nlreturn
+    - path: pkg/tls/tls.go
+      linters:
+       - nlreturn
+    - path: pkg/zbxlib/expressions.go
       linters:
        - nlreturn

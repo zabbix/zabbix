@@ -41,11 +41,19 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 	return
 }
 
-func (pc *passiveCheck) handleCheck(data []byte) {
-	// the timeout is one minute to allow agent connections (with max timeout of 30s) safely execute
+func (pc *passiveCheck) handleCheck(data []byte, timeout uint32) {
+	// the timeout is one minute to allow see any timeout problem with passive checks
 	const timeoutForSinglePassiveChecks = time.Minute
+	var checkTimeout time.Duration
+
+	if timeout == 0 {
+		checkTimeout = timeoutForSinglePassiveChecks
+	} else {
+		checkTimeout = time.Second * time.Duration(timeout)
+	}
+
 	// direct passive check timeout is handled by the scheduler
-	s, err := pc.scheduler.PerformTask(string(data), timeoutForSinglePassiveChecks, agent.PassiveChecksClientID)
+	s, err := pc.scheduler.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
 
 	if err != nil {
 		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())

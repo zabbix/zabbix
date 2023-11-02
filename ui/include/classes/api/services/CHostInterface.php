@@ -264,7 +264,7 @@ class CHostInterface extends CApiService {
 			$interfaceDBfields = ['interfaceid' => null];
 			$dbInterfaces = $this->get([
 				'output' => API_OUTPUT_EXTEND,
-				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
+				'interfaceids' => array_column($interfaces, 'interfaceid'),
 				'editable' => true,
 				'preservekeys' => true
 			]);
@@ -282,19 +282,13 @@ class CHostInterface extends CApiService {
 
 		$dbHosts = API::Host()->get([
 			'output' => ['host'],
-			'hostids' => zbx_objectValues($interfaces, 'hostid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$dbProxies = API::Proxy()->get([
-			'output' => ['host'],
-			'proxyids' => zbx_objectValues($interfaces, 'hostid'),
+			'hostids' => array_column($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$check_have_items = [];
+
 		foreach ($interfaces as &$interface) {
 			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -306,6 +300,7 @@ class CHostInterface extends CApiService {
 				}
 
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
+
 				if (isset($interface['hostid']) && bccomp($dbInterface['hostid'], $interface['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot switch host for interface.'));
 				}
@@ -321,12 +316,8 @@ class CHostInterface extends CApiService {
 				$interface = zbx_array_merge($dbInterface, $interface);
 			}
 			else {
-				if (!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']])) {
+				if (!isset($dbHosts[$interface['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
-				if (isset($dbProxies[$interface['hostid']])) {
-					$interface['type'] = INTERFACE_TYPE_UNKNOWN;
 				}
 				elseif (!isset($interface['type'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -347,13 +338,6 @@ class CHostInterface extends CApiService {
 						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
 							$interface['ip'],
 							$dbHosts[$interface['hostid']]['host']
-					));
-				}
-				elseif ($dbProxies && !empty($dbProxies[$interface['hostid']]['host'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
-							$interface['ip'],
-							$dbProxies[$interface['hostid']]['host']
 					));
 				}
 				else {

@@ -23,12 +23,16 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectGraph;
 
 class CWidgetFieldMultiSelectGraphView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectGraph $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectGraph $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {
 		return 'graphs';
+	}
+
+	protected function getObjectLabels(): array {
+		return ['object' => _('Graph'), 'objects' => _('Graphs')];
 	}
 
 	protected function getPopupParameters(): array {

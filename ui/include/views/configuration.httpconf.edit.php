@@ -377,7 +377,6 @@ $webscenario_tabs = (new CTabView())
 			'source' => 'httptest',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'
 		]),
@@ -432,7 +431,8 @@ $html_page
 		'is_templated' => (int) $data['templated'],
 		'variables' => $data['variables'],
 		'headers' => $data['headers'],
-		'steps' => $data['steps']
+		'steps' => $data['steps'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

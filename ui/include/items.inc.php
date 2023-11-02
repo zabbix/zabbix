@@ -280,7 +280,7 @@ function orderItemsByDelay(array &$items, $sortorder, array $options){
 
 	foreach ($items as &$item) {
 		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0)) {
 			$item['delay_sort'] = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -558,13 +558,15 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 				->setArgument('context', 'template');
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url = (new CUrl('disc_prototypes.php'))
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.prototype.list')
 				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 				->setArgument('context', 'template');
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url = (new CUrl('items.php'))
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
 				->setArgument('context', 'template');
@@ -602,23 +604,23 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->setArgument('context', 'template');
+				$name = new CLink($template['name'], $url);
 			}
 			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('disc_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.prototype.edit')
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setAttribute('data-context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl('items.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.edit')
+					->setAttribute('data-hostid', $parent_templates['links'][$itemid]['hostid'])
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-context', 'template');
 			}
-
-			$name = new CLink($template['name'], $url);
 		}
 		else {
 			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -1065,6 +1067,15 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 				];
 			}
 
+			if ($item['units'] === 's' && array_key_exists('decimals', $convert_options)
+					&& $convert_options['decimals'] != 0) {
+				return [
+					'value' => convertUnitSWithDecimals($value, false, $convert_options['decimals'], true),
+					'units' => '',
+					'is_mapped' => false
+				];
+			}
+
 			$converted_value = convertUnitsRaw([
 				'value' => $value,
 				'units' => $item['units']
@@ -1110,6 +1121,49 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 }
 
 /**
+ * Converts seconds to the biggest unit of measure with decimals.
+ *
+ * @param int|float|string  $value            Time period in seconds
+ * @param bool              $ignore_millisec  Ignores milliseconds
+ * @param int               $decimals         Max number of first non-zero decimals to display
+ * @param bool              $decimals_exact   Display exactly this number of decimals instead of first non-zeros
+ *
+ * @return string
+ */
+function convertUnitSWithDecimals($value, bool $ignore_millisec = false, int $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		bool $decimals_exact = false): string {
+	$value = (float)$value;
+	$part = '';
+	$result = 0;
+
+	foreach ([
+		'y' => SEC_PER_YEAR,
+		'M' => SEC_PER_MONTH,
+		'd' => SEC_PER_DAY,
+		'h' => SEC_PER_HOUR,
+		'm' => SEC_PER_MIN,
+		's' => 1
+	] as $key => $sec_per_part) {
+		if (floor($value / $sec_per_part) > 0) {
+			$part = $key;
+			$result = $value / $sec_per_part;
+			break;
+		}
+	}
+
+	if ($part === '' && $ignore_millisec) {
+		$part = 's';
+		$result = $value;
+	}
+	elseif ($part === '') {
+		$part = 'ms';
+		$result = $value * 1000;
+	}
+
+	return formatFloat($result, ['decimals' => $decimals, 'decimals_exact' => $decimals_exact]).$part;
+}
+
+/**
  * Check whether the unit of an item is binary or not.
  *
  * @param string $units
@@ -1122,32 +1176,31 @@ function isBinaryUnits(string $units): bool {
 
 /**
  * Retrieves from DB historical data for items and applies functional calculations.
- * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
+ * If fails for some reason, returns null.
  *
  * @param array		$item
- * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
  * @param string	$item['itemid']		ID of item
- * @param string	$item['units']		units of item
+ * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
  * @param string	$function			function to apply to time period from param, allowed: min, max and avg
  * @param string	$parameter			formatted parameter for function, example: "2w" meaning 2 weeks
  *
- * @return string item functional value from history
+ * @return string|null item functional value from history
  */
 function getItemFunctionalValue($item, $function, $parameter) {
 	// Check whether function is allowed and parameter is specified.
 	if (!in_array($function, ['min', 'max', 'avg']) || $parameter === '') {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	// Check whether item type is allowed for min, max and avg functions.
 	if ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 	if ($number_parser->parse($parameter) != CParser::PARSE_SUCCESS) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	$parameter = $number_parser->calcValue();
@@ -1155,17 +1208,10 @@ function getItemFunctionalValue($item, $function, $parameter) {
 	$time_from = time() - $parameter;
 
 	if ($time_from < 0 || $time_from > ZBX_MAX_DATE) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
-	$result = Manager::History()->getAggregatedValue($item, $function, $time_from);
-
-	if ($result !== null) {
-		return convertUnits(['value' => $result, 'units' => $item['units']]);
-	}
-	else {
-		return UNRESOLVED_MACRO_STRING;
-	}
+	return Manager::History()->getAggregatedValue($item, $function, $time_from);
 }
 
 /**
@@ -1239,7 +1285,7 @@ function getCurrentDelay($delay, array $flexible_intervals, $now) {
 	$current_delay = -1;
 
 	foreach ($flexible_intervals as $flexible_interval) {
-		list($flexible_delay, $flexible_period) = explode('/', $flexible_interval);
+		[$flexible_delay, $flexible_period] = explode('/', $flexible_interval);
 		$flexible_delay = (int) $flexible_delay;
 
 		if (($current_delay == -1 || $flexible_delay < $current_delay) && checkTimePeriod($flexible_period, $now)) {
@@ -1520,6 +1566,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 		ZBX_PREPROC_SNMP_WALK_TO_JSON => [
 			'group' => _('SNMP'),
 			'name' => _('SNMP walk to JSON')
+		],
+		ZBX_PREPROC_SNMP_GET_VALUE => [
+			'group' => _('SNMP'),
+			'name' => _('SNMP get value')
 		],
 		ZBX_PREPROC_MULTIPLIER => [
 			'group' => _('Arithmetic'),
@@ -1825,6 +1875,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:
+			case ZBX_PREPROC_SNMP_GET_VALUE:
 				$step['params'] = $step['params'][0];
 				break;
 
@@ -1860,6 +1911,14 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_REGSUB:
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			case ZBX_PREPROC_STR_REPLACE:
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+					unset($step['params'][1]);
+				}
+
 				$step['params'] = implode("\n", $step['params']);
 				break;
 
@@ -2049,8 +2108,6 @@ function prepareLldMacroPaths(array $macro_paths): array {
  * @return array
  */
 function prepareLldFilter(array $filter): array {
-	ksort($filter['conditions']);
-
 	foreach ($filter['conditions'] as $i => &$condition) {
 		if ($condition['macro'] === '' && $condition['value'] === '') {
 			unset($filter['conditions'][$i]);
@@ -2283,94 +2340,91 @@ function getMainItemFieldNames(array $input): array {
  * Get item field names of the given type and template ID.
  *
  * @param array  $input
- * @param string $input['templateid']
- * @param int    $input['type']
+ *        string $input['templateid']
+ *        int    $input['type']
  */
 function getTypeItemFieldNames(array $input): array {
 	switch ($input['type']) {
 		case ITEM_TYPE_ZABBIX:
-			return ['interfaceid', 'delay'];
+			return $input['templateid'] == 0
+				? ['interfaceid', 'timeout', 'delay']
+				: ['interfaceid', 'delay'];
 
 		case ITEM_TYPE_TRAPPER:
 			return ['trapper_hosts'];
 
 		case ITEM_TYPE_SIMPLE:
-			return ['interfaceid', 'username', 'password', 'delay'];
+			return $input['templateid'] == 0
+				? ['interfaceid', 'username', 'password', 'timeout', 'delay']
+				: ['interfaceid', 'username', 'password', 'delay'];
 
 		case ITEM_TYPE_INTERNAL:
 			return ['delay'];
 
 		case ITEM_TYPE_ZABBIX_ACTIVE:
-			return ['delay'];
+			return $input['templateid'] == 0
+				? ['timeout', 'delay']
+				: ['delay'];
 
 		case ITEM_TYPE_EXTERNAL:
-			return ['interfaceid', 'delay'];
+			return $input['templateid'] == 0
+				? ['interfaceid', 'timeout', 'delay']
+				: ['interfaceid', 'delay'];
 
 		case ITEM_TYPE_DB_MONITOR:
-			return ['username', 'password', 'params', 'delay'];
+			return $input['templateid'] == 0
+				? ['username', 'password', 'params', 'timeout', 'delay']
+				: ['username', 'password', 'params', 'delay'];
 
 		case ITEM_TYPE_IPMI:
-			if ($input['templateid'] == 0) {
-				return ['interfaceid', 'ipmi_sensor', 'delay'];
-			}
-			else {
-				return ['interfaceid', 'delay'];
-			}
+			return $input['templateid'] == 0
+				? ['interfaceid', 'ipmi_sensor', 'delay']
+				: ['interfaceid', 'delay'];
 
 		case ITEM_TYPE_SSH:
-			return ['interfaceid', 'authtype', 'username', 'publickey', 'privatekey', 'password', 'params', 'delay'];
+			return $input['templateid'] == 0
+				? ['interfaceid', 'authtype', 'username', 'publickey', 'privatekey', 'password', 'params', 'timeout',
+					'delay'
+				]
+				: ['interfaceid', 'authtype', 'username', 'publickey', 'privatekey', 'password', 'params', 'delay'];
 
 		case ITEM_TYPE_TELNET:
-			return ['interfaceid', 'username', 'password', 'params', 'delay'];
+			return $input['templateid'] == 0
+				? ['interfaceid', 'username', 'password', 'params', 'timeout', 'delay']
+				: ['interfaceid', 'username', 'password', 'params', 'delay'];
 
 		case ITEM_TYPE_CALCULATED:
 			return ['params', 'delay'];
 
 		case ITEM_TYPE_JMX:
-			if ($input['templateid'] == 0) {
-				return ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay'];
-			}
-			else {
-				return ['interfaceid', 'username', 'password', 'delay'];
-			}
+			return $input['templateid'] == 0
+				? ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay']
+				: ['interfaceid', 'username', 'password', 'delay'];
 
 		case ITEM_TYPE_SNMPTRAP:
 			return ['interfaceid'];
 
 		case ITEM_TYPE_DEPENDENT:
-			if ($input['templateid'] == 0) {
-				return ['master_itemid'];
-			}
-
-			return [];
+			return $input['templateid'] == 0 ? ['master_itemid'] : [];
 
 		case ITEM_TYPE_HTTPAGENT:
-			if ($input['templateid'] == 0) {
-				return ['url', 'query_fields', 'request_method', 'post_type', 'posts', 'headers', 'status_codes',
+			return $input['templateid'] == 0
+				? ['url', 'query_fields', 'request_method', 'post_type', 'posts', 'headers', 'status_codes',
 					'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy', 'interfaceid', 'authtype',
 					'username', 'password', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file',
 					'ssl_key_password', 'timeout', 'delay', 'allow_traps', 'trapper_hosts'
-				];
-			}
-			else {
-				return ['interfaceid', 'delay', 'allow_traps', 'trapper_hosts'];
-			}
+				]
+				: ['interfaceid', 'delay', 'allow_traps', 'trapper_hosts'];
 
 		case ITEM_TYPE_SNMP:
-			if ($input['templateid'] == 0) {
-				return ['interfaceid', 'snmp_oid', 'delay'];
-			}
-			else {
-				return ['interfaceid', 'delay'];
-			}
+			return $input['templateid'] == 0
+				? ['interfaceid', 'snmp_oid', 'timeout', 'delay']
+				: ['interfaceid', 'delay'];
 
 		case ITEM_TYPE_SCRIPT:
-			if ($input['templateid'] == 0) {
-				return ['parameters', 'params', 'timeout', 'delay'];
-			}
-			else {
-				return ['delay'];
-			}
+			return $input['templateid'] == 0
+				? ['parameters', 'params', 'timeout', 'delay']
+				: ['delay'];
 	}
 }
 
@@ -2379,12 +2433,13 @@ function getTypeItemFieldNames(array $input): array {
  *
  * @param array  $field_names
  * @param array  $input
- * @param int    $input['type']
- * @param string $input['key_']
- * @param int    $input['value_type']
- * @param int    $input['authtype']
- * @param int    $input['allow_traps']
- * @param int    $input['hosts'][0]['status']
+ *        int    $input['type']
+ *        string $input['key_']
+ *        int    $input['value_type']
+ *        int    $input['authtype']
+ *        int    $input['allow_traps']
+ *        string $input['snmp_oid']
+ *        int    $input['hosts'][0]['status']
  *
  * @return array
  */
@@ -2417,6 +2472,12 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 					[ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]
 				);
 
+			case 'timeout':
+				return ($input['type'] != ITEM_TYPE_SIMPLE || (strncmp($input['key_'], 'icmpping', 8) != 0
+						&& strncmp($input['key_'], 'vmware.', 7) != 0))
+					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'get[', 4) == 0
+						|| strncmp($input['snmp_oid'], 'walk[', 5) == 0);
+
 			case 'delay':
 				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;
 
@@ -2430,4 +2491,108 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 
 		return true;
 	});
+}
+
+/**
+ * Apply sorting for discovery rule filter or override filter conditions, if appropriate.
+ * Prioritization by non/exist operator applied between matching macros.
+ *
+ * @param array $conditions
+ * @param int   $evaltype
+ *
+ * @return array
+ */
+function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
+	switch ($evaltype) {
+		case CONDITION_EVAL_TYPE_AND_OR:
+		case CONDITION_EVAL_TYPE_AND:
+		case CONDITION_EVAL_TYPE_OR:
+			usort($conditions, static function(array $condition_a, array $condition_b): int {
+				$comparison = strnatcasecmp($condition_a['macro'], $condition_b['macro']);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				$exist_operators = [CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_EXISTS];
+
+				$comparison = (int) in_array($condition_b['operator'], $exist_operators)
+					- (int) in_array($condition_a['operator'], $exist_operators);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				return strnatcasecmp($condition_a['value'], $condition_b['value']);
+			});
+
+			foreach ($conditions as $i => &$condition) {
+				$condition['formulaid'] = num2letter($i);
+			}
+			unset($condition);
+			break;
+
+		case CONDITION_EVAL_TYPE_EXPRESSION:
+			CArrayHelper::sort($conditions, ['formulaid']);
+			break;
+	}
+
+	return array_values($conditions);
+}
+
+/**
+ * Get per-item-type timeouts from proxy or global settings.
+ *
+ * @param string $proxyid
+ *
+ * @return array
+ */
+function getInheritedTimeouts(string $proxyid): array {
+	if ($proxyid != 0) {
+		$db_proxies = API::Proxy()->get([
+			'output' => ['custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+				'timeout_telnet_agent', 'timeout_script'
+			],
+			'proxyids' => $proxyid,
+			'nopermissions' => true
+		]);
+		$db_proxy = reset($db_proxies);
+
+		if ($db_proxy && $db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+			return [
+				'source' => 'proxy',
+				'proxyid' => $proxyid,
+				'timeouts' => [
+					ITEM_TYPE_ZABBIX => $db_proxy['timeout_zabbix_agent'],
+					ITEM_TYPE_SIMPLE => $db_proxy['timeout_simple_check'],
+					ITEM_TYPE_ZABBIX_ACTIVE => $db_proxy['timeout_zabbix_agent'],
+					ITEM_TYPE_EXTERNAL => $db_proxy['timeout_external_check'],
+					ITEM_TYPE_DB_MONITOR => $db_proxy['timeout_db_monitor'],
+					ITEM_TYPE_SSH => $db_proxy['timeout_ssh_agent'],
+					ITEM_TYPE_TELNET => $db_proxy['timeout_telnet_agent'],
+					ITEM_TYPE_HTTPAGENT => $db_proxy['timeout_http_agent'],
+					ITEM_TYPE_SNMP => $db_proxy['timeout_snmp_agent'],
+					ITEM_TYPE_SCRIPT => $db_proxy['timeout_script']
+				]
+			];
+		}
+	}
+
+	return [
+		'source' => 'global',
+		'proxyid' => $proxyid,
+		'timeouts' => [
+			ITEM_TYPE_ZABBIX => CSettingsHelper::get(CSettingsHelper::TIMEOUT_ZABBIX_AGENT),
+			ITEM_TYPE_SIMPLE => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SIMPLE_CHECK),
+			ITEM_TYPE_ZABBIX_ACTIVE => CSettingsHelper::get(CSettingsHelper::TIMEOUT_ZABBIX_AGENT),
+			ITEM_TYPE_EXTERNAL => CSettingsHelper::get(CSettingsHelper::TIMEOUT_EXTERNAL_CHECK),
+			ITEM_TYPE_DB_MONITOR => CSettingsHelper::get(CSettingsHelper::TIMEOUT_DB_MONITOR),
+			ITEM_TYPE_SSH => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SSH_AGENT),
+			ITEM_TYPE_TELNET => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
+			ITEM_TYPE_HTTPAGENT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
+			ITEM_TYPE_SNMP => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SNMP_AGENT),
+			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
+		]
+	];
 }

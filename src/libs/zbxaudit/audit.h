@@ -47,6 +47,7 @@
 #define AUDIT_RESOURCE_HOST_PROTOTYPE		37
 #define AUDIT_RESOURCE_SETTINGS			40
 #define AUDIT_RESOURCE_HA_NODE			47
+#define AUDIT_RESOURCE_HISTORY			53
 
 zbx_hashset_t	*zbx_get_audit_hashset(void);
 

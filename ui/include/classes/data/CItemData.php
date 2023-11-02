@@ -257,7 +257,7 @@ final class CItemData {
 			'vmware.dc.tags.get[url,id]',
 			'vmware.dvswitch.discovery[url]',
 			'vmware.dvswitch.fetchports.get[url,uuid,<filter>,<mode>]',
-			'vmware.eventlog[url,<mode>]',
+			'vmware.eventlog[url,<mode>,<severity>]',
 			'vmware.fullname[url]',
 			'vmware.hv.alarms.get[url,uuid]',
 			'vmware.hv.cluster.name[url,uuid]',
@@ -490,6 +490,101 @@ final class CItemData {
 	}
 
 	/**
+	 * Returns sets of elements (DOM IDs) to set visible, disabled, when a 'parent' field value is changed.
+	 *
+	 * @return array
+	 */
+	public static function filterSwitchingConfiguration(): array {
+		$all_item_types = -1;
+
+		return [
+			'for_type' => [
+				$all_item_types => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_CALCULATED => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_DB_MONITOR => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_DEPENDENT => [],
+				ITEM_TYPE_EXTERNAL => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_HTTPAGENT => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_INTERNAL => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_IPMI => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_JMX => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SCRIPT => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SIMPLE => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SNMP => [
+					'js-filter-snmp-oid-label',
+					'js-filter-snmp-oid-field',
+					'filter_snmp_oid',
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SNMPTRAP => [],
+				ITEM_TYPE_SSH => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_TELNET => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_TRAPPER => [],
+				ITEM_TYPE_ZABBIX => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_ZABBIX_ACTIVE => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				]
+			]
+		];
+	}
+
+	/**
 	 * Returns sets of elements (DOM IDs, default field values, dependent option values) to set visible,
 	 * disabled, or set value of, when a 'parent' field value is changed.
 	 *
@@ -498,6 +593,39 @@ final class CItemData {
 	 * @return array
 	 */
 	public static function fieldSwitchingConfiguration(array $data): array {
+		if ($data['is_discovery_rule']) {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey'
+				]
+			];
+		}
+		else {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PASSWORD => [
+					'js-item-password-label',
+					'js-item-password-field',
+					'password'
+				],
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey',
+					'js-item-passphrase-label',
+					'js-item-passphrase-field',
+					'passphrase'
+				]
+			];
+		}
+
 		return [
 			// Ids to toggle when the field 'type' is changed.
 			'for_type' => [
@@ -518,6 +646,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'js-item-username-label',
 					'js-item-username-field',
 					'username',
@@ -547,6 +677,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -558,13 +690,13 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'js-item-query-fields-label',
 					'js-item-query-fields-field',
 					'js-item-request-method-label',
 					'js-item-request-method-field',
 					'request_method',
-					'js-item-timeout-label',
-					'js-item-timeout-field',
 					'js-item-post-type-label',
 					'js-item-post-type-field',
 					'js-item-posts-label',
@@ -654,13 +786,13 @@ final class CItemData {
 					'js-item-parameters-field',
 					'js-item-script-label',
 					'js-item-script-field',
-					'js-item-timeout-label',
-					'js-item-timeout-field',
 					'js-item-delay-label',
 					'js-item-delay-field',
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -670,6 +802,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'js-item-interface-label',
 					'js-item-interface-field',
 					'interfaceid',
@@ -694,6 +828,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -724,6 +860,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'params_script',
 					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH],
 					['id' => 'value_type', 'defaultValue' => '']
@@ -745,6 +883,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'params_script',
 					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET],
 					['id' => 'value_type', 'defaultValue' => '']
@@ -765,6 +905,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -774,21 +916,14 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.
-			'for_authtype' => [
-				ITEM_AUTHTYPE_PUBLICKEY => [
-					'js-item-private-key-label',
-					'js-item-private-key-field',
-					'privatekey',
-					'js-item-public-key-label',
-					'js-item-public-key-field',
-					'publickey'
-				]
-			],
+			'for_authtype' => $for_authtype,
 			'for_http_auth_type' => [
 				ZBX_HTTP_AUTH_BASIC => [
 					'js-item-http-username-label',
@@ -1870,8 +2005,8 @@ final class CItemData {
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.dvswitch.fetchports'
 				]
 			],
-			'vmware.eventlog[url,<mode>]' => [
-				'description' => _('VMware event log, "url" - VMware service URL, "mode"- all (default), skip - skip processing of older data'),
+			'vmware.eventlog[url,<mode>,<severity>]' => [
+				'description' => _('VMware event log, "url" - VMware service URL, "mode"- all (default) or skip - skip processing of older data, "severity" - filtering is disabled by default or "error,warning,info,user" in any combination'),
 				'value_type' => ITEM_VALUE_TYPE_LOG,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.eventlog'

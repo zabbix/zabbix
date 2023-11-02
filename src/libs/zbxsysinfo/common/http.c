@@ -146,7 +146,7 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 	return size * nmemb;
 }
 
-static int	curl_page_get(char *url, char **buffer, char **error)
+static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 {
 	CURLcode		err;
 	http_response_t		page = {0};
@@ -172,7 +172,7 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE,
 					sysinfo_get_config_source_ip()))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
-					(long)sysinfo_get_config_timeout())) ||
+					(long)timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
@@ -212,7 +212,8 @@ out:
 	return ret;
 }
 
-static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
+static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer,
+		char **error)
 {
 	char	*url = NULL;
 	int	ret;
@@ -257,7 +258,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		goto out;
 	}
 
-	ret = curl_page_get(url, buffer, error);
+	ret = curl_page_get(url, timeout, buffer, error);
 out:
 	zbx_free(url);
 
@@ -284,7 +285,8 @@ static char	*find_port_sep(char *host, size_t len)
 	return NULL;
 }
 
-static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
+static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer,
+		char **error)
 {
 	char		*url = NULL, *hostname = NULL, *path_loc = NULL;
 	int		ret = SYSINFO_RET_OK, ipv6_host_found = 0;
@@ -398,8 +400,8 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), hostname, port_num,
-			sysinfo_get_config_timeout(), ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), hostname, port_num, timeout,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		char	*request = NULL;
 
@@ -459,7 +461,7 @@ int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, &buffer, &error)))
 	{
 		zbx_rtrim(buffer, "\r\n");
 		SET_TEXT_RESULT(result, buffer);
@@ -488,7 +490,7 @@ int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, NULL, &error)))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, NULL, &error)))
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	else
 		SET_MSG_RESULT(result, error);
@@ -533,7 +535,7 @@ int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == output || '\0' == *output)
 		output = "\\0";
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, &buffer, &error)))
 	{
 		char	*ptr = NULL, *str;
 

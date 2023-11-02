@@ -81,7 +81,7 @@ void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
 
 #if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
-char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding);
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **error);
 #endif	/* HAVE_ICONV */
 
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4

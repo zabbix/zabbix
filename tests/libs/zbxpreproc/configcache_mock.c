@@ -21,12 +21,16 @@
 #include "zbxcacheconfig.h"
 
 int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error)
+		int hostids_num, unsigned char env, char **error);
+
+int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, unsigned char env, char **error)
 {
 	ZBX_UNUSED(um_cache);
 	ZBX_UNUSED(text);
 	ZBX_UNUSED(hostids);
 	ZBX_UNUSED(hostids_num);
+	ZBX_UNUSED(env);
 	ZBX_UNUSED(error);
 
 	return SUCCEED;

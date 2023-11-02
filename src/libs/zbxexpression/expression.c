@@ -685,6 +685,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		raw_value = 0;
 		pos = token.loc.l;
 		inner_token = token;
+		ret = SUCCEED;
 
 		switch (token.type)
 		{
@@ -717,7 +718,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					/* Ignore functions with macros not supporting them, but do not skip the */
 					/* whole token, nested macro should be resolved in this case. */
 					pos++;
-					continue;
+					ret = FAIL;
 				}
 				break;
 			case ZBX_TOKEN_USER_MACRO:
@@ -739,7 +740,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				continue;
 		}
 
-		ret = SUCCEED;
+		if (SUCCEED == ret)
+		{
 
 		if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
 				ZBX_MACRO_TYPE_MESSAGE_UPDATE |
@@ -770,7 +772,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 
 					pos = token.loc.r;
 				}
-				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
+				else if (ZBX_TOKEN_EXPRESSION_MACRO == inner_token.type)
 				{
 					zbx_timespec_t	ts;
 					char		*errmsg = NULL;
@@ -1491,34 +1493,34 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
-							"r.proxy_hostid")))
+							"r.proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to, "host");
+							ret = expr_db_get_proxy_value(proxyid, &replace_to, "name");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
-							"r.proxy_hostid")))
+							"r.proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 						{
 							replace_to = zbx_strdup(replace_to, "");
 						}
 						else
 						{
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to,
+							ret = expr_db_get_proxy_value(proxyid, &replace_to,
 									"description");
 						}
 					}
@@ -1592,34 +1594,34 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
-							"proxy_hostid")))
+							"proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to, "host");
+							ret = expr_db_get_proxy_value(proxyid, &replace_to, "name");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
-							"proxy_hostid")))
+							"proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 						{
 							replace_to = zbx_strdup(replace_to, "");
 						}
 						else
 						{
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to,
+							ret = expr_db_get_proxy_value(proxyid, &replace_to,
 									"description");
 						}
 					}
@@ -2766,6 +2768,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 						(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
 				res = FAIL;
 			}
+		}
 		}
 
 		if (FAIL == ret)
