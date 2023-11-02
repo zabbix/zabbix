@@ -18,14 +18,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class DataDisplayInGraphs {
-	/**
-	 * Create data for data display of graphs related tests.
-	 *
-	 * @return array
-	 */
-	public static function load() {
-		$responce = CDataHelper::createHosts([
+
+require_once dirname(__FILE__) . '/../include/CWebTest.php';
+
+/**
+ * @backup profiles
+ *
+ * @onBefore prepareGraphData
+ */
+class testDataDisplayInGraphs extends CWebTest {
+
+	protected static $hostid;
+	protected static $timestamps;
+	protected static $itemids;
+	protected static $dashboardid;
+
+	public static function prepareGraphData() {
+		$host_responce = CDataHelper::createHosts([
 			[
 				'host' => 'Host for data display on graphs',
 				'interfaces' => [
@@ -79,7 +88,7 @@ class DataDisplayInGraphs {
 						'delay' => '1m'
 					],
 					[
-						'name' => 'Item for pie chart2',
+						'name' => 'Item for pie chart 2',
 						'key_' => 'item_key_6',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
@@ -89,22 +98,25 @@ class DataDisplayInGraphs {
 			]
 		]);
 
-		$hostid = $responce['hostids']['Host for data display on graphs'];
-		$history1_itemid = $responce['itemids']['Host for data display on graphs:item_key_1'];
-		$history2_itemid = $responce['itemids']['Host for data display on graphs:item_key_2'];
-		$trends1_itemid = $responce['itemids']['Host for data display on graphs:item_key_3'];
-		$trends2_itemid = $responce['itemids']['Host for data display on graphs:item_key_4'];
-		$pie1_itemid = $responce['itemids']['Host for data display on graphs:item_key_5'];
-		$pie2_itemid = $responce['itemids']['Host for data display on graphs:item_key_6'];
+		self::$hostid = $host_responce['hostids']['Host for data display on graphs'];
 
-		CDataHelper::call('graph.create', [
+		self::$itemids = [
+			'Item for history data display 1' => $host_responce['itemids']['Host for data display on graphs:item_key_1'],
+			'Item for history data display 2' => $host_responce['itemids']['Host for data display on graphs:item_key_2'],
+			'Item for trends data display 1' => $host_responce['itemids']['Host for data display on graphs:item_key_3'],
+			'Item for trends data display 2' => $host_responce['itemids']['Host for data display on graphs:item_key_4'],
+			'Item for pie chart 1' => $host_responce['itemids']['Host for data display on graphs:item_key_5'],
+			'Item for pie chart 2' => $host_responce['itemids']['Host for data display on graphs:item_key_6'],
+		];
+
+		$graph_responce = CDataHelper::call('graph.create', [
 			[
 				'name' => 'History graph 1',
 				'width' => 800,
 				'height' => 250,
 				'gitems' => [
 					[
-						'itemid' => $history1_itemid,
+						'itemid' => self::$itemids['Item for history data display 1'],
 						'color' => 'FF0000'
 					]
 				]
@@ -123,7 +135,7 @@ class DataDisplayInGraphs {
 				'ymax_type' => 1,
 				'gitems' => [
 					[
-						'itemid' => $history2_itemid,
+						'itemid' => self::$itemids['Item for history data display 2'],
 						'color' => '1A7C11',
 						'calc_fnc' => 2,
 						'yaxisside' => 1
@@ -136,11 +148,11 @@ class DataDisplayInGraphs {
 				'height' => 400,
 				'gitems' => [
 					[
-						'itemid' => $history1_itemid,
+						'itemid' => self::$itemids['Item for history data display 1'],
 						'color' => 'FF0000'
 					],
 					[
-						'itemid' => $history2_itemid,
+						'itemid' => self::$itemids['Item for history data display 2'],
 						'color' => '1A7C11',
 						'calc_fnc' => 2, // Should not influence the graph since only history data will be displayed.
 						'yaxisside' => 1
@@ -154,11 +166,11 @@ class DataDisplayInGraphs {
 				'graphtype' => GRAPH_TYPE_STACKED,
 				'gitems' => [
 					[
-						'itemid' => $history1_itemid,
+						'itemid' => self::$itemids['Item for history data display 1'],
 						'color' => 'FF0000'
 					],
 					[
-						'itemid' => $history2_itemid,
+						'itemid' => self::$itemids['Item for history data display 2'],
 						'color' => '1A7C11'
 					]
 				]
@@ -169,7 +181,7 @@ class DataDisplayInGraphs {
 				'height' => 250,
 				'gitems' => [
 					[
-						'itemid' => $trends1_itemid,
+						'itemid' => self::$itemids['Item for trends data display 1'],
 						'color' => 'FF0000',
 						'calc_fnc' => 7
 					]
@@ -189,7 +201,7 @@ class DataDisplayInGraphs {
 				'ymax_type' => 1,
 				'gitems' => [
 					[
-						'itemid' => $trends2_itemid,
+						'itemid' => self::$itemids['Item for trends data display 2'],
 						'color' => '1A7C11',
 						'calc_fnc' => 7,
 						'yaxisside' => 1
@@ -202,12 +214,12 @@ class DataDisplayInGraphs {
 				'height' => 400,
 				'gitems' => [
 					[
-						'itemid' => $trends1_itemid,
+						'itemid' => self::$itemids['Item for trends data display 1'],
 						'color' => 'FF0000',
 						'calc_fnc' => 7
 					],
 					[
-						'itemid' => $trends2_itemid,
+						'itemid' => self::$itemids['Item for trends data display 2'],
 						'color' => '1A7C11',
 						'calc_fnc' => 7,
 						'yaxisside' => 1
@@ -220,12 +232,12 @@ class DataDisplayInGraphs {
 				'height' => 400,
 				'gitems' => [
 					[
-						'itemid' => $trends1_itemid,
+						'itemid' => self::$itemids['Item for trends data display 1'],
 						'color' => 'FF0000',
 						'calc_fnc' => 1
 					],
 					[
-						'itemid' => $trends2_itemid,
+						'itemid' => self::$itemids['Item for trends data display 2'],
 						'color' => '1A7C11',
 						'calc_fnc' => 1,
 						'yaxisside' => 1
@@ -238,12 +250,12 @@ class DataDisplayInGraphs {
 				'height' => 400,
 				'gitems' => [
 					[
-						'itemid' => $trends1_itemid,
+						'itemid' => self::$itemids['Item for trends data display 1'],
 						'color' => 'FF0000',
 						'calc_fnc' => 2
 					],
 					[
-						'itemid' => $trends2_itemid,
+						'itemid' => self::$itemids['Item for trends data display 2'],
 						'color' => '1A7C11',
 						'calc_fnc' => 2,
 						'yaxisside' => 1
@@ -256,12 +268,12 @@ class DataDisplayInGraphs {
 				'height' => 400,
 				'gitems' => [
 					[
-						'itemid' => $trends1_itemid,
+						'itemid' => self::$itemids['Item for trends data display 1'],
 						'color' => 'FF0000',
 						'calc_fnc' => 4
 					],
 					[
-						'itemid' => $trends2_itemid,
+						'itemid' => self::$itemids['Item for trends data display 2'],
 						'color' => '1A7C11',
 						'calc_fnc' => 4,
 						'yaxisside' => 1
@@ -275,11 +287,11 @@ class DataDisplayInGraphs {
 				'height' => 300,
 				'gitems' => [
 					[
-						'itemid' => $pie1_itemid,
+						'itemid' => self::$itemids['Item for pie chart 1'],
 						'color' => '00FF00'
 					],
 					[
-						'itemid' => $pie2_itemid,
+						'itemid' => self::$itemids['Item for pie chart 2'],
 						'color' => 'FF0000'
 					]
 				]
@@ -292,11 +304,11 @@ class DataDisplayInGraphs {
 				'show_3d' => 1,
 				'gitems' => [
 					[
-						'itemid' => $pie1_itemid,
+						'itemid' => self::$itemids['Item for pie chart 1'],
 						'color' => '00FF00'
 					],
 					[
-						'itemid' => $pie2_itemid,
+						'itemid' => self::$itemids['Item for pie chart 2'],
 						'color' => 'FF0000'
 					]
 				]
@@ -308,11 +320,11 @@ class DataDisplayInGraphs {
 				'height' => 300,
 				'gitems' => [
 					[
-						'itemid' => $pie1_itemid,
+						'itemid' => self::$itemids['Item for pie chart 1'],
 						'color' => '00FF00'
 					],
 					[
-						'itemid' => $pie2_itemid,
+						'itemid' => self::$itemids['Item for pie chart 2'],
 						'color' => 'FF0000'
 					]
 				]
@@ -325,11 +337,11 @@ class DataDisplayInGraphs {
 				'show_3d' => 1,
 				'gitems' => [
 					[
-						'itemid' => $pie1_itemid,
+						'itemid' => self::$itemids['Item for pie chart 1'],
 						'color' => '00FF00'
 					],
 					[
-						'itemid' => $pie2_itemid,
+						'itemid' => self::$itemids['Item for pie chart 2'],
 						'color' => 'FF0000'
 					]
 				]
@@ -340,9 +352,9 @@ class DataDisplayInGraphs {
 		$timestamp = '07-08-2023 12:00 EET';
 
 		$item_data = [
-			// Trend data for first trend item.
+			// Trends data for first trends item.
 			[
-				'itemid' => $trends1_itemid,
+				'itemid' => self::$itemids['Item for trends data display 1'],
 				'timestamps' => [
 					$timestamp.' - 5 days + 18 hours',
 					$timestamp.' - 4 days',
@@ -476,7 +488,7 @@ class DataDisplayInGraphs {
 			],
 			// History data for first history item.
 			[
-				'itemid' => $history1_itemid,
+				'itemid' => self::$itemids['Item for history data display 1'],
 				'timestamps' => [
 					$timestamp,
 					$timestamp.' + 1 minute',
@@ -494,9 +506,9 @@ class DataDisplayInGraphs {
 				],
 				'values' => [10.5, 8.33, 12.69, 4.025, 3.1, 7, 6.66, -1.5, 0.31, 6.47, 2.11, 8.98, 10.01]
 			],
-			// Trends data for second trend item.
+			// Trends data for second trends item.
 			[
-				'itemid' => $trends2_itemid,
+				'itemid' => self::$itemids['Item for trends data display 2'],
 				'timestamps' => [
 					$timestamp.' - 5 days + 18 hours',
 					$timestamp.' - 4 days',
@@ -595,7 +607,7 @@ class DataDisplayInGraphs {
 			],
 			// History data for second history item.
 			[
-				'itemid' => $history2_itemid,
+				'itemid' => self::$itemids['Item for history data display 2'],
 				'timestamps' => [
 					$timestamp,
 					$timestamp.' + 1 minute',
@@ -615,7 +627,7 @@ class DataDisplayInGraphs {
 			]
 		];
 
-		// Add history and trend values to item displayed in graphs and widgets.
+		// Add history and trends values to item displayed in graphs and widgets.
 		foreach ($item_data as $data) {
 			foreach ($data['timestamps'] as &$timestamp) {
 				$timestamp = strtotime($timestamp);
@@ -625,10 +637,25 @@ class DataDisplayInGraphs {
 			CDataHelper::addItemData($data['itemid'], $data['values'], $data['timestamps']);
 		}
 
-		CDataHelper::addItemData($pie1_itemid, 0.66);
-		CDataHelper::addItemData($pie2_itemid, 0.34);
+		CDataHelper::addItemData(self::$itemids['Item for pie chart 1'], 0.66);
+		CDataHelper::addItemData(self::$itemids['Item for pie chart 2'], 0.34);
 
-		// Create dashboards for Top host widget testing.
+		self::$timestamps = [
+			'history' => [
+				'from' => '2023-08-07 12:58:00',
+				'to' => '2023-08-07 13:20:00',
+			],
+			'trends' => [
+				'from' => '2023-08-03 00:00:00',
+				'to' => '2023-08-07 12:00:00',
+			],
+			'pie' => [
+				'from' => 'now-1h',
+				'to' => 'now'
+			]
+		];
+
+		// Create dashboard with SVG graphs and classic graph widgets.
 		$dashboard_responce = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard to check data display in graphs',
@@ -650,7 +677,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000001
+										'value' => $graph_responce['graphids'][0]
 									]
 								]
 							],
@@ -666,7 +693,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000002
+										'value' => $graph_responce['graphids'][1]
 									]
 								]
 							],
@@ -682,7 +709,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000003
+										'value' => $graph_responce['graphids'][2]
 									]
 								]
 							],
@@ -698,7 +725,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000004
+										'value' => $graph_responce['graphids'][3]
 									]
 								]
 							],
@@ -714,7 +741,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000005
+										'value' => $graph_responce['graphids'][4]
 									]
 								]
 							],
@@ -730,7 +757,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000006
+										'value' => $graph_responce['graphids'][5]
 									]
 								]
 							],
@@ -746,7 +773,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000007
+										'value' => $graph_responce['graphids'][6]
 									]
 								]
 							],
@@ -762,7 +789,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000008
+										'value' => $graph_responce['graphids'][7]
 									]
 								]
 							],
@@ -778,7 +805,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000009
+										'value' => $graph_responce['graphids'][8]
 									]
 								]
 							],
@@ -794,15 +821,20 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000010
+										'value' => $graph_responce['graphids'][9]
 									]
 								]
-							],
+							]
+						]
+					],
+					[
+						'name' => 'Pie charts',
+						'widgets' => [
 							[
 								'type' => 'graph',
 								'name' => '',
 								'x' => 0,
-								'y' => 20,
+								'y' => 0,
 								'width' => 6,
 								'height' => 4,
 								'view_mode' => 0,
@@ -810,7 +842,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000011
+										'value' => $graph_responce['graphids'][10]
 									]
 								]
 							],
@@ -818,7 +850,7 @@ class DataDisplayInGraphs {
 								'type' => 'graph',
 								'name' => '',
 								'x' => 6,
-								'y' => 20,
+								'y' => 0,
 								'width' => 6,
 								'height' => 4,
 								'view_mode' => 0,
@@ -826,7 +858,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000012
+										'value' => $graph_responce['graphids'][11]
 									]
 								]
 							],
@@ -834,7 +866,7 @@ class DataDisplayInGraphs {
 								'type' => 'graph',
 								'name' => '',
 								'x' => 12,
-								'y' => 20,
+								'y' => 0,
 								'width' => 6,
 								'height' => 4,
 								'view_mode' => 0,
@@ -842,7 +874,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000013
+										'value' => $graph_responce['graphids'][12]
 									]
 								]
 							],
@@ -850,7 +882,7 @@ class DataDisplayInGraphs {
 								'type' => 'graph',
 								'name' => '',
 								'x' => 18,
-								'y' => 20,
+								'y' => 0,
 								'width' => 6,
 								'height' => 4,
 								'view_mode' => 0,
@@ -858,7 +890,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 6,
 										'name' => 'graphid',
-										'value' => 2000014
+										'value' => $graph_responce['graphids'][13]
 									]
 								]
 							]
@@ -884,7 +916,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => $history1_itemid
+										'value' => self::$itemids['Item for history data display 1']
 									]
 								]
 							],
@@ -905,7 +937,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => $trends1_itemid
+										'value' => self::$itemids['Item for trends data display 1']
 									]
 								]
 							]
@@ -956,12 +988,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:59:00'
+										'value' => self::$timestamps['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1022,12 +1054,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:59:00'
+										'value' => self::$timestamps['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1088,12 +1120,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:59:00'
+										'value' => self::$timestamps['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1154,12 +1186,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:59:00'
+										'value' => self::$timestamps['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1185,7 +1217,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -1200,7 +1232,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 1,
@@ -1215,12 +1247,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 00:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 09:00:00'
+										'value' => self::$timestamps['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1246,7 +1278,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -1266,7 +1298,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 1,
@@ -1286,12 +1318,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 00:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 09:00:00'
+										'value' => self::$timestamps['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1317,7 +1349,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -1337,7 +1369,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 1,
@@ -1357,12 +1389,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 00:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 09:00:00'
+										'value' => self::$timestamps['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1388,7 +1420,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -1408,7 +1440,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 1,
@@ -1428,12 +1460,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 00:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 09:00:00'
+										'value' => self::$timestamps['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1499,12 +1531,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:59:00'
+										'value' => self::$timestamps['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1565,12 +1597,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:59:00'
+										'value' => self::$timestamps['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1596,7 +1628,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -1606,7 +1638,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 0,
@@ -1636,12 +1668,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 03:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 09:00:00'
+										'value' => self::$timestamps['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1667,7 +1699,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -1677,7 +1709,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 0,
@@ -1707,12 +1739,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 03:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 09:00:00'
+										'value' => self::$timestamps['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1772,13 +1804,13 @@ class DataDisplayInGraphs {
 									],
 									[
 										'type' => 1,
-										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'name' => 'time_from',
+										'value' => '2023-08-07 12:54:00'
 									],
 									[
 										'type' => 1,
-										'name' => 'time_from',
-										'value' => '2023-08-07 12:54:00'
+										'name' => 'time_to',
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 1,
@@ -1834,7 +1866,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -1844,7 +1876,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 1,
@@ -1874,7 +1906,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 03:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
@@ -1965,12 +1997,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:59:00'
+										'value' => self::$timestamps['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 13:19:00'
+										'value' => self::$timestamps['history']['to']
 									],
 									[
 										'type' => 0,
@@ -2001,7 +2033,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.0.0',
-										'value' => 'Item for trend data display 1'
+										'value' => 'Item for trends data display 1'
 									],
 									[
 										'type' => 1,
@@ -2011,7 +2043,7 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'ds.items.1.0',
-										'value' => 'Item for trend data display 2'
+										'value' => 'Item for trends data display 2'
 									],
 									[
 										'type' => 1,
@@ -2051,12 +2083,12 @@ class DataDisplayInGraphs {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-03 03:00:00'
+										'value' => self::$timestamps['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-07 09:00:00'
+										'value' => self::$timestamps['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -2071,19 +2103,236 @@ class DataDisplayInGraphs {
 			]
 		]);
 
-		$timestamps = [
-			'history_start' => '2023-08-07 12:58:00',
-			'history_end' => '2023-08-07 13:20:00',
-			'trends_start' => '2023-08-03 00:00:00',
-			'trends_end' => '2023-08-07 12:00:00',
-			'pie_start' => 'now-24h',
-			'pie_end' => 'now'
-		];
+		self::$dashboardid = $dashboard_responce['dashboardids'][0];
+	}
 
+	public function getMonitoringGraphData() {
 		return [
-			'hostid' => $hostid,
-			'dashboardid' => $dashboard_responce['dashboardids'][0],
-			'timestamps' => $timestamps
+			[
+				[
+					'type' => 'history'
+				]
+			],
+			[
+				[
+					'type' => 'trends'
+				]
+			],
+			[
+				[
+					'type' => 'pie'
+				]
+			],
+			[
+				[
+					'type' => 'history',
+					'kiosk_mode' => true
+				]
+			],
+			[
+				[
+					'type' => 'trends',
+					'kiosk_mode' => true
+				]
+			],
+			[
+				[
+					'type' => 'pie',
+					'kiosk_mode' => true
+				]
+			]
 		];
+	}
+
+	/**
+	 * @dataProvider getMonitoringGraphData
+	 */
+	public function testDataDisplayInGraphs_MonitoringHosts($data) {
+		$this->page->login()->open('zabbix.php?action=charts.view&filter_set=1&filter_hostids%5B0%5D='.self::$hostid)
+				->waitUntilReady();
+		// Select the time selector tab if it is not expanded.
+		$time_tab = $this->query('xpath://a[contains(@class, "btn-time")]')->one();
+		$timeselector_tab = $this->query('id:tab_1')->one();
+
+		if ($timeselector_tab->isDisplayed(false)) {
+			$time_tab->click();
+			$timeselector_tab->waitUntilVisible();
+		}
+
+		// Set time selector to display the time period, required for the corresponding data type.
+		$this->setTimeSelector(self::$timestamps[$data['type']]);
+
+		CFilterElement::find()->one()->selectTab('Filter');
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$filter_form->fill(['Name' => $data['type']]);
+
+		$screenshot_string = (CTestArrayHelper::get($data, 'kiosk_mode'))
+			? 'monitoring_hosts'.$data['type'].'_kiosk_'
+			: 'monitoring_hosts'.$data['type'].'_';
+
+		foreach (['All graphs', 'Host graphs', 'Simple graphs'] as $show) {
+			// Pie widget displays data in non-fixed time period, so only host graph screenshot will not differ each time.
+			if ($data['type'] === 'pie' && $show !== 'Host graphs') {
+				continue;
+			}
+
+			$filter_form->fill(['Show' => $show]);
+			$filter_form->submit();
+
+			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
+				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+				$this->page->waitUntilReady();
+			}
+			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
+			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
+			foreach ($charts_table->query('class:center')->all() as $graph) {
+				$graph->waitUntilClassesNotPresent('is-loading');
+			}
+
+			$this->assertScreenshot($charts_table, $screenshot_string.$show);
+
+			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
+				$this->query('xpath://button[@title="Normal view"]')->one()->click();
+				$this->page->waitUntilReady();
+			}
+		}
+	}
+
+	public function getLatestDataGraphData() {
+		return [
+			[
+				[
+					'type' => 'history',
+					'item' => 'Item for history data display 1'
+				]
+			],
+			[
+				[
+					'type' => 'trends',
+					'item' => 'Item for trends data display 1'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLatestDataGraphData
+	 */
+	public function testDataDisplayInGraphs_LatestData($data) {
+		$this->page->login()->open('history.php?action=showgraph&itemids%5B%5D='.self::$itemids[$data['item']])
+				->waitUntilReady();
+		// In Latest data the image loads longer, so need to wait for image source to change before checking the screenshot.
+		$image = $this->query('id:historyGraph')->one();
+		$old_source = $image->getAttribute('src');
+
+		// Set time selector to display the time period, required for the corresponding data type.
+		$this->setTimeSelector(self::$timestamps[$data['type']]);
+
+		// Wait for the image source to chenge and check graph screenshot.
+		$image->waitUntilAttributesNotPresent(['src' => $old_source]);
+		$screenshot_id = 'latest_data_'.$data['type'];
+		$this->assertScreenshot($this->query('class:center')->one(), $screenshot_id);
+
+		$this->checkKioskMode('class:center', $screenshot_id);
+	}
+
+	public function getDashboardWidgetData() {
+		return [
+			[
+				[
+					'type' => 'history',
+					'page' => 'Host graphs'
+				]
+			],
+			[
+				[
+					'type' => 'trends',
+					'page' => 'Host graphs'
+				]
+			],
+			[
+				[
+					'type' => 'pie',
+					'page' => 'Pie charts'
+				]
+			],
+			[
+				[
+					'type' => 'history',
+					'page' => 'Simple graphs'
+				]
+			],
+			[
+				[
+					'type' => 'trends',
+					'page' => 'Simple graphs'
+				]
+			],
+			[
+				[
+					'page' => 'SVG graph types'
+				]
+			],
+			[
+				[
+					'page' => 'Missing data + axes + timeshift + agg func'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDashboardWidgetData
+	 */
+	public function testDataDisplayInGraphs_DashboardWidgets($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+
+		// It's required to set time selector only for pages with classic graph widgets, SVG graphs have period set in config.
+		if (CTestArrayHelper::get($data, 'type')) {
+			$this->setTimeSelector(self::$timestamps[$data['type']]);
+		}
+
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+
+		// Open the required dashboard page and check screenshot.
+		if ($data['page'] !== $dashboard->getSelectedPageName()) {
+			$dashboard->selectPage($data['page']);
+			$dashboard->waitUntilReady();
+		}
+		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
+		$this->assertScreenshot($dashboard, $screenshot_id);
+
+		$this->checkKioskMode('class:dashboard-grid', $screenshot_id);
+	}
+
+	/**
+	 * Check graphs screenshots in Kiosk mode.
+	 *
+	 * @param string	$object_locator		locator of element with graphs
+	 * @param string	$id					ID of the screenshot
+	 */
+	protected function checkKioskMode($object_locator, $id) {
+		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->page->waitUntilReady();
+
+		$object= $this->query($object_locator)->waitUntilPresent()->one();
+		$this->assertScreenshot($object, $id.'_kiosk');
+
+		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->page->waitUntilReady();
+	}
+
+	/**
+	 * Set time selector configuration according to the desired period.
+	 *
+	 * @param array	$timestamps		timestamps that represent the start and the end of the desired period
+	 */
+	protected function setTimeSelector($timestamps) {
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+
+		foreach (['from', 'to'] as $fieldid) {
+			$filter_form->getField('id:'.$fieldid)->waitUntilVisible()->fill($timestamps[$fieldid]);
+		}
+		$filter_form->query('id:apply')->one()->click();
 	}
 }

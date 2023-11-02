@@ -319,4 +319,13 @@ class CDashboardElement extends CElement {
 			return ($target->getWidgets()->filter(CElementFilter::NOT_READY)->count() === 0);
 		};
 	}
+
+	/**
+	 * Return the name of the selected dashboard page.
+	 *
+	 * @return string
+	 */
+	public function getSelectedPageName() {
+		$this->query('xpath://div[@class="selected-tab"]/span')->one()->getText();
+	}
 }
