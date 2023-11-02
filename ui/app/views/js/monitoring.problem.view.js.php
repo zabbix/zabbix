@@ -100,7 +100,7 @@
 				this.refresh_url.setArgument('page', '1');
 
 				this.refreshResults();
-				this.refreshData();
+				this.refreshCounters();
 				chkbxRange.clearSelectedOnFilterChange();
 
 				if (this.active_filter !== this.filter._active_item) {
@@ -135,7 +135,7 @@
 					});
 			});
 
-			this.refreshData();
+			this.refreshCounters();
 
 			// Keep timeselector changes in global_timerange.
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
@@ -391,29 +391,21 @@
 			this.refreshNow();
 		},
 
-		refreshData() {
+		refreshCounters() {
 			clearTimeout(this.refresh_timer);
+
 			fetch(this.refresh_simple_url, {
 				method: 'POST',
-				body: new URLSearchParams({
-					filter_counters: 1,
-					from: this.filter._active_item._data.from,
-					to: this.filter._active_item._data.to
-				})
+				body: new URLSearchParams({filter_counters: 1})
 			})
 				.then(response => response.json())
 				.then(response => {
-					const timeselector_text = document.querySelector('li[data-target="tabfilter_timeselector"]')
-						.querySelector('a.tabfilter-item-link');
-
-					timeselector_text.textContent = `${response.timeselector_label}`;
-
 					if (response.filter_counters) {
 						this.filter.updateCounters(response.filter_counters);
 					}
 
 					if (this.refresh_interval > 0) {
-						this.refresh_timer = setTimeout(() => this.refreshData(), this.refresh_interval);
+						this.refresh_timer = setTimeout(() => this.refreshCounters(), this.refresh_interval);
 					}
 				})
 				.catch(() => {
@@ -421,7 +413,7 @@
 					 * On error restart refresh timer.
 					 * If refresh interval is set to 0 (no refresh) schedule initialization request after 5 sec.
 					 */
-					this.refresh_timer = setTimeout(() => this.refreshData(),
+					this.refresh_timer = setTimeout(() => this.refreshCounters(),
 						this.refresh_interval > 0 ? this.refresh_interval : 5000
 					);
 				});
@@ -498,7 +490,7 @@
 
 				uncheckTableRows('problem');
 				view.refreshResults();
-				view.refreshData();
+				view.refreshCounters();
 			}
 		}
 	};

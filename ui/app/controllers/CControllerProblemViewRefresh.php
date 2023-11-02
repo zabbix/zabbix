@@ -89,8 +89,8 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			foreach ($filters as $index => $tabfilter) {
 				if (!$tabfilter['filter_custom_time']) {
 					$tabfilter = [
-						'from' => $tabfilter['from'],
-						'to' => $tabfilter['to']
+						'from' => $profile->from,
+						'to' => $profile->to
 					] + $tabfilter;
 				}
 				else {
@@ -99,8 +99,6 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 
 				$data['filter_counters'][$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
-
-			$data['timeselector_label'] = relativeDateToText($this->getInput('from'), $this->getInput('to'));
 
 			if (($messages = getMessages()) !== null) {
 				$data['messages'] = $messages->toString();

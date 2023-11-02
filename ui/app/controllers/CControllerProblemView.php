@@ -134,8 +134,8 @@ class CControllerProblemView extends CControllerProblem {
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter'),
 				'timeselector' => [
-					'from' => $this->hasInput('from') ? $this->getInput('from') : $profile->from,
-					'to' => $this->hasInput('to') ? $this->getInput('to') : $profile->to,
+					'from' => $profile->from,
+					'to' => $profile->to,
 					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
 				] + getTimeselectorActions($profile->from, $profile->to)
 			],
