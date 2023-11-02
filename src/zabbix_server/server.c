@@ -48,7 +48,7 @@
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
-#include "taskmanager/taskmanager.h"
+#include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
 #include "zbxconnector.h"
@@ -85,10 +85,8 @@
 #include "zbxdiscovery.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
-
 #ifdef HAVE_OPENIPMI
-#include "ipmi/ipmi_manager.h"
-#include "ipmi/ipmi_poller.h"
+#include "zbxipmi.h"
 #endif
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
@@ -1399,11 +1397,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
-							get_zbx_progname, &events_cbs, listen_sock, config_startup_time,
-							config_proxydata_frequency};
+							zbx_progname, &events_cbs, listen_sock, config_startup_time,
+							config_proxydata_frequency, get_config_forks};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
-							CONFIG_FORKS};
+							get_config_forks};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_zbx_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
 							zbx_config_source_ip, config_ssl_ca_location,
@@ -1675,10 +1673,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
 				thread_args.args = &ipmi_manager_args;
-				zbx_thread_start(ipmi_manager_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_ipmi_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				zbx_thread_start(ipmi_poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_ipmi_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_ALERTMANAGER:

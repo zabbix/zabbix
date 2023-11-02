@@ -29,8 +29,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
-	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
-	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
 	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
@@ -106,6 +104,10 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS)
+
+if HAVE_IPMI
+COMMON_LIB_FILES += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
+endif
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 

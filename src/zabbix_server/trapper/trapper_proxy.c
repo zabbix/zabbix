@@ -22,12 +22,14 @@
 #include "trapper.h"
 
 #include "zbxcommshigh.h"
+#include "../taskmanager/taskmanager_server.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
+
+#include "zbxcommshigh.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
 #include "zbxdbwrap.h"
 #include "zbxproxybuffer.h"
-#include "../taskmanager/taskmanager.h"
 #include "zbxcompress.h"
 #include "zbxcachehistory.h"
 

@@ -26,6 +26,9 @@
 #include "../../../src/libs/zbxsysinfo/sysinfo.h"
 
 int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
+		int (*validate_func)(const char *), const char *sendtoclose, int *value_int);
+
+int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
 	ZBX_UNUSED(host);

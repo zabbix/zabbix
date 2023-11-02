@@ -27,7 +27,6 @@
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
-#include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -39,12 +38,14 @@
 #include "discoverer_job.h"
 #include "zbxproxybuffer.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxpoller.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
 #endif
 
 static zbx_get_progname_f	zbx_get_progname_cb = NULL;
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
 
 typedef struct
 {
@@ -343,8 +344,8 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 					item.timeout = dcheck->timeout;
 
-					if (SUCCEED == get_value_agent(&item, source_ip, &result) &&
-							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+					if (SUCCEED == zbx_agent_get_value(&item, source_ip, zbx_get_program_type_cb(),
+							&result) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 					}
@@ -983,7 +984,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 }
 
 static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_druleids,
-		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts, unsigned char program_type)
+		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts)
 {
 	int				rule_count = 0, delay, i, k, tmt_simple = 0, tmt_agent = 0, tmt_snmp = 0;
 	char				*delay_str = NULL;
@@ -1126,7 +1127,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 		zbx_vector_discoverer_jobs_ptr_append(jobs, job);
 		rule_count++;
 next:
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(drule->druleid);
 
 		zbx_dc_drule_queue(now, drule->druleid, delay);
@@ -1760,7 +1761,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
-
+	zbx_get_program_type_cb = discoverer_args_in->zbx_get_program_type_cb_arg;
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg);
@@ -1856,8 +1857,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			zbx_hashset_create(&check_counts, 1, discoverer_check_count_hash,
 					discoverer_check_count_compare);
 
-			rule_count = process_discovery(&nextcheck, &incomplete_druleids, &jobs, &check_counts,
-					discoverer_args_in->zbx_get_program_type_cb_arg());
+			rule_count = process_discovery(&nextcheck, &incomplete_druleids, &jobs, &check_counts);
 
 			if (0 == nextcheck)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;
