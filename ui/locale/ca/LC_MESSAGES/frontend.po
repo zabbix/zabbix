@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-10-05 06:00+0000\n"
+"PO-Revision-Date: 2023-10-21 07:29+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -6759,6 +6759,10 @@ msgstr "Supervisió del registre d'esdeveniments. Retorna un registre"
 #: include/views/configuration.triggers.edit.php:100
 msgid "Event name"
 msgstr "Nom de l'esdeveniment"
+
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr "El nom de l'esdeveniment coincideix amb el nom del trigger (amb macros ampliades) tret que s'especifiqui un nom d'esdeveniment personalitzat a la configuració del trigger."
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
