@@ -578,7 +578,7 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 	zbx_json_free(&json);
 }
 
-CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_delay,
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
 		int check_response_code)
 {
 	CURLcode	err;
@@ -623,8 +623,8 @@ next_attempt:
 		context->header.offset = 0;
 		context->body.offset = 0;
 
-		if (0 != attempt_delay && 1 < context->max_attempts)
-			sleep(attempt_delay);
+		if (0 != attempt_interval && 1 < context->max_attempts)
+			sleep(attempt_interval);
 	}
 	while (0 < --context->max_attempts);
 

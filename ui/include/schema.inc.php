@@ -9672,7 +9672,7 @@ return [
 				'length' => 10,
 				'default' => '31'
 			],
-			'attempt_delay' => [
+			'attempt_interval' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,

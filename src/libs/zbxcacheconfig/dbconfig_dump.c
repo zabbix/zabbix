@@ -1553,7 +1553,7 @@ static void	DCdump_connectors(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  status:%d", connector->status);
 		zabbix_log(LOG_LEVEL_TRACE, "  tags_evaltype:%d", connector->tags_evaltype);
 		zabbix_log(LOG_LEVEL_TRACE, "  item_value_type:%d", connector->item_value_type);
-		zabbix_log(LOG_LEVEL_TRACE, "  attempt_delay:'%s'", connector->attempt_delay);
+		zabbix_log(LOG_LEVEL_TRACE, "  attempt_interval:'%s'", connector->attempt_interval);
 
 		DCdump_connector_tags(connector);
 	}

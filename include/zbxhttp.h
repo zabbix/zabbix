@@ -100,7 +100,7 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
 		char **error);
 
-CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_delay,
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
 		int check_response_code);
 int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURLcode err, long *response_code,
 		char **out, char **error);

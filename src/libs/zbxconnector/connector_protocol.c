@@ -122,7 +122,7 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 		const zbx_connector_t *connector)
 {
 	zbx_uint32_t	data_len = 0, url_len, timeout_len, token_len, http_proxy_len, username_len, password_len,
-			ssl_cert_file_len, ssl_key_file_len, ssl_key_password_len, attempt_delay_len;
+			ssl_cert_file_len, ssl_key_file_len, ssl_key_password_len, attempt_interval_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, connector->protocol);
@@ -141,7 +141,7 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	zbx_serialize_prepare_str_len(data_len, connector->ssl_key_file, ssl_key_file_len);
 	zbx_serialize_prepare_str_len(data_len, connector->ssl_key_password, ssl_key_password_len);
 	zbx_serialize_prepare_value(data_len, connector->item_value_type);
-	zbx_serialize_prepare_str_len(data_len, connector->attempt_delay, attempt_delay_len);
+	zbx_serialize_prepare_str_len(data_len, connector->attempt_interval, attempt_interval_len);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -170,14 +170,14 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	ptr += zbx_serialize_str(ptr, connector->ssl_key_file, ssl_key_file_len);
 	ptr += zbx_serialize_str(ptr, connector->ssl_key_password, ssl_key_password_len);
 	ptr += zbx_serialize_value(ptr, connector->item_value_type);
-	(void)zbx_serialize_str(ptr, connector->attempt_delay, attempt_delay_len);
+	(void)zbx_serialize_str(ptr, connector->attempt_interval, attempt_interval_len);
 }
 
 void	zbx_connector_deserialize_connector_and_data_point(const unsigned char *data, zbx_uint32_t size,
 		zbx_connector_t *connector, zbx_vector_connector_data_point_t *connector_data_points)
 {
 	zbx_uint32_t		url_len, timeout_len, token_len, http_proxy_len, username_len, password_len,
-				ssl_cert_file_len, ssl_key_file_len, ssl_key_password_len, attempt_delay_len;
+				ssl_cert_file_len, ssl_key_file_len, ssl_key_password_len, attempt_interval_len;
 	const unsigned char	*start = data;
 
 	data += zbx_deserialize_value(data, &connector->protocol);
@@ -196,7 +196,7 @@ void	zbx_connector_deserialize_connector_and_data_point(const unsigned char *dat
 	data += zbx_deserialize_str(data, &connector->ssl_key_file, ssl_key_file_len);
 	data += zbx_deserialize_str(data, &connector->ssl_key_password, ssl_key_password_len);
 	data += zbx_deserialize_value(data, &connector->item_value_type);
-	data += zbx_deserialize_str(data, &connector->attempt_delay, attempt_delay_len);
+	data += zbx_deserialize_str(data, &connector->attempt_interval, attempt_interval_len);
 
 	zbx_connector_deserialize_data_point(data, (zbx_uint32_t)(size - (data - start)), connector_data_points);
 }

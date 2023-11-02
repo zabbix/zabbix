@@ -640,7 +640,7 @@ typedef struct
 	int			senders;
 
 	int			item_value_type;
-	char			*attempt_delay;
+	char			*attempt_interval;
 }
 zbx_connector_t;
 

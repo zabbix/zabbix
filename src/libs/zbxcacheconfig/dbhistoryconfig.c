@@ -964,7 +964,8 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 					dc_connector->ssl_key_password);
 			connector->ssl_key_password = zbx_strdup(connector->ssl_key_password,
 					dc_connector->ssl_key_password);
-			connector->attempt_delay = zbx_strdup(connector->attempt_delay, dc_connector->attempt_delay);
+			connector->attempt_interval = zbx_strdup(connector->attempt_interval,
+					dc_connector->attempt_interval);
 		}
 
 		*connector_revision = config->revision.connector;

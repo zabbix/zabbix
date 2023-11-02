@@ -63,7 +63,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 #define ATTEMPT_DELAY_MAX	10
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200";
 	zbx_http_context_t	context;
-	int			ret, timeout_seconds, attempt_delay_sec;
+	int			ret, timeout_seconds, attempt_interval_sec;
 
 	zbx_http_context_create(&context);
 
@@ -74,10 +74,10 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		goto skip;
 	}
 
-	if (FAIL == zbx_is_time_suffix(connector.attempt_delay, &attempt_delay_sec,
-			(int)strlen(connector.attempt_delay)) || 10 < attempt_delay_sec)
+	if (FAIL == zbx_is_time_suffix(connector.attempt_interval, &attempt_interval_sec,
+			(int)strlen(connector.attempt_interval)) || 10 < attempt_interval_sec)
 	{
-		error = zbx_dsprintf(NULL, "Invalid attempt delay: %s", connector.attempt_delay);
+		error = zbx_dsprintf(NULL, "Invalid attempt delay: %s", connector.attempt_interval);
 		ret = FAIL;
 		goto skip;
 	}
@@ -90,7 +90,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 			HTTP_STORE_RAW, config_source_ip, &error)))
 	{
 		long		response_code;
-		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_delay_sec, 1);
+		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_interval_sec, 1);
 
 		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code,
 				&out, &error)))
@@ -159,7 +159,7 @@ skip:
 	zbx_free(connector.ssl_cert_file);
 	zbx_free(connector.ssl_key_file);
 	zbx_free(connector.ssl_key_password);
-	zbx_free(connector.attempt_delay);
+	zbx_free(connector.attempt_interval);
 
 	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_CONNECTOR_RESULT, NULL, 0))
 	{
