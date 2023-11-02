@@ -383,6 +383,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextNotPresent('Parent items');
 		}
 
+		$this->assertTrue($form->getField('Name')->isDisplayed());
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 		$this->assertEquals('true', $form->getField('Name')->getAttribute('autofocus'));
 
@@ -390,6 +391,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->assertEquals('true', $form->getField('Name')->getAttribute('readonly'));
 		}
 
+		$this->assertTrue($form->getField('Type')->isDisplayed());
 		$type_field = $form->getField('Type')->asDropdown();
 
 		if (!isset($templateid)) {
@@ -426,6 +428,7 @@ class testFormItem extends CLegacyWebTest {
 			$type = $type_field->getText();
 		}
 
+		$this->assertTrue($form->getField('Key')->isDisplayed());
 		$this->assertEquals(2048, $form->getField('Key')->getAttribute('maxlength'));
 
 		if (!isset($templateid)) {
@@ -474,6 +477,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'Database monitor') {
+			$this->assertTrue($form->getField('SQL query')->isDisplayed());
 			$this->assertEquals(7, $form->getField('SQL query')->getAttribute('rows'));
 			$this->zbxTestAssertElementValue('params_ap', '');
 		}
@@ -483,6 +487,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
+			$this->assertTrue($form->getField('Executed script')->isDisplayed());
 			$this->assertEquals(7, $form->getField('Executed script')->getAttribute('rows'));
 		}
 		else {
@@ -491,6 +496,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'Calculated') {
+			$this->assertTrue($form->getField('Formula')->isDisplayed());
 			$this->assertEquals(7, $form->getField('Formula')->getAttribute('rows'));
 		}
 		else {
@@ -533,11 +539,12 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'IPMI agent') {
+			$this->assertTrue($form->getField('IPMI sensor')->isDisplayed());
 			$this->assertEquals(128, $form->getField('IPMI sensor')->getAttribute('maxlength'));
 		}
 		else {
 			$this->zbxTestTextNotVisible('IPMI sensor');
-			$this->assertFalse($form->query('id:ipmi_sensor')->one()->isDisplayed());
+			$this->assertFalse($form->getField('IPMI sensor')->isDisplayed());
 		}
 
 		if ($type == 'SSH agent') {
@@ -553,13 +560,16 @@ class testFormItem extends CLegacyWebTest {
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check'
 				|| $type == 'Database monitor') {
+			$this->assertTrue($form->getField('User name')->isDisplayed());
 			$this->assertEquals(255, $form->getField('User name')->getAttribute('maxlength'));
 
 			if (isset($authtype) && $authtype == 'Public key') {
+				$this->assertTrue($form->getField('Key passphrase')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Key passphrase')->getAttribute('maxlength'));
 				$this->assertFalse($form->query('name:password')->one()->isDisplayed());
 			}
 			else {
+				$this->assertTrue($form->getField('Password')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Password')->getAttribute('maxlength'));
 			}
 		}
@@ -568,6 +578,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if	(isset($authtype) && $authtype == 'Public key') {
+			$this->assertTrue($form->query('id', ['publickey', 'privatekey'])->one()->isDisplayed());
 			$this->assertEquals(64, $form->getField('Public key file')->getAttribute('maxlength'));
 			$this->assertEquals(64, $form->getField('Private key file')->getAttribute('maxlength'));
 		}
@@ -576,6 +587,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if	($type === 'SNMP agent') {
+			$this->assertTrue($form->getField('SNMP OID')->isDisplayed());
 			$this->assertEquals(512, $form->getField('SNMP OID')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
 				$this->assertEquals('walk[OID1,OID2,...]', $form->getField('SNMP OID')->getAttribute('placeholder'));
@@ -594,7 +606,7 @@ class testFormItem extends CLegacyWebTest {
 			$hint->waitUntilNotPresent();
 		}
 		else {
-			$this->assertFalse($form->query('id:snmp_oid')->one()->isDisplayed());
+			$this->assertFalse($form->getField('SNMP OID')->isDisplayed());
 		}
 
 		switch ($type) {
@@ -610,13 +622,14 @@ class testFormItem extends CLegacyWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 			case 'Calculated':
+				$this->assertTrue($form->getField('Update interval')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Update interval')->getAttribute('maxlength'));
 				if (!isset($itemid)) {
 					$form->checkValue(['Update interval' => '1m']);
 				}
 				break;
 			default:
-				$this->assertFalse($form->query('id:delay')->one()->isDisplayed());
+				$this->assertFalse($form->getField('Update interval')->isDisplayed());
 		}
 
 		if (isset($templateid)) {
@@ -638,13 +651,14 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($value_type === 'Numeric (float)' || ($value_type == 'Numeric (unsigned)')) {
+			$this->assertTrue($form->getField('Units')->isDisplayed());
 			$this->assertEquals(255, $form->getField('Units')->getAttribute('maxlength'));
 			if(isset($templateid)) {
 				$this->assertEquals('true', $form->getField('Units')->getAttribute('readonly'));
 			}
 		}
 		else {
-			$this->assertFalse($form->query('id:units')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Units')->isDisplayed());
 		}
 
 		// Custom intervals isn't visible for type 'SNMP trap' and 'Zabbix trapper'
@@ -670,6 +684,7 @@ class testFormItem extends CLegacyWebTest {
 			);
 		}
 
+		$this->assertTrue($form->getField('History')->isDisplayed());
 		$this->assertEquals(255, $form->getField('History')->getAttribute('maxlength'));
 
 		if (!isset($itemid)) {
@@ -677,18 +692,20 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
+			$this->assertTrue($form->getField('Trends')->isDisplayed());
 			$this->assertEquals(255, $form->getField('Trends')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
 				$this->assertEquals('365d', $form->getField('Trends')->getValue());
 			}
 		}
 		else {
-			$this->assertFalse($form->query('id:trends')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Trends')->isDisplayed());
 		}
 
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
 			$this->zbxTestTextPresent('Value mapping');
 			$valuemap_field = $form->getField('Value mapping');
+			$this->assertTrue($valuemap_field->isDisplayed());
 			if (!isset($templateid)) {
 				$this->assertEquals('', $valuemap_field->getValue());
 
@@ -747,21 +764,23 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->assertFalse($dialog->query('id:js-item-value-map-label')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Value mapping')->isDisplayed());
 		}
 
 		if ($type == 'Zabbix trapper') {
+			$this->assertTrue($form->getField('Allowed hosts')->isDisplayed());
 			$this->assertEquals(255, $form->getField('Allowed hosts')->getAttribute('maxlength'));
 		}
 		else {
-			$this->assertFalse($form->query('id:trapper_hosts')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Allowed hosts')->isDisplayed());
 		}
 
 		if ($value_type == 'Log') {
+			$this->assertTrue($form->getField('Log time format')->isDisplayed());
 			$this->assertEquals(64, $form->getField('Log time format')->getAttribute('maxlength'));
 		}
 		else {
-			$this->assertFalse($form->query('id:logtimefmt')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Log time format')->isDisplayed());
 		}
 
 		$this->zbxTestTextNotPresent(['Applications', 'New application']);
@@ -845,6 +864,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->assertEquals('-None-', $host_inventory->getText());
 		}
 
+		$this->assertTrue($form->getField('Description')->isDisplayed());
 		$this->assertEquals(7, $form->getField('Description')->getAttribute('rows'));
 		$this->assertTrue($form->getField('Enabled')->asCheckbox()->isSelected());
 		$this->assertEquals('Cancel', $dialog_footer->query('button:Cancel')->one()->getText());
