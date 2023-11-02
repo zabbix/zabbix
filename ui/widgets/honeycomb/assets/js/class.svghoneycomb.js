@@ -714,16 +714,11 @@ class CSVGHoneycomb {
 			const lines_widths = [];
 
 			labels
-				.each((d, index_label, nodes) => {
-					const lines = d[data_attribute].split('\r\n');
-
-					d3.select(nodes[index_label])
+				.each((d, index_label, nodes_labels) => {
+					d3.select(nodes_labels[index_label])
 						.selectAll('tspan')
-						.each((d, index_line) => {
-							lines_widths.push(this.#getMeasuredTextWidth(
-								lines[index_line],
-								default_size * 10,
-								this.#svg.style('font-family')) * this.#scale)
+						.each((d, index_line, nodes_lines) => {
+							lines_widths.push(nodes_lines[index_line].getComputedTextLength() * this.#scale);
 						});
 				});
 
@@ -1069,23 +1064,5 @@ class CSVGHoneycomb {
 		path += 'Z';
 
 		return path.replaceAll(',', ' ');
-	}
-
-	/**
-	 * Get text width using canvas measuring.
-	 *
-	 * @param {string} text
-	 * @param {number} size
-	 * @param {string} font_family
-	 *
-	 * @returns {number}
-	 */
-	#getMeasuredTextWidth(text, size, font_family) {
-		const canvas = document.createElement('canvas');
-		const context = canvas.getContext('2d');
-
-		context.font = `${size}px ${font_family}`;
-
-		return context.measureText(text).width;
 	}
 }
