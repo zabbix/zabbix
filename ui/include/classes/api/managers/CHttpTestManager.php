@@ -289,7 +289,8 @@ class CHttpTestManager {
 			'filter' => [
 				'httptestid' => array_keys($httptestids),
 				'type' => $types
-			]
+			],
+			'sortfield' => ['httptest_fieldid']
 		];
 		$result = DBselect(DB::makeSql('httptest_field', $options));
 
@@ -494,7 +495,8 @@ class CHttpTestManager {
 			' FROM httpstep hs,httpstep_field hsf'.
 			' WHERE hs.httpstepid=hsf.httpstepid'.
 				' AND '.dbConditionId('hs.httpstepid', array_keys($httpstepids)).
-				' AND '.dbConditionInt('hsf.type', array_keys($types))
+				' AND '.dbConditionInt('hsf.type', array_keys($types)).
+				' ORDER BY hsf.httpstep_fieldid'
 		);
 
 		while ($row = DBfetch($result)) {
@@ -742,7 +744,7 @@ class CHttpTestManager {
 					foreach ($httptest[$httptest_field] as &$field) {
 						$db_field = array_shift($db_fields);
 
-						if ($db_field) {
+						if ($db_field !== null) {
 							$upd_field = DB::getUpdatedValues('httptest_field', $field, $db_field);
 
 							if ($upd_field) {
@@ -1119,7 +1121,7 @@ class CHttpTestManager {
 						foreach ($step[$step_field] as &$field) {
 							$db_field = array_shift($db_fields);
 
-							if ($db_field) {
+							if ($db_field !== null) {
 								$upd_field = DB::getUpdatedValues('httpstep_field', $field, $db_field);
 
 								if ($upd_field) {
