@@ -306,6 +306,8 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
+	zbx_progname = get_program_name(argv[0]);
+
 	zbx_init_library_common(NULL, get_zbx_progname);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname);
@@ -318,8 +320,6 @@ int	main(int argc, char **argv)
 	}
 #endif
 	zbx_config_tls = zbx_config_tls_new();
-
-	zbx_progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,

@@ -1441,6 +1441,9 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
+	argv = zbx_setproctitle_init(argc, argv);
+	zbx_progname = get_program_name(argv[0]);
+
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
@@ -1459,8 +1462,6 @@ int	main(int argc, char **argv)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 	zbx_config_tls = zbx_config_tls_new();
-	argv = zbx_setproctitle_init(argc, argv);
-	zbx_progname = get_program_name(argv[0]);
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);

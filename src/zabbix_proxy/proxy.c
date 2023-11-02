@@ -1162,12 +1162,13 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
+	argv = zbx_setproctitle_init(argc, argv);
+	zbx_progname = get_program_name(argv[0]);
+
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 	zbx_init_library_nix(get_zbx_progname);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
-	argv = zbx_setproctitle_init(argc, argv);
-	zbx_progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
