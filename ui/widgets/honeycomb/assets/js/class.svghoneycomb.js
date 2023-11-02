@@ -34,7 +34,7 @@ class CSVGHoneycomb {
 
 	static ID_COUNTER = 0;
 
-	static CELL_WIDTH_MIN = 32;
+	static CELL_WIDTH_MIN = 70;
 	static LABEL_HEIGHT_MIN = 12;
 
 	static LABEL_PRIMARY_SIZE_DEFAULT = 20;
