@@ -1175,24 +1175,23 @@ function isBinaryUnits(string $units): bool {
 }
 
 /**
- * Retrieves from DB historical data for items and applies functional calculations.
- * If fails for some reason, returns null.
+ * Get item value aggregation.
  *
- * @param array		$item
- * @param string	$item['itemid']		ID of item
- * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
- * @param string	$function			function to apply to time period from param, allowed: min, max and avg
- * @param string	$parameter			formatted parameter for function, example: "2w" meaning 2 weeks
+ * @param array  $item
+ *               $item['itemid']     Item ID.
+ *               $item['value_type'] Item value type (either ITEM_VALUE_TYPE_FLOAT or ITEM_VALUE_TYPE_UINT64).
+ *               $item['history']    Item history storage period.
+ *               $item['trends']     Item trends storage period.
+ * @param string $function           Aggregation function (either 'min', 'max' or 'avg').
+ * @param string $parameter          Time shift for aggregation (like '1h' or '2w').
  *
- * @return string|null item functional value from history
+ * @return string|null
  */
-function getItemFunctionalValue($item, $function, $parameter) {
-	// Check whether function is allowed and parameter is specified.
+function getItemFunctionalValue(array $item, string $function, string $parameter): ?string {
 	if (!in_array($function, ['min', 'max', 'avg']) || $parameter === '') {
 		return null;
 	}
 
-	// Check whether item type is allowed for min, max and avg functions.
 	if ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 		return null;
 	}
@@ -1203,15 +1202,25 @@ function getItemFunctionalValue($item, $function, $parameter) {
 		return null;
 	}
 
-	$parameter = $number_parser->calcValue();
+	$time_shift = $number_parser->calcValue();
 
-	$time_from = time() - $parameter;
+	$time_from = time() - $time_shift;
 
 	if ($time_from < 0 || $time_from > ZBX_MAX_DATE) {
 		return null;
 	}
 
-	return Manager::History()->getAggregatedValue($item, $function, $time_from);
+	[$item] = CItemHelper::addDataSource([$item], $time_from);
+
+	$aggregated_data = Manager::History()->getAggregatedValues([$item],
+		CItemHelper::resolveAggregateFunction($function), $time_from
+	);
+
+	if (!$aggregated_data) {
+		return null;
+	}
+
+	return $aggregated_data[$item['itemid']]['value'];
 }
 
 /**
@@ -2595,51 +2604,4 @@ function getInheritedTimeouts(string $proxyid): array {
 			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
 		]
 	];
-}
-
-/**
- * Retrieve the translated string representation of aggregation function constant.
- *
- * @param int $calc_fnc The numeric value of aggregation function constant.
- *
- * @return string The string representation of aggregation function.
- */
-function item_aggr_fnc2desc(int $calc_fnc): string {
-	switch ($calc_fnc) {
-		case AGGREGATE_NONE:
-			return _('not used');
-		case AGGREGATE_MIN:
-			return _('min');
-		case AGGREGATE_MAX:
-			return _('max');
-		case AGGREGATE_AVG:
-			return _('avg');
-		case AGGREGATE_COUNT:
-			return _('count');
-		case AGGREGATE_SUM:
-			return _('sum');
-		case AGGREGATE_FIRST:
-			return _('first');
-		case AGGREGATE_LAST:
-			return _('last');
-	}
-}
-
-/**
- * Retrieve the string representation of aggregation function constant.
- *
- * @param int $calc_fnc  The numeric value of aggregation function constant. Value must be one of:
- *                       AGGREGATE_COUNT, AGGREGATE_FIRST, AGGREGATE_LAST.
- *
- * @return string The string representation of aggregation function.
- */
-function item_aggr_fnc2str(int $calc_fnc): string {
-	switch ($calc_fnc) {
-		case AGGREGATE_COUNT:
-			return 'count';
-		case AGGREGATE_FIRST:
-			return 'first';
-		case AGGREGATE_LAST:
-			return 'last';
-	}
 }

@@ -22,6 +22,7 @@
 namespace Widgets\Item\Includes;
 
 use API,
+	CItemHelper,
 	CWidgetsData;
 
 use Zabbix\Widgets\{
@@ -275,14 +276,14 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [
-					AGGREGATE_NONE => item_aggr_fnc2desc(AGGREGATE_NONE),
-					AGGREGATE_MIN => item_aggr_fnc2desc(AGGREGATE_MIN),
-					AGGREGATE_MAX => item_aggr_fnc2desc(AGGREGATE_MAX),
-					AGGREGATE_AVG => item_aggr_fnc2desc(AGGREGATE_AVG),
-					AGGREGATE_COUNT => item_aggr_fnc2desc(AGGREGATE_COUNT),
-					AGGREGATE_SUM => item_aggr_fnc2desc(AGGREGATE_SUM),
-					AGGREGATE_FIRST => item_aggr_fnc2desc(AGGREGATE_FIRST),
-					AGGREGATE_LAST => item_aggr_fnc2desc(AGGREGATE_LAST)
+					AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+					AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+					AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+					AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+					AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+					AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+					AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
+					AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 				]))->setDefault(AGGREGATE_NONE)
 			)
 			->addField(

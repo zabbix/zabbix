@@ -41,7 +41,7 @@ window.widget_item_form = new class {
 			this.#promiseGetItemType()
 				.then((type) => {
 					if (this._form.isConnected) {
-						this.#is_item_numeric = this.#isItemTypeNumeric(type);
+						this.#is_item_numeric = type !== null && this.#isItemValueTypeNumeric(type);
 						this.updateForm();
 					}
 				});
@@ -81,7 +81,7 @@ window.widget_item_form = new class {
 		this.#promiseGetItemType()
 			.then((type) => {
 				if (this._form.isConnected) {
-					this.#is_item_numeric = this.#isItemTypeNumeric(type);
+					this.#is_item_numeric = type !== null && this.#isItemValueTypeNumeric(type);
 					this.updateForm();
 				}
 			});
@@ -135,22 +135,22 @@ window.widget_item_form = new class {
 		const history_data_trends = document.querySelector('#history input[name="history"]:checked')
 			.value == <?= Widget::HISTORY_DATA_TRENDS ?>;
 
-		document.getElementById('history_warning').style.display = history_data_trends && !this.#is_item_numeric
+		document.getElementById('item-history-data-warning').style.display = history_data_trends && !this.#is_item_numeric
 			? ''
 			: 'none';
 
-		document.getElementById('item_value_aggregate_warning').style.display =
+		document.getElementById('item-aggregate-function-warning').style.display =
 				aggregate_warning_functions.includes(parseInt(aggregate_function.value)) && !this.#is_item_numeric
 			? ''
 			: 'none';
 
-		document.getElementById('item-value-thresholds-warning').style.display = this.#is_item_numeric ? 'none' : '';
+		document.getElementById('item-thresholds-warning').style.display = this.#is_item_numeric ? 'none' : '';
 	}
 
 	/**
 	 * Fetch type of currently selected item.
 	 *
-	 * @return {Promise<any>}  Resolved promise will contain item type, or false in case of error or if no item is
+	 * @return {Promise<any>}  Resolved promise will contain item type, or null in case of error or if no item is
 	 *                         currently selected.
 	 */
 	#promiseGetItemType() {
@@ -178,17 +178,17 @@ window.widget_item_form = new class {
 			.catch((exception) => {
 				console.log('Could not get item type', exception);
 
-				return false;
+				return null;
 			});
 	}
 
 	/**
-	 * Check if provided item type is numeric.
+	 * Check if item value type is numeric.
 	 *
-	 * @param {int|bool} type  Item type.
+	 * @param {int} type  Item value type.
 	 */
-	#isItemTypeNumeric(type) {
-		return type === <?= ITEM_VALUE_TYPE_FLOAT ?> || type === <?= ITEM_VALUE_TYPE_UINT64 ?>;
+	#isItemValueTypeNumeric(type) {
+		return type == <?= ITEM_VALUE_TYPE_FLOAT ?> || type == <?= ITEM_VALUE_TYPE_UINT64 ?>;
 	}
 
 	/**

@@ -30,10 +30,6 @@ use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 $form = new CWidgetFormView($data);
 
-$history_warning_icon = makeWarningIcon(
-	_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
-);
-
 $form
 	->addField(
 		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
@@ -71,9 +67,10 @@ $form
 			->addField(
 				(new CWidgetFieldSelectView($data['fields']['aggregate_function']))
 					->setFieldHint(
-				makeWarningIcon(_('With this setting only numeric items will be displayed.'))
-					->addStyle('display: none')
-					->setId('item_value_aggregate_warning'))
+						makeWarningIcon(_('With this setting only numeric items will be displayed.'))
+							->addStyle('display: none')
+							->setId('item-aggregate-function-warning')
+					)
 			)
 			->addField(
 				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
@@ -84,7 +81,9 @@ $form
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonListView($data['fields']['history']))->setFieldHint(
-					$history_warning_icon->setId('history_warning')
+					makeWarningIcon(
+						_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+					)->setId('item-history-data-warning')
 				)
 			)
 	)
@@ -249,7 +248,7 @@ function getChangeIndicatorFieldsGroupView(array $fields): CWidgetFieldsGroupVie
 function getThresholdFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Thresholds')))
 		->setFieldHint(
-			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
+			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-thresholds-warning')
 		)
 		->addField(
 			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()

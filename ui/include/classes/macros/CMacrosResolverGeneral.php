@@ -1613,7 +1613,7 @@ class CMacrosResolverGeneral {
 				}
 				else {
 					$db_items = API::Item()->get([
-						'output' => ['itemid', 'key_', 'value_type', 'units'],
+						'output' => ['itemid', 'key_', 'history', 'trends', 'value_type', 'units'],
 						'webitems' => true,
 						'filter' => [
 							'host' => $host,

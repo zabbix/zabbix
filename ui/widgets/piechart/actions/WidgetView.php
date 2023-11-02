@@ -25,6 +25,7 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CHousekeepingHelper,
+	CItemHelper,
 	CMacrosResolverHelper,
 	CParser,
 	CSimpleIntervalParser,
@@ -423,7 +424,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE) {
 				if ($legend_aggregation_show) {
-					$name = item_aggr_fnc2desc($metric['options']['aggregate_function']).
+					$name = CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']).
 						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
 				}
 				else {

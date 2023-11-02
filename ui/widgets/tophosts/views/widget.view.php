@@ -56,7 +56,6 @@ else {
 
 	foreach ($data['rows'] as $columns) {
 		$row = [];
-		$use_thresholds = false;
 
 		foreach ($columns as $i => $column) {
 			$column_config = $data['configuration'][$i];
@@ -75,26 +74,29 @@ else {
 
 			$color = $column_config['base_color'];
 
-			if (array_key_exists('item', $column)) {
-				$use_thresholds = ($column['item']['value_type'] != ITEM_VALUE_TYPE_STR
-					&& $column['item']['value_type'] != ITEM_VALUE_TYPE_TEXT)
-					|| $column_config['aggregate_function'] == AGGREGATE_COUNT;
-			}
-
 			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
 					&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
-					&& array_key_exists('thresholds', $column_config)
-					&& $use_thresholds) {
-				foreach ($column_config['thresholds'] as $threshold) {
-					$threshold_value = $column['is_binary_units']
-						? $threshold['threshold_binary']
-						: $threshold['threshold'];
+					&& array_key_exists('thresholds', $column_config)) {
+				$is_numeric_value_type = in_array($column['item']['value_type'],
+					[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+				);
+				$is_numeric_aggregation_result = in_array($column_config['aggregate_function'],
+					[AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM]
+				);
+				$is_numeric_data = $is_numeric_value_type || $is_numeric_aggregation_result;
 
-					if ($column['value'] < $threshold_value) {
-						break;
+				if ($is_numeric_data) {
+					foreach ($column_config['thresholds'] as $threshold) {
+						$threshold_value = $column['is_binary_units']
+							? $threshold['threshold_binary']
+							: $threshold['threshold'];
+
+						if ($column['value'] < $threshold_value) {
+							break;
+						}
+
+						$color = $threshold['color'];
 					}
-
-					$color = $threshold['color'];
 				}
 			}
 

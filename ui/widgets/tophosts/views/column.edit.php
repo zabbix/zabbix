@@ -121,16 +121,13 @@ $form_grid->addItem([
 	new CFormField($item_select)
 ]);
 
-$numeric_only_warning = new CSpan(
-	makeWarningIcon(_('With this setting only numeric items will be displayed.'))
-);
-
 // Display.
 $form_grid->addItem([
 	new CLabel(
 		[
 			_('Display'),
-			$numeric_only_warning->setId('tophosts-column-display-warning')
+			(makeWarningIcon(_('With this setting only numeric items will be displayed.')))
+				->setId('tophosts-column-display-warning')
 		],
 		'display'
 	),
@@ -206,7 +203,7 @@ $thresholds->addItem(
 $form_grid->addItem([
 	new CLabel([
 		_('Thresholds'),
-		new CSpan(makeWarningIcon(_('This setting applies only to numeric data.')))
+		makeWarningIcon(_('This setting applies only to numeric data.'))
 	], 'thresholds_table'),
 	new CFormField($thresholds)
 ]);
@@ -224,7 +221,8 @@ $form_grid->addItem([
 	new CLabel(
 		[
 			_('Aggregation function'),
-			$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
+			(makeWarningIcon(_('With this setting only numeric items will be displayed.')))
+				->setId('tophosts-column-aggregate-function-warning')
 		],
 		'aggregate_function'
 	),
@@ -232,14 +230,14 @@ $form_grid->addItem([
 		(new CSelect('aggregate_function'))->setId('aggregate_function')
 			->setValue($data['aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
-				AGGREGATE_NONE => item_aggr_fnc2desc(AGGREGATE_NONE),
-				AGGREGATE_MIN => item_aggr_fnc2desc(AGGREGATE_MIN),
-				AGGREGATE_MAX => item_aggr_fnc2desc(AGGREGATE_MAX),
-				AGGREGATE_AVG => item_aggr_fnc2desc(AGGREGATE_AVG),
-				AGGREGATE_COUNT => item_aggr_fnc2desc(AGGREGATE_COUNT),
-				AGGREGATE_SUM => item_aggr_fnc2desc(AGGREGATE_SUM),
-				AGGREGATE_FIRST => item_aggr_fnc2desc(AGGREGATE_FIRST),
-				AGGREGATE_LAST => item_aggr_fnc2desc(AGGREGATE_LAST)
+				AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+				AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+				AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+				AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+				AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+				AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+				AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
+				AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 			]))
 	)
 ]);
@@ -268,10 +266,8 @@ $form_grid->addItem([
 	new CLabel(
 		[
 			_('History data'),
-			(new CSpan(
-				makeWarningIcon(
-					_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
-				)
+			(makeWarningIcon(
+				_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
 			))->setId('tophosts-column-history-data-warning')
 		],
 		'history'

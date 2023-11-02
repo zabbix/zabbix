@@ -28,7 +28,7 @@
 
 use Widgets\Item\Widget;
 
-if ($data['error'] !== '') {
+if (array_key_exists('error', $data)) {
 	$body = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 else {

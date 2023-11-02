@@ -29,6 +29,7 @@ use CButton,
 	CDiv,
 	CFormField,
 	CFormGrid,
+	CItemHelper,
 	CLabel,
 	CLink,
 	CList,
@@ -288,13 +289,13 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
 									->setValue((int) $value['aggregate_function'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_LAST => item_aggr_fnc2desc(AGGREGATE_LAST),
-										AGGREGATE_MIN => item_aggr_fnc2desc(AGGREGATE_MIN),
-										AGGREGATE_MAX => item_aggr_fnc2desc(AGGREGATE_MAX),
-										AGGREGATE_AVG => item_aggr_fnc2desc(AGGREGATE_AVG),
-										AGGREGATE_COUNT => item_aggr_fnc2desc(AGGREGATE_COUNT),
-										AGGREGATE_SUM => item_aggr_fnc2desc(AGGREGATE_SUM),
-										AGGREGATE_FIRST => item_aggr_fnc2desc(AGGREGATE_FIRST)
+										AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST),
+										AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+										AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+										AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+										AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+										AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+										AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -310,12 +311,12 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_dataset_aggregation')
 									->setValue((int) $value['dataset_aggregation'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_NONE => item_aggr_fnc2desc(AGGREGATE_NONE),
-										AGGREGATE_MIN => item_aggr_fnc2desc(AGGREGATE_MIN),
-										AGGREGATE_MAX => item_aggr_fnc2desc(AGGREGATE_MAX),
-										AGGREGATE_AVG => item_aggr_fnc2desc(AGGREGATE_AVG),
-										AGGREGATE_COUNT => item_aggr_fnc2desc(AGGREGATE_COUNT),
-										AGGREGATE_SUM => item_aggr_fnc2desc(AGGREGATE_SUM)
+										AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+										AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+										AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+										AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+										AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+										AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)

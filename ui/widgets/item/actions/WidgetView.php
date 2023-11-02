@@ -24,12 +24,12 @@ namespace Widgets\Item\Actions;
 use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
+	CItemHelper,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CSettingsHelper,
 	CUrl,
-	Manager,
-	CWidgetHelper;
+	Manager;
 
 use Widgets\Item\Widget;
 
@@ -44,539 +44,347 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$name = $this->widget->getDefaultName();
-		$cells = [];
-		$url = null;
-		$error = '';
-		$description = '';
-		$value = null;
-		$change_indicator = null;
-		$time = '';
-		$units = '';
-		$decimals = null;
-		$last_value = null;
-		$is_binary_units = true;
-		$prev_value = null;
-		$time_from = 0;
-		$time_to = 0;
+		$item = $this->getItem();
 
-		$options = [
-			'output' => ['value_type', 'history', 'trends'],
-			'selectValueMap' => ['mappings'],
-			'itemids' => $this->fields_values['itemid'],
-			'webitems' => true,
-			'preservekeys' => true
+		$output = [
+			'name' => $this->getName($item),
+			'info' => $this->makeWidgetInfo(),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
-		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
-			$time_from = $this->fields_values['time_period']['from_ts'];
-			$time_to = $this->fields_values['time_period']['to_ts'];
+		if ($item !== null) {
+			$show = array_flip($this->fields_values['show']);
+			$show_change_indicator = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show);
+
+			[$data_last, $data_prev] = $this->getItemValues($item, $show_change_indicator);
+
+			$output += [
+				'cells' => $this->arrangeAndConfigure($this->getElements($item, $data_last, $data_prev)),
+				'url' => $this->getUrl($item),
+				'bg_color' => $this->getBgColor($item, $data_last)
+			];
+		}
+		else {
+			$output['error'] = _('No permissions to referred object or it does not exist!');
 		}
 
-		$tmp_items = [];
+		$this->setResponse(new CControllerResponseData($output));
+	}
+
+	private function getItem(): ?array {
+		$item_options = [
+			'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'value_type', 'units'],
+			'selectValueMap' => ['mappings'],
+			'webitems' => true
+		];
 
 		if ($this->fields_values['override_hostid']) {
-			$tmp_items = API::Item()->get([
+			$src_items = API::Item()->get([
 				'output' => ['key_'],
 				'itemids' => $this->fields_values['itemid'],
 				'webitems' => true
 			]);
 
-			if ($tmp_items) {
-				$options = [
-					'output' => ['value_type', 'history', 'trends'],
-					'selectValueMap' => ['mappings'],
-					'hostids' => $this->fields_values['override_hostid'],
-					'webitems' => true,
-					'filter' => [
-						'key_' => $tmp_items[0]['key_']
-					],
-					'preservekeys' => true
-				];
+			if (!$src_items) {
+				return null;
 			}
+
+			$item_options['hostids'] = $this->fields_values['override_hostid'];
+			$item_options['filter']['key_'] = $src_items[0]['key_'];
 		}
+		else {
+			$item_options['itemids'] = $this->fields_values['itemid'];
+		}
+
+		$items = API::Item()->get($item_options);
+
+		return $items ? $items[0] : null;
+	}
+
+	private function getItemValues(array $item, bool $with_data_prev): array {
+		$history = Manager::History();
+		$function = $this->fields_values['aggregate_function'];
+
+		if ($function != AGGREGATE_NONE) {
+			$time_from = $this->fields_values['time_period']['from_ts'];
+			$time_to = $this->fields_values['time_period']['to_ts'];
+
+			$item_last = $this->addDataSource($item, $time_from);
+			$data_last = $history->getAggregatedValues([$item_last], $function, $time_from, $time_to);
+			$data_last = $data_last ? reset($data_last) : null;
+
+			if ($with_data_prev && $data_last !== null) {
+				$time_from_prev = $time_from * 2 - $time_to - 1;
+				$time_to_prev = $time_from - 1;
+
+				$item_prev = $this->addDataSource($item, $time_from_prev);
+				$data_prev = $history->getAggregatedValues([$item_prev], $function, $time_from_prev, $time_to_prev);
+				$data_prev = $data_prev ? reset($data_prev) : null;
+			}
+			else {
+				$data_prev = null;
+			}
+
+			return [$data_last, $data_prev];
+		}
+
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+
+		$item = $this->addDataSource($item, time() - $history_period);
+
+		if ($item['source'] === 'trends') {
+			$data_last = $history->getAggregatedValues([$item], AGGREGATE_LAST, time() - $history_period);
+			$data_last = $data_last ? reset($data_last) : null;
+
+			if ($with_data_prev && $data_last !== null) {
+				$time_to_prev = $data_last['clock'] - 1;
+				$time_from_prev = $time_to_prev - $history_period;
+
+				$data_prev = $history->getAggregatedValues($item, AGGREGATE_LAST, $time_from_prev, $time_to_prev);
+				$data_prev = $data_prev ? reset($data_prev) : null;
+			}
+			else {
+				$data_prev = null;
+			}
+
+			return [$data_last, $data_prev];
+		}
+
+		$history_limit = $with_data_prev ? 2 : 1;
+		$history = $history->getLastValues([$item], $history_limit, $history_period);
+
+		if ($history) {
+			$item_history = reset($history);
+
+			$data_last = count($item_history) > 0 ? $item_history[0] : null;
+			$data_prev = count($item_history) > 1 ? $item_history[1] : null;
+		}
+		else {
+			$data_last = null;
+			$data_prev = null;
+		}
+
+		return [$data_last, $data_prev];
+	}
+
+	private function addDataSource(array $item, int $time): array {
+		switch ($this->fields_values['history']) {
+			case Widget::HISTORY_DATA_AUTO:
+				[$item] = CItemHelper::addDataSource([$item], $time);
+				break;
+
+			case Widget::HISTORY_DATA_TRENDS:
+				$item['source'] = 'trends';
+				break;
+
+			default:
+				$item['source'] = 'history';
+				break;
+		}
+
+		if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+			$item['source'] = 'history';
+		}
+
+		return $item;
+	}
+
+	private function getElements(array $item, ?array $data_last, ?array $data_prev): array {
+		$elements = [
+			'description' => '',
+			'value_type' => $item['value_type'],
+			'units' => '',
+			'value' => null,
+			'decimals' => null,
+			'change_indicator' => null,
+			'time' => ''
+		];
 
 		$show = array_flip($this->fields_values['show']);
+		$show_change_indicator = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show);
 
-		/*
-		 * Select original item name in several cases: if user is in normal dashboards or in template dashboards when
-		 * user is in view mode to display that item name in widget name. Item name should be select only if it is not
-		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
-		 */
-		if ($this->getInput('name', '') === '') {
-			if (!$this->isTemplateDashboard() || ($this->fields_values['override_hostid'] && $tmp_items)) {
-				$options['output'] = array_merge($options['output'], ['name']);
+		if ($data_last === null) {
+			$elements['value_type'] = ITEM_VALUE_TYPE_TEXT;
+
+			if (array_key_exists(Widget::SHOW_TIME, $show)) {
+				$elements['time'] = date(DATE_TIME_FORMAT_SECONDS);
 			}
 
-			if (!$this->isTemplateDashboard()) {
-				$options['selectHosts'] = ['name'];
-			}
+			return $elements;
 		}
 
-		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
-		if (($this->fields_values['override_hostid'] && $tmp_items) || !$this->fields_values['override_hostid']) {
-			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
-			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
-				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
-			}
-
-			if ($this->fields_values['units_show'] != 1 || $this->fields_values['units'] === '') {
-				$options['output'][] = 'units';
-			}
+		if (array_key_exists(Widget::SHOW_TIME, $show)) {
+			$elements['time'] = date(DATE_TIME_FORMAT_SECONDS, (int) $data_last['clock']);
 		}
 
-		if ($this->fields_values['override_hostid']) {
-			if ($tmp_items) {
-				$items = API::Item()->get($options);
-				$itemid = key($items);
-			}
-			else {
-				$items = [];
-			}
-		}
-		else {
-			$items = API::Item()->get($options);
+		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
+			$item['widget_description'] = $this->fields_values['description'];
 
-			if ($this->fields_values['itemid']) {
-				$itemid = $this->fields_values['itemid'][0];
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				[$item] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item]);
 			}
+
+			$elements['description'] = $item['widget_description'];
 		}
 
-		if ($items) {
-			$item = $items[$itemid];
-
-			self::addItemDataSource($items, $time_from, $time_to, $this->fields_values['history']);
-
-			$history = [];
-			$value_type = $item['value_type'];
-			$aggregate_function = $this->fields_values['aggregate_function'];
-
-			if ($aggregate_function == AGGREGATE_NONE) {
-				$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-			}
-			else {
-				$history_period = $time_to - $time_from;
-			}
-
-			if ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64) {
-				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
-					$item = $items[$itemid];
-
-					$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
-					$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
+		switch ($item['value_type']) {
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				if ($this->fields_values['units_show'] == 1) {
+					if ($this->fields_values['units'] !== '') {
+						$item['units'] = $this->fields_values['units'];
+					}
 				}
 				else {
-					$history = Manager::History()->getAggregationByInterval($items, $time_from, $time_to,
-						$aggregate_function, $time_to
-					);
+					$item['units'] = '';
 				}
 
-				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
-					$last_results = [];
-				}
-				else {
-					$last_results = Manager::History()->getAggregationByInterval($items, $time_from, $time_to,
-						$aggregate_function, $time_from
-					);
-				}
+				$formatted_value = formatHistoryValueRaw($data_last['value'], $item, false, [
+					'decimals' => $this->fields_values['decimal_places'],
+					'decimals_exact' => true,
+					'small_scientific' => false,
+					'zero_as_zero' => false
+				]);
 
-				if ($last_results) {
-					$aggregate_data = $last_results[$items[$itemid]['itemid']]['data'];
-					$previous_time_to = $time_to - 1 - $history_period;
-					$previous_time_from = $previous_time_to - $history_period;
+				$elements['value'] = $formatted_value['value'];
+				$elements['units'] = $formatted_value['units'];
 
-					$prev_results = Manager::History()->getAggregationByInterval($items, $previous_time_from,
-						$previous_time_to, $aggregate_function, $history_period
-					);
+				if (!$formatted_value['is_mapped']) {
+					$numeric_formatting = getNumericFormatting();
+					$decimal_pos = strrpos($elements['value'], $numeric_formatting['decimal_point']);
 
-					if ($prev_results) {
-						$aggregate_data += [
-							'1' => $prev_results[$items[$itemid]['itemid']]['data'][0]
-						];
+					if ($decimal_pos !== false) {
+						$elements['decimals'] = substr($elements['value'], $decimal_pos);
+						$elements['value'] = substr($elements['value'], 0, $decimal_pos);
 					}
 				}
 
-				if ($last_results) {
-					$history[$items[$itemid]['itemid']] = $aggregate_data;
-					$history[$itemid][0]['clock'] = $time_to;
-				}
-
-				if ($aggregate_function == AGGREGATE_COUNT && $history) {
-					foreach ($history as &$item_data) {
-						foreach ($item_data as &$data) {
-							$data['value'] = $data['count'];
-							unset($data['count']);
-						}
-						unset($data);
-					}
-					unset($item_data);
-				}
-			}
-			else {
-				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
-					$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
-					$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
-				}
-
-				if (in_array($aggregate_function, [AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT])) {
-					$non_numeric_history = Manager::History()->getAggregatedValue($item,
-						item_aggr_fnc2str($aggregate_function), $time_from, $time_to
-					);
-
-					if ($non_numeric_history) {
-						$history = [
-							$item['itemid'] => [
-								0 => [
-									'itemid' => $item['itemid'],
-									'value' => $non_numeric_history,
-									'clock' => $time_to
-								]
-							]
-						];
-					}
-
-					if ($aggregate_function == AGGREGATE_COUNT) {
-						$interval = $time_to - $time_from;
-						$previous_time_to = $time_to - 1 - $interval;
-						$previous_time_from = $previous_time_to - $interval;
-
-						$prev_value = Manager::History()->getAggregatedValue($item,
-							item_aggr_fnc2str($aggregate_function), $previous_time_from, $previous_time_to
-						);
-
-						if ($non_numeric_history && $prev_value) {
-							$history[$item['itemid']] += [
-								1 => [
-									'itemid' => $item['itemid'],
-									'value' => $prev_value,
-									'clock' => $time_to
-								]
-							];
+				if ($show_change_indicator && $data_prev !== null) {
+					if ($formatted_value['is_mapped']) {
+						if ($data_last['value'] != $data_prev['value']) {
+							$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP_DOWN;
 						}
 					}
+					elseif ($data_last['value'] > $data_prev['value']) {
+						$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP;
+					}
+					elseif ($data_last['value'] < $data_prev['value']) {
+						$elements['change_indicator'] = Widget::CHANGE_INDICATOR_DOWN;
+					}
 				}
-			}
+				break;
 
-			if ($history) {
-				$last_value = $history[$itemid][0]['value'];
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_LOG:
+			case ITEM_VALUE_TYPE_BINARY:
+				$elements['value'] = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+					? italic(_('binary value'))
+					: formatHistoryValue($data_last['value'], $item, false);
 
-				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = $aggregate_function == AGGREGATE_NONE
-						? date(DATE_TIME_FORMAT_SECONDS)
-						: date(DATE_TIME_FORMAT_SECONDS, (int) $history[$itemid][0]['clock']);
+				if ($show_change_indicator && $data_prev !== null
+						&& $data_last['value'] !== $data_prev['value']) {
+					$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP_DOWN;
 				}
-
-				switch ($value_type) {
-					case ITEM_VALUE_TYPE_FLOAT:
-					case ITEM_VALUE_TYPE_UINT64:
-						$prev_value = array_key_exists(1, $history[$itemid]) ? $history[$itemid][1]['value'] : null;
-
-						$item_units = $this->fields_values['units_show'] == 1 && $this->fields_values['units'] !== ''
-							? $this->fields_values['units']
-							: $item['units'];
-
-						$is_binary_units = isBinaryUnits($item_units);
-
-						if ($this->fields_values['units_show'] == 1) {
-							if ($this->fields_values['units'] !== '') {
-								$item['units'] = $this->fields_values['units'];
-							}
-						}
-						else {
-							$item['units'] = '';
-						}
-
-						$formatted_value = formatHistoryValueRaw($last_value, $item, false, [
-							'decimals' => $this->fields_values['decimal_places'],
-							'decimals_exact' => true,
-							'small_scientific' => false,
-							'zero_as_zero' => false
-						]);
-
-						$value = $formatted_value['value'];
-						$units = $formatted_value['units'];
-
-						if (!$formatted_value['is_mapped']) {
-							$numeric_formatting = getNumericFormatting();
-							$decimal_pos = strrpos($value, $numeric_formatting['decimal_point']);
-
-							if ($decimal_pos !== false) {
-								$decimals = substr($value, $decimal_pos);
-								$value = substr($value, 0, $decimal_pos);
-							}
-						}
-
-						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
-							if ($formatted_value['is_mapped']) {
-								if ($last_value != $prev_value) {
-									$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
-								}
-							}
-							elseif ($last_value > $prev_value) {
-								$change_indicator = Widget::CHANGE_INDICATOR_UP;
-							}
-							elseif ($last_value < $prev_value) {
-								$change_indicator = Widget::CHANGE_INDICATOR_DOWN;
-							}
-						}
-						break;
-
-					case ITEM_VALUE_TYPE_STR:
-					case ITEM_VALUE_TYPE_TEXT:
-					case ITEM_VALUE_TYPE_LOG:
-					case ITEM_VALUE_TYPE_BINARY:
-						if ($aggregate_function == AGGREGATE_COUNT) {
-							$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
-
-							$formatted_value = formatHistoryValueRaw($last_value, $item, false, [
-								'decimals' => $this->fields_values['decimal_places'],
-								'decimals_exact' => true,
-								'small_scientific' => false,
-								'zero_as_zero' => false
-							]);
-
-							$value = $formatted_value['value'];
-							$units = $formatted_value['units'];
-						}
-						else {
-							$value = $value_type == ITEM_VALUE_TYPE_BINARY
-								? italic(_('binary value'))
-								: formatHistoryValue($last_value, $items[$itemid], false);
-						}
-
-						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
-							if ($aggregate_function == AGGREGATE_COUNT) {
-								if ($last_value > (int) $prev_value) {
-									$change_indicator = Widget::CHANGE_INDICATOR_UP;
-								}
-								elseif ($last_value < (int) $prev_value) {
-									$change_indicator = Widget::CHANGE_INDICATOR_DOWN;
-								}
-							}
-							elseif (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
-									&& $last_value !== $prev_value) {
-								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
-							}
-						}
-						break;
-				}
-			}
-			else {
-				$value_type = ITEM_VALUE_TYPE_TEXT;
-
-				// Since there is no value, we can still show time.
-				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = date(DATE_TIME_FORMAT_SECONDS);
-				}
-			}
-
-			if ($this->getInput('name', '') === '') {
-				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-					// Resolve original item name when user is in normal dashboards or template dashboards view mode.
-					$name = $items[$itemid]['name'];
-				}
-
-				if (!$this->isTemplateDashboard()) {
-					$name = $items[$itemid]['hosts'][0]['name'].NAME_DELIMITER.$name;
-				}
-			}
-
-			/*
-			 * It doesn't matter if item has value or not, description can be resolved separately if needed. If item
-			 * will have value, it will resolve, otherwise it will not.
-			 */
-			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
-				// Overwrite item name with the custom description.
-				$items[$itemid]['widget_description'] = $this->fields_values['description'];
-
-				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
-				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-					$items = CMacrosResolverHelper::resolveItemWidgetDescriptions($items);
-				}
-
-				// All macros in item name are resolved here.
-				$description = $items[$itemid]['widget_description'];
-			}
-
-			$cells = self::arrangeByCells($this->fields_values, [
-				'description' => $description,
-				'value_type' => $value_type,
-				'units' => $units,
-				'value' => $value,
-				'decimals' => $decimals,
-				'change_indicator' => $change_indicator,
-				'time' => $time,
-				'items' => $items,
-				'itemid' => $itemid
-			]);
-
-			// Use the real item value type.
-			$url = (new CUrl('history.php'))
-				->setArgument('action',
-					($items[$itemid]['value_type'] == ITEM_VALUE_TYPE_FLOAT
-							|| $items[$itemid]['value_type'] == ITEM_VALUE_TYPE_UINT64)
-						? HISTORY_GRAPH
-						: HISTORY_VALUES
-				)
-				->setArgument('itemids[]', $itemid);
-		}
-		else {
-			$error = _('No permissions to referred object or it does not exist!');
+				break;
 		}
 
-		$bg_color = $this->fields_values['bg_color'];
-
-		if ($last_value !== null && $item['value_type'] != ITEM_VALUE_TYPE_STR
-				&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT) {
-			$number_parser = new CNumberParser([
-				'with_size_suffix' => true,
-				'with_time_suffix' => true,
-				'is_binary_size' => $is_binary_units
-			]);
-
-			foreach ($this->fields_values['thresholds'] as $threshold) {
-				$number_parser->parse($threshold['threshold']);
-
-				$threshold_value = $number_parser->calcValue();
-
-				if ($threshold_value > $last_value) {
-					break;
-				}
-
-				$bg_color = $threshold['color'];
-			}
-		}
-
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $name),
-			'cells' => $cells,
-			'url' => $url,
-			'bg_color' => $bg_color,
-			'error' => $error,
-			'info' => $this->makeWidgetInfo(),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
+		return $elements;
 	}
 
 	/**
-	 * Arrange all widget parts by cells, apply all related configuration settings to each part.
+	 * Arrange and configure widget elements as defined in widget configuration.
 	 *
-	 * @static
-	 *
-	 * @param array       $fields_values  Input fields from the form.
-	 * @param array       $fields_values  ['show']              Flags to show description, value, time and change indicator.
-	 * @param int         $fields_values  ['desc_v_pos']        Vertical position of the description.
-	 * @param int         $fields_values  ['desc_h_pos']        Horizontal position of the description.
-	 * @param int         $fields_values  ['desc_bold']         Font weight of the description (0 - normal, 1 - bold).
-	 * @param int         $fields_values  ['desc_size']         Font size of the description.
-	 * @param string      $fields_values  ['desc_color']        Font color of the description.
-	 * @param int         $fields_values  ['value_v_pos']       Vertical position of the value.
-	 * @param int         $fields_values  ['value_h_pos']       Horizontal position of the value.
-	 * @param int         $fields_values  ['value_bold']        Font weight of the value (0 - normal, 1 - bold).
-	 * @param int         $fields_values  ['value_size']        Font size of the value.
-	 * @param string      $fields_values  ['value_color']       Font color of the value.
-	 * @param int         $fields_values  ['units_show']        Display units or not (0 - hide, 1 - show).
-	 * @param int         $fields_values  ['units_pos']         Position of the units.
-	 * @param int         $fields_values  ['units_bold']        Font weight of the units (0 - normal, 1 - bold).
-	 * @param int         $fields_values  ['units_size']        Font size of the units.
-	 * @param string      $fields_values  ['units_color']       Font color of the units.
-	 * @param int         $fields_values  ['decimal_size']      Font size of the fraction.
-	 * @param int         $fields_values  ['time_v_pos']        Vertical position of the time.
-	 * @param int         $fields_values  ['time_h_pos']        Horizontal position of the time.
-	 * @param int         $fields_values  ['time_bold']         Font weight of the time (0 - normal, 1 - bold).
-	 * @param int         $fields_values  ['time_size']         Font size of the time.
-	 * @param string      $fields_values  ['time_color']        Font color of the time.
-	 * @param array       $data           Array of pre-processed data that needs to be displayed.
-	 * @param string      $data           ['description']       Item description with all macros resolved.
-	 * @param string      $data           ['value_type']        Calculated value type. It can be integer or text.
-	 * @param string      $data           ['units']             Units of the item. Can be empty string if nothing to show.
-	 * @param string|null $data           ['value']             Value of the item or NULL if there is no value.
-	 * @param string|null $data           ['decimals']          Decimal places or NULL if there is no decimals to show.
-	 * @param int|null    $data           ['change_indicator']  Change indicator type or NULL if indicator should not be shown.
-	 * @param string      $data           ['time']              Time when item received the value or current time if no data.
-	 * @param array       $data           ['items']             The original array of items.
-	 * @param string      $data           ['itemid']            Item ID from the host.
+	 * @param array       $elements  Pre-processed elements for displaying.
+	 *        string      $elements['description']       Item description with all macros resolved.
+	 *        string      $elements['value_type']        Item value type.
+	 *        string      $elements['units']             Item units.
+	 *        string|null $elements['value']             Item value without decimal part.
+	 *        string|null $elements['decimals']          Decimal part of item value.
+	 *        int|null    $elements['change_indicator']  Change indicator type.
+	 *        string      $elements['time']              Time related to the item value, or current time if no data.
 	 *
 	 * @return array
 	 */
-	private static function arrangeByCells(array $fields_values, array $data): array {
+	private function arrangeAndConfigure(array $elements): array {
 		$cells = [];
 
-		$show = array_flip($fields_values['show']);
+		$config = $this->fields_values;
+
+		$show = array_flip($config['show']);
 
 		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
-			$cells[$fields_values['desc_v_pos']][$fields_values['desc_h_pos']] = [
+			$cells[$config['desc_v_pos']][$config['desc_h_pos']] = [
 				'item_description' => [
-					'text' => $data['description'],
-					'font_size' => $fields_values['desc_size'],
-					'bold' => ($fields_values['desc_bold'] == 1),
-					'color' => $fields_values['desc_color']
+					'text' => $elements['description'],
+					'font_size' => $config['desc_size'],
+					'bold' => $config['desc_bold'] == 1,
+					'color' => $config['desc_color']
 				]
 			];
 		}
 
 		if (array_key_exists(Widget::SHOW_VALUE, $show)) {
 			$item_value_cell = [
-				'value_type' => $data['value_type']
+				'value_type' => $elements['value_type']
 			];
 
-			if ($fields_values['units_show'] == 1 && $data['units'] !== '') {
+			if ($config['units_show'] == 1 && $elements['units'] !== '') {
 				$item_value_cell['parts']['units'] = [
-					'text' => $data['units'],
-					'font_size' => $fields_values['units_size'],
-					'bold' => ($fields_values['units_bold'] == 1),
-					'color' => $fields_values['units_color']
+					'text' => $elements['units'],
+					'font_size' => $config['units_size'],
+					'bold' => $config['units_bold'] == 1,
+					'color' => $config['units_color']
 				];
-				$item_value_cell['units_pos'] = $fields_values['units_pos'];
+				$item_value_cell['units_pos'] = $config['units_pos'];
 			}
 
 			$item_value_cell['parts']['value'] = [
-				'text' => $data['value'],
-				'font_size' => $fields_values['value_size'],
-				'bold' => ($fields_values['value_bold'] == 1),
-				'color' => $fields_values['value_color']
+				'text' => $elements['value'],
+				'font_size' => $config['value_size'],
+				'bold' => $config['value_bold'] == 1,
+				'color' => $config['value_color']
 			];
 
-			if ($data['decimals'] !== null) {
+			if ($elements['decimals'] !== null) {
 				$item_value_cell['parts']['decimals'] = [
-					'text' => $data['decimals'],
-					'font_size' => $fields_values['decimal_size'],
-					'bold' => ($fields_values['value_bold'] == 1),
-					'color' => $fields_values['value_color']
+					'text' => $elements['decimals'],
+					'font_size' => $config['decimal_size'],
+					'bold' => $config['value_bold'] == 1,
+					'color' => $config['value_color']
 				];
 			}
 
-			$cells[$fields_values['value_v_pos']][$fields_values['value_h_pos']] = [
+			$cells[$config['value_v_pos']][$config['value_h_pos']] = [
 				'item_value' => $item_value_cell
 			];
 		}
 
-		if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data['change_indicator'] !== null) {
+		if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $elements['change_indicator'] !== null) {
 			$colors = [
-				Widget::CHANGE_INDICATOR_UP => $fields_values['up_color'],
-				Widget::CHANGE_INDICATOR_DOWN => $fields_values['down_color'],
-				Widget::CHANGE_INDICATOR_UP_DOWN => $fields_values['updown_color']
+				Widget::CHANGE_INDICATOR_UP => $config['up_color'],
+				Widget::CHANGE_INDICATOR_DOWN => $config['down_color'],
+				Widget::CHANGE_INDICATOR_UP_DOWN => $config['updown_color']
 			];
 
-			// Change indicator can be displayed with or without value.
-			$cells[$fields_values['value_v_pos']][$fields_values['value_h_pos']]['item_value']['parts']['change_indicator'] = [
-				'type' => $data['change_indicator'],
-				'font_size' => ($data['decimals'] !== null)
-					? max($fields_values['value_size'], $fields_values['decimal_size'])
-					: $fields_values['value_size'],
-				'color' => $colors[$data['change_indicator']]
+			$cells[$config['value_v_pos']][$config['value_h_pos']]['item_value']['parts']['change_indicator'] = [
+				'type' => $elements['change_indicator'],
+				'font_size' => $elements['decimals'] !== null
+					? max($config['value_size'], $config['decimal_size'])
+					: $config['value_size'],
+				'color' => $colors[$elements['change_indicator']]
 			];
 		}
 
 		if (array_key_exists(Widget::SHOW_TIME, $show)) {
-			$cells[$fields_values['time_v_pos']][$fields_values['time_h_pos']] = [
+			$cells[$config['time_v_pos']][$config['time_h_pos']] = [
 				'item_time' => [
-					'text' => $data['time'],
-					'font_size' => $fields_values['time_size'],
-					'bold' => ($fields_values['time_bold'] == 1),
-					'color' => $fields_values['time_color']
+					'text' => $elements['time'],
+					'font_size' => $config['time_size'],
+					'bold' => $config['time_bold'] == 1,
+					'color' => $config['time_color']
 				]
 			];
 		}
@@ -588,6 +396,47 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($row);
 
 		return $cells;
+	}
+
+	private function getName(?array $item): string {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
+			return $this->getInput('name', $this->widget->getDefaultName());
+		}
+		else {
+			if ($this->getInput('name', '') !== '') {
+				$name = $this->getInput('name');
+			}
+			elseif ($item !== null) {
+				$name = $item['name'];
+			}
+			else {
+				$name = $this->widget->getDefaultName();
+			}
+
+			if (!$this->isTemplateDashboard()) {
+				if ($this->fields_values['override_hostid']) {
+					$hosts = API::Host()->get([
+						'output' => ['name'],
+						'hostids' => $this->fields_values['override_hostid']
+					]);
+				}
+				elseif ($item !== null) {
+					$hosts = API::Host()->get([
+						'output' => ['name'],
+						'itemids' => $item['itemid']
+					]);
+				}
+				else {
+					$hosts = [];
+				}
+
+				if ($hosts) {
+					$name = $hosts[0]['name'].NAME_DELIMITER.$name;
+				}
+			}
+
+			return $name;
+		}
 	}
 
 	/**
@@ -610,27 +459,46 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $info;
 	}
 
-	/**
-	 * Calculate the data source for item based on widget configuration and global housekeeping settings.
-	 *
-	 * @param array $items        [IN/OUT] Array of items to get source for.
-	 * @param int   $time_from    [IN] Timestamp indicating start of time period (seconds).
-	 * @param int   $time_now     [IN] Timestamp for current point in time (seconds).
-	 * @param int   $data_source  [IN] Data source specified in widget form.
-	 */
-	private static function addItemDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
-		if ($data_source == Widget::HISTORY_DATA_HISTORY || $data_source == Widget::HISTORY_DATA_TRENDS) {
-			foreach ($items as &$item) {
-				$item['source'] = $data_source == Widget::HISTORY_DATA_TRENDS
-					&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-						? 'trends'
-						: 'history';
-			}
-			unset($item);
+	private function getUrl(array $item): string {
+		return (new CUrl('history.php'))
+			->setArgument('action',
+				$item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64
+					? HISTORY_GRAPH
+					: HISTORY_VALUES
+			)
+			->setArgument('itemids[]', $item['itemid'])
+			->getUrl();
+	}
 
-			return;
+	public function getBgColor(array $item, ?array $data_last): string {
+		$bg_color = $this->fields_values['bg_color'];
+
+		if ($data_last === null) {
+			return $bg_color;
 		}
 
-		CWidgetHelper::addDataSource($items, $time_from, $time_now);
+		$units = $this->fields_values['units_show'] == 1 && $this->fields_values['units'] !== ''
+			? $this->fields_values['units']
+			: $item['units'];
+
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => isBinaryUnits($units)
+		]);
+
+		foreach ($this->fields_values['thresholds'] as $threshold) {
+			$number_parser->parse($threshold['threshold']);
+
+			$threshold_value = $number_parser->calcValue();
+
+			if ($threshold_value > $data_last['value']) {
+				break;
+			}
+
+			$bg_color = $threshold['color'];
+		}
+
+		return $bg_color;
 	}
 }

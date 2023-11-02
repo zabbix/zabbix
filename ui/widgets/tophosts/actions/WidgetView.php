@@ -25,11 +25,11 @@ use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
+	CItemHelper,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CSettingsHelper,
-	Manager,
-	CWidgetHelper;
+	Manager;
 
 use Widgets\TopHosts\Widget;
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
@@ -140,8 +140,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		$time_now = time();
-
 		$master_column_index = $this->fields_values['column'];
 		$master_column = $configuration[$master_column_index];
 		$master_entities = $hosts;
@@ -154,7 +152,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities = array_key_exists($master_column_index, $items)
 					? $items[$master_column_index]
 					: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
-				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
+				$master_entity_values = self::getItemValues($master_entities, $master_column);
 				break;
 
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
@@ -273,7 +271,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 				}
 
-				$column_item_values = self::getItemValues($column_items, $column, $time_now);
+				$column_item_values = self::getItemValues($column_items, $column);
 			}
 
 			if ($calc_extremes && ($column['min'] !== '' || $column['max'] !== '')) {
@@ -397,11 +395,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 	}
 
+	/**
+	 * Check if column configuration requires selecting numeric items only.
+	 *
+	 * @param array $column  Column configuration.
+	 *
+	 * @return bool
+	 */
 	private static function isNumericOnlyColumn(array $column): bool {
-		$aggregate_functions = [AGGREGATE_NONE, AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT];
-
-		return (!in_array($column['aggregate_function'], $aggregate_functions))
-			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS;
+		return $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
+			|| in_array($column['aggregate_function'], [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM]);
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
@@ -414,8 +417,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true,
 			'filter' => [
 				'name' => $name,
-				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null,
-				'status' => ITEM_STATUS_ACTIVE
+				'status' => ITEM_STATUS_ACTIVE,
+				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null
 			],
 			'sortfield' => 'key_',
 			'preservekeys' => true
@@ -434,106 +437,72 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $items;
 	}
 
-	private static function getItemValues(array $items, array $column, int $time_now): array {
-		static $history_period;
+	private static function getItemValues(array $items, array $column): array {
+		static $history_period_s;
+
+		if ($history_period_s === null) {
+			$history_period_s = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		}
+
+		$time_from = $column['aggregate_function'] != AGGREGATE_NONE
+			? $column['time_period']['from_ts']
+			: time() - $history_period_s;
+
+		$items = self::addDataSource($items, $time_from, $column);
+
 		$result = [];
 
-		if ($history_period === null) {
-			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		}
+		if ($column['aggregate_function'] != AGGREGATE_NONE) {
+			$values = Manager::History()->getAggregatedValues($items, $column['aggregate_function'], $time_from,
+				$column['time_period']['to_ts']
+			);
 
-		$aggregate_function = $column['aggregate_function'];
-
-		if ($aggregate_function == AGGREGATE_NONE) {
-			$time_to = $time_now;
-			$time_from = $time_to - $history_period;
-
-			self::addItemDataSource($items, $time_from, $time_now, $column['history']);
-
-			$history = [];
-
-			foreach ($items as $itemid => $item) {
-				if ($item['source'] === 'history') {
-					$history[$itemid] = $item;
-				}
-			}
-
-			$values = Manager::History()->getLastValues($history, 1, $history_period);
-
-			return array_map(fn($value) => $value[0]['value'], $values);
+			$result += array_column($values, 'value', 'itemid');
 		}
 		else {
-			$from = time() - $history_period;
+			$items_by_source = ['history' => [], 'trends' => []];
 
-			$time_from = $column['time_period']['from_ts'];
-			$time_to = $column['time_period']['to_ts'];
+			foreach (self::addDataSource($items, $time_from, $column) as $itemid => $item) {
+				$items_by_source[$item['source']][$itemid] = $item;
+			}
 
-			self::addItemDataSource($items, $from, $time_now, $column['history']);
-		}
+			if ($items_by_source['history']) {
+				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
+				$result += array_column(array_column($values, 0), 'value', 'itemid');
+			}
 
-		foreach ($items as $item) {
-			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-				$values = Manager::History()->getAggregationByInterval(
-					[$item], $time_from, $time_to, $aggregate_function, $time_from
+			if ($items_by_source['trends']) {
+				$values = Manager::History()->getAggregatedValues($items_by_source['trends'], AGGREGATE_LAST,
+					$time_from
 				);
 
-				if ($values) {
-					foreach ($values as $value) {
-						$result += $aggregate_function != AGGREGATE_COUNT
-							? [$value['data'][0]['itemid'] => $value['data'][0]['value']]
-							: [$value['data'][0]['itemid'] => $value['data'][0]['count']];
-					}
-				}
-			}
-			else {
-				$non_numeric_history = [];
-
-				if (in_array($aggregate_function, [AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT])) {
-					$non_numeric_history = Manager::History()->getAggregatedValue($item,
-						item_aggr_fnc2str($aggregate_function), $time_from, $time_to
-					);
-				}
-
-				if ($aggregate_function == AGGREGATE_COUNT) {
-					$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
-
-					if ($non_numeric_history) {
-						$formatted_value = formatHistoryValueRaw($non_numeric_history, $item, false, [
-							'decimals' => $column['decimal_places'],
-							'decimals_exact' => true,
-							'small_scientific' => false,
-							'zero_as_zero' => false
-						]);
-
-						$non_numeric_history = $formatted_value['value'];
-					}
-				}
-
-				if ($non_numeric_history) {
-					$result += [
-						$item['itemid'] => $non_numeric_history
-					];
-				}
+				$result += array_column($values, 'value', 'itemid');
 			}
 		}
 
 		return $result;
 	}
 
-	private static function addItemDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
-		if ($data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
-				|| $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS) {
+	private static function addDataSource(array $items, int $time, array $column): array {
+		if ($column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_AUTO) {
+			$items = CItemHelper::addDataSource($items, $time);
+		}
+		else {
 			foreach ($items as &$item) {
-				$item['source'] = $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
-					&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-						? 'trends'
-						: 'history';
+				$item['source'] = $column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
+					? 'trends'
+					: 'history';
 			}
 			unset($item);
-
-			return;
 		}
 
-		CWidgetHelper::addDataSource($items, $time_from, $time_now);
+		foreach ($items as &$item) {
+			if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+				$item['source'] = 'history';
+			}
+		}
+		unset($item);
+
+		return $items;
 	}
 }
