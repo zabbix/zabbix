@@ -218,7 +218,7 @@ class CSVGHoneycomb {
 			.attr('height', height);
 
 		if (this.#closest_ratio?.ratio) {
-			const closest_ratio_new = this.#getClosestRatio();
+			const closest_ratio_new = this.#getClosestRatio(this.#cells_data.length);
 
 			if (this.#closest_ratio.ratio !== closest_ratio_new.ratio) {
 				this.#elements.honeycomb_container.html('');
@@ -253,7 +253,7 @@ class CSVGHoneycomb {
 		this.#cells_data_structured = [];
 
 		if (this.#cells_data.length > 0) {
-			this.#closest_ratio = this.#getClosestRatio();
+			this.#closest_ratio = this.#getClosestRatio(this.#cells_data.length);
 
 			this.#column_count = Math.ceil(this.#cells_data.length / this.#closest_ratio.rows);
 			this.#row_count = this.#closest_ratio.rows;
@@ -294,19 +294,19 @@ class CSVGHoneycomb {
 	 *
 	 * @returns {Object}
 	 */
-	#getClosestRatio() {
+	#getClosestRatio(cells_count) {
 		const ratios_possible = [];
 
 		let columns = 1;
 
-		for (columns; columns < this.#cells_data.length + 1; columns++) {
+		for (columns; columns < cells_count + 1; columns++) {
 			let rows = 1;
 
-			if (this.#cells_data.length % columns === 0) {
-				rows = this.#cells_data.length / columns;
+			if (cells_count % columns === 0) {
+				rows = cells_count / columns;
 			}
 			else {
-				rows = Math.ceil(this.#cells_data.length / columns);
+				rows = Math.ceil(cells_count / columns);
 			}
 
 			ratios_possible.push({
@@ -349,35 +349,34 @@ class CSVGHoneycomb {
 
 		this.#scale = Math.min(this.#width / honeycomb_size.width, this.#height / honeycomb_size.height);
 
-		// Offset for pop out.
-		const scale_offset = this.#radius_outer * this.#scale / 0.4 / 10000;
-
-		this.#scale -= scale_offset;
-
 		if (this.#cells_data.length > 0) {
 			const cell_min_radius_inner = CSVGHoneycomb.CELL_WIDTH_MIN / 2;
 			const cell_min_radius_outer = cell_min_radius_inner / Math.sqrt(3) * 2;
 			const cell_radius_inner = this.#radius_inner * this.#scale;
 
 			if (cell_radius_inner < cell_min_radius_inner) {
-				this.#scale = this.#scale * cell_min_radius_inner / cell_radius_inner;
-
 				let cells_gap_new = cell_min_radius_outer / 10;
 
-				this.#row_count = Math.floor(this.#height / (cell_min_radius_outer * 2 + cells_gap_new / 2));
+				this.#row_count = Math.floor(this.#height / (cell_min_radius_outer + cell_min_radius_outer / 2 + cells_gap_new));
 				if (this.#row_count < 1) {
 					this.#row_count = 1;
 				}
 
-				this.#column_count = Math.floor(
-					this.#width
-					/ ((cell_min_radius_inner * 2 + cells_gap_new / 2) + cell_min_radius_inner + cells_gap_new / 2)
-				);
+				this.#column_count = Math.floor(this.#width / (cell_min_radius_inner * 2 - cells_gap_new));
 				if (this.#column_count < 1) {
 					this.#column_count = 1;
 				}
 
-				const cell_count = this.#row_count * this.#column_count;
+				let cell_count = this.#row_count * this.#column_count;
+
+				if (cell_count > this.#cells_data.length) {
+					cell_count = this.#cells_data.length;
+					this.#row_count = this.#closest_ratio.rows;
+					this.#column_count = this.#closest_ratio.columns;
+				}
+
+				this.#closest_ratio = this.#getClosestRatio(cell_count);
+
 				this.#cells_data_structured = [];
 
 				for (let i = 0; i < cell_count; i += this.#column_count) {
@@ -396,12 +395,32 @@ class CSVGHoneycomb {
 				this.#elements.honeycomb_container.html('');
 
 				this.#drawCells(this.#cells_data_structured);
-
 				this.#drawOtherCell();
+			}
+			else {
+				this.#column_count = Math.ceil(this.#cells_data.length / this.#closest_ratio.rows);
+				this.#row_count = this.#closest_ratio.rows;
 
-				honeycomb_size = getHoneycombSize();
+				this.#closest_ratio = this.#getClosestRatio(this.#cells_data.length);
+
+				this.#elements.honeycomb_container.html('');
+				this.#cells_data_structured = [];
+
+				for (let i = 0; i < this.#cells_data.length; i += this.#column_count) {
+					const row = this.#cells_data.slice(i, i + this.#column_count);
+					this.#cells_data_structured.push(row);
+				}
+
+				this.#drawCells(this.#cells_data_structured);
 			}
 		}
+
+		honeycomb_size = getHoneycombSize();
+
+		this.#scale = Math.min(this.#width / honeycomb_size.width, this.#height / honeycomb_size.height);
+
+		// Offset for cell pop out.
+		this.#scale -= this.#scale / 10;
 
 		const position_start_x = this.#radius_inner * this.#scale;
 		const position_centered_x = this.#width / 2 - honeycomb_size.width * this.#scale / 2;
