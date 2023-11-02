@@ -146,7 +146,7 @@ static void	async_reverse_dns_event(int err, char type, int count, int ttl, void
 {
 	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() result:%d type:%d ttl:%d", __func__, err, type, ttl);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() result:%d type:%d count:%d ttl:%d", __func__, err, type, count, ttl);
 
 	if (0 != err)
 	{
