@@ -91,14 +91,16 @@ typedef struct
 	char					*dnsname;
 	int					now;
 	zbx_uint64_t				unique_dcheckid;
+	int					processed_checks_per_ip;
 }
 zbx_discoverer_results_t;
 
 ZBX_PTR_VECTOR_DECL(discoverer_results_ptr, zbx_discoverer_results_t*)
 
 zbx_discoverer_results_t	*discovery_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid);
-void				discover_results_merge(zbx_hashset_t *hr_dst,
-					zbx_vector_discoverer_results_ptr_t *vr_src, zbx_discoverer_task_t *task);
+void				discover_results_partrange_merge(zbx_hashset_t *hr_dst,
+					zbx_vector_discoverer_results_ptr_t *vr_src, zbx_discoverer_task_t *task,
+					int force);
 void				results_free(zbx_discoverer_results_t *result);
 zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port, const zbx_uint64_t dcheckid);
 void				dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges);
