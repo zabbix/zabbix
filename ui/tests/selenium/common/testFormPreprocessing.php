@@ -763,7 +763,88 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public static function getItemPreprocessingCreateData() {
 		return [
-			// Structured data. CSV to JSON.
+			// Text - Regular expression.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Regular expression simple',
+						'Key' => 'regular-expression-simple[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => 'test', 'parameter_2' => 'TEST' ]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Regular expression complex',
+						'Key' => 'regular-expression-complex[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Regular expression',
+							'parameter_1' => '^(\d{4}-\d{1,2}-[0123]{1}\d) test ([\x{1F49A}\x{1F499}])',
+							'parameter_2' => 'date \N emoji \N'
+						]
+					]
+				]
+			],
+			// Text - Replace.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Replace',
+						'Key' => 'replace[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => 'old string ', 'parameter_2' => 'NEW👍string ']
+					]
+				]
+			],
+			// Text - Trim.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Trim',
+						'Key' => 'trim[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Trim', 'parameter_1' => ' \t\\\\']
+					]
+				]
+			],
+			// Text - Right trim.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Right trim',
+						'Key' => 'right-trim[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Right trim', 'parameter_1' => '\n']
+					]
+				]
+			],
+			// Text - Left trim.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Left trim',
+						'Key' => 'left-trim[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Left trim', 'parameter_1' => ' ']
+					]
+				]
+			],
+			// Structured data - CSV to JSON.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -800,7 +881,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
-			// In range.
+			// Validation - In range.
 			[
 				[
 					'expected' => TEST_GOOD,
