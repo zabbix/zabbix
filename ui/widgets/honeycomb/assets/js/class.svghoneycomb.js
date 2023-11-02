@@ -468,6 +468,7 @@ class CSVGHoneycomb {
 		this.#drawNoData();
 		this.#drawHoneycombContainer();
 		this.#drawPoppedCell();
+		this.#drawPoppedCellShadow();
 	}
 
 	/**
@@ -517,6 +518,28 @@ class CSVGHoneycomb {
 
 		this.#elements.popped_cell_simple = null;
 		this.#elements.popped_cell_static = null;
+	}
+
+	/**
+	 * Add filter element for shadow of popped cell.
+	 */
+	#drawPoppedCellShadow() {
+		const defs = this.#svg.append('svg:defs');
+
+		const filter = defs
+			.append('svg:filter')
+			.attr('id', 'popped-cell-shadow')
+			.attr('width', '200%')
+			.attr('height', '200%')
+			.attr('x', '-50%')
+			.attr('y', '-50%');
+
+		filter
+			.append('svg:feDropShadow')
+			.attr('dx', 0)
+			.attr('dy', 0)
+			.attr('stdDeviation', this.#radius_outer * 0.2)
+			.attr('flood-opacity', 0.7);
 	}
 
 	/**
@@ -894,15 +917,6 @@ class CSVGHoneycomb {
 			.style('display', 'block');
 
 		this.#elements.popped_cell
-			.select('path')
-			.transition()
-			.duration(200)
-			.ease(d3.easeLinear)
-			.styleTween('filter', () =>
-				(t) => `drop-shadow(0 0 ${this.#radius_outer / 10}px rgba(0, 0, 0, ${0.5 * t}))`
-			);
-
-		this.#elements.popped_cell
 			.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL}`)
 			.style('display', 'block');
 
@@ -912,6 +926,18 @@ class CSVGHoneycomb {
 		// Need to position in case if any label was hidden due to small height,
 		// because in popped cell both labels must be visible.
 		this.#positionLabels(labels_primary, labels_secondary, false);
+
+		const cell_color = this.#elements.popped_cell
+			.select('path')
+			.style('fill');
+
+		const stroke_color = d3.color(cell_color).darker(1);
+
+		this.#elements.popped_cell
+			.select('path')
+			.style('filter', 'url(#popped-cell-shadow)')
+			.style('stroke', stroke_color)
+			.style('stroke-width', this.#radius_inner / 100);
 	};
 
 	/**
