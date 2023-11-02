@@ -608,7 +608,7 @@ zabbix_export:
           name: 'Zabbix proxy: Proxy memory buffer, % used'
           type: INTERNAL
           key: 'zabbix[proxy_buffer,buffer,pused]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -632,7 +632,7 @@ zabbix_export:
           name: 'Zabbix proxy: Proxy buffer, state changes'
           type: INTERNAL
           key: 'zabbix[proxy_buffer,state,changes]'
-          history: 1w
+          history: 7d
           description: 'The number of state changes between disk/memory buffer modes since proxy start.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -645,7 +645,7 @@ zabbix_export:
           name: 'Zabbix proxy: Proxy buffer, state'
           type: INTERNAL
           key: 'zabbix[proxy_buffer,state,current]'
-          history: 1w
+          history: 7d
           description: |
             The current working state of proxy buffer where the new data is being stored. Possible values:
             

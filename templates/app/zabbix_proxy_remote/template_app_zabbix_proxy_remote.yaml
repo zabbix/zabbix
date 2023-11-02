@@ -857,7 +857,7 @@ zabbix_export:
           type: DEPENDENT
           key: proxy_buffer.buffer.pused
           delay: '0'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -890,7 +890,7 @@ zabbix_export:
           type: DEPENDENT
           key: proxy_buffer.state.changes
           delay: '0'
-          history: 1w
+          history: 7d
           description: 'The number of state changes between disk/memory buffer modes since proxy start.'
           preprocessing:
             - type: JSONPATH
@@ -911,7 +911,7 @@ zabbix_export:
           type: DEPENDENT
           key: proxy_buffer.state.current
           delay: '0'
-          history: 1w
+          history: 7d
           description: |
             The current working state of proxy buffer where the new data is being stored. Possible values:
             
