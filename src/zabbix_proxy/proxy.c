@@ -1393,7 +1393,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
 								zbx_config_source_ip, &events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
-								zbx_progname, &events_cbs, &listen_sock,
+								get_zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
