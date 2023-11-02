@@ -1001,7 +1001,7 @@ class testTaskCreate extends CAPITest {
 					]
 				],
 				'expected_results' => [],
-				'expected_error' => 'Cannot send request: item "6 Item-T (0/1/1)" on host "API test task.create template" is not monitored.'
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			'Test LLD rule (not monitored)' => [
 				'task' => [
@@ -1041,7 +1041,7 @@ class testTaskCreate extends CAPITest {
 					]
 				],
 				'expected_results' => [],
-				'expected_error' => 'Cannot send request: discovery rule "5 LLD-T (0/1/1)" on host "API test task.create template" is not monitored.'
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 
 			// Test dependent items and LLD rules.

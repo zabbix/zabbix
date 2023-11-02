@@ -518,6 +518,7 @@ class CTask extends CApiService {
 			'output' => ['type', 'name_resolved', 'status', 'flags', 'master_itemid'],
 			'selectHosts' => ['name', 'status'],
 			'itemids' => $itemids,
+			'templated' => false,
 			'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 			'preservekeys' => true
 		]), ['name_resolved' => 'name']);
@@ -529,6 +530,7 @@ class CTask extends CApiService {
 				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
+				'templated' => false,
 				'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 				'preservekeys' => true
 			]);
