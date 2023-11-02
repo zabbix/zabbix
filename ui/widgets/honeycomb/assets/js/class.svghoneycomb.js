@@ -439,16 +439,16 @@ class CSVGHoneycomb {
 
 		this.#positionLabels(labels_primary, labels_secondary);
 
-		if ((labels_primary.node() && isVisible(labels_primary.node()))
-				&& (!labels_secondary.node() || !isVisible(labels_secondary.node()))) {
+		if ((!labels_primary.empty() && isVisible(labels_primary.node()))
+				&& (labels_secondary.empty() || !isVisible(labels_secondary.node()))) {
 			let label_primary_position_y = this.#label_primary_font_size / 2;
 			label_primary_position_y -= this.#label_primary_font_size / 2 * (this.#label_primary_line_count - 1);
 
 			labels_primary.attr('transform', `translate(0 ${label_primary_position_y})`);
 		}
 
-		if ((!labels_primary.node() || !isVisible(labels_primary.node()))
-				&& (labels_secondary.node() && isVisible(labels_secondary.node()))) {
+		if ((labels_primary.empty() || !isVisible(labels_primary.node()))
+				&& (!labels_secondary.empty() && isVisible(labels_secondary.node()))) {
 			let label_secondary_position_y = this.#label_secondary_font_size / 2;
 			label_secondary_position_y -= this.#label_secondary_font_size / 2 * (this.#label_secondary_line_count - 1);
 
@@ -457,8 +457,8 @@ class CSVGHoneycomb {
 
 		const available_cell_height = this.#radius_outer * this.#scale - this.#radius_outer * this.#scale / 10;
 
-		if ((labels_primary.node() && isVisible(labels_primary.node()))
-				&& (labels_secondary.node() || isVisible(labels_secondary.node()))) {
+		if ((!labels_primary.empty() && isVisible(labels_primary.node()))
+				&& (!labels_secondary.empty() && isVisible(labels_secondary.node()))) {
 			const label_primary_height = this.#label_primary_font_size * this.#scale;
 			const label_secondary_height = this.#label_secondary_font_size * this.#scale;
 
