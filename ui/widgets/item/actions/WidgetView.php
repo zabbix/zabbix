@@ -128,10 +128,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($items) {
-			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-				$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
-			}
-
 			$item = $items[$itemid];
 
 			$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
@@ -227,7 +223,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($this->getInput('name', '') === '') {
 				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 					// Resolve original item name when user is in normal dashboards or template dashboards view mode.
-					$name = $items[$itemid]['name'];
+					$name = $items[$itemid]['name_resolved'];
 				}
 
 				if (!$this->isTemplateDashboard()) {
