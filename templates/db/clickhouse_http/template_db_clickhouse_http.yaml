@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:24:27Z'
+  date: '2023-10-30T11:35:29Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2018,11 +2018,11 @@ zabbix_export:
                         host: 'ClickHouse by HTTP'
                         key: clickhouse.ping
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: GRAPH_CLASSIC
                   'y': '2'
                   width: '12'
@@ -2084,11 +2084,11 @@ zabbix_export:
                         host: 'ClickHouse by HTTP'
                         key: 'net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]'
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: ITEM
                   name: Uptime
                   x: '8'
@@ -2100,11 +2100,11 @@ zabbix_export:
                         host: 'ClickHouse by HTTP'
                         key: clickhouse.uptime
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: ITEM
                   name: Version
                   x: '12'
@@ -2116,11 +2116,11 @@ zabbix_export:
                         host: 'ClickHouse by HTTP'
                         key: clickhouse.version
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '2'

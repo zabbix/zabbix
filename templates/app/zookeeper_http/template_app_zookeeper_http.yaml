@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:20:57Z'
+  date: '2023-10-30T11:32:41Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1130,7 +1130,7 @@ zabbix_export:
                         host: 'Zookeeper by HTTP'
                         key: zookeeper.server_state
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                 - type: GRAPH_CLASSIC
                   'y': '2'
@@ -1163,11 +1163,11 @@ zabbix_export:
                         host: 'Zookeeper by HTTP'
                         key: zookeeper.uptime
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: ITEM
                   name: Version
                   x: '8'
@@ -1179,7 +1179,7 @@ zabbix_export:
                         host: 'Zookeeper by HTTP'
                         key: zookeeper.version
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                 - type: GRAPH_CLASSIC
                   x: '12'

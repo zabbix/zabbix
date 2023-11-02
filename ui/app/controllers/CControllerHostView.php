@@ -124,7 +124,7 @@ class CControllerHostView extends CControllerHost {
 				'expanded' => $profile->expanded,
 				'page' => $filter['page']
 			]
-		] + $this->getData($filter);
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Hosts'));

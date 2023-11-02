@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:31:36Z'
+  date: '2023-10-30T11:42:01Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -101,11 +101,11 @@ zabbix_export:
                         host: 'Zabbix agent'
                         key: agent.ping
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: ITEM
                   name: Version
                   x: '6'
@@ -118,11 +118,11 @@ zabbix_export:
                         host: 'Zabbix agent'
                         key: agent.version
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'
@@ -239,11 +239,11 @@ zabbix_export:
                         host: 'Zabbix agent active'
                         key: agent.ping
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: ITEM
                   name: Version
                   x: '6'
@@ -256,11 +256,11 @@ zabbix_export:
                         host: 'Zabbix agent active'
                         key: agent.version
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'
