@@ -491,7 +491,13 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	protected function checkFieldValue($field, $values, $raise_exception = true) {
-		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class, CHostInterfaceElement::class];
+		$classes = [
+			CMultifieldTableElement::class,
+			CFormElement::class,
+			CMultiselectElement::class,
+			CCheckboxListElement::class,
+			CHostInterfaceElement::class
+		];
 		$element = $this->getField($field);
 
 		if (is_array($values) && !in_array(get_class($element), $classes)) {
