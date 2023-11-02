@@ -289,8 +289,9 @@ class testDashboardClockWidget extends CWebTest {
 							'id:time_sec' => true, 'id:time_format' => '24-hour'
 					],
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
-					'xpath:.//div[@class="fields-group fields-group-tzone"]' => ['id:tzone_size' => 20, 'id:tzone_bold' => false,
-							'id:tzone_color' => null, 'id:tzone_timezone' => 'Local default: (UTC+03:00) Europe/Riga',
+					'xpath:.//div[@class="fields-group fields-group-tzone"]' => ['id:tzone_size' => 20,
+							'id:tzone_bold' => false, 'id:tzone_color' => null,
+							'id:tzone_timezone' => CDateTimeHelper::getTimeZoneFormat('Local default'),
 							'id:tzone_format' => 'Short'
 					]
 				];
