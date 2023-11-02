@@ -3,12 +3,12 @@
 
 ## Overview
 
-The template to monitor Kubernetes state that work without any external scripts. 
+The template to monitor Kubernetes state. 
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 
 Template `Kubernetes cluster state by HTTP` - collects metrics by HTTP agent from kube-state-metrics endpoint and Kubernetes API.
 
-Don't forget change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
+Don't forget to change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.

@@ -580,13 +580,11 @@ class CElementQuery implements IWaitable {
 			'CDropdownElement'			=> '/z-select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
-				'/div[contains(@class, "multiselect-control")]',
-				'/div/div[contains(@class, "multiselect-control")]' // TODO: remove after fix DEV-1071.
+				'/div[contains(@class, "multiselect-control")]'
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',
-				'/ul/li/ul[contains(@class, "radio-list-control")]',
-				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
+				'/ul/li/ul[contains(@class, "radio-list-control")]'
 			],
 			'CCheckboxListElement'		=> [
 				'/ul[contains(@class, "checkbox-list")]',
@@ -597,7 +595,6 @@ class CElementQuery implements IWaitable {
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
-				'/div/table', // TODO: remove after fix DEV-1071.
 				'/*[contains(@class, "table-forms-separator")]/table'
 			],
 			'CCompositeInputElement'	=> [
