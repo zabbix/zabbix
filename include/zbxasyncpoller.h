@@ -29,7 +29,7 @@ typedef enum
 	ZBX_ASYNC_TASK_READ,
 	ZBX_ASYNC_TASK_WRITE,
 	ZBX_ASYNC_TASK_STOP,
-
+	ZBX_ASYNC_TASK_RESOLVE_REVERSE
 }
 zbx_async_task_state_t;
 

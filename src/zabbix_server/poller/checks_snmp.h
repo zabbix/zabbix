@@ -33,6 +33,13 @@
 #define ZBX_SNMP_STR_ASCII	5
 #define ZBX_SNMP_STR_UNDEFINED	255
 
+typedef enum
+{
+	ZABBIX_SNMP_RESOLVE_REVERSE_DNS_NO = 0,
+	ZABBIX_SNMP_RESOLVE_REVERSE_DNS_YES,
+}
+zbx_snmp_resolve_reverse_dns_t;
+
 typedef struct zbx_snmp_context	zbx_snmp_context_t;
 
 void	zbx_init_library_mt_snmp(void);
@@ -47,7 +54,7 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip);
+		const char *config_source_ip, zbx_snmp_resolve_reverse_dns_t resolve_reverse_dns);
 zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context);
 void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context);
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
