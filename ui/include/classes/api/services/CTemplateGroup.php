@@ -760,7 +760,7 @@ class CTemplateGroup extends CApiService {
 
 		$db_groups = $this->get([
 			'output' => [],
-			'groupids' => array_column($data, 'groupid'),
+			'groupids' => array_column($data['groups'], 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -790,13 +790,17 @@ class CTemplateGroup extends CApiService {
 			}
 		}
 
-		$templateids = array_column($data['templates'], 'templateid');
-
 		$templates = [];
 		$del_templates = [];
 
+		if (!$db_templates) {
+			return;
+		}
+
+		$templateids = array_column($data['templates'], 'templateid');
+
 		foreach ($db_templates as $db_template) {
-			if (in_array($db_template, $templateids)) {
+			if (in_array($db_template['templateid'], $templateids)) {
 				$templates[$db_template['templateid']] = [
 					'templateid' => $db_template['templateid'],
 					'groups' => $data['groups']
@@ -811,8 +815,16 @@ class CTemplateGroup extends CApiService {
 		}
 
 		API::Template()->addAffectedGroups($templates + $del_templates, $db_templates);
-		API::Template()->addUnchangedGroups($templates, $db_templates);
-		API::Template()->addUnchangedGroups($del_templates, $db_templates, $data);
+
+		if ($templates) {
+			API::Template()->addUnchangedGroups($templates, $db_templates);
+		}
+
+		if ($del_templates) {
+			API::Template()->addUnchangedGroups($del_templates, $db_templates,
+				['groupids' => array_column($data['groups'], 'groupid')]
+			);
+		}
 
 		$templates += $del_templates;
 

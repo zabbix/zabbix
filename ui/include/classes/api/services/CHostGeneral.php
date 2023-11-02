@@ -305,7 +305,7 @@ abstract class CHostGeneral extends CHostBase {
 		$result = DBselect(DB::makeSql('hgset', $options));
 
 		while ($row = DBfetch($result)) {
-			foreach ($hgsets[$row['hash']['hostids']] as $hostid) {
+			foreach ($hgsets[$row['hash']]['hostids'] as $hostid) {
 				$ins_host_hgsets[] = [
 					'hostid' => $hostid,
 					'hgsetid' => $row['hgsetid']
@@ -510,11 +510,11 @@ abstract class CHostGeneral extends CHostBase {
 				continue;
 			}
 
-			$db_templates = ($db_hosts !== null)
-				? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
-				: [];
-
 			if (array_key_exists('templates', $host)) {
+				$db_templates = ($db_hosts !== null)
+					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
+					: [];
+
 				foreach ($host['templates'] as $template) {
 					if (array_key_exists($template['templateid'], $db_templates)) {
 						unset($db_templates[$template['templateid']]);

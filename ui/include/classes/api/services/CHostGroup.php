@@ -1085,7 +1085,7 @@ class CHostGroup extends CApiService {
 
 		$db_groups = $this->get([
 			'output' => [],
-			'groupids' => array_column($data, 'groupid'),
+			'groupids' => array_column($data['groups'], 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -1098,14 +1098,15 @@ class CHostGroup extends CApiService {
 			}
 		}
 
+		$hostids_condition = $data['hosts'] ? ['hostids' => array_column($data['hosts'], 'hostid')] : [];
+
 		$db_hosts = API::Host()->get([
 			'output' => ['hostid', 'host', 'flags'],
 			'groupids' => array_column($data['groups'], 'groupid'),
-			'hostids' => array_column($data['hosts'], 'hostid'),
 			'searchByAny' => true,
 			'editable' => true,
 			'preservekeys' => true
-		]);
+		] + $hostids_condition);
 
 		foreach ($data['hosts'] as $i => $host) {
 			if (!array_key_exists($host['hostid'], $db_hosts)) {
@@ -1121,13 +1122,17 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		$hostids = array_column($data['hosts'], 'hostid');
-
 		$hosts = [];
 		$del_hosts = [];
 
+		if (!$db_hosts) {
+			return;
+		}
+
+		$hostids = array_column($data['hosts'], 'hostid');
+
 		foreach ($db_hosts as $db_host) {
-			if (in_array($db_host, $hostids)) {
+			if (in_array($db_host['hostid'], $hostids)) {
 				$hosts[$db_host['hostid']] = [
 					'hostid' => $db_host['hostid'],
 					'groups' => $data['groups']
@@ -1142,8 +1147,16 @@ class CHostGroup extends CApiService {
 		}
 
 		API::Host()->addAffectedGroups($hosts + $del_hosts, $db_hosts);
-		API::Host()->addUnchangedGroups($hosts, $db_hosts);
-		API::Host()->addUnchangedGroups($del_hosts, $db_hosts, $data);
+
+		if ($hosts) {
+			API::Host()->addUnchangedGroups($hosts, $db_hosts);
+		}
+
+		if ($del_hosts) {
+			API::Host()->addUnchangedGroups($del_hosts, $db_hosts,
+				['groupids' => array_column($data['groups'], 'groupid')]
+			);
+		}
 
 		$hosts += $del_hosts;
 

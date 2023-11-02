@@ -802,7 +802,7 @@ class CHost extends CHostGeneral {
 				$old_field_hostids[] = $host['hostid'];
 			}
 
-			unset($host['groups'], $host['tags'], $host['macros'], $host['templates']);
+			unset($host['groups'], $host['tags'], $host['macros'], $host['templates'], $host['templates_clear']);
 		}
 		unset($host);
 
@@ -960,7 +960,7 @@ class CHost extends CHostGeneral {
 		}
 
 		if (array_key_exists('templates', $data) && $data['templates']) {
-			$this->checkTemplates($hosts, $hosts, '/templates',
+			$this->checkTemplates($hosts, $db_hosts, '/templates',
 				array_flip(array_column($data['templates'], 'templateid'))
 			);
 			$this->checkTemplatesLinks($hosts, $db_hosts);
@@ -2312,7 +2312,7 @@ class CHost extends CHostGeneral {
 		$this->checkGroups($hosts, $db_hosts);
 		$this->checkTemplates($hosts, $db_hosts);
 		$this->checkTemplatesLinks($hosts, $db_hosts);
-		$templates = $this->validateHostMacros($hosts, $db_hosts);
+		$hosts = $this->validateHostMacros($hosts, $db_hosts);
 
 		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');
 

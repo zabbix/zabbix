@@ -31,14 +31,14 @@ abstract class CHostBase extends CApiService {
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
 
-	protected function checkTemplates(array &$hosts, array $db_hosts = null, string $path = null,
+	protected function checkTemplates(array &$hosts, array &$db_hosts = null, string $path = null,
 			array $template_indexes = null, string $path_clear = null, array $template_clear_indexes = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_template_indexes = [];
 		$clear_template_indexes = [];
 
-		foreach ($hosts as $i1 => $host) {
+		foreach ($hosts as $i1 => &$host) {
 			if (array_key_exists('templates', $host) && array_key_exists('templates_clear', $host)) {
 				foreach ($host['templates_clear'] as $i2_clear => $template_clear) {
 					foreach ($host['templates'] as $i2 => $template) {
@@ -65,30 +65,61 @@ abstract class CHostBase extends CApiService {
 			}
 
 			if (array_key_exists('templates', $host)) {
-				$db_templateids = $db_hosts !== null
-					? array_flip(array_column($db_hosts[$host[$id_field_name]]['templates'], 'templateid'))
+				$db_templates = $db_hosts !== null
+					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
 					: [];
 
 				foreach ($host['templates'] as $i2 => $template) {
-					if (array_key_exists($template['templateid'], $db_templateids)) {
-						unset($db_templateids[$template['templateid']]);
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						if ($db_templates[$template['templateid']]['link_type'] != TEMPLATE_LINK_MANUAL) {
+							unset($host['templates'][$i2]);
+
+							$db_hosttemplateid = $db_templates[$template['templateid']]['hosttemplateid'];
+							unset($db_hosts[$host[$id_field_name]]['templates'][$db_hosttemplateid]);
+						}
+
+						unset($db_templates[$template['templateid']]);
 					}
 					else {
 						$ins_template_indexes[$template['templateid']][$i1] = $i2;
 					}
 				}
+
+				if ($db_templates) {
+					$templateids_clear = array_key_exists('templates_clear', $host)
+						? array_column($host['templates_clear'], 'templateid')
+						: [];
+
+					foreach ($db_templates as $db_template) {
+						if ($db_template['link_type'] != TEMPLATE_LINK_MANUAL
+								&& !in_array($db_template['templateid'], $templateids_clear)) {
+							unset($db_hosts[$host[$id_field_name]]['templates'][$db_template['hosttemplateid']]);
+						}
+					}
+				}
 			}
 
 			if (array_key_exists('templates_clear', $host)) {
-				$db_templateids = array_column($db_hosts[$host[$id_field_name]]['templates'], 'templateid');
+				$db_templates = array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid');
 
 				foreach ($host['templates_clear'] as $i2 => $template) {
-					if (!in_array($template['templateid'], $db_templateids)) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						if ($db_templates[$template['templateid']]['link_type'] != TEMPLATE_LINK_MANUAL) {
+							unset($host['templates_clear'][$i2]);
+
+							$db_hosttemplateid = $db_templates[$template['templateid']]['hosttemplateid'];
+							unset($db_hosts[$host[$id_field_name]]['templates'][$db_hosttemplateid]);
+						}
+
+						unset($db_templates[$template['templateid']]);
+					}
+					else {
 						$clear_template_indexes[$template['templateid']][$i1] = $i2;
 					}
 				}
 			}
 		}
+		unset($host);
 
 		if ($ins_template_indexes) {
 			$db_templates = API::Template()->get([
@@ -1361,10 +1392,6 @@ abstract class CHostBase extends CApiService {
 				}
 
 				foreach ($db_templates as $del_template) {
-					if ($del_template['link_type'] == TEMPLATE_LINK_LLD) {
-						continue;
-					}
-
 					$changed = true;
 					$del_hosttemplateids[] = $del_template['hosttemplateid'];
 
@@ -1387,7 +1414,7 @@ abstract class CHostBase extends CApiService {
 					$upd_hostids[$i] = $host[$id_field_name];
 				}
 				else {
-					unset($host['templates'], $host['templates_clear'], $db_hosts[$host[$id_field_name]]['templates']);
+					unset($host['templates'], $db_hosts[$host[$id_field_name]]['templates']);
 				}
 			}
 		}
