@@ -54,6 +54,7 @@ typedef struct
 		int	index_port;
 		int	dcheck_index;
 		int	count;
+		int	checks_per_ip;
 	}
 	state;
 	zbx_vector_iprange_t	*ipranges;
@@ -86,6 +87,7 @@ int			discoverer_task_compare(const void *d1, const void *d2);
 void			discoverer_task_clear(zbx_discoverer_task_t *task);
 void			discoverer_task_free(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_task_check_count_get(zbx_discoverer_task_t *task);
+zbx_uint64_t		discoverer_task_ip_check_count_get(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_job_tasks_free(zbx_discoverer_job_t *job);
 void			discoverer_job_free(zbx_discoverer_job_t *job);
 zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc_dcheck_ptr_t *dchecks_common,

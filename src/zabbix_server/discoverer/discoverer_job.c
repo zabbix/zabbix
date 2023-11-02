@@ -77,6 +77,14 @@ zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 	return (zbx_uint64_t)task->dchecks.values_num;
 }
 
+zbx_uint64_t	discoverer_task_ip_check_count_get(zbx_discoverer_task_t *task)
+{
+	if (DISCOVERY_ADDR_RANGE == task->addr_type && 0 != task->addr.range->state.checks_per_ip)
+		return (zbx_uint64_t)task->addr.range->state.checks_per_ip;	/* except ICMP */
+	else
+		return discoverer_task_check_count_get(task);
+}
+
 zbx_uint64_t	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
 {
 	zbx_uint64_t		check_count = 0;
