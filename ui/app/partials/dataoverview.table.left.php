@@ -22,15 +22,13 @@
 /**
  * @var CPartial $this
  */
-$table = (new CTableInfo())
-	->makeVerticalRotation()
-	->setHeadingColumn(0);
+$table = (new CTableInfo())->setHeadingColumn(0);
 
 $header = [_('Hosts')];
 foreach ($data['items'] as $item_name => $item_data) {
 	foreach ($item_data as $columns_data) {
-		$header[] = (new CColHeader($item_name))
-			->addClass('vertical_rotation')
+		$header[] = (new CSpan($item_name))
+			->addClass(ZBX_STYLE_TEXT_VERTICAL)
 			->setTitle($item_name);
 	}
 }

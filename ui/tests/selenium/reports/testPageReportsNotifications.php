@@ -66,7 +66,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		sort($user_alias);
 
 		$users = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th[@class="vertical_rotation"]'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/span[@class="text-vertical"]'));
 		foreach ($elements as $i => $element) {
 			$users[] = $element->getText();
 		}
@@ -199,7 +199,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Get user column number in table
 		$user_column_number = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th[@class="vertical_rotation"]'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/span[@class="text-vertical"]'));
 		foreach ($elements as $index => $element) {
 			// 2 is column of month plus column count begin from 1 not from 0
 			$user_column_number[$element->getText()] = $index + 2;
