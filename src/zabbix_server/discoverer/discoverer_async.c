@@ -202,7 +202,8 @@ static void	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_d
 	zbx_set_snmp_bulkwalk_options();
 
 	if (FAIL == zbx_async_check_snmp(&item, &result, process_snmp_result, snmp_result, NULL,
-			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip, 1))
+			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
+			ZABBIX_SNMP_RESOLVE_REVERSE_DNS_YES))
 	{
 		zbx_free(snmp_result);
 	}
