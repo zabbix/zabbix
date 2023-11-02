@@ -530,10 +530,9 @@ class CExpressionParser extends CParser {
 	 *  - function like func(/host/item,<params>)
 	 *  - floating point number; can be with suffix [KMGTsmhdw]
 	 *  - string
-	 *  - macro like {TRIGGER.VALUE}
-	 *  - user macro like {$MACRO}
-	 *  - LLD macro like {#LLD}
-	 *  - LLD macro with function like {{#LLD}.func())}
+	 *  - macros like {TRIGGER.VALUE} and {{TRIGGER.VALUE}.func()}
+	 *  - user macros like {$MACRO} and {{$MACRO}.func()}
+	 *  - LLD macros like {#LLD} and {{#LLD}.func()}
 	 *
 	 * @param string  $source
 	 * @param int     $pos
@@ -842,7 +841,9 @@ class CExpressionParser extends CParser {
 			}
 
 			if ($allow_macros) {
-				if ((new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]))->parse($value) == CParser::PARSE_SUCCESS
+				$parser_options = ['macros' => ['{TRIGGER.VALUE}']];
+				if ((new CMacroParser($parser_options))->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CMacroFunctionParser($parser_options))->parse($value) == CParser::PARSE_SUCCESS
 						|| (new CUserMacroParser)->parse($value) == CParser::PARSE_SUCCESS
 						|| (new CUserMacroFunctionParser)->parse($value) == CParser::PARSE_SUCCESS
 						|| (new CLLDMacroParser)->parse($value) == CParser::PARSE_SUCCESS
