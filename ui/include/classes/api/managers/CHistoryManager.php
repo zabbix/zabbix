@@ -1226,6 +1226,100 @@ class CHistoryManager {
 	}
 
 	/**
+	 * Elasticsearch specific implementation of getAggregatedValues.
+	 *
+	 * @see CHistoryManager::getAggregatedValues
+	 */
+	private function getAggregatedValuesFromElasticsearch(array $items, string $function, int $time_from, ?int $time_to)
+			: array {
+		$aggs_value_clock = [
+			'clock' => [
+				'max' => [
+					'field' => 'clock'
+				]
+			]
+		];
+
+		switch ($function) {
+			case AGGREGATE_MIN:
+				$aggs_value_clock['value'] = ['min' => ['field' => 'value']];
+				break;
+			case AGGREGATE_MAX:
+				$aggs_value_clock['value'] = ['max' => ['field' => 'value']];
+				break;
+			case AGGREGATE_AVG:
+				$aggs_value_clock['value'] = ['avg' => ['field' => 'value']];
+				break;
+			case AGGREGATE_COUNT:
+				$aggs_value_clock['value'] = ['value_count' => ['field' => 'clock']];
+				break;
+			case AGGREGATE_SUM:
+				$aggs_value_clock['value'] = ['sum' => ['field' => 'value']];
+				break;
+			case AGGREGATE_FIRST:
+				$aggs_value_clock['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
+				$aggs_value_clock['clock'] = ['min' => ['field' => 'clock']];
+				break;
+			case AGGREGATE_LAST:
+				$aggs_value_clock['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
+				break;
+		}
+
+		$itemids_by_value_type = [];
+
+		foreach ($items as $item) {
+			$itemids_by_value_type[$item['value_type']][$item['itemid']] = true;
+		}
+
+		$result = [];
+
+		foreach (self::getElasticsearchEndpoints(array_keys($itemids_by_value_type)) as $value_type => $endpoint) {
+			$query = [
+				'query' => [
+					'bool' => [
+						'must' => [
+							[
+								'terms' => [
+									'itemid' => array_keys($itemids_by_value_type[$value_type])
+								]
+							],
+							[
+								'range' => [
+									'clock' => ['gte' => $time_from] + ($time_to !== null ? ['lte' => $time_to] : [])
+								]
+							]
+						]
+					]
+				],
+				'aggs' => [
+					'group_by_itemid' => [
+						'terms' => [
+							'field' => 'itemid',
+							'size' => count($itemids_by_value_type[$value_type])
+						],
+						'aggs' => $aggs_value_clock
+					]
+				],
+				'size' => 0
+			];
+
+			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
+
+			foreach ($data['group_by_itemid']['buckets'] as $item_data) {
+				$result[$item_data['key']] = [
+					'itemid' => $item_data['key'],
+					'value' => $function == AGGREGATE_FIRST || $function == AGGREGATE_LAST
+						? (string) $item_data['value']['hits']['hits'][0]['_source']['value']
+						: (string) $item_data['value']['value'],
+					'clock' => (int) $item_data['clock']['value_as_string']
+				];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * SQL specific implementation of getAggregatedValues.
 	 *
 	 * @see CHistoryManager::getAggregatedValues
@@ -1333,100 +1427,6 @@ class CHistoryManager {
 						'clock' => $row['clock']
 					];
 				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Elasticsearch specific implementation of getAggregatedValues.
-	 *
-	 * @see CHistoryManager::getAggregatedValues
-	 */
-	private function getAggregatedValuesFromElasticsearch(array $items, string $function, int $time_from, ?int $time_to)
-			: array {
-		$aggs_value_clock = [
-			'clock' => [
-				'max' => [
-					'field' => 'clock'
-				]
-			]
-		];
-
-		switch ($function) {
-			case AGGREGATE_MIN:
-				$aggs_value_clock['value'] = ['min' => ['field' => 'value']];
-				break;
-			case AGGREGATE_MAX:
-				$aggs_value_clock['value'] = ['max' => ['field' => 'value']];
-				break;
-			case AGGREGATE_AVG:
-				$aggs_value_clock['value'] = ['avg' => ['field' => 'value']];
-				break;
-			case AGGREGATE_COUNT:
-				$aggs_value_clock['value'] = ['value_count' => ['field' => 'clock']];
-				break;
-			case AGGREGATE_SUM:
-				$aggs_value_clock['value'] = ['sum' => ['field' => 'value']];
-				break;
-			case AGGREGATE_FIRST:
-				$aggs_value_clock['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
-				$aggs_value_clock['clock'] = ['min' => ['field' => 'clock']];
-				break;
-			case AGGREGATE_LAST:
-				$aggs_value_clock['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
-				break;
-		}
-
-		$itemids_by_value_type = [];
-
-		foreach ($items as $item) {
-			$itemids_by_value_type[$item['value_type']][$item['itemid']] = true;
-		}
-
-		$result = [];
-
-		foreach (self::getElasticsearchEndpoints(array_keys($itemids_by_value_type)) as $value_type => $endpoint) {
-			$query = [
-				'query' => [
-					'bool' => [
-						'must' => [
-							[
-								'terms' => [
-									'itemid' => array_keys($itemids_by_value_type[$value_type])
-								]
-							],
-							[
-								'range' => [
-									'clock' => ['gte' => $time_from] + ($time_to !== null ? ['lte' => $time_to] : [])
-								]
-							]
-						]
-					]
-				],
-				'aggs' => [
-					'group_by_itemid' => [
-						'terms' => [
-							'field' => 'itemid',
-							'size' => count($itemids_by_value_type[$value_type])
-						],
-						'aggs' => $aggs_value_clock
-					]
-				],
-				'size' => 0
-			];
-
-			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
-
-			foreach ($data['group_by_itemid']['buckets'] as $item_data) {
-				$result[$item_data['key']] = [
-					'itemid' => $item_data['key'],
-					'value' => $function == AGGREGATE_FIRST || $function == AGGREGATE_LAST
-						? (string) $item_data['value']['hits']['hits'][0]['_source']['value']
-						: (string) $item_data['value']['value'],
-					'clock' => (int) $item_data['clock']['value_as_string']
-				];
 			}
 		}
 
