@@ -1525,6 +1525,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <key>ceph.pool["{#POOLNAME}",percent_used]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>The percentage of the storage used per pool.</description>
                      <application_prototypes>
