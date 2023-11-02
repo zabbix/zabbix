@@ -914,7 +914,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			result = results.values[i];
 
-			if (NULL == result->dnsname)
+			if (NULL == result->dnsname && 0 != result->services.values_num)
 			{
 				zabbix_log(LOG_LEVEL_WARNING,
 						"Missing 'dnsname', result skipped (druleid=" ZBX_FS_UI64 ", ip: '%s')",
@@ -924,11 +924,12 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			memset(&dhost, 0, sizeof(zbx_db_dhost));
 			host_status = process_services(handle, result->druleid, &dhost, result->ip,
-					result->dnsname,result->now, result->unique_dcheckid, &result->services,
+					result->dnsname, result->now, result->unique_dcheckid, &result->services,
 					events_cbs->add_event_cb);
 
-			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip, result->dnsname,
-					host_status, result->now, events_cbs->add_event_cb);
+			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip,
+					NULL != result->dnsname ? result->dnsname : "", host_status, result->now,
+					events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
 				events_cbs->process_events_cb(NULL, NULL);
@@ -1630,7 +1631,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			if (FAIL == ret)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->worker_id, error);
+				zabbix_log(LOG_LEVEL_WARNING, "[%d] Discovery rule " ZBX_FS_UI64 " error:%s",
+						worker->worker_id, job->druleid, error);
 				zbx_free(error);
 			}
 

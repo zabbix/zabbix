@@ -125,12 +125,12 @@ static void	process_snmp_result(void *data)
 		service->status = DOBJECT_STATUS_UP;
 		zbx_vector_discoverer_services_ptr_append(&snmp_result->dresult->services, service);
 
-		if (NULL ==  snmp_result->dresult->dnsname)
+		if (NULL ==  snmp_result->dresult->dnsname || '\0' == *snmp_result->dresult->dnsname)
 		{
 			char	dns[ZBX_INTERFACE_DNS_LEN_MAX];
 
 			zbx_gethost_by_ip(snmp_result->dresult->ip, dns, sizeof(dns));
-			snmp_result->dresult->dnsname = zbx_strdup(NULL, dns);
+			snmp_result->dresult->dnsname = zbx_strdup(snmp_result->dresult->dnsname, dns);
 		}
 	}
 
@@ -224,6 +224,8 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	zbx_free(item.snmpv3_contextname);
 	zbx_free_agent_result(&result);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
+			ip, port, item.key_orig, ret);
 	return ret;
 }
 
@@ -329,10 +331,11 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 			zbx_vector_portrange_clear(&port_ranges);
 		}
 
+		task->addr.range->state.dcheck_index = 0;
 		discoverer_net_check_result_flush(dmanager, task, &results, 0);
 	}
 out:	/* try to close all handles if they are exhausted */
-	while (0 == *stop && 0 != poller_config.processing)
+	while (0 != poller_config.processing)
 	{
 		event_base_loop(poller_config.base, EVLOOP_ONCE);
 		discoverer_net_check_result_flush(dmanager, task, &results, 0);
