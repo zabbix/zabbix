@@ -33,7 +33,6 @@ typedef struct
 	struct event			*tx_event;
 	struct event			*rx_event;
 	struct event			*timeout_event;
-	char				ip[65];
 	int				timeout;
 	char				*error;
 	struct evdns_base		*dnsbase;
@@ -57,7 +56,8 @@ static void	async_task_remove(zbx_async_task_t *task)
 	if (NULL != task->timeout_event)
 		event_free(task->timeout_event);
 
-	evutil_freeaddrinfo(task->ai);
+	if (NULL != task->ai)
+		evutil_freeaddrinfo(task->ai);
 
 	zbx_free(task->error);
 	zbx_free(task);
@@ -152,7 +152,7 @@ static void	async_reverse_dns_event(int err, char type, int count, int ttl, void
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot reverse DNS name: %s", evdns_err_to_string(err));
 		task->error = zbx_strdup(task->error, evdns_err_to_string(err));
-		async_event(-1, EV_TIMEOUT, task);
+		task->address = NULL;
 	}
 	else
 	{
@@ -160,9 +160,9 @@ static void	async_reverse_dns_event(int err, char type, int count, int ttl, void
 			task->address = *(char **)addresses;
 		else
 			task->address = NULL;
-
-		async_event(-1, 0, task);
 	}
+
+	async_event(-1, 0, task);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -176,21 +176,19 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 	if (0 != err)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve DNS name: %s", evutil_gai_strerror(err));
-		task->ip[0] = '\0';
 		task->error = zbx_strdup(task->error, evutil_gai_strerror(err));
 		async_event(-1, EV_TIMEOUT, task);
 	}
 	else
 	{
 		struct timeval	tv = {task->timeout, 0};
+		char		ip[65];
+
+		if (FAIL == zbx_inet_ntop(ai, ip, (socklen_t)sizeof(ip)))
+			ip[0] = '\0';
 
 		task->ai = ai;
-
-		if (FAIL == zbx_inet_ntop(ai, task->ip, (socklen_t)sizeof(task->ip)))
-			task->ip[0] = '\0';
-
-		task->address = task->ip;
-
+		task->address = ip;
 		evtimer_add(task->timeout_event, &tv);
 		async_event(-1, 0, task);
 	}
