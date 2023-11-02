@@ -2317,6 +2317,8 @@ button {
   background-color: #ffffff;
   border-collapse: separate;
   border: 1px solid #dfe4e7; }
+  .list-table.fixed {
+    table-layout: fixed; }
   .list-table thead th {
     height: 100%;
     overflow: hidden;

@@ -4,6 +4,10 @@
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
+	&.fixed {
+		table-layout: fixed;
+	}
+
 	thead {
 		th {
 			height: 100%;
