@@ -67,7 +67,6 @@ PROXY_SUBDIRS = \
 	zabbix_server/poller \
 	zabbix_server/trapper \
 	zabbix_server/vmware \
-	zabbix_server/ipmi \
 	zabbix_server/preproc \
 	zabbix_server/service \
 	zabbix_proxy \
