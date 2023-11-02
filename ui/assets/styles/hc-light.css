@@ -3521,7 +3521,6 @@ section {
     display: flex;
     flex: 1;
     justify-content: space-between;
-    background-color: #ffffff;
     margin-top: -3px; }
   .filter-container.tabfilter-container nav > ul > li {
     padding-top: 3px; }
@@ -3582,7 +3581,8 @@ section {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover {
         background: #f4f4f4; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: #ffffff; }
+      background-color: #ffffff;
+      border-color: #9f9f9f; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.focused {
