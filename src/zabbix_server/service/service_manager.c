@@ -235,12 +235,10 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = DBselect("select p.eventid,p.clock,p.severity,t.tag,t.value,p.ns,es.eventid"
+	result = DBselect("select p.eventid,p.clock,p.severity,t.tag,t.value,p.ns"
 			" from problem p"
 			" left join problem_tag t"
 				" on p.eventid=t.eventid"
-			" left join event_suppress es"
-				" on p.eventid=es.eventid"
 			" where p.source=%d"
 				" and p.object=%d"
 				" and r_eventid is null"
@@ -260,6 +258,8 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			event->ns = atoi(row[5]);
 			event->value = TRIGGER_VALUE_PROBLEM;
 			event->severity = atoi(row[2]);
+			event->mtime = 0;
+			event->suppressed = 0;
 			zbx_vector_ptr_create(&event->tags);
 			zbx_hashset_insert(problem_events, &event, sizeof(zbx_event_t *));
 		}
@@ -273,11 +273,22 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			tag->value = zbx_strdup(NULL, row[4]);
 			zbx_vector_ptr_append(&event->tags, tag);
 		}
+	}
+	DBfree_result(result);
 
-		if (FAIL == DBis_null(row[5]))
-			event->suppressed = 1;
-		else
-			event->suppressed = 0;
+	result = DBselect("select distinct(eventid) from event_suppress");
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_event_t	event_local, *event_p, **ptr;
+
+		ZBX_STR2UINT64(event_local.eventid, row[0]);
+		event_p = &event_local;
+
+		if (NULL != (ptr = zbx_hashset_search(problem_events, &event_p)))
+		{
+			event_p = *ptr;
+			event_p->suppressed = 1;
+		}
 	}
 	DBfree_result(result);
 
@@ -2584,9 +2595,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 			{
 				event = *ptr;
 				if (event->suppressed == 1)
-				{
 					continue;
-				}
 			}
 
 			if (service_problem->severity > status)
@@ -2594,7 +2603,14 @@ static void	db_update_services(zbx_service_manager_t *manager)
 				status = service_problem->severity;
 
 				if (0 == (service_diff->flags & ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS))
-					ts = service_problem->ts;
+				{
+					if (NULL != ptr && 0 != event->mtime)
+					{
+						ts.sec = event->mtime;
+					}
+					else
+						ts = service_problem->ts;
+				}
 			}
 		}
 
@@ -2678,6 +2694,7 @@ static void	recover_services_problem(zbx_service_manager_t *service_manager, con
 			service_problem->eventid = event->eventid;
 			service_problem->serviceid = service_diff->serviceid;
 			service_problem->severity = event->severity;
+
 			service_problem->ts.sec = event->clock;
 			service_problem->ts.ns = event->ns;
 
@@ -2742,6 +2759,7 @@ static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_servi
 		}
 
 		(*pevent)->suppressed = suppressed;
+		(*pevent)->mtime = (int)time(NULL);
 
 		pi_local.eventid = eventids->values[i];
 

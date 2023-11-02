@@ -122,6 +122,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 		}
 
 		data += zbx_deserialize_value(data, &event->suppressed);
+		event->mtime = 0;
 	}
 }
 
