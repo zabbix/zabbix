@@ -2645,18 +2645,12 @@ zabbix_export:
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Resources usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'HPE iLO: Fans'
               widgets:
                 - type: GRAPH_PROTOTYPE
                   width: '24'
                   height: '10'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
@@ -2671,9 +2665,6 @@ zabbix_export:
                   width: '24'
                   height: '10'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
@@ -2696,9 +2687,6 @@ zabbix_export:
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Line input voltage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2712,9 +2700,6 @@ zabbix_export:
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Last power output'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 724ed4e07ca34bf594719298055a0837
           name: 'Computer system type'
