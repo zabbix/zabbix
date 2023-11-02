@@ -464,12 +464,8 @@ class CTemplateGroup extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($groupids as $i => $groupid) {
-			if (!array_key_exists($groupid, $db_groups)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i + 1), _('object does not exist, or you have no permissions to it')
-				));
-			}
+		if (count($db_groups) != count($groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -776,11 +772,18 @@ class CTemplateGroup extends CApiService {
 		$db_templates = API::Template()->get([
 			'output' => ['templateid', 'host'],
 			'groupids' => array_column($data['groups'], 'groupid'),
-			'templateids' => array_column($data['templates'], 'templateids'),
-			'searchByAny' => true,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		if ($data['templates']) {
+			$db_templates += API::Template()->get([
+				'output' => ['templateid', 'host'],
+				'templateids' => array_column($data['templates'], 'templateid'),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
 
 		foreach ($data['templates'] as $i => $template) {
 			if (!array_key_exists($template['templateid'], $db_templates)) {

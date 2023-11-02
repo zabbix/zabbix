@@ -76,14 +76,14 @@ class testTemplate extends CAPITest {
 					'host' => 'test-template-04',
 					'groups' => ['groupid' => 9999]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/groups/1": object does not exist, or you have no permissions to it.'
 			],
 			[
 				'request' => [
 					'host' => 'test-template-05',
 					'groups' => ['groupid' => 1]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!',
+				'expected_error' => 'Invalid parameter "/1/groups/1": object does not exist, or you have no permissions to it.',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix']
 			],
 			[
@@ -179,7 +179,7 @@ class testTemplate extends CAPITest {
 						'templates' => ['templateid' => 99999]
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/templates/1": object does not exist, or you have no permissions to it.'
 			],
 			[
 				'request' => [
@@ -189,7 +189,7 @@ class testTemplate extends CAPITest {
 						'templates' => ['templateid' => 10047 /* "Zabbix server health" */]
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!',
+				'expected_error' => 'Invalid parameter "/1/groups/1": object does not exist, or you have no permissions to it.',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix']
 			],
 			[

@@ -1098,15 +1098,21 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		$hostids_condition = $data['hosts'] ? ['hostids' => array_column($data['hosts'], 'hostid')] : [];
-
 		$db_hosts = API::Host()->get([
 			'output' => ['hostid', 'host', 'flags'],
 			'groupids' => array_column($data['groups'], 'groupid'),
-			'searchByAny' => true,
 			'editable' => true,
 			'preservekeys' => true
-		] + $hostids_condition);
+		]);
+
+		if ($data['hosts']) {
+			$db_hosts += API::Host()->get([
+				'output' => ['hostid', 'host', 'flags'],
+				'hostids' => array_column($data['hosts'], 'hostid'),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
 
 		foreach ($data['hosts'] as $i => $host) {
 			if (!array_key_exists($host['hostid'], $db_hosts)) {

@@ -543,16 +543,16 @@ class CUser extends CApiService {
 			}
 		}
 
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::checkRoles($users, $db_roles);
+		self::addRoleType($users, $db_roles, $db_users);
+
 		self::addAffectedObjects($users, $db_users);
 
 		if ($usernames) {
 			$this->checkDuplicates($usernames);
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
-
-		$db_roles = self::getDbRoles($users, $db_users);
-		self::checkRoles($users, $db_roles);
-		self::addRoleType($users, $db_roles, $db_users);
 
 		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, $db_users);
@@ -861,10 +861,6 @@ class CUser extends CApiService {
 	 * @param array|null $db_users
 	 */
 	private static function addRoleType(array &$users, array $db_roles, array &$db_users = null): void {
-		if (!$db_roles) {
-			return;
-		}
-
 		foreach ($users as &$user) {
 			$user['role_type'] = null;
 
@@ -1241,6 +1237,7 @@ class CUser extends CApiService {
 				$ugsets[$ugset_hash]['userids'][] = $user['userid'];
 			}
 		}
+		unset($user);
 
 		if ($ugsets) {
 			if ($db_users === null) {
@@ -1688,7 +1685,7 @@ class CUser extends CApiService {
 		$ugsets = [];
 
 		foreach ($db_users as $db_user) {
-			if ($db_user['role']['type'] !== null && $db_user['role']['type'] != USER_TYPE_SUPER_ADMIN
+			if ($db_user['role'] && $db_user['role']['type'] != USER_TYPE_SUPER_ADMIN
 					&& $db_user['usrgrps']) {
 				$ugset_hash = self::getUgSetHash([]);
 
@@ -2516,7 +2513,7 @@ class CUser extends CApiService {
 		$user = array_intersect_key($idp_user_data, $attrs);
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')]
 		]];
@@ -2534,8 +2531,8 @@ class CUser extends CApiService {
 		$user['ts_provisioned'] = time();
 		$users = [$userid => $user];
 
-		$db_roles = self::getDbRoles($users);
-		self::addRoleType($users, $db_roles);
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::addRoleType($users, $db_roles, $db_users);
 
 		if (array_key_exists('medias', $user)) {
 			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
