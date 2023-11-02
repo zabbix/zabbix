@@ -841,6 +841,45 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'get_scripts_by_hosts':
+		$result = '';
+
+		$scripts = API::Script()->getScriptsByHosts([
+			'hostid' => $data['hostid'],
+			'scriptid' => $data['scriptid'],
+			'manualinput' => $data['manualinput']
+		]);
+
+		if ($scripts) {
+			if (array_key_exists('error', $scripts)) {
+				$result = $scripts;
+			}
+			else {
+				$result = $scripts[$data['hostid']][0];
+			}
+		}
+
+		break;
+
+	case 'get_scripts_by_events':
+		$result = '';
+
+		$scripts = API::Script()->getScriptsByEvents([
+			'eventid' => $data['eventid'],
+			'scriptid' => $data['scriptid'],
+			'manualinput' => $data['manualinput']
+		]);
+
+		if ($scripts) {
+			if (array_key_exists('error', $scripts)) {
+				$result = $scripts;
+			}
+			else {
+				$result = $scripts[$data['eventid']][0];
+			}
+		}
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }

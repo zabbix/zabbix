@@ -311,7 +311,7 @@ function getMenuPopupHost(options, trigger_element) {
 	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
-			items: getMenuPopupURLData(options.urls, trigger_element)
+			items: getMenuPopupURLData(options.urls, trigger_element, options.hostid, null)
 		});
 	}
 
@@ -960,7 +960,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
-			items: getMenuPopupURLData(options.urls, trigger_element)
+			items: getMenuPopupURLData(options.urls, trigger_element, null, options.eventid)
 		});
 	}
 
@@ -1450,12 +1450,14 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_
 /**
  * Build URL menu tree.
  *
- * @param {array} urls             URL names and menu paths.
- * @param {Node}  trigger_element  UI element which triggered opening of overlay dialogue.
+ * @param {array}        urls             URL names and menu paths.
+ * @param {Node}         trigger_element  UI element which triggered opening of overlay dialogue.
+ * @param {string|null}  hostid           ID of host which triggered opening of overlay dialogue.
+ * @param {string|null}  eventid          ID of event which triggered opening of overlay dialogue.
  *
  * @return {array}
  */
-function getMenuPopupURLData(urls, trigger_element) {
+function getMenuPopupURLData(urls, trigger_element, hostid, eventid) {
 	let tree = {};
 
 	// Parse URLs and create tree.
@@ -1474,7 +1476,10 @@ function getMenuPopupURLData(urls, trigger_element) {
 				manualinput_prompt: url.manualinput_prompt,
 				manualinput_validator_type: url.manualinput_validator_type,
 				manualinput_validator: url.manualinput_validator,
-				manualinput_default_value: url.manualinput_default_value
+				manualinput_default_value: url.manualinput_default_value,
+				scriptid: url.scriptid,
+				hostid: hostid,
+				eventid: eventid
 			});
 		}
 	}
@@ -1578,20 +1583,53 @@ function openManualinputDialogue(item, data) {
 	});
 
 	overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-		if (data.params.confirmation === '') {
-			item.url = data.params.url.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
+		const curl = new Curl('jsrpc.php');
 
-			window.open(item.url, '_blank');
+		curl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
+		curl.setArgument('scriptid', data.params.scriptid);
+		curl.setArgument('manualinput', e.detail.data.manualinput);
+
+		if (data.params.hostid !== null) {
+			curl.setArgument('method', 'get_scripts_by_hosts');
+			curl.setArgument('hostid', data.params.hostid);
 		}
-		else {
-			item.url = data.params.url.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
-
-			let confirmation_message = data.params.confirmation.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
-
-			if (confirm(confirmation_message)) {
-				window.open(item.url, '_blank');
-			}
+		else if (data.params.eventid !== null) {
+			curl.setArgument('method', 'get_scripts_by_events');
+			curl.setArgument('eventid', data.params.eventid);
 		}
+
+		const form = document.getElementById('script-userinput-form');
+
+		fetch(curl.getUrl())
+			.then((response) => response.json())
+			.then((response) => {
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				if ('error' in response.result) {
+					const message_box = makeMessageBox('bad', [response.result.error], '', true, true)[0];
+
+					form.parentNode.insertBefore(message_box, form);
+				}
+				else {
+					item.url = response.result.url;
+
+					if (response.result.confirmation === '') {
+						window.open(item.url, '_blank');
+					}
+					else {
+						if (confirm(response.result.confirmation)) {
+							window.open(item.url, '_blank');
+						}
+					}
+				}
+			})
+			.catch((exception) => {
+				console.log('Could not retrieve macro values:', exception);
+			});
 	});
 }
 

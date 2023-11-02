@@ -103,7 +103,6 @@ window.script_userinput_popup = new class {
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else if ('data' in response) {
-					overlayDialogueDestroy(this.overlay.dialogueid);
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 			})

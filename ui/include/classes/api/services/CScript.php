@@ -1243,15 +1243,33 @@ class CScript extends CApiService {
 
 	/**
 	 * Returns all the scripts that are available on each given host. Automatically resolves macros in
-	 * confirmation and URL fields.
+	 * confirmation, URL and manual input prompt fields.
 	 *
-	 * @param $hostids
+	 * @param array  $options
+	 * @param string $options['hostid']       Host ID to return scripts for.
+	 * @param string $options['scriptid']     Script ID for value retrieval (optional).
+	 * @param string $options['manualinput']  Value of the user-provided {MANUALINPUT} macro value (optional).
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function getScriptsByHosts($hostids) {
-		zbx_value2array($hostids);
+	public function getScriptsByHosts(array $options = []): array {
+		$options = zbx_toArray($options);
 
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
+			'manualinput' =>    ['type' => API_STRING_UTF8, 'length' => '255']
+		]];
+
+		foreach ($options as $index => $option) {
+			if (!CApiInputValidator::validate($api_input_rules, $option, '/'.($index + 1), $error)) {
+				return ['error' => $error];
+			}
+		}
+
+		$hostids = array_column($options, 'hostid');
 		$scripts_by_host = [];
 
 		if (!$hostids) {
@@ -1262,12 +1280,7 @@ class CScript extends CApiService {
 			$scripts_by_host[$hostid] = [];
 		}
 
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-		if (!CApiInputValidator::validate($api_input_rules, $hostids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$scripts = $this->get([
+		$parameters = [
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
 				'publickey', 'privatekey', 'menu_path', 'url', 'new_window', 'manualinput', 'manualinput_prompt',
@@ -1276,7 +1289,15 @@ class CScript extends CApiService {
 			'hostids' => $hostids,
 			'sortfield' => 'name',
 			'preservekeys' => true
-		]);
+		];
+
+		$scriptids = array_column($options, 'scriptid');
+
+		if ($scriptids) {
+			$parameters['scriptids'] = $scriptids;
+		}
+
+		$scripts = $this->get($parameters);
 
 		$scripts = $this->addRelatedGroupsAndHosts([
 			'selectGroups' => null,
@@ -1288,6 +1309,14 @@ class CScript extends CApiService {
 			$macros_data = [];
 
 			foreach ($scripts as $scriptid => $script) {
+				foreach ($options as $option) {
+					if ($option['hostid'] == $hostid
+							&& array_key_exists('scriptid', $option) && $option['scriptid'] == $scriptid
+							&& array_key_exists('manualinput', $option)) {
+						$macros_data[$hostid][$scriptid]['manualinput_value'] = $option['manualinput'];
+					}
+				}
+
 				foreach ($script['hosts'] as $host) {
 					$hostid = $host['hostid'];
 
@@ -1351,24 +1380,36 @@ class CScript extends CApiService {
 
 	/**
 	 * Returns all the scripts that are available on each given event. Automatically resolves macros in
-	 * confirmation and URL fields.
+	 * confirmation, URL and manual input prompt fields.
 	 *
-	 * @param $eventids
+	 * @param array  $options
+	 * @param string $options['eventid']      Event ID to return scripts for.
+	 * @param string $options['scriptid']     Script ID for value retrieval (optional).
+	 * @param string $options['manualinput']  Value of the user-provided {MANUALINPUT} macro value.
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function getScriptsByEvents($eventids) {
-		zbx_value2array($eventids);
-
+	public function getScriptsByEvents(array $options = []): array {
+		$options = zbx_toArray($options);
+		$eventids = array_column($options, 'eventid');
 		$scripts_by_events = [];
 
 		if (!$eventids) {
 			return $scripts_by_events;
 		}
 
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-		if (!CApiInputValidator::validate($api_input_rules, $eventids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'eventid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
+			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
+			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => '255', 'default' => '']
+		]];
+
+		foreach ($options as $index => $option) {
+			if (!CApiInputValidator::validate($api_input_rules, $option, '/'.($index + 1), $error)) {
+				return ['error' => $error];
+			}
 		}
 
 		foreach ($eventids as $eventid) {
@@ -1443,7 +1484,9 @@ class CScript extends CApiService {
 			}
 		}
 
-		$scripts = $this->get([
+		$scriptids = array_column($options, 'scriptid');
+
+		$parameters = [
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
 				'publickey', 'privatekey', 'menu_path', 'url', 'new_window', 'manualinput', 'manualinput_prompt',
@@ -1452,7 +1495,13 @@ class CScript extends CApiService {
 			'hostids' => array_keys($hostids),
 			'sortfield' => 'name',
 			'preservekeys' => true
-		]);
+		];
+
+		if ($scriptids) {
+			$parameters['scriptids'] = $scriptids;
+		}
+
+		$scripts = $this->get($parameters);
 
 		$scripts = $this->addRelatedGroupsAndHosts([
 			'selectGroups' => null,
@@ -1465,6 +1514,13 @@ class CScript extends CApiService {
 			$processed_scripts_per_event = [];
 
 			foreach ($scripts as $scriptid => $script) {
+				foreach ($options as $option) {
+					if ($option['eventid'] == $eventid && array_key_exists('scriptid', $option)
+							&& $option['scriptid'] == $scriptid && array_key_exists('manualinput', $option)) {
+						$macros_data[$eventid][$scriptid]['manualinput_value'] = $option['manualinput'];
+					}
+				}
+
 				foreach ($events as $eventid => $event) {
 					foreach ($event['hosts'] as $event_host) {
 						foreach ($script['hosts'] as $host) {

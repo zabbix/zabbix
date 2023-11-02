@@ -549,16 +549,55 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			if (confirmation === '') {
-				execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
-			}
-			else {
-				confirmation = confirmation.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
+			const curl = new Curl('jsrpc.php');
 
-				showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
-					e.detail.data.manualinput
-				);
+			curl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
+			curl.setArgument('scriptid', scriptid);
+			curl.setArgument('manualinput', e.detail.data.manualinput);
+
+			if (hostid !== null) {
+				curl.setArgument('method', 'get_scripts_by_hosts');
+				curl.setArgument('hostid', hostid);
 			}
+			else if (eventid !== null) {
+				curl.setArgument('method', 'get_scripts_by_events');
+				curl.setArgument('eventid', eventid);
+			}
+
+			const form = document.getElementById('script-userinput-form');
+
+			fetch(curl.getUrl())
+				.then((response) => response.json())
+				.then((response) => {
+					for (const element of form.parentNode.children) {
+						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+							element.parentNode.removeChild(element);
+						}
+					}
+
+					if ('error' in response.result) {
+						const message_box = makeMessageBox('bad', [response.result.error], '', true, true)[0];
+
+						form.parentNode.insertBefore(message_box, form);
+					}
+					else {
+						overlayDialogueDestroy(overlay.dialogueid);
+
+						confirmation = response.result.confirmation;
+
+						if (confirmation === '') {
+							execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
+						}
+						else {
+							showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid,
+								csrf_token, e.detail.data.manualinput
+							);
+						}
+					}
+				})
+				.catch((exception) => {
+					console.log('Could not retrieve macro values:', exception);
+				});
 		});
 	}
 	else if (confirmation.length > 0) {

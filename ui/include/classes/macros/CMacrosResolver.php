@@ -2671,7 +2671,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
 				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
-				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap()),
+				'manualinput' => ['{MANUALINPUT}']
 			],
 			'usermacros' => true
 		];
@@ -2679,10 +2680,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macros = ['host' => [], 'interface' => [], 'user_data' => [], 'inventory' => []];
 		$usermacros = [];
 
+		$manualinput_value = [];
+
 		foreach ($data as $hostid => $script) {
+			foreach ($script as $parameters) {
+				if (array_key_exists('manualinput_value', $parameters)) {
+					$manualinput_value[$hostid] = $parameters['manualinput_value'];
+				}
+			}
+
 			// Reset matched macros for each host.
 			$matched_macros = [
-				'macros' => ['host' => [], 'interface' => [], 'user_data' => [], 'inventory' => []],
+				'macros' => ['host' => [], 'interface' => [], 'user_data' => [], 'inventory' => [],
+					'manualinput' => []
+				],
 				'usermacros' => []
 			];
 
@@ -2734,6 +2745,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$macros['user_data'][$hostid] = true;
 			}
 
+			foreach ($matched_macros['macros']['manualinput'] as $macro) {
+				$macro_values[$hostid][$macro] = UNRESOLVED_MACRO_STRING;
+			}
+
 			if ($matched_macros['usermacros']) {
 				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
@@ -2743,6 +2758,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macro_values);
+
+		if ($macro_values) {
+			foreach ($macro_values[$hostid] as $type => &$macro_value) {
+				if ($manualinput_value && $type === '{MANUALINPUT}') {
+					$macro_value = $manualinput_value[$hostid];
+				}
+			}
+			unset($macro_value);
+		}
 
 		foreach ($this->getUserMacros($usermacros) as $hostid => $usermacros_data) {
 			$macro_values[$hostid] = array_key_exists($hostid, $macro_values)
@@ -2816,7 +2840,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'{EVENT.VALUE}', '{EVENT.CAUSE.ID}', '{EVENT.CAUSE.NAME}', '{EVENT.CAUSE.NSEVERITY}',
 					'{EVENT.CAUSE.SEVERITY}', '{EVENT.CAUSE.STATUS}', '{EVENT.CAUSE.VALUE}'
 				],
-				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}']
+				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
+				'manualinput' => ['{MANUALINPUT}']
 			],
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
@@ -2832,10 +2857,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($data as $eventid => $script) {
+			$manualinput_value = [];
+			foreach ($script as $parameters) {
+				if (array_key_exists('manualinput_value', $parameters)) {
+					$manualinput_value[$eventid] = $parameters['manualinput_value'];
+				}
+			}
+
 			$event = $events[$eventid];
 			$triggerid = $event['objectid'];
 			$matched_macros = [
-				'macros' => ['host' => [], 'interface' => [], 'inventory' => [], 'event' => [], 'user_data' => []],
+				'macros' => ['host' => [], 'interface' => [], 'inventory' => [], 'event' => [], 'user_data' => [],
+					'manualinput' => []
+				],
 				'macros_n' => ['host' => [], 'interface' => [], 'inventory' => []],
 				'usermacros' => []
 			];
@@ -2900,6 +2934,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach ($matched_macros['macros']['user_data'] as $macro) {
 				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
 				$macros['user_data'][$hostid] = true;
+			}
+
+			foreach ($matched_macros['macros']['manualinput'] as $macro) {
+				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
 			}
 
 			// Numeric index macros.
@@ -3011,6 +3049,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values[$eventid] = array_key_exists($eventid, $macro_values)
 				? array_merge($macro_values[$eventid], $usermacros_data['macros'])
 				: $usermacros_data['macros'];
+		}
+
+		if ($macro_values) {
+			foreach ($macro_values[$eventid] as $type => &$macro_value) {
+				if ($manualinput_value && $type === '{MANUALINPUT}') {
+					$macro_value = $manualinput_value[$eventid];
+				}
+			}
+			unset($macro_value);
 		}
 
 		$types = $this->transformToPositionTypes($types);

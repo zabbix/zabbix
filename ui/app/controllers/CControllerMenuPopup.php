@@ -185,8 +185,16 @@ class CControllerMenuPopup extends CController {
 			}
 
 			$all_scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
-				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
+				? API::Script()->getScriptsByHosts(['hostid' => $data['hostid']])
 				: [];
+
+			if (array_key_exists('error', $all_scripts)) {
+				error($all_scripts['error']);
+				unset($all_scripts['error']);
+			}
+			else {
+				$all_scripts = array_key_exists($data['hostid'], $all_scripts) ? $all_scripts[$data['hostid']] : [];
+			}
 
 			$scripts = [];
 			$urls = [];
@@ -281,7 +289,8 @@ class CControllerMenuPopup extends CController {
 					'manualinput_prompt' => $url['manualinput_prompt'],
 					'manualinput_validator_type' => $url['manualinput_validator_type'],
 					'manualinput_validator' => $url['manualinput_validator'],
-					'manualinput_default_value' => $url['manualinput_default_value']
+					'manualinput_default_value' => $url['manualinput_default_value'],
+					'scriptid' => $url['scriptid']
 				];
 			}
 
@@ -833,7 +842,12 @@ class CControllerMenuPopup extends CController {
 			$scripts_by_events = [];
 
 			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS) && $event) {
-				$scripts_by_events = API::Script()->getScriptsByEvents([$event['eventid']]);
+				$scripts_by_events = API::Script()->getScriptsByEvents(['eventid' => $event['eventid']]);
+			}
+
+			if (array_key_exists('error', $scripts_by_events)) {
+				error($scripts_by_events['error']);
+				unset($scripts_by_events['error']);
 			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
@@ -919,7 +933,8 @@ class CControllerMenuPopup extends CController {
 					'manualinput_prompt' => $url['manualinput_prompt'],
 					'manualinput_validator_type' => $url['manualinput_validator_type'],
 					'manualinput_validator' => $url['manualinput_validator'],
-					'manualinput_default_value' => $url['manualinput_default_value']
+					'manualinput_default_value' => $url['manualinput_default_value'],
+					'scriptid' => $url['scriptid']
 				];
 			}
 

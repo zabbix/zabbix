@@ -68,3 +68,5 @@ const KEY_PAGE_DOWN = 34;
 const KEY_END = 35;
 const KEY_HOME = 36;
 const KEY_SPACE = 32;
+
+const PAGE_TYPE_TEXT_RETURN_JSON = 11;
