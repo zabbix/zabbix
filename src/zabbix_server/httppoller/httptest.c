@@ -19,6 +19,7 @@
 
 #include "httptest.h"
 
+#include "common.h"
 #include "log.h"
 #include "preproc.h"
 #include "daemon.h"
@@ -603,6 +604,103 @@ out:
 	return ret;
 }
 
+char	*parse_parameters(const char *str)
+{
+	const char	*ptr;
+	char		*charset = NULL;
+
+	for (ptr = str; '\0' != *ptr; ptr++)
+	{
+		const char	*next;
+
+		if ('=' != *ptr)
+			continue;
+
+		ptr++;
+
+		next = strchr(ptr, ';');
+
+		if (next == ptr)
+			break;
+
+		for (;' ' == *str; str++);
+
+		if (0 == zbx_strncasecmp(str, "charset", ZBX_CONST_STRLEN("charset")))
+		{
+			if (NULL != next)
+			{
+				size_t	alloc_len = 0, offset = 0;
+
+				zbx_strncpy_alloc(&charset, &alloc_len, &offset, ptr, next - ptr - 1);
+			}
+			else
+				charset = zbx_strdup(NULL, ptr);
+
+			zbx_lrtrim(charset, " ");
+			break;
+		}
+
+		if (NULL == next)
+			break;
+
+		ptr = next;
+		str = ptr + 1;
+	}
+
+	return charset;
+}
+
+static char	*parse_media_type(const char *str)
+{
+	const char	*ptr;
+	char		*charset = NULL;
+
+	for (;' ' == *str; str++);
+
+	if (0 == zbx_strncasecmp(str, "text/html", ZBX_CONST_STRLEN("text/html")))
+		zabbix_log(LOG_LEVEL_INFORMATION, "got html");
+
+	if (NULL != (ptr = strchr(str, ';')))
+		charset = parse_parameters(ptr + 1);
+
+	return charset;
+}
+
+void	zbx_http_retrieve_charset(CURL *easyhandle, char **data, size_t *size, size_t *allocated)
+{
+	struct curl_header	*type;
+	CURLHcode		h;
+
+	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
+			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "cannot retrieve Content-Type header:%u", h);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "name '%s' value '%s' amount:%lu index: %lu"
+				" origin:%u", type->name, type->value, type->amount,
+				type->index, type->origin);
+
+		char	*charset = parse_media_type(type->value);
+
+		if (NULL != charset && 0 != strcmp(charset, "UTF-8"))
+		{
+			char	*converted;
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "converting from charset '%s'", charset);
+
+			converted = convert_to_utf8(*data, *size, charset);
+			zbx_free(*data);
+
+			*data = converted;
+			*size = strlen(converted);
+			*allocated = *size;
+		}
+		zbx_free(charset);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process single scenario of http test                              *
@@ -870,7 +968,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			errbuf[0] = '\0';
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+			{
+				zbx_http_retrieve_charset(easyhandle, &page.data, &page.offset, &page.allocated);
 				break;
+			}
 
 			zbx_free(page.data);
 		}
@@ -882,7 +983,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		{
 			char	*var_err_str = NULL;
 
-			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __func__, httpstep.url, page.data);
+			zabbix_log(LOG_LEVEL_INFORMATION, "%s() page.data from %s:'%s'", __func__, httpstep.url, page.data);
 
 			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
