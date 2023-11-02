@@ -1776,7 +1776,7 @@ class CScreenProblem extends CScreenBase {
 		)));
 
 		if ($html) {
-			$hint_table = (new CTable())->addClass('list-table');
+			$hint_table = (new CTable())->addClass(ZBX_STYLE_LIST_TABLE);
 		}
 
 		foreach ($items as $itemid => $item) {
