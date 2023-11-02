@@ -157,7 +157,11 @@ static void	async_reverse_dns_event(int err, char type, int count, int ttl, void
 	else
 	{
 		if (0 != count)
+		{
 			task->address = *(char **)addresses;
+			zabbix_log(LOG_LEVEL_DEBUG, "resolved reverse DNS name: %s", task->address);
+
+		}
 		else
 			task->address = NULL;
 	}
