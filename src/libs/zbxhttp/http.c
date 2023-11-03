@@ -391,4 +391,124 @@ clean:
 
 	return ret;
 }
+
+static char	*get_media_parameter(const char *str, const char *key, size_t key_len)
+{
+	const char	*ptr, *next;
+	char		*charset = NULL;
+
+	for (;;str = next + 1)
+	{
+		if (NULL == (ptr = strchr(str, '=')))
+			break;
+
+		ptr++;
+
+		if (NULL != (next = strchr(str, ';')))
+		{
+			if (next <= ptr)
+				break;
+		}
+
+		for (;' ' == *str; str++);
+
+		if (0 == zbx_strncasecmp(str, key, key_len))
+		{
+			if (NULL != next)
+			{
+				size_t	alloc_len = 0, offset = 0;
+
+				zbx_strncpy_alloc(&charset, &alloc_len, &offset, ptr, next - ptr - 1);
+			}
+			else
+				charset = zbx_strdup(NULL, ptr);
+
+			zbx_lrtrim(charset, " ");
+			zbx_strupper(charset);
+			break;
+		}
+
+		if (NULL == next)
+			break;
+	}
+
+	return charset;
+}
+
+static char	*get_media_type_charset(const char *str, char *data)
+{
+	const char	*ptr;
+	char		*charset = NULL;
+
+	for (;' ' == *str; str++);
+
+	if (NULL != (ptr = strchr(str, ';')))
+		charset = get_media_parameter(ptr + 1, "charset", ZBX_CONST_STRLEN("charset"));
+
+	if (NULL == charset)
+	{
+		if (0 == zbx_strncasecmp(str, "text/html", ZBX_CONST_STRLEN("text/html")))
+		{
+			char	*content = NULL , *errmsg = NULL;
+
+			if (FAIL == zbx_html_get_charset_content(data, &charset, &content, &errmsg))
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot parse html:%s", errmsg);
+				zbx_free(errmsg);
+			}
+
+			if (NULL != content && NULL == charset)
+			{
+				if (NULL != (ptr = strchr(content, ';')))
+					charset = get_media_parameter(ptr + 1, "charset", ZBX_CONST_STRLEN("charset"));
+			}
+
+			zbx_free(content);
+		}
+	}
+
+	if (NULL != charset)
+	{
+		zbx_lrtrim(charset, " ");
+		zbx_strupper(charset);
+	}
+
+	return charset;
+}
+
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated)
+{
+	struct curl_header	*type;
+	CURLHcode		h;
+
+	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
+			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve Content-Type header:%u", h);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "name '%s' value '%s' amount:%lu index: %lu"
+				" origin:%u", type->name, type->value, type->amount,
+				type->index, type->origin);
+
+		char	*charset = get_media_type_charset(type->value, *data);
+
+		if (NULL != charset && 0 != strcmp(charset, "UTF-8"))
+		{
+			char	*converted;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
+
+			converted = convert_to_utf8(*data, *size, charset);
+			zbx_free(*data);
+
+			*data = converted;
+			*size = strlen(converted);
+			*allocated = *size;
+		}
+		zbx_free(charset);
+	}
+}
+
 #endif
