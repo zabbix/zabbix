@@ -188,7 +188,7 @@ class testDataDisplayInGraphs extends CWebTest {
 				]
 			],
 			[
-				'name' => 'Thrends graph 2',
+				'name' => 'Trends graph 2',
 				'width' => 950,
 				'height' => 300,
 				'yaxismin' => -5,
@@ -2150,7 +2150,8 @@ class testDataDisplayInGraphs extends CWebTest {
 	public function testDataDisplayInGraphs_MonitoringHosts($data) {
 		$this->page->login()->open('zabbix.php?action=charts.view&filter_set=1&filter_hostids%5B0%5D='.self::$hostid)
 				->waitUntilReady();
-		// Select the time selector tab if it is not expanded.
+
+		// Open the time selector tab if it's not opened yet.
 		$time_tab = $this->query('xpath://a[contains(@class, "btn-time")]')->one();
 		$timeselector_tab = $this->query('id:tab_1')->one();
 
@@ -2162,6 +2163,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		// Set time selector to display the time period, required for the corresponding data type.
 		$this->setTimeSelector(self::$timestamps[$data['type']]);
 
+		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Name' => $data['type']]);
@@ -2170,19 +2172,27 @@ class testDataDisplayInGraphs extends CWebTest {
 			? 'monitoring_hosts'.$data['type'].'_kiosk_'
 			: 'monitoring_hosts'.$data['type'].'_';
 
+		// Check screenshots of graphs for each option in 'Show' field.
 		foreach (['All graphs', 'Host graphs', 'Simple graphs'] as $show) {
 			// Pie widget displays data in non-fixed time period, so only host graph screenshot will not differ each time.
 			if ($data['type'] === 'pie' && $show !== 'Host graphs') {
 				continue;
 			}
 
-			$filter_form->fill(['Show' => $show]);
-			$filter_form->submit();
+			// Select the desired value in Show field, if it is not selected already.
+			$filter_form->invalidate();
 
+			if ($filter_form->getField('Show')->getValue() !== $show) {
+				$filter_form->fill(['Show' => $show]);
+				$filter_form->submit();
+			}
+
+			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 				$this->page->waitUntilReady();
 			}
+
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
 			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			foreach ($charts_table->query('class:center')->all() as $graph) {
@@ -2191,6 +2201,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
+			// Switch back to normal view to avoid impacting following scenarios.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Normal view"]')->one()->click();
 				$this->page->waitUntilReady();
@@ -2290,6 +2301,10 @@ class testDataDisplayInGraphs extends CWebTest {
 		// It's required to set time selector only for pages with classic graph widgets, SVG graphs have period set in config.
 		if (CTestArrayHelper::get($data, 'type')) {
 			$this->setTimeSelector(self::$timestamps[$data['type']]);
+			$content_locator = 'tag:img';
+		}
+		else {
+			$content_locator = 'class:svg-graph-grid';
 		}
 
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
@@ -2299,10 +2314,16 @@ class testDataDisplayInGraphs extends CWebTest {
 			$dashboard->selectPage($data['page']);
 			$dashboard->waitUntilReady();
 		}
+
+		// For widgets waiting for dashboard to be ready is not enoguh - need to wait for all widget content to load.
+		foreach ($dashboard->getWidgets() as $widget) {
+			$widget->query($content_locator)->waitUntilVisible();
+		}
+
 		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
 		$this->assertScreenshot($dashboard, $screenshot_id);
 
-		$this->checkKioskMode('class:dashboard-grid', $screenshot_id);
+		$this->checkKioskMode('class:dashboard-grid', $screenshot_id, $content_locator);
 	}
 
 	/**
@@ -2310,12 +2331,21 @@ class testDataDisplayInGraphs extends CWebTest {
 	 *
 	 * @param string	$object_locator		locator of element with graphs
 	 * @param string	$id					ID of the screenshot
+	 * @param string	$content_locator	locator of graph content - applicable only for dashboard widgets
 	 */
-	protected function checkKioskMode($object_locator, $id) {
+	protected function checkKioskMode($object_locator, $id, $content_locator = false) {
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		$object= $this->query($object_locator)->waitUntilPresent()->one();
+
+		// For widgets waiting for dashboard to be present is not enoguh - need to wait for all widget content to load.
+		if ($content_locator) {
+			foreach ($object->asDashboard()->getWidgets() as $widget) {
+				$widget->query($content_locator)->waitUntilVisible();
+			}
+		}
+
 		$this->assertScreenshot($object, $id.'_kiosk');
 
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
