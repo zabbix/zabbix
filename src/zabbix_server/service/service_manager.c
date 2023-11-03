@@ -2607,6 +2607,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 					if (NULL != ptr && 0 != event->mtime)
 					{
 						ts.sec = event->mtime;
+						ts.ns = 0;
 					}
 					else
 						ts = service_problem->ts;
