@@ -637,6 +637,7 @@ char	*parse_parameters(const char *str)
 				charset = zbx_strdup(NULL, ptr);
 
 			zbx_lrtrim(charset, " ");
+			zbx_strupper(charset);
 			break;
 		}
 
@@ -658,7 +659,7 @@ static char	*parse_media_type(const char *str)
 	for (;' ' == *str; str++);
 
 	if (0 == zbx_strncasecmp(str, "text/html", ZBX_CONST_STRLEN("text/html")))
-		zabbix_log(LOG_LEVEL_INFORMATION, "got html");
+		zabbix_log(LOG_LEVEL_DEBUG, "got html");
 
 	if (NULL != (ptr = strchr(str, ';')))
 		charset = parse_parameters(ptr + 1);
@@ -674,11 +675,11 @@ void	zbx_http_retrieve_charset(CURL *easyhandle, char **data, size_t *size, size
 	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
 			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "cannot retrieve Content-Type header:%u", h);
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve Content-Type header:%u", h);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "name '%s' value '%s' amount:%lu index: %lu"
+		zabbix_log(LOG_LEVEL_TRACE, "name '%s' value '%s' amount:%lu index: %lu"
 				" origin:%u", type->name, type->value, type->amount,
 				type->index, type->origin);
 
@@ -688,7 +689,7 @@ void	zbx_http_retrieve_charset(CURL *easyhandle, char **data, size_t *size, size
 		{
 			char	*converted;
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "converting from charset '%s'", charset);
+			zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
 
 			converted = convert_to_utf8(*data, *size, charset);
 			zbx_free(*data);
