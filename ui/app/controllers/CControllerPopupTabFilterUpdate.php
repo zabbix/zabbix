@@ -96,8 +96,9 @@ class CControllerPopupTabFilterUpdate extends CController {
 		];
 
 		if ($this->getInput('support_custom_time', 0) && $properties['filter_custom_time']) {
-			$properties['from'] = $this->getInput('tabfilter_from', '');
-			$properties['to'] = $this->getInput('tabfilter_to', '');
+			$properties['from'] = $this->getInput('tabfilter_from');
+			$properties['to'] = $this->getInput('tabfilter_to');
+			$properties['filter_custom_time_label'] = relativeDateToText($properties['from'], $properties['to']);
 		}
 
 		$filter = (new CTabFilterProfile($idx, []))->read();
