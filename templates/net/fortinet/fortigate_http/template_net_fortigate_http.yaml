@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-30T14:10:44Z'
+  date: '2023-11-01T20:51:55Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -3450,7 +3450,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: 'net.tcp.service["{$FGATE.SCHEME}","{$FGATE.API.FQDN}","{$FGATE.API.PORT}"]'
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: Name
@@ -3464,7 +3464,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.name
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: Firmware
@@ -3478,7 +3478,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.device.firmware
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'API availability'
@@ -3492,7 +3492,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.api.status
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: Model
@@ -3507,7 +3507,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.device.model
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'Virtual Domain'
@@ -3522,11 +3522,11 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.device.vdom
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: ITEM
                   name: Uptime
                   x: '16'
@@ -3539,7 +3539,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.uptime
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'Serial Number'
@@ -3554,7 +3554,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.device.serialnumber
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'Number of CPUs'
@@ -3569,7 +3569,7 @@ zabbix_export:
                         host: 'FortiGate by HTTP'
                         key: fgate.cpu.num
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
             - name: 'System performance'
               widgets:

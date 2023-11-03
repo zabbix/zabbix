@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-30T11:34:16Z'
+  date: '2023-11-01T20:47:49Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -3088,10 +3088,10 @@ zabbix_export:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
                         key: azure.cosmosdb.service.availability
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
                     - type: STRING
                       name: units
@@ -3147,7 +3147,7 @@ zabbix_export:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
                         key: azure.cosmosdb.provisioned.throughput
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'Normalized RU Consumption'
@@ -3161,11 +3161,11 @@ zabbix_export:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
                         key: azure.cosmosdb.normalized.ru.consumption
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: ITEM
                   name: 'Document Count'
                   x: '18'
@@ -3178,7 +3178,7 @@ zabbix_export:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
                         key: azure.cosmosdb.document.count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
     - uuid: 2d8b9329b5d04cdf85bf17d2d0db2b29
       template: 'Azure Microsoft SQL Database by HTTP'
