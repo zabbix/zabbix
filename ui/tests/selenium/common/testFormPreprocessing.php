@@ -787,7 +787,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						[
 							'type' => 'Regular expression',
 							'parameter_1' => '^(\d{4}-\d{1,2}-[0123]{1}\d) test ([\x{1F49A}\x{1F499}])',
-							'parameter_2' => 'date \N emoji \N'
+							'parameter_2' => 'date \1 emoji \2'
 						]
 					]
 				]
@@ -844,6 +844,32 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// Structured data - XML XPath.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'XML XPath',
+						'Key' => 'xml-xpath[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'XML XPath', 'parameter_1' => '//div[contains(@class, "test")]']
+					]
+				]
+			],
+			// Structured data - JSONPath.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'JSONPath',
+						'Key' => 'jsonpath[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JSONPath', 'parameter_1' => '$.test[:1].type']
+					]
+				]
+			],
 			// Structured data - CSV to JSON.
 			[
 				[
@@ -881,6 +907,265 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// Structured data - XML to JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'XML to JSON',
+						'Key' => 'xml-to-json[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'XML to JSON']
+					]
+				]
+			],
+			// SNMP - SNMP walk value.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - Unchanged',
+						'Key' => 'snmp-walk-value-unchanged[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk value', 'parameter_1' => '1.3.6.1.2.1.1.1', 'parameter_2' => 'Unchanged']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - UTF-8 from Hex-STRING',
+						'Key' => 'snmp-walk-value-utf8-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk value', 'parameter_1' => 'SNMPv2-MIB::sysName.0', 'parameter_2' => 'UTF-8 from Hex-STRING']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - MAC from Hex-STRING',
+						'Key' => 'snmp-walk-value-mac-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk value', 'parameter_1' => 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr', 'parameter_2' => 'MAC from Hex-STRING']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - Integer from BITS',
+						'Key' => 'snmp-walk-value-int-bits[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3.4.5.6.7.8.9', 'parameter_2' => 'Integer from BITS']
+					]
+				]
+			],
+			// SNMP - SNMP walk to JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - Unchanged',
+						'Key' => 'snmp-walk-to-json-unchanged[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => 'test',
+							'parameter_table_1_2' => '1.3.6.1.2.1.1.1',
+							'parameter_table_1_3' => 'Unchanged'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - UTF-8 from Hex-STRING',
+						'Key' => 'snmp-walk-to-json-uft8-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => 'fieldName',
+							'parameter_table_1_2' => 'SNMPv2-MIB::sysName.0',
+							'parameter_table_1_3' => 'UTF-8 from Hex-STRING'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - MAC from Hex-STRING',
+						'Key' => 'snmp-walk-to-json-mac-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => '1234',
+							'parameter_table_1_2' => 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr',
+							'parameter_table_1_3' => 'MAC from Hex-STRING'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - Integer from BITS',
+						'Key' => 'snmp-walk-to-json-int-bits[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => 'test.test',
+							'parameter_table_1_2' => '1.2.3.4.5.6.7.8.9',
+							'parameter_table_1_3' => 'Integer from BITS'
+						]
+					]
+				]
+			],
+			// SNMP - SNMP get value.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP get value - UTF-8 from Hex-STRING',
+						'Key' => 'snmp-get-value-utf8-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP get value', 'parameter_1' => 'UTF-8 from Hex-STRING']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP get value - MAC from Hex-STRING',
+						'Key' => 'snmp-get-value-mac-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP get value - Integer from BITS',
+						'Key' => 'snmp-get-value-int-bits[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP get value',	'parameter_1' => 'Integer from BITS']
+					]
+				]
+			],
+			// Arithmetic - Custom multiplier.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Custom multiplier',
+						'Key' => 'custom-multiplier[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '1.23']
+					]
+				]
+			],
+			// Change - Simple change.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Simple change',
+						'Key' => 'simple-change[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Simple change']
+					]
+				]
+			],
+			// Change - Change per second.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Change per second',
+						'Key' => 'change-per-second[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Change per second']
+					]
+				]
+			],
+			// Numeral systems - Boolean to decimal.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Boolean to decimal',
+						'Key' => 'boolean-to-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Boolean to decimal']
+					]
+				]
+			],
+			// Numeral systems - Octal to decimal.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Octal to decimal',
+						'Key' => 'octal-to-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Octal to decimal']
+					]
+				]
+			],
+			// Numeral systems - Hexadecimal to decimal.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Hexadecimal to decimal',
+						'Key' => 'hexadecimal-to-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Hexadecimal to decimal']
+					]
+				]
+			],
+			// Custom scripts - JavaScript.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'JavaScript',
+						'Key' => 'javascript[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript', 'parameter_1' => 'alert("hi!");']
+					]
+				]
+			],
 			// Validation - In range.
 			[
 				[
@@ -891,19 +1176,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '-3.5', 'parameter_2' => '-1.5']
-					]
-				]
-			],
-			// Validation
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'Not supported step',
-						'Key' => 'check-for-not-supported[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for not supported value']
 					]
 				]
 			],
@@ -919,6 +1191,117 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// Validation - Matches regular expression.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Matches regular expression',
+						'Key' => 'matches-regular-expression[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Matches regular expression', 'parameter_1' => '^test[123].*\d{4}-\d{1,2}-[0123]{1}\d$']
+					]
+				]
+			],
+			// Validation - Does not match regular expression.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Does not match regular expression',
+						'Key' => 'does-not-match-regular-expression[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Does not match regular expression', 'parameter_1' => '^test[123].*\d{4}-\d{1,2}-[0123]{1}\d$']
+					]
+				]
+			],
+			// Validation - Check for error in JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for error in JSON',
+						'Key' => 'check-for-error-in-json[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in JSON', 'parameter_1' => '$.path.to.node']
+					]
+				]
+			],
+			// Validation - Check for error in XML.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for error in XML',
+						'Key' => 'check-for-error-in-json[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in XML', 'parameter_1' => '//div[contains(@class, "test")]']
+					]
+				]
+			],
+			// Validation - Check for error using regular expression.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for error using regular expression',
+						'Key' => 'check-for-error-using-regular-expression[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Check for error using regular expression',
+							'parameter_1' => '^test[123].*(\d{4}-\d{1,2}-[0123]{1})\d$',
+							'parameter_2' => 'output \1'
+						]
+					]
+				]
+			],
+			// Validation - Check for not supported value.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - any error',
+						'Key' => 'check-for-not-supported-value-any-error[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error matches',
+						'Key' => 'check-for-not-supported-value-error-matches[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches'/*, 'parameter_2' => '^test.*$'*/]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match',
+						'Key' => 'check-for-not-supported-value-error-does-not-match[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match'/*, 'parameter_2' => '^test.*$'*/]
+					]
+				]
+			],
+
+
+
+
+
 			[
 				[
 					'expected' => TEST_GOOD,

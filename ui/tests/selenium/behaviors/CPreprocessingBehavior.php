@@ -73,6 +73,24 @@ class CPreprocessingBehavior extends CBehavior {
 				'name'		=> 'error_handler_params',
 				'selector'	=> 'xpath:.//input[contains(@id, "_error_handler_params")]',
 				'value'		=> ['getValue']
+			],
+			[
+				'name' 		=> 'parameter_table_1_1',
+				'selector'	=> 'xpath:.//tr[1]/td[1]/*',
+				'detect'	=> true,
+				'value'		=> ['getValue']
+			],
+			[
+				'name' 		=> 'parameter_table_1_2',
+				'selector'	=> 'xpath:.//tr[1]/td[2]/*',
+				'detect'	=> true,
+				'value'		=> ['getValue']
+			],
+			[
+				'name' 		=> 'parameter_table_1_3',
+				'selector'	=> 'xpath:.//tr[1]/td[3]/*',
+				'detect'	=> true,
+				'value'		=> ['getValue']
 			]
 		];
 	}
