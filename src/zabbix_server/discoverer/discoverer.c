@@ -27,7 +27,7 @@
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
-#include "../poller/checks_agent.h"
+#include "../poller/checks_snmp.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
@@ -38,8 +38,8 @@
 #include "discoverer_async.h"
 #include "zbxproxybuffer.h"
 #include "zbx_discoverer_constants.h"
-#include "../poller/checks_snmp.h"
 #include "discoverer_taskprep.h"
+#include "zbxpoller.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
@@ -258,13 +258,11 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 				item.timeout = dcheck->timeout;
 
-				if (SUCCEED == get_value_agent(&item, dmanager.source_ip, &result) &&
-						NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+				if (SUCCEED == (ret = zbx_agent_get_value(&item, dmanager.source_ip, program_type,
+						&result) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result))))
 				{
 					zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 				}
-				else
-					ret = FAIL;
 
 				if (FAIL == ret && ZBX_ISSET_MSG(&result))
 				{

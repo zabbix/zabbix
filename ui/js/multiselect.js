@@ -390,6 +390,7 @@
 	 * a 'data-params' attribute with the following possible properties:
 	 *     string url                   backend url
 	 *     string name                  input element name
+	 *     string multiselect_id        multiselect wrapper id (optional)
 	 *     object labels                translated labels (optional)
 	 *     array  data                  preload data {id, name, prefix} (optional)
 	 *     string data[][id]
@@ -434,6 +435,7 @@
 		var defaults = {
 			url: '',
 			name: '',
+			multiselect_id: '',
 			object_labels: {object: '', objects: ''},
 			labels: {
 				'No matches found': t('No matches found'),
@@ -502,7 +504,8 @@
 
 			$obj.wrap($('<div>', {
 				'class': ZBX_STYLE_CLASS,
-				css: ms.options.styles
+				css: ms.options.styles,
+				id: ms.options.multiselect_id !== '' ? ms.options.multiselect_id : null
 			}));
 
 			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {

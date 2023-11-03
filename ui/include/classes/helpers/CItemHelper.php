@@ -22,6 +22,18 @@
 class CItemHelper extends CItemGeneralHelper {
 
 	/**
+	 * Get item fields default values.
+	 */
+	public static function getDefaults(): array {
+		$general_fields = parent::getDefaults();
+
+		return [
+			'flags'				=> ZBX_FLAG_DISCOVERY_NORMAL,
+			'inventory_link'	=> 0
+		] + $general_fields;
+	}
+
+	/**
 	 * @param string $src_templateid
 	 * @param string $dst_templateid
 	 *
@@ -54,6 +66,44 @@ class CItemHelper extends CItemGeneralHelper {
 		$dst_options = ['hostids' => [$dst_hostid]];
 
 		return self::copy($src_options, $dst_options);
+	}
+
+	/**
+	 * Convert API data to be ready to use for edit or create form.
+	 *
+	 * @param array $item  Array of API fields data.
+	 */
+	public static function convertApiInputForForm(array $item): array {
+		$item = parent::convertApiInputForForm($item);
+		$item['parent_items'] = makeItemTemplatesHtml(
+			$item['itemid'],
+			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
+			ZBX_FLAG_DISCOVERY_NORMAL,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => false
+		]);
+
+		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
+		}
+		else {
+			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			$item['delay_flex'] = [];
+		}
+
+		if ($item['master_itemid']) {
+			$master_item = API::Item()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $item['master_itemid'],
+				'webitems' => true
+			]);
+			$item['master_item'] = $master_item ? reset($master_item) : [];
+		}
+
+		return $item;
 	}
 
 	/**

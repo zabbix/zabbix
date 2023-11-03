@@ -1,0 +1,1 @@
+..F....... [ZBX-23521] fixed password field label not changing to key passphrase and back for SSH agent item when changing authentication method (agriscenko)
