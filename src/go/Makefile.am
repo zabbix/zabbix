@@ -157,4 +157,4 @@ style:
 format:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go fmt ./... 
 
-.PHONY: all build check clean clean-go-build clean-sbom format sbom sbom-apps sbom-mod sbom-ms sbom-za2 sbom-zws style
+.PHONY: all build check clean clean-go-build clean-sbom format sbom sbom-apps sbom-mod sbom-za2 sbom-zws style
