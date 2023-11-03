@@ -1256,6 +1256,11 @@ class CScript extends CApiService {
 	 */
 	public function getScriptsByHosts(array $options = []): array {
 		$options = zbx_toArray($options);
+		$hostids = array_column($options, 'hostid');
+
+		if (!$hostids) {
+			return $scripts_by_host;
+		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -1265,16 +1270,11 @@ class CScript extends CApiService {
 
 		foreach ($options as $index => $option) {
 			if (!CApiInputValidator::validate($api_input_rules, $option, '/'.($index + 1), $error)) {
-				return ['error' => $error];
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 
-		$hostids = array_column($options, 'hostid');
 		$scripts_by_host = [];
-
-		if (!$hostids) {
-			return $scripts_by_host;
-		}
 
 		foreach ($hostids as $hostid) {
 			$scripts_by_host[$hostid] = [];
@@ -1396,10 +1396,6 @@ class CScript extends CApiService {
 		$eventids = array_column($options, 'eventid');
 		$scripts_by_events = [];
 
-		if (!$eventids) {
-			return $scripts_by_events;
-		}
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'eventid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
@@ -1408,7 +1404,7 @@ class CScript extends CApiService {
 
 		foreach ($options as $index => $option) {
 			if (!CApiInputValidator::validate($api_input_rules, $option, '/'.($index + 1), $error)) {
-				return ['error' => $error];
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 

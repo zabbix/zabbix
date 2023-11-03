@@ -1159,6 +1159,18 @@ class testScripts extends CAPITest {
 				'confirmation' => 'Confirmation macros: {$GLOBAL_MACRO}, {HOST.HOST}, {USER.FULLNAME}, {HOST.CONN},'.
 					' {HOST.IP}, {HOST.DNS}, {HOST.PORT}, {INVENTORY.ALIAS}, {INVENTORY.OS}, {INVENTORY.TYPE}'
 			],
+			'get_hosts_script' => [
+				'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server 1',
+				'host_access' => PERM_READ_WRITE,
+				'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+				'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+				'manualinput_validator' => '1,2,3,4,5'
+			],
 
 			// script.getScriptsByEvents
 			'get_events_url' => [
@@ -3020,7 +3032,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.'
 			],
 			'Test script.create "manualinput_validator" field empty when manualinput validator type is list' => [
 				'script' => [
@@ -3033,9 +3045,9 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.'
 			],
-			'Test script.create "manualinput_validator" field for input type string (invalid regular expression)' => [
+			'Test script.create "manualinput_validator" field for input type string (invalid regular expression - square brackets)' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -3046,7 +3058,20 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '[[[[['
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator": invalid regular expression.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[[": "Compilation failed: missing terminating ] for character class at offset 5".'
+			],
+			'Test script.create "manualinput_validator" field for input type string (invalid regular expression - no closing parenthesis)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => 'asd('
+				],
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "asd(": "Compilation failed: missing closing parenthesis at offset 4".'
 			],
 			'Test script.create "manualinput_default_value" field does not match "manualinput_validator" field' => [
 				'script' => [
@@ -3060,7 +3085,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '\btest\b',
 					'manualinput_default_value' => '123'
 				],
-				'expected_error' => 'Incorrect value for field "manualinput_default_value": input does not match the provided pattern: \btest\b.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: \btest\b.'
 			],
 			'Test script.create "manualinput_validator" field duplicate entries (empty strings)' => [
 				'script' => [
@@ -3073,7 +3098,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,,2,3,'
 				],
-				'expected_error' => 'Incorrect value for field "manualinput_validator": values must be unique.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
 			],
 			'Test script.create "manualinput_validator" field duplicate entries' => [
 				'script' => [
@@ -3086,7 +3111,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,2,3,3'
 				],
-				'expected_error' => 'Incorrect value for field "manualinput_validator": values must be unique.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
 			],
 			'Test script.create invalid "manualinput" field value' => [
 				'script' => [
@@ -3108,7 +3133,7 @@ class testScripts extends CAPITest {
 					'manualinput_prompt' => 'abc',
 					'manualinput_validator_type' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be one of 1, 0.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be one of 0, 1.'
 			],
 			'Test script.create unexpected "manualinput_prompt" field value for scope host' => [
 				'script' => [
@@ -4515,7 +4540,7 @@ class testScripts extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "scriptid", "name", "command", "host_access", "usrgrpid", "groupid", "description", "confirmation", "type", "execute_on", "timeout", "parameters", "scope", "port", "authtype", "username", "password", "publickey", "privatekey", "menu_path", "url", "new_window", "manualinput", "manualinput_prompt", "manualinput_validator", "manualinput_validator_type", "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "scriptid", "name", "command", "host_access", "usrgrpid", "groupid", "description", "confirmation", "type", "execute_on", "timeout", "parameters", "scope", "port", "authtype", "username", "password", "publickey", "privatekey", "menu_path", "url", "new_window", "manualinput", "manualinput_prompt", "manualinput_validator_type", "manualinput_validator", "manualinput_default_value".'
 			],
 
 			// Check "selectHostGroups" option.
@@ -6144,22 +6169,30 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_manualinput_params',
 					'manualinput_validator' => '1,,2,3,'
 				],
-				'expected_error' => 'Incorrect value for field "manualinput_validator": values must be unique.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
 			],
 			'Test script.update invalid "manualinput_default_value" value (with repetitive values)' => [
 				'script' => [
 					'scriptid' => 'update_manualinput_params',
 					'manualinput_validator' => '1,1,2,3'
 				],
-				'expected_error' => 'Incorrect value for field "manualinput_validator": values must be unique.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
 			],
-			'Test script.update invalid "manualinput_validator" regular expression value' => [
+			'Test script.update invalid "manualinput_validator" regular expression value (only opening square brackets)' => [
 				'script' => [
 					'scriptid' => 'update_manualinput_params',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '[[[['
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator": invalid regular expression.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[": "Compilation failed: missing terminating ] for character class at offset 4".'
+			],
+			'Test script.update invalid "manualinput_validator" regular expression value (missing closing parenthesis)' => [
+				'script' => [
+					'scriptid' => 'update_manualinput_params',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => 'ab('
+				],
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "ab(": "Compilation failed: missing closing parenthesis at offset 3".'
 			],
 			'Test script.update invalid "manualinput_default_value" value (does not match the pattern)' => [
 				'script' => [
@@ -6168,7 +6201,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '\d',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Incorrect value for field "manualinput_default_value": input does not match the provided pattern: \d.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: \d.'
 			],
 			'Test script.update invalid "manualinput_default_value" value (no value provided)' => [
 				'script' => [
@@ -6176,7 +6209,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '\d'
 				],
-				'expected_error' => 'Incorrect value for field "manualinput_default_value": input does not match the provided pattern: \d.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: \d.'
 			],
 			'Test script.update invalid scope change with manualinput parameters' => [
 				'script' => [
@@ -8176,19 +8209,63 @@ class testScripts extends CAPITest {
 	 */
 	public static function getScriptsByHostsInvalid(): array {
 		return [
-			'Test script.getScriptsByHosts invalid fields' => [
+			'Test script.getScriptsByHosts invalid "hostid" field (array)' => [
 				'request' => [
-					'hostids' => ['']
+					[
+						'hostid' => []
+					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
 			],
-			'Test script.getScriptsByHosts identical IDs given' => [
+			'Test script.getScriptsByHosts invalid "hostid" field (string)' => [
 				'request' => [
-					'hostids' => [0, 0]
+					[
+						'hostid' => ''
+					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/2": value (0) already exists.'
+				'expected_error' => 'Invalid parameter "/1/hostid": a number is expected.'
+			],
+			'Test script.getScriptsByHosts invalid "scriptid" field (string)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => ''
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
+			],
+			'Test script.getScriptsByHosts invalid "scriptid" field (array)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => []
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
+			],
+			'Test script.getScriptsByHosts invalid "manualinput" field (integer)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'manualinput' => 999999
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/manualinput": a character string is expected.'
+			],
+			'Test script.getScriptsByHosts invalid "manualinput" field (array)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'manualinput' => []
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/manualinput": a character string is expected.'
 			]
 		];
 	}
@@ -8204,30 +8281,63 @@ class testScripts extends CAPITest {
 		return [
 			'Test script.getScriptsByHosts with superadmin' => [
 				'request' => [
-					'hostids' => [
-						'plain_r', 'plain_d', 'macros_rw_1', 'macros_r_2', 'macros_rw_3', 'interface_rw_1',
-						'interface_rw_2', 'inventory_rw_1', 'inventory_rw_2'
+					[
+						'hostid' => 'plain_r'
+					],
+					[
+						'hostid' => 'plain_d'
+					],
+					[
+						'hostid' => 'macros_rw_1'
+					],
+					[
+						'hostid' => 'macros_r_2'
+					],
+					[
+						'hostid' => 'macros_rw_3'
+					],
+					[
+						'hostid' => 'interface_rw_1'
+					],
+					[
+						'hostid' => 'interface_rw_2'
+					],
+					[
+						'hostid' => 'inventory_rw_1'
+					],
+					[
+						'hostid' => 'inventory_rw_2'
 					]
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
 						// Superadmin has all scripts available.
-						'plain_r' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'plain_d' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'macros_r_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh'],
+						'plain_r' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
+							'get_hosts_script'
+						],
+						'plain_d' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
+							'get_hosts_script'
+						],
+						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
+							'get_hosts_script'
+						],
+						'macros_r_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
+							'get_hosts_script'
+						],
+						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
+							'get_hosts_script'
+						],
 						'interface_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh'
+							'get_hosts_ssh', 'get_hosts_script'
 						],
 						'interface_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh'
+							'get_hosts_ssh', 'get_hosts_script'
 						],
 						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh'
+							'get_hosts_ssh', 'get_hosts_script'
 						],
 						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh'
+							'get_hosts_ssh', 'get_hosts_script'
 						]
 					],
 					'scripts' => [
@@ -8351,6 +8461,35 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_script',
+							'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
 						]
 					],
 					'host_macros' => [
@@ -8382,7 +8521,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'plain_d' => [
 							'{HOST.ID}' => 'plain_d',
@@ -8412,7 +8552,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_rw_1' => [
 							'{HOST.ID}' => 'macros_rw_1',
@@ -8442,7 +8583,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_r_2' => [
 							'{HOST.ID}' => 'macros_r_2',
@@ -8472,7 +8614,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_rw_3' => [
 							'{HOST.ID}' => 'macros_rw_3',
@@ -8502,7 +8645,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'interface_rw_1' => [
 							'{HOST.ID}' => 'interface_rw_1',
@@ -8532,7 +8676,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'interface_rw_2' => [
 							'{HOST.ID}' => 'interface_rw_2',
@@ -8562,7 +8707,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'inventory_rw_1' => [
 							'{HOST.ID}' => 'inventory_rw_1',
@@ -8592,7 +8738,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'inventory_rw_2' => [
 							'{HOST.ID}' => 'inventory_rw_2',
@@ -8622,7 +8769,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						]
 					]
 				],
@@ -8631,9 +8779,32 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByHosts with admin' => [
 				'request' => [
 					'login' => ['user' => 'api_test_admin', 'password' => '4P1T3$tEr'],
-					'hostids' => [
-						'plain_r', 'plain_d', 'macros_rw_1', 'macros_r_2', 'macros_rw_3', 'interface_rw_1',
-						'interface_rw_2', 'inventory_rw_1', 'inventory_rw_2'
+					[
+						'hostid' => 'plain_r'
+					],
+					[
+						'hostid' => 'plain_d'
+					],
+					[
+						'hostid' => 'macros_rw_1'
+					],
+					[
+						'hostid' => 'macros_r_2'
+					],
+					[
+						'hostid' => 'macros_rw_3'
+					],
+					[
+						'hostid' => 'interface_rw_1'
+					],
+					[
+						'hostid' => 'interface_rw_2'
+					],
+					[
+						'hostid' => 'inventory_rw_1'
+					],
+					[
+						'hostid' => 'inventory_rw_2'
 					]
 				],
 				'expected_result' => [
@@ -8641,19 +8812,21 @@ class testScripts extends CAPITest {
 						// Regular admin does not have all scripts available.
 						'plain_r' => ['get_hosts_url', 'get_hosts_ipmi'],
 						'plain_d' => [],
-						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh'],
+						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
 						'macros_r_2' => ['get_hosts_url', 'get_hosts_ipmi'],
-						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh'],
-						'interface_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh'],
-						'interface_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh'],
-						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh'],
-						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh']
+						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
+						'interface_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
+						'interface_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
+						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
+						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script']
 					],
 					'!has.hostid:scriptid' => [
-						'plain_r' => ['get_hosts_webhook', 'get_hosts_ssh'],
-						'plain_d' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ipmi', 'get_hosts_ssh'],
+						'plain_r' => ['get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'plain_d' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ipmi', 'get_hosts_ssh',
+							'get_hosts_script'
+						],
 						'macros_rw_1' => ['get_hosts_webhook'],
-						'macros_r_2' => ['get_hosts_webhook', 'get_hosts_ssh'],
+						'macros_r_2' => ['get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
 						'macros_rw_3' => ['get_hosts_webhook'],
 						'interface_rw_1' => ['get_hosts_webhook'],
 						'interface_rw_2' => ['get_hosts_webhook'],
@@ -8751,6 +8924,35 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_script',
+							'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
 						]
 					],
 					'host_macros' => [
@@ -8782,7 +8984,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_rw_1' => [
 							'{HOST.ID}' => 'macros_rw_1',
@@ -8812,7 +9015,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_r_2' => [
 							'{HOST.ID}' => 'macros_r_2',
@@ -8842,7 +9046,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_rw_3' => [
 							'{HOST.ID}' => 'macros_rw_3',
@@ -8872,7 +9077,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'interface_rw_1' => [
 							'{HOST.ID}' => 'interface_rw_1',
@@ -8902,7 +9108,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'interface_rw_2' => [
 							'{HOST.ID}' => 'interface_rw_2',
@@ -8932,7 +9139,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'inventory_rw_1' => [
 							'{HOST.ID}' => 'inventory_rw_1',
@@ -8962,7 +9170,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'inventory_rw_2' => [
 							'{HOST.ID}' => 'inventory_rw_2',
@@ -8992,7 +9201,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						]
 					]
 				],
@@ -9001,9 +9211,32 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByHosts with user' => [
 				'request' => [
 					'login' => ['user' => 'api_test_user', 'password' => '4P1T3$tEr'],
-					'hostids' => [
-						'plain_r', 'plain_d', 'macros_rw_1', 'macros_r_2', 'macros_rw_3', 'interface_rw_1',
-						'interface_rw_2', 'inventory_rw_1', 'inventory_rw_2'
+					[
+						'hostid' => 'plain_r'
+					],
+					[
+						'hostid' => 'plain_d'
+					],
+					[
+						'hostid' => 'macros_rw_1'
+					],
+					[
+						'hostid' => 'macros_r_2'
+					],
+					[
+						'hostid' => 'macros_rw_3'
+					],
+					[
+						'hostid' => 'interface_rw_1'
+					],
+					[
+						'hostid' => 'interface_rw_2'
+					],
+					[
+						'hostid' => 'inventory_rw_1'
+					],
+					[
+						'hostid' => 'inventory_rw_2'
 					]
 				],
 				'expected_result' => [
@@ -9011,19 +9244,21 @@ class testScripts extends CAPITest {
 						// Regular user does not have all scripts available.
 						'plain_r' => ['get_hosts_url', 'get_hosts_webhook'],
 						'plain_d' => [],
-						'macros_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh'],
+						'macros_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
 						'macros_r_2' => ['get_hosts_url', 'get_hosts_webhook'],
-						'macros_rw_3' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'interface_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'interface_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh'],
-						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh']
+						'macros_rw_3' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'interface_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'interface_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script']
 					],
 					'!has.hostid:scriptid' => [
 						'plain_r' => ['get_hosts_ipmi', 'get_hosts_ssh'],
-						'plain_d' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ipmi', 'get_hosts_ssh'],
+						'plain_d' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ipmi', 'get_hosts_ssh',
+							'get_hosts_script'
+						],
 						'macros_rw_1' => ['get_hosts_ipmi'],
-						'macros_r_2' => ['get_hosts_ipmi', 'get_hosts_ssh'],
+						'macros_r_2' => ['get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
 						'macros_rw_3' => ['get_hosts_ipmi'],
 						'interface_rw_1' => ['get_hosts_ipmi'],
 						'interface_rw_2' => ['get_hosts_ipmi'],
@@ -9120,6 +9355,35 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_script',
+							'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
 						]
 					],
 					'host_macros' => [
@@ -9151,7 +9415,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_rw_1' => [
 							'{HOST.ID}' => 'macros_rw_1',
@@ -9181,7 +9446,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_r_2' => [
 							'{HOST.ID}' => 'macros_r_2',
@@ -9211,7 +9477,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'macros_rw_3' => [
 							'{HOST.ID}' => 'macros_rw_3',
@@ -9241,7 +9508,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'interface_rw_1' => [
 							'{HOST.ID}' => 'interface_rw_1',
@@ -9271,7 +9539,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'interface_rw_2' => [
 							'{HOST.ID}' => 'interface_rw_2',
@@ -9301,7 +9570,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'inventory_rw_1' => [
 							'{HOST.ID}' => 'inventory_rw_1',
@@ -9331,7 +9601,8 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
 						],
 						'inventory_rw_2' => [
 							'{HOST.ID}' => 'inventory_rw_2',
@@ -9361,7 +9632,280 @@ class testScripts extends CAPITest {
 							'{INVENTORY.CONTACT}' => '',
 							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
 							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByHosts with superadmin (specific script id)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => 'get_hosts_script'
+					]
+				],
+				'expected_result' => [
+					'has.hostid:scriptid' => [
+						'plain_r' => ['get_hosts_script'],
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_hosts_script',
+							'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						]
+					],
+					'host_macros' => [
+						'plain_r' => [
+							'{HOST.ID}' => 'plain_r',
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.HOST}' => 'api_test_host_plain_r',
+							'{HOST.NAME}' => 'API test host - plain, read',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => '{HOST.NAME1}',
+							'{HOST.NAME2}' => '{HOST.NAME2}',
+							'{EVENT.ID}' => '{EVENT.ID}',
+							'{EVENT.NAME}' => '{EVENT.NAME}',
+							'{EVENT.NSEVERITY}' => '{EVENT.NSEVERITY}',
+							'{EVENT.SEVERITY}' => '{EVENT.SEVERITY}',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
+							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '*UNKNOWN*'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByHosts with superadmin (specific script id and manualinput)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => 'get_hosts_script',
+						'manualinput' => '3'
+					]
+				],
+				'expected_result' => [
+					'has.hostid:scriptid' => [
+						'plain_r' => ['get_hosts_script'],
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_hosts_script',
+							'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						]
+					],
+					'host_macros' => [
+						'plain_r' => [
+							'{HOST.ID}' => 'plain_r',
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.HOST}' => 'api_test_host_plain_r',
+							'{HOST.NAME}' => 'API test host - plain, read',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => '{HOST.NAME1}',
+							'{HOST.NAME2}' => '{HOST.NAME2}',
+							'{EVENT.ID}' => '{EVENT.ID}',
+							'{EVENT.NAME}' => '{EVENT.NAME}',
+							'{EVENT.NSEVERITY}' => '{EVENT.NSEVERITY}',
+							'{EVENT.SEVERITY}' => '{EVENT.SEVERITY}',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
+							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '3'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByHosts with superadmin (2 objects with additional script id and manualinput)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => 'get_hosts_script',
+						'manualinput' => '3'
+					],
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => 'get_hosts_url',
+						'manualinput' => '4'
+					]
+				],
+				'expected_result' => [
+					'has.hostid:scriptid' => [
+						'plain_r' => ['get_hosts_script'],
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_hosts_script',
+							'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_url',
+							'name' => 'API test script.getScriptsByHosts - URL',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$HOST_MACRO_OTHER},'.
+								' {$GLOBAL_MACRO}, {$DOESNOTEXIST}, {HOST.ID}, {HOST.HOST}, {HOST.NAME},'.
+								' {HOST.CONN}, {HOST.DNS}, {HOST.PORT}, {HOST.NAME1}, {HOST.NAME2}, {EVENT.ID},'.
+								' {EVENT.NAME}, {EVENT.NSEVERITY}, {EVENT.SEVERITY}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
+						]
+					],
+					'host_macros' => [
+						'plain_r' => [
+							'{HOST.ID}' => 'plain_r',
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.HOST}' => 'api_test_host_plain_r',
+							'{HOST.NAME}' => 'API test host - plain, read',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => '{HOST.NAME1}',
+							'{HOST.NAME2}' => '{HOST.NAME2}',
+							'{EVENT.ID}' => '{EVENT.ID}',
+							'{EVENT.NAME}' => '{EVENT.NAME}',
+							'{EVENT.NSEVERITY}' => '{EVENT.NSEVERITY}',
+							'{EVENT.SEVERITY}' => '{EVENT.SEVERITY}',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
+							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '4'
 						]
 					]
 				],
@@ -9381,6 +9925,7 @@ class testScripts extends CAPITest {
 		if (array_key_exists('login', $request)) {
 			$this->authorize($request['login']['user'], $request['login']['password']);
 		}
+		unset($request['login']);
 
 		$request = self::resolveIds($request);
 
@@ -9394,7 +9939,9 @@ class testScripts extends CAPITest {
 			$expected_result = self::resolveComplexIds($expected_result);
 		}
 
-		$result = $this->call('script.getScriptsByHosts', $request['hostids'], $expected_error);
+		$request = zbx_toArray($request);
+
+		$result = $this->call('script.getScriptsByHosts', $request, $expected_error);
 
 		if ($expected_error === null) {
 			if (array_key_exists('has.hostid:scriptid', $expected_result)) {
@@ -9417,11 +9964,15 @@ class testScripts extends CAPITest {
 				foreach ($result_scripts as $result_script) {
 					foreach ($expected_result['scripts'] as $expected_script) {
 						if (bccomp($result_script['scriptid'], $expected_script['scriptid']) == 0) {
-
 							$expected_script['url'] = strtr($expected_script['url'],
 								$expected_result['host_macros'][$hostid]
 							);
+
 							$expected_script['confirmation'] = strtr($expected_script['confirmation'],
+								$expected_result['host_macros'][$hostid]
+							);
+
+							$expected_script['manualinput_prompt'] = strtr($expected_script['manualinput_prompt'],
 								$expected_result['host_macros'][$hostid]
 							);
 
@@ -9440,19 +9991,63 @@ class testScripts extends CAPITest {
 	 */
 	public static function getScriptsByEventsInvalid(): array {
 		return [
-			'Test script.getScriptsByEvents invalid fields' => [
+			'Test script.getScriptsByEvents invalid "eventid" field (array)' => [
 				'request' => [
-					'eventids' => ['']
+					[
+						'eventid' => []
+					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/eventid": a number is expected.'
 			],
-			'Test script.getScriptsByEvents identical IDs given' => [
+			'Test script.getScriptsByEvents invalid "eventid" field (string)' => [
 				'request' => [
-					'eventids' => [0, 0]
+					[
+						'eventid' => ''
+					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/2": value (0) already exists.'
+				'expected_error' => 'Invalid parameter "/1/eventid": a number is expected.'
+			],
+			'Test script.getScriptsByEvents invalid "eventid" field (array)' => [
+				'request' => [
+					[
+						'eventid' =>  'plain_rw_single_d',
+						'scriptid' => []
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
+			],
+			'Test script.getScriptsByEvents invalid "eventid" field (string)' => [
+				'request' => [
+					[
+						'eventid' =>  'plain_rw_single_d',
+						'scriptid' => ''
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
+			],
+			'Test script.getScriptsByEvents invalid "manualinput" field (array)' => [
+				'request' => [
+					[
+						'eventid' =>  'plain_rw_single_d',
+						'manualinput' => []
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/manualinput": a character string is expected.'
+			],
+			'Test script.getScriptsByEvents invalid "manualinput" field (integer)' => [
+				'request' => [
+					[
+						'eventid' =>  'plain_rw_single_d',
+						'manualinput' => 555
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/manualinput": a character string is expected.'
 			]
 		];
 	}
@@ -9468,10 +10063,38 @@ class testScripts extends CAPITest {
 		return [
 			'Test script.getScriptsByEvents with superadmin' => [
 				'request' => [
-					'eventids' => [
-						'plain_rw_single_d', 'plain_r_single_d', 'plain_d_single_d', 'plain_rw_r_dual_d',
-						'macros_rw_single_1_h', 'macros_rw_r_dual_1_2_h', 'macros_rw_dual_1_3_h', 'interface_rw_dual_a',
-						'inventory_rw_dual_a', 'macros_d_cause', 'macros_rw_symptom'
+					[
+						'eventid' => 'plain_rw_single_d'
+					],
+					[
+						'eventid' => 'plain_r_single_d'
+					],
+					[
+						'eventid' => 'plain_d_single_d'
+					],
+					[
+						'eventid' =>  'plain_rw_r_dual_d'
+					],
+					[
+						'eventid' =>  'macros_rw_single_1_h'
+					],
+					[
+						'eventid' =>  'macros_rw_r_dual_1_2_h'
+					],
+					[
+						'eventid' => 'macros_rw_dual_1_3_h'
+					],
+					[
+						'eventid' => 'interface_rw_dual_a'
+					],
+					[
+						'eventid' => 'inventory_rw_dual_a'
+					],
+					[
+						'eventid' => 'macros_d_cause'
+					],
+					[
+						'eventid' => 'macros_rw_symptom'
 					]
 				],
 				'expected_result' => [
@@ -10090,10 +10713,38 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents with admin' => [
 				'request' => [
 					'login' => ['user' => 'api_test_admin', 'password' => '4P1T3$tEr'],
-					'eventids' => [
-						'plain_rw_single_d', 'plain_r_single_d', 'plain_d_single_d', 'plain_rw_r_dual_d',
-						'macros_rw_single_1_h', 'macros_rw_r_dual_1_2_h', 'macros_rw_dual_1_3_h', 'interface_rw_dual_a',
-						'inventory_rw_dual_a', 'macros_d_cause', 'macros_rw_symptom'
+					[
+						'eventid' => 'plain_rw_single_d'
+					],
+					[
+						'eventid' => 'plain_r_single_d'
+					],
+					[
+						'eventid' => 'plain_d_single_d'
+					],
+					[
+						'eventid' => 'plain_rw_r_dual_d'
+					],
+					[
+						'eventid' => 'macros_rw_single_1_h'
+					],
+					[
+						'eventid' => 'macros_rw_r_dual_1_2_h'
+					],
+					[
+						'eventid' => 'macros_rw_dual_1_3_h'
+					],
+					[
+						'eventid' => 'interface_rw_dual_a'
+					],
+					[
+						'eventid' => 'inventory_rw_dual_a'
+					],
+					[
+						'eventid' => 'macros_d_cause'
+					],
+					[
+						'eventid' => 'macros_rw_symptom'
 					]
 				],
 				'expected_result' => [
@@ -10619,10 +11270,38 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents with user' => [
 				'request' => [
 					'login' => ['user' => 'api_test_user', 'password' => '4P1T3$tEr'],
-					'eventids' => [
-						'plain_rw_single_d', 'plain_r_single_d', 'plain_d_single_d', 'plain_rw_r_dual_d',
-						'macros_rw_single_1_h', 'macros_rw_r_dual_1_2_h', 'macros_rw_dual_1_3_h', 'interface_rw_dual_a',
-						'inventory_rw_dual_a',  'macros_d_cause', 'macros_rw_symptom'
+					[
+						'eventid' => 'plain_rw_single_d'
+					],
+					[
+						'eventid' => 'plain_r_single_d'
+					],
+					[
+						'eventid' => 'plain_d_single_d'
+					],
+					[
+						'eventid' => 'plain_rw_r_dual_d'
+					],
+					[
+						'eventid' => 'macros_rw_single_1_h'
+					],
+					[
+						'eventid' => 'macros_rw_r_dual_1_2_h'
+					],
+					[
+						'eventid' => 'macros_rw_dual_1_3_h'
+					],
+					[
+						'eventid' => 'interface_rw_dual_a'
+					],
+					[
+						'eventid' => 'inventory_rw_dual_a'
+					],
+					[
+						'eventid' => 'macros_d_cause'
+					],
+					[
+						'eventid' => 'macros_rw_symptom'
 					]
 				],
 				'expected_result' => [
@@ -11158,6 +11837,7 @@ class testScripts extends CAPITest {
 		if (array_key_exists('login', $request)) {
 			$this->authorize($request['login']['user'], $request['login']['password']);
 		}
+		unset($request['login']);
 
 		// Replace ID placeholders with real IDs.
 		$request = self::resolveIds($request);
@@ -11172,7 +11852,7 @@ class testScripts extends CAPITest {
 			$expected_result = self::resolveComplexIds($expected_result);
 		}
 
-		$result = $this->call('script.getScriptsByEvents', $request['eventids'], $expected_error);
+		$result = $this->call('script.getScriptsByEvents', $request, $expected_error);
 
 		if ($expected_error === null) {
 			if (array_key_exists('has.eventid:scriptid', $expected_result)) {
@@ -11377,7 +12057,20 @@ class testScripts extends CAPITest {
 			$request = $request_;
 		}
 
-		// For script.get method and getScriptsByHosts/Events.
+		// For getScriptsByHosts/Events methods.
+		if (array_column($request, 'hostid') || array_column($request, 'eventid')) {
+			foreach ($request as &$object) {
+				foreach (['hostid', 'eventid', 'scriptid'] as $field) {
+					if (array_key_exists($field, $object) && $object[$field] != '0' && $object[$field] !== ''
+							&& $object[$field] !== null && !is_array($object[$field])) {
+						$object[$field] = self::$data[$field.'s'][$object[$field]];
+					}
+				}
+			}
+		}
+		unset($object);
+
+		// For script.get method.
 		foreach (['scriptids', 'groupids', 'eventids', 'hostids', 'usrgrpids', 'actionids'] as $field) {
 			if (array_key_exists($field, $request)) {
 				if (is_array($request[$field]) && $request[$field]) {

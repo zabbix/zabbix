@@ -188,11 +188,7 @@ class CControllerMenuPopup extends CController {
 				? API::Script()->getScriptsByHosts(['hostid' => $data['hostid']])
 				: [];
 
-			if (array_key_exists('error', $all_scripts)) {
-				error($all_scripts['error']);
-				unset($all_scripts['error']);
-			}
-			else {
+			if ($all_scripts) {
 				$all_scripts = array_key_exists($data['hostid'], $all_scripts) ? $all_scripts[$data['hostid']] : [];
 			}
 
@@ -845,9 +841,8 @@ class CControllerMenuPopup extends CController {
 				$scripts_by_events = API::Script()->getScriptsByEvents(['eventid' => $event['eventid']]);
 			}
 
-			if (array_key_exists('error', $scripts_by_events)) {
-				error($scripts_by_events['error']);
-				unset($scripts_by_events['error']);
+			if (!$scripts_by_events) {
+				return [];
 			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.

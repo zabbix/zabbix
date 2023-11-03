@@ -576,7 +576,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 					}
 
 					if ('error' in response.result) {
-						const message_box = makeMessageBox('bad', [response.result.error], '', true, true)[0];
+						const message_box = makeMessageBox('bad', response.result.error, '', true, true)[0];
 
 						form.parentNode.insertBefore(message_box, form);
 					}

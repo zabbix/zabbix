@@ -850,15 +850,17 @@ switch ($data['method']) {
 			'manualinput' => $data['manualinput']
 		]);
 
-		if ($scripts) {
-			if (array_key_exists('error', $scripts)) {
-				$result = $scripts;
-			}
-			else {
-				$result = $scripts[$data['hostid']][0];
-			}
+		$errors = CMessageHelper::getMessages();
+
+		if ($errors) {
+			$result = [
+				'error' => array_values(array_column($errors, 'message'))
+			];
 		}
 
+		if ($scripts) {
+			$result = $scripts[$data['hostid']][0];
+		}
 		break;
 
 	case 'get_scripts_by_events':
@@ -870,13 +872,16 @@ switch ($data['method']) {
 			'manualinput' => $data['manualinput']
 		]);
 
-		if ($scripts) {
-			if (array_key_exists('error', $scripts)) {
-				$result = $scripts;
-			}
-			else {
-				$result = $scripts[$data['eventid']][0];
-			}
+		$errors = CMessageHelper::getMessages();
+
+		if ($errors) {
+			$result = [
+				'error' => array_values(array_column($errors, 'message'))
+			];
+		}
+
+		elseif ($scripts) {
+			$result = $scripts[$data['eventid']][0];
 		}
 		break;
 
