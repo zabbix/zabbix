@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T15:39:54Z'
+  date: '2023-11-03T11:46:11Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2016,7 +2016,7 @@ zabbix_export:
             - uuid: 93f6abb8363e4ee2ad2801090cf006b0
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage from MAX, percent'
               type: DEPENDENT
-              key: 'oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_from_max_pct["{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2037,18 +2037,18 @@ zabbix_export:
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 - uuid: dd246e51d0b343f0b18b18dc802dfbc2
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage from MAX is too high'
                   event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high (over {$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     - name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high'
-                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
+                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
                   tags:
                     - tag: scope
                       value: capacity
                 - uuid: a82c07893e04440ea9c0e5e7f8f79602
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high'
                   event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high (over {$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}% for 5m).'
                   priority: HIGH
