@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-30T11:34:54Z'
+  date: '2023-11-01T20:48:03Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1449,10 +1449,10 @@ zabbix_export:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.total
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
                 - type: ITEM
                   name: 'Cloud SQL total'
@@ -1472,10 +1472,10 @@ zabbix_export:
                         host: 'GCP by HTTP'
                         key: gcp.cloudsql.instances.total
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1509,10 +1509,10 @@ zabbix_export:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.mysql_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
                 - type: ITEM
                   name: 'GCE regular instances'
@@ -1532,10 +1532,10 @@ zabbix_export:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.regular_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
                 - type: ITEM
                   name: 'Cloud SQL PostgreSQL'
@@ -1556,10 +1556,10 @@ zabbix_export:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.pgsql_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1596,10 +1596,10 @@ zabbix_export:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.cos_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
                 - type: ITEM
                   name: 'Cloud SQL MSSQL'
@@ -1620,10 +1620,10 @@ zabbix_export:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.mssql_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                     - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '4'
     - uuid: 507d70db18554a4e9ee5e09bb29bc85f
       template: 'GCP Cloud SQL MSSQL by HTTP'
@@ -5478,7 +5478,7 @@ zabbix_export:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         key: gcp.cloudsql.mysql.repl.slave_io_running
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'I/O Thread Error'
@@ -5499,7 +5499,7 @@ zabbix_export:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         key: gcp.cloudsql.mysql.repl.last_io_errno
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'SQL Thread State'
@@ -5520,7 +5520,7 @@ zabbix_export:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         key: gcp.cloudsql.mysql.repl.slave_sql_running
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'SQL Thread Error'
@@ -5541,7 +5541,7 @@ zabbix_export:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         key: gcp.cloudsql.mysql.repl.last_sql_errno
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
       valuemaps:
         - uuid: ea83090a16d94eb3bb643009c784d820

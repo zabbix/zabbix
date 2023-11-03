@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-30T11:26:15Z'
+  date: '2023-11-01T20:44:40Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1414,11 +1414,11 @@ zabbix_export:
                         host: 'Hadoop by HTTP'
                         key: 'net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]'
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: GRAPH_CLASSIC
                   'y': '2'
                   width: '12'
@@ -1453,7 +1453,7 @@ zabbix_export:
                         host: 'Hadoop by HTTP'
                         key: hadoop.namenode.uptime
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'NameNode response time'
@@ -1466,11 +1466,11 @@ zabbix_export:
                         host: 'Hadoop by HTTP'
                         key: 'net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]'
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: ITEM
                   name: 'ResourceManager status'
                   x: '12'
@@ -1482,11 +1482,11 @@ zabbix_export:
                         host: 'Hadoop by HTTP'
                         key: 'net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]'
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '2'
@@ -1523,7 +1523,7 @@ zabbix_export:
                         host: 'Hadoop by HTTP'
                         key: hadoop.resourcemanager.uptime
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'ResourceManager response time'
@@ -1536,11 +1536,11 @@ zabbix_export:
                         host: 'Hadoop by HTTP'
                         key: 'net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]'
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
       valuemaps:
         - uuid: 6c967c4df18d4c7ebb0fd4be17df292a
           name: 'Service state'
