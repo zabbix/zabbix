@@ -29,7 +29,7 @@
 #include "zbxcompress.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "../taskmanager/taskmanager.h"
+#include "../taskmanager/taskmanager_proxy.h"
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
 

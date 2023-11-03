@@ -2029,6 +2029,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxip/Makefile
 	src/libs/zbxipcservice/Makefile
+	src/libs/zbxipmi/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxkvs/Makefile
 	src/libs/zbxlog/Makefile
@@ -2040,6 +2041,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnum/Makefile
 	src/libs/zbxodbc/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpoller/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxproxybuffer/Makefile
@@ -2109,7 +2111,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
-	src/zabbix_server/ipmi/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile

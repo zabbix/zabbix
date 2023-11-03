@@ -1102,7 +1102,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_get_config_forks_f get_config_forks)
 {
 	int	ret = SUCCEED;
 
@@ -1156,7 +1157,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
-						config_comms->config_trapper_timeout, config_comms->config_source_ip);
+						config_comms->config_trapper_timeout, config_comms->config_source_ip,
+						get_config_forks, zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1186,7 +1188,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time);
+			{
+				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
+						zbx_get_program_type_cb());
+			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
 		{
@@ -1284,7 +1289,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_get_config_forks_f get_config_forks)
 {
 	ssize_t	bytes_received;
 
@@ -1292,7 +1298,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
-			events_cbs, proxydata_frequency);
+			events_cbs, proxydata_frequency, get_config_forks);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1388,7 +1394,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,
-					trapper_args_in->proxydata_frequency);
+					trapper_args_in->proxydata_frequency,
+					trapper_args_in->get_process_forks_cb_arg);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

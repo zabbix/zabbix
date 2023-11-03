@@ -253,7 +253,7 @@ tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxsysinfo/process_http
 tests/zabbix_server/pinger/zbx_pinger_test
-tests/zabbix_server/poller/zbx_poller_test
+tests/libs/zbxpoller/zbx_poller_test
 tests/libs/zbxpreproc/item_preproc_csv_to_json
 tests/libs/zbxpreproc/item_preproc_xpath
 tests/libs/zbxpreproc/zbx_item_preproc
