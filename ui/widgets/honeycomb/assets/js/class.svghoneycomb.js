@@ -31,6 +31,7 @@ class CSVGHoneycomb {
 	static ZBX_STYLE_LABEL =					'svg-honeycomb-label';
 	static ZBX_STYLE_LABEL_PRIMARY =			'svg-honeycomb-label-primary';
 	static ZBX_STYLE_LABEL_SECONDARY =			'svg-honeycomb-label-secondary';
+	static ZBX_STYLE_LABEL_LINE =				'svg-honeycomb-label-line';
 
 	static ID_COUNTER = 0;
 
@@ -191,6 +192,20 @@ class CSVGHoneycomb {
 	#label_secondary_font_size = 0;
 
 	/**
+	 * Canvas context for text measuring.
+	 *
+	 * @type {object}
+	 */
+	#canvas_context = null;
+
+	/**
+	 * Font family of SVG.
+	 *
+	 * @type {string}
+	 */
+	#font_family = '';
+
+	/**
 	 * @param {Object} padding             Inner padding of the root SVG element.
 	 *        {number} padding.horizontal
 	 *        {number} padding.vertical
@@ -206,6 +221,8 @@ class CSVGHoneycomb {
 			.on('click', (e) => this.#onClickSvg(e));
 
 		this.#cell_path = this.#generatePath();
+		this.#canvas_context = document.createElement('canvas').getContext('2d');
+		this.#font_family = this.#svg.style('font-family');
 
 		this.#createContainers();
 
@@ -366,7 +383,9 @@ class CSVGHoneycomb {
 			if (cell_radius_inner < cell_min_radius_inner) {
 				let cells_gap_new = cell_min_radius_outer / 10;
 
-				this.#row_count = Math.floor(this.#height / (cell_min_radius_outer + cell_min_radius_outer / 2 + cells_gap_new));
+				this.#row_count = Math.floor(
+					this.#height / (cell_min_radius_outer + cell_min_radius_outer / 2 + cells_gap_new)
+				);
 				if (this.#row_count < 1) {
 					this.#row_count = 1;
 				}
@@ -450,18 +469,12 @@ class CSVGHoneycomb {
 
 		if ((!labels_primary.empty() && isVisible(labels_primary.node()))
 				&& (labels_secondary.empty() || !isVisible(labels_secondary.node()))) {
-			let label_primary_position_y = this.#label_primary_font_size / 2;
-			label_primary_position_y -= this.#label_primary_font_size / 2 * (this.#label_primary_line_count - 1);
-
-			labels_primary.attr('transform', `translate(0 ${label_primary_position_y})`);
+			labels_primary.attr('y', -this.#label_primary_font_size / 2 * this.#label_primary_line_count);
 		}
 
 		if ((labels_primary.empty() || !isVisible(labels_primary.node()))
 				&& (!labels_secondary.empty() && isVisible(labels_secondary.node()))) {
-			let label_secondary_position_y = this.#label_secondary_font_size / 2;
-			label_secondary_position_y -= this.#label_secondary_font_size / 2 * (this.#label_secondary_line_count - 1);
-
-			labels_secondary.attr('transform', `translate(0 ${label_secondary_position_y})`);
+			labels_secondary.attr('y', -this.#label_secondary_font_size / 2 * this.#label_secondary_line_count);
 		}
 
 		const available_cell_height = this.#radius_outer * this.#scale - this.#radius_outer * this.#scale / 10;
@@ -670,11 +683,15 @@ class CSVGHoneycomb {
 		let labels_primary = null;
 		let labels_secondary = null;
 
+		const available_cell_width = this.#radius_inner * 2 - this.#radius_inner / 10;
+
 		if (this.#config.primary_label.show) {
 			labels_primary = this.#elements.honeycomb_cells
-				.append('svg:text')
+				.append('svg:foreignObject')
 				.attr('class', `${CSVGHoneycomb.ZBX_STYLE_LABEL} ${CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY}`)
-				.style('fill', `#${this.#config.primary_label.color}`)
+				.attr('x', -available_cell_width / 2)
+				.style('width', `${available_cell_width}px`)
+				.style('color', `#${this.#config.primary_label.color}`)
 				.style('font-weight', this.#config.primary_label.is_bold ? 'bold' : '')
 				.style('display', 'block');
 
@@ -682,17 +699,19 @@ class CSVGHoneycomb {
 
 			for (let i = 0; i < this.#label_primary_line_count; i++) {
 				labels_primary
-					.append('svg:tspan')
-					.text(d => d.primary_label.split('\r\n')[i])
-					.attr('x', '0');
+					.append('xhtml:div')
+					.attr('class', CSVGHoneycomb.ZBX_STYLE_LABEL_LINE)
+					.text(d => d.primary_label.split('\r\n')[i]);
 			}
 		}
 
 		if (this.#config.secondary_label.show) {
 			labels_secondary = this.#elements.honeycomb_cells
-				.append('svg:text')
+				.append('svg:foreignObject')
 				.attr('class', `${CSVGHoneycomb.ZBX_STYLE_LABEL} ${CSVGHoneycomb.ZBX_STYLE_LABEL_SECONDARY}`)
-				.style('fill', `#${this.#config.secondary_label.color}`)
+				.attr('x', -available_cell_width / 2)
+				.style('width', `${available_cell_width}px`)
+				.style('color', `#${this.#config.secondary_label.color}`)
 				.style('font-weight', this.#config.secondary_label.is_bold ? 'bold' : '')
 				.style('display', 'block');
 
@@ -700,9 +719,9 @@ class CSVGHoneycomb {
 
 			for (let i = 0; i < this.#label_secondary_line_count; i++) {
 				labels_secondary
-					.append('svg:tspan')
-					.text(d => d.secondary_label.split('\r\n')[i])
-					.attr('x', '0');
+					.append('xhtml:div')
+					.attr('class', CSVGHoneycomb.ZBX_STYLE_LABEL_LINE)
+					.text(d => d.secondary_label.split('\r\n')[i]);
 			}
 		}
 
@@ -727,17 +746,9 @@ class CSVGHoneycomb {
 					const lines = d[data_attribute].split('\r\n');
 
 					d3.select(nodes_labels[index_label])
-						.selectAll('tspan')
-						.each((d, index_line, nodes_lines) => {
-							// Save current text of label
-							const current_text_content = nodes_lines[index_line].textContent;
-
-							// Use the full text for computing its length
-							nodes_lines[index_line].textContent = lines[index_line];
-							lines_widths.push(nodes_lines[index_line].getComputedTextLength() * this.#scale);
-
-							// Revert text back as it was
-							nodes_lines[index_line].textContent = current_text_content;
+						.selectAll(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_LINE}`)
+						.each((d, index_line) => {
+							lines_widths.push(this.#getMeasuredTextWidth(lines[index_line], default_size * 10));
 						});
 				});
 
@@ -776,20 +787,17 @@ class CSVGHoneycomb {
 			}
 
 			if (this.#config.secondary_label.show) {
-				label_primary_position_y = -this.#radius_outer / 2 + this.#label_primary_font_size;
+				label_primary_position_y = -this.#radius_outer / 2;
 			}
 			else {
-				label_primary_position_y = this.#label_primary_font_size / 2
-					- this.#label_primary_font_size / 2 * (this.#label_primary_line_count - 1);
+				label_primary_position_y = -this.#label_primary_font_size / 2 * this.#label_primary_line_count;
 			}
 
 			primary
-				.attr('transform', `translate(0 ${label_primary_position_y})`)
-				.style('font-size', `${this.#label_primary_font_size}px`);
-
-			primary
-				.selectAll('tspan')
-				.attr('y', (d, index) => this.#label_primary_font_size * index);
+				.attr('y', label_primary_position_y)
+				.style('height', `${this.#label_primary_font_size * this.#label_primary_line_count}px`)
+				.style('font-size', `${this.#label_primary_font_size}px`)
+				.style('line-height', `${this.#label_primary_font_size}px`);
 		}
 
 		if (this.#config.secondary_label.show) {
@@ -811,19 +819,17 @@ class CSVGHoneycomb {
 
 			if (this.#config.primary_label.show) {
 				label_secondary_position_y = this.#radius_outer / 2
-					- this.#label_secondary_font_size / 2 * (this.#label_secondary_line_count - 1);
+					- this.#label_secondary_font_size * this.#label_secondary_line_count;
 			}
 			else {
-				label_secondary_position_y = this.#label_secondary_font_size / 2;
+				label_secondary_position_y = -this.#label_secondary_font_size / 2 * this.#label_secondary_line_count;
 			}
 
 			secondary
-				.attr('transform', `translate(0 ${label_secondary_position_y})`)
-				.style('font-size', `${this.#label_secondary_font_size}px`);
-
-			secondary
-				.selectAll('tspan')
-				.attr('y', (d, index) => this.#label_secondary_font_size * index);
+				.attr('y', label_secondary_position_y)
+				.style('height', `${this.#label_secondary_font_size * this.#label_secondary_line_count}px`)
+				.style('font-size', `${this.#label_secondary_font_size}px`)
+				.style('line-height', `${this.#label_secondary_font_size}px`);
 		}
 
 		if (this.#config.primary_label.show && this.#config.secondary_label.show) {
@@ -834,12 +840,8 @@ class CSVGHoneycomb {
 			if (total_height < this.#radius_outer) {
 				const offset = (this.#radius_outer - total_height) / 3;
 
-				primary.attr('transform',
-					`translate(0 ${label_primary_position_y + offset / this.#label_primary_line_count / 2})`
-				);
-				secondary.attr('transform',
-					`translate(0 ${label_secondary_position_y - offset / this.#label_secondary_line_count / 2})`
-				);
+				primary.attr('y', label_primary_position_y + offset / this.#label_primary_line_count);
+				secondary.attr('y', label_secondary_position_y - offset / this.#label_secondary_line_count);
 			}
 		}
 
@@ -863,27 +865,6 @@ class CSVGHoneycomb {
 			check_labels_height(primary, this.#label_primary_font_size);
 			check_labels_height(secondary, this.#label_secondary_font_size);
 		}
-
-		const available_cell_width = this.#radius_inner * 2 - this.#radius_inner / 10;
-
-		const adjust_labels_width = (labels, data_attribute) => {
-			labels
-				?.each((d, index_label, nodes) => {
-					const lines = d[data_attribute].split('\r\n');
-
-					d3.select(nodes[index_label])
-						.selectAll('tspan')
-						.each((d, index_line, nodes) => {
-							nodes[index_line].textContent = lines[index_line];
-							while (nodes[index_line].getComputedTextLength() > available_cell_width) {
-								nodes[index_line].textContent = `${nodes[index_line].textContent.slice(0, -4)}...`;
-							}
-						});
-				});
-		};
-
-		adjust_labels_width(primary, 'primary_label');
-		adjust_labels_width(secondary, 'secondary_label');
 	};
 
 	/**
@@ -1082,5 +1063,19 @@ class CSVGHoneycomb {
 		path += 'Z';
 
 		return path.replaceAll(',', ' ');
+	}
+
+	/**
+	 * Get text width using canvas measuring.
+	 *
+	 * @param {string} text
+	 * @param {number} font_size
+	 *
+	 * @returns {number}
+	 */
+	#getMeasuredTextWidth(text, font_size) {
+		this.#canvas_context.font = `${font_size}px ${this.#font_family}`;
+
+		return this.#canvas_context.measureText(text).width;
 	}
 }

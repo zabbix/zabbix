@@ -4,8 +4,14 @@
 	}
 
 	.svg-honeycomb-label {
-		fill: $honeycomb-label-color;
-		text-anchor: middle;
+		color: $honeycomb-label-color;
+		text-align: center;
+
+		.svg-honeycomb-label-line {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 	}
 
 	.svg-honeycomb-cell-no-data path,

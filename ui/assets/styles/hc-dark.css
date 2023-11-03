@@ -3502,8 +3502,12 @@ section {
 .svg-honeycomb .svg-honeycomb-cell path {
   fill: #335463; }
 .svg-honeycomb .svg-honeycomb-label {
-  fill: #eeeeee;
-  text-anchor: middle; }
+  color: #eeeeee;
+  text-align: center; }
+  .svg-honeycomb .svg-honeycomb-label .svg-honeycomb-label-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; }
 .svg-honeycomb .svg-honeycomb-cell-no-data path,
 .svg-honeycomb .svg-honeycomb-cell-other path {
   fill: #111111; }
