@@ -646,11 +646,11 @@ static void	zbx_get_charset_content(xmlNode *a_node, xmlChar **charset, xmlChar 
 				{
 					if (NULL != *content)
 						xmlFree(*content);
-						
+
 					*content = xmlGetProp(cur_node, attr->name);
 				}
 				else if (0 == strcmp("charset", (const char *)attr->name))
-				{		
+				{
 					*charset = xmlGetProp(cur_node, attr->name);
 					break;
 				}
