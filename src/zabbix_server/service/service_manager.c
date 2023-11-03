@@ -2594,7 +2594,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 			if (NULL != (ptr = zbx_hashset_search(&manager->problem_events, &event)))
 			{
 				event = *ptr;
-				if (event->suppressed == 1)
+				if (1 == event->suppressed)
 					continue;
 			}
 
