@@ -126,7 +126,7 @@ FIELD		|hgsetid	|t_id		|	|NOT NULL	|0	|1|hgset
 FIELD		|groupid	|t_id		|	|NOT NULL	|0	|2|hstgrp	|		|RESTRICT
 INDEX		|1		|groupid
 
-TABLE|host_hgset|hostid,hgsetid|ZBX_TEMPLATE
+TABLE|host_hgset|hostid|ZBX_TEMPLATE
 FIELD		|hostid	|t_id		|	|NOT NULL	|0	|1|hosts
 FIELD		|hgsetid	|t_id		|	|NOT NULL	|0	|2|hgset	|		|RESTRICT
 INDEX		|1		|hgsetid
@@ -401,7 +401,7 @@ FIELD		|ugsetid	|t_id		|	|NOT NULL	|0	|1|ugset
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0	|2|usrgrp	|		|RESTRICT
 INDEX		|1		|usrgrpid
 
-TABLE|user_ugset|userid,ugsetid|ZBX_DATA
+TABLE|user_ugset|userid|ZBX_DATA
 FIELD		|userid	|t_id		|	|NOT NULL	|0	|1|users
 FIELD		|ugsetid	|t_id		|	|NOT NULL	|0	|2|ugset	|		|RESTRICT
 INDEX		|1		|ugsetid

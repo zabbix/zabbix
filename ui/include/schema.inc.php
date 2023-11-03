@@ -453,7 +453,7 @@ return [
 		]
 	],
 	'host_hgset' => [
-		'key' => 'hostid,hgsetid',
+		'key' => 'hostid',
 		'fields' => [
 			'hostid' => [
 				'null' => false,
@@ -1712,7 +1712,7 @@ return [
 		]
 	],
 	'user_ugset' => [
-		'key' => 'userid,ugsetid',
+		'key' => 'userid',
 		'fields' => [
 			'userid' => [
 				'null' => false,

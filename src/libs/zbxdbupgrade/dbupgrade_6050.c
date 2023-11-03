@@ -1813,7 +1813,7 @@ static int	DBpatch_6050155(void)
 static int	DBpatch_6050156(void)
 {
 	const zbx_db_table_t table =
-			{"host_hgset", "hostid,hgsetid", 0,
+			{"host_hgset", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
