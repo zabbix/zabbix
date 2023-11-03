@@ -24,7 +24,6 @@ package swap
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -52,7 +51,8 @@ func getSwapSize() (uint64, uint64, error) {
 	return uint64(info.Totalswap), uint64(info.Freeswap), nil
 }
 
-func getSwapPages() (r uint64, w uint64, err error) {
+func getSwapPages() (r uint64, w uint64, data bool) {
+	var err error
 	var file *os.File
 	var st uint8
 
@@ -74,29 +74,29 @@ func getSwapPages() (r uint64, w uint64, err error) {
 		}
 
 		if st == 3 {
+			data = true
 			break
 		}
 	}
 
-	if st != 3 {
+	if !data {
 		r, w = 0, 0
-		err = errors.New("Cannot obtain swap information")
 	}
 
 	return
 }
 
-func getSwapDevStats(swapdev string, rw bool) (uint64, uint64, error) {
+func getSwapDevStats(swapdev string, rw bool) (uint64, uint64, bool) {
 	var err error
 
 	var stat fs.FileInfo
 	if stat, err = os.Stat(swapdev); err != nil {
-		return 0, 0, err
+		return 0, 0, false
 	}
 
 	var file *os.File
 	if file, err = os.Open(diskstatLocation); err != nil {
-		return 0, 0, err
+		return 0, 0, false
 	}
 	defer file.Close()
 
@@ -148,27 +148,27 @@ func getSwapDevStats(swapdev string, rw bool) (uint64, uint64, error) {
 			continue
 		}
 
-		return io, sect, nil
+		return io, sect, true
 	}
 
-	return 0, 0, errors.New("Cannot obtain swap information")
+	return 0, 0, false
 }
 
-func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, err error) {
+func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, gotData bool) {
 	if len(swapdev) == 0 || swapdev == "all" {
 		swapdev = ""
 		if rw {
-			_, pag, err = getSwapPages()
+			_, pag, gotData = getSwapPages()
 		} else {
-			pag, _, err = getSwapPages()
+			pag, _, gotData = getSwapPages()
 		}
 	} else if !strings.HasPrefix(swapdev, devPath) {
-		swapdev += devPath
+		swapdev = devPath + swapdev
 	}
 
 	var file *os.File
-	var errFile error
-	if file, errFile = os.Open(swapLocation); errFile != nil {
+	var err error
+	if file, err = os.Open(swapLocation); err != nil {
 		return
 	}
 	defer file.Close()
@@ -183,22 +183,21 @@ func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, 
 			continue
 		}
 
-		if ioRec, sectRec, errDev := getSwapDevStats(scanner.Text(), rw); errDev == nil {
+		if ioRec, sectRec, gotStats := getSwapDevStats(scanner.Text(), rw); gotStats {
 			io += ioRec
 			sect += sectRec
-
-			err = error(nil)
+			gotData = true
 		}
 	}
 
 	return
 }
 
-func getSwapStatsIn(swapdev string) (uint64, uint64, uint64, error) {
+func getSwapStatsIn(swapdev string) (uint64, uint64, uint64, bool) {
 	return getSwapStats(swapdev, false)
 }
 
-func getSwapStatsOut(swapdev string) (uint64, uint64, uint64, error) {
+func getSwapStatsOut(swapdev string) (uint64, uint64, uint64, bool) {
 	return getSwapStats(swapdev, true)
 }
 
