@@ -58,6 +58,7 @@ typedef struct
 	}
 	state;
 	zbx_vector_iprange_t	*ipranges;
+	zbx_uint64_t		id;
 }
 zbx_task_range_t;
 

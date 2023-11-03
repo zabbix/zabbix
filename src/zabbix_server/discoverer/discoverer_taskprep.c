@@ -116,6 +116,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 {
 	zbx_discoverer_task_t	task_local, *task;
 	zbx_vector_portrange_t	port_ranges;
+	zbx_task_range_t	range_cmp = {.id = 0 };
 	int			port = 0, checks_count = 0;
 
 	if (SVC_ICMPPING != dcheck->type)
@@ -134,6 +135,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 		checks_count = 1;
 
 	task_local.addr_type = DISCOVERY_ADDR_RANGE;
+	task_local.addr.range = &range_cmp;
 	task_local.port = 0;
 	zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
 	zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
@@ -249,7 +251,89 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 	return checks_count;
 }
 
+static void	process_rangetask_copy(zbx_discoverer_task_t *task, zbx_task_range_t *range, zbx_hashset_t *tasks)
+{
+	zbx_discoverer_task_t	*task_out = zbx_hashset_insert(tasks, task, sizeof(zbx_discoverer_task_t));
 
+	zbx_vector_dc_dcheck_ptr_create(&task_out->dchecks);
+	zbx_vector_dc_dcheck_ptr_append_array(&task_out->dchecks, task->dchecks.values, task->dchecks.values_num);
+	task_out->addr.range = (zbx_task_range_t *)zbx_malloc(NULL, sizeof(zbx_task_range_t));
+	*task_out->addr.range = *range;
+	task->addr.range->id++;
+}
+
+static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *tasks_dst)
+{
+	zbx_discoverer_task_t	*task;
+	zbx_hashset_iter_t	iter;
+	zbx_vector_portrange_t	port_ranges;
+	int			total = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_src:%d tasks_dst:%d", __func__, tasks_src->num_data,
+			tasks_dst->num_data);
+
+	zbx_vector_portrange_create(&port_ranges);
+	zbx_hashset_iter_reset(tasks_src, &iter);
+
+	while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_task_range_t	range;
+
+		if (DISCOVERY_ADDR_IP == task->addr_type)
+		{
+			zbx_hashset_insert(tasks_dst, task, sizeof(zbx_discoverer_task_t));
+			zbx_hashset_iter_remove(&iter);
+			continue;
+		}
+
+		task->addr.range->state.count = 0;
+		range = *task->addr.range;
+
+		while (SUCCEED == zbx_iprange_uniq_iter(task->addr.range->ipranges->values,
+				task->addr.range->ipranges->values_num, &task->addr.range->state.index_ip,
+				task->addr.range->state.ipaddress))
+
+		{
+
+			for (; task->addr.range->state.dcheck_index < task->dchecks.values_num;
+					task->addr.range->state.dcheck_index++)
+			{
+				zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->addr.range->state.dcheck_index];
+
+				dcheck_port_ranges_get(dcheck->ports, &port_ranges);
+
+				while (SUCCEED == zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num,
+						&task->addr.range->state.index_port, &task->addr.range->state.port))
+				{
+					if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX == range.state.count)
+					{
+						process_rangetask_copy(task, &range, tasks_dst);
+						range = *task->addr.range;
+					}
+
+					range.state.count++;
+					total++;
+				}
+
+				task->addr.range->state.port = 0;
+				zbx_vector_portrange_clear(&port_ranges);
+			}
+
+			task->addr.range->state.dcheck_index = 0;
+		}
+
+		if (0 != range.state.count)
+			process_rangetask_copy(task, &range, tasks_dst);
+
+		discoverer_task_clear(task);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_portrange_destroy(&port_ranges);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() tasks_src:%d tasks_dst:%d total:%d", __func__, tasks_src->num_data,
+			tasks_dst->num_data, total);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -259,8 +343,9 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
 		zbx_hashset_t *check_counts, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
 {
-	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
-	int		i = 0;
+	zbx_hashset_t		tasks_local, *tasks_ptr;
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
+	int			i = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
 
@@ -309,6 +394,8 @@ next:
 			break;
 	}
 
+	zbx_hashset_create(&tasks_local, 1, discoverer_task_hash, discoverer_task_compare);
+	tasks_ptr = 0 == drule->concurrency_max ? &tasks_local : tasks;
 	*ip = '\0';
 
 	while (SUCCEED == zbx_iprange_uniq_next(ipranges->values, ipranges->values_num, ip, sizeof(ip)))
@@ -324,7 +411,7 @@ next:
 					dchecks_common, ipranges);
 		}
 
-		checks_count += process_checks(drule, ip, 0, &need_resolve, queue_capacity, tasks, dchecks_common,
+		checks_count += process_checks(drule, ip, 0, &need_resolve, queue_capacity, tasks_ptr, dchecks_common,
 				ipranges);
 
 		if (0 == *queue_capacity)
@@ -342,7 +429,24 @@ next:
 			check_count->count += checks_count;
 		}
 	}
+
+	if (0 == drule->concurrency_max)
+		process_task_range_split(&tasks_local, tasks);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	if (0 != tasks_local.num_data)
+	{
+		zbx_discoverer_task_t	*task;
+		zbx_hashset_iter_t	iter;
+
+		zbx_hashset_iter_reset(&tasks_local, &iter);
+
+		while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
+			discoverer_task_clear(task);
+	}
+
+	zbx_hashset_destroy(&tasks_local);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() tasks:%d check_counts(ip):%d", __func__, tasks->num_data,
+			check_counts->num_data);
 }
 

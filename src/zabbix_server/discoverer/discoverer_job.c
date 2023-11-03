@@ -21,20 +21,26 @@
 
 ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
+typedef struct {
+	zbx_uint32_t	port;
+	zbx_uint32_t	dcheck_type;
+}
+dtask_hash_t;
+
 zbx_hash_t	discoverer_task_hash(const void *data)
 {
 	const zbx_discoverer_task_t	*task = (const zbx_discoverer_task_t *)data;
 	zbx_hash_t			hash;
-	struct {
-		zbx_uint32_t		port;
-		zbx_uint32_t		dcheck_type;
-	}				state;
-	const char			*ip = DISCOVERY_ADDR_IP == task->addr_type ? task->addr.ip : "";
+	dtask_hash_t			state;
 
 	state.port = task->port;
 	state.dcheck_type = DISCOVERY_ADDR_IP == task->addr_type ? 0 : task->dchecks.values[0]->type;
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC((zbx_uint64_t*)&state);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(ip, strlen(ip), hash);
+
+	if (DISCOVERY_ADDR_RANGE == task->addr_type)
+		hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&task->addr.range->id, sizeof(task->addr.range->id), hash);
+	else
+		hash = ZBX_DEFAULT_STRING_HASH_ALGO(task->addr.ip, strlen(task->addr.ip), hash);
 
 	return hash;
 }
@@ -43,16 +49,24 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 {
 	const zbx_discoverer_task_t	*task1 = (const zbx_discoverer_task_t *)d1;
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
-	const char			*ip1 = DISCOVERY_ADDR_IP == task1->addr_type ? task1->addr.ip : "",
-					*ip2 = DISCOVERY_ADDR_IP == task2->addr_type ? task2->addr.ip : "";
-	unsigned char			type1, type2;
+	dtask_hash_t			state1, state2;
+	int				ret;
 
-	ZBX_RETURN_IF_NOT_EQUAL(task1->port, task2->port);
-	type1 = DISCOVERY_ADDR_IP == task1->addr_type ? 0 : task1->dchecks.values[0]->type;
-	type2 = DISCOVERY_ADDR_IP == task2->addr_type ? 0 : task2->dchecks.values[0]->type;
-	ZBX_RETURN_IF_NOT_EQUAL(type1, type2);
+	state1.port = task1->port;
+	state2.port = task2->port;
+	state1.dcheck_type = DISCOVERY_ADDR_IP == task1->addr_type ? 0 : task1->dchecks.values[0]->type;
+	state2.dcheck_type = DISCOVERY_ADDR_IP == task2->addr_type ? 0 : task2->dchecks.values[0]->type;
 
-	return strcmp(ip1, ip2);
+	if (0 != (ret = memcmp(&state1, &state2, sizeof(dtask_hash_t))))
+		return ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(task1->addr_type, task2->addr_type);
+
+	if (DISCOVERY_ADDR_IP == task1->addr_type)
+		return strcmp(task1->addr.ip, task2->addr.ip);
+
+	ZBX_RETURN_IF_NOT_EQUAL(task1->addr.range->id, task2->addr.range->id);
+	return 0;
 }
 
 void	discoverer_task_clear(zbx_discoverer_task_t *task)
@@ -60,7 +74,7 @@ void	discoverer_task_clear(zbx_discoverer_task_t *task)
 	if (DISCOVERY_ADDR_IP == task->addr_type)
 		zbx_free(task->addr.ip);
 	else
-		zbx_free(task->addr.range);
+		zbx_free(task->addr.range);	/* the range vector is stored on job level */
 
 	/* dcheck is stored in job->dcheck_common */
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);

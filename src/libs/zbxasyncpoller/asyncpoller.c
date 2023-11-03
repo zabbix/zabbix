@@ -148,7 +148,7 @@ static void	async_reverse_dns_event(int err, char type, int count, int ttl, void
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() result:%d type:%d count:%d ttl:%d", __func__, err, type, count, ttl);
 
-	if (0 != err)
+	if (DNS_ERR_NONE != err)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot reverse DNS name: %s", evdns_err_to_string(err));
 		task->error = zbx_strdup(task->error, evdns_err_to_string(err));
