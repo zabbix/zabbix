@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-10-25 17:13+0000\n"
+"PO-Revision-Date: 2023-11-01 13:08+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1935,7 +1935,7 @@ msgstr "No se pudo agregar la correlación"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr "No se puede agregar la página al panel: se ha añadido el número máximo de %1$d páginas del panel."
+msgstr "No se puede agregar la página al tablero: se ha añadido el número máximo de %1$d páginas del tablero."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -2073,7 +2073,7 @@ msgstr "No se pudo agregar el escenario web"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr "No se puede añadir el widget: no hay suficiente espacio libre en el panel."
+msgstr "No se puede añadir el widget: no hay suficiente espacio libre en el tablero."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2544,6 +2544,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "No pude desactivar el tipo de soporte"
 msgstr[1] "No pude desactivar los tipos de soporte"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2627,6 +2633,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "No se pudo habilitar el tipo de soporte"
 msgstr[1] "No se pudieron habilitar los tipos de soporte"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3110,7 +3122,7 @@ msgstr "No se puede probar el tipo de medio deshabilitado."
 msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
 msgstr[0] "No se puede desbloquear el usuario"
-msgstr[1] ""
+msgstr[1] "No se pueden desbloquear los usuarios"
 
 #: include/classes/api/services/CHostGeneral.php:719
 #: include/classes/api/services/CHostGeneral.php:1356
@@ -3225,7 +3237,7 @@ msgstr "No se puede actualizar una gráfica descubierta."
 #: include/classes/api/services/CHostGroup.php:809
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
-msgstr ""
+msgstr "No se puede actualizar un grupo de equipos descubierto \"%1$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:82
 #, c-format
@@ -3272,7 +3284,7 @@ msgstr "No se pudo actualizar la correlación"
 #: include/classes/api/services/CTrigger.php:836
 #, c-format
 msgid "Cannot update dependencies of inherited trigger \"%1$s\"."
-msgstr ""
+msgstr "No se pueden actualizar las dependencias del disparador heredado \"%1$s\"."
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:734
@@ -3367,10 +3379,14 @@ msgstr "No se pudo actualizar el mantenimiento"
 msgid "Cannot update media type"
 msgstr "No se pudo actualizar el tipo de medios"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
-msgstr ""
+msgstr "No se puede actualizar el módulo: %1$s."
 
 #: sysmaps.php:184
 msgid "Cannot update network map"
@@ -3399,7 +3415,7 @@ msgstr "No se pudo actualizar la expresión regular"
 #: app/controllers/CControllerScheduledReportUpdate.php:63
 #: app/controllers/CControllerScheduledReportUpdate.php:156
 msgid "Cannot update scheduled report"
-msgstr ""
+msgstr "No se puede actualizar un informe programado"
 
 #: app/controllers/CControllerScriptUpdate.php:61
 #: app/controllers/CControllerScriptUpdate.php:170
@@ -3411,7 +3427,7 @@ msgstr "No se pudo actualizar el script"
 #: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
-msgstr ""
+msgstr "No se puede actualizar el alcance del script. El script \"%1$s\" se utiliza en la acción \"%2$s\"."
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -3419,17 +3435,17 @@ msgstr ""
 #: include/classes/api/services/CService.php:2430
 #, c-format
 msgid "Cannot update service \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede actualizar el servicio \"%1$s\": %2$s."
 
 #: app/controllers/CControllerPopupMassupdateService.php:157
 msgid "Cannot update services"
-msgstr ""
+msgstr "No se pueden actualizar los servicios"
 
 #: include/classes/api/services/CHttpTest.php:538
 #: include/classes/api/services/CHttpTest.php:743
 #, c-format
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede actualizar el paso para una plantilla de escenario web \"%1$s\": %2$s."
 
 #: templates.php:209
 msgid "Cannot update template"
@@ -3437,7 +3453,7 @@ msgstr "No se pudo actualizar la plantilla"
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:351
 msgid "Cannot update templates"
-msgstr ""
+msgstr "No se pueden actualizar las plantillas"
 
 #: app/controllers/CControllerPopupMassupdateTrigger.php:210 triggers.php:416
 msgid "Cannot update trigger"
@@ -3496,11 +3512,11 @@ msgstr "Distingue mayúsculas y minúsculas"
 #: app/views/administration.authentication.edit.php:192
 #: app/views/administration.authentication.edit.php:315
 msgid "Case-sensitive login"
-msgstr ""
+msgstr "Inicio de sesión sensible a mayúsculas"
 
 #: include/locales.inc.php:35
 msgid "Catalan (ca_ES)"
-msgstr ""
+msgstr "Catalán (ca_ES)"
 
 #: include/classes/data/CItemData.php:1033
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
@@ -3658,11 +3674,11 @@ msgstr "Comprueba si el servicio DNS está levantado. Devuelve 0 - DNS está ca�
 
 #: include/classes/data/CItemData.php:1165
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
-msgstr ""
+msgstr "Comprueba si el archivo existe. Devuelve 0: no se encuentra; 1: existe un archivo del tipo especificado"
 
 #: include/classes/data/CItemData.php:853
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Comprueba si el equipo es accesible mediante ping ICMP. 0 - El ping ICMP falla. 1 - El ping ICMP tiene éxito."
 
 #: include/classes/data/CItemData.php:953
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
@@ -3698,7 +3714,7 @@ msgstr "Las comprobaciones deben ser únicas."
 
 #: app/views/popup.service.edit.php:314 app/views/popup.service.edit.php:327
 msgid "Child services"
-msgstr ""
+msgstr "Servicios dependientes"
 
 #: include/locales.inc.php:36
 msgid "Chinese (zh_CN)"
@@ -3720,11 +3736,11 @@ msgstr "No se permite el enlace de plantillas circular."
 #: include/classes/core/ZBase.php:494
 #, c-format
 msgid "Class %1$s not found for action %2$s."
-msgstr ""
+msgstr "No se encontró la clase %1$s para la acción %2$s."
 
 #: include/classes/core/ZBase.php:494
 msgid "Class not found."
-msgstr ""
+msgstr "Clase no encontrada."
 
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
@@ -3752,11 +3768,11 @@ msgstr "Limpiar cuando se deslinke"
 
 #: jsLoader.php:150
 msgid "Click and drag to desired size."
-msgstr ""
+msgstr "Pulse y arrastre hasta el tamaño deseado."
 
 #: jsLoader.php:330
 msgid "Click to view or edit"
-msgstr ""
+msgstr "Pulse para ver o editar"
 
 #: include/classes/widgets/CWidgetConfig.php:53
 msgid "Clock"
@@ -3792,11 +3808,11 @@ msgstr "Clonar"
 #: app/views/configuration.host.edit.php:63
 #: app/views/js/popup.host.edit.js.php:47 host_prototypes.php:177
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "Se han modificado los valores de los parámetros del equipo clonado."
 
 #: templates.php:194
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "Se han modificado los valores de los parámetros de la plantilla clonada."
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
@@ -3824,7 +3840,7 @@ msgstr "Cerrar nuevo evento"
 
 #: app/views/configuration.correlation.edit.php:154
 msgid "Close new events"
-msgstr ""
+msgstr "Cerrar nuevos eventos"
 
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -3901,7 +3917,7 @@ msgstr ""
 #: include/items.inc.php:1319
 msgctxt "SNMP Community"
 msgid "Community"
-msgstr ""
+msgstr "Comunidad"
 
 #: app/partials/monitoring.problem.filter.php:263
 msgid "Compact view"
@@ -4022,7 +4038,7 @@ msgstr "Configuración de los gráficos"
 
 #: app/controllers/CControllerHostEdit.php:263
 msgid "Configuration of host"
-msgstr ""
+msgstr "Configuración de equipo"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
@@ -4772,12 +4788,12 @@ msgstr "Checo (cs_CZ)"
 #: jsLoader.php:400
 msgctxt "Default color option"
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: jsLoader.php:183
 msgctxt "abbreviation of severity level"
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 msgctxt "XML date format"
@@ -4816,7 +4832,7 @@ msgstr "Oscuro"
 #: include/classes/helpers/CMenuHelper.php:34
 #: include/classes/helpers/CRoleHelper.php:336
 msgid "Dashboard"
-msgstr "Panel de control"
+msgstr "Tablero de control"
 
 #: include/classes/api/services/CDashboard.php:388
 #: include/classes/api/services/CTemplateDashboard.php:431
@@ -4827,7 +4843,7 @@ msgstr "Ya existe el tablero \"%1$s\"."
 #: include/classes/api/services/CDashboardGeneral.php:91
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
-msgstr ""
+msgstr "El tablero \"%1$s\" se utiliza en el informe \"%2$s\"."
 
 #: app/controllers/CControllerDashboardUpdate.php:145
 #: app/controllers/CControllerTemplateDashboardUpdate.php:139
@@ -4843,15 +4859,15 @@ msgstr[1] "Tableros borrados"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
-msgstr ""
+msgstr "Propiedades de la página del tablero"
 
 #: app/views/dashboard.properties.edit.php:88
 msgid "Dashboard properties"
-msgstr ""
+msgstr "Propiedades del tablero"
 
 #: app/views/popup.dashboard.share.edit.php:151
 msgid "Dashboard sharing"
-msgstr ""
+msgstr "Compartir tablero"
 
 #: app/controllers/CControllerDashboardShareUpdate.php:94
 #: app/controllers/CControllerDashboardUpdate.php:140
@@ -11948,6 +11964,12 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Módulo eliminado: %1$s."
 msgstr[1] "Módulos eliminados: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11955,12 +11977,22 @@ msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Módulo deshabilitado: %1$s."
 msgstr[1] "Módulos deshabilitados: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Módulo habilitado: %1$s."
 msgstr[1] "Módulos habilitados: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
