@@ -100,6 +100,13 @@ class CSVGHoneycomb {
 	#radius_inner = Math.sqrt(3) / 2 * this.#radius_outer;
 
 	/**
+	 * d attribute of path element to display hexagonal cell.
+	 *
+	 * @type {string}
+	 */
+	#cell_path = '';
+
+	/**
 	 * Gap between cells.
 	 *
 	 * @type {number}
@@ -197,6 +204,8 @@ class CSVGHoneycomb {
 		this.#svg = d3.create('svg:svg')
 			.attr('class', CSVGHoneycomb.ZBX_STYLE_CLASS)
 			.on('click', (e) => this.#onClickSvg(e));
+
+		this.#cell_path = this.#generatePath();
 
 		this.#createContainers();
 
@@ -501,7 +510,7 @@ class CSVGHoneycomb {
 
 		this.#elements.no_data_cell
 			.append('svg:path')
-			.attr('d', this.#generatePath());
+			.attr('d', this.#cell_path);
 
 		const font_size = 200;
 		const position_y = font_size / 2;
@@ -604,7 +613,7 @@ class CSVGHoneycomb {
 
 		this.#elements.honeycomb_cells
 			.append('svg:path')
-			.attr('d', this.#generatePath())
+			.attr('d', this.#cell_path)
 			.style('fill', d => {
 				if (!d.is_numeric) {
 					// Do not apply thresholds to non-numeric items
