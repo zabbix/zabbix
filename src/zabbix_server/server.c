@@ -1290,11 +1290,15 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
 				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
-				if (FAIL == (ret = zbx_rtc_wait_for_sync_finish(rtc)))
-					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
+
+				/* wait for service manager startup */
+				if (FAIL == (ret = zbx_rtc_wait_for_sync_finish(rtc)))
+					goto out;
+
+				/* wait for configuration sync */
 				if (FAIL == (ret = zbx_rtc_wait_for_sync_finish(rtc)))
 					goto out;
 
