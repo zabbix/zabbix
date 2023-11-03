@@ -1383,7 +1383,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					],
 					'trim' => true
 				]
-			],
+			]
 		];
 	}
 
