@@ -442,6 +442,7 @@ static char	*get_media_type_charset(const char *str, char *data)
 	if (NULL != (ptr = strchr(str, ';')))
 		charset = get_media_parameter(ptr + 1, "charset", ZBX_CONST_STRLEN("charset"));
 
+#ifdef HAVE_LIBXML2
 	if (NULL == charset)
 	{
 		if (0 == zbx_strncasecmp(str, "text/html", ZBX_CONST_STRLEN("text/html")))
@@ -463,6 +464,9 @@ static char	*get_media_type_charset(const char *str, char *data)
 			zbx_free(content);
 		}
 	}
+#else
+	ZBX_UNUSED(data);
+#endif
 
 	if (NULL != charset)
 	{

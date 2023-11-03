@@ -58,7 +58,6 @@ SERVER_SUBDIRS = \
 	zbxtasks \
 	zbxhistory \
 	zbxcompress \
-	zbxxml \
 	zbxembed \
 	zbxprometheus \
 	zbxvault \
@@ -85,7 +84,6 @@ PROXY_SUBDIRS = \
 	zbxtasks \
 	zbxhistory \
 	zbxcompress \
-	zbxxml \
 	zbxembed \
 	zbxprometheus \
 	zbxvault \
@@ -117,6 +115,7 @@ SUBDIRS = \
 	zbxregexp \
 	zbxipcservice \
 	zbxcompress \
+	zbxxml \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
