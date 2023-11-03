@@ -2311,6 +2311,13 @@ msgstr[0] "Nie można wyłączyć typu mediów"
 msgstr[1] "Nie można wyłączyć typów mediów"
 msgstr[2] "Nie można wyłączyć typów mediów"
 
+#: app/controllers/CControllerModuleUpdate.php:146
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2383,6 +2390,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Nie można włączyć typu mediów"
 msgstr[1] "Nie można włączyć typów mediów"
 msgstr[2] "Nie można włączyć typów mediów"
+
+#: app/controllers/CControllerModuleUpdate.php:142
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -2991,6 +3005,10 @@ msgstr "Nie można zaktualizować utrzymania"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "Nie można zaktualizować typu mediów"
+
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -11541,6 +11559,13 @@ msgstr[0] "Usunięty moduł: %1$s."
 msgstr[1] "Usunięte moduły: %1$s."
 msgstr[2] "Usunięte moduły: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11549,6 +11574,13 @@ msgstr[0] "Wyłączony moduł: %1$s."
 msgstr[1] "Wyłączone moduły: %1$s."
 msgstr[2] "Wyłączone moduły: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
@@ -11556,6 +11588,10 @@ msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Włączony moduł: %1$s."
 msgstr[1] "Włączone moduły: %1$s."
 msgstr[2] "Włączone moduły: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format

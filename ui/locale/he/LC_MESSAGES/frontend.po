@@ -2265,6 +2265,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "לא ניתן לנטרל סוג מדיה"
 msgstr[1] "לא ניתן לנטרל סוגי מדיה"
 
+#: app/controllers/CControllerModuleUpdate.php:146
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2328,6 +2334,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "לא ניתן להפעיל סוג מדיה"
 msgstr[1] "לא ניתן להפעיל סוגי מדיה"
+
+#: app/controllers/CControllerModuleUpdate.php:142
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -2927,6 +2939,10 @@ msgstr "לא ניתן לעדכן את עבודת התחזוקה"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "לא ניתן לעדכן את סוג המדיה"
+
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -11445,6 +11461,12 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] "נמחק מודול: %1$s."
 msgstr[1] "נמחקו מודולים: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11452,12 +11474,22 @@ msgid_plural "Modules disabled: %1$s."
 msgstr[0] "הושבת מודול: %1$s."
 msgstr[1] "הושבתו מודולים: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "הופעל מודול: %1$s."
 msgstr[1] "הופעלו מודולים: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
