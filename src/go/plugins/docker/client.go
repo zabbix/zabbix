@@ -26,6 +26,7 @@ import (
 	"net"
 	"net/http"
 	"path"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
@@ -35,11 +36,23 @@ type client struct {
 	client http.Client
 }
 
-func newClient(socketPath string, timeout int) *client {
-	transport := &http.Transport{
-		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-			return net.Dial("unix", socketPath)
-		},
+func newClient(endpoint string, timeout int) *client {
+	var transport http.RoundTripper
+
+	if strings.HasPrefix(endpoint, "unix://") {
+		socketPath := strings.TrimPrefix(endpoint, "unix://")
+		transport = &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("unix", socketPath)
+			},
+		}
+	} else if strings.HasPrefix(endpoint, "tcp://") {
+		tcpAddress := strings.TrimPrefix(endpoint, "tcp://")
+		transport = &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("tcp", tcpAddress)
+			},
+		}
 	}
 
 	client := client{}
