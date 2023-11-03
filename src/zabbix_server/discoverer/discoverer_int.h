@@ -31,6 +31,14 @@
 
 typedef struct
 {
+	zbx_uint64_t	druleid;
+	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
+	zbx_uint64_t	count;
+}
+zbx_discoverer_check_count_t;
+
+typedef struct
+{
 	zbx_discoverer_queue_t	*queue;
 	pthread_t		thread;
 	int			worker_id;

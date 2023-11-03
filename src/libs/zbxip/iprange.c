@@ -412,7 +412,7 @@ void	zbx_iprange_first(const zbx_iprange_t *iprange, int *address)
 {
 	int	i, groups;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = 0; i < groups; i++)
 		address[i] = iprange->range[i].from;
@@ -441,7 +441,7 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 {
 	int	i, groups;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = groups - 1; i >= 0; i--)
 	{
@@ -516,16 +516,18 @@ int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip
  ******************************************************************************/
 int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx, int *ipaddress)
 {
-	int	i, z[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	int	i, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	if (0 == num)
 		return FAIL;
 
-	if (num == *idx)
+	if (*idx == num)
 		return FAIL;
 
-	if (0 == *idx && 0 == memcmp(ipaddress, z, ZBX_IPRANGE_V4 == ipranges->type ? 4 : 8))
+	if (0 == memcmp(ipaddress, z, ZBX_IPRANGE_V4 == ipranges->type ?
+			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
 	{
+		*idx = 0;
 		zbx_iprange_first(ipranges, ipaddress);
 		return SUCCEED;
 	}
@@ -567,7 +569,7 @@ int	zbx_iprange_validate(const zbx_iprange_t *iprange, const int *address)
 {
 	int	i, groups;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = 0; i < groups; i++)
 	{
@@ -594,7 +596,7 @@ zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange)
 	int		i, groups;
 	zbx_uint64_t	n, volume = 1;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = 0; i < groups; i++)
 	{
