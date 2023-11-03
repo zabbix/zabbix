@@ -3114,6 +3114,7 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 	}
 
 	db_update_services(service_manager);
+	zbx_hashset_clear(&service_manager->service_diffs);
 out:
 	zbx_vector_ptr_clear_ext(&event_severities, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&event_severities);
