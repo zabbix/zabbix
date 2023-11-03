@@ -190,7 +190,7 @@ require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
 require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
-require_once dirname(__FILE__) . '/reports/testPageReportsTopTriggers.php';
+require_once dirname(__FILE__).'/reports/testPageReportsTopTriggers.php';
 require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 
@@ -244,6 +244,7 @@ require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
+require_once dirname(__FILE__).'/testDataDisplayInGraphs.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
@@ -388,6 +389,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
+		$suite->addTestSuite('testDataDisplayInGraphs');
 
 		// Groups.
 		$suite->addTestSuite('testFormHostGroup');
