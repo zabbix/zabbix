@@ -694,7 +694,6 @@ class CHost extends CHostGeneral {
 		$this->updateHgSets($hosts);
 		$this->updateTags($hosts);
 		$this->updateMacros($hosts);
-		$this->updateTemplates($hosts);
 
 		$hosts_rtdata = [];
 		$hosts_interfaces = [];
@@ -728,6 +727,8 @@ class CHost extends CHostGeneral {
 		if ($hosts_interfaces) {
 			API::HostInterface()->create($hosts_interfaces);
 		}
+
+		$this->updateTemplates($hosts);
 
 		if ($hosts_inventory) {
 			DB::insert('host_inventory', $hosts_inventory, false);
@@ -793,18 +794,6 @@ class CHost extends CHostGeneral {
 		$this->updateHgSets($hosts, $db_hosts);
 		$this->updateTags($hosts, $db_hosts);
 		$this->updateMacros($hosts, $db_hosts);
-		$this->updateTemplates($hosts, $db_hosts);
-
-		$old_field_hostids = [];
-
-		foreach ($hosts as &$host) {
-			if (array_diff_key($host, array_flip(['hostid', 'groups', 'tags', 'macros', 'templates']))) {
-				$old_field_hostids[] = $host['hostid'];
-			}
-
-			unset($host['groups'], $host['tags'], $host['macros'], $host['templates'], $host['templates_clear']);
-		}
-		unset($host);
 
 		$inventories = [];
 		foreach ($hosts as &$host) {
@@ -831,9 +820,7 @@ class CHost extends CHostGeneral {
 		]);
 
 		foreach ($hosts as $host) {
-			if (!in_array($host['hostid'], $old_field_hostids)) {
-				continue;
-			}
+			$host = array_diff_key($host, array_flip(['groups', 'tags', 'macros', 'templates', 'templates_clear']));
 
 			// Extend host inventory with the required data.
 			if (array_key_exists('inventory', $host) && $host['inventory']) {
@@ -853,6 +840,8 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 			}
 		}
+
+		$this->updateTemplates($hosts, $db_hosts);
 	}
 
 	/**
@@ -872,8 +861,6 @@ class CHost extends CHostGeneral {
 	public function massAdd(array $data) {
 		$this->validateMassAdd($data, $hosts, $db_hosts);
 
-		$this->updateForce($hosts, $db_hosts);
-
 		// add new interfaces
 		if (!empty($data['interfaces'])) {
 			API::HostInterface()->massAdd([
@@ -881,6 +868,8 @@ class CHost extends CHostGeneral {
 				'interfaces' => zbx_toArray($data['interfaces'])
 			]);
 		}
+
+		$this->updateForce($hosts, $db_hosts);
 
 		return ['hostids' => array_column($data['hosts'], 'hostid')];
 	}
@@ -990,12 +979,6 @@ class CHost extends CHostGeneral {
 	 */
 	public function massUpdate($data) {
 		$this->validateMassUpdate($data, $hosts, $db_hosts);
-
-		if (array_intersect_key($data, array_flip(['groups', 'macros', 'templates', 'templates_clear']))) {
-			$this->updateForce($hosts, $db_hosts);
-		}
-
-		unset($data['groups'], $data['macros'], $data['templates'], $data['templates_clear']);
 
 		$hostids = array_column($data['hosts'], 'hostid');
 
@@ -1226,6 +1209,10 @@ class CHost extends CHostGeneral {
 					}
 				}
 			}
+		}
+
+		if (array_intersect_key($data, array_flip(['groups', 'macros', 'templates', 'templates_clear']))) {
+			$this->updateForce($hosts, $db_hosts);
 		}
 
 		$new_hosts = [];
@@ -1534,7 +1521,7 @@ class CHost extends CHostGeneral {
 	public function delete(array $hostids): array {
 		$this->validateDelete($hostids, $db_hosts);
 
-		self::deleteForce($db_hosts, false);
+		self::deleteForce($db_hosts);
 
 		return ['hostids' => $hostids];
 	}
