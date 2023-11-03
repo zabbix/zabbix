@@ -2727,6 +2727,292 @@ class testDashboardTopHostsWidget extends CWebTest {
 		);
 	}
 
+	public static function getWidgetTimePeriodData() {
+		return [
+			// Widget with default configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'main_fields' => [
+								'Name' => 'Default widget'
+							],
+							'column_fields' => [
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column default'
+								]
+							]
+						]
+					]
+				]
+			],
+			// Widget with "Custom" time period configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'main_fields' => [
+								'Name' => 'Item widget with "Custom" time period'
+							],
+							'column_fields' => [
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column with "Custom" time period',
+									'Aggregation function' => 'min',
+									'Time period' => 'Custom'
+								]
+							]
+						]
+					]
+				]
+			],
+			// Two widgets with "Widget" and "Custom" time period configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'main_fields' => [
+								'Type' => 'Graph (classic)',
+								'Name' => 'Graph widget with "Custom" time period',
+								'Graph' => 'Linux: System load',
+								'Time period' => 'Custom',
+								'id:time_period_from' => 'now-5400',
+								'id:time_period_to' => 'now-1800'
+							]
+						],
+						[
+							'main_fields' => [
+								'Name' => 'Item widget with "Widget" time period'
+							],
+							'column_fields' => [
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column with "Widget" time period',
+									'Aggregation function' => 'max',
+									'Time period' => 'Widget',
+									'Widget' => 'Linux: System load'
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'widgets' => [
+						[
+							'main_fields' => [
+								'Type' => 'Graph (classic)',
+								'Name' => 'Graph widget with "Custom" time period',
+								'Graph' => 'Linux: System load',
+								'Time period' => 'Custom',
+								'id:time_period_from' => 'now-5400',
+								'id:time_period_to' => 'now-1800'
+							]
+						],
+						[
+							'main_fields' => [
+								'Name' => 'Item widget with "Widget" time period'
+							],
+							'column_fields' => [
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column default'
+								],
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column with "Widget" time period',
+									'Aggregation function' => 'avg',
+									'Time period' => 'Widget',
+									'Widget' => 'Linux: System load'
+								],
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column with "Custom" time period',
+									'Aggregation function' => 'count',
+									'Time period' => 'Custom'
+								]
+							]
+						]
+					]
+				]
+			],
+			// Top hosts widget with time period "Dashboard" (enabled zoom filter).
+			[
+				[
+					'widgets' => [
+						[
+							'main_fields' => [
+								'Name' => 'Top hosts widget with "Dashboard" time period'
+							],
+							'column_fields' => [
+								[
+									'Item' => 'Available memory in %',
+									'Name' => 'Column with "Dashboard" time period',
+									'Aggregation function' => 'sum',
+									'Time period' => 'Dashboard'
+								]
+							]
+						]
+					],
+					'zoom_filter' => true
+				]
+			],
+			// Two widgets with time period "Dashboard" and "Custom" time period configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'main_fields' => [
+								'Name' => 'Top hosts widget with "Custom" time period'
+							],
+							'column_fields' => [
+								[
+									'Item' => 'Available memory in %',
+									'Name' => 'Column with "Custom" time period',
+									'Aggregation function' => 'first',
+									'Time period' => 'Custom',
+									'id:time_period_from' => 'now-2y',
+									'id:time_period_to' => 'now-1y'
+								]
+							]
+						],
+						[
+							'main_fields' => [
+								'Type' => 'Action log',
+								'Name' => 'Action log widget with Dashboard time period' // time period default state.
+							]
+						]
+					],
+					'zoom_filter' => true
+				]
+			],
+			[
+				[
+					'widgets' => [
+						[
+							'main_fields' => [
+								'Type' => 'Graph (classic)',
+								'Name' => 'Graph widget with "Custom" time period',
+								'Graph' => 'Linux: System load',
+								'Time period' => 'Custom',
+								'id:time_period_from' => 'now-5400',
+								'id:time_period_to' => 'now-1800'
+							]
+						],
+						[
+							'main_fields' => [
+								'Name' => 'Top hosts widget with "Custom" time period'
+							],
+							'column_fields' => [
+								[
+									'Item' => 'Available memory in %',
+									'Name' => 'Column with "Custom" time period',
+									'Aggregation function' => 'first',
+									'Time period' => 'Custom',
+									'id:time_period_from' => 'now-2y',
+									'id:time_period_to' => 'now-1y'
+								],
+								[
+									'Item' => 'Available memory in %',
+									'Name' => 'Column with "Dashboard" time period',
+									'Aggregation function' => 'last',
+									'Time period' => 'Dashboard'
+								],
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column default'
+								],
+								[
+									'Item' => 'Available memory',
+									'Name' => 'Column with "Widget" time period',
+									'Aggregation function' => 'min',
+									'Time period' => 'Widget',
+									'Widget' => 'Linux: System load'
+								]
+							]
+						]
+					],
+					'zoom_filter' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check that dashboard time period filter appears regarding widget configuration.
+	 *
+	 * @dataProvider getWidgetTimePeriodData
+	 */
+	public function testDashboardTopHostsWidget_TimePeriodFilter($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				CDataHelper::get('TopHostsWidget.dashboardids.Zoom filter check')
+		);
+		$dashboard = CDashboardElement::find()->one();
+
+		foreach ($data['widgets'] as $widget) {
+			$form = $dashboard->edit()->addWidget()->asForm();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
+
+			// Add new column.
+			if (array_key_exists('column_fields', $widget)) {
+				$this->fillColumnForm($widget, 'create');
+			}
+
+			$form->fill($widget['main_fields']);
+			$form->submit();
+			COverlayDialogElement::ensureNotPresent();
+			$this->page->waitUntilReady();
+			$dashboard->save();
+		}
+
+		$dashboard->waitUntilReady();
+		$this->assertMessage('Dashboard updated');
+
+		if (array_key_exists('zoom_filter', $data)) {
+			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
+			$filter = CFilterElement::find()->one();
+			$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
+			$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
+
+			// Check time selector fields layout.
+			$this->assertEquals('now-1h', $this->query('id:from')->one()->getValue());
+			$this->assertEquals('now', $this->query('id:to')->one()->getValue());
+
+			$buttons = [
+				'xpath://button[contains(@class, "btn-time-left")]' => true,
+				'xpath://button[contains(@class, "btn-time-right")]' => false,
+				'button:Zoom out' => true,
+				'button:Apply' => true,
+				'id:from_calendar' => true,
+				'id:to_calendar' => true
+			];
+			foreach ($buttons as $selector => $enabled) {
+				$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+			}
+
+			foreach (['id:from' => 19, 'id:to' => 19] as $input => $value) {
+				$this->assertEquals($value, $this->query($input)->one()->getAttribute('maxlength'));
+			}
+
+			$this->assertEquals(1, $this->query('button:Apply')->all()->filter(CElementFilter::CLICKABLE)->count());
+			$this->assertTrue($filter->isExpanded());
+		}
+		else {
+			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
+		}
+
+		// Clear particular dashboard for next test case.
+		DBexecute('DELETE FROM widget'.
+			' WHERE dashboard_pageid'.
+			' IN (SELECT dashboard_pageid'.
+				' FROM dashboard_page'.
+				' WHERE dashboardid='.CDataHelper::get('TopHostsWidget.dashboardids.Zoom filter check').
+			')'
+		);
+	}
+
 	/**
 	 * Function used to create Top Hosts widget with special columns for CheckTextItems and WidgetAppearance scenarios.
 	 *

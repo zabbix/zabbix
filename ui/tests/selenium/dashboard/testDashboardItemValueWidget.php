@@ -43,6 +43,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	}
 
 	protected static $dashboardid;
+	protected static $dashboard_zoom;
 	protected static $old_name = 'New widget';
 	protected static $threshold_widget = 'Widget with thresholds';
 
@@ -202,9 +203,19 @@ class testDashboardItemValueWidget extends CWebTest {
 						]
 					]
 				]
+			],
+			[
+				'name' => 'Dashboard for zoom filter check',
+				'private' => 0,
+				'pages' => [
+					[
+						'name' => 'Page with widgets'
+					]
+				]
 			]
 		]);
 		self::$dashboardid = $response['dashboardids'][0];
+		self::$dashboard_zoom = $response['dashboardids'][1];
 	}
 
 	/**
@@ -1226,12 +1237,13 @@ class testDashboardItemValueWidget extends CWebTest {
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'thresholds' => [
-						['threshold' => '0.9999'],
-						['color' => 'AABBCC', 'threshold' => '1'],
-						['threshold' => '5K'],
-						['color' => 'FFEB3B', 'threshold' => '1G'],
-						['threshold' => '999999999999999']
-					]
+						['threshold' => ' 0.9999 '],
+						['color' => 'AABBCC', 'threshold' => ' 1 '],
+						['threshold' => ' 5K '],
+						['color' => 'FFEB3B', 'threshold' => ' 1G '],
+						['threshold' => ' 999999999999999 ']
+					],
+					'trim' => true
 				]
 			],
 			[
@@ -1346,7 +1358,32 @@ class testDashboardItemValueWidget extends CWebTest {
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					]
 				]
-			]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => ' Test trailing spaces ',
+						'Advanced configuration' => true,
+						'id:description' => ' {ITEM.NAME} ',
+						'id:desc_size' => ' 1 ',
+						'Decimal places' => ' 1',
+						'id:decimal_size' => ' 1 ',
+						'id:value_size' => ' 1 ',
+						'id:units' => ' s ',
+						'id:units_size' => ' 1 ',
+						'id:time_size' => ' 1 ',
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom',
+						'id:time_period_from' => ' now-2w ',
+						'id:time_period_to' => ' now-1w '
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+					],
+					'trim' => true
+				]
+			],
 		];
 	}
 
@@ -1440,9 +1477,16 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->getThresholdTable()->fill($data['thresholds']);
 		}
 
-		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
+		if ($expected === TEST_GOOD) {
+			$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
+
+		if (array_key_exists('trim', $data)) {
+			$this->trimArray($data);
+		}
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
@@ -1662,7 +1706,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Name' => 'Item Widget with type of information - characters',
 						'Advanced configuration' => true
 					],
-					'selector' => 'id:item-value-thresholds-warning',
+					'selector' => 'id:item-thresholds-warning',
 					'label' => 'Thresholds',
 					'warning_message' => 'This setting applies only to numeric data.'
 				]
@@ -1675,7 +1719,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Name' => 'Item Widget with type of information - text',
 						'Advanced configuration' => true
 					],
-					'selector' => 'id:item-value-thresholds-warning',
+					'selector' => 'id:item-thresholds-warning',
 					'label' => 'Thresholds',
 					'warning_message' => 'This setting applies only to numeric data.'
 				]
@@ -1688,7 +1732,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Name' => 'Item Widget with type of information - log',
 						'Advanced configuration' => true
 					],
-					'selector' => 'id:item-value-thresholds-warning',
+					'selector' => 'id:item-thresholds-warning',
 					'label' => 'Thresholds',
 					'warning_message' => 'This setting applies only to numeric data.'
 				]
@@ -1702,7 +1746,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -1716,7 +1760,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -1730,7 +1774,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -1744,7 +1788,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -1758,7 +1802,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'History data' => 'Trends'
 					],
-					'selector' => 'id:history_warning',
+					'selector' => 'id:item-history-data-warning',
 					'label' => 'History data',
 					'warning_message' => 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
 				]
@@ -1772,7 +1816,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'History data' => 'Trends'
 					],
-					'selector' => 'id:history_warning',
+					'selector' => 'id:item-history-data-warning',
 					'label' => 'History data',
 					'warning_message' => 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
 				]
@@ -1786,7 +1830,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'History data' => 'Trends'
 					],
-					'selector' => 'id:history_warning',
+					'selector' => 'id:item-history-data-warning',
 					'label' => 'History data',
 					'warning_message' => 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
 				]
@@ -1801,7 +1845,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1815,7 +1859,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1829,7 +1873,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1843,7 +1887,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1855,7 +1899,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Name' => 'Item Widget with type of information - Numeric (unsigned)',
 						'Advanced configuration' => true
 					],
-					'selector' => 'id:item-value-thresholds-warning',
+					'selector' => 'id:item-thresholds-warning',
 					'label' => 'Thresholds'
 				]
 			],
@@ -1867,7 +1911,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Name' => 'Item Widget with type of information - Numeric (float)',
 						'Advanced configuration' => true
 					],
-					'selector' => 'id:item-value-thresholds-warning',
+					'selector' => 'id:item-thresholds-warning',
 					'label' => 'Thresholds'
 				]
 			],
@@ -1880,7 +1924,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1893,7 +1937,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1906,7 +1950,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1919,7 +1963,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1932,7 +1976,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1945,7 +1989,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1958,7 +2002,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1971,7 +2015,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item_value_aggregate_warning',
+					'selector' => 'id:item-aggregate-function-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -1984,7 +2028,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'History data' => 'Trends'
 					],
-					'selector' => 'id:history_warning',
+					'selector' => 'id:item-history-data-warning',
 					'label' => 'History data'
 				]
 			],
@@ -1997,7 +2041,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true,
 						'History data' => 'Trends'
 					],
-					'selector' => 'id:history_warning',
+					'selector' => 'id:item-history-data-warning',
 					'label' => 'History data'
 				]
 			]
@@ -2005,11 +2049,11 @@ class testDashboardItemValueWidget extends CWebTest {
 	}
 
 	/**
-	 * Check warning message for threshold, when item type is not numeric.
+	 * Check warning message, when item type is not numeric.
 	 *
 	 * @dataProvider getWarningMessageData
 	 */
-	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
+	public function testDashboardItemValueWidget_WarningMessage($data) {
 		$info = 'class:zi-i-warning';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -2020,14 +2064,13 @@ class testDashboardItemValueWidget extends CWebTest {
 		if ($data['numeric'] === true || array_key_exists('any_type_of_information', $data)) {
 			// Check that warning item is not displayed.
 			$form->query($data['selector'])->one()->waitUntilNotVisible();
-			$this->assertFalse($form->query($data['selector'])->one()->isVisible());
 
 			// Check that info icon is not displayed.
 			$this->assertFalse($form->getLabel($data['label'])->query($info)->one()->isVisible());
 		}
 		else {
 			// Check that warning item is displayed.
-			$this->assertTrue($form->query($data['selector'])->one()->isVisible());
+			$form->query($data['selector'])->one()->waitUntilVisible();
 
 			// Check that info icon is displayed.
 			$this->assertTrue($form->getLabel($data['label'])->query($info)->one()->isVisible());
@@ -2081,5 +2124,216 @@ class testDashboardItemValueWidget extends CWebTest {
 			);
 			$index++;
 		}
+	}
+
+	public static function getWidgetTimePeriodData() {
+		return [
+			// Widget with default configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'Item' => 'Available memory',
+							'Name' => 'Default widget'
+						]
+					]
+				]
+			],
+			// Widget with "Custom" time period configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'Item' => 'Available memory',
+							'Name' => 'Item widget with "Custom" time period',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom'
+						]
+					]
+				]
+			],
+			// Two widgets with "Widget" and "Custom" time period configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'Type' => 'Graph (classic)',
+							'Name' => 'Graph widget with "Custom" time period',
+							'Graph' => 'Linux: System load',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-5400',
+							'id:time_period_to' => 'now-1800'
+						],
+						[
+							'Item' => 'Available memory',
+							'Name' => 'Item widget with "Widget" time period',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'max',
+							'Time period' => 'Widget',
+							'Widget' => 'Linux: System load'
+						]
+					]
+				]
+			],
+			// Item value widget with time period "Dashboard" (enabled zoom filter).
+			[
+				[
+					'widgets' => [
+						[
+							'Item' => 'Available memory in %',
+							'Name' => 'Item value widget with "Dashboard" time period',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'avg',
+							'Time period' => 'Dashboard'
+						]
+					],
+					'zoom_filter' => true
+				]
+			],
+			// Two widgets with time period "Dashboard" and "Custom" time period configuration.
+			[
+				[
+					'widgets' => [
+						[
+							'Item' => 'Available memory in %',
+							'Name' => 'Item value widget with "Custom" time period',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2y',
+							'id:time_period_to' => 'now-1y'
+						],
+						[
+							'Type' => 'Action log',
+							'Name' => 'Action log widget with Dashboard time period' // time period default state.
+						]
+					],
+					'zoom_filter' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check that dashboard time period filter appears regarding widget configuration.
+	 *
+	 * @dataProvider getWidgetTimePeriodData
+	 */
+	public function testDashboardItemValueWidget_TimePeriodFilter($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_zoom)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+
+		foreach ($data['widgets'] as $widgets) {
+			$form = $dashboard->edit()->addWidget()->asForm();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
+			$form->fill($widgets);
+			$form->submit();
+
+			COverlayDialogElement::ensureNotPresent();
+			$this->page->waitUntilReady();
+			$dashboard->save();
+		}
+
+		$dashboard->waitUntilReady();
+		$this->assertMessage('Dashboard updated');
+
+		if (array_key_exists('zoom_filter', $data)) {
+			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
+			$filter = CFilterElement::find()->one();
+			$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
+			$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
+
+			// Check time selector fields layout.
+			$this->assertEquals('now-1h', $this->query('id:from')->one()->getValue());
+			$this->assertEquals('now', $this->query('id:to')->one()->getValue());
+
+			$buttons = [
+				'xpath://button[contains(@class, "btn-time-left")]' => true,
+				'xpath://button[contains(@class, "btn-time-right")]' => false,
+				'button:Zoom out' => true,
+				'button:Apply' => true,
+				'id:from_calendar' => true,
+				'id:to_calendar' => true
+			];
+			foreach ($buttons as $selector => $enabled) {
+				$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+			}
+
+			foreach (['id:from' => 19, 'id:to' => 19] as $input => $value) {
+				$this->assertEquals($value, $this->query($input)->one()->getAttribute('maxlength'));
+			}
+
+			$this->assertEquals(1, $this->query('button:Apply')->all()->filter(CElementFilter::CLICKABLE)->count());
+			$this->assertTrue($filter->isExpanded());
+		}
+		else {
+			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
+		}
+
+		// Clear particular dashboard for next test case.
+		DBexecute('DELETE FROM widget'.
+			' WHERE dashboard_pageid'.
+			' IN (SELECT dashboard_pageid'.
+				' FROM dashboard_page'.
+				' WHERE dashboardid='.self::$dashboard_zoom.
+			')'
+		);
+	}
+
+	public function testDashboardItemValueWidget_TimePeriodIcon() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_zoom)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+
+		$data = [
+			'Item' => 'Available memory in %',
+			'Name' => 'Item value widget with "Custom" time period',
+			'Advanced configuration' => true,
+			'Aggregation function' => 'min',
+			'Time period' => 'Custom'
+		];
+
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
+		$form->fill($data);
+		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
+		$dashboard->waitUntilReady();
+
+		// Check that time period icon is displayed.
+		$time_icon = 'xpath://button[@class="btn-icon zi-time-period"]';
+		$this->assertTrue($dashboard->query($time_icon)->one()->isVisible());
+
+		// Check hint-box.
+		$dashboard->query($time_icon)->one()->click();
+		$hint = $dashboard->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+		$this->assertEquals('Last 1 hour', $hint->getText());
+
+		// Close the hint-box.
+		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
+
+		$dashboard->edit()->getWidget('Item value widget with "Custom" time period')->edit();
+		$form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used']);
+		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
+		$dashboard->waitUntilReady();
+		$this->assertFalse($dashboard->query($time_icon)->one(false)->isValid());
+	}
+
+	/**
+	 * Recursive function for trimming all values in multi-level array.
+	 *
+	 * @param array    $array    array to be trimmed
+	 */
+	protected function trimArray(&$array) {
+		foreach ($array as &$value) {
+			if (!is_array($value)) {
+				$value = trim($value);
+			}
+			else {
+				$this->trimArray($value);
+			}
+		}
+		unset($value);
 	}
 }
