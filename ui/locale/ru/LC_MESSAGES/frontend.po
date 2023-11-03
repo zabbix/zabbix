@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-10-19 11:28+0000\n"
+"PO-Revision-Date: 2023-11-03 13:36+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -679,12 +679,11 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "Класс действия %1$s должен расширять %2$s класс."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Действие удалено"
-msgstr[1] "Действие удалено"
-msgstr[2] "Действие удалено"
+msgstr[1] "Действия удалены"
+msgstr[2] "Действия удалены"
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -1633,7 +1632,7 @@ msgstr "Как минимум один параметр должен быть в
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Должен быть включкен как минимум один параметр."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"

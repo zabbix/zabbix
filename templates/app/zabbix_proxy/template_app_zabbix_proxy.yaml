@@ -604,6 +604,62 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
+        - uuid: e60cdba498a94c19955696f40d5e1b32
+          name: 'Zabbix proxy: Proxy memory buffer, % used'
+          type: INTERNAL
+          key: 'zabbix[proxy_buffer,buffer,pused]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            Statistics and availability of Zabbix proxy memory buffer usage statistics. Percentage of used proxy memory buffer.
+            Proxy memory buffer is used to store the new historical data and upload from it without accessing database.
+          tags:
+            - tag: component
+              value: system
+          triggers:
+            - uuid: 9b6cb370c00f4ebda91cdf247adc4780
+              expression: 'max(/Zabbix proxy health/zabbix[proxy_buffer,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}'
+              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the proxy memory buffer'
+              priority: AVERAGE
+              description: 'Consider increasing ProxyMemoryBufferSize in the zabbix_proxy.conf configuration file.'
+              tags:
+                - tag: scope
+                  value: capacity
+                - tag: scope
+                  value: performance
+        - uuid: 1f5fbc277a574ce7a418439695f124ca
+          name: 'Zabbix proxy: Proxy buffer, state changes'
+          type: INTERNAL
+          key: 'zabbix[proxy_buffer,state,changes]'
+          history: 7d
+          description: 'The number of state changes between disk/memory buffer modes since proxy start.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: system
+        - uuid: c970e56eda504a4d89b051439dda9787
+          name: 'Zabbix proxy: Proxy buffer, state'
+          type: INTERNAL
+          key: 'zabbix[proxy_buffer,state,current]'
+          history: 7d
+          description: |
+            The current working state of proxy buffer where the new data is being stored. Possible values:
+            
+            0 - disk (also returned when memory buffer is disabled);
+            1 - memory.
+          valuemap:
+            name: 'Proxy buffer mode'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: system
         - uuid: 3b66d42ec1fa4dc7a41750aacf6e68f3
           name: 'Zabbix proxy: Values waiting to be sent'
           type: INTERNAL
@@ -972,6 +1028,14 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAD
+      valuemaps:
+        - uuid: 10388a0c06864ac483377f4ad3a91854
+          name: 'Proxy buffer mode'
+          mappings:
+            - value: '0'
+              newvalue: Disk
+            - value: '1'
+              newvalue: Memory
   graphs:
     - uuid: 40b649050cb8420888abcae129eafe27
       name: 'Zabbix proxy: Zabbix cache usage, % used'
@@ -997,6 +1061,11 @@ zabbix_export:
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[vmware,buffer,pused]'
+        - sortorder: '4'
+          color: '274482'
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[proxy_buffer,buffer,pused]'
     - uuid: 7635642bf94249e39d420a6eba1f6649
       name: 'Zabbix proxy: Zabbix data gathering process busy %'
       ymin_type_1: FIXED
