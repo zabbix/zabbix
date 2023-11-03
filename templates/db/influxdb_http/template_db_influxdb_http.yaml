@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:25:17Z'
+  date: '2023-11-01T20:48:32Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -795,9 +795,6 @@ zabbix_export:
                       value:
                         host: 'InfluxDB by HTTP'
                         name: 'InfluxDB: [{#ORG_NAME}]: Query requests'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'InfluxDB: Query traffic'
                   x: '12'
@@ -812,9 +809,6 @@ zabbix_export:
                       value:
                         host: 'InfluxDB by HTTP'
                         name: 'InfluxDB: [{#ORG_NAME}]: Query traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: d1b4478bdfc44c6db79a4a262f605d92
           name: 'InfluxDB healthcheck'

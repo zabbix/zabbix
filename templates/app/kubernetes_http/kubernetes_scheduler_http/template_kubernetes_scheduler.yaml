@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:14:43Z'
+  date: '2023-11-01T20:45:19Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -957,9 +957,6 @@ zabbix_export:
                       value:
                         host: 'Kubernetes Scheduler by HTTP'
                         name: 'Kubernetes Scheduler: [{#SINGLETON}]Binding latency'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -973,9 +970,6 @@ zabbix_export:
                       value:
                         host: 'Kubernetes Scheduler by HTTP'
                         name: 'Kubernetes Scheduler: ["{#RESULT}"] E2e latency'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -989,9 +983,6 @@ zabbix_export:
                       value:
                         host: 'Kubernetes Scheduler by HTTP'
                         name: 'Kubernetes Scheduler: [{#SINGLETON}]Scheduling algorithm duration'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
   graphs:
     - uuid: dd98f209541449f4a476718c46a0e721
       name: 'Kubernetes Scheduler: Memory usage'

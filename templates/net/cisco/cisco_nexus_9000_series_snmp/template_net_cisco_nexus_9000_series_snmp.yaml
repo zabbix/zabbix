@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:34:07Z'
+  date: '2023-11-01T20:51:12Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1499,9 +1499,6 @@ zabbix_export:
                       value:
                         host: 'Cisco Nexus 9000 Series by SNMP'
                         name: '#{#SNMPINDEX}: CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1515,9 +1512,6 @@ zabbix_export:
                       value:
                         host: 'Cisco Nexus 9000 Series by SNMP'
                         name: '{#SNMPVALUE}: Memory utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -1531,9 +1525,6 @@ zabbix_export:
                       value:
                         host: 'Cisco Nexus 9000 Series by SNMP'
                         name: '{#SNMPVALUE}: Temperature'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Network traffic'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1548,9 +1539,6 @@ zabbix_export:
                       value:
                         host: 'Cisco Nexus 9000 Series by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: aadba98c69b14fbab88e7c37cab158c6
           name: 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanTrayOperStatus'

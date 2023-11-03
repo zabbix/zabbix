@@ -1126,6 +1126,10 @@ form {
 		button {
 			margin: 0;
 		}
+
+		table {
+			width: auto;
+		}
 	}
 
 	button {
@@ -5417,7 +5421,7 @@ svg {
 	}
 }
 
-.icon-invisible {
+a.icon-invisible {
 	&:link,
 	&:hover,
 	&:focus {

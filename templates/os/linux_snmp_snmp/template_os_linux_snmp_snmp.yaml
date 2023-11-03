@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:57:54Z'
+  date: '2023-11-01T20:58:36Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1757,9 +1757,6 @@ zabbix_export:
                       value:
                         host: 'Linux by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: 59f09fada3ab43d1bdb70091f92e77f1
           name: 'System performance'
           pages:
@@ -1796,9 +1793,6 @@ zabbix_export:
                       value:
                         host: 'Linux by SNMP'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -1812,9 +1806,6 @@ zabbix_export:
                       value:
                         host: 'Linux by SNMP'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -1828,9 +1819,6 @@ zabbix_export:
                       value:
                         host: 'Linux by SNMP'
                         key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: INTEGER
                       name: source_type
                       value: '3'
@@ -1847,9 +1835,6 @@ zabbix_export:
                       value:
                         host: 'Linux by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -1863,9 +1848,6 @@ zabbix_export:
                       value:
                         host: 'Linux by SNMP'
                         name: 'Linux: CPU usage{#SINGLETON}'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'
