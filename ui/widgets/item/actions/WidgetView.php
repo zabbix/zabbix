@@ -203,7 +203,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		$show = array_flip($this->fields_values['show']);
-		$show_change_indicator = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show);
+
+		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
+			$item['widget_description'] = $this->fields_values['description'];
+
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				[$item] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item]);
+			}
+
+			$elements['description'] = $item['widget_description'];
+		}
 
 		if ($data_last === null) {
 			$elements['value_type'] = ITEM_VALUE_TYPE_TEXT;
@@ -217,16 +226,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (array_key_exists(Widget::SHOW_TIME, $show)) {
 			$elements['time'] = date(DATE_TIME_FORMAT_SECONDS, (int) $data_last['clock']);
-		}
-
-		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
-			$item['widget_description'] = $this->fields_values['description'];
-
-			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-				[$item] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item]);
-			}
-
-			$elements['description'] = $item['widget_description'];
 		}
 
 		switch ($item['value_type']) {
@@ -261,7 +260,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 				}
 
-				if ($show_change_indicator && $data_prev !== null) {
+				if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data_prev !== null) {
 					if ($formatted_value['is_mapped']) {
 						if ($data_last['value'] != $data_prev['value']) {
 							$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP_DOWN;
@@ -284,7 +283,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					? italic(_('binary value'))
 					: formatHistoryValue($data_last['value'], $item, false);
 
-				if ($show_change_indicator && $data_prev !== null
+				if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data_prev !== null
 						&& $data_last['value'] !== $data_prev['value']) {
 					$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP_DOWN;
 				}
