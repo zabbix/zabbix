@@ -105,7 +105,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 		case ZBX_TCP_SEC_TLS_PSK:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent"
 					" but support for TLS was not compiled into %s.",
-					get_program_type_string(poller_get_program_type()())));
+					get_program_type_string(program_type)));
 			ret = CONFIG_ERROR;
 			goto out;
 #endif
