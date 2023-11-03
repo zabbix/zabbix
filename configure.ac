@@ -1385,27 +1385,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
 
-	dnl Check for LIBXML2 [by default - skip]
-	LIBXML2_CHECK_CONFIG([no])
-	if test "x$want_libxml2" = "xyes"; then
-		if test "x$found_libxml2" != "xyes"; then
-			AC_MSG_ERROR([LIBXML2 library not found])
-		else
-			have_libxml2="yes"
-		fi
-	fi
-
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
-	
-	AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBXML2_LDFLAGS"
-	AGENT_LIBS="$AGENT_LIBS $LIBXML2_LIBS"
-
-	AC_SUBST(LIBXML2_CFLAGS)
-
 	dnl Checking for unixODBC support
 	LIBUNIXODBC_CHECK_CONFIG([no])
 	if test "x$want_unixodbc" = "xyes"; then
@@ -1515,6 +1494,29 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	if test "x$found_libpthread" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpthread (libpthread check failed)])
 	fi
+fi
+
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
+	dnl Check for LIBXML2 [by default - skip]
+	LIBXML2_CHECK_CONFIG([no])
+	if test "x$want_libxml2" = "xyes"; then
+		if test "x$found_libxml2" != "xyes"; then
+			AC_MSG_ERROR([LIBXML2 library not found])
+		else
+			have_libxml2="yes"
+		fi
+	fi
+
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
+
+	AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBXML2_LDFLAGS"
+	AGENT_LIBS="$AGENT_LIBS $LIBXML2_LIBS"
+
+	AC_SUBST(LIBXML2_CFLAGS)
 fi
 
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
