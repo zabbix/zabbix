@@ -193,7 +193,10 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 	{
 		if (NULL != buffer)
+		{
+			zbx_http_convert_to_utf8(easyhandle, &page.data, &page.offset, &page.allocated);
 			*buffer = page.data;
+		}
 
 		ret = SYSINFO_RET_OK;
 	}
