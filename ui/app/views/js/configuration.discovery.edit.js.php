@@ -287,7 +287,7 @@ window.drule_edit_popup = new class {
 
 				if (typeof checked_source.dataset.id !== 'undefined') {
 					if (checked_source.dataset.id === input.dcheckid) {
-						input[field] = '<?= ZBX_DISCOVERY_VALUE ?>';
+						input[field] = <?= ZBX_DISCOVERY_VALUE ?>;
 					}
 					else {
 						input[field] = default_value;
@@ -298,8 +298,8 @@ window.drule_edit_popup = new class {
 				}
 			};
 
-			setInputSource('host_source', '<?= ZBX_DISCOVERY_DNS ?>');
-			setInputSource('name_source', '<?= ZBX_DISCOVERY_UNSPEC ?>');
+			setInputSource('host_source', <?= ZBX_DISCOVERY_DNS ?>);
+			setInputSource('name_source', <?= ZBX_DISCOVERY_UNSPEC ?>);
 
 			delete input.uniqueness_criteria;
 		}
