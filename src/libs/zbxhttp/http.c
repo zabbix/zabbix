@@ -422,9 +422,6 @@ static char	*get_media_parameter(const char *str, const char *key, size_t key_le
 			}
 			else
 				charset = zbx_strdup(NULL, ptr);
-
-			zbx_lrtrim(charset, " ");
-			zbx_strupper(charset);
 			break;
 		}
 
@@ -453,7 +450,7 @@ static char	*get_media_type_charset(const char *str, char *data)
 
 			if (FAIL == zbx_html_get_charset_content(data, &charset, &content, &errmsg))
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "cannot parse html:%s", errmsg);
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot parse html:%s", errmsg);
 				zbx_free(errmsg);
 			}
 
@@ -509,6 +506,8 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_
 		}
 		zbx_free(charset);
 	}
+
+	zbx_replace_invalid_utf8(*data);
 }
 
 #endif

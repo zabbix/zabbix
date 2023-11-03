@@ -872,9 +872,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 			{
-				zabbix_increase_log_level();
 				zbx_http_convert_to_utf8(easyhandle, &page.data, &page.offset, &page.allocated);
-				zabbix_decrease_log_level();
 				break;
 			}
 

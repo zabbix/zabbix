@@ -374,18 +374,17 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
+	zbx_replace_invalid_utf8(header.data);
+
+	if (NULL != body.data)
+		zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
+
 	switch (item->retrieve_mode)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
 			if (NULL == body.data)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty content"));
-				goto clean;
-			}
-
-			if (FAIL == zbx_is_utf8(body.data))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
 				goto clean;
 			}
 
@@ -401,12 +400,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_HEADERS:
-			if (FAIL == zbx_is_utf8(header.data))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
-				goto clean;
-			}
-
 			if (HTTP_STORE_JSON == item->output_format)
 			{
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -427,12 +420,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_BOTH:
-			if (FAIL == zbx_is_utf8(header.data) || (NULL != body.data && FAIL == zbx_is_utf8(body.data)))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
-				goto clean;
-			}
-
 			if (HTTP_STORE_JSON == item->output_format)
 			{
 				http_output_json(item->retrieve_mode, &buffer, &header, &body);
