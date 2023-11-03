@@ -690,7 +690,7 @@ class CSVGHoneycomb {
 				.append('svg:foreignObject')
 				.attr('class', `${CSVGHoneycomb.ZBX_STYLE_LABEL} ${CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY}`)
 				.attr('x', -available_cell_width / 2)
-				.style('width', `${available_cell_width}px`)
+				.attr('width', `${available_cell_width}px`)
 				.style('color', `#${this.#config.primary_label.color}`)
 				.style('font-weight', this.#config.primary_label.is_bold ? 'bold' : '')
 				.style('display', 'block');
@@ -710,7 +710,7 @@ class CSVGHoneycomb {
 				.append('svg:foreignObject')
 				.attr('class', `${CSVGHoneycomb.ZBX_STYLE_LABEL} ${CSVGHoneycomb.ZBX_STYLE_LABEL_SECONDARY}`)
 				.attr('x', -available_cell_width / 2)
-				.style('width', `${available_cell_width}px`)
+				.attr('width', `${available_cell_width}px`)
 				.style('color', `#${this.#config.secondary_label.color}`)
 				.style('font-weight', this.#config.secondary_label.is_bold ? 'bold' : '')
 				.style('display', 'block');
@@ -795,7 +795,7 @@ class CSVGHoneycomb {
 
 			primary
 				.attr('y', label_primary_position_y)
-				.style('height', `${this.#label_primary_font_size * this.#label_primary_line_count}px`)
+				.attr('height', `${this.#label_primary_font_size * this.#label_primary_line_count}px`)
 				.style('font-size', `${this.#label_primary_font_size}px`)
 				.style('line-height', `${this.#label_primary_font_size}px`);
 		}
@@ -827,7 +827,7 @@ class CSVGHoneycomb {
 
 			secondary
 				.attr('y', label_secondary_position_y)
-				.style('height', `${this.#label_secondary_font_size * this.#label_secondary_line_count}px`)
+				.attr('height', `${this.#label_secondary_font_size * this.#label_secondary_line_count}px`)
 				.style('font-size', `${this.#label_secondary_font_size}px`)
 				.style('line-height', `${this.#label_secondary_font_size}px`);
 		}
