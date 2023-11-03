@@ -218,7 +218,8 @@ class CMacrosResolverGeneral {
 	 *
 	 * @param array  $texts
 	 * @param array  $types
-	 * @param bool   $types['usermacros']                         Extract user macros. For example, "{$MACRO}".
+	 * @param bool   $types['usermacros']                         Extract user macros.
+	 *                                                              For example, "{$MACRO}", "{{$MACRO}.func(param)}".
 	 * @param array  $types['macros'][][<macro_patterns>]         Extract macros with optional macro function.
 	 *                                                              For example, "{HOST.HOST}",
 	 *                                                                "{{ITEM.VALUE}.func(param)}".
@@ -231,17 +232,19 @@ class CMacrosResolverGeneral {
 	 *                                                                {{EVENT.TAGS.Service}.func(param)}"
 	 * @param bool   $types['references']                         Extract dollar-sign references. For example, "$5".
 	 * @param bool   $types['lldmacros']                          Extract low-level discovery macros.
-	 *                                                              For example, "{#LLD.MACRO}".
+	 *                                                              For example, "{#LLD}", {{#LLD}.func(param)}.
 	 * @param bool   $types['functionids']                        Extract numeric macros. For example, "{12345}".
 	 * @param bool   $types['expr_macros']                        Extract expression macros.
-	 *                                                              For example, "{?func(/host/key, param)}".
+	 *                                                              For example, "{?func(/host/key, param)}",
+	 *                                                                "{{?func(/host/key, param)}.func(param)}"
 	 * @param bool   $types['expr_macros_host']                   Extract expression macros with the ability to
 	 *                                                              specify a {HOST.HOST} macro or an empty host name
 	 *                                                              instead of a hostname.
 	 *                                                              For example,
 	 *                                                                "{?func(/host/key, param)}",
 	 *                                                                "{?func(/{HOST.HOST}/key, param)}",
-	 *                                                                "{?func(//key, param)}".
+	 *                                                                "{?func(//key, param)}",
+	 *                                                                "{{?func(/host/key, param)}.func(param)}".
 	 * @param bool   $types['expr_macros_host_n']                 Extract expression macros with the ability to
 	 *                                                              specify a {HOST.HOST<1-9>} macro or an empty host
 	 *                                                              name instead of a hostname.
@@ -249,7 +252,8 @@ class CMacrosResolverGeneral {
 	 *                                                                "{?func(/host/key, param)}",
 	 *                                                                "{?func(/{HOST.HOST}/key, param)}",
 	 *                                                                "{?func(/{HOST.HOST5}/key, param)}",
-	 *                                                                "{?func(//key, param)}".
+	 *                                                                "{?func(//key, param)}",
+	 *                                                                "{{?func(/host/key, param)}.func(param)}".
 	 *
 	 * @return array
 	 */

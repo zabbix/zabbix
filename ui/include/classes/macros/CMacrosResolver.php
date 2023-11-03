@@ -41,7 +41,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	];
 
 	/**
-	 * Resolve macros.
+	 * Resolve macros with or without macro functions.
 	 *
 	 * Macros examples:
 	 * user: {$MACRO1}, {$MACRO2}, ...
