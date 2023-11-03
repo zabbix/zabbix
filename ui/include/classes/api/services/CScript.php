@@ -855,7 +855,7 @@ class CScript extends CApiService {
 					$common_fields['manualinput_validator'] = ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')];
 				}
 			}
-			elseif ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_DISABLED) {
+			else {
 				unset($common_fields['manualinput_prompt'], $common_fields['manualinput_validator_type'],
 					$common_fields['manualinput_validator'], $common_fields['manualinput_default_value']
 				);
