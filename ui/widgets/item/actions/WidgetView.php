@@ -401,41 +401,36 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			return $this->getInput('name', $this->widget->getDefaultName());
 		}
-		else {
-			if ($this->getInput('name', '') !== '') {
-				$name = $this->getInput('name');
+
+		if ($this->getInput('name', '') !== '') {
+			return $this->getInput('name');
+		}
+
+		$name = $item !== null ? $item['name'] : $this->widget->getDefaultName();
+
+		if (!$this->isTemplateDashboard()) {
+			if ($this->fields_values['override_hostid']) {
+				$hosts = API::Host()->get([
+					'output' => ['name'],
+					'hostids' => $this->fields_values['override_hostid']
+				]);
 			}
 			elseif ($item !== null) {
-				$name = $item['name'];
+				$hosts = API::Host()->get([
+					'output' => ['name'],
+					'itemids' => $item['itemid']
+				]);
 			}
 			else {
-				$name = $this->widget->getDefaultName();
+				$hosts = [];
 			}
 
-			if (!$this->isTemplateDashboard()) {
-				if ($this->fields_values['override_hostid']) {
-					$hosts = API::Host()->get([
-						'output' => ['name'],
-						'hostids' => $this->fields_values['override_hostid']
-					]);
-				}
-				elseif ($item !== null) {
-					$hosts = API::Host()->get([
-						'output' => ['name'],
-						'itemids' => $item['itemid']
-					]);
-				}
-				else {
-					$hosts = [];
-				}
-
-				if ($hosts) {
-					$name = $hosts[0]['name'].NAME_DELIMITER.$name;
-				}
+			if ($hosts) {
+				$name = $hosts[0]['name'].NAME_DELIMITER.$name;
 			}
-
-			return $name;
 		}
+
+		return $name;
 	}
 
 	/**
