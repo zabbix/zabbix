@@ -822,6 +822,10 @@ class CHost extends CHostGeneral {
 		foreach ($hosts as $host) {
 			$host = array_diff_key($host, array_flip(['groups', 'tags', 'macros', 'templates', 'templates_clear']));
 
+			if (!array_diff_key($host, array_flip(['hostid']))) {
+				continue;
+			}
+
 			// Extend host inventory with the required data.
 			if (array_key_exists('inventory', $host) && $host['inventory']) {
 				// If inventory mode is HOST_INVENTORY_DISABLED, database record is not created.
