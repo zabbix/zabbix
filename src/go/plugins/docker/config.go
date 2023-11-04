@@ -60,7 +60,7 @@ func (p *Plugin) Validate(options interface{}) error {
 	}
 
 	endpointParts := strings.SplitN(opts.Endpoint, "://", 2)
-	if len(endpointParts) == 1 || endpointParts[0] != "unix" {
+	if len(endpointParts) == 1 || (endpointParts[0] != "unix" && endpointParts[0] != "tcp") {
 		return errors.New("invalid endpoint format")
 	}
 
