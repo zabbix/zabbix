@@ -66,7 +66,7 @@ func newClient(endpoint string, timeout int) *client {
 			},
 		}
 		connectionType = TCP
-		tcpEndpoint = endpoint
+		tcpEndpoint = tcpAddress
 	}
 
 	client := client{
