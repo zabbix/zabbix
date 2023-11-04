@@ -32,12 +32,23 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
+type connectionType int
+
+const (
+	UnixSocket connectionType = iota
+	TCP
+)
+
 type client struct {
-	client http.Client
+	client         http.Client
+	connectionType connectionType
+	tcpEndpoint    string
 }
 
 func newClient(endpoint string, timeout int) *client {
 	var transport http.RoundTripper
+	var connectionType connectionType
+	var tcpEndpoint string
 
 	if strings.HasPrefix(endpoint, "unix://") {
 		socketPath := strings.TrimPrefix(endpoint, "unix://")
@@ -46,6 +57,7 @@ func newClient(endpoint string, timeout int) *client {
 				return net.Dial("unix", socketPath)
 			},
 		}
+		connectionType = UnixSocket
 	} else if strings.HasPrefix(endpoint, "tcp://") {
 		tcpAddress := strings.TrimPrefix(endpoint, "tcp://")
 		transport = &http.Transport{
@@ -53,19 +65,32 @@ func newClient(endpoint string, timeout int) *client {
 				return net.Dial("tcp", tcpAddress)
 			},
 		}
+		connectionType = TCP
+		tcpEndpoint = endpoint
 	}
 
-	client := client{}
-	client.client = http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(timeout) * time.Second,
+	client := client{
+		client: http.Client{
+			Transport: transport,
+			Timeout:   time.Duration(timeout) * time.Second,
+		},
+		connectionType: connectionType,
+		tcpEndpoint:    tcpEndpoint,
 	}
 
 	return &client
 }
 
 func (cli *client) Query(queryPath string) ([]byte, error) {
-	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
+	var resp *http.Response
+	var err error
+
+	if cli.connectionType == UnixSocket {
+		resp, err = cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
+	} else if cli.connectionType == TCP {
+		resp, err = cli.client.Get("http://" + cli.tcpEndpoint + path.Join(dockerVersion, queryPath))
+	}
+
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
