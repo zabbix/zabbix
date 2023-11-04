@@ -210,12 +210,13 @@ class CRelativeTimeParser extends CParser {
 	/**
 	 * Get DateTime object with its value set to either start or end of the period derived from the date/time specified.
 	 *
-	 * @param                   $is_start
+	 * @param bool              $is_start
 	 * @param DateTimeZone|null $timezone
+	 * @param int|null          $timestamp
 	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime($is_start, DateTimeZone $timezone = null, ?int $timestamp = null): ?DateTime {
+	public function getDateTime(bool $is_start, DateTimeZone $timezone = null, ?int $timestamp = null): ?DateTime {
 		if ($this->match === '') {
 			return null;
 		}
