@@ -88,7 +88,7 @@ func (cli *client) Query(queryPath string) ([]byte, error) {
 	if cli.connectionType == UnixSocket {
 		resp, err = cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
 	} else if cli.connectionType == TCP {
-		resp, err = cli.client.Get("http://" + cli.tcpEndpoint + path.Join(dockerVersion, queryPath))
+		resp, err = cli.client.Get("http://" + path.Join(cli.tcpEndpoint, queryPath))
 	}
 
 	if err != nil {
