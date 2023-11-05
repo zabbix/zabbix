@@ -32,22 +32,20 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-type connectionType int
-
 const (
-	UnixSocket connectionType = iota
-	TCP
+	UnixSocket = 0
+	TCP        = 1
 )
 
 type client struct {
 	client         http.Client
-	connectionType connectionType
+	connectionType int
 	tcpEndpoint    string
 }
 
 func newClient(endpoint string, timeout int) *client {
 	var transport http.RoundTripper
-	var connectionType connectionType
+	var connectionType int
 	var tcpEndpoint string
 
 	if strings.HasPrefix(endpoint, "unix://") {
