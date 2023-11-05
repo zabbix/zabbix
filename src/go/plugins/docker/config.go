@@ -45,8 +45,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.options.Timeout = global.Timeout
 	}
 
-	socketPath := strings.Split(p.options.Endpoint, "://")[1]
-	p.client = newClient(socketPath, p.options.Timeout)
+	p.client = newClient(p.options.Endpoint, p.options.Timeout)
 }
 
 // Validate implements the Configurator interface.
