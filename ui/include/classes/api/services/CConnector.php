@@ -202,15 +202,15 @@ class CConnector extends CApiService {
 			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]), 'default' => DB::getDefault('connector', 'data_type')],
 			'url' =>				['type' => API_URL, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'item_value_type' => 	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type')],
-										['else' => true, 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type'), 'default' => DB::getDefault('connector', 'item_value_type')]
+										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR | ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG | ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 | ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT)],
+										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('connector', 'item_value_type')]
 			]],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5', 'default' => DB::getDefault('connector', 'max_attempts')],
 			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY , 'in' => '1:10'],
-										['else' => true, 'type' => API_TIME_UNIT, 'in' => '1:10', 'default' => DB::getDefault('connector', 'attempt_interval')]
+										['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('connector', 'attempt_interval')]
 			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
@@ -367,15 +367,15 @@ class CConnector extends CApiService {
 			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS])],
 			'url' =>				['type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'item_value_type' => 	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type')],
-										['else' => true, 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type')]
+										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR | ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG | ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 | ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT)],
+										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('connector', 'item_value_type')]
 			]],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5'],
 			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:10'],
-										['else' => true, 'type' => API_TIME_UNIT, 'in' => '1:10']
+										['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('connector', 'attempt_interval')]
 			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
