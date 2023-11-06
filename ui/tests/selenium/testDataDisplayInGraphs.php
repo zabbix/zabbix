@@ -2244,7 +2244,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		$screenshot_id = 'latest_data_'.$data['type'];
 		$this->assertScreenshot($this->query('class:center')->one(), $screenshot_id);
 
-		$this->checkKioskMode('class:center', $screenshot_id);
+		$this->checkKioskMode('class:center', $screenshot_id, $old_source);
 	}
 
 	public function getDashboardWidgetData() {
@@ -2318,7 +2318,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
 		$this->assertScreenshot($dashboard, $screenshot_id);
 
-		$this->checkKioskMode('class:dashboard-grid', $screenshot_id, $content_locator);
+		$this->checkKioskMode('class:dashboard-grid', $screenshot_id);
 	}
 
 	/**
@@ -2326,20 +2326,20 @@ class testDataDisplayInGraphs extends CWebTest {
 	 *
 	 * @param string	$object_locator		locator of element with graphs
 	 * @param string	$id					ID of the screenshot
-	 * @param string	$content_locator	locator of graph content - applicable only for dashboard widgets
+	 * @param string	$old_source			value of the src attribute - applicable only for latest data
 	 */
-	protected function checkKioskMode($object_locator, $id, $content_locator = false) {
+	protected function checkKioskMode($object_locator, $id, $old_source = null) {
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		$object = $this->query($object_locator)->waitUntilPresent()->one();
 
-		// Wait for the object with the graphs to be present.
+		// Wait for the dashboard to load widgets in kiosk mode or wait for latest data graph to change its source.
 		if ($object_locator === 'class:dashboard-grid') {
 			$object->asDashboard()->waitUntilReady();
 		}
 		else {
-			$this->query('id:historyGraph')->waitUntilAttributesPresent('src');
+			$object->query('tag:img')->one()->waitUntilAttributesNotPresent(['src' => $old_source]);
 		}
 
 		$this->assertScreenshot($object, $id.'_kiosk');
