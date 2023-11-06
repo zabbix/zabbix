@@ -30,9 +30,9 @@ define('CURRENT_YEAR', date("Y"));
  */
 class testPageHostDashboards extends CWebTest {
 
-	protected const HOST_NAME = 'Host for Host Dashboards';
-	protected const TEMPLATE_NAME = 'Template for '.self::HOST_NAME;
-	protected const COUNT_MANY = 20;
+	const HOST_NAME = 'Host for Host Dashboards';
+	const TEMPLATE_NAME = 'Template for '.self::HOST_NAME;
+	const COUNT_MANY = 20;
 
 	public function prepareHostDashboardsData() {
 		$data = [
@@ -51,7 +51,7 @@ class testPageHostDashboards extends CWebTest {
 									'height' => 4,
 									'fields' => [
 										[
-											'type' => 0,
+											'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 											'name' => '*',
 											'value' => 0
 										]
@@ -106,32 +106,37 @@ class testPageHostDashboards extends CWebTest {
 
 		$breadcrumbs = $this->query('class:breadcrumbs')->one();
 		$this->assertEquals('zabbix.php?action=host.view', $breadcrumbs->query('link:All hosts')->one()->getAttribute('href'));
-		$this->assertEquals(self::HOST_NAME, $breadcrumbs->query('xpath:./li[2]/span')->one()->getText());
+		$this->assertEquals(['All hosts', self::HOST_NAME], $breadcrumbs->query('tag:li')->all()->asText());
 
-		$dashboard_navigation = $this->query('class:host-dashboard-navigation')->one();
+		$host_dashboard_navigation = $this->query('class:host-dashboard-navigation')->one();
 
-		$prev_button = $dashboard_navigation->query('xpath:.//button[@title="Previous dashboard"]')->one();
+		$prev_button = $host_dashboard_navigation->query('xpath:.//button[@title="Previous dashboard"]')->one();
 		$this->assertTrue($prev_button->isDisplayed());
 		$this->assertFalse($prev_button->isEnabled());
 
-		$dasboard_tab = $dashboard_navigation->query('xpath:.//span[text()="Dashboard 1"]')->one();
-		$this->assertEquals('Dashboard 1', $dasboard_tab->getAttribute('title'));
+		$dashboard_tab = $host_dashboard_navigation->query('xpath:.//span[text()="Dashboard 1"]')->one();
+		$this->assertEquals('Dashboard 1', $dashboard_tab->getAttribute('title'));
 
 		// Assert the listed dashboard dropdown.
-		$list_button = $dashboard_navigation->query('xpath:.//button[@title="Dashboard list"]')->one();
+		$list_button = $host_dashboard_navigation->query('xpath:.//button[@title="Dashboard list"]')->one();
 		$this->assertTrue($list_button->isClickable());
 		$list_button->click();
 		$popup_menu = $list_button->asPopupButton()->getMenu();
 		$this->assertEquals(['Dashboard 1'], $popup_menu->getItems()->asText());
 		$popup_menu->close();
 
-		$next_button = $dashboard_navigation->query('xpath:.//button[@title="Next dashboard"]')->one();
+		$next_button = $host_dashboard_navigation->query('xpath:.//button[@title="Next dashboard"]')->one();
 		$this->assertTrue($next_button->isDisplayed());
 		$this->assertFalse($next_button->isEnabled());
 
 		// Check page tabs.
-		foreach (['Page 1', 'Page 2'] as $page) {
-			$this->assertTrue($this->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($page).']')->exists());
+		$dashboard_navigation = $this->query('class:dashboard-navigation')->one();
+		$this->assertEquals(['Page 1', 'Page 2'], $dashboard_navigation->query('xpath:.//li[@ class="sortable-item"]')->all()->asText());
+
+		// Check Slideshow button.
+		foreach (['Stop', 'Start'] as $status) {
+			$this->assertTrue($dashboard_navigation->query('xpath:.//button/span[text()="'.$status.' slideshow"]')->one()->isDisplayed());
+			$dashboard_navigation->query('xpath:.//button['.CXPathHelper::fromClass('btn-dashboard-toggle-slideshow').']')->one()->click();
 		}
 
 		// Check Slideshow button.
@@ -153,21 +158,38 @@ class testPageHostDashboards extends CWebTest {
 
 		// Check that Header and Filter disappeared.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
-		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
+		$this->assertFalse(CFilterElement::find()->one()->isVisible());
 		$this->assertFalse($this->query('class:host-dashboard-navigation')->exists());
-		$this->assertTrue($this->query('class:dashboard')->exists());
+		$this->assertTrue(CDashboardElement::find()->one()->getWidgets()->first()->isVisible());
+
+		// Check that Breadcrumbs are still visible.
+		$breadcrumbs = $this->query('xpath://ul[@class="breadcrumbs"]//span')->all();
+		$this->assertEquals(['All hosts', self::HOST_NAME], $breadcrumbs->asText());
+
+		foreach ($breadcrumbs as $breadcrumb) {
+			$this->assertTrue($breadcrumb->isVisible());
+		}
 
 		// Check Dashboard page controls.
 		foreach (['Previous page', 'Stop slideshow', 'Next page'] as $button) {
 			$this->assertTrue($this->query('xpath://button[@title="'.$button.'"]')->exists());
 		}
 
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+		// Check Slideshow button.
+		$dashboard_controls = $this->query('class:dashboard-kioskmode-controls')->one();
+
+		foreach (['Stop', 'Start'] as $status) {
+			$this->assertTrue($dashboard_controls->query('xpath:.//button[@title="'.$status.' slideshow"]')->one()->isDisplayed());
+			$dashboard_controls->query('xpath:.//button['.
+					CXPathHelper::fromClass('btn-dashboard-kioskmode-toggle-slideshow').']')->one()->click();
+		}
+
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->hoverMouse()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
-		foreach (['xpath://div[@aria-label="Filter"]', 'class:host-dashboard-navigation', 'class:dashboard'] as $selector) {
+		foreach (['xpath://div['.CXPathHelper::fromClass('filter-space').']', 'class:host-dashboard-navigation', 'class:dashboard'] as $selector) {
 			$this->assertTrue($this->query($selector)->exists());
 		}
 	}
@@ -244,16 +266,18 @@ class testPageHostDashboards extends CWebTest {
 			[
 				[
 					'fields' => ['id:from' => '$#^$@', 'id:to' => '&nbsp;'],
-					'error' => true,
-					'error_message_from' => 'Invalid date.',
-					'error_message_to' => 'Invalid date.'
+					'error' => [
+						'from' => 'Invalid date.',
+						'to' => 'Invalid date.'
+					]
 				]
 			],
 			[
 				[
 					'fields' => ['id:from' => 'now-3y', 'id:to' => 'now'],
-					'error' => true,
-					'error_message_from' => 'Maximum time period to display is 730 days.'
+					'error' => [
+						'from' => 'Maximum time period to display is 730 days.'
+					]
 				]
 			]
 		];
@@ -266,7 +290,8 @@ class testPageHostDashboards extends CWebTest {
 	 */
 	public function testPageHostDashboards_CheckFilters($data) {
 		$this->openDashboardsForHost(self::HOST_NAME);
-		$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
+		$filter = CFilterElement::find()->one();
+		$form = $filter->asForm(['normalized' => true]);
 
 		// Set custom time filter.
 		if (CTestArrayHelper::get($data, 'fields')) {
@@ -279,7 +304,16 @@ class testPageHostDashboards extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		if (!CTestArrayHelper::get($data, 'error', false)) {
+		if (CTestArrayHelper::get($data, 'error', false)) {
+			// If error expected.
+
+			// Assert error text.
+			foreach ($data['error'] as $field => $text) {
+				$message = $this->query('xpath://ul[@data-error-for='.CXPathHelper::escapeQuotes($field).']//li')->one();
+				$this->assertEquals($text, $message->getText());
+			}
+		}
+		else {
 			// If error not expected.
 
 			// Check Zoom buttons.
@@ -293,20 +327,10 @@ class testPageHostDashboards extends CWebTest {
 			$form->checkValue(CTestArrayHelper::get($data, 'expected_fields', CTestArrayHelper::get($data, 'fields')));
 
 			// Check tab title.
-			$this->assertTrue($this->query('link',
-				CTestArrayHelper::get($data, 'expected_tab', CTestArrayHelper::get($data, 'link')))->exists()
+			$this->assertEquals(
+				CTestArrayHelper::get($data, 'expected_tab', CTestArrayHelper::get($data, 'link')),
+				$filter->getSelectedTabName()
 			);
-		}
-		else {
-			// If error expected.
-
-			// Check error text if defined.
-			foreach (['from', 'to'] as $field) {
-				if (CTestArrayHelper::get($data, 'error_message_'.$field)) {
-					$message = $this->query('xpath://ul[@data-error-for='.CXPathHelper::escapeQuotes($field).']//li')->one();
-					$this->assertEquals($data['error_message_'.$field], $message->getText());
-				}
-			}
 		}
 	}
 
@@ -412,13 +436,13 @@ class testPageHostDashboards extends CWebTest {
 		$this->assertEquals(count($api_dashboards) > 1, $next_button->isEnabled());
 
 		// Assert dashboard Tabs and Pages.
-		foreach ($api_dashboards as $i => $dashboard) {
-			$dasboard_tab = $navigation->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($dashboard['name']).']')->one();
-			$this->assertEquals($dashboard['name'], $dasboard_tab->getAttribute('title'));
+		foreach ($api_dashboards as $dashboard) {
+			$dashboard_tab = $navigation->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($dashboard['name']).']')->one();
+			$this->assertEquals($dashboard['name'], $dashboard_tab->getAttribute('title'));
 
-			// Only switch the Dashboard if it is not the first one.
-			if ($i > 0) {
-				$dasboard_tab->click();
+			// If not already on the correct Dashboard, then switch.
+			if ($dashboard['name'] !== $navigation->query('xpath:.//div[@class="selected-tab"]')->one()->getText()) {
+				$dashboard_tab->click();
 				$this->page->waitUntilReady();
 			}
 
@@ -439,12 +463,12 @@ class testPageHostDashboards extends CWebTest {
 				// Parent to all Page tabs.
 				$page_tabs = $this->query('class:dashboard-navigation-tabs')->one();
 
-				foreach ($dashboard['pages'] as $j => $page) {
+				foreach ($dashboard['pages'] as $page) {
 					$page_tab = $page_tabs->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($page['name']).']')->one();
 					$this->assertEquals($page['name'], $page_tab->getAttribute('title'));
 
 					// Only switch the Page if it is not the first one.
-					if ($j > 0) {
+					if ($page['name'] !== $page_tabs->query('xpath:.//div[@class="selected-tab"]')->one()->getText()) {
 						$page_tab->click();
 						$this->page->waitUntilReady();
 					}
@@ -551,14 +575,20 @@ class testPageHostDashboards extends CWebTest {
 		];
 		$api_dashboards = $this->createHostWithDashboards($data);
 
-		// Open the newly created Host.
+		// Open the newly created Host dashboard.
 		$this->openDashboardsForHost('Dashboards for dropdown');
 
-		// Click each dashboard in the menu and assert that it opened.
+		// Click each Dashboard in the menu and assert that it opened.
 		foreach ($api_dashboards as $dashboard) {
-			$list_button = $this->query('xpath:.//button[@title="Dashboard list"]')->one();
-			$list_button->click();
-			$list_button->asPopupButton()->getMenu()->select($dashboard['name']);
+			$navigation = $this->query('class:host-dashboard-navigation')->one();
+
+			// Only switch if not already on the correct Dashboard.
+			if ($dashboard['name'] !== $navigation->query('xpath:.//div[@ class="selected-tab"]')->one()->getText()) {
+				$list_button = $this->query('xpath:.//button[@title="Dashboard list"]')->one();
+				$list_button->click();
+				$list_button->asPopupButton()->getMenu()->select($dashboard['name']);
+			}
+
 			$this->checkDashboardOpen($dashboard);
 		}
 	}
@@ -571,8 +601,7 @@ class testPageHostDashboards extends CWebTest {
 	protected function openDashboardsForHost($host_name) {
 		// Instead of searching the Host in the UI it is faster to just get the ID from the database.
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host_name));
-		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.$id);
-		$this->page->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.$id)->waitUntilReady();
 	}
 
 	/**
@@ -587,7 +616,7 @@ class testPageHostDashboards extends CWebTest {
 			[
 				'host' => 'Template for '.$data['host_name'],
 				'groups' => [
-					['groupid' => '1']
+					['groupid' => '1'] // template group 'Templates'
 				]
 			]
 		]);
@@ -597,7 +626,7 @@ class testPageHostDashboards extends CWebTest {
 			[
 				'host' => $data['host_name'],
 				'groups' => [
-					['groupid' => '6']
+					['groupid' => '6'] // host group 'Virtual machines'
 				],
 				'templates' => [
 					'templateid' => $template_id
@@ -678,10 +707,21 @@ class testPageHostDashboards extends CWebTest {
 	 * @param $page         Page data array
 	 */
 	protected function checkDashboardOpen ($dashboard, $page = null) {
-		if($page === null) {
+		if ($page === null) {
 			$page = $dashboard['pages'][0];
 		}
 
+		// Check that the correct Dashboard tab is selected.
+		$navigation = $this->query('class:host-dashboard-navigation')->one();
+		$this->assertEquals($dashboard['name'], $navigation->query('xpath:.//div[@ class="selected-tab"]')->one()->getText());
+
+		// Check that the correct Page tab is selected.
+		if (count(CTestArrayHelper::get($dashboard, 'pages', [])) > 1) {
+			$page_tabs = $this->query('class:dashboard-navigation-tabs')->one();
+			$this->assertEquals($page['name'], $page_tabs->query('xpath:.//div[@class="selected-tab"]')->one()->getText());
+		}
+
+		// Assert correct Dashboard is displayed by asserting the Widget name.
 		CDashboardElement::find()->one()->getWidget($this->widgetName($dashboard['name'], $page['name']));
 	}
 }
