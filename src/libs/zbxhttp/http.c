@@ -621,12 +621,6 @@ static char	*get_media_type_charset(const char *content_type, char *body, size_t
 
 	if (NULL == charset)
 	{
-		size_t		len = zbx_strlen_utf8_nchars(body, 1024);
-		unsigned char	tmp = body[len];
-
-		body[len] = '\0';
-
-#ifdef HAVE_LIBXML2
 		char	*content = NULL;
 
 		html_get_charset_content(body, &charset, &content);
@@ -641,8 +635,7 @@ static char	*get_media_type_charset(const char *content_type, char *body, size_t
 		}
 
 		zbx_free(content);
-#endif
-		body[len] = tmp;
+
 		if (NULL == charset)
 		{
 			const char	*bom_encoding = get_bom_econding(body, size);
