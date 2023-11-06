@@ -2159,8 +2159,8 @@ class testDashboardItemValueWidget extends CWebTest {
 					'widgets' => [
 						[
 							'Type' => 'Graph (classic)',
-							'Name' => 'Graph widget with "Custom" time period',
 							'Graph' => 'Linux: System load',
+							'Name' => 'Graph widget with "Custom" time period',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-5400',
 							'id:time_period_to' => 'now-1800'
@@ -2171,7 +2171,7 @@ class testDashboardItemValueWidget extends CWebTest {
 							'Advanced configuration' => true,
 							'Aggregation function' => 'max',
 							'Time period' => 'Widget',
-							'Widget' => 'Linux: System load'
+							'Widget' => 'Graph widget with "Custom" time period'
 						]
 					]
 				]
@@ -2284,6 +2284,8 @@ class testDashboardItemValueWidget extends CWebTest {
 	public function testDashboardItemValueWidget_TimePeriodIcon() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_zoom)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 
 		$data = [
 			'Item' => 'Available memory in %',
@@ -2292,9 +2294,6 @@ class testDashboardItemValueWidget extends CWebTest {
 			'Aggregation function' => 'min',
 			'Time period' => 'Custom'
 		];
-
-		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		$form->fill($data);
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
@@ -2312,7 +2311,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		// Close the hint-box.
 		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 
-		$dashboard->edit()->getWidget('Item value widget with "Custom" time period')->edit();
+		$dashboard->edit()->getWidget($data['Name'])->edit();
 		$form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used']);
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();

@@ -2774,8 +2774,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'main_fields' => [
 								'Type' => 'Graph (classic)',
-								'Name' => 'Graph widget with "Custom" time period',
 								'Graph' => 'Linux: System load',
+								'Name' => 'Graph widget with "Custom" time period',
 								'Time period' => 'Custom',
 								'id:time_period_from' => 'now-5400',
 								'id:time_period_to' => 'now-1800'
@@ -2791,7 +2791,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 									'Name' => 'Column with "Widget" time period',
 									'Aggregation function' => 'max',
 									'Time period' => 'Widget',
-									'Widget' => 'Linux: System load'
+									'Widget' => 'Graph widget with "Custom" time period'
 								]
 							]
 						]
@@ -2804,8 +2804,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'main_fields' => [
 								'Type' => 'Graph (classic)',
-								'Name' => 'Graph widget with "Custom" time period',
 								'Graph' => 'Linux: System load',
+								'Name' => 'Graph widget with "Custom" time period',
 								'Time period' => 'Custom',
 								'id:time_period_from' => 'now-5400',
 								'id:time_period_to' => 'now-1800'
@@ -2825,7 +2825,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 									'Name' => 'Column with "Widget" time period',
 									'Aggregation function' => 'avg',
 									'Time period' => 'Widget',
-									'Widget' => 'Linux: System load'
+									'Widget' => 'Graph widget with "Custom" time period'
 								],
 								[
 									'Item' => 'Available memory',
@@ -2894,8 +2894,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'main_fields' => [
 								'Type' => 'Graph (classic)',
-								'Name' => 'Graph widget with "Custom" time period',
 								'Graph' => 'Linux: System load',
+								'Name' => 'Graph widget with "Custom" time period',
 								'Time period' => 'Custom',
 								'id:time_period_from' => 'now-5400',
 								'id:time_period_to' => 'now-1800'
@@ -2929,7 +2929,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 									'Name' => 'Column with "Widget" time period',
 									'Aggregation function' => 'min',
 									'Time period' => 'Widget',
-									'Widget' => 'Linux: System load'
+									'Widget' => 'Graph widget with "Custom" time period'
 								]
 							]
 						]

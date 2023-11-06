@@ -219,7 +219,7 @@ class TopHostsWidget {
 				]
 			],
 			[
-				'name' => 'Zoom filter check',
+				'name' => 'top_host_zoom_filter',
 				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [[]]
