@@ -26,6 +26,7 @@ class CSVGHoneycomb {
 	static ZBX_STYLE_CELL =						'svg-honeycomb-cell';
 	static ZBX_STYLE_CELL_NO_DATA =				'svg-honeycomb-cell-no-data';
 	static ZBX_STYLE_CELL_POPPED =				'svg-honeycomb-cell-popped';
+	static ZBX_STYLE_CELL_POPPED_SHADOW =		'svg-honeycomb-cell-popped-shadow';
 	static ZBX_STYLE_CELL_OTHER =				'svg-honeycomb-cell-other';
 	static ZBX_STYLE_CELL_OTHER_ELLIPSIS =		'svg-honeycomb-cell-other-ellipsis';
 	static ZBX_STYLE_LABEL =					'svg-honeycomb-label';
@@ -571,7 +572,7 @@ class CSVGHoneycomb {
 
 		const filter = defs
 			.append('svg:filter')
-			.attr('id', 'popped-cell-shadow')
+			.attr('id', CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW)
 			.attr('width', '200%')
 			.attr('height', '200%')
 			.attr('x', '-50%')
@@ -581,8 +582,8 @@ class CSVGHoneycomb {
 			.append('svg:feDropShadow')
 			.attr('dx', 0)
 			.attr('dy', 0)
-			.attr('stdDeviation', this.#radius_outer * 0.2)
-			.attr('flood-opacity', 0.7);
+			.attr('flood-color', '#888888')
+			.attr('flood-opacity', 1);
 	}
 
 	/**
@@ -920,7 +921,10 @@ class CSVGHoneycomb {
 		const popped_translate_x = row_translate_x + cell_translate_x;
 		const popped_translate_y = row_translate_y + cell_translate_y;
 
-		const scale_popped = 1.3;
+		// By how many pixels to increase a cell.
+		const increase = 10;
+
+		const scale_popped = (this.#radius_outer * this.#scale + increase) / (this.#radius_outer * this.#scale);
 
 		this.#elements.popped_cell
 			.datum(this.#elements.popped_cell_simple.datum())
@@ -950,9 +954,13 @@ class CSVGHoneycomb {
 
 		this.#elements.popped_cell
 			.select('path')
-			.style('filter', 'url(#popped-cell-shadow)')
+			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW})`)
 			.style('stroke', stroke_color)
-			.style('stroke-width', this.#radius_inner / 100);
+			.style('stroke-width', 1);
+
+		this.#svg
+			.select(`#${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW} feDropShadow`)
+			.attr('stdDeviation', (this.#radius_outer * this.#scale) / (this.#scale * 10))
 	};
 
 	/**
