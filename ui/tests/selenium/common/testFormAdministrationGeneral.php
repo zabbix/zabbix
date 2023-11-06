@@ -197,7 +197,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	/**
 	 * Test for updating and checking simple configuration fields.
 	 *
-	 * @param array      $data		  Data provider
+	 * @param array $data    data provider
 	 */
 	public function executeUpdate($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {

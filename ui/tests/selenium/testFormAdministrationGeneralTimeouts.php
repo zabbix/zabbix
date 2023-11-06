@@ -68,33 +68,48 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 	 * Test for checking timeouts layout.
 	 */
 	public function testFormAdministrationGeneralTimeouts_Layout() {
+		$maxlengths = [
+			'Zabbix agent' => 255,
+			'Simple check' => 255,
+			'SNMP agent' => 255,
+			'External check' => 255,
+			'Database monitor' => 255,
+			'HTTP agent' => 255,
+			'SSH agent' => 255,
+			'TELNET agent' => 255,
+			'Script' => 255,
+			'Communication' => 32,
+			'Connection' => 32,
+			'Media type test' => 32,
+			'Script execution' => 32,
+			'Item test' => 32,
+			'Scheduled report test' => 32
+		];
+
 		$this->page->login()->open($this->config_link)->waitUntilReady();
-		$form = $this->query($this->form_selector)->waitUntilPresent()->asForm()->one();
-		$form->checkValue($this->default_values);
-
-		// Count timeouts headers. Right now there is only 2.
-		$count = $form->query('xpath:.//legend/span')->all()->count();
-
-		// Get timeouts headers as text and save as array.
-		$timeouts_header = [];
-		for ($i = 1; $i <= $count; $i++) {
-			$timeouts_header[] = $form->query('xpath:(.//legend/span)['.$i.']')->one()->getText();
-		}
-
-		// Compare received headers with provided.
-		$this->assertEquals(['Timeouts for item types', 'Network timeouts for UI'], $timeouts_header);
-
-		// Check that all fields are marked as mandatory.
-		foreach ($this->default_values as $timeout_label => $value) {
-			$this->assertEquals('form-label-asterisk', $form->getLabel($timeout_label)->getAttribute('class'));
-		}
-
-		// Check if buttons are clickable.
-		$this->assertTrue($form->query('button', ['Update', 'Reset defaults'])->one()->isClickable());
 
 		// Check if Header and Title are as expected.
 		$this->page->assertHeader('Timeouts');
 		$this->page->assertTitle('Configuration of timeouts');
+		$form = $this->query($this->form_selector)->waitUntilPresent()->asForm()->one();
+		$form->checkValue($this->default_values);
+
+		// Check that timeouts headers exists.
+		$this->assertEquals(['Timeouts for item types', 'Network timeouts for UI'],
+				$form->query('xpath:.//legend/span')->all()->asText()
+		);
+
+		// Check that all fields are marked as mandatory.
+		$this->assertEquals(array_keys($this->default_values), $form->getRequiredLabels());
+
+		// Check if buttons are clickable.
+		$this->assertTrue($form->query('button', ['Update', 'Reset defaults'])->one()->isClickable());
+
+		// Fields are visible, can be edited and maxlength checked.
+		foreach ($maxlengths as $label => $maxlength) {
+			$this->assertTrue($form->getField($label)->isClickable());
+			$this->assertEquals($maxlength, $form->getField($label)->getAttribute('maxlength'));
+		}
 	}
 
 	/**
@@ -113,7 +128,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 
 	public static function getUpdateValueData() {
 		return [
-			// #0
+			// #0.
 			[
 				[
 					'fields' => [
@@ -124,7 +139,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #1
+			// #1.
 			[
 				[
 					'fields' => [
@@ -135,7 +150,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #2
+			// #2.
 			[
 				[
 					'fields' => [
@@ -146,7 +161,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #3
+			// #3.
 			[
 				[
 					'fields' => [
@@ -157,7 +172,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #4
+			// #4.
 			[
 				[
 					'fields' => [
@@ -168,7 +183,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #5
+			// #5.
 			[
 				[
 					'fields' => [
@@ -179,7 +194,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #6
+			// #6.
 			[
 				[
 					'fields' => [
@@ -190,7 +205,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #7
+			// #7.
 			[
 				[
 					'fields' => [
@@ -201,7 +216,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #8
+			// #8.
 			[
 				[
 					'fields' => [
@@ -212,7 +227,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #9
+			// #9.
 			[
 				[
 					'fields' => [
@@ -223,7 +238,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #10
+			// #10.
 			[
 				[
 					'fields' => [
@@ -234,7 +249,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #11
+			// #11.
 			[
 				[
 					'fields' => [
@@ -245,7 +260,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #12
+			// #12.
 			[
 				[
 					'fields' => [
@@ -256,7 +271,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #13
+			// #13.
 			[
 				[
 					'fields' => [
@@ -267,7 +282,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #14
+			// #14.
 			[
 				[
 					'fields' => [
@@ -365,7 +380,46 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #18 Update values with macros for all item timeouts.
+			// #18 Update values for all timeouts.
+			[
+				[
+					'fields' => [
+						'Zabbix agent' => '33',
+						'Simple check' => '33',
+						'SNMP agent' => '33',
+						'External check' => '33',
+						'Database monitor' => '33',
+						'HTTP agent' => '33',
+						'SSH agent' => '33',
+						'TELNET agent' => '33',
+						'Script' => '33',
+						'Communication' => '29',
+						'Connection' => '29',
+						'Media type test' => '29',
+						'Script execution' => '29',
+						'Item test' => '29',
+						'Scheduled report test' => '29'
+					],
+					'db_check' => [
+						'timeout_zabbix_agent' => '33',
+						'timeout_simple_check' => '33',
+						'timeout_snmp_agent' => '33',
+						'timeout_external_check' => '33',
+						'timeout_db_monitor' => '33',
+						'timeout_http_agent' => '33',
+						'timeout_ssh_agent' => '33',
+						'timeout_telnet_agent' => '33',
+						'timeout_script' => '33',
+						'socket_timeout' => '29',
+						'connect_timeout' => '29',
+						'media_type_test_timeout' => '29',
+						'script_timeout' => '29',
+						'item_test_timeout' => '29',
+						'report_test_timeout' => '29'
+					]
+				]
+			],
+			// #19 Update values with macros for all item timeouts.
 			[
 				[
 					'fields' => [
@@ -392,7 +446,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #19 Update all available timeouts with minutes type.
+			// #20 Update all available timeouts with minutes type.
 			[
 				[
 					'fields' => [
@@ -429,7 +483,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #20
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -439,7 +493,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
 				]
 			],
-			// #21
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -449,7 +503,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
 				]
 			],
-			// #22
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -459,7 +513,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
 				]
 			],
-			// #23
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -469,7 +523,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
 				]
 			],
-			// #24
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -479,7 +533,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
 				]
 			],
-			// #25
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -489,7 +543,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
 				]
 			],
-			// #26
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -499,7 +553,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
 				]
 			],
-			// #27
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -509,7 +563,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
 				]
 			],
-			// #28
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -519,7 +573,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
 				]
 			],
-			// #29
+			// #30.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -529,7 +583,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
 				]
 			],
-			// #30
+			// #31.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -539,7 +593,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
 				]
 			],
-			// #31
+			// #32.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -549,7 +603,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
 				]
 			],
-			// #32
+			// #33.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -559,7 +613,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
 				]
 			],
-			// #33
+			// #34.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -569,7 +623,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
 				]
 			],
-			// #34
+			// #35.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -579,7 +633,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
 				]
 			],
-			// #35
+			// #36.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -589,7 +643,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
 				]
 			],
-			// #36
+			// #37.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -599,7 +653,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
 				]
 			],
-			// #37
+			// #38.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -609,127 +663,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
 				]
 			],
-			// #38
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Communication' => '0s'
-					],
-					'details' => 'Incorrect value for field "socket_timeout": value must be one of 1-300.'
-				]
-			],
-			// #39
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Communication' => '301s'
-					],
-					'details' => 'Incorrect value for field "socket_timeout": value must be one of 1-300.'
-				]
-			],
-			// #40
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Connection' => '0s'
-					],
-					'details' => 'Incorrect value for field "connect_timeout": value must be one of 1-30.'
-				]
-			],
-			// #41
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Connection' => '31s'
-					],
-					'details' => 'Incorrect value for field "connect_timeout": value must be one of 1-30.'
-				]
-			],
-			// #42
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Media type test' => '0s'
-					],
-					'details' => 'Incorrect value for field "media_type_test_timeout": value must be one of 1-300.'
-				]
-			],
-			// #43
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Media type test' => '301s'
-					],
-					'details' => 'Incorrect value for field "media_type_test_timeout": value must be one of 1-300.'
-				]
-			],
-			// #44
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Script execution' => '0s'
-					],
-					'details' => 'Incorrect value for field "script_timeout": value must be one of 1-300.'
-				]
-			],
-			// #45
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Script execution' => '301s'
-					],
-					'details' => 'Incorrect value for field "script_timeout": value must be one of 1-300.'
-				]
-			],
-			// #46
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Item test' => '0s'
-					],
-					'details' => 'Incorrect value for field "item_test_timeout": value must be one of 1-600.'
-				]
-			],
-			// #47
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Item test' => '601s'
-					],
-					'details' => 'Incorrect value for field "item_test_timeout": value must be one of 1-600.'
-				]
-			],
-			// #48
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Scheduled report test' => '0s'
-					],
-					'details' => 'Incorrect value for field "report_test_timeout": value must be one of 1-300.'
-				]
-			],
-			// #49
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Scheduled report test' => '301s'
-					],
-					'details' => 'Incorrect value for field "report_test_timeout": value must be one of 1-300.'
-				]
-			],
-			// #50 All network timeouts errors at once.
+			// #39 All network timeouts errors at once - less than available.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -751,7 +685,29 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #51 All fields empty.
+			// #40 All network timeouts errors at once - higher than available.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '301s',
+						'Connection' => '31s',
+						'Media type test' => '301s',
+						'Script execution' => '301s',
+						'Item test' => '601s',
+						'Scheduled report test' => '301s'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
+						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
+						'Incorrect value for field "media_type_test_timeout": value must be one of 1-300.',
+						'Incorrect value for field "script_timeout": value must be one of 1-300.',
+						'Incorrect value for field "item_test_timeout": value must be one of 1-600.',
+						'Incorrect value for field "report_test_timeout": value must be one of 1-300.'
+					]
+				]
+			],
+			// #41 All fields empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -791,7 +747,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #52
+			// #42.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -801,7 +757,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
 				]
 			],
-			// #53
+			// #43.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -811,7 +767,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
 				]
 			],
-			// #54
+			// #44.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -821,7 +777,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
 				]
 			],
-			// #55
+			// #45.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -831,7 +787,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
 				]
 			],
-			// #56
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -841,7 +797,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
 				]
 			],
-			// #57
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -851,7 +807,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
 				]
 			],
-			// #58
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -861,7 +817,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
 				]
 			],
-			// #59
+			// #49.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -871,7 +827,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
 				]
 			],
-			// #60
+			// #50.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -881,67 +837,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
 				]
 			],
-			// #61
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Communication' => 'test'
-					],
-					'details' => 'Incorrect value for field "socket_timeout": a time unit is expected.'
-				]
-			],
-			// #62
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Connection' => 'test'
-					],
-					'details' => 'Incorrect value for field "connect_timeout": a time unit is expected.'
-				]
-			],
-			// #63
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Media type test' => 'test'
-					],
-					'details' => 'Incorrect value for field "media_type_test_timeout": a time unit is expected.'
-				]
-			],
-			// #64
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Script execution' => 'test'
-					],
-					'details' => 'Incorrect value for field "script_timeout": a time unit is expected.'
-				]
-			],
-			// #65
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Item test' => 'test'
-					],
-					'details' => 'Incorrect value for field "item_test_timeout": a time unit is expected.'
-				]
-			],
-			// #66
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Scheduled report test' => 'test'
-					],
-					'details' => 'Incorrect value for field "report_test_timeout": a time unit is expected.'
-				]
-			],
-			// #67 All network timeouts time unit errors at once.
+			// #51 All network timeouts time unit errors at once.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -963,6 +859,476 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #52 Check 1h time validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '1h',
+						'Connection' => '1h',
+						'Media type test' => '1h',
+						'Script execution' => '1h',
+						'Item test' => '1h',
+						'Scheduled report test' => '1h'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
+						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
+						'Incorrect value for field "media_type_test_timeout": value must be one of 1-300.',
+						'Incorrect value for field "script_timeout": value must be one of 1-300.',
+						'Incorrect value for field "item_test_timeout": value must be one of 1-600.',
+						'Incorrect value for field "report_test_timeout": value must be one of 1-300.'
+					]
+				]
+			],
+			// #53 Check 1d time validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '1d',
+						'Connection' => '1d',
+						'Media type test' => '1d',
+						'Script execution' => '1d',
+						'Item test' => '1d',
+						'Scheduled report test' => '1d'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
+						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
+						'Incorrect value for field "media_type_test_timeout": value must be one of 1-300.',
+						'Incorrect value for field "script_timeout": value must be one of 1-300.',
+						'Incorrect value for field "item_test_timeout": value must be one of 1-600.',
+						'Incorrect value for field "report_test_timeout": value must be one of 1-300.'
+					]
+				]
+			],
+			// #54 All network timeouts errors for 1w validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '1w',
+						'Connection' => '1w',
+						'Media type test' => '1w',
+						'Script execution' => '1w',
+						'Item test' => '1w',
+						'Scheduled report test' => '1w'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
+						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
+						'Incorrect value for field "media_type_test_timeout": value must be one of 1-300.',
+						'Incorrect value for field "script_timeout": value must be one of 1-300.',
+						'Incorrect value for field "item_test_timeout": value must be one of 1-600.',
+						'Incorrect value for field "report_test_timeout": value must be one of 1-300.'
+					]
+				]
+			],
+			// #55 All network timeouts errors for 1M validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '1M',
+						'Connection' => '1M',
+						'Media type test' => '1M',
+						'Script execution' => '1M',
+						'Item test' => '1M',
+						'Scheduled report test' => '1M'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": a time unit is expected.',
+						'Incorrect value for field "connect_timeout": a time unit is expected.',
+						'Incorrect value for field "media_type_test_timeout": a time unit is expected.',
+						'Incorrect value for field "script_timeout": a time unit is expected.',
+						'Incorrect value for field "item_test_timeout": a time unit is expected.',
+						'Incorrect value for field "report_test_timeout": a time unit is expected.'
+					]
+				]
+			],
+			// #56 All network timeouts errors for 1y validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '1y',
+						'Connection' => '1y',
+						'Media type test' => '1y',
+						'Script execution' => '1y',
+						'Item test' => '1y',
+						'Scheduled report test' => '1y'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": a time unit is expected.',
+						'Incorrect value for field "connect_timeout": a time unit is expected.',
+						'Incorrect value for field "media_type_test_timeout": a time unit is expected.',
+						'Incorrect value for field "script_timeout": a time unit is expected.',
+						'Incorrect value for field "item_test_timeout": a time unit is expected.',
+						'Incorrect value for field "report_test_timeout": a time unit is expected.'
+					]
+				]
+			],
+			// #57.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Zabbix agent' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
+				]
+			],
+			// #58.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Zabbix agent' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
+				]
+			],
+			// #59.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Zabbix agent' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
+				]
+			],
+			// #60.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Simple check' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
+				]
+			],
+			// #61.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Simple check' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
+				]
+			],
+			// #62.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Simple check' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
+				]
+			],
+			// #63.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SNMP agent' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
+				]
+			],
+			// #64.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SNMP agent' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
+				]
+			],
+			// #65.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SNMP agent' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
+				]
+			],
+			// #66.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'External check' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
+				]
+			],
+			// #67.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'External check' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
+				]
+			],
+			// #68.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'External check' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
+				]
+			],
+			// #69.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Database monitor' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
+				]
+			],
+			// #70.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Database monitor' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
+				]
+			],
+			// #71.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Database monitor' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
+				]
+			],
+			// #72.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'HTTP agent' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
+				]
+			],
+			// #73.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'HTTP agent' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
+				]
+			],
+			// #74.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'HTTP agent' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
+				]
+			],
+			// #75.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSH agent' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
+				]
+			],
+			// #76.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSH agent' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
+				]
+			],
+			// #77.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSH agent' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
+				]
+			],
+			// #78.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'TELNET agent' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
+				]
+			],
+			// #79.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'TELNET agent' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
+				]
+			],
+			// #80.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'TELNET agent' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
+				]
+			],
+			// #81.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Script' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
+				]
+			],
+			// #82.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Script' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
+				]
+			],
+			// #83.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Script' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
+				]
+			],
+			// #84.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Zabbix agent' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_zabbix_agent": a number is too large.'
+				]
+			],
+			// #85.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Simple check' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_simple_check": a number is too large.'
+				]
+			],
+			// #86.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SNMP agent' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_snmp_agent": a number is too large.'
+				]
+			],
+			// #87.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'External check' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_external_check": a number is too large.'
+				]
+			],
+			// #88.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Database monitor' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_db_monitor": a number is too large.'
+				]
+			],
+			// #89.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'HTTP agent' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_http_agent": a number is too large.'
+				]
+			],
+			// #90.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSH agent' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_ssh_agent": a number is too large.'
+				]
+			],
+			// #91.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'TELNET agent' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_telnet_agent": a number is too large.'
+				]
+			],
+			// #92.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Script' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_script": a number is too large.'
+				]
+			]
 			// TODO: uncomment after ZBX-23636. Fields should be trimmed.
 //			[
 //				[
