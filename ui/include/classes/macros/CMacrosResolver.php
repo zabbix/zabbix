@@ -781,9 +781,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve {HOST.HOST<1-9} and empty placeholders in the expression macros.
 	 *   For example:
-	 *     {$last(/ /key)} => {$last(/Zabbix server/key)}
-	 *     {$last(/MySQL server/key)} => {$last(/MySQL server/key)}
-	 *     {$last(/{HOST.HOST}/key)} => {$last(/host/key)}
+	 *     {?last(/ /key)} => {?last(/Zabbix server/key)}
+	 *     {?last(/MySQL server/key)} => {?last(/MySQL server/key)}
+	 *     {?last(/{HOST.HOST}/key)} => {?last(/host/key)}
 	 *
 	 * @param string	$macro            [IN]     Original macro.
 	 * @param array		$data             [IN/OUT] Data, returned by CHistFunctionParser.
