@@ -48,7 +48,7 @@
 int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
-	const char	*param2;
+	const char	*param2, *param3;
 
 	nparams = get_rparams_num(request);
 
@@ -268,25 +268,6 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		SET_TEXT_RESULT(result, nodes);
 	}
-	else if (0 == strcmp(param1, "nvps"))
-	{
-		if (2 != nparams)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			goto out;
-		}
-
-		if (NULL == (param2 = get_rparam(request, 1)) || 0 != strcmp(param2, "limit"))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-			goto out;
-		}
-
-		zbx_vps_monitor_stats_t	stats;
-
-		zbx_vps_monitor_get_stats(&stats);
-		SET_UI64_RESULT(result, stats.values_limit);
-	}
 	else if (0 == strcmp(param1, "vps"))
 	{
 		zbx_vps_monitor_stats_t	stats;
@@ -301,31 +282,30 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			{
 				zbx_uint64_t	value = (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0);
 				SET_UI64_RESULT(result, value);
+				ret = SUCCEED;
+
+				goto out;
 			}
 			else if (0 == strcmp(param2, "limit"))
 			{
 				SET_UI64_RESULT(result, stats.values_limit);
-			}
-			else
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				ret = SUCCEED;
+
 				goto out;
 			}
-
-			ret = SUCCEED;
-			goto out;
 		}
 
-		if (3 != nparams)
+		if (3 < nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
 		}
-		else if (0 == strcmp(param2, "written"))
-		{
-			param2 = get_rparam(request, 2);
 
-			if (0 == strcmp(param2, "total"))
+		param3 = get_rparam(request, 2);
+
+		if (0 == strcmp(param2, "written"))
+		{
+			if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "total"))
 			{
 				SET_UI64_RESULT(result, stats.written_num);
 				ret = SUCCEED;
@@ -341,18 +321,16 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 
-		param2 = get_rparam(request, 2);
-
-		if (0 == strcmp(param2, "available"))
-		{
-			SET_UI64_RESULT(result, stats.overcommit_limit - stats.overcommit);
-		}
-		else if (0 == strcmp(param2, "pavailable"))
+		if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "pavailable"))
 		{
 			SET_DBL_RESULT(result, (double)(stats.overcommit_limit - stats.overcommit) * 100 /
 					stats.overcommit_limit);
 		}
-		else if (0 == strcmp(param2, "limit"))
+		else if (0 == strcmp(param3, "available"))
+		{
+			SET_UI64_RESULT(result, stats.overcommit_limit - stats.overcommit);
+		}
+		else if (0 == strcmp(param3, "limit"))
 		{
 			SET_UI64_RESULT(result, stats.overcommit_limit);
 		}
