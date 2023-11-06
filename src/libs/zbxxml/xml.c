@@ -657,7 +657,10 @@ static void	zbx_get_charset_content(xmlNode *a_node, xmlChar **charset, xmlChar 
 			}
 
 			if (0 == http_equiv_content && NULL != *content)
-				xmlFree(content);
+			{
+				xmlFree(*content);
+				*content = NULL;
+			}
 		}
 
 		zbx_get_charset_content(cur_node->children, charset, content);

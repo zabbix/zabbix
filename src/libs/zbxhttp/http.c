@@ -432,55 +432,71 @@ static char	*get_media_parameter(const char *str, const char *key, size_t key_le
 	return charset;
 }
 
-static char	*get_media_type_charset(const char *str, char *data)
+static char	*get_media_type_charset(const char *content_type, char *body, size_t size)
 {
 	const char	*ptr;
 	char		*charset = NULL;
 
-	for (;' ' == *str; str++);
+	if (NULL != content_type)
+	{
+		for (;' ' == *content_type; content_type++);
 
-	if (NULL != (ptr = strchr(str, ';')))
-		charset = get_media_parameter(ptr + 1, "charset", ZBX_CONST_STRLEN("charset"));
+		if (NULL != (ptr = strchr(content_type, ';')))
+			charset = get_media_parameter(ptr + 1, "charset", ZBX_CONST_STRLEN("charset"));
+	}
 
-#ifdef HAVE_LIBXML2
 	if (NULL == charset)
 	{
-		if (0 == zbx_strncasecmp(str, "text/html", ZBX_CONST_STRLEN("text/html")))
+		size_t		len = zbx_strlen_utf8_nchars(body, 1024);
+		unsigned char	tmp = body[len];
+
+		body[len] = '\0';
+
+#ifdef HAVE_LIBXML2
+		char	*content = NULL , *errmsg = NULL;
+
+		if (FAIL == zbx_html_get_charset_content(body, &charset, &content, &errmsg))
 		{
-			char	*content = NULL , *errmsg = NULL;
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse html:%s", errmsg);
+			zbx_free(errmsg);
+		}
 
-			if (FAIL == zbx_html_get_charset_content(data, &charset, &content, &errmsg))
+		if (NULL != content && NULL == charset)
+		{
+			if (NULL != (ptr = strchr(content, ';')))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot parse html:%s", errmsg);
-				zbx_free(errmsg);
+				charset = get_media_parameter(ptr + 1, "charset",
+					ZBX_CONST_STRLEN("charset"));
 			}
+		}
 
-			if (NULL != content && NULL == charset)
-			{
-				if (NULL != (ptr = strchr(content, ';')))
-					charset = get_media_parameter(ptr + 1, "charset", ZBX_CONST_STRLEN("charset"));
-			}
+		zbx_free(content);
+#endif
+		body[len] = tmp;
+		if (NULL == charset)
+		{
+			const char	*bom_encoding = get_bom_econding(body, size);
 
-			zbx_free(content);
+			if ('\0' != *bom_encoding)
+				charset = zbx_strdup(NULL, bom_encoding);
+			else if (SUCCEED == zbx_is_utf8(body))
+				charset = zbx_strdup(NULL, "UTF-8");
+			else
+				charset = zbx_strdup(NULL, "WINDOWS-1252");
 		}
 	}
-#else
-	ZBX_UNUSED(data);
-#endif
 
-	if (NULL != charset)
-	{
-		zbx_lrtrim(charset, " ");
-		zbx_strupper(charset);
-	}
+	zbx_lrtrim(charset, " ");
+	zbx_strupper(charset);
 
 	return charset;
 }
 
-void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated)
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_t *allocated)
 {
 	struct curl_header	*type;
 	CURLHcode		h;
+	char			*charset, *content_type = NULL;
 
 	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
 			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
@@ -493,25 +509,26 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_
 				" origin:%u", type->name, type->value, type->amount,
 				type->index, type->origin);
 
-		char	*charset = get_media_type_charset(type->value, *data);
-
-		if (NULL != charset && 0 != strcmp(charset, "UTF-8"))
-		{
-			char	*converted;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
-
-			converted = convert_to_utf8(*data, *size, charset);
-			zbx_free(*data);
-
-			*data = converted;
-			*size = strlen(converted);
-			*allocated = *size;
-		}
-		zbx_free(charset);
+		content_type = type->value;
 	}
 
-	zbx_replace_invalid_utf8(*data);
+	charset = get_media_type_charset(content_type, *body, *size);
+
+	if (0 != strcmp(charset, "UTF-8"))
+	{
+		char	*converted;
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "converting from charset '%s'", charset);
+
+		converted = convert_to_utf8(*body, *size, charset);
+		zbx_free(*body);
+
+		*body = converted;
+		*size = strlen(converted);
+		*allocated = *size;
+	}
+
+	zbx_free(charset);
 }
 
 #endif
