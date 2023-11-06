@@ -24,6 +24,8 @@ package swap
 
 import (
 	"zabbix.com/pkg/win32"
+
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 func getSwapSize() (uint64, uint64, error) {
@@ -43,12 +45,12 @@ func getSwapSize() (uint64, uint64, error) {
 	return total, avail, nil
 }
 
-func getSwapStatsIn() (uint64, uint64, uint64, error) {
-	return nil, nil, nil, plugin.UnsupportedMetricError
+func getSwapStatsIn(string) (uint64, uint64, uint64, error) {
+	return 0, 0, 0, plugin.UnsupportedMetricError
 }
 
-func getSwapStatsOut() (uint64, uint64, uint64, error) {
-	return nil, nil, nil, plugin.UnsupportedMetricError
+func getSwapStatsOut(string) (uint64, uint64, uint64, error) {
+	return 0, 0, 0, plugin.UnsupportedMetricError
 }
 
 func init() {

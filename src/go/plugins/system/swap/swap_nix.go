@@ -24,6 +24,7 @@ package swap
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -193,14 +194,23 @@ func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, 
 	return
 }
 
-func getSwapStatsIn(swapdev string) (uint64, uint64, uint64, bool) {
-	return getSwapStats(swapdev, false)
+func getSwapStatsIn(swapdev string) (io uint64, sect uint64, pag uint64, err error) {
+	var gotData bool
+	if io, sect, pag, gotData = getSwapStats(swapdev, false); !gotData {
+		err = errors.New("Failed to get swap information.")
+	}
+
+	return
 }
 
-func getSwapStatsOut(swapdev string) (uint64, uint64, uint64, bool) {
-	return getSwapStats(swapdev, true)
-}
+func getSwapStatsOut(swapdev string) (io uint64, sect uint64, pag uint64, err error) {
+	var gotData bool
+	if io, sect, pag, gotData = getSwapStats(swapdev, true); !gotData {
+		err = errors.New("Failed to get swap information.")
+	}
 
+	return
+}
 func init() {
 	plugin.RegisterMetrics(&impl, "Swap",
 		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",

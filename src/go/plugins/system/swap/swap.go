@@ -89,16 +89,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		var io, sect, pag uint64
-		var gotData bool
 
 		if key == "system.swap.in" {
-			io, sect, pag, gotData = getSwapStatsIn(swapdev)
+			io, sect, pag, err = getSwapStatsIn(swapdev)
 		} else {
-			io, sect, pag, gotData = getSwapStatsOut(swapdev)
+			io, sect, pag, err = getSwapStatsOut(swapdev)
 		}
 
-		if !gotData {
-			return nil, errors.New("Failed to get swap information.")
+		if err != nil {
+			return nil, err
 		}
 
 		var mode string
