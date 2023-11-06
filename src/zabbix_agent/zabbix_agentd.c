@@ -1575,11 +1575,29 @@ int	main(int argc, char **argv)
 			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #endif
+		case ZBX_TASK_TEST_CONFIG:
+			printf("Validating configuration file \"%s\"\n", config_file);
+
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
+			load_aliases(CONFIG_ALIASES);
+			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+
+			if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
+				zbx_free(error);
+				exit(EXIT_FAILURE);
+			}
+
+			zbx_free_metrics();
+			zbx_alias_list_free();
+			zbx_free_config();
+			printf("Validation successful\n");
+
+			exit(EXIT_SUCCESS);
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
-		case ZBX_TASK_TEST_CONFIG:
-			zbx_load_config(ZBX_TASK_TEST_CONFIG == t.task ? ZBX_CFG_FILE_REQUIRED : ZBX_CFG_FILE_OPTIONAL,
-					&t);
+			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
 			if (SUCCEED != zbx_init_perf_collector(ZBX_SINGLE_THREADED, &error))
 			{
@@ -1613,7 +1631,7 @@ int	main(int argc, char **argv)
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)
 				zbx_test_parameter(TEST_METRIC);
-			else if (ZBX_TASK_PRINT_SUPPORTED == t.task)
+			else
 				zbx_test_parameters();
 #ifdef _WINDOWS
 			zbx_free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
