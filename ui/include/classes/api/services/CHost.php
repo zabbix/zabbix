@@ -1251,7 +1251,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'status'],
+			'output' => ['hostid', 'host', 'flags', 'status', 'name'],
 			'hostids' => array_column($data['hosts'], 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
