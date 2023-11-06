@@ -210,7 +210,7 @@ class CConnector extends CApiService {
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5', 'default' => DB::getDefault('connector', 'max_attempts')],
 			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY , 'in' => '1:10'],
-										['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('connector', 'attempt_interval')]
+										['else' => true, 'type' => API_TIME_UNIT, 'in' => '5']
 			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
@@ -375,7 +375,7 @@ class CConnector extends CApiService {
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5'],
 			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:10'],
-										['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('connector', 'attempt_interval')]
+										['else' => true, 'type' => API_TIME_UNIT, 'in' => '5']
 			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
