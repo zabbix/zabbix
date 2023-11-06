@@ -2602,6 +2602,24 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 
 				]
+			],
+			// #237 Create Pie chart.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Pie chart',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart'
+				]
 			]
 		];
 	}

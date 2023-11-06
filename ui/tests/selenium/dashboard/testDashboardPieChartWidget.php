@@ -30,8 +30,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 class testDashboardPieChartWidget extends CWebTest
 {
 	protected static $dashboardid;
-	protected static $screenshot_host_id;
-	protected static $screenshot_host_item_ids;
+	protected static $item_ids;
 	protected const TYPE_ITEM_PATTERN = 'Item pattern';
 	protected const TYPE_ITEM_LIST = 'Item list';
 	protected const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
@@ -68,66 +67,55 @@ class testDashboardPieChartWidget extends CWebTest
 		$response = CDataHelper::createHosts([
 			[
 				'host' => self::HOST_NAME_ITEM_LIST,
-				'groups' => [['groupid' => '6']]
+				'groups' => [['groupid' => '6']],
+				'items' => [
+					[
+						'name' => 'item-1',
+						'key_' => 'key-1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'item-2',
+						'key_' => 'key-2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
 			],
 			[
 				'host' => self::HOST_NAME_SCREENSHOTS,
-				'groups' => [['groupid' => '6']]
-			]
-		]);
-		$host_id = $response['hostids'][self::HOST_NAME_ITEM_LIST];
-		CDataHelper::call('item.create', [
-			[
-				'hostid' => $host_id,
-				'name' => 'item-1',
-				'key_' => 'key-1',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			[
-				'hostid' => $host_id,
-				'name' => 'item-2',
-				'key_' => 'key-2',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'groups' => [['groupid' => '6']],
+				'items' => [
+					[
+						'name' => 'item-1',
+						'key_' => 'item-1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'item-2',
+						'key_' => 'item-2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'item-3',
+						'key_' => 'item-3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'item-4',
+						'key_' => 'item-4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
 			]
 		]);
 
-		self::$screenshot_host_id = $response['hostids'][self::HOST_NAME_SCREENSHOTS];
-		$response = CDataHelper::call('item.create', [
-			[
-				'hostid' => self::$screenshot_host_id,
-				'name' => 'item-1',
-				'key_' => 'key-1',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			[
-				'hostid' => self::$screenshot_host_id,
-				'name' => 'item-2',
-				'key_' => 'key-2',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			[
-				'hostid' => self::$screenshot_host_id,
-				'name' => 'item-3',
-				'key_' => 'key-3',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT
-			],
-			[
-				'hostid' => self::$screenshot_host_id,
-				'name' => 'item-4',
-				'key_' => 'key-4',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT
-			]
-		]);
-		self::$screenshot_host_item_ids = [];
-		foreach([0, 1, 2, 3] as $id) {
-			self::$screenshot_host_item_ids['item-'.($id + 1)] = intval($response['itemids'][$id]);
-		}
+		self::$item_ids = $response['itemids'];
 	}
 
 	public function getLayoutData() {
@@ -173,13 +161,7 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertEquals($data['header_text'], $dialog->getTitle());
 
 		// Check Help button.
-		$help_button = $dialog->query('xpath:.//*[@title="Help"]')->one();
-		$this->assertTrue($help_button->isClickable());
-		$version = substr(ZABBIX_VERSION, 0, 3);
-		$this->assertEquals(
-				'https://www.zabbix.com/documentation/'.$version.'/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart',
-				$help_button->getAttribute('href')
-		);
+		$this->assertTrue($dialog->query('xpath:.//*[@title="Help"]')->one()->isClickable());
 
 		// Check Close button.
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
@@ -207,25 +189,15 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertLabels(['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'], $form);
 		$this->assertTrue($form->query('xpath:.//li[@data-set="0"]//button[@title="Delete"]')->one()->isClickable());
 
-		foreach(['id:ds_0_hosts_',
-				'id:ds_0_items_',
-				'name:ds[0][aggregate_function]',
-				'name:ds[0][dataset_aggregation]',
-				'name:ds[0][data_set_label]'] as $selector) {
+		foreach(['id:ds_0_hosts_', 'id:ds_0_items_'] as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isClickable());
 		}
 
-		$hints = [
-			'label-ds_{id}_aggregate_function' => 'Aggregates each item in the data set.',
-			'label-ds_{id}_dataset_aggregation' => 'Aggregates the whole data set.',
-			'ds_{id}_data_set_label' => 'Also used as legend label for aggregated data sets.',
-		];
-
-		foreach ($hints as $selector => $expected_hint) {
-			$selector = str_replace('{id}', '0', $selector);
-			$this->assertEquals($expected_hint, $this->query('xpath://label[@for='.CXPathHelper::escapeQuotes($selector).
-					']/button')->one()->getAttribute('data-hintbox-contents'));
+		foreach(['Aggregation function', 'Data set aggregation', 'Data set label'] as $label) {
+			$this->assertTrue($form->getField($label)->isClickable());
 		}
+
+		$this->validateDataSetHintboxes($form);
 
 		// Screenshot Item pattern.
 		$this->screenshotLayout($dialog, 'piechart_item_pattern', $data['action']);
@@ -252,11 +224,7 @@ class testDashboardPieChartWidget extends CWebTest
 			$this->assertTrue($form->query($selector)->one()->isClickable());
 		}
 
-		foreach ($hints as $selector => $expected_hint) {
-			$selector = str_replace('{id}', '1', $selector);
-			$this->assertEquals($expected_hint, $this->query('xpath://label[@for='.CXPathHelper::escapeQuotes($selector).
-					']/button')->one()->getAttribute('data-hintbox-contents'));
-		}
+		$this->validateDataSetHintboxes($form);
 
 		// Screenshot Item list.
 		$this->screenshotLayout($dialog, 'piechart_item_list', $data['action']);
@@ -825,7 +793,7 @@ class testDashboardPieChartWidget extends CWebTest
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
 		// Delete item history data in DB.
 		foreach ([1, 2, 3, 4] as $id) {
-			CDataHelper::removeItemData(self::$screenshot_host_item_ids['item-'.$id]);
+			CDataHelper::removeItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':item-'.$id]);
 		}
 
 		// Set the new item history data.
@@ -834,14 +802,14 @@ class testDashboardPieChartWidget extends CWebTest
 			foreach ($item_data as $record) {
 				// Always minus 10 seconds for safety.
 				$time = time() - 10 + CTestArrayHelper::get($record, 'time');
-				CDataHelper::addItemData(self::$screenshot_host_item_ids[$item_key], $record['value'], $time);
+				CDataHelper::addItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$item_key], $record['value'], $time);
 			}
 		}
 
 		// Fill in the actual Item ids into the data set data (this only applies to Item list data sets).
 		foreach ($data['widget_fields'] as $id => $field) {
 			if (preg_match('/^ds\.[0-9]\.itemids\.[0-9]$/', $field['name'])) {
-				$field['value'] = self::$screenshot_host_item_ids[$field['value']];
+				$field['value'] = self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$field['value']];
 				$data['widget_fields'][$id] = $field;
 			}
 		}
@@ -931,6 +899,27 @@ class testDashboardPieChartWidget extends CWebTest
 		// Screenshot the widget.
 		$this->page->removeFocus();
 		$this->assertScreenshot($widget, 'piechart_display_'.$data['screenshot_id']);
+	}
+
+	/**
+	 * Checks the hintboxes in the Create/Edit form for both Data set forms.
+	 *
+	 * @param $form    Data set form
+	 */
+	protected function validateDataSetHintboxes($form) {
+		$hints = [
+			'Aggregation function' => 'Aggregates each item in the data set.',
+			'Data set aggregation' => 'Aggregates the whole data set.',
+			'Data set label' => 'Also used as legend label for aggregated data sets.',
+		];
+
+		foreach ($hints as $field => $text) {
+			// Summon the hint-box, assert text and close.
+			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$this->assertEquals($text, $hint->getText());
+			$hint->query('xpath:./button')->one()->click();
+		}
 	}
 
 	/**
