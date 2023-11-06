@@ -35,7 +35,7 @@ window.widget_honeycomb_form = new class {
 
 		colorPalette.setThemeColors(thresholds_colors);
 
-		this.#form.addEventListener('change', (e) => this.#updateForm(e.target));
+		this.#form.addEventListener('change', () => this.#updateForm());
 
 		$thresholds_table.on('afterremove.dynamicRows', () => this.#updateForm());
 
@@ -57,14 +57,9 @@ window.widget_honeycomb_form = new class {
 		this.#updateForm();
 	}
 
-	#updateForm(trigger = null) {
+	#updateForm() {
 		const primary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY ?>}`);
 		const secondary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY ?>}`);
-
-		if ([primary_show, secondary_show].filter((checkbox) => checkbox.checked && !checkbox.disabled).length === 0) {
-			trigger.checked = true;
-			this.#updateForm(trigger);
-		}
 
 		this.#updateLabelFields('primary', primary_show);
 		this.#updateLabelFields('secondary', secondary_show)

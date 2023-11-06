@@ -242,6 +242,16 @@ class WidgetForm extends CWidgetForm {
 			]);
 		}
 
-		return parent::validate($strict);
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if (!$this->getFieldValue('show')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+		}
+
+		return $errors;
 	}
 }
