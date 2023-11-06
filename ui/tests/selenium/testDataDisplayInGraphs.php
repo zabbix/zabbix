@@ -349,7 +349,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		]);
 
 		// This timestamp represents the changing point between trends and history data.
-		$timestamp = '07-08-2023 12:00 EET';
+		$timestamp = '07-10-2023 12:00 EET';
 
 		$item_data = [
 			// Trends data for first trends item.
@@ -642,12 +642,12 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		self::$timestamps = [
 			'history' => [
-				'from' => '2023-08-07 12:58:00',
-				'to' => '2023-08-07 13:20:00',
+				'from' => '2023-10-07 12:58:00',
+				'to' => '2023-10-07 13:20:00',
 			],
 			'trends' => [
-				'from' => '2023-08-03 00:00:00',
-				'to' => '2023-08-07 12:00:00',
+				'from' => '2023-10-03 00:00:00',
+				'to' => '2023-10-07 12:00:00',
 			],
 			'pie' => [
 				'from' => 'now-1h',
@@ -1805,7 +1805,7 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => '2023-08-07 12:54:00'
+										'value' => '2023-10-07 12:54:00'
 									],
 									[
 										'type' => 1,
@@ -1911,7 +1911,7 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => '2023-08-08 12:00:00'
+										'value' => '2023-10-08 12:00:00'
 									],
 									[
 										'type' => 1,
@@ -2315,11 +2315,6 @@ class testDataDisplayInGraphs extends CWebTest {
 			$dashboard->waitUntilReady();
 		}
 
-		// For widgets waiting for dashboard to be ready is not enoguh - need to wait for all widget content to load.
-		foreach ($dashboard->getWidgets() as $widget) {
-			$widget->query($content_locator)->waitUntilVisible();
-		}
-
 		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
 		$this->assertScreenshot($dashboard, $screenshot_id);
 
@@ -2337,13 +2332,14 @@ class testDataDisplayInGraphs extends CWebTest {
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
-		$object= $this->query($object_locator)->waitUntilPresent()->one();
+		$object = $this->query($object_locator)->waitUntilPresent()->one();
 
-		// For widgets waiting for dashboard to be present is not enoguh - need to wait for all widget content to load.
-		if ($content_locator) {
-			foreach ($object->asDashboard()->getWidgets() as $widget) {
-				$widget->query($content_locator)->waitUntilVisible();
-			}
+		// Wait for the object with the graphs to be present.
+		if ($object_locator === 'class:dashboard-grid') {
+			$object->asDashboard()->waitUntilReady();
+		}
+		else {
+			$this->query('id:historyGraph')->waitUntilAttributesPresent('src');
 		}
 
 		$this->assertScreenshot($object, $id.'_kiosk');
