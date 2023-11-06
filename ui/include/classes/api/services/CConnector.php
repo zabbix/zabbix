@@ -209,7 +209,7 @@ class CConnector extends CApiService {
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5'],
 			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY , 'in' => '1:10'],
+										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY , 'in' => '1:10', DB::getDefault('connector', 'attempt_interval')],
 										['else' => true, 'type' => API_TIME_UNIT, 'in' => '1:10', 'default' => DB::getDefault('connector', 'attempt_interval')]
 			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
