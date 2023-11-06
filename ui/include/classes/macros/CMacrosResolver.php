@@ -344,7 +344,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'event' => [], 'log' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'log' => [], 'usermacros' => []];
 
 		$triggerid = $trigger['triggerid'];
 
