@@ -22,6 +22,7 @@ package smart
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"zabbix.com/pkg/conf"
@@ -55,6 +56,8 @@ type Plugin struct {
 }
 
 var impl Plugin
+
+var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -140,6 +143,13 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
+	for _, v := range params {
+		err := clearString(v)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	switch len(params) {
 	case twoParameters:
 		return p.diskGetSingle(params[firstParameter], params[secondParameter])
@@ -424,6 +434,14 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	}
 
 	return ssdType
+}
+
+func clearString(str string) error {
+	if !cleanRegex.MatchString(str) {
+		return zbxerr.New(fmt.Sprintf("invalid characters found in parameter '%s'", str))
+	}
+
+	return nil
 }
 
 func init() {
