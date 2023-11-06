@@ -959,6 +959,21 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Zabbix agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Simple check timeout - 0',
 						'Proxy mode' => 'Active'
 					],
@@ -997,6 +1012,21 @@ class testFormAdministrationProxies extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "/1/timeout_simple_check": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Simple check timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Simple check' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_simple_check": a time unit is expected.'
 					]
 				]
 			],
@@ -1049,6 +1079,21 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'SNMP agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SNMP agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'External check timeout - 0',
 						'Proxy mode' => 'Active'
 					],
@@ -1087,6 +1132,21 @@ class testFormAdministrationProxies extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "/1/timeout_external_check": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'External check timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'External check' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
 					]
 				]
 			],
@@ -1139,6 +1199,21 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Database monitor timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Database monitor' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_db_monitor": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'HTTP agent timeout - 0',
 						'Proxy mode' => 'Active'
 					],
@@ -1184,6 +1259,21 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'HTTP agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'HTTP agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_http_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'SSH agent timeout - 0',
 						'Proxy mode' => 'Active'
 					],
@@ -1214,7 +1304,7 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'SSH agent timeout - too large',
+						'Proxy name' => 'SSH agent timeout - test',
 						'Proxy mode' => 'Active'
 					],
 					'timeout_fields' => [
@@ -1222,6 +1312,21 @@ class testFormAdministrationProxies extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "/1/timeout_ssh_agent": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SSH agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SSH agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
 					]
 				]
 			],
@@ -1274,6 +1379,21 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'TELNET agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'TELNET agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Script timeout - 0',
 						'Proxy mode' => 'Active'
 					],
@@ -1312,6 +1432,21 @@ class testFormAdministrationProxies extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "/1/timeout_script": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Script timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Script' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_script": a time unit is expected.'
 					]
 				]
 			],
