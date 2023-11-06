@@ -35,9 +35,19 @@ class CConnector extends CApiService {
 	protected $tableAlias = 'c';
 	protected $sortColumns = ['connectorid', 'name', 'data_type', 'status'];
 
-	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-		'max_attempts', 'timeout', 'http_proxy', 'authtype', 'username', 'password', 'token', 'verify_peer',
-		'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status', 'tags_evaltype'
+	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'item_value_type', 'url',
+		'max_records', 'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype',
+		'username',	'password',	'token', 'verify_peer',	'verify_host', 'ssl_cert_file', 'ssl_key_file',
+		'ssl_key_password',	'description', 'status', 'tags_evaltype'
+	];
+
+	private array $filter_fields = ['connectorid', 'name', 'protocol', 'data_type', 'item_value_type', 'url',
+		'max_records', 'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype',
+		'username', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'status', 'tags_evaltype'
+	];
+
+	private array $search_fields = ['name', 'url', 'attempt_interval', 'timeout', 'http_proxy', 'username', 'token',
+		'ssl_cert_file', 'ssl_key_file', 'description'
 	];
 
 	/**
@@ -57,8 +67,8 @@ class CConnector extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'connectorids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['connectorid', 'name', 'protocol', 'data_type', 'authtype', 'status']],
-			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'url', 'http_proxy', 'username', 'token', 'description']],
+			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => $this->filter_fields],
+			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => $this->search_fields],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>				['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
@@ -189,11 +199,19 @@ class CConnector extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'name')],
 			'protocol' =>			['type' => API_INT32, 'in' => ZBX_STREAMING_PROTOCOL_V1],
-			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS])],
+			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]), 'default' => DB::getDefault('connector', 'data_type')],
+			'item_value_type' => 	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type')],
+										['else' => true, 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type'), 'default' => DB::getDefault('connector', 'item_value_type')]
+			]],
 			'url' =>				['type' => API_URL, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5'],
+			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY , 'in' => '1:10'],
+										['else' => true, 'type' => API_TIME_UNIT, 'in' => '1:10', 'default' => DB::getDefault('connector', 'attempt_interval')]
+			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER]), 'default' => DB::getDefault('connector', 'authtype')],
@@ -314,7 +332,9 @@ class CConnector extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['authtype']);
+		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', [
+			'authtype', 'data_type', 'max_attempts'
+		]);
 
 		$db_defaults = DB::getDefaults('connector');
 
@@ -329,6 +349,14 @@ class CConnector extends CApiService {
 			if ($connector['authtype'] != ZBX_HTTP_AUTH_BEARER) {
 				$connector += ['token' => $db_defaults['token']];
 			}
+
+			if ($connector['data_type'] != ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+				$connector += ['item_value_type' => $db_defaults['item_value_type']];
+			}
+
+			if ($connector['max_attempts'] <= 1) {
+				$connector += ['attempt_interval' => $db_defaults['attempt_interval']];
+			}
 		}
 		unset($connector);
 
@@ -337,10 +365,18 @@ class CConnector extends CApiService {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'name')],
 			'protocol' =>			['type' => API_INT32, 'in' => ZBX_STREAMING_PROTOCOL_V1],
 			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS])],
+			'item_value_type' => 	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type')],
+										['else' => true, 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.DB::getDefault('connector', 'item_value_type')]
+			]],
 			'url' =>				['type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5'],
+			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:10'],
+										['else' => true, 'type' => API_TIME_UNIT, 'in' => '1:10']
+			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER])],

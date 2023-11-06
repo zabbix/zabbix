@@ -40,7 +40,7 @@ window.connector_edit_popup = new class {
 			allow_empty: true
 		});
 
-		for (const id of ['tags', 'authtype', 'max_records_mode']) {
+		for (const id of ['data_type', 'tags', 'authtype', 'max_records_mode', 'max_attempts']) {
 			document.getElementById(id).addEventListener('change', () => this._updateForm());
 		}
 
@@ -50,6 +50,13 @@ window.connector_edit_popup = new class {
 	}
 
 	_updateForm() {
+		const data_type = this.form.querySelector('[name="data_type"]:checked').value;
+		const item_value_type = this.form.querySelectorAll('.js-field-item-value-type');
+
+		for (const element of item_value_type) {
+			element.style.display = data_type == <?= ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES ?> ? '' : 'none';
+		}
+
 		for (const tag_operator of document.getElementById('tags').querySelectorAll('.js-tag-operator')) {
 			const tag_value = tag_operator.closest('.form_row').querySelector('.js-tag-value');
 
@@ -72,6 +79,9 @@ window.connector_edit_popup = new class {
 
 		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
 		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
+
+		this.form.querySelector('[name="attempt_interval"]')
+			.disabled = this.form.querySelector('[name="max_attempts"]').value <= 1;
 	}
 
 	clone({title, buttons}) {

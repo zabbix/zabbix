@@ -60,10 +60,10 @@ class CControllerConnectorEdit extends CController {
 
 		if ($this->hasInput('connectorid')) {
 			$db_connectors = API::Connector()->get([
-				'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-					'max_attempts', 'timeout', 'http_proxy', 'authtype', 'username', 'password', 'token', 'verify_peer',
-					'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status',
-					'tags_evaltype'
+				'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'item_value_type',
+					'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype', 'username',
+					'password', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file',
+					'ssl_key_password', 'description', 'status', 'tags_evaltype'
 				],
 				'selectTags' => ['tag', 'operator', 'value'],
 				'connectorids' => $this->getInput('connectorid')
@@ -86,13 +86,35 @@ class CControllerConnectorEdit extends CController {
 	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('connector');
 
+		$all_item_value_types = [ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT, ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
+			ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG, ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR, ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT
+		];
+
+		rsort($all_item_value_types);
+
 		if ($this->connector !== null) {
+			$checked_item_value_types = [];
+
+			if (array_key_exists('item_value_type', $this->connector)) {
+				foreach ($all_item_value_types as $value) {
+					if ($this->connector['item_value_type'] - $value >= 0) {
+						$checked_item_value_types[] = $value;
+						$this->connector['item_value_type'] -= $value;
+					}
+
+					if ($this->connector['item_value_type'] === 0) {
+						break;
+					}
+				}
+			}
+
 			$data = [
 				'connectorid' => $this->connector['connectorid'],
 				'form' => [
 					'name' => $this->connector['name'],
 					'protocol' => $this->connector['protocol'],
 					'data_type' => (int) $this->connector['data_type'],
+					'item_value_type' => $checked_item_value_types,
 					'url' => $this->connector['url'],
 					'authtype' => (int) $this->connector['authtype'],
 					'username' => $this->connector['username'],
@@ -103,6 +125,7 @@ class CControllerConnectorEdit extends CController {
 					'max_records' => (int) $this->connector['max_records'],
 					'max_senders' => (int) $this->connector['max_senders'],
 					'max_attempts' => (int) $this->connector['max_attempts'],
+					'attempt_interval' => $this->connector['attempt_interval'],
 					'timeout' => $this->connector['timeout'],
 					'verify_peer' => (int) $this->connector['verify_peer'],
 					'verify_host' => (int) $this->connector['verify_host'],
@@ -131,6 +154,7 @@ class CControllerConnectorEdit extends CController {
 					'name' => $db_defaults['name'],
 					'protocol' => (int) $db_defaults['protocol'],
 					'data_type' => (int) $db_defaults['data_type'],
+					'item_value_type' => $all_item_value_types,
 					'url' => $db_defaults['url'],
 					'authtype' => (int) $db_defaults['authtype'],
 					'username' => $db_defaults['username'],
@@ -141,6 +165,7 @@ class CControllerConnectorEdit extends CController {
 					'max_senders' => (int) $db_defaults['max_senders'],
 					'max_attempts' => (int) $db_defaults['max_attempts'],
 					'timeout' => $db_defaults['timeout'],
+					'attempt_interval' => $db_defaults['attempt_interval'],
 					'http_proxy' => $db_defaults['http_proxy'],
 					'verify_peer' => (int) $db_defaults['verify_peer'],
 					'verify_host' => (int) $db_defaults['verify_host'],

@@ -31,6 +31,7 @@ class CControllerConnectorCreate extends CController {
 			'protocol' =>			'db connector.protocol|in '.ZBX_STREAMING_PROTOCOL_V1,
 			'data_type' =>			'db connector.data_type|in '.implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]),
 			'url' =>				'required|not_empty|db connector.url',
+			'item_value_type' =>	'array',
 			'authtype' =>			'db connector.authtype|in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER]),
 			'username' =>			'db connector.username',
 			'password' =>			'db connector.password',
@@ -41,6 +42,7 @@ class CControllerConnectorCreate extends CController {
 			'max_senders' =>		'db connector.max_senders|ge 1|le 100',
 			'max_attempts' =>		'db connector.max_attempts|ge 1|le 5',
 			'timeout' =>			'db connector.timeout',
+			'attempt_interval' =>	'db connector.attempt_interval',
 			'verify_peer' =>		'db connector.verify_peer|in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
 			'verify_host' =>		'db connector.verify_host|in '.implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 			'ssl_cert_file' =>		'db connector.ssl_cert_file',
@@ -64,6 +66,14 @@ class CControllerConnectorCreate extends CController {
 
 			if ($this->getInput('authtype', ZBX_HTTP_AUTH_NONE) == ZBX_HTTP_AUTH_BEARER) {
 				$fields['token'] = 'required|not_empty';
+			}
+
+			if ($this->getInput('data_type') == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+				$fields['item_value_type'] = 'required';
+			}
+
+			if ($this->getInput('max_attempts') > 1) {
+				$fields['attempt_interval'] = 'required|not_empty';
 			}
 
 			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
@@ -97,18 +107,20 @@ class CControllerConnectorCreate extends CController {
 		$db_defaults = DB::getDefaults('connector');
 
 		$connector = [
+			'data_type' => $this->getInput('data_type', $db_defaults['data_type']),
 			'authtype' => $this->getInput('authtype', $db_defaults['authtype']),
 			'max_records' => $this->getInput('max_records_mode', 0) == 1
 				? $this->getInput('max_records')
 				: $db_defaults['max_records'],
+			'max_attempts' => $this->getInput('max_attempts', $db_defaults['max_attempts']),
 			'verify_peer' => $this->getInput('verify_peer', ZBX_HTTP_VERIFY_PEER_OFF),
 			'verify_host' => $this->getInput('verify_host', ZBX_HTTP_VERIFY_HOST_OFF),
 			'status' => $this->getInput('status', ZBX_CONNECTOR_STATUS_DISABLED),
 			'tags' => []
 		];
 
-		$this->getInputs($connector, ['name', 'protocol', 'data_type', 'url', 'max_senders', 'max_attempts', 'timeout',
-			'http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'tags_evaltype'
+		$this->getInputs($connector, ['name', 'protocol', 'url', 'max_senders', 'timeout', 'http_proxy',
+			'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'tags_evaltype'
 		]);
 
 		switch ($connector['authtype']) {
@@ -121,6 +133,14 @@ class CControllerConnectorCreate extends CController {
 
 			case ZBX_HTTP_AUTH_BEARER:
 				$connector['token'] = $this->getInput('token');
+		}
+
+		if ($connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+			$connector['item_value_type'] = array_sum($this->getInput('item_value_type'));
+		}
+
+		if ($connector['max_attempts'] > 1) {
+			$connector['attempt_interval'] = $this->getInput('attempt_interval');
 		}
 
 		foreach ($this->getInput('tags', []) as $tag) {
