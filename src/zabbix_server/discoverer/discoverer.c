@@ -259,12 +259,12 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				item.timeout = dcheck->timeout;
 
 				if (SUCCEED == (ret = zbx_agent_get_value(&item, dmanager.source_ip, program_type,
-						&result) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result))))
+						&result)) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 				{
 					zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 				}
 
-				if (FAIL == ret && ZBX_ISSET_MSG(&result))
+				if (SUCCEED != ret && ZBX_ISSET_MSG(&result))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "discovery: item [%s] error: %s",
 							item.key, result.msg);
@@ -584,7 +584,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			result = results.values[i];
 
-			if (NULL == result->dnsname && 0 != result->services.values_num)
+			if (NULL == result->dnsname)
 			{
 				zabbix_log(LOG_LEVEL_WARNING,
 						"Missing 'dnsname', result skipped (druleid=" ZBX_FS_UI64 ", ip: '%s')",
@@ -1026,11 +1026,14 @@ static void	discover_results_move_value(zbx_discoverer_results_t *src, zbx_hashs
 		src->dnsname = NULL;
 		src->ip = NULL;
 	}
-	else if (NULL == dst->dnsname)
+	else if (NULL == dst->dnsname && NULL != src->dnsname)
 	{
 		dst->dnsname = src->dnsname;
 		src->dnsname = NULL;
 	}
+
+	if (NULL == dst->dnsname)
+		dst->dnsname = zbx_strdup(NULL, "");
 
 	zbx_vector_discoverer_services_ptr_append_array(&dst->services, src->services.values,
 			src->services.values_num);

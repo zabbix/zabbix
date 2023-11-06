@@ -101,6 +101,7 @@ static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 {
 	switch(dcheck->type)
 	{
+	case SVC_AGENT:
 	case SVC_ICMPPING:
 	case SVC_SNMPv1:
 	case SVC_SNMPv2c:
@@ -279,7 +280,7 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 	{
 		zbx_task_range_t	range;
 
-		if (DISCOVERY_ADDR_IP == task->addr_type)
+		if (DISCOVERY_ADDR_IP == task->addr_type || SVC_SNMPv3 == task->dchecks.values[0]->type)
 		{
 			zbx_hashset_insert(tasks_dst, task, sizeof(zbx_discoverer_task_t));
 			zbx_hashset_iter_remove(&iter);

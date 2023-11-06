@@ -21,6 +21,7 @@
 #include "discoverer_async.h"
 #include "zbxlog.h"
 #include "../poller/checks_snmp.h"
+#include "../poller/async_agent.h"
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
 #include <event2/dns.h>
@@ -43,7 +44,7 @@ typedef struct
 	zbx_discoverer_results_t	*dresult;
 	zbx_uint64_t			dcheckid;
 }
-discovery_snmp_result_t;
+discovery_async_result_t;
 
 static void	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)
 {
@@ -97,34 +98,34 @@ static void	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 
 static void	process_snmp_result(void *data)
 {
-	discovery_snmp_result_t	*snmp_result = zbx_async_check_snmp_get_arg(data);
+	discovery_async_result_t	*async_result = zbx_async_check_snmp_get_arg(data);
 	zbx_dc_item_context_t	*item = zbx_async_check_snmp_get_item_context(data);
 	char			**pvalue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
 			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
 
-	snmp_result->poller_config->processing--;
-	snmp_result->dresult->processed_checks_per_ip++;
+	async_result->poller_config->processing--;
+	async_result->dresult->processed_checks_per_ip++;
 
 	if (SUCCEED == item->ret && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&item->result)))
 	{
 		zbx_discoverer_dservice_t	*service;
 
-		service = result_dservice_create(item->interface.port, snmp_result->dcheckid);
+		service = result_dservice_create(item->interface.port, async_result->dcheckid);
 		zbx_strlcpy_utf8(service->value, *pvalue, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 		service->status = DOBJECT_STATUS_UP;
-		zbx_vector_discoverer_services_ptr_append(&snmp_result->dresult->services, service);
+		zbx_vector_discoverer_services_ptr_append(&async_result->dresult->services, service);
 
-		if (NULL ==  snmp_result->dresult->dnsname || '\0' == *snmp_result->dresult->dnsname)
+		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
 		{
-			snmp_result->dresult->dnsname = zbx_strdup(snmp_result->dresult->dnsname,
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname,
 					NULL == zbx_async_check_snmp_get_reverse_dns(data) ? "" :
 					zbx_async_check_snmp_get_reverse_dns(data));
 		}
 	}
 
-	zbx_free(snmp_result);
+	zbx_free(async_result);
 	zbx_async_check_snmp_clean(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
@@ -133,15 +134,15 @@ static void	process_snmp_result(void *data)
 static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
 		char *ip, const int port, zbx_discoverer_results_t *dresult, char **error)
 {
-	int			ret;
-	zbx_dc_item_t		item;
-	AGENT_RESULT		result;
-	discovery_snmp_result_t	*snmp_result;
+	int				ret;
+	zbx_dc_item_t			item;
+	AGENT_RESULT			result;
+	discovery_async_result_t	*async_result;
 
-	snmp_result = (discovery_snmp_result_t *) zbx_malloc(NULL, sizeof(discovery_snmp_result_t));
-	snmp_result->dresult = dresult;
-	snmp_result->poller_config = poller_config;
-	snmp_result->dcheckid = dcheck->dcheckid;
+	async_result = (discovery_async_result_t *) zbx_malloc(NULL, sizeof(discovery_async_result_t));
+	async_result->dresult = dresult;
+	async_result->poller_config = poller_config;
+	async_result->dcheckid = dcheck->dcheckid;
 
 	zbx_init_agent_result(&result);
 
@@ -193,7 +194,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 
 	zbx_set_snmp_bulkwalk_options();
 
-	if (FAIL == (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, snmp_result, NULL,
+	if (FAIL == (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, async_result, NULL,
 			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
 			ZABBIX_SNMP_RESOLVE_REVERSE_DNS_YES)))
 	{
@@ -202,7 +203,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 		else
 			*error = zbx_strdup(*error, "Error of snmp check");
 
-		zbx_free(snmp_result);
+		zbx_free(async_result);
 	}
 	else
 		poller_config->processing++;
@@ -215,6 +216,100 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	zbx_free(item.snmpv3_contextname);
 	zbx_free_agent_result(&result);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
+			ip, port, item.key_orig, ret);
+	return ret;
+}
+
+static void	process_agent_result(void *data)
+{
+	zbx_agent_context		*agent_context = (zbx_agent_context *)data;
+	discovery_async_result_t	*async_result = (discovery_async_result_t *)agent_context->arg;
+	zbx_dc_item_context_t		*item = &agent_context->item;
+	char				**pvalue;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
+
+	async_result->poller_config->processing--;
+	async_result->dresult->processed_checks_per_ip++;
+
+	if (SUCCEED == item->ret && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&item->result)))
+	{
+		zbx_discoverer_dservice_t	*service;
+
+		service = result_dservice_create(item->interface.port, async_result->dcheckid);
+		zbx_strlcpy_utf8(service->value, *pvalue, ZBX_MAX_DISCOVERED_VALUE_SIZE);
+		service->status = DOBJECT_STATUS_UP;
+		zbx_vector_discoverer_services_ptr_append(&async_result->dresult->services, service);
+
+		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
+		{
+			char	dns[ZBX_INTERFACE_DNS_LEN_MAX];
+
+			zbx_gethost_by_ip(item->interface.ip_orig, dns, sizeof(dns));
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname, dns);
+/*
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname,
+					NULL == zbx_async_check_snmp_get_reverse_dns(data) ? "" :
+					zbx_async_check_snmp_get_reverse_dns(data));
+*/
+		}
+	}
+
+	zbx_free(async_result);
+	zbx_async_check_agent_clean(agent_context);
+	zbx_free(agent_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+}
+
+static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
+		char *ip, const int port, zbx_discoverer_results_t *dresult, char **error)
+{
+	int				ret;
+	zbx_dc_item_t			item;
+	AGENT_RESULT			result;
+	discovery_async_result_t	*async_result;
+
+	async_result = (discovery_async_result_t *) zbx_malloc(NULL, sizeof(discovery_async_result_t));
+	async_result->dresult = dresult;
+	async_result->poller_config = poller_config;
+	async_result->dcheckid = dcheck->dcheckid;
+
+	zbx_init_agent_result(&result);
+
+	memset(&item, 0, sizeof(zbx_dc_item_t));
+	zbx_strscpy(item.key_orig, dcheck->key_);
+
+	item.interface.useip = 1;
+	zbx_strscpy(item.interface.ip_orig, ip);
+	item.interface.addr = item.interface.ip_orig;
+	item.interface.port = port;
+
+	item.value_type = ITEM_VALUE_TYPE_STR;
+	item.type = ITEM_TYPE_ZABBIX;
+
+	item.key = zbx_strdup(NULL, item.key_orig);
+	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
+	item.timeout = dcheck->timeout;
+
+	if (FAIL == (ret = zbx_async_check_agent(&item, &result, process_agent_result, async_result, NULL,
+			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip /*,
+			ZABBIX_SNMP_RESOLVE_REVERSE_DNS_YES */)))
+	{
+		if (ZBX_ISSET_MSG(&result))
+			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
+		else
+			*error = zbx_strdup(*error, "Error of agent check");
+
+		zbx_free(async_result);
+	}
+	else
+		poller_config->processing++;
+
+	zbx_free(item.key);
+	zbx_free_agent_result(&result);
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
 			ip, port, item.key_orig, ret);
 	return ret;
@@ -319,6 +414,10 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 					ret = FAIL;
 					*error = zbx_strdup(*error, "Support for SNMP checks was not compiled in.");
 #endif
+					break;
+				case SVC_AGENT:
+					ret = discovery_agent(&poller_config, dcheck, ip, task->addr.range->state.port,
+							result, error);
 					break;
 				default:
 					ret = FAIL;
