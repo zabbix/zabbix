@@ -2169,8 +2169,8 @@ class testDataDisplayInGraphs extends CWebTest {
 		$filter_form->fill(['Name' => $data['type']]);
 
 		$screenshot_string = (CTestArrayHelper::get($data, 'kiosk_mode'))
-			? 'monitoring_hosts'.$data['type'].'_kiosk_'
-			: 'monitoring_hosts'.$data['type'].'_';
+			? 'monitoring_hosts_'.$data['type'].'_kiosk_'
+			: 'monitoring_hosts_'.$data['type'].'_';
 
 		// Check screenshots of graphs for each option in 'Show' field.
 		foreach (['All graphs', 'Host graphs', 'Simple graphs'] as $show) {
@@ -2181,11 +2181,11 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			// Select the desired value in Show field, if it is not selected already.
 			$filter_form->invalidate();
-
 			if ($filter_form->getField('Show')->getValue() !== $show) {
 				$filter_form->fill(['Show' => $show]);
-				$filter_form->submit();
 			}
+
+			$filter_form->submit();
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
