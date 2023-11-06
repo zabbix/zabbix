@@ -41,8 +41,8 @@ class CControllerConnectorCreate extends CController {
 			'max_records' =>		'db connector.max_records|ge 0',
 			'max_senders' =>		'db connector.max_senders|ge 1|le 100',
 			'max_attempts' =>		'db connector.max_attempts|ge 1|le 5',
-			'timeout' =>			'db connector.timeout',
 			'attempt_interval' =>	'db connector.attempt_interval',
+			'timeout' =>			'db connector.timeout',
 			'verify_peer' =>		'db connector.verify_peer|in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
 			'verify_host' =>		'db connector.verify_host|in '.implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 			'ssl_cert_file' =>		'db connector.ssl_cert_file',
@@ -64,12 +64,12 @@ class CControllerConnectorCreate extends CController {
 				'timeout' =>		'required|not_empty'
 			];
 
-			if ($this->getInput('authtype', ZBX_HTTP_AUTH_NONE) == ZBX_HTTP_AUTH_BEARER) {
-				$fields['token'] = 'required|not_empty';
-			}
-
 			if ($this->getInput('data_type') == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
 				$fields['item_value_type'] = 'required';
+			}
+
+			if ($this->getInput('authtype', ZBX_HTTP_AUTH_NONE) == ZBX_HTTP_AUTH_BEARER) {
+				$fields['token'] = 'required|not_empty';
 			}
 
 			if ($this->getInput('max_attempts') > 1) {

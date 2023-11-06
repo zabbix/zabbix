@@ -95,14 +95,16 @@ class CControllerConnectorEdit extends CController {
 		if ($this->connector !== null) {
 			$checked_item_value_types = [];
 
+			$item_value_type = (int) $this->connector['item_value_type'];
+
 			if (array_key_exists('item_value_type', $this->connector)) {
-				foreach ($all_item_value_types as $value) {
-					if ($this->connector['item_value_type'] - $value >= 0) {
-						$checked_item_value_types[] = $value;
-						$this->connector['item_value_type'] -= $value;
+				foreach ($all_item_value_types as $value_type) {
+					if ($item_value_type - $value_type >= 0) {
+						$checked_item_value_types[] = $value_type;
+						$item_value_type -= $value_type;
 					}
 
-					if ($this->connector['item_value_type'] === 0) {
+					if ($item_value_type === 0) {
 						break;
 					}
 				}
@@ -114,8 +116,8 @@ class CControllerConnectorEdit extends CController {
 					'name' => $this->connector['name'],
 					'protocol' => $this->connector['protocol'],
 					'data_type' => (int) $this->connector['data_type'],
-					'item_value_type' => $checked_item_value_types,
 					'url' => $this->connector['url'],
+					'item_value_type' => $checked_item_value_types,
 					'authtype' => (int) $this->connector['authtype'],
 					'username' => $this->connector['username'],
 					'password' => $this->connector['password'],
@@ -154,8 +156,8 @@ class CControllerConnectorEdit extends CController {
 					'name' => $db_defaults['name'],
 					'protocol' => (int) $db_defaults['protocol'],
 					'data_type' => (int) $db_defaults['data_type'],
-					'item_value_type' => $all_item_value_types,
 					'url' => $db_defaults['url'],
+					'item_value_type' => $all_item_value_types,
 					'authtype' => (int) $db_defaults['authtype'],
 					'username' => $db_defaults['username'],
 					'password' => $db_defaults['password'],
@@ -164,8 +166,8 @@ class CControllerConnectorEdit extends CController {
 					'max_records' => (int) $db_defaults['max_records'],
 					'max_senders' => (int) $db_defaults['max_senders'],
 					'max_attempts' => (int) $db_defaults['max_attempts'],
-					'timeout' => $db_defaults['timeout'],
 					'attempt_interval' => $db_defaults['attempt_interval'],
+					'timeout' => $db_defaults['timeout'],
 					'http_proxy' => $db_defaults['http_proxy'],
 					'verify_peer' => (int) $db_defaults['verify_peer'],
 					'verify_host' => (int) $db_defaults['verify_host'],

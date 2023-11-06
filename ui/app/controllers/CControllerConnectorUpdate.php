@@ -31,8 +31,8 @@ class CControllerConnectorUpdate extends CController {
 			'name' =>				'required|not_empty|db connector.name',
 			'protocol' =>			'db connector.protocol|in '.ZBX_STREAMING_PROTOCOL_V1,
 			'data_type' =>			'db connector.data_type|in '.implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]),
-			'item_value_type' =>	'array',
 			'url' =>				'required|not_empty|db connector.url',
+			'item_value_type' =>	'array',
 			'authtype' =>			'db connector.authtype|in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER]),
 			'username' =>			'db connector.username',
 			'password' =>			'db connector.password',
@@ -65,12 +65,12 @@ class CControllerConnectorUpdate extends CController {
 				'timeout' =>		'required|not_empty'
 			];
 
-			if ($this->getInput('authtype', ZBX_HTTP_AUTH_NONE) == ZBX_HTTP_AUTH_BEARER) {
-				$fields['token'] = 'required|not_empty';
-			}
-
 			if ($this->getInput('data_type') == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
 				$fields['item_value_type'] = 'required';
+			}
+
+			if ($this->getInput('authtype', ZBX_HTTP_AUTH_NONE) == ZBX_HTTP_AUTH_BEARER) {
+				$fields['token'] = 'required|not_empty';
 			}
 
 			if ($this->getInput('max_attempts') > 1) {
