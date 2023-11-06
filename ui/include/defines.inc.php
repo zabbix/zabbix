@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha7');
+define('ZABBIX_VERSION',		'7.0.0alpha8');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
@@ -2009,6 +2009,7 @@ define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
+define('ZBX_STYLE_LIST_TABLE_FIXED', 'fixed');
 define('ZBX_STYLE_LIST_TABLE_ACTIONS', 'list-table-actions');
 define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
 define('ZBX_STYLE_LIST_TABLE_STICKY_HEADER', 'sticky-header');
@@ -2121,6 +2122,7 @@ define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
+define('ZBX_STYLE_TEXT_VERTICAL', 'text-vertical');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');
