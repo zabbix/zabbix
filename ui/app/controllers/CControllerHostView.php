@@ -125,7 +125,7 @@ class CControllerHostView extends CControllerHost {
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			]
-		] + $this->getData($filter);
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Hosts'));

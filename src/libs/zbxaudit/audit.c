@@ -23,6 +23,7 @@
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxnum.h"
+#include "zbx_scripts_constants.h"
 
 #define AUDIT_USERID		__UINT64_C(0)
 #define AUDIT_USERID_SQL	"null"

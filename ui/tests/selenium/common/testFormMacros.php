@@ -2530,7 +2530,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	private function checkItemFields($url, $name, $key) {
 		$this->page->login()->open($url)->waitUntilReady();
 		$table = $this->query('xpath://form[@name="item_list"]/table[@class="list-table"] | '.
-				'//table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+				'//table[contains(@class, "list-table fixed")]')->asTable()->waitUntilPresent()->one();
 
 		$name_column = $table->findRow('Name', $name, true)->getColumn('Name');
 		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());

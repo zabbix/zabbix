@@ -31,6 +31,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbx_trigger_constants.h"
+#include "zbx_scripts_constants.h"
 
 /*
  * 5.4 development database patches
