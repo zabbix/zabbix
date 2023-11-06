@@ -1619,7 +1619,7 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();

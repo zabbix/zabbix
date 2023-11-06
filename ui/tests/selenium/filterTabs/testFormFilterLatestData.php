@@ -36,7 +36,7 @@ class testFormFilterLatestData extends testFormFilter {
 	];
 
 	private function getTableSelector() {
-		return 'xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']';
+		return 'xpath://table['.CXPathHelper::fromClass('list-table fixed').']';
 	}
 
 	/**
