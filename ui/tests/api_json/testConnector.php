@@ -912,12 +912,27 @@ class testConnector extends CAPITest {
 					}
 				}
 
+				if ($db_connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES
+						&& array_key_exists('item_value_type', $connector)) {
+					$this->assertEquals($connector['item_value_type'], $db_connector['item_value_type']);
+				}
+				else {
+					$this->assertEquals($db_defaults['item_value_type'], $db_connector['item_value_type']);
+				}
+
 				// Text fields.
 				if (array_key_exists('timeout', $connector)) {
 					$this->assertSame($connector['timeout'], $db_connector['timeout']);
 				}
 				else {
 					$this->assertSame($db_defaults['timeout'], $db_connector['timeout']);
+				}
+
+				if ($db_connector['max_attempts'] > 1 && array_key_exists('attempt_interval', $connector)) {
+					$this->assertSame($connector['attempt_interval'], $db_connector['attempt_interval']);
+				}
+				else {
+					$this->assertSame($db_defaults['attempt_interval'], $db_connector['attempt_interval']);
 				}
 
 				foreach (['http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description'] as $field) {
@@ -2062,6 +2077,14 @@ class testConnector extends CAPITest {
 					}
 				}
 
+				if ($db_connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES
+						&& array_key_exists('item_value_type', $connector)) {
+					$this->assertEquals($connector['item_value_type'], $connector_upd['item_value_type']);
+				}
+				else {
+					$this->assertEquals($connector['item_value_type'], $connector_upd['item_value_type']);
+				}
+
 				// Text fields.
 				foreach (['timeout', 'http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description']
 						as $field) {
@@ -2071,6 +2094,13 @@ class testConnector extends CAPITest {
 					else {
 						$this->assertSame($db_connector[$field], $connector_upd[$field]);
 					}
+				}
+
+				if ($connector_upd['max_attempts'] > 1 && array_key_exists('attempt_interval', $connector)) {
+						$this->assertSame($connector['attempt_interval'], $connector_upd['attempt_interval']);
+				}
+				else {
+					$this->assertSame($connector['attempt_interval'], $connector_upd['attempt_interval']);
 				}
 
 				if (in_array($connector_upd['authtype'], [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
@@ -2223,10 +2253,10 @@ class testConnector extends CAPITest {
 	 */
 	private function getConnectors(array $connectorids): array {
 		$response = $this->call('connector.get', [
-			'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-				'max_attempts', 'timeout', 'http_proxy', 'authtype', 'username', 'password', 'token', 'verify_peer',
-				'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status',
-				'tags_evaltype'
+			'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type', 'max_records',
+				'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype', 'username',
+				'password', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'description', 'status', 'tags_evaltype'
 			],
 			'selectTags' => ['tag', 'operator', 'value'],
 			'connectorids' => $connectorids,
