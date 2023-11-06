@@ -51,12 +51,11 @@
 </script>
 <script>
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
-				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
-			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
-		}
-		else {
-			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
+		if (document.getElementById('type').value == <?= ITEM_TYPE_SSH ?>) {
+			document.getElementById('js-item-password-label').innerText =
+					document.getElementById('authtype').value == <?= ITEM_AUTHTYPE_PUBLICKEY ?>
+				? <?= json_encode(_('Key passphrase')) ?>
+				: <?= json_encode(_('Password')) ?>;
 		}
 	}
 
@@ -344,7 +343,7 @@
 
 				this.updateHintDisplay();
 
-				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
+				// 'Do not store' trends for Calculated with string-types of information is forced on Item save.
 				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?> && !this.discovered_item) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {

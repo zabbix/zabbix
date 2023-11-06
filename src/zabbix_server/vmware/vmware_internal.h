@@ -25,6 +25,8 @@
 
 #include "zbxxml.h"
 
+#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
+
 #define ZBX_POST_VSPHERE_HEADER									\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
 		"<SOAP-ENV:Envelope"								\

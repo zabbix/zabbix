@@ -34,19 +34,12 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 	if (zbx_agent_pid == getpid() && -1 != level)
 	{
 		va_list	tmp;
-		int	rv;
 		size_t	size;
 
 		va_copy(tmp, args);
 
-		if (0 > (rv = zbx_vsnprintf_check_len(fmt, tmp)))
-		{
-			va_end(tmp);
-
-			return;
-		}
-
-		size = (size_t)rv + 2;
+		// zbx_vsnprintf_check_len() cannot return negative result
+		size = (size_t)zbx_vsnprintf_check_len(fmt, tmp) + 2;
 
 		va_end(tmp);
 

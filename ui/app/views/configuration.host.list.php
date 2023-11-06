@@ -25,6 +25,8 @@
  */
 
 $this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
 if ($data['uncheck']) {
@@ -447,10 +449,11 @@ foreach ($data['hosts'] as $host) {
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
-				(new CUrl('items.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.list')
+					->setArgument('context', 'host')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
-					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['items'])
 		],
