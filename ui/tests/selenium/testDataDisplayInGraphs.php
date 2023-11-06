@@ -2301,10 +2301,6 @@ class testDataDisplayInGraphs extends CWebTest {
 		// It's required to set time selector only for pages with classic graph widgets, SVG graphs have period set in config.
 		if (CTestArrayHelper::get($data, 'type')) {
 			$this->setTimeSelector(self::$timestamps[$data['type']]);
-			$content_locator = 'tag:img';
-		}
-		else {
-			$content_locator = 'class:svg-graph-grid';
 		}
 
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
