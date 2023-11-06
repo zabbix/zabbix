@@ -20,6 +20,9 @@
 #include "common.h"
 #include "log.h"
 #include "zbxhttp.h"
+#include "zbxtypes.h"
+#include <stddef.h>
+#include "zbxalgo.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -432,6 +435,177 @@ static char	*get_media_parameter(const char *str, const char *key, size_t key_le
 	return charset;
 }
 
+static int	parse_attribute_name(const char *data, size_t pos, zbx_strloc_t *loc)
+{
+	const char	*ptr = data + pos;
+
+	if (NULL != strchr(" \"'=<>`/", *ptr))
+		return FAIL;
+
+	while ('\0' != *(++ptr))
+	{
+		if (' ' == *ptr || '=' == *ptr)
+			break;
+	}
+
+	loc->l = pos;
+	loc->r = (size_t)(ptr - data) - 1;
+
+	return SUCCEED;
+}
+
+static size_t	skip_spaces(const char *data, size_t pos)
+{
+	while (' ' == data[pos] || '\t' == data[pos])
+		pos++;
+
+	return pos;
+}
+
+static int	parse_attribute_op(const char *data, size_t pos, zbx_strloc_t *loc)
+{
+	if ('=' == data[pos])
+	{
+		loc->l = pos;
+		loc->r = pos;
+
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	parse_attribute_value(const char *data, size_t pos, zbx_strloc_t *loc)
+{
+	const char	*ptr;
+	char		*charlist;
+	unsigned char	quoted;
+
+	ptr = data + pos;
+
+	if ('"' == *ptr)
+	{
+		charlist = "\"";
+		quoted = 1;
+	}
+	else if ('\'' == *ptr)
+	{
+		charlist = "'";
+		quoted = 1;
+	}
+	else if (NULL == strchr(" \"'=<>`", *ptr))
+	{
+		quoted = 0;
+		charlist = " \"'=<>`";
+	}
+	else
+		return FAIL;
+
+	loc->l = pos;
+
+	while (NULL == strchr(charlist, *(++ptr)))
+	{
+		if ('\0' == *ptr)
+			return FAIL;
+	}
+
+	if (1 == quoted)
+		loc->r = (size_t)(ptr - data);
+	else
+		loc->r = (size_t)(ptr - data) - 1;
+
+	return SUCCEED;
+}
+
+static int	parse_attribute_key_value(const char *data, size_t pos, zbx_strloc_t *loc_name, zbx_strloc_t *loc_op,
+		zbx_strloc_t *loc_value)
+{
+	if (SUCCEED != parse_attribute_name(data, pos, loc_name))
+		return FAIL;
+
+	pos = skip_spaces(data, loc_name->r + 1);
+
+	if (SUCCEED != parse_attribute_op(data, pos, loc_op))
+	{
+		*loc_value = *loc_op = *loc_name;
+		return SUCCEED;
+	}
+
+	pos = skip_spaces(data, loc_op->r + 1);
+
+	if (SUCCEED != parse_attribute_value(data, pos, loc_value))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(loc->r - loc->l + 1, text_len);
+	return zbx_strncasecmp(src + loc->l, text, text_len);
+}
+
+static char	*str_loc_dup(const char *src, const zbx_strloc_t *loc)
+{
+	char	*str;
+	size_t	len;
+
+	len = loc->r - loc->l + 1;
+	str = zbx_malloc(NULL, len + 1);
+	memcpy(str, src + loc->l, len);
+	str[len] = '\0';
+
+	return str;
+}
+
+static size_t	parse_html_attributes(const char *data, char **content, char **charset)
+{
+	size_t		pos = 0;
+	zbx_strloc_t	loc_name, loc_op, loc_value, loc_content;
+	int		http_equiv_content_found = 0, content_found = 0;
+
+	pos = skip_spaces(data, pos);
+
+	while ('>' != data[pos])
+	{
+		if (FAIL == parse_attribute_key_value(data, pos, &loc_name, &loc_op, &loc_value))
+			break;
+
+		pos = skip_spaces(data, loc_value.r + 1);
+
+		if (0 == str_loc_cmp(data, &loc_name, "http-equiv", ZBX_CONST_STRLEN("http-equiv")) &&
+				0 == str_loc_cmp(data, &loc_value, "\"content-type\"",
+				ZBX_CONST_STRLEN("\"content-type\"")))
+		{
+			http_equiv_content_found = 1;
+		}
+		else if (0 == str_loc_cmp(data, &loc_name, "content", ZBX_CONST_STRLEN("content")))
+		{
+			loc_content = loc_value;
+			content_found = 1;
+		}
+		else if (0 == str_loc_cmp(data, &loc_name, "charset", ZBX_CONST_STRLEN("\"charset\"")))
+		{
+			*charset = str_loc_dup(data, &loc_value);
+			return pos;
+		}
+	}
+
+	if (1 == http_equiv_content_found && 1 == content_found)
+		*content = str_loc_dup(data, &loc_content);
+
+	return pos;
+}
+
+static void	html_get_charset_content(const char *data, char **charset, char **content)
+{
+	while (NULL != (data = strstr(data, "<meta")) && NULL == *charset && NULL == *content)
+	{
+		data += ZBX_CONST_STRLEN("<meta");
+		data += parse_html_attributes(data, content, charset);
+	}
+}
+
 static char	*get_media_type_charset(const char *content_type, char *body, size_t size)
 {
 	const char	*ptr;
@@ -453,13 +627,9 @@ static char	*get_media_type_charset(const char *content_type, char *body, size_t
 		body[len] = '\0';
 
 #ifdef HAVE_LIBXML2
-		char	*content = NULL , *errmsg = NULL;
+		char	*content = NULL;
 
-		if (FAIL == zbx_html_get_charset_content(body, &charset, &content, &errmsg))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse html:%s", errmsg);
-			zbx_free(errmsg);
-		}
+		html_get_charset_content(body, &charset, &content);
 
 		if (NULL != content && NULL == charset)
 		{
