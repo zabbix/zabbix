@@ -2100,7 +2100,7 @@ class testConnector extends CAPITest {
 						$this->assertSame($connector['attempt_interval'], $connector_upd['attempt_interval']);
 				}
 				else {
-					$this->assertSame($connector['attempt_interval'], $connector_upd['attempt_interval']);
+					$this->assertSame($db_connector['attempt_interval'], $connector_upd['attempt_interval']);
 				}
 
 				if (in_array($connector_upd['authtype'], [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
