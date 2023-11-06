@@ -822,10 +822,6 @@ class CHost extends CHostGeneral {
 		foreach ($hosts as $host) {
 			$host = array_diff_key($host, array_flip(['groups', 'tags', 'macros', 'templates', 'templates_clear']));
 
-			if (!array_diff_key($host, array_flip(['hostid']))) {
-				continue;
-			}
-
 			// Extend host inventory with the required data.
 			if (array_key_exists('inventory', $host) && $host['inventory']) {
 				// If inventory mode is HOST_INVENTORY_DISABLED, database record is not created.
@@ -988,16 +984,6 @@ class CHost extends CHostGeneral {
 
 		sort($hostids);
 
-		$db_hosts = $this->get([
-			'output' => ['hostid', 'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-				'tls_psk_identity', 'tls_psk', 'inventory_mode'
-			],
-			'hostids' => $hostids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
 		// Check inventory mode value.
 		if (array_key_exists('inventory_mode', $data)) {
 			$valid_inventory_modes = [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC];
@@ -1108,7 +1094,8 @@ class CHost extends CHostGeneral {
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
 
-		unset($data['hosts'], $data['interfaces'], $data['inventory'], $data['inventory_mode']);
+		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
+			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
 		if (!zbx_empty($data)) {
 			DB::update('hosts', [
@@ -1215,7 +1202,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if (array_intersect_key($data, array_flip(['groups', 'macros', 'templates', 'templates_clear']))) {
+		if ($hosts) {
 			$this->updateForce($hosts, $db_hosts);
 		}
 
@@ -1264,7 +1251,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags'],
+			'output' => ['hostid', 'host', 'flags', 'status'],
 			'hostids' => array_column($data['hosts'], 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -1286,6 +1273,11 @@ class CHost extends CHostGeneral {
 					));
 				}
 			}
+		}
+
+		if (!array_key_exists('groups', $data) && !array_key_exists('macros', $data)
+				&& !array_key_exists('templates', $data) && !array_key_exists('templates_clear', $data)) {
+			return;
 		}
 
 		$hosts = $data['hosts'];
