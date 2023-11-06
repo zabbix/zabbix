@@ -2082,7 +2082,7 @@ class testConnector extends CAPITest {
 					$this->assertEquals($connector['item_value_type'], $connector_upd['item_value_type']);
 				}
 				else {
-					$this->assertEquals($connector['item_value_type'], $connector_upd['item_value_type']);
+					$this->assertEquals($db_connector['item_value_type'], $connector_upd['item_value_type']);
 				}
 
 				// Text fields.
