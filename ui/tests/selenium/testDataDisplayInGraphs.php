@@ -188,7 +188,7 @@ class testDataDisplayInGraphs extends CWebTest {
 				]
 			],
 			[
-				'name' => 'Thrends graph 2',
+				'name' => 'Trends graph 2',
 				'width' => 950,
 				'height' => 300,
 				'yaxismin' => -5,
@@ -349,7 +349,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		]);
 
 		// This timestamp represents the changing point between trends and history data.
-		$timestamp = '07-08-2023 12:00 EET';
+		$timestamp = '07-10-2023 12:00 EET';
 
 		$item_data = [
 			// Trends data for first trends item.
@@ -642,12 +642,12 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		self::$timestamps = [
 			'history' => [
-				'from' => '2023-08-07 12:58:00',
-				'to' => '2023-08-07 13:20:00',
+				'from' => '2023-10-07 12:58:00',
+				'to' => '2023-10-07 13:20:00',
 			],
 			'trends' => [
-				'from' => '2023-08-03 00:00:00',
-				'to' => '2023-08-07 12:00:00',
+				'from' => '2023-10-03 00:00:00',
+				'to' => '2023-10-07 12:00:00',
 			],
 			'pie' => [
 				'from' => 'now-1h',
@@ -1805,7 +1805,7 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_period.from',
-										'value' => '2023-08-07 12:54:00'
+										'value' => '2023-10-07 12:54:00'
 									],
 									[
 										'type' => 1,
@@ -1911,7 +1911,7 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_period.to',
-										'value' => '2023-08-08 12:00:00'
+										'value' => '2023-10-08 12:00:00'
 									],
 									[
 										'type' => 1,
@@ -2150,39 +2150,49 @@ class testDataDisplayInGraphs extends CWebTest {
 	public function testDataDisplayInGraphs_MonitoringHosts($data) {
 		$this->page->login()->open('zabbix.php?action=charts.view&filter_set=1&filter_hostids%5B0%5D='.self::$hostid)
 				->waitUntilReady();
-		// Select the time selector tab if it is not expanded.
-		$time_tab = $this->query('xpath://a[contains(@class, "btn-time")]')->one();
-		$timeselector_block = $this->query('class:time-input')->one();
 
-		if ($timeselector_block->isDisplayed(false)) {
+		// Open the time selector tab if it's not opened yet.
+		$time_tab = $this->query('xpath://a[contains(@class, "btn-time")]')->one();
+		$timeselector_tab = $this->query('id:tab_1')->one();
+
+		if ($timeselector_tab->isDisplayed(false)) {
 			$time_tab->click();
-			$timeselector_block->waitUntilVisible();
+			$timeselector_tab->waitUntilVisible();
 		}
 
 		// Set time selector to display the time period, required for the corresponding data type.
 		$this->setTimeSelector(self::$timestamps[$data['type']]);
 
+		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Name' => $data['type']]);
 
 		$screenshot_string = (CTestArrayHelper::get($data, 'kiosk_mode'))
-			? 'monitoring_hosts'.$data['type'].'_kiosk_'
-			: 'monitoring_hosts'.$data['type'].'_';
+			? 'monitoring_hosts_'.$data['type'].'_kiosk_'
+			: 'monitoring_hosts_'.$data['type'].'_';
 
+		// Check screenshots of graphs for each option in 'Show' field.
 		foreach (['All graphs', 'Host graphs', 'Simple graphs'] as $show) {
 			// Pie widget displays data in non-fixed time period, so only host graph screenshot will not differ each time.
 			if ($data['type'] === 'pie' && $show !== 'Host graphs') {
 				continue;
 			}
 
-			$filter_form->fill(['Show' => $show]);
+			// Select the desired value in Show field, if it is not selected already.
+			$filter_form->invalidate();
+			if ($filter_form->getField('Show')->getValue() !== $show) {
+				$filter_form->fill(['Show' => $show]);
+			}
+
 			$filter_form->submit();
 
+			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 				$this->page->waitUntilReady();
 			}
+
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
 			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			foreach ($charts_table->query('class:center')->all() as $graph) {
@@ -2191,6 +2201,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
+			// Switch back to normal view to avoid impacting following scenarios.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Normal view"]')->one()->click();
 				$this->page->waitUntilReady();
@@ -2299,6 +2310,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$dashboard->selectPage($data['page']);
 			$dashboard->waitUntilReady();
 		}
+
 		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
 		$this->assertScreenshot($dashboard, $screenshot_id);
 
@@ -2312,10 +2324,30 @@ class testDataDisplayInGraphs extends CWebTest {
 	 * @param string	$id					ID of the screenshot
 	 */
 	protected function checkKioskMode($object_locator, $id) {
+		if ($object_locator === 'class:center') {
+			$image = $this->query($object_locator)->one()->query('tag:img')->one();
+			$old_source = $image->getAttribute('src');
+		}
+
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
-		$object= $this->query($object_locator)->waitUntilPresent()->one();
+		$object = $this->query($object_locator)->waitUntilPresent()->one();
+
+		// Wait for the dashboard to load widgets or wait for latest data graph to complete loading graph with new source.
+		if ($object_locator === 'class:center') {
+			$image->waitUntilAttributesNotPresent(['src' => $old_source]);
+
+			$callback = function() use ($image) {
+				return CElementQuery::getDriver()->executeScript('return arguments[0].complete;', [$image]);
+			};
+
+			CElementQuery::wait()->until($callback, 'Failed to wait for image to be loaded');
+		}
+		else {
+			$object->asDashboard()->waitUntilReady();
+		}
+
 		$this->assertScreenshot($object, $id.'_kiosk');
 
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
