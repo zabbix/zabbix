@@ -22,7 +22,11 @@
 
 package main
 
-import "git.zabbix.com/ap/plugin-support/zbxflag"
+import (
+	"errors"
+
+	"git.zabbix.com/ap/plugin-support/zbxflag"
+)
 
 const usageMessageExampleConfPath = `/etc/zabbix/zabbix_agent2.conf`
 
@@ -40,7 +44,24 @@ func eventLogErr(err error) error { return nil }
 
 func confirmService() {}
 
-func validateExclusiveFlags(args *Arguments) error { return nil }
+func validateExclusiveFlags(args *Arguments) error {
+	var (
+		defaultFlagSet    = args.test != "" || args.print || args.verbose
+		exclusiveFlagsSet = []bool{args.testConfig}
+		count             int
+	)
+
+	for _, exclusiveFlagSet := range exclusiveFlagsSet {
+		if exclusiveFlagSet {
+			count++
+		}
+		if count >= 2 || (exclusiveFlagSet && defaultFlagSet) {
+			return errors.New("mutually exclusive options used, use help '-help'('-h'), for additional information")
+		}
+	}
+
+	return nil
+}
 
 func handleWindowsService(conf string) error { return nil }
 

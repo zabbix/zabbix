@@ -57,6 +57,7 @@ const usageMessageFormat = //
   %[1]s [-c config-file]
   %[1]s [-c config-file] [-v] -p
   %[1]s [-c config-file] [-v] -t item-key
+  %[1]s [-c config-file] -T
   %[1]s [-c config-file] -R runtime-option
   %[1]s -h
   %[1]s -V
@@ -108,6 +109,7 @@ type Arguments struct {
 	configPath     string
 	foreground     bool
 	test           string
+	testConfig     bool
 	print          bool
 	verbose        bool
 	version        bool
@@ -225,7 +227,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	defer cleanUpExternal()
 
-	if args.test != "" || args.print {
+	if args.test != "" || args.print || args.testConfig {
 		m, err := prepareMetricPrintManager(args.verbose)
 		if err != nil {
 			fatalExit("failed to prepare metric print", err)
@@ -233,7 +235,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 		if args.test != "" {
 			checkMetric(m, args.test)
-		} else {
+		} else if args.print {
 			checkMetrics(m)
 		}
 
@@ -502,6 +504,15 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 			},
 			Default: "",
 			Dest:    &args.test,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "test-config",
+				Shorthand:   "T",
+				Description: "Validate configuration file and exit",
+			},
+			Default: false,
+			Dest:    &args.testConfig,
 		},
 		&zbxflag.StringFlag{
 			Flag: zbxflag.Flag{
