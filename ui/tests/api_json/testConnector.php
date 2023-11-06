@@ -2077,7 +2077,7 @@ class testConnector extends CAPITest {
 					}
 				}
 
-				if ($db_connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES
+				if ($connector_upd['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES
 						&& array_key_exists('item_value_type', $connector)) {
 					$this->assertEquals($connector['item_value_type'], $connector_upd['item_value_type']);
 				}
