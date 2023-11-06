@@ -2052,6 +2052,7 @@ class testConnector extends CAPITest {
 		if ($expected_error === null) {
 			$connectorids = array_column($connectors, 'connectorid');
 			$db_connectors = $this->getConnectors($connectorids);
+			$db_defaults = DB::getDefaults('connector');
 
 			$this->call('connector.update', $connectors, $expected_error);
 
@@ -2082,7 +2083,7 @@ class testConnector extends CAPITest {
 					$this->assertEquals($connector['item_value_type'], $connector_upd['item_value_type']);
 				}
 				else {
-					$this->assertEquals($db_connector['item_value_type'], $connector_upd['item_value_type']);
+					$this->assertEquals($db_defaults['item_value_type'], $connector_upd['item_value_type']);
 				}
 
 				// Text fields.
@@ -2100,7 +2101,7 @@ class testConnector extends CAPITest {
 						$this->assertSame($connector['attempt_interval'], $connector_upd['attempt_interval']);
 				}
 				else {
-					$this->assertSame($db_connector['attempt_interval'], $connector_upd['attempt_interval']);
+					$this->assertSame($db_defaults['attempt_interval'], $connector_upd['attempt_interval']);
 				}
 
 				if (in_array($connector_upd['authtype'], [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
