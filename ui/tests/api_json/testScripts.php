@@ -6319,7 +6319,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful for scope event with manualinput' => [
 				'script' => [
 					'scriptid' => 'update_scope_event_with_manualinput',
-					'manualinput_prompt' => '',
+					'manualinput_prompt' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.'
 			]
@@ -9800,7 +9800,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
-						'plain_r' => ['get_hosts_script'],
+						'plain_r' => ['get_hosts_script']
 					],
 					'scripts' => [
 						[
@@ -9879,7 +9879,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
-						'plain_r' => ['get_hosts_script'],
+						'plain_r' => ['get_hosts_script']
 					],
 					'scripts' => [
 						[
@@ -9963,7 +9963,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
-						'plain_r' => ['get_hosts_script', 'get_hosts_url'],
+						'plain_r' => ['get_hosts_script', 'get_hosts_url']
 					],
 					'scripts' => [
 						[
@@ -10073,7 +10073,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
-						'plain_r' => ['get_hosts_ssh'],
+						'plain_r' => ['get_hosts_ssh']
 					],
 					'scripts' => [
 						[
@@ -10105,7 +10105,7 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
-						],
+						]
 					],
 					'host_macros' => [
 						'plain_r' => [
@@ -10288,7 +10288,7 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 
@@ -12329,7 +12329,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
-						'plain_rw_single_d' => ['get_events_script'],
+						'plain_rw_single_d' => ['get_events_script']
 					],
 					'scripts' => [
 						[
@@ -12421,7 +12421,7 @@ class testScripts extends CAPITest {
 				'expected_result' => [
 					'has.eventid:scriptid' => [
 						'plain_rw_single_d' => ['get_events_script'],
-						'plain_rw_r_dual_d' => ['get_events_script'],
+						'plain_rw_r_dual_d' => ['get_events_script']
 					],
 					'scripts' => [
 						[
@@ -12533,7 +12533,7 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
 							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
-						],
+						]
 					]
 				],
 				'expected_error' => null
@@ -12548,7 +12548,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
-						'plain_rw_single_d' => ['get_events_script'],
+						'plain_rw_single_d' => ['get_events_script']
 					],
 					'scripts' => [
 						[
@@ -12702,7 +12702,7 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
-						],
+						]
 					],
 					'event_macros' => [
 						'plain_rw_single_d' => [
@@ -13030,11 +13030,11 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
 							'{MANUALINPUT}' => '1'
-						],
+						]
 					]
 				],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 
