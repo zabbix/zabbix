@@ -1012,11 +1012,11 @@ class testConnector extends CAPITest {
 			'Test connector.get: unexpected parameter in "filter"' => [
 				'request' => [
 					'filter' => [
-						'max_records' => 'max_records'
+						'description' => 'description'
 					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "max_records".'
+				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "description".'
 			],
 
 			// Check "search" option.
@@ -1052,7 +1052,7 @@ class testConnector extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "max_records", "max_senders", "max_attempts", "timeout", "http_proxy", "authtype", "username", "password", "token", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "item_value_type", "max_records", "max_senders", "max_attempts", "attempt_interval", "timeout", "http_proxy", "authtype", "username", "password", "token", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
 			],
 
 			// Check "selectTags" option.

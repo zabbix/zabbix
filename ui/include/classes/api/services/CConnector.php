@@ -35,13 +35,13 @@ class CConnector extends CApiService {
 	protected $tableAlias = 'c';
 	protected $sortColumns = ['connectorid', 'name', 'data_type', 'status'];
 
-	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'item_value_type', 'url',
+	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type',
 		'max_records', 'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype',
 		'username',	'password',	'token', 'verify_peer',	'verify_host', 'ssl_cert_file', 'ssl_key_file',
 		'ssl_key_password',	'description', 'status', 'tags_evaltype'
 	];
 
-	private array $filter_fields = ['connectorid', 'name', 'protocol', 'data_type', 'item_value_type', 'url',
+	private array $filter_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type',
 		'max_records', 'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype',
 		'username', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'status', 'tags_evaltype'
 	];
