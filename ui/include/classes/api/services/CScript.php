@@ -1257,6 +1257,7 @@ class CScript extends CApiService {
 	public function getScriptsByHosts(array $options = []): array {
 		$options = zbx_toArray($options);
 		$hostids = array_column($options, 'hostid');
+		$scripts_by_host = [];
 
 		if (!$hostids) {
 			return $scripts_by_host;
@@ -1273,8 +1274,6 @@ class CScript extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
-
-		$scripts_by_host = [];
 
 		foreach ($hostids as $hostid) {
 			$scripts_by_host[$hostid] = [];
@@ -1305,20 +1304,26 @@ class CScript extends CApiService {
 			'selectHosts' => ['hostid']
 		], $scripts, $hostids);
 
+		$manualinput_values = [];
+
+		foreach ($options as $option) {
+			if (array_key_exists('scriptid', $option) && array_key_exists('manualinput', $option)) {
+				$manualinput_values[$option['hostid']][$option['scriptid']] =  $option['manualinput'];
+			}
+		}
+
 		if ($scripts) {
 			$macros_data = [];
 
 			foreach ($scripts as $scriptid => $script) {
-				foreach ($options as $option) {
-					if ($option['hostid'] == $hostid
-							&& array_key_exists('scriptid', $option) && $option['scriptid'] == $scriptid
-							&& array_key_exists('manualinput', $option)) {
-						$macros_data[$hostid][$scriptid]['manualinput_value'] = $option['manualinput'];
-					}
-				}
-
 				foreach ($script['hosts'] as $host) {
 					$hostid = $host['hostid'];
+
+					if (array_key_exists($hostid, $manualinput_values)
+						&& array_key_exists($scriptid, $manualinput_values[$hostid])) {
+						$macros_data[$hostid][$scriptid]['manualinput_value'] =
+							$manualinput_values[$hostid][$scriptid];
+					}
 
 					if (array_key_exists($hostid, $scripts_by_host)) {
 						if (strpos($script['confirmation'], '{') !== false) {
@@ -1508,15 +1513,15 @@ class CScript extends CApiService {
 		if ($scripts) {
 			$macros_data = [];
 			$processed_scripts_per_event = [];
+			$manualinput_values = [];
+
+			foreach ($options as $option) {
+				if (array_key_exists('scriptid', $option) && array_key_exists('manualinput', $option)) {
+					$manualinput_values[$option['eventid']][$option['scriptid']] =  $option['manualinput'];
+				}
+			}
 
 			foreach ($scripts as $scriptid => $script) {
-				foreach ($options as $option) {
-					if ($option['eventid'] == $eventid && array_key_exists('scriptid', $option)
-							&& $option['scriptid'] == $scriptid && array_key_exists('manualinput', $option)) {
-						$macros_data[$eventid][$scriptid]['manualinput_value'] = $option['manualinput'];
-					}
-				}
-
 				foreach ($events as $eventid => $event) {
 					foreach ($event['hosts'] as $event_host) {
 						foreach ($script['hosts'] as $host) {
@@ -1534,6 +1539,12 @@ class CScript extends CApiService {
 										&& strpos($script['manualinput_prompt'], '{') !== false) {
 									$macros_data[$eventid][$scriptid]['manualinput_prompt'] =
 										$script['manualinput_prompt'];
+								}
+
+								if (array_key_exists($eventid, $manualinput_values)
+										&& array_key_exists($scriptid, $manualinput_values[$eventid])) {
+									$macros_data[$eventid][$scriptid]['manualinput_value'] =
+										$manualinput_values[$eventid][$scriptid];
 								}
 							}
 						}

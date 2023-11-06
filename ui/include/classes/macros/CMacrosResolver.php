@@ -2759,15 +2759,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macro_values);
 
-		if ($macro_values) {
-			foreach ($macro_values[$hostid] as $type => &$macro_value) {
-				if ($manualinput_value && $type === '{MANUALINPUT}') {
-					$macro_value = $manualinput_value[$hostid];
-				}
-			}
-			unset($macro_value);
-		}
-
 		foreach ($this->getUserMacros($usermacros) as $hostid => $usermacros_data) {
 			$macro_values[$hostid] = array_key_exists($hostid, $macro_values)
 				? array_merge($macro_values[$hostid], $usermacros_data['macros'])
@@ -2775,6 +2766,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($data as $hostid => &$scripts) {
+			if ($macro_values) {
+				foreach ($macro_values[$hostid] as $type => &$macro_value) {
+					if ($manualinput_value && $type === '{MANUALINPUT}') {
+						$macro_value = $manualinput_value[$hostid];
+					}
+				}
+				unset($macro_value);
+			}
+
 			if (array_key_exists($hostid, $macro_values)) {
 				foreach ($scripts as &$fields) {
 					foreach ($fields as &$value) {
@@ -2855,9 +2855,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'host_n' => [], 'interface_n' => [], 'inventory_n' => []
 		];
 		$usermacros = [];
+		$manualinput_value = [];
 
 		foreach ($data as $eventid => $script) {
-			$manualinput_value = [];
 			foreach ($script as $parameters) {
 				if (array_key_exists('manualinput_value', $parameters)) {
 					$manualinput_value[$eventid] = $parameters['manualinput_value'];
@@ -3050,20 +3050,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				? array_merge($macro_values[$eventid], $usermacros_data['macros'])
 				: $usermacros_data['macros'];
 		}
-
-		if ($macro_values) {
-			foreach ($macro_values[$eventid] as $type => &$macro_value) {
-				if ($manualinput_value && $type === '{MANUALINPUT}') {
-					$macro_value = $manualinput_value[$eventid];
-				}
-			}
-			unset($macro_value);
-		}
-
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value.
 		foreach ($data as $eventid => &$scripts) {
+			if ($macro_values) {
+				foreach ($macro_values[$eventid] as $type => &$macro_value) {
+					if ($type === '{MANUALINPUT}' && array_key_exists($eventid, $manualinput_value)) {
+						$macro_value = $manualinput_value[$eventid];
+					}
+				}
+				unset($macro_value);
+			}
+
 			$event = $events[$eventid];
 			$triggerid = $event['objectid'];
 

@@ -1119,6 +1119,28 @@ class testScripts extends CAPITest {
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => '1,2,3'
 			],
+			'update_scope_action_to_host_with_manualinput' => [
+				'name' => 'API test script.update action to host',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => 'reboot server'
+			],
+			'update_scope_event' => [
+				'name' => 'API test script.update for scope event',
+				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'command' => 'reboot server'
+			],
+			'update_scope_event_with_manualinput' => [
+				'name' => 'API test script.update for scope event with manualinput parameters',
+				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'command' => 'reboot server',
+				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+				'manualinput_prompt' => 'test',
+				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+				'manualinput_validator' => '1,2,3'
+			],
 
 			// script.getScriptsByHosts
 			'get_hosts_url' => [
@@ -1218,6 +1240,18 @@ class testScripts extends CAPITest {
 				'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 				'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME}, {EVENT.CAUSE.NSEVERITY},'.
 					' {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS}, {EVENT.CAUSE.VALUE}'
+			],
+			'get_events_script' => [
+				'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+				'command' => 'reboot server 1',
+				'host_access' => PERM_READ_WRITE,
+				'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+				'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+				'manualinput_validator' => '1,2,3,4,5'
 			],
 
 			// script.create - to check existing names and menu paths.
@@ -6218,6 +6252,76 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+			],
+			'Test script.update unexpected "manualinput" for scope action' => [
+				'script' => [
+					'scriptid' => 'update_scope_action_to_host_with_manualinput',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2,3',
+					'manualinput_default_value' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+			],
+			'Test script.update unexpected "manualinput_default_value" when changing scope' => [
+				'script' => [
+					'scriptid' => 'update_scope_action_to_host_with_manualinput',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2,3',
+					'manualinput_default_value' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+			],
+			'Test script.update incorrect "manualinput_validator" when changing scope' => [
+				'script' => [
+					'scriptid' => 'update_scope_action_to_host_with_manualinput',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '[[[[[',
+					'manualinput_default_value' => 'abc'
+				],
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[[": "Compilation failed: missing terminating ] for character class at offset 5".'
+			],
+			'Test script.update unexpected "manualinput" for scope action when changing scope from event' => [
+				'script' => [
+					'scriptid' => 'update_scope_event',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2,3',
+					'manualinput_default_value' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+			],
+			'Test script.update unexpected "manualinput_default_value" for scope event' => [
+				'script' => [
+					'scriptid' => 'update_scope_event',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2,3',
+					'manualinput_default_value' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+			],
+			'Test script.update incorrect "manualinput_default_value" for scope event' => [
+				'script' => [
+					'scriptid' => 'update_scope_event_with_manualinput',
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '[A-Za-z]',
+					'manualinput_default_value' => '123'
+				],
+				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: [A-Za-z].'
+			],
+			'Test script.update successful for scope event with manualinput' => [
+				'script' => [
+					'scriptid' => 'update_scope_event_with_manualinput',
+					'manualinput_prompt' => '',
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.'
 			]
 		];
 	}
@@ -7208,6 +7312,54 @@ class testScripts extends CAPITest {
 						'scriptid' => 'update_manualinput_params',
 						'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED
 					]
+				],
+				'expected_error' => null
+			],
+			'Test script update successful from scope action to host with manualinput' => [
+				'script' => [
+					[
+						'scriptid' => 'update_scope_action_to_host_with_manualinput',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+						'manualinput_prompt' => 'prompt text',
+						'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+						'manualinput_validator' => '1,2,3,4'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script update successful manualinput validator type' => [
+				'script' => [
+					[
+						'scriptid' => 'update_scope_action_to_host_with_manualinput',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+						'manualinput_prompt' => 'prompt text',
+						'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+						'manualinput_validator' => '[1-5]',
+						'manualinput_default_value' => '1'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.update successful for scope event' => [
+				'script' => [
+					'scriptid' => 'update_scope_event',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '\d',
+					'manualinput_default_value' => '3'
+				],
+				'expected_error' => null
+			],
+			'Test script.update successful for scope event with manualinput' => [
+				'script' => [
+					'scriptid' => 'update_scope_event_with_manualinput',
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '[A-Za-z]',
+					'manualinput_default_value' => 'A'
 				],
 				'expected_error' => null
 			]
@@ -9796,7 +9948,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test script.getScriptsByHosts with superadmin (2 objects with additional script id and manualinput)' => [
+			'Test script.getScriptsByHosts with 2 objects of the same host, different script id and manualinput' => [
 				'request' => [
 					[
 						'hostid' => 'plain_r',
@@ -9811,7 +9963,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
-						'plain_r' => ['get_hosts_script'],
+						'plain_r' => ['get_hosts_script', 'get_hosts_url'],
 					],
 					'scripts' => [
 						[
@@ -9910,7 +10062,233 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			]
+			],
+			'Test script.getScriptsByHosts with superadmin (manualinput passed but not added in any fields)' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => 'get_hosts_ssh',
+						'manualinput' => '3'
+					]
+				],
+				'expected_result' => [
+					'has.hostid:scriptid' => [
+						'plain_r' => ['get_hosts_ssh'],
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_hosts_ssh',
+							'name' => 'API test script.getScriptsByHosts - SSH password',
+							'command' => 'reboot server',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$GLOBAL_MACRO}, {HOST.HOST}, {USER.FULLNAME},'.
+								' {HOST.CONN}, {HOST.IP}, {HOST.DNS}, {HOST.PORT}, {INVENTORY.ALIAS},'.
+								' {INVENTORY.OS}, {INVENTORY.TYPE}',
+							'type' => (string) ZBX_SCRIPT_TYPE_SSH,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => 'user',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
+						],
+					],
+					'host_macros' => [
+						'plain_r' => [
+							'{HOST.ID}' => 'plain_r',
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.HOST}' => 'api_test_host_plain_r',
+							'{HOST.NAME}' => 'API test host - plain, read',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => '{HOST.NAME1}',
+							'{HOST.NAME2}' => '{HOST.NAME2}',
+							'{EVENT.ID}' => '{EVENT.ID}',
+							'{EVENT.NAME}' => '{EVENT.NAME}',
+							'{EVENT.NSEVERITY}' => '{EVENT.NSEVERITY}',
+							'{EVENT.SEVERITY}' => '{EVENT.SEVERITY}',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
+							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByHosts for 2 events with scriptid and manualinput' => [
+				'request' => [
+					[
+						'hostid' => 'plain_r',
+						'scriptid' => 'get_hosts_script',
+						'manualinput' => '3'
+					],
+					[
+						'hostid' => 'plain_d',
+						'scriptid' => 'get_hosts_url',
+						'manualinput' => '4'
+					]
+				],
+				'expected_result' => [
+					'has.hostid:scriptid' => [
+						'plain_r' => ['get_hosts_script'],
+						'plain_d' => ['get_hosts_url']
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_hosts_script',
+							'name' => 'API test script.getScriptsByHosts - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_url',
+							'name' => 'API test script.getScriptsByHosts - URL',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$HOST_MACRO_OTHER},'.
+								' {$GLOBAL_MACRO}, {$DOESNOTEXIST}, {HOST.ID}, {HOST.HOST}, {HOST.NAME},'.
+								' {HOST.CONN}, {HOST.DNS}, {HOST.PORT}, {HOST.NAME1}, {HOST.NAME2}, {EVENT.ID},'.
+								' {EVENT.NAME}, {EVENT.NSEVERITY}, {EVENT.SEVERITY}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
+						]
+					],
+					'host_macros' => [
+						'plain_r' => [
+							'{HOST.ID}' => 'plain_r',
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.HOST}' => 'api_test_host_plain_r',
+							'{HOST.NAME}' => 'API test host - plain, read',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => '{HOST.NAME1}',
+							'{HOST.NAME2}' => '{HOST.NAME2}',
+							'{EVENT.ID}' => '{EVENT.ID}',
+							'{EVENT.NAME}' => '{EVENT.NAME}',
+							'{EVENT.NSEVERITY}' => '{EVENT.NSEVERITY}',
+							'{EVENT.SEVERITY}' => '{EVENT.SEVERITY}',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
+							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '3'
+						],
+						'plain_d' => [
+							'{HOST.ID}' => 'plain_d',
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.HOST}' => 'api_test_host_plain_d',
+							'{HOST.NAME}' => 'API test host - plain, deny',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => '{HOST.NAME1}',
+							'{HOST.NAME2}' => '{HOST.NAME2}',
+							'{EVENT.ID}' => '{EVENT.ID}',
+							'{EVENT.NAME}' => '{EVENT.NAME}',
+							'{EVENT.NSEVERITY}' => '{EVENT.NSEVERITY}',
+							'{EVENT.SEVERITY}' => '{EVENT.SEVERITY}',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '{INVENTORY.OS1}',
+							'{INVENTORY.OS2}' => '{INVENTORY.OS2}',
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{MANUALINPUT}' => '4'
+						]
+					]
+				],
+				'expected_error' => null
+			],
 		];
 	}
 
@@ -10009,7 +10387,7 @@ class testScripts extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/1/eventid": a number is expected.'
 			],
-			'Test script.getScriptsByEvents invalid "eventid" field (array)' => [
+			'Test script.getScriptsByEvents invalid "scriptid" field (array)' => [
 				'request' => [
 					[
 						'eventid' =>  'plain_rw_single_d',
@@ -10019,7 +10397,7 @@ class testScripts extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
 			],
-			'Test script.getScriptsByEvents invalid "eventid" field (string)' => [
+			'Test script.getScriptsByEvents invalid "scriptid" field (string)' => [
 				'request' => [
 					[
 						'eventid' =>  'plain_rw_single_d',
@@ -10101,37 +10479,37 @@ class testScripts extends CAPITest {
 					'has.eventid:scriptid' => [
 						// Superadmin has all scripts available.
 						'plain_rw_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'plain_r_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_single_1_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'interface_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'inventory_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_symptom' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						]
 					],
 					'scripts' => [
@@ -10285,6 +10663,36 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
 						]
 					],
 					'event_macros' => [
@@ -10324,7 +10732,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10362,7 +10771,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_d_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10400,7 +10810,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10438,7 +10849,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -10476,7 +10888,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -10514,7 +10927,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -10552,7 +10966,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10590,7 +11005,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10628,7 +11044,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_d_cause' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10666,7 +11083,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_symptom' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10704,7 +11122,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
 							'{EVENT.CAUSE.SEVERITY}' => 'Disaster',
 							'{EVENT.CAUSE.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
-							'{EVENT.CAUSE.VALUE}' => (string) TRIGGER_VALUE_TRUE
+							'{EVENT.CAUSE.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						]
 					]
 				],
@@ -10751,39 +11170,39 @@ class testScripts extends CAPITest {
 					'has.eventid:scriptid' => [
 						// Regular admin does not have all scripts available.
 						'plain_rw_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'plain_d_single_d' => [],
 						'plain_r_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_url_cause'],
 						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_single_1_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'interface_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'inventory_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_d_cause' => [],
 						'macros_rw_symptom' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						]
 					],
 					'!has.eventid:scriptid' => [
 						'plain_rw_single_d' => ['get_events_webhook'],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
-						'plain_r_single_d' => ['get_events_webhook', 'get_events_ssh'],
+						'plain_r_single_d' => ['get_events_webhook', 'get_events_ssh', 'get_events_script'],
 						'plain_rw_r_dual_d' => ['get_events_webhook'],
 						'macros_rw_single_1_h' => ['get_events_webhook'],
 						'macros_rw_r_dual_1_2_h' => ['get_events_webhook'],
@@ -10791,7 +11210,7 @@ class testScripts extends CAPITest {
 						'interface_rw_dual_a' => ['get_events_webhook'],
 						'inventory_rw_dual_a' => ['get_events_webhook'],
 						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_symptom' => ['get_events_webhook']
 					],
@@ -10917,6 +11336,36 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
 						]
 					],
 					'event_macros' => [
@@ -10956,7 +11405,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -10994,7 +11444,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -11032,7 +11483,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -11070,7 +11522,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -11108,7 +11561,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -11146,7 +11600,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -11184,7 +11639,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -11222,7 +11678,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						// Cause event is restricted, so macros resolve to empty string.
 						'macros_rw_symptom' => [
@@ -11261,7 +11718,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						]
 					]
 				],
@@ -11308,39 +11766,39 @@ class testScripts extends CAPITest {
 					'has.eventid:scriptid' => [
 						// Regular user does not have all scripts available.
 						'plain_rw_single_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'plain_d_single_d' => [],
 						'plain_r_single_d' => ['get_events_url', 'get_events_webhook', 'get_events_url_cause'],
 						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_single_1_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'interface_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'inventory_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						],
 						'macros_d_cause' => [],
 						'macros_rw_symptom' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause'
+							'get_events_url_cause', 'get_events_script'
 						]
 					],
 					'!has.eventid:scriptid' => [
 						'plain_rw_single_d' => ['get_events_ipmi'],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
-						'plain_r_single_d' => ['get_events_ipmi', 'get_events_ssh'],
+						'plain_r_single_d' => ['get_events_ipmi', 'get_events_ssh', 'get_events_script'],
 						'plain_rw_r_dual_d' => ['get_events_ipmi'],
 						'macros_rw_single_1_h' => ['get_events_ipmi'],
 						'macros_rw_r_dual_1_2_h' => ['get_events_ipmi'],
@@ -11348,7 +11806,7 @@ class testScripts extends CAPITest {
 						'interface_rw_dual_a' => ['get_events_ipmi'],
 						'inventory_rw_dual_a' => ['get_events_ipmi'],
 						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
 						],
 						'macros_rw_symptom' => ['get_events_ipmi']
 					],
@@ -11472,6 +11930,36 @@ class testScripts extends CAPITest {
 							'manualinput_validator' => '',
 							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
 						]
 					],
 					// CSeverityHelper cannot be used here. Use untranslated plain text.
@@ -11512,7 +12000,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -11550,7 +12039,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -11588,7 +12078,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -11626,7 +12117,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -11664,7 +12156,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -11702,7 +12195,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -11740,7 +12234,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -11778,7 +12273,8 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						],
 						// Cause event is restricted, so macros resolve to empty string.
 						'macros_rw_symptom' => [
@@ -11817,12 +12313,728 @@ class testScripts extends CAPITest {
 							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
 							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
-							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
 						]
 					]
 				],
 				'expected_error' => null
-			]
+			],
+			'Test script.getScriptsByEvents with scriptid' => [
+				'request' => [
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_script'
+					]
+				],
+				'expected_result' => [
+					'has.eventid:scriptid' => [
+						'plain_rw_single_d' => ['get_events_script'],
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						]
+					],
+					'event_macros' => [
+						'plain_rw_single_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'plain_rw_single_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, single, read-write, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByEvents for 2 events with same scriptid' => [
+				'request' => [
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_script'
+					],
+					[
+						'eventid' => 'plain_rw_r_dual_d',
+						'scriptid' => 'get_events_script'
+					]
+				],
+				'expected_result' => [
+					'has.eventid:scriptid' => [
+						'plain_rw_single_d' => ['get_events_script'],
+						'plain_rw_r_dual_d' => ['get_events_script'],
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						]
+					],
+					'event_macros' => [
+						'plain_rw_single_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'plain_rw_single_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, single, read-write, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
+						],
+						'plain_rw_r_dual_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => 'API test host - plain, read',
+							'{EVENT.ID}' => 'plain_rw_r_dual_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, dual, read-write & read, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'API Two Tester Two (api_test_user)',
+							'{USER.NAME}' => 'API Two',
+							'{USER.SURNAME}' => 'Tester Two',
+							'{USER.USERNAME}' => 'api_test_user',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
+						],
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByEvents for 1 event with scriptid and manualinput' => [
+				'request' => [
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_script',
+						'manualinput' => '5'
+					]
+				],
+				'expected_result' => [
+					'has.eventid:scriptid' => [
+						'plain_rw_single_d' => ['get_events_script'],
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						]
+					],
+					'event_macros' => [
+						'plain_rw_single_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'plain_rw_single_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, single, read-write, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => '5'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByEvents for 1 event with different scriptids' => [
+				'request' => [
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_script'
+					],
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_url'
+					]
+				],
+				'expected_result' => [
+					'has.eventid:scriptid' => [
+						'plain_rw_single_d' => ['get_events_script', 'get_events_url']
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_url',
+							'name' => 'API test script.getScriptsByEvents - URL',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$HOST_MACRO_OTHER},'.
+								' {$GLOBAL_MACRO}, {$DOESNOTEXIST}, {HOST.ID}, {HOST.HOST}, {HOST.NAME}, {HOST.CONN},'.
+								' {HOST.DNS}, {HOST.PORT}, {HOST.NAME1}, {HOST.NAME2}, {EVENT.ID}, {EVENT.NAME},'.
+								' {EVENT.NSEVERITY}, {EVENT.SEVERITY}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
+						],
+					],
+					'event_macros' => [
+						'plain_rw_single_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'plain_rw_single_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, single, read-write, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => UNRESOLVED_MACRO_STRING
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByEvents for 1 event with different scriptids and manualinput' => [
+				'request' => [
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_script',
+						'manualinput' => '3'
+					],
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_url'
+					]
+				],
+				'expected_result' => [
+					'has.eventid:scriptid' => [
+						'plain_rw_single_d' => ['get_events_script', 'get_events_url']
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_url',
+							'name' => 'API test script.getScriptsByEvents - URL',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$HOST_MACRO_OTHER},'.
+								' {$GLOBAL_MACRO}, {$DOESNOTEXIST}, {HOST.ID}, {HOST.HOST}, {HOST.NAME}, {HOST.CONN},'.
+								' {HOST.DNS}, {HOST.PORT}, {HOST.NAME1}, {HOST.NAME2}, {EVENT.ID}, {EVENT.NAME},'.
+								' {EVENT.NSEVERITY}, {EVENT.SEVERITY}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
+						]
+					],
+					'event_macros' => [
+						'plain_rw_single_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'plain_rw_single_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, single, read-write, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => '3'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.getScriptsByEvents for 2 events with different scriptid and different manualinputs' => [
+				'request' => [
+					[
+						'eventid' => 'plain_rw_single_d',
+						'scriptid' => 'get_events_script',
+						'manualinput' => '4'
+					],
+					[
+						'eventid' => 'plain_rw_r_dual_d',
+						'scriptid' => 'get_events_url',
+						'manualinput' => '1'
+					]
+				],
+				'expected_result' => [
+					'has.eventid:scriptid' => [
+						'plain_rw_single_d' => ['get_events_script'],
+						'plain_rw_r_dual_d' => ['get_events_url']
+					],
+					'scripts' => [
+						[
+							'scriptid' => 'get_events_script',
+							'name' => 'API test script.getScriptsByEvents - Custom script with manualinput',
+							'command' => 'reboot server 1',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, '.
+								'{MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
+								.'macros',
+							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_url',
+							'name' => 'API test script.getScriptsByEvents - URL',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$HOST_MACRO_OTHER},'.
+								' {$GLOBAL_MACRO}, {$DOESNOTEXIST}, {HOST.ID}, {HOST.HOST}, {HOST.NAME}, {HOST.CONN},'.
+								' {HOST.DNS}, {HOST.PORT}, {HOST.NAME1}, {HOST.NAME2}, {EVENT.ID}, {EVENT.NAME},'.
+								' {EVENT.NSEVERITY}, {EVENT.SEVERITY}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput_prompt' => '',
+							'manualinput_validator' => '',
+							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_default_value' => ''
+						]
+					],
+					'event_macros' => [
+						'plain_rw_single_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'plain_rw_single_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, single, read-write, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => '4'
+						],
+						'plain_rw_r_dual_d' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'plain_rw',
+							'{HOST.HOST}' => 'api_test_host_plain_rw',
+							'{HOST.NAME}' => 'API test host - plain, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - plain, read-write',
+							'{HOST.NAME2}' => 'API test host - plain, read',
+							'{EVENT.ID}' => 'plain_rw_r_dual_d',
+							'{EVENT.NAME}' => 'API test trigger - plain, dual, read-write & read, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'API Two Tester Two (api_test_user)',
+							'{USER.NAME}' => 'API Two',
+							'{USER.SURNAME}' => 'Tester Two',
+							'{USER.USERNAME}' => 'api_test_user',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING,
+							'{MANUALINPUT}' => '1'
+						],
+					]
+				],
+				'expected_error' => null
+			],
 		];
 	}
 
@@ -11878,7 +13090,12 @@ class testScripts extends CAPITest {
 							$expected_script['url'] = strtr($expected_script['url'],
 								$expected_result['event_macros'][$eventid]
 							);
+
 							$expected_script['confirmation'] = strtr($expected_script['confirmation'],
+								$expected_result['event_macros'][$eventid]
+							);
+
+							$expected_script['manualinput_prompt'] = strtr($expected_script['manualinput_prompt'],
 								$expected_result['event_macros'][$eventid]
 							);
 
