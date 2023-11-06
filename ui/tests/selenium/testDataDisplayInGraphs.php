@@ -2244,7 +2244,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		$screenshot_id = 'latest_data_'.$data['type'];
 		$this->assertScreenshot($this->query('class:center')->one(), $screenshot_id);
 
-		$this->checkKioskMode('class:center', $screenshot_id, $old_source);
+		$this->checkKioskMode('class:center', $screenshot_id);
 	}
 
 	public function getDashboardWidgetData() {
@@ -2326,20 +2326,30 @@ class testDataDisplayInGraphs extends CWebTest {
 	 *
 	 * @param string	$object_locator		locator of element with graphs
 	 * @param string	$id					ID of the screenshot
-	 * @param string	$old_source			value of the src attribute - applicable only for latest data
 	 */
-	protected function checkKioskMode($object_locator, $id, $old_source = null) {
+	protected function checkKioskMode($object_locator, $id) {
+		if ($object_locator === 'class:center') {
+			$image = $this->query($object_locator)->one()->query('tag:img')->one();
+			$old_source = $image->getAttribute('src');
+		}
+
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		$object = $this->query($object_locator)->waitUntilPresent()->one();
 
-		// Wait for the dashboard to load widgets in kiosk mode or wait for latest data graph to change its source.
-		if ($object_locator === 'class:dashboard-grid') {
-			$object->asDashboard()->waitUntilReady();
+		// Wait for the dashboard to load widgets or wait for latest data graph to complete loading graph with new source.
+		if ($object_locator === 'class:center') {
+			$image->waitUntilAttributesNotPresent(['src' => $old_source]);
+
+			$callback = function() use ($image) {
+				return CElementQuery::getDriver()->executeScript('return arguments[0].complete;', [$image]);
+			};
+
+			CElementQuery::wait()->until($callback, 'Failed to wait for image to be loaded');
 		}
 		else {
-			$object->query('tag:img')->one()->waitUntilAttributesNotPresent(['src' => $old_source]);
+			$object->asDashboard()->waitUntilReady();
 		}
 
 		$this->assertScreenshot($object, $id.'_kiosk');
