@@ -41,6 +41,8 @@ class CSVGHoneycomb {
 	static LABEL_PRIMARY_SIZE_DEFAULT = 20;
 	static LABEL_SECONDARY_SIZE_DEFAULT = 30;
 
+	static TEXT_BASELINE = 0.8;
+
 	/**
 	 * Widget configuration.
 	 *
@@ -795,9 +797,9 @@ class CSVGHoneycomb {
 
 			primary
 				.attr('y', label_primary_position_y)
-				.attr('height', `${this.#label_primary_font_size * this.#label_primary_line_count}px`)
+				.attr('height', `${this.#label_primary_font_size * this.#label_primary_line_count / CSVGHoneycomb.TEXT_BASELINE}px`)
 				.style('font-size', `${this.#label_primary_font_size}px`)
-				.style('line-height', `${this.#label_primary_font_size}px`);
+				.style('line-height', `${this.#label_primary_font_size / CSVGHoneycomb.TEXT_BASELINE}px`);
 		}
 
 		if (this.#config.secondary_label.show) {
@@ -826,10 +828,10 @@ class CSVGHoneycomb {
 			}
 
 			secondary
-				.attr('y', label_secondary_position_y)
-				.attr('height', `${this.#label_secondary_font_size * this.#label_secondary_line_count}px`)
+				.attr('y', label_secondary_position_y - this.#label_secondary_font_size * (1 - CSVGHoneycomb.TEXT_BASELINE))
+				.attr('height', `${this.#label_secondary_font_size * this.#label_secondary_line_count / CSVGHoneycomb.TEXT_BASELINE}px`)
 				.style('font-size', `${this.#label_secondary_font_size}px`)
-				.style('line-height', `${this.#label_secondary_font_size}px`);
+				.style('line-height', `${this.#label_secondary_font_size / CSVGHoneycomb.TEXT_BASELINE}px`);
 		}
 
 		if (this.#config.primary_label.show && this.#config.secondary_label.show) {
