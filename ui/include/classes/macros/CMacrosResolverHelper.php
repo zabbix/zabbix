@@ -323,7 +323,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return array
 	 */
-	public static function resolveTriggerDescriptions(array $triggers, array $options = []) {
+	public static function resolveTriggerDescriptions(array $triggers, array $options): array {
 		$options += [
 			'events' => false,
 			'html' => false
