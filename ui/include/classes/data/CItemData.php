@@ -36,6 +36,7 @@ final class CItemData {
 			'kernel.openfiles',
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
@@ -1213,8 +1214,8 @@ final class CItemData {
 				'description' => _('Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.record',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.record'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.perf',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.perf'
 				]
 			],
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
