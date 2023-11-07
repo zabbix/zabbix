@@ -90,7 +90,9 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 			HTTP_STORE_RAW, config_source_ip, &error)))
 	{
 		long		response_code;
-		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_interval_sec, 1);
+		CURLcode	err;
+
+		err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_interval_sec, 1);
 
 		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code,
 				&out, &error)))
