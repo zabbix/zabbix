@@ -779,7 +779,6 @@ static char	*get_media_type_charset(const char *content_type, char *body, size_t
 		else
 			charset = zbx_strdup(NULL, "WINDOWS-1252");
 	}
-	
 
 	zbx_lrtrim(charset, " ");
 	zbx_strupper(charset);
