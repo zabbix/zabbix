@@ -131,7 +131,7 @@ class testPageHostDashboards extends CWebTest {
 
 		// Check page tabs.
 		$dashboard_navigation = $this->query('class:dashboard-navigation')->one();
-		$this->assertEquals(['Page 1', 'Page 2'], $dashboard_navigation->query('xpath:.//li[@ class="sortable-item"]')->all()->asText());
+		$this->assertEquals(['Page 1', 'Page 2'], $dashboard_navigation->query('xpath:.//li[@class="sortable-item"]')->all()->asText());
 
 		// Check Slideshow button.
 		foreach (['Stop', 'Start'] as $status) {
@@ -583,7 +583,7 @@ class testPageHostDashboards extends CWebTest {
 			$navigation = $this->query('class:host-dashboard-navigation')->one();
 
 			// Only switch if not already on the correct Dashboard.
-			if ($dashboard['name'] !== $navigation->query('xpath:.//div[@ class="selected-tab"]')->one()->getText()) {
+			if ($dashboard['name'] !== $navigation->query('xpath:.//div[@class="selected-tab"]')->one()->getText()) {
 				$list_button = $this->query('xpath:.//button[@title="Dashboard list"]')->one();
 				$list_button->click();
 				$list_button->asPopupButton()->getMenu()->select($dashboard['name']);
@@ -713,7 +713,7 @@ class testPageHostDashboards extends CWebTest {
 
 		// Check that the correct Dashboard tab is selected.
 		$navigation = $this->query('class:host-dashboard-navigation')->one();
-		$this->assertEquals($dashboard['name'], $navigation->query('xpath:.//div[@ class="selected-tab"]')->one()->getText());
+		$this->assertEquals($dashboard['name'], $navigation->query('xpath:.//div[@class="selected-tab"]')->one()->getText());
 
 		// Check that the correct Page tab is selected.
 		if (count(CTestArrayHelper::get($dashboard, 'pages', [])) > 1) {
