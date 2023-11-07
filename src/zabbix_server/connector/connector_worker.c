@@ -75,7 +75,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	}
 
 	if (FAIL == zbx_is_time_suffix(connector.attempt_interval, &attempt_interval_sec,
-			(int)strlen(connector.attempt_interval)) || 10 < attempt_interval_sec)
+			(int)strlen(connector.attempt_interval)) || ATTEMPT_DELAY_MAX < attempt_interval_sec)
 	{
 		error = zbx_dsprintf(NULL, "Invalid attempt delay: %s", connector.attempt_interval);
 		ret = FAIL;
