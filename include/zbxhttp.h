@@ -41,8 +41,6 @@ size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata);
 
 typedef size_t	(*zbx_curl_cb_t)(void *ptr, size_t size, size_t nmemb, void *userdata);
 
-void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated);
-
 int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zbx_http_response_t *body,
 		zbx_curl_cb_t header_cb, zbx_curl_cb_t body_cb, char *errbuf, char **error);
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
@@ -50,6 +48,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		char **error);
 char	*zbx_http_parse_header(char **headers);
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated);
 
 int	zbx_http_get(const char *url, const char *header, long timeout, char **out, long *response_code, char **error);
 #endif

@@ -1795,7 +1795,6 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 #ifdef HAVE_LIBXML2
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
-int	zbx_html_get_charset_content(char *xml_data, char **charset, char **content, char **errmsg);
 #endif
 
 /* audit logging mode */
