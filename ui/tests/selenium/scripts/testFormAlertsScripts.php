@@ -1595,7 +1595,6 @@ class testFormAlertsScripts extends CWebTest {
 		$this->assertEquals($data['resolved_macros'], $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$popup->close();
-//		sleep(60);
 
 		// Check that script link is not present in the context menu for other manual action.
 		$table->query('link', $without_script)->one()->click();
