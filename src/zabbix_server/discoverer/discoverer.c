@@ -157,7 +157,7 @@ static int	dcheck_get_timeout(unsigned char type, int *timeout_sec)
  * Return value: SUCCEED - service is UP, FAIL - service not discovered       *
  *                                                                            *
  ******************************************************************************/
-static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, char **value, size_t *value_alloc)
+static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port)
 {
 	int		ret = SUCCEED;
 	const char	*service = NULL;
@@ -166,8 +166,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
 
 	zbx_init_agent_result(&result);
-
-	**value = '\0';
 
 	switch (dcheck->type)
 	{
@@ -213,9 +211,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 
 	if (SUCCEED == ret)
 	{
-		char		**pvalue;
-		size_t		value_offset = 0;
-		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN];
 
 		switch (dcheck->type)
@@ -238,36 +233,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
 					ret = FAIL;
-				}
-
-				break;
-			case SVC_AGENT:
-				memset(&item, 0, sizeof(zbx_dc_item_t));
-
-				zbx_strscpy(item.key_orig, dcheck->key_);
-
-				item.interface.useip = 1;
-				zbx_strscpy(item.interface.ip_orig, ip);
-				item.interface.addr = item.interface.ip_orig;
-				item.interface.port = port;
-
-				item.value_type	= ITEM_VALUE_TYPE_STR;
-				item.type = ITEM_TYPE_ZABBIX;
-
-				item.key = item.key_orig;
-				item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
-				item.timeout = dcheck->timeout;
-
-				if (SUCCEED == (ret = zbx_agent_get_value(&item, dmanager.source_ip, program_type,
-						&result)) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
-				{
-					zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
-				}
-
-				if (SUCCEED != ret && ZBX_ISSET_MSG(&result))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "discovery: item [%s] error: %s",
-							item.key, result.msg);
 				}
 
 				break;
@@ -821,6 +786,7 @@ zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port,
 	service = (zbx_discoverer_dservice_t *)zbx_malloc(NULL, sizeof(zbx_discoverer_dservice_t));
 	service->dcheckid = dcheckid;
 	service->port = port;
+	*service->value = '\0';
 
 	return service;
 }
@@ -895,7 +861,6 @@ static void	discovery_icmp_result_proc(const zbx_uint64_t druleid, const int dch
 
 		service = result_dservice_create(task->port, dcheckid);
 		service->status = DOBJECT_STATUS_UP;
-		*service->value = '\0';
 		zbx_vector_discoverer_services_ptr_append(&result->services, service);
 	}
 
@@ -1151,8 +1116,6 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	zbx_vector_discoverer_services_ptr_t	services;
 	zbx_discoverer_results_t		*result = NULL, result_cmp;
-	char					*value = NULL;
-	size_t					value_alloc = 128;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ip:%s resolve_dns:%d dchecks:%d key[0]:%s", log_worker_id, __func__,
 			DISCOVERY_ADDR_IP == task->addr_type ? task->addr.ip : "ipranges",
@@ -1170,23 +1133,18 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 
 	zbx_vector_discoverer_services_ptr_create(&services);
 
-	value = (char *)zbx_malloc(value, value_alloc);
-
 	for (i = 0; i < task->dchecks.values_num; i++)
 	{
 		zbx_dc_dcheck_t			*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[i];
 		zbx_discoverer_dservice_t	*service;
 
-		if (FAIL == discover_service(dcheck, task->addr.ip, task->port, &value, &value_alloc))
+		if (FAIL == discover_service(dcheck, task->addr.ip, task->port))
 			continue;
 
 		service = result_dservice_create(task->port, dcheck->dcheckid);
 		service->status = DOBJECT_STATUS_UP;
-		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 		zbx_vector_discoverer_services_ptr_append(&services, service);
 	}
-
-	zbx_free(value);
 
 	result_cmp.druleid = druleid;
 	result_cmp.ip = task->addr.ip;
