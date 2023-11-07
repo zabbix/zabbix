@@ -39,6 +39,10 @@ class testWidgets extends CWebTest {
 			$dialog->query('id:add')->one()->waitUntilClickable()->click();
 			$class = 'xpath://div[@class="table-forms-td-right"]//div[@class="multiselect-control"]';
 		}
+		elseif ($widget === 'Clock') {
+			$dialog->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
+			$dialog->query('button:Select')->one()->waitUntilClickable()->click();
+		}
 
 		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$host_item_dialog->query('button:Select')->one()->waitUntilClickable()->click();

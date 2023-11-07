@@ -23,6 +23,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
  * @backup widget, profiles
@@ -32,7 +33,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  * @onBefore prepareClockWidgetData
  */
 
-class testDashboardClockWidget extends CWebTest {
+class testDashboardClockWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -275,9 +276,9 @@ class testDashboardClockWidget extends CWebTest {
 				// Open "Advanced configuration" block to check its fields.
 				$form->fill(['Advanced configuration' => true]);
 
-				// Check that only Background colour and Time fields are visible (because only Time checkbox is checked).
+				// Check that only Background color and Time fields are visible (because only Time checkbox is checked).
 				// There are two labels "Time zone", so the xpath is used for the container.
-				foreach (['Background colour' => true, 'Date' => false, 'Time' => true,
+				foreach (['Background color' => true, 'Date' => false, 'Time' => true,
 							'xpath:.//div[@class="fields-group fields-group-tzone"]' => false] as $name => $visible) {
 					$this->assertTrue($form->getField($name)->isVisible($visible));
 				}
@@ -626,7 +627,7 @@ class testDashboardClockWidget extends CWebTest {
 						'id:show_2' => false,
 						'id:show_3' => false,
 						'Advanced configuration' => true,
-						'Background colour' => 'FFEB3B',
+						'Background color' => 'FFEB3B',
 						'id:date_size' => '50',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => 'F57F17'
@@ -648,7 +649,7 @@ class testDashboardClockWidget extends CWebTest {
 						'id:show_2' => true,
 						'id:show_3' => false,
 						'Advanced configuration' => true,
-						'Background colour' => '7B1FA2',
+						'Background color' => '7B1FA2',
 						'id:date_size' => '15',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '002B4D',
@@ -675,7 +676,7 @@ class testDashboardClockWidget extends CWebTest {
 						'id:show_2' => true,
 						'id:show_3' => false,
 						'Advanced configuration' => true,
-						'Background colour' => '43A047',
+						'Background color' => '43A047',
 						'id:date_size' => '55',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '64B5F6',
@@ -702,7 +703,7 @@ class testDashboardClockWidget extends CWebTest {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background colour' => 'C62828',
+						'Background color' => 'C62828',
 						'id:date_size' => '40',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => 'FDD835',
@@ -735,7 +736,7 @@ class testDashboardClockWidget extends CWebTest {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background colour' => '001819',
+						'Background color' => '001819',
 						'id:date_size' => '33',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
@@ -878,7 +879,7 @@ class testDashboardClockWidget extends CWebTest {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background colour' => '001819',
+						'Background color' => '001819',
 						'id:date_size' => '333',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
@@ -916,7 +917,7 @@ class testDashboardClockWidget extends CWebTest {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background colour' => '001819',
+						'Background color' => '001819',
 						'id:date_size' => '33',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
@@ -1155,7 +1156,7 @@ class testDashboardClockWidget extends CWebTest {
 				'id:show_2' => false,
 				'id:show_3' => false,
 				'Advanced configuration' => true,
-				'Background colour' => '001819'
+				'Background color' => '001819'
 			]);
 		}
 
@@ -1219,17 +1220,7 @@ class testDashboardClockWidget extends CWebTest {
 	 * Check if binary items are not available for Clock widget.
 	 */
 	public function testDashboardClockWidget_CheckAvailableItems() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for updating clock widgets']);
-		$dialog =  CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
-		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
-		$dialog->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
-		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
-		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
-		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill('Host for all item value types');
-		$table->waitUntilReloaded();
-		$this->assertTableDataColumn(['Character item', 'Float item', 'Log item',
-				'Text item', 'Unsigned item', 'Unsigned_dependent item']);
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for updating clock widgets'];
+		$this->checkAvailableItems($url, 'Clock');
 	}
 }
