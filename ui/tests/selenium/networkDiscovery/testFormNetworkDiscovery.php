@@ -1448,24 +1448,21 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'SNMPv1 agent (200) "new test SNMP OID"'
+						'ICMP ping "allow redirect"'
 
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
-							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false
+							'IP address' => true
 						],
 						'Host name' => [
-							'DNS name' => false,
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => true
+							'DNS name' => true,
+							'IP address' => false
 						],
 						'Visible name' => [
 							'Host name' => false,
 							'DNS name' => false,
-							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false
+							'IP address' => true
 						]
 					]
 				]
@@ -1483,26 +1480,23 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'SNMPv1 agent (200) "new test SNMP OID"',
+						'ICMP ping "allow redirect"',
 						'SNMPv2 agent (903) "v2 new test SNMP OID"'
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
 							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						],
 						'Host name' => [
-							'DNS name' => false,
+							'DNS name' => true,
 							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => true,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						],
 						'Visible name' => [
 							'Host name' => false,
 							'DNS name' => false,
 							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						]
 					]
