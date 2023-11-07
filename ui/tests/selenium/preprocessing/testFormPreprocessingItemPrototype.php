@@ -41,9 +41,6 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	const CLONE_RULEID				= 133800;	// 'Host for triggers filtering' -> 'Discovery rule for triggers filtering'
 	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 
-	public $clone_item_prototypeid = self::CLONE_ITEM_PROTOTYPEID;
-	public $inherited_item_prototype = self::INHERITED_ITEM_PROTOTYPE;
-
 	public function getItemPrototypePrometheusData() {
 		return array_merge($this->getPrometheusData(), [
 			[

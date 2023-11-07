@@ -1371,8 +1371,8 @@ class testMassUpdateItems extends CWebTest{
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
 				$table = $this->query('xpath://form[@name='.
-					CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
-					']/table')->asTable()->one();
+						CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+						']/table')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
 				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 				$form = $overlay->asForm();
@@ -1797,8 +1797,8 @@ class testMassUpdateItems extends CWebTest{
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
 				$table = $this->query('xpath://form[@name='.
-					CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
-					']/table')->asTable()->one();
+						CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+						']/table')->asTable()->one();
 				// TODO: not stable test testPageMassUpdateItems_ChangePreprocessing#8 on Jenkins, failed to properly waitUntilReady for page
 				try {
 					$table->query('link', $name)->one()->waitUntilClickable()->click();
@@ -2243,8 +2243,8 @@ class testMassUpdateItems extends CWebTest{
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
 				$table = $this->query('xpath://form[@name='.
-					CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
-					']/table')->asTable()->one();
+						CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+						']/table')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
 				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 				$form = $overlay->asForm();
@@ -2321,8 +2321,8 @@ class testMassUpdateItems extends CWebTest{
 
 		// Get item table.
 		$table = $this->query('xpath://form[@name='.
-			CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
-			']/table')->asTable()->one();
+				CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+				']/table')->asTable()->one();
 		$table->findRows('Name', $data)->select();
 
 		// Open mass update form.

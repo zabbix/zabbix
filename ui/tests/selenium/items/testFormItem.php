@@ -364,8 +364,10 @@ class testFormItem extends CLegacyWebTest {
 		$this->page->assertTitle('Configuration of items');
 		$this->page->assertHeader('Items');
 
-		$this->query(isset($itemid) ? 'link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$itemid) : 'button:Create item')
-				->one()->click();
+		$this->query(isset($itemid)
+			? 'link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$itemid)
+			: 'button:Create item'
+		)->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->page->assertTitle('Configuration of items');

@@ -517,7 +517,7 @@ class testFormPreprocessingTest extends CWebTest {
 			$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
 		}
 
-		$dialog->query('class:btn-overlay-close')->one()->click();
+		$dialog->close();
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 

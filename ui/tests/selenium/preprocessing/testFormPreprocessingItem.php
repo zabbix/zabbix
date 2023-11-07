@@ -38,9 +38,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
 	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
 
-	public $clone_itemid = self::CLONE_ITEMID;
-	public $inherited_itemid = self::INHERITED_ITEMID;
-
 	public function getItemPreprocessingPrometheusData() {
 		return array_merge($this->getPrometheusData(), [
 			[

@@ -46,6 +46,10 @@ abstract class testFormPreprocessing extends CWebTest {
 	public $button;
 	public $fail_message;
 
+	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
+	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
+	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule' -> 'testInheritanceItemPrototypePreprocessing'
+	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 	const CLONE_PREPROCESSING = [
 		[
 			'type' => '1',
@@ -2852,8 +2856,8 @@ abstract class testFormPreprocessing extends CWebTest {
 		}
 		else {
 			$item_name = ($item === 'Item')
-				? CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? $this->inherited_itemid : $this->clone_itemid))
-				: CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? $this->inherited_item_prototype : $this->clone_item_prototypeid));
+				? CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEMID : self::CLONE_ITEMID))
+				: CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEM_PROTOTYPE : self::CLONE_ITEM_PROTOTYPEID));
 
 			$this->query('link', $item_name)->one()->click();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();

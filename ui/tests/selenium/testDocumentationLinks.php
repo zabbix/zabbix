@@ -2629,11 +2629,10 @@ class testDocumentationLinks extends CWebTest {
 
 		// If the link was located in a popup - close this popup.
 		if ($dialog->isValid()) {
-			$modals = COverlayDialogElement::find()->all();
-			for ($i = 0; $i < $modals->count(); $i++) {
-				$current_modal = COverlayDialogElement::find()->all()->last();
-				$current_modal->query('button:Cancel')->waitUntilClickable()->one()->click();
-				$current_modal->waitUntilNotPresent();
+			$dialogs = COverlayDialogElement::find()->all();
+
+			for ($i = $dialogs->count() - 1; $i >= 0; $i--) {
+				$dialogs->get($i)->close(true);
 			}
 		}
 

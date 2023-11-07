@@ -48,7 +48,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	*/
 	public function testPageItemPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
-		$context = (str_contains($data['name'], '001')) ? 'template' : 'host';
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context='.$context);
 
@@ -78,10 +78,10 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	 */
 	public function testPageItemPrototypes_SimpleDelete($data) {
 		$itemid = $data['itemid'];
-		$context = ($data['status'] === '3') ? 'template' : 'host';
-
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context='.$context);
+
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('itemids_'.$itemid);
 		$this->query('button:Delete')->one()->click();
