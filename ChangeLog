@@ -1,8 +1,24 @@
 Changes for 7.0.0alpha8
 
 New features:
+.........T [ZBXNEXT-8568] added new proxy memory buffer metrics to Zabbix proxy health templates (drasikhov)
+.........T [ZBXNEXT-8522] added HPE iLO by HTTP template (drasikhov)
+.........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
+.........T [ZBXCTR-20] added scheme for metrics endpoints (ebbex)
 
 Bug fixes:
+..F....... [ZBX-22400] fixed Web scenarios configuration form to display parent web scenarios on page refresh (ddauksa)
+..F....... [ZBX-23290] fixed gap in the filter by tags on Monitoring > Latest data page (agriscenko)
+..F....... [ZBX-23399] fixed browser console errors when mass updating host and removing all value mappings (agriscenko)
+..F....... [ZBX-23430] fixed selected filter tab in high contrast themes being indistinguishable from others when collapsed (agriscenko)
+..F....... [ZBX-23429] removed strange dots in latest data caused by overflow-ellipsis (dfofanovs)
+.........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
+..F....... [ZBX-23521] fixed password field label not changing to key passphrase and back for SSH agent item when changing authentication method (agriscenko)
+..F....... [ZBX-23431] fixed non-working "Network timeout for item test" setting (agriscenko)
+..F....... [ZBX-23615] fixed receiving data from the database twice the first time it is loaded (ashubin)
+..F....... [ZBX-22537] fixed displaying symptom events in case multiple cause events have more than 50 symptoms (Ivo)
+..F....... [ZBX-19531] fixed tables with header text vertical rotation (ashubin, jfreibergs)
+.......P.. [ZBX-23157] fixed proxy buffer statistic handling in disk mode (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0alpha7
@@ -350,6 +366,30 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.9rc1
+
+New features:
+.......PS. [ZBXNEXT-8729] updated max supported TimescaleDB version to 2.12 (mprihodko)
+.........T [ZBXNEXT-8522] added HPE iLO by HTTP template (drasikhov)
+.........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
+
+Bug fixes:
+..F....... [ZBX-22400] fixed Web scenarios configuration form to display parent web scenarios on page refresh (ddauksa)
+..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
+..F....... [ZBX-23290] fixed gap in the filter by tags on Monitoring > Latest data page (agriscenko)
+..F....... [ZBX-23399] fixed browser console errors when mass updating host and removing all value mappings (agriscenko)
+..F....... [ZBX-23430] fixed selected filter tab in high contrast themes being indistinguishable from others when collapsed (agriscenko)
+.........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
+..F....... [ZBX-23521] fixed password field label not changing to key passphrase and back for SSH agent item when changing authentication method (agriscenko)
+..F....... [ZBX-23431] fixed non-working "Network timeout for item test" setting (agriscenko)
+..F....... [ZBX-23285] added missing bottom border for disabled button dropdown on hover for inherited macros (dfofanovs)
+..F....... [ZBX-23615] fixed receiving data from the database twice the first time it is loaded (ashubin)
+..F....... [ZBX-23429] removed strange dots in latest data caused by overflow-ellipsis (dfofanovs)
+..F....... [ZBX-22537] fixed displaying symptom events in case multiple cause events have more than 50 symptoms (Ivo)
+..F....... [ZBX-19531] fixed tables with header text vertical rotation (ashubin, jfreibergs)
+........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.8
@@ -1830,6 +1870,28 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.24rc1
+
+New features:
+...G...... [ZBXNEXT-8708] add version metric to oracle plugin in Zabbix agent 2 (rzvejs)
+.......PS. [ZBXNEXT-8729] updated max supported TimescaleDB version to 2.12 (mprihodko)
+.........T [ZBXNEXT-8522] added HPE iLO by HTTP template (drasikhov)
+.........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
+
+Bug fixes:
+..F....... [ZBX-22400] fixed Web scenarios configuration form to display parent web scenarios on page refresh (ddauksa)
+..F....... [ZBX-23290] fixed gap in the filter by tags on Monitoring > Latest data page (agriscenko)
+..F....... [ZBX-23430] fixed selected filter tab in high contrast themes being indistinguishable from others when collapsed (agriscenko)
+.........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
+..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
+..F....... [ZBX-23521] fixed password field label not changing to key passphrase and back for SSH agent item when changing authentication method (agriscenko)
+..F....... [ZBX-23431] fixed non-working "Network timeout for item test" setting (agriscenko)
+..F....... [ZBX-23285] added missing bottom border for disabled button dropdown on hover for inherited macros (dfofanovs)
+..F....... [ZBX-23615] fixed receiving data from the database twice the first time it is loaded (ashubin)
+..F....... [ZBX-19531] fixed tables with header text vertical rotation (ashubin, jfreibergs)
+........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.23
@@ -4616,6 +4678,15 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.40rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
+..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.39

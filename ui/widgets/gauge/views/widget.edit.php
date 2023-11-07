@@ -45,11 +45,6 @@ $form
 	->addField(
 		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(3)
 	)
-	->addItem(
-		new CFormField(
-			(new CLabel(_('At least one parameter must be enabled.')))->setAsteriskMark()
-		)
-	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addField(
