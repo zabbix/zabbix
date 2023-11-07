@@ -2929,7 +2929,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 								],
 								[
 									'Name' => 'Column default',
-									'Item' => 'Available memory',
+									'Item' => 'Available memory'
 								],
 								[
 									'Name' => 'Column with "Widget" time period',
