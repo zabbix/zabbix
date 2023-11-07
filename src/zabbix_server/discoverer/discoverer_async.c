@@ -193,7 +193,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 
 	if (FAIL == (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, async_result, NULL,
 			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
-			ZABBIX_SNMP_RESOLVE_REVERSE_DNS_YES)))
+			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
 		if (ZBX_ISSET_MSG(&result))
 			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
@@ -285,7 +285,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 
 	if (FAIL == (ret = zbx_async_check_agent(&item, &result, process_agent_result, async_result, NULL,
 			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
-			ZABBIX_AGENT_RESOLVE_REVERSE_DNS_YES)))
+			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
 		if (ZBX_ISSET_MSG(&result))
 			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));

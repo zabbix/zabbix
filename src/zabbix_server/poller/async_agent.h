@@ -32,20 +32,6 @@ typedef enum
 }
 zbx_zabbix_agent_step_t;
 
-typedef enum
-{
-	ZABBIX_AGENT_STEP_DEFAULT = 0,
-	ZABBIX_AGENT_STEP_REVERSE_DNS,
-}
-zbx_zabbix_rdns_step_t;
-
-typedef enum
-{
-	ZABBIX_AGENT_RESOLVE_REVERSE_DNS_NO = 0,
-	ZABBIX_AGENT_RESOLVE_REVERSE_DNS_YES,
-}
-zbx_agent_resolve_reverse_dns_t;
-
 typedef struct
 {
 	zbx_dc_item_context_t		item;
@@ -61,15 +47,15 @@ typedef struct
 	unsigned char			tls_connect;
 	const char			*config_source_ip;
 	int				config_timeout;
-	zbx_agent_resolve_reverse_dns_t	resolve_reverse_dns;
-	zbx_zabbix_rdns_step_t		rdns_step;
+	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
+	zbx_async_rdns_step_t		rdns_step;
 	char				*reverse_dns;
 }
 zbx_agent_context;
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_agent_resolve_reverse_dns_t resolve_reverse_dns);
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
 void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
 #endif

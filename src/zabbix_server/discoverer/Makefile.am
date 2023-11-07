@@ -13,6 +13,8 @@ libzbxdiscoverer_a_SOURCES = \
 	discoverer_taskprep.h \
 	discoverer_async.c \
 	discoverer_async.h \
+	async_tcpsvc.c \
+	async_tcpsvc.h \
 	discoverer_int.h
 
 libzbxdiscoverer_a_CFLAGS = \

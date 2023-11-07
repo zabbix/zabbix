@@ -146,13 +146,6 @@ zbx_bulkwalk_context_t;
 ZBX_PTR_VECTOR_DECL(bulkwalk_context, zbx_bulkwalk_context_t*)
 ZBX_PTR_VECTOR_IMPL(bulkwalk_context, zbx_bulkwalk_context_t*)
 
-typedef enum
-{
-	ZABBIX_SNMP_STEP_DEFAULT = 0,
-	ZABBIX_SNMP_STEP_REVERSE_DNS,
-}
-zbx_zabbix_snmp_step_t;
-
 struct zbx_snmp_context
 {
 	void				*arg;
@@ -179,8 +172,8 @@ struct zbx_snmp_context
 	char				*snmpv3_privpassphrase;
 	const char			*config_source_ip;
 	unsigned char			snmp_oid_type;
-	zbx_snmp_resolve_reverse_dns_t	resolve_reverse_dns;
-	zbx_zabbix_snmp_step_t		step;
+	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
+	zbx_async_rdns_step_t		step;
 	char				*reverse_dns;
 };
 
@@ -2514,7 +2507,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
-	if (ZABBIX_SNMP_STEP_REVERSE_DNS == snmp_context->step)
+	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == snmp_context->step)
 	{
 		if (NULL != addr)
 			snmp_context->reverse_dns = zbx_strdup(NULL, addr);
@@ -2634,10 +2627,10 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 					snmp_context->results = NULL;
 					snmp_context->item.ret = SUCCEED;
 
-					if (ZABBIX_SNMP_RESOLVE_REVERSE_DNS_YES == snmp_context->resolve_reverse_dns)
+					if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == snmp_context->resolve_reverse_dns)
 					{
 						task_ret = ZBX_ASYNC_TASK_RESOLVE_REVERSE;
-						snmp_context->step = ZABBIX_SNMP_STEP_REVERSE_DNS;
+						snmp_context->step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
 					}
 
 					goto stop;
@@ -2715,7 +2708,7 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_snmp_resolve_reverse_dns_t resolve_reverse_dns)
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	int			i, ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
@@ -2728,7 +2721,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
 	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
-	snmp_context->step = ZABBIX_SNMP_STEP_DEFAULT;
+	snmp_context->step = ZABBIX_ASYNC_STEP_DEFAULT;
 	snmp_context->reverse_dns = NULL;
 
 	snmp_context->ssp = NULL;
@@ -3247,7 +3240,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
 				&snmp_result, NULL, snmp_result.base, dnsbase, config_source_ip,
-				ZABBIX_SNMP_RESOLVE_REVERSE_DNS_NO)))
+				ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO)))
 		{
 			if (1 == snmp_result.finished || -1 != event_base_dispatch(snmp_result.base))
 			{

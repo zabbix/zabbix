@@ -71,7 +71,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
-	if (ZABBIX_AGENT_STEP_REVERSE_DNS == agent_context->rdns_step)
+	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == agent_context->rdns_step)
 	{
 		if (NULL != addr)
 			agent_context->reverse_dns = zbx_strdup(NULL, addr);
@@ -222,9 +222,9 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->item.ret,
 						agent_context->item.interface.addr, &agent_context->item.result);
 
-				if (ZABBIX_AGENT_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns)
+				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns)
 				{
-					agent_context->rdns_step = ZABBIX_AGENT_STEP_REVERSE_DNS;
+					agent_context->rdns_step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
 					return ZBX_ASYNC_TASK_RESOLVE_REVERSE;
 				}
 
@@ -258,7 +258,7 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_agent_resolve_reverse_dns_t resolve_reverse_dns)
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
 	int			ret = NOTSUPPORTED;
@@ -286,7 +286,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 		agent_context->item.key = zbx_strdup(NULL, item->key);
 
 	agent_context->resolve_reverse_dns = resolve_reverse_dns;
-	agent_context->rdns_step = ZABBIX_AGENT_STEP_DEFAULT;
+	agent_context->rdns_step = ZABBIX_ASYNC_STEP_DEFAULT;
 	agent_context->reverse_dns = NULL;
 
 	agent_context->tls_connect = item->host.tls_connect;

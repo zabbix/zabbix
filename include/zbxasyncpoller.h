@@ -33,6 +33,21 @@ typedef enum
 }
 zbx_async_task_state_t;
 
+
+typedef enum
+{
+	ZABBIX_ASYNC_STEP_DEFAULT = 0,
+	ZABBIX_ASYNC_STEP_REVERSE_DNS,
+}
+zbx_async_rdns_step_t;
+
+typedef enum
+{
+	ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO = 0,
+	ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES,
+}
+zbx_async_resolve_reverse_dns_t;
+
 typedef int (*zbx_async_task_process_cb_t)(short event, void *data, int *fd, const char *addr, char *dnserr);
 typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
