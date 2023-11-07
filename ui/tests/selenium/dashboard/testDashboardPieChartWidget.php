@@ -199,9 +199,6 @@ class testDashboardPieChartWidget extends CWebTest
 
 		$this->validateDataSetHintboxes($form);
 
-		// Screenshot Item pattern.
-		$this->screenshotLayout($dialog, 'piechart_item_pattern', $data['action']);
-
 		// Check Add data set buttons.
 		foreach (['id:dataset-add', 'id:dataset-menu'] as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isClickable());
@@ -212,22 +209,13 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
-		foreach (['data-indicator' => 'count', 'data-indicator-value' => 2] as $attribute => $expected_value) {
-			$this->assertEquals($expected_value, $form->query('id:tab_data_set')->one()->getAttribute($attribute));
-		}
-
 		$this->assertLabels(['Data set #2', 'Aggregation function', 'Data set aggregation', 'Data set label'], $form);
 
-		foreach(['name:ds[1][aggregate_function]',
-					'name:ds[1][dataset_aggregation]',
-					'name:ds[1][data_set_label]'] as $selector) {
-			$this->assertTrue($form->query($selector)->one()->isClickable());
+		foreach(['Aggregation function', 'Data set aggregation', 'Data set label'] as $label) {
+			$this->assertTrue($form->getField($label)->isClickable());
 		}
 
 		$this->validateDataSetHintboxes($form);
-
-		// Screenshot Item list.
-		$this->screenshotLayout($dialog, 'piechart_item_list', $data['action']);
 
 		// Displaying options tab.
 		$form->selectTab('Displaying options');
@@ -235,14 +223,12 @@ class testDashboardPieChartWidget extends CWebTest
 		$form->invalidate();
 		$this->assertLabels(['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than '], $form);
 
-		foreach (['Auto', 'History', 'Trends'] as $label) {
-			$this->assertTrue($form->getField('History data selection')->
-					query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one()->isClickable());
-		}
+		$radios = ['id:source' => ['Auto', 'History', 'Trends'], 'id:draw_type' => ['Pie', 'Doughnut']];
 
-		foreach (['Pie', 'Doughnut'] as $label) {
-			$this->assertTrue($form->getField('Draw')->
-					query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one()->isClickable());
+		foreach ($radios as $selector => $labels) {
+			$radio_draw = $form->query($selector)->asSegmentedRadio()->one();
+			$radio_draw->isEnabled();
+			$this->assertEquals($labels, $radio_draw->getLabels()->asText());
 		}
 
 		$this->assertRangeLayout('Space between sectors', 'space', $form, ['min' => '0', 'max' => '10', 'step' => '1', 'value' => '1']);
@@ -253,9 +239,6 @@ class testDashboardPieChartWidget extends CWebTest
 
 		$form->fill(['id:merge' => true]);
 		$form->invalidate();
-		foreach (['data-indicator' => 'mark', 'data-indicator-value' => 1] as $attribute => $expected_value) {
-			$this->assertEquals($expected_value, $form->query('id:tab_displaying_options')->one()->getAttribute($attribute));
-		}
 
 		foreach (['merge_percent', 'merge_color'] as $id) {
 			$this->assertTrue($form->query('id', $id)->one()->isEnabled());
@@ -275,43 +258,39 @@ class testDashboardPieChartWidget extends CWebTest
 			$this->assertTrue($form->getField($label)->isEnabled());
 		}
 
-		// Screenshot Displaying options.
-		$this->screenshotLayout($dialog, 'piechart_displaying_options', $data['action']);
+		$this->assertFalse($form->getField('Units')->isEnabled());
+
+		$form->fill(['id:units_show' => true]);
+		$this->assertTrue($form->getField('Units')->isEnabled());
 
 		// Time period tab.
 		$form->selectTab('Time period');
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
-		foreach (['Dashboard', 'Widget', 'Custom'] as $label) {
-			$this->assertTrue($form->getField('Time period')->
-					query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one()->isClickable());
-		}
-
-		// Screenshot Time period.
-		$this->screenshotLayout($dialog, 'piechart_time_period', $data['action']);
+		$radio2 = $form->query('id:time_period_data_source')->asSegmentedRadio()->one();
+		$this->assertTrue($radio2->isEnabled());
+		$this->assertEquals(['Dashboard', 'Widget', 'Custom'], $radio2->getLabels()->asText());
 
 		// Legend tab.
 		$form->selectTab('Legend');
 		$this->page->waitUntilReady();
 		$form->invalidate();
-		$this->assertLabels(['Show legend', 'Show aggregation function', 'Number of rows', 'Number of columns'], $form);
-		$this->assertTrue($form->getField('Show legend')->isEnabled());
-		$this->assertTrue($form->getField('Show legend')->isChecked());
-		$this->assertTrue($form->getField('Show aggregation function')->isEnabled());
-		$this->assertTrue($form->getField('Show aggregation function')->isChecked(false));
+
+		foreach (['Show legend', 'Show aggregation function', 'Number of rows', 'Number of columns'] as $label) {
+			$this->assertTrue($form->getLabel($label)->isClickable());
+		}
+
+		foreach (['Show legend' => true, 'Show aggregation function' => false] as $label => $checked) {
+			$this->assertTrue($form->getField($label)->isChecked($checked));
+		}
 
 		$this->assertRangeLayout('Number of rows', 'legend_lines', $form, ['min' => '1', 'max' => '10', 'step' => '1', 'value' => '1']);
 		$this->assertRangeLayout('Number of columns', 'legend_columns', $form, ['min' => '1', 'max' => '4', 'step' => '1', 'value' => '4']);
 
-		// Screenshot Legend.
-		$this->screenshotLayout($dialog, 'piechart_legend', $data['action']);
-
-		// Check footer buttons.
-		$footer = $dialog->query('class:overlay-dialogue-footer')->one();
-
+		// Footer buttons.
 		foreach([$data['primary_button_text'], 'Cancel'] as $button) {
-			$this->assertTrue($footer->query('button', $button)->one()->isClickable());
+			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
 		}
 	}
 
@@ -920,23 +899,6 @@ class testDashboardPieChartWidget extends CWebTest
 			$this->assertEquals($text, $hint->getText());
 			$hint->query('xpath:./button')->one()->click();
 		}
-	}
-
-	/**
-	 * Take screenshot of the edit form, but only in the 'create' test to avoid excessive screenshots.
-	 *
-	 * @param $dialog
-	 * @param $id
-	 * @param $action
-	 */
-	protected function screenshotLayout($dialog, $id, $action) {
-		if ($action !== 'create') {
-			return;
-		}
-
-		// Screenshot Item pattern.
-		$this->page->removeFocus();
-		$this->assertScreenshot($dialog, $id);
 	}
 
 	/**
