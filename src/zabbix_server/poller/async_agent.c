@@ -71,6 +71,14 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
+	if (ZABBIX_AGENT_STEP_REVERSE_DNS == agent_context->rdns_step)
+	{
+		if (NULL != addr)
+			agent_context->reverse_dns = zbx_strdup(NULL, addr);
+
+		goto stop;
+	}
+
 	if (0 == event)
 	{
 		/* initialization */
@@ -214,6 +222,12 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->item.ret,
 						agent_context->item.interface.addr, &agent_context->item.result);
 
+				if (ZABBIX_AGENT_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns)
+				{
+					agent_context->rdns_step = ZABBIX_AGENT_STEP_REVERSE_DNS;
+					return ZBX_ASYNC_TASK_RESOLVE_REVERSE;
+				}
+
 				break;
 			}
 
@@ -238,12 +252,13 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 	zbx_free(agent_context->item.key);
 	zbx_free(agent_context->tls_arg1);
 	zbx_free(agent_context->tls_arg2);
+	zbx_free(agent_context->reverse_dns);
 	zbx_free_agent_result(&agent_context->item.result);
 }
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip)
+		const char *config_source_ip, zbx_agent_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
 	int			ret = NOTSUPPORTED;
@@ -269,6 +284,10 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	}
 	else
 		agent_context->item.key = zbx_strdup(NULL, item->key);
+
+	agent_context->resolve_reverse_dns = resolve_reverse_dns;
+	agent_context->rdns_step = ZABBIX_AGENT_STEP_DEFAULT;
+	agent_context->reverse_dns = NULL;
 
 	agent_context->tls_connect = item->host.tls_connect;
 	zbx_strlcpy(agent_context->item.host, item->host.host, sizeof(agent_context->item.host));

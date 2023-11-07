@@ -241,15 +241,8 @@ static void	process_agent_result(void *data)
 
 		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
 		{
-			char	dns[ZBX_INTERFACE_DNS_LEN_MAX];
-
-			zbx_gethost_by_ip(item->interface.ip_orig, dns, sizeof(dns));
-			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname, dns);
-/*
 			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname,
-					NULL == zbx_async_check_snmp_get_reverse_dns(data) ? "" :
-					zbx_async_check_snmp_get_reverse_dns(data));
-*/
+					NULL == agent_context->reverse_dns ? "" : agent_context->reverse_dns);
 		}
 	}
 
@@ -291,8 +284,8 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	item.timeout = dcheck->timeout;
 
 	if (FAIL == (ret = zbx_async_check_agent(&item, &result, process_agent_result, async_result, NULL,
-			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip /*,
-			ZABBIX_SNMP_RESOLVE_REVERSE_DNS_YES */)))
+			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
+			ZABBIX_AGENT_RESOLVE_REVERSE_DNS_YES)))
 	{
 		if (ZBX_ISSET_MSG(&result))
 			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
@@ -347,9 +340,10 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 
 	log_worker_id = worker_id;
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:%d"
-			" checks per ip:%d dchecks:%d worker_max:%d", log_worker_id, __func__, druleid,
+			" checks per ip:%d dchecks:%d type:%u worker_max:%d", log_worker_id, __func__, druleid,
 			task->addr.range->id, task->addr.range->state.count, task->addr.range->state.checks_per_ip,
-			task->dchecks.values_num, worker_max);
+			task->dchecks.values_num, task->dchecks.values[task->addr.range->state.dcheck_index]->type,
+			worker_max);
 
 
 	if (0 == worker_max)

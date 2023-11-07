@@ -276,7 +276,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 			{
 				errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
 						poller_config, poller_config, poller_config->base, poller_config->dnsbase,
-						poller_config->config_source_ip);
+						poller_config->config_source_ip, ZABBIX_AGENT_RESOLVE_REVERSE_DNS_NO);
 			}
 			else
 			{
