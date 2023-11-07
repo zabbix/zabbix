@@ -22,6 +22,7 @@
 #include "zbxlog.h"
 #include "../poller/checks_snmp.h"
 #include "../poller/async_agent.h"
+#include "async_tcpsvc.h"
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
 #include <event2/dns.h>
@@ -303,6 +304,134 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	return ret;
 }
 
+static void	process_tcpsvc_result(void *data)
+{
+	zbx_tcpsvc_context		*tcpsvc_context = (zbx_tcpsvc_context *)data;
+	discovery_async_result_t	*async_result = (discovery_async_result_t *)tcpsvc_context->arg;
+	zbx_dc_item_context_t		*item = &tcpsvc_context->item;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
+
+	async_result->poller_config->processing--;
+	async_result->dresult->processed_checks_per_ip++;
+
+	if (SUCCEED == item->ret && ZBX_ISSET_UI64(&item->result) && 0 != item->result.ui64)
+	{
+		zbx_discoverer_dservice_t	*service;
+
+
+		service = result_dservice_create(item->interface.port, async_result->dcheckid);
+		service->status = DOBJECT_STATUS_UP;
+		zbx_vector_discoverer_services_ptr_append(&async_result->dresult->services, service);
+
+		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
+		{
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname,
+					NULL == tcpsvc_context->reverse_dns ? "" : tcpsvc_context->reverse_dns);
+		}
+	}
+
+	zbx_free(async_result);
+	zbx_async_check_tcpsvc_clean(tcpsvc_context);
+	zbx_free(tcpsvc_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+}
+
+static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
+		char *ip, const int port, zbx_discoverer_results_t *dresult, char **error)
+{
+	int				ret;
+	const char			*service = NULL;
+	zbx_dc_item_t			item;
+	AGENT_RESULT			result;
+	discovery_async_result_t	*async_result;
+
+	switch (dcheck->type)
+	{
+		case SVC_SSH:
+			service = "ssh";
+			break;
+		case SVC_LDAP:
+			service = "ldap";
+			break;
+		case SVC_SMTP:
+			service = "smtp";
+			break;
+		case SVC_FTP:
+			service = "ftp";
+			break;
+		case SVC_HTTP:
+			service = "http";
+			break;
+		case SVC_POP:
+			service = "pop";
+			break;
+		case SVC_NNTP:
+			service = "nntp";
+			break;
+		case SVC_IMAP:
+			service = "imap";
+			break;
+		case SVC_TCP:
+			service = "tcp";
+			break;
+		case SVC_HTTPS:
+			service = "https";
+			break;
+		case SVC_TELNET:
+			service = "telnet";
+			break;
+		case SVC_AGENT:
+			break;
+		default:
+			*error = zbx_dsprintf(*error, "Error of unknown service:%u", dcheck->type);
+			return FAIL;
+	}
+
+	zbx_init_agent_result(&result);
+
+	async_result = (discovery_async_result_t *) zbx_malloc(NULL, sizeof(discovery_async_result_t));
+	async_result->dresult = dresult;
+	async_result->poller_config = poller_config;
+	async_result->dcheckid = dcheck->dcheckid;
+
+	memset(&item, 0, sizeof(zbx_dc_item_t));
+	zbx_snprintf(item.key_orig, sizeof(item.key_orig), "net.tcp.service[%s,%s,%d]", service, ip, port);
+	item.key = item.key_orig;
+
+	item.interface.useip = 1;
+	zbx_strscpy(item.interface.ip_orig, ip);
+	item.interface.addr = item.interface.ip_orig;
+	item.interface.port = port;
+
+	item.value_type = ITEM_VALUE_TYPE_UINT64;
+	item.type = ITEM_TYPE_SIMPLE;
+
+	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
+	item.timeout = dcheck->timeout;
+
+	if (FAIL == (ret = zbx_async_check_tcpsvc(&item, &result, process_tcpsvc_result, async_result, NULL,
+			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
+			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
+	{
+		if (ZBX_ISSET_MSG(&result))
+			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
+		else
+			*error = zbx_strdup(*error, "Error of net.tcp.service check");
+
+		zbx_free(async_result);
+	}
+	else
+		poller_config->processing++;
+
+	zbx_free_agent_result(&result);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
+			ip, port, item.key_orig, ret);
+	return ret;
+}
+
 static void	discoverer_net_check_result_flush(zbx_discoverer_manager_t *dmanager, zbx_discoverer_task_t *task,
 		zbx_vector_discoverer_results_ptr_t *results, int force)
 {
@@ -406,6 +535,20 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 					break;
 				case SVC_AGENT:
 					ret = discovery_agent(&poller_config, dcheck, ip, task->addr.range->state.port,
+							result, error);
+					break;
+				case SVC_SSH:
+				case SVC_LDAP:
+				case SVC_SMTP:
+				case SVC_FTP:
+				case SVC_HTTP:
+				case SVC_POP:
+				case SVC_NNTP:
+				case SVC_IMAP:
+				case SVC_TCP:
+				case SVC_HTTPS:
+				case SVC_TELNET:
+					ret = discovery_tcpsvc(&poller_config, dcheck, ip, task->addr.range->state.port,
 							result, error);
 					break;
 				default:
