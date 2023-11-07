@@ -12,6 +12,214 @@ out:
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
+test case: ISO-8859-1 without ;
+in:
+  encoding: 'text/html charset=ISO-8859-1'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'WINDOWS-1252'
+  return: SUCCEED
+---
+test case: ISO-8859-1 charset with spaces
+in:
+  encoding: ' text/html ; charset = ISO-8859-1 '
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: ISO-8859-1 charset empty
+in:
+  encoding: 'text/html;'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'WINDOWS-1252'
+  return: SUCCEED
+---
+test case: ISO-8859-1 charset special symbol
+in:
+  encoding: 'text/html;=ISO-8859-1'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'WINDOWS-1252'
+  return: SUCCEED
+---
+test case: ISO-8859-1 charset special symbol
+in:
+  encoding: 'text/html;=ISO-8859-1'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'WINDOWS-1252'
+  return: SUCCEED
+---
+test case: ISO-8859-1 quoted
+in:
+  encoding: 'text/html; charset="ISO-8859-1"'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: ISO-8859-1 quoted/unquote
+in:
+  encoding: 'text/html; charset="\"ISO-8859-1\""'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: '"ISO-8859-1"'
+  return: SUCCEED
+---
+test case: ISO-8859-1 quoted/unquote last
+in:
+  encoding: 'text/html; charset="ISO-8859-1\\"'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'ISO-8859-1\'
+  return: SUCCEED
+---
+test case: ISO-8859-1 quoted but no matching quote
+in:
+  encoding: 'text/html; charset="ISO-8859-1'
+  buffer_length: 7
+  buffer: &buffer
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+out:
+  expected_result_buffer_length: 14
+  expected_result_buffer:
+    - '¡±ÁÑáñÿ'
+  encoding: 'WINDOWS-1252'
+  return: SUCCEED
+### html
+---
+test case: ISO-8859-1
+in:
+  encoding: 'text/html'
+  buffer_length: 279
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta name="description"
+        content="line1
+        line2,
+        line3." />
+  <meta name="keywords" content="W3C, HTML, CSS, SVG, Web standards">
+  <meta charset="iso-8859-1" />
+</head>
+<body>
+
+The content of the document......\xA1\xB1\xC1\xD1\xE1\xF1\xFF
+
+</body>
+</html>'
+out:
+  expected_result_buffer_length: 286
+  expected_result_buffer:
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta name="description"
+        content="line1
+        line2,
+        line3." />
+  <meta name="keywords" content="W3C, HTML, CSS, SVG, Web standards">
+  <meta charset="iso-8859-1" />
+</head>
+<body>
+
+The content of the document......¡±ÁÑáñÿ
+
+</body>
+</html>'
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: ISO-8859-1 http-equiv
+in:
+  encoding: 'text/html'
+  buffer_length: 322
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description"
+        content="line1
+        line2,
+        line3." />
+  <meta name="keywords" content="W3C, HTML, CSS, SVG, Web standards">
+</head>
+<body>
+
+The content of the document......\xA1\xB1\xC1\xD1\xE1\xF1\xFF
+
+</body>
+</html>'
+out:
+  expected_result_buffer_length: 329
+  expected_result_buffer:
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description"
+        content="line1
+        line2,
+        line3." />
+  <meta name="keywords" content="W3C, HTML, CSS, SVG, Web standards">
+</head>
+<body>
+
+The content of the document......¡±ÁÑáñÿ
+
+</body>
+</html>'
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
 test case: empty text nothing happens
 # empty text
 in:

@@ -41,7 +41,7 @@ char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected)
 			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
 
 		if (offset + length > expected)
-			fail_msg("Incorrect message size");
+			fail_msg("Incorrect message size, expected:%ld actual:%ld", expected, offset + length);
 
 		memcpy(buffer + offset, value, length);
 		offset += length;
