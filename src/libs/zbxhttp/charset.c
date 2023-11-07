@@ -378,6 +378,9 @@ char	*zbx_determine_charset(const char *content_type, char *body, size_t size)
 	const char	*ptr;
 	char		*charset = NULL;
 
+	if (0 == size)
+		charset = zbx_strdup(NULL, "UTF-8");
+
 	if (NULL != content_type)
 	{
 		if (NULL != (ptr = strchr(content_type, ';')))
