@@ -1265,37 +1265,10 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
 {
-#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT	0x01
-#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR	0x02
-#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG	0x04
-#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64	0x08
-#define ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT	0x10
-	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT) && item->value_type == ITEM_VALUE_TYPE_FLOAT) {
+	if (0 != (mask & (1 << item->value_type)))
 		return SUCCEED;
-	}
-
-	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR) && item->value_type == ITEM_VALUE_TYPE_STR) {
-		return SUCCEED;
-	}
-
-	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG) && item->value_type == ITEM_VALUE_TYPE_LOG) {
-		return SUCCEED;
-	}
-
-	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64) && item->value_type == ITEM_VALUE_TYPE_UINT64) {
-		return SUCCEED;
-	}
-
-	if ((mask & ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT) && item->value_type == ITEM_VALUE_TYPE_TEXT) {
-		return SUCCEED;
-	}
 
 	return FAIL;
-#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT
-#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR
-#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG
-#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64
-#undef ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT
 }
 
 /******************************************************************************
