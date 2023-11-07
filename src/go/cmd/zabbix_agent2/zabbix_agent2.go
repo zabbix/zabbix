@@ -162,9 +162,13 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fatalExit("", errors.Join(err, eventLogErr(err)))
 	}
 
+	if args.testConfig {
+		fmt.Printf("Validating configuration file \"%s\"\n", args.configPath)
+	}
+
 	err = conf.Load(args.configPath, &agent.Options)
 	if err != nil {
-		if args.configPath != "" {
+		if args.configPath != "" || args.testConfig {
 			fatalExit("", errors.Join(err, eventLogErr(err)))
 		}
 
@@ -242,6 +246,10 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		m.Stop()
 		monitor.Wait(monitor.Scheduler)
 		cleanUpExternal()
+
+		if args.testConfig {
+			fmt.Print("Validation successful\n")
+		}
 
 		return
 	}

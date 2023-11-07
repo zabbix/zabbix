@@ -1500,6 +1500,8 @@ int	main(int argc, char **argv)
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
 
+	if (ZBX_TASK_TEST_CONFIG == t.task)
+		printf("Validating configuration file \"%s\"\n", config_file);
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
 	/* into windows event log while zabbix_log is not ready */
@@ -1576,8 +1578,6 @@ int	main(int argc, char **argv)
 			break;
 #endif
 		case ZBX_TASK_TEST_CONFIG:
-			printf("Validating configuration file \"%s\"\n", config_file);
-
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			load_aliases(CONFIG_ALIASES);
 			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
