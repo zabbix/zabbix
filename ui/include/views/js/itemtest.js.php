@@ -271,7 +271,8 @@
 	 *                                     - 'test' button to test single preprocessing step (step index).
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_element, step_obj_nr) {
-		var $row = jQuery(trigger_element).closest('.preprocessing-list-item, .preprocessing-list-foot, .tfoot-buttons'),
+		var $row = jQuery(trigger_element)
+					.closest('.preprocessing-list-item, .preprocessing-list-foot, .overlay-dialogue-footer'),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
 			cached_values = $row.data('test-data') || [];
 

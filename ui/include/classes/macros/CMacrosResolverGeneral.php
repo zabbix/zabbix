@@ -1393,7 +1393,7 @@ class CMacrosResolverGeneral {
 					if ($options['html']) {
 						$macro_value = str_replace(["\r\n", "\n"], [" "], $macro_value);
 						$hint_table = (new CTable())
-							->addClass('list-table')
+							->addClass(ZBX_STYLE_LIST_TABLE)
 							->addRow([
 								new CCol($function['name']),
 								new CCol(
