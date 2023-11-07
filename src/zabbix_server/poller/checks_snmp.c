@@ -2740,9 +2740,15 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	snmp_context->item.hostid = item->host.hostid;
 	snmp_context->item.value_type = item->value_type;
 	snmp_context->item.flags = item->flags;
-	snmp_context->item.key = item->key;
-	item->key = NULL;
 	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
+
+	if (item->key != item->key_orig)
+	{
+		snmp_context->item.key = item->key;
+		item->key = NULL;
+	}
+	else
+		snmp_context->item.key = zbx_strdup(NULL, item->key);
 
 	zbx_init_agent_result(&snmp_context->item.result);
 

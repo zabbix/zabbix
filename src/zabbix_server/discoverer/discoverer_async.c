@@ -148,6 +148,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 
 	memset(&item, 0, sizeof(zbx_dc_item_t));
 	zbx_strscpy(item.key_orig, dcheck->key_);
+	item.key = item.key_orig;
 
 	item.interface.useip = 1;
 	zbx_strscpy(item.interface.ip_orig, ip);
@@ -171,19 +172,15 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 			item.type = ITEM_TYPE_SNMP;
 	}
 
-	item.key = zbx_strdup(NULL, item.key_orig);
 	item.snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
 	item.snmp_oid = dcheck->key_;
 	item.timeout = dcheck->timeout;
 
 	if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 	{
-		item.snmpv3_securityname = zbx_strdup(NULL,
-				dcheck->snmpv3_securityname);
-		item.snmpv3_authpassphrase = zbx_strdup(NULL,
-				dcheck->snmpv3_authpassphrase);
-		item.snmpv3_privpassphrase = zbx_strdup(NULL,
-				dcheck->snmpv3_privpassphrase);
+		item.snmpv3_securityname = zbx_strdup(NULL, dcheck->snmpv3_securityname);
+		item.snmpv3_authpassphrase = zbx_strdup(NULL, dcheck->snmpv3_authpassphrase);
+		item.snmpv3_privpassphrase = zbx_strdup(NULL, dcheck->snmpv3_privpassphrase);
 
 		item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
 
@@ -208,7 +205,6 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	else
 		poller_config->processing++;
 
-	zbx_free(item.key);
 	zbx_free(item.snmp_community);
 	zbx_free(item.snmpv3_securityname);
 	zbx_free(item.snmpv3_authpassphrase);
@@ -281,6 +277,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 
 	memset(&item, 0, sizeof(zbx_dc_item_t));
 	zbx_strscpy(item.key_orig, dcheck->key_);
+	item.key = item.key_orig;
 
 	item.interface.useip = 1;
 	zbx_strscpy(item.interface.ip_orig, ip);
@@ -290,7 +287,6 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	item.value_type = ITEM_VALUE_TYPE_STR;
 	item.type = ITEM_TYPE_ZABBIX;
 
-	item.key = zbx_strdup(NULL, item.key_orig);
 	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 	item.timeout = dcheck->timeout;
 
@@ -308,7 +304,6 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	else
 		poller_config->processing++;
 
-	zbx_free(item.key);
 	zbx_free_agent_result(&result);
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
 			ip, port, item.key_orig, ret);

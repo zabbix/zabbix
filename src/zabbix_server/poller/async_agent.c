@@ -260,9 +260,16 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	agent_context->item.interface = item->interface;
 	agent_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			agent_context->item.interface.dns_orig : agent_context->item.interface.ip_orig);
-	agent_context->item.key = item->key;
 	agent_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
-	item->key = NULL;
+
+	if (item->key != item->key_orig)
+	{
+		agent_context->item.key = item->key;
+		item->key = NULL;
+	}
+	else
+		agent_context->item.key = zbx_strdup(NULL, item->key);
+
 	agent_context->tls_connect = item->host.tls_connect;
 	zbx_strlcpy(agent_context->item.host, item->host.host, sizeof(agent_context->item.host));
 
