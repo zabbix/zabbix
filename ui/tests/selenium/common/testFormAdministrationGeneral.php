@@ -151,14 +151,21 @@ class testFormAdministrationGeneral extends CWebTest {
 	/**
 	 * Test for checking configuration form.
 	 *
-	 * @param array      $data		  Data provider
-	 * @param boolean    $other		  If it is Other configuration parameters form
+	 * @ param array      $data        data provider
+	 * @ param boolean    $other       if is Other configuration parameters form
+	 * @ param boolean    $timeouts    if it Timeouts configuration form
 	 */
-	public function executeCheckForm($data, $other = false) {
+	public function executeCheckForm($data, $other = false, $timeouts = false) {
 		$this->page->login()->open($this->config_link);
 		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
+
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults', $other);
+
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD && $timeouts) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM config');
+		}
+
 		// Fill form with new data.
 		if (CTestArrayHelper::get($data, 'fields.Default time zone')) {
 			$data['fields']['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($data['fields']['Default time zone']);
@@ -167,68 +174,41 @@ class testFormAdministrationGeneral extends CWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
+		$message = (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD)
 			? 'Configuration updated'
 			: 'Cannot update configuration';
-		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
+
+		$expected = CTestArrayHelper::get($data, 'expected') ? TEST_GOOD : TEST_BAD;
+		$this->assertMessage($expected, $message, CTestArrayHelper::get($data, 'details'));
+
 		// Check saved configuration in frontend.
 		$this->page->refresh();
 		$form->invalidate();
+
 		// Check trimming symbols in Login attempts field.
 		if (CTestArrayHelper::get($data['fields'], 'Login attempts') === '3M') {
 			$data['fields']['Login attempts'] = '3';
 		}
+
 		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default_values;
 		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD && CTestArrayHelper::get($values, 'Default time zone')) {
 			$values['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($values['Default time zone']);
 		}
+
 		$form->checkValue($values);
+
 		// Check saved configuration in database.
 		$config = CDBHelper::getRow('SELECT * FROM config');
 		$db = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
 			? CTestArrayHelper::get($data, 'db', [])
 			: $this->db_default_values;
+
 		foreach ($db as $key => $value) {
 			$this->assertArrayHasKey($key, $config);
 			$this->assertEquals($value, $config[$key]);
 		}
-	}
 
-	/**
-	 * Test for updating and checking simple configuration fields.
-	 *
-	 * @param array $data    data provider
-	 */
-	public function executeUpdate($data) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
-		}
-
-		// Open configuration page and fill with values.
-		$this->page->login()->open($this->config_link)->waitUntilReady();
-		$form = $this->query($this->form_selector)->waitUntilPresent()->asForm()->one();
-		$form->fill($data['fields']);
-		$form->submit()->waitUntilReloaded();
-
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$form->checkValue($data['fields']);
-
-			// Check DB configuration.
-			$db_values = [];
-			foreach ($data['db_check'] as $values => $value) {
-				$db_values[] = $values;
-			}
-
-			$this->assertEquals($data['db_check'],  CDBHelper::getRow('SELECT '.implode(', ', $db_values).' FROM config'));
-
-			// Reset back to default values.
-			$form->query('button:Reset defaults')->one()->click();
-			COverlayDialogElement::find()->waitUntilVisible()->one()->query('button:Reset defaults')->one()->click();
-			$form->submit()->waitUntilReloaded();
-		}
-		else {
-			$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['details']);
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD && $timeouts) {
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
 		}
 	}
