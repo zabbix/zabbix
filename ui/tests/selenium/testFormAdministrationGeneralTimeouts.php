@@ -1328,6 +1328,252 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					],
 					'details' => 'Invalid parameter "/timeout_script": a number is too large.'
 				]
+			],
+			// #93.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Zabbix agent' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
+				]
+			],
+			// #94.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Zabbix agent' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
+				]
+			],
+			// #95.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Simple check' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
+				]
+			],
+			// #96.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Simple check' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
+				]
+			],
+			// #97.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SNMP agent' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
+				]
+			],
+			// #98.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SNMP agent' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
+				]
+			],
+			// #99.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'External check' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
+				]
+			],
+			// #100.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'External check' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
+				]
+			],
+			// #101.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Database monitor' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
+				]
+			],
+			// #102.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Database monitor' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
+				]
+			],
+			// #103.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'HTTP agent' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
+				]
+			],
+			// #103.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'HTTP agent' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
+				]
+			],
+			// #104.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSH agent' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
+				]
+			],
+			// #105.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSH agent' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
+				]
+			],
+			// #106.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'TELNET agent' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
+				]
+			],
+			// #107.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'TELNET agent' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
+				]
+			],
+			// #108.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Script' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
+				]
+			],
+			// #109.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Script' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
+				]
+			],
+			// #110 All network timeouts errors with LLD macros.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '{#LDD_MACROS}',
+						'Connection' => '{#LDD_MACROS}',
+						'Media type test' => '{#LDD_MACROS}',
+						'Script execution' => '{#LDD_MACROS}',
+						'Item test' => '{#LDD_MACROS}',
+						'Scheduled report test' => '{#LDD_MACROS}'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": a time unit is expected.',
+						'Incorrect value for field "connect_timeout": a time unit is expected.',
+						'Incorrect value for field "media_type_test_timeout": a time unit is expected.',
+						'Incorrect value for field "script_timeout": a time unit is expected.',
+						'Incorrect value for field "item_test_timeout": a time unit is expected.',
+						'Incorrect value for field "report_test_timeout": a time unit is expected.'
+					]
+				]
+			],
+			// #111 All network timeouts errors with global macros.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '{HOST.HOST}',
+						'Connection' => '{HOST.HOST}',
+						'Media type test' => '{HOST.HOST}',
+						'Script execution' => '{HOST.HOST}',
+						'Item test' => '{HOST.HOST}',
+						'Scheduled report test' => '{HOST.HOST}'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": a time unit is expected.',
+						'Incorrect value for field "connect_timeout": a time unit is expected.',
+						'Incorrect value for field "media_type_test_timeout": a time unit is expected.',
+						'Incorrect value for field "script_timeout": a time unit is expected.',
+						'Incorrect value for field "item_test_timeout": a time unit is expected.',
+						'Incorrect value for field "report_test_timeout": a time unit is expected.'
+					]
+				]
+			],
+			// #112 All network timeouts errors with user macros.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Communication' => '{$MACROS}',
+						'Connection' => '{$MACROS}',
+						'Media type test' => '{$MACROS}',
+						'Script execution' => '{$MACROS}',
+						'Item test' => '{$MACROS}',
+						'Scheduled report test' => '{$MACROS}'
+					],
+					'details' => [
+						'Incorrect value for field "socket_timeout": a time unit is expected.',
+						'Incorrect value for field "connect_timeout": a time unit is expected.',
+						'Incorrect value for field "media_type_test_timeout": a time unit is expected.',
+						'Incorrect value for field "script_timeout": a time unit is expected.',
+						'Incorrect value for field "item_test_timeout": a time unit is expected.',
+						'Incorrect value for field "report_test_timeout": a time unit is expected.'
+					]
+				]
 			]
 			// TODO: uncomment after ZBX-23636. Fields should be trimmed.
 //			[
