@@ -303,7 +303,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$this->page->waitUntilReady();
 
 		// Creating new trigger - expression is mandatory.
-		$this->triggerCreateUpdate($data, 'last(/Host with everything/host_item_1)=0', 'Trigger added');
+		$this->triggerCreateUpdate($data, 'Trigger added', 'last(/Host with everything/host_item_1)=0');
 	}
 
 	public static function getTriggerUpdateData() {
@@ -349,7 +349,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 				'&context=host'
 		)->waitUntilReady();
 		$this->query('link:Host trigger update')->one()->click();
-		$this->triggerCreateUpdate($data, null, 'Trigger updated', 'Cannot update trigger', 'Host trigger update');
+		$this->triggerCreateUpdate($data, 'Trigger updated', null, 'Cannot update trigger', 'Host trigger update');
 	}
 
 	public static function getLinkedTriggerUpdateData() {
@@ -380,7 +380,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		)->waitUntilReady();
 		$this->query('link:Trigger that linked')->one()->click();
 		$this->page->waitUntilReady();
-		$this->triggerCreateUpdate($data, null, 'Trigger updated', 'Cannot update trigger', 'Trigger that linked');
+		$this->triggerCreateUpdate($data, 'Trigger updated', null, 'Cannot update trigger', 'Trigger that linked');
 	}
 
 	public static function getTriggerPrototypeCreateData() {
@@ -444,8 +444,8 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$this->page->waitUntilReady();
 
 		// Creating new trigger prototype - expression is mandatory.
-		$this->triggerCreateUpdate($data, 'last(/Host with everything/host_everything_prot_[{#KEY}])=0',
-				'Trigger prototype added'
+		$this->triggerCreateUpdate($data, 'Trigger prototype added',
+				'last(/Host with everything/host_everything_prot_[{#KEY}])=0'
 		);
 	}
 
@@ -480,7 +480,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		)->waitUntilReady();
 		$this->query('link:Host trigger prototype update{#KEY}')->one()->click();
 		$this->page->waitUntilReady();
-		$this->triggerCreateUpdate($data, null, 'Trigger prototype updated', 'Cannot update trigger prototype',
+		$this->triggerCreateUpdate($data, 'Trigger prototype updated', null, 'Cannot update trigger prototype',
 				'Host trigger prototype update{#KEY}'
 		);
 	}
@@ -543,7 +543,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$this->query('link:Trigger prototypes')->one()->click();
 		$this->page->waitUntilReady();
 		$this->query('link:trigger prototype linked update{#KEY}')->one()->click();
-		$this->triggerCreateUpdate($data, null, 'Trigger prototype updated', 'Cannot update trigger prototype',
+		$this->triggerCreateUpdate($data, 'Trigger prototype updated', null, 'Cannot update trigger prototype',
 				'trigger prototype linked update{#KEY}'
 		);
 	}

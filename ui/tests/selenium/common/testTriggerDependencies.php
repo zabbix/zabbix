@@ -46,12 +46,12 @@ class testTriggerDependencies extends CWebTest {
 	 * Create or update trigger with dependencies.
 	 *
 	 * @param array  $data				data provider.
-	 * @param string $expression		trigger expression used in create scenarios.
 	 * @param string $success_title		success message title.
+	 * @param string $expression		trigger expression used in create scenarios.
 	 * @param string $error_title		error message title.
 	 * @param string $name_check		trigger name that should be checked in update scenarios.
 	 */
-	public function triggerCreateUpdate($data, $expression = null, $success_title, $error_title = null, $name_check = null) {
+	public function triggerCreateUpdate($data, $success_title, $expression = null, $error_title = null, $name_check = null) {
 		// If scenarios is TEST_BAD, hash should be checked.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
