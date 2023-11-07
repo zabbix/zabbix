@@ -20,12 +20,10 @@
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxtypes.h"
 #include "zbxvariant.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
-#	include <libxml/HTMLparser.h>
 #endif
 
 #include "../zbxalgo/vectorimpl.h"
@@ -568,137 +566,6 @@ static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *js
 #endif /* HAVE_LIBXML2 */
 
 #ifdef HAVE_LIBXML2
-static int	zbx_open_html(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg)
-{
-	xmlErrorPtr	pErr;
-
-	if (NULL == (*xml_doc = htmlReadMemory(data, strlen(data), "noname.html", NULL, options)))
-	{
-		if (NULL != (pErr = xmlGetLastError()))
-		{
-			const char	*pmessage;
-
-			if (NULL != strstr(pErr->message, "use XML_PARSE_HUGE option"))
-				pmessage = "Excessive depth in XML document";
-			else
-				pmessage = pErr->message;
-
-			if (0 > maxerrlen)
-				*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pmessage);
-			else
-				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML value: %s", pmessage);
-		}
-		else
-		{
-			if (0 > maxerrlen)
-				*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
-			else
-				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML value");
-		}
-
-		return FAIL;
-	}
-
-	if (NULL == (*root_node = xmlDocGetRootElement((xmlDoc *)*xml_doc)))
-	{
-		if (0 > maxerrlen)
-			*errmsg = zbx_dsprintf(*errmsg, "Cannot parse XML root");
-		else
-			zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML root");
-
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-static void	zbx_get_charset_content(xmlNode *a_node, xmlChar **charset, xmlChar **content)
-{
-	for (xmlNode *cur_node = a_node; NULL != cur_node && NULL == *charset && NULL == *content;
-			cur_node = cur_node->next)
-	{
-		if (cur_node->type == XML_ELEMENT_NODE && 0 == strcmp((char *)cur_node->name, "meta"))
-		{
-			xmlAttr	*attr;
-			int	http_equiv_content = 0;
-
-			for (attr = cur_node->properties; NULL != attr; attr = attr->next)
-			{
-				if (NULL == attr->name)
-					continue;
-
-				if (0 == strcmp("http-equiv", (const char *)attr->name))
-				{
-					xmlChar	*value;
-
-					if (NULL != (value = xmlGetProp(cur_node, attr->name)))
-					{
-						if (0 == zbx_strncasecmp((const char *)value, "content-type",
-								ZBX_CONST_STRLEN("content-type")))
-						{
-							http_equiv_content = 1;
-						}
-
-						xmlFree(value);
-					}
-				}
-				else if (0 == strcmp("content", (const char *)attr->name))
-				{
-					if (NULL != *content)
-						xmlFree(*content);
-
-					*content = xmlGetProp(cur_node, attr->name);
-				}
-				else if (0 == strcmp("charset", (const char *)attr->name))
-				{
-					*charset = xmlGetProp(cur_node, attr->name);
-					break;
-				}
-			}
-
-			if (0 == http_equiv_content && NULL != *content)
-			{
-				xmlFree(*content);
-				*content = NULL;
-			}
-		}
-
-		zbx_get_charset_content(cur_node->children, charset, content);
-	}
-}
-
-int	zbx_html_get_charset_content(char *xml_data, char **charset, char **content, char **errmsg)
-{
-#ifndef HAVE_LIBXML2
-	ZBX_UNUSED(xml_data);
-	ZBX_UNUSED(charset);
-	ZBX_UNUSED(content);
-	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
-	return FAIL;
-#else
-	xmlDoc	*doc = NULL;
-	xmlNode	*node;
-	int	ret = FAIL;
-
-	if (FAIL == zbx_open_html(xml_data, XML_PARSE_NOBLANKS|XML_PARSE_NOERROR|XML_PARSE_NOWARNING, -1,
-			(void **)&doc, (void **)&node, errmsg))
-	{
-		if (NULL == doc)
-			goto exit;
-
-		if (NULL == node)
-			goto clean;
-	}
-
-	zbx_get_charset_content(node ,(xmlChar **)charset, (xmlChar **)content);
-	ret = SUCCEED;
-clean:
-	xmlFreeDoc(doc);
-exit:
-	return ret;
-#endif /* HAVE_LIBXML2 */
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: to create xmlDoc and it's root node for input data                *

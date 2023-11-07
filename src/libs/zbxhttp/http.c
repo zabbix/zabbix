@@ -823,6 +823,8 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 	}
 
 	zbx_free(charset);
+
+	zbx_replace_invalid_utf8(*body);
 }
 
 #endif
