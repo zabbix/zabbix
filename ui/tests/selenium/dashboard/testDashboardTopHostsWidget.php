@@ -2734,13 +2734,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
+							'widget_type' => 'Top hosts',
 							'main_fields' => [
 								'Name' => 'Default widget'
 							],
 							'column_fields' => [
 								[
-									'Item' => 'Available memory',
-									'Name' => 'Column default'
+									'Name' => 'Column default',
+									'Item' => 'Available memory'
 								]
 							]
 						]
@@ -2752,13 +2753,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
+							'widget_type' => 'Top hosts',
 							'main_fields' => [
 								'Name' => 'Item widget with "Custom" time period'
 							],
 							'column_fields' => [
 								[
-									'Item' => 'Available memory',
 									'Name' => 'Column with "Custom" time period',
+									'Item' => 'Available memory',
 									'Aggregation function' => 'min',
 									'Time period' => 'Custom'
 								]
@@ -2772,23 +2774,24 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
+							'widget_type' => 'Graph (classic)',
 							'main_fields' => [
-								'Type' => 'Graph (classic)',
-								'Graph' => 'Linux: System load',
 								'Name' => 'Graph widget with "Custom" time period',
+								'Graph' => 'Linux: System load',
 								'Time period' => 'Custom',
 								'id:time_period_from' => 'now-5400',
 								'id:time_period_to' => 'now-1800'
 							]
 						],
 						[
+							'widget_type' => 'Top hosts',
 							'main_fields' => [
 								'Name' => 'Item widget with "Widget" time period'
 							],
 							'column_fields' => [
 								[
-									'Item' => 'Available memory',
 									'Name' => 'Column with "Widget" time period',
+									'Item' => 'Available memory',
 									'Aggregation function' => 'max',
 									'Time period' => 'Widget',
 									'Widget' => 'Graph widget with "Custom" time period'
@@ -2802,34 +2805,35 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
+							'widget_type' => 'Graph (classic)',
 							'main_fields' => [
-								'Type' => 'Graph (classic)',
-								'Graph' => 'Linux: System load',
 								'Name' => 'Graph widget with "Custom" time period',
+								'Graph' => 'Linux: System load',
 								'Time period' => 'Custom',
 								'id:time_period_from' => 'now-5400',
 								'id:time_period_to' => 'now-1800'
 							]
 						],
 						[
+							'widget_type' => 'Top hosts',
 							'main_fields' => [
 								'Name' => 'Item widget with "Widget" time period'
 							],
 							'column_fields' => [
 								[
-									'Item' => 'Available memory',
-									'Name' => 'Column default'
+									'Name' => 'Column default',
+									'Item' => 'Available memory'
 								],
 								[
-									'Item' => 'Available memory',
 									'Name' => 'Column with "Widget" time period',
+									'Item' => 'Available memory',
 									'Aggregation function' => 'avg',
 									'Time period' => 'Widget',
 									'Widget' => 'Graph widget with "Custom" time period'
 								],
 								[
-									'Item' => 'Available memory',
 									'Name' => 'Column with "Custom" time period',
+									'Item' => 'Available memory',
 									'Aggregation function' => 'count',
 									'Time period' => 'Custom'
 								]
@@ -2843,13 +2847,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
+							'widget_type' => 'Top hosts',
 							'main_fields' => [
 								'Name' => 'Top hosts widget with "Dashboard" time period'
 							],
 							'column_fields' => [
 								[
-									'Item' => 'Available memory in %',
 									'Name' => 'Column with "Dashboard" time period',
+									'Item' => 'Available memory in %',
 									'Aggregation function' => 'sum',
 									'Time period' => 'Dashboard'
 								]
@@ -2864,13 +2869,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
+							'widget_type' => 'Top hosts',
 							'main_fields' => [
 								'Name' => 'Top hosts widget with "Custom" time period'
 							],
 							'column_fields' => [
 								[
-									'Item' => 'Available memory in %',
 									'Name' => 'Column with "Custom" time period',
+									'Item' => 'Available memory in %',
 									'Aggregation function' => 'first',
 									'Time period' => 'Custom',
 									'id:time_period_from' => 'now-2y',
@@ -2879,8 +2885,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 							]
 						],
 						[
+							'widget_type' => 'Action log',
 							'main_fields' => [
-								'Type' => 'Action log',
 								'Name' => 'Action log widget with Dashboard time period' // time period default state.
 							]
 						]
@@ -2892,41 +2898,42 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
+							'widget_type' => 'Graph (classic)',
 							'main_fields' => [
-								'Type' => 'Graph (classic)',
-								'Graph' => 'Linux: System load',
 								'Name' => 'Graph widget with "Custom" time period',
+								'Graph' => 'Linux: System load',
 								'Time period' => 'Custom',
 								'id:time_period_from' => 'now-5400',
 								'id:time_period_to' => 'now-1800'
 							]
 						],
 						[
+							'widget_type' => 'Top hosts',
 							'main_fields' => [
 								'Name' => 'Top hosts widget with "Custom" time period'
 							],
 							'column_fields' => [
 								[
-									'Item' => 'Available memory in %',
 									'Name' => 'Column with "Custom" time period',
+									'Item' => 'Available memory in %',
 									'Aggregation function' => 'first',
 									'Time period' => 'Custom',
 									'id:time_period_from' => 'now-2y',
 									'id:time_period_to' => 'now-1y'
 								],
 								[
-									'Item' => 'Available memory in %',
 									'Name' => 'Column with "Dashboard" time period',
+									'Item' => 'Available memory in %',
 									'Aggregation function' => 'last',
 									'Time period' => 'Dashboard'
 								],
 								[
+									'Name' => 'Column default',
 									'Item' => 'Available memory',
-									'Name' => 'Column default'
 								],
 								[
-									'Item' => 'Available memory',
 									'Name' => 'Column with "Widget" time period',
+									'Item' => 'Available memory',
 									'Aggregation function' => 'min',
 									'Time period' => 'Widget',
 									'Widget' => 'Graph widget with "Custom" time period'
@@ -2953,7 +2960,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		foreach ($data['widgets'] as $widget) {
 			$form = $dashboard->edit()->addWidget()->asForm();
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL($widget['widget_type'])]);
 
 			// Add new column.
 			if (array_key_exists('column_fields', $widget)) {

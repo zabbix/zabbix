@@ -2133,8 +2133,11 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
-							'Item' => 'Available memory',
-							'Name' => 'Default widget'
+							'widget_type' => 'Item value',
+							'fields' => [
+								'Name' => 'Default widget',
+								'Item' => 'Available memory'
+							]
 						]
 					]
 				]
@@ -2144,11 +2147,14 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
-							'Item' => 'Available memory',
-							'Name' => 'Item widget with "Custom" time period',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'min',
-							'Time period' => 'Custom'
+							'widget_type' => 'Item value',
+							'fields' => [
+								'Name' => 'Item widget with "Custom" time period',
+								'Item' => 'Available memory',
+								'Advanced configuration' => true,
+								'Aggregation function' => 'min',
+								'Time period' => 'Custom'
+							]
 						]
 					]
 				]
@@ -2158,20 +2164,25 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
-							'Type' => 'Graph (classic)',
-							'Graph' => 'Linux: System load',
-							'Name' => 'Graph widget with "Custom" time period',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-5400',
-							'id:time_period_to' => 'now-1800'
+							'widget_type' => 'Graph (classic)',
+							'fields' => [
+								'Name' => 'Graph widget with "Custom" time period',
+								'Graph' => 'Linux: System load',
+								'Time period' => 'Custom',
+								'id:time_period_from' => 'now-5400',
+								'id:time_period_to' => 'now-1800'
+							]
 						],
 						[
-							'Item' => 'Available memory',
-							'Name' => 'Item widget with "Widget" time period',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'max',
-							'Time period' => 'Widget',
-							'Widget' => 'Graph widget with "Custom" time period'
+							'widget_type' => 'Item value',
+							'fields' => [
+								'Name' => 'Item widget with "Widget" time period',
+								'Item' => 'Available memory',
+								'Advanced configuration' => true,
+								'Aggregation function' => 'max',
+								'Time period' => 'Widget',
+								'Widget' => 'Graph widget with "Custom" time period'
+							]
 						]
 					]
 				]
@@ -2181,11 +2192,14 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
-							'Item' => 'Available memory in %',
-							'Name' => 'Item value widget with "Dashboard" time period',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'avg',
-							'Time period' => 'Dashboard'
+							'widget_type' => 'Item value',
+							'fields' => [
+								'Name' => 'Item value widget with "Dashboard" time period',
+								'Item' => 'Available memory in %',
+								'Advanced configuration' => true,
+								'Aggregation function' => 'avg',
+								'Time period' => 'Dashboard'
+							]
 						]
 					],
 					'zoom_filter' => true
@@ -2196,17 +2210,22 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'widgets' => [
 						[
-							'Item' => 'Available memory in %',
-							'Name' => 'Item value widget with "Custom" time period',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-2y',
-							'id:time_period_to' => 'now-1y'
+							'widget_type' => 'Item value',
+							'fields' => [
+								'Name' => 'Item value widget with "Custom" time period',
+								'Item' => 'Available memory in %',
+								'Advanced configuration' => true,
+								'Aggregation function' => 'sum',
+								'Time period' => 'Custom',
+								'id:time_period_from' => 'now-2y',
+								'id:time_period_to' => 'now-1y'
+							]
 						],
 						[
-							'Type' => 'Action log',
-							'Name' => 'Action log widget with Dashboard time period' // time period default state.
+							'widget_type' => 'Action log',
+							'fields' => [
+								'Name' => 'Action log widget with Dashboard time period' // time period default state.
+							]
 						]
 					],
 					'zoom_filter' => true
@@ -2224,10 +2243,10 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_zoom)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 
-		foreach ($data['widgets'] as $widgets) {
+		foreach ($data['widgets'] as $widget) {
 			$form = $dashboard->edit()->addWidget()->asForm();
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
-			$form->fill($widgets);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL($widget['widget_type'])]);
+			$form->fill($widget['fields']);
 			$form->submit();
 
 			COverlayDialogElement::ensureNotPresent();
