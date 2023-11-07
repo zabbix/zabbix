@@ -167,7 +167,11 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
 
 		// Check main (generic) fields.
-		$this->assertLabels(['Type', 'Name', 'Refresh interval', 'Show header'], $form);
+		$this->assertNonUniformLabel('Show header', $form);
+
+		foreach (['Type', 'Name', 'Refresh interval'] as $label) {
+			$this->assertTrue($form->getLabel($label)->isClickable());
+		}
 
 		foreach(['id:type', 'id:name', 'id:rf_rate', 'id:show_header'] as $selector) {
 			$input = $form->query($selector)->one();
@@ -186,7 +190,12 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertEquals(['Data set', 'Displaying options', 'Time period', 'Legend'], $form->getTabs());
 
 		// Check Item pattern.
-		$this->assertLabels(['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'], $form);
+		$this->assertNonUniformLabel('Data set #1', $form);
+
+		foreach (['Aggregation function', 'Data set aggregation', 'Data set label'] as $label) {
+			$this->assertTrue($form->getLabel($label)->isClickable());
+		}
+
 		$this->assertTrue($form->query('xpath:.//li[@data-set="0"]//button[@title="Delete"]')->one()->isClickable());
 
 		foreach(['id:ds_0_hosts_', 'id:ds_0_items_'] as $selector) {
@@ -209,7 +218,7 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
-		$this->assertLabels(['Data set #2', 'Aggregation function', 'Data set aggregation', 'Data set label'], $form);
+		$this->assertNonUniformLabel('Data set #2', $form);
 
 		foreach(['Aggregation function', 'Data set aggregation', 'Data set label'] as $label) {
 			$this->assertTrue($form->getField($label)->isClickable());
@@ -221,7 +230,12 @@ class testDashboardPieChartWidget extends CWebTest
 		$form->selectTab('Displaying options');
 		$this->page->waitUntilReady();
 		$form->invalidate();
-		$this->assertLabels(['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than '], $form);
+
+		$this->assertNonUniformLabel('Merge sectors smaller than ', $form);
+
+		foreach (['History data selection', 'Draw', 'Space between sectors'] as $label) {
+			$this->assertTrue($form->getLabel($label)->isVisible());
+		}
 
 		$radios = ['id:source' => ['Auto', 'History', 'Trends'], 'id:draw_type' => ['Pie', 'Doughnut']];
 
@@ -922,20 +936,18 @@ class testDashboardPieChartWidget extends CWebTest
 
 
 	/**
-	 * Checks that given labels exist in a form.
+	 * Checks that a given label exists in a form.
 	 *
-	 * @param array $labels           labels to assert
-	 * @param CFormElement $form      form that these labels should exist in.
+	 * @param string $label           label to assert
+	 * @param CFormElement $form      form that this label should exist in.
 	 */
-	protected function assertLabels($labels, $form) {
-		foreach ($labels as $label) {
-			try {
-				$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->exists());
-			}
-			catch (PHPUnit\Framework\ExpectationFailedException $e) {
-				// Throw a more detailed error.
-				throw new Exception("Failed to find label: ".$label);
-			}
+	protected function assertNonUniformLabel($label, $form) {
+		try {
+			$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->exists());
+		}
+		catch (PHPUnit\Framework\ExpectationFailedException $e) {
+			// Throw a more detailed error.
+			throw new Exception("Failed to find label: ".$label);
 		}
 	}
 
@@ -978,16 +990,6 @@ class testDashboardPieChartWidget extends CWebTest
 	}
 
 	/**
-	 * Waits for a widget to stop loading and to show the pie chart.
-	 *
-	 * @param CWidgetElement $widget    widget element to wait
-	 */
-	protected function waitForWidgetToLoad($widget) {
-		$widget->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$widget->getContent()->query('class:svg-pie-chart')->waitUntilVisible();
-	}
-
-	/**
 	 * Calculates widget name from field data in data provider.
 	 * If no name is provided, then use an MD5 as the name so that it is unique.
 	 *
@@ -1012,13 +1014,11 @@ class testDashboardPieChartWidget extends CWebTest
 
 			// Save Dashboard.
 			$widget = $dashboard->getWidget($this->calculateWidgetName($data['fields']));
-			$this->waitForWidgetToLoad($widget);
+			$widget->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+			$widget->getContent()->query('class:svg-pie-chart')->waitUntilVisible();
 			$dashboard->save();
 
-			// Assert successful save.
-			$message = CMessageElement::find()->waitUntilPresent()->one();
-			$this->assertTrue($message->isGood());
-			$this->assertEquals('Dashboard updated', $message->getTitle());
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Assert data in edit form.
 			$form = $widget->edit();
@@ -1066,15 +1066,7 @@ class testDashboardPieChartWidget extends CWebTest
 			}
 		}
 		else {
-			// Assert error message.
-			$message = CMessageElement::find()->waitUntilPresent()->one();
-			$this->assertTrue($message->isBad());
-
-			$errors = is_array($data['error']) ? $data['error'] : [$data['error']];
-
-			foreach ($errors as $i => $error) {
-				$this->assertEquals($error, $message->getLines()->get($i)->getText());
-			}
+			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 	}
 
@@ -1111,12 +1103,10 @@ class testDashboardPieChartWidget extends CWebTest
 		$tabs = ['Displaying options', 'Time period', 'Legend'];
 
 		foreach ($tabs as $tab) {
-			if (!array_key_exists($tab, $fields)) {
-				continue;
+			if (array_key_exists($tab, $fields)) {
+				$form->selectTab($tab);
+				$form->fill($fields[$tab]);
 			}
-
-			$form->selectTab($tab);
-			$form->fill($fields[$tab]);
 		}
 	}
 
