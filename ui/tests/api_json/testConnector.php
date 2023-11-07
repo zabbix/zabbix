@@ -284,6 +284,43 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/url": value is too long.'
 			],
 
+			// Check "item_value_type".
+			'Test connector.create: invalid "item_value_type" (not in range)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'item_value_type' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-31.'
+			],
+			'Test connector.create: invalid "item_value_type" (not in range) 2' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'data_type' => ZBX_CONNECTOR_DATA_TYPE_EVENTS,
+					'url' => 'http://localhost/',
+					'item_value_type' => 27
+				],
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 31.'
+			],
+			'Test connector.create: invalid "item_value_type" (string)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'data_type' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES,
+					'url' => 'http://localhost/',
+					'item_value_type' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/item_value_type": an integer is expected.'
+			],
+			'Test connector.create: invalid "item_value_type" (boolean)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'data_type' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES,
+					'url' => 'http://localhost/',
+					'item_value_type' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/item_value_type": an integer is expected.'
+			],
+
 			// Check "max_records".
 			'Test connector.create: invalid "max_records" (string)' => [
 				'connector' => [
@@ -336,6 +373,53 @@ class testConnector extends CAPITest {
 					'max_attempts' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 1-5.'
+			],
+
+			// Check "attempt_interval".
+			'Test connector.create: invalid "attempt_interval" (not in range)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 2,
+					'attempt_interval' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
+			],
+			'Test connector.create: invalid "attempt_interval" (not in range) 2' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 1,
+					'attempt_interval' => '10s'
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 5.'
+			],
+			'Test connector.create: invalid "attempt_interval" (empty string)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 2,
+					'attempt_interval' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
+			],
+			'Test connector.create: invalid "attempt_interval" (string)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 2,
+					'attempt_interval' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
+			],
+			'Test connector.create: invalid "attempt_interval" (boolean)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 2,
+					'attempt_interval' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": a character string is expected.'
 			],
 
 			// Check "timeout".
@@ -832,11 +916,14 @@ class testConnector extends CAPITest {
 				'connector' => [
 					[
 						'name' => 'API create first connector',
-						'url' => 'http://localhost/'
+						'url' => 'http://localhost/',
+						'item_value_type' => 30
 					],
 					[
 						'name' => 'API create second connector',
-						'url' => 'http://localhost/'
+						'url' => 'http://localhost/',
+						'data_type' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES,
+						'item_value_type' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT
 					]
 				],
 				'expected_error' => null
@@ -1550,6 +1637,31 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/url": value is too long.'
 			],
 
+			// Check "item_value_type".
+			'Test connector.create: invalid "item_value_type" (not in range)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'item_value_type' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-31.'
+			],
+			'Test connector.create: invalid "item_value_type" (not in range) 2' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'data_type' => ZBX_CONNECTOR_DATA_TYPE_EVENTS,
+					'item_value_type' => 27
+				],
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 31.'
+			],
+			'Test connector.create: invalid "item_value_type" (string)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'data_type' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES,
+					'item_value_type' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/item_value_type": an integer is expected.'
+			],
+
 			// Check "max_records".
 			'Test connector.update: invalid "max_records" (string)' => [
 				'connector' => [
@@ -1596,6 +1708,48 @@ class testConnector extends CAPITest {
 					'max_attempts' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 1-5.'
+			],
+
+			// Check "attempt_interval".
+			'Test connector.create: invalid "attempt_interval" (not in range)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 2,
+					'attempt_interval' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
+			],
+			'Test connector.create: invalid "attempt_interval" (not in range) 2' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 1,
+					'attempt_interval' => '10s'
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 5.'
+			],
+			'Test connector.create: invalid "attempt_interval" (empty string)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 2,
+					'attempt_interval' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
+			],
+			'Test connector.create: invalid "attempt_interval" (string)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 2,
+					'attempt_interval' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
+			],
+			'Test connector.create: invalid "attempt_interval" (boolean)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 2,
+					'attempt_interval' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": a character string is expected.'
 			],
 
 			// Check "timeout".
