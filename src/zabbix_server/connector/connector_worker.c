@@ -92,7 +92,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		long		response_code;
 		CURLcode	err;
 
-		err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_interval_sec, 1);
+		err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_interval_sec,
+				ZBX_HTTP_CHECK_RESPONSE_CODE);
 
 		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code,
 				&out, &error)))

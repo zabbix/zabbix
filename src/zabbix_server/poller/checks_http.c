@@ -37,7 +37,8 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
 			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error))
 	{
-		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, 0, 0);
+		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, 0,
+				ZBX_HTTP_IGNORE_RESPONSE_CODE);
 
 		if (SUCCEED == zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &out,
 				&error) && SUCCEED == zbx_handle_response_code(item->status_codes, response_code, out,
