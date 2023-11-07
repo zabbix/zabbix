@@ -158,13 +158,14 @@ void	zbx_json_free(struct zbx_json *j)
 		zbx_free(j->buffer);
 }
 
-static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
+static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t type, size_t max_size, size_t *cutoff)
 {
 	size_t		len = 0;
 	const char	*sptr;
 	char		buffer[] = {"null"};
+	int		max_size_reached = 0;
 
-	for (sptr = (NULL != string ? string : buffer); '\0' != *sptr; sptr++)
+	for (sptr = (NULL != string ? string : buffer); '\0' != *sptr && !max_size_reached; sptr++)
 	{
 		switch (*sptr)
 		{
@@ -177,21 +178,64 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 			case '\n': /* newline */
 			case '\r': /* carriage return */
 			case '\t': /* horizontal tab */
-				len += 2;
+				if (!max_size || 2 + len < max_size)
+					len += 2;
+				else
+					max_size_reached = 1;
 				break;
 			default:
 				/* RFC 8259 requires escaping control characters U+0000 - U+001F */
 				if (0x1f >= (unsigned char)*sptr)
-					len += 6;
+				{
+					if (!max_size || 6 + len < max_size)
+						len += 6;
+					else
+						max_size_reached = 1;
+				}
 				else
-					len++;
+				{
+					if (!max_size || 1 + len < max_size)
+						len++;
+					else
+						max_size_reached = 1;
+				}
 		}
 	}
 
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type)
-		len += 2; /* "" */
+		len += 2;
+
+	if (max_size && max_size_reached)	/* cut utf8 sequence if exists at the end */
+	{
+		size_t to_cut = 0;
+
+		*cutoff = (sptr - string) - 1;
+
+		for (size_t i = MIN(4, *cutoff); 0x80 == (0xc0 & *(--sptr)) && 0 < i; i--, to_cut++);
+
+		if (0xf0 <= *sptr && 3 > to_cut)	/* cut in 4 byte sequence */
+		{
+			len -= to_cut + 1;
+			*cutoff -= to_cut + 1;
+		}
+		else if (0xe0 <= *sptr && 2 > to_cut)	/* cut in 3 byte sequence */
+		{
+			len -= to_cut + 1;
+			*cutoff -= to_cut + 1;
+		}
+		else if (0xc0 <= *sptr && 1 > to_cut)	/* cut in 2 byte sequence */
+		{
+			len--;
+			(*cutoff)--;
+		}
+	}
 
 	return len;
+}
+
+static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
+{
+	return __zbx_json_stringsize_limit(string, type, 0, NULL);
 }
 
 /******************************************************************************
@@ -213,7 +257,7 @@ static char	zbx_num2hex(unsigned char c)
 		return (char)(c + 0x30);	/* 0-9 */
 }
 
-static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t type)
+static char	*__zbx_json_insstring_limit(char *p, const char *string, zbx_json_type_t type, size_t str_len)
 {
 	const char	*sptr;
 	char		buffer[] = {"null"};
@@ -221,7 +265,7 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type)
 		*p++ = '"';
 
-	for (sptr = (NULL != string ? string : buffer); '\0' != *sptr; sptr++)
+	for (sptr = (NULL != string ? string : buffer); (!str_len || sptr - string < str_len) && '\0' != *sptr; sptr++)
 	{
 		switch (*sptr)
 		{
@@ -275,6 +319,11 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 		*p++ = '"';
 
 	return p;
+}
+
+static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t type)
+{
+	return __zbx_json_insstring_limit(p, string, type, 0);
 }
 
 void	zbx_json_escape(char **string)
@@ -345,9 +394,10 @@ void	zbx_json_addarray(struct zbx_json *j, const char *name)
 	__zbx_json_addobject(j, name, 0);
 }
 
-void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
+size_t	zbx_json_addstring_limit(
+		struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type, size_t max_size)
 {
-	size_t	len = 0;
+	size_t	len = 0, str_len = 0;
 	char	*p, *psrc, *pdst;
 
 	assert(j);
@@ -360,7 +410,7 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 		len += __zbx_json_stringsize(name, ZBX_JSON_TYPE_STRING);
 		len += 1; /* : */
 	}
-	len += __zbx_json_stringsize(string, type);
+	len += __zbx_json_stringsize_limit(string, type, max_size ? max_size + 1 : 0, &str_len);
 
 	__zbx_json_realloc(j, j->buffer_size + len + 1/*'\0'*/);
 
@@ -379,11 +429,18 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 		p = __zbx_json_insstring(p, name, ZBX_JSON_TYPE_STRING);
 		*p++ = ':';
 	}
-	p = __zbx_json_insstring(p, string, type);
+	p = __zbx_json_insstring_limit(p, string, type, str_len);
 
 	j->buffer_offset = p - j->buffer;
 	j->buffer_size += len;
 	j->status = ZBX_JSON_COMMA;
+
+	return string && str_len ? strlen(string) : 0;
+}
+
+void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
+{
+	zbx_json_addstring_limit(j, name, string, type, 0);
 }
 
 void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data)

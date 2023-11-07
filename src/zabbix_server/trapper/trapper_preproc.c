@@ -255,6 +255,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 	zbx_pp_result_t			*result;
 	zbx_vector_pp_result_ptr_t	results;
 	zbx_pp_history_t		history;
+	size_t				truncated;
 
 	zbx_vector_pp_step_ptr_create(&steps);
 	zbx_vector_pp_result_ptr_create(&results);
@@ -327,7 +328,13 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 	for (i = 0; i < bypass_first; i++)
 	{
 		zbx_json_addobject(json, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1], ZBX_JSON_TYPE_STRING);
+		truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1],
+			ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+		if (truncated) {
+			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+		}
 		zbx_json_close(json);
 	}
 
@@ -362,8 +369,14 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 			}
 			else if (ZBX_VARIANT_NONE != result->value.type)
 			{
-				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT,
-						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING);
+				truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
+						ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+				if (truncated) {
+					zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+					zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+				}
 			}
 			else
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
@@ -380,8 +393,14 @@ err:
 
 		if (ZBX_VARIANT_NONE != result->value.type)
 		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
-					ZBX_JSON_TYPE_STRING);
+			truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+					zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
+					ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+			if (truncated) {
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+			}
 		}
 		else
 			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
