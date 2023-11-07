@@ -213,17 +213,17 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 
 		for (size_t i = MIN(4, *cutoff); 0x80 == (0xc0 & *(--sptr)) && 0 < i; i--, to_cut++);
 
-		if (0xf0 <= *sptr && 3 > to_cut)	/* cut in 4 byte sequence */
+		if (0xf0 <= (unsigned char)*sptr && 3 > to_cut)	/* cut in 4 byte sequence */
 		{
 			len -= to_cut + 1;
 			*cutoff -= to_cut + 1;
 		}
-		else if (0xe0 <= *sptr && 2 > to_cut)	/* cut in 3 byte sequence */
+		else if (0xe0 <= (unsigned char)*sptr && 2 > to_cut)	/* cut in 3 byte sequence */
 		{
 			len -= to_cut + 1;
 			*cutoff -= to_cut + 1;
 		}
-		else if (0xc0 <= *sptr && 1 > to_cut)	/* cut in 2 byte sequence */
+		else if (0xc0 <= (unsigned char)*sptr && 1 > to_cut)	/* cut in 2 byte sequence */
 		{
 			len--;
 			(*cutoff)--;
@@ -265,7 +265,8 @@ static char	*__zbx_json_insstring_limit(char *p, const char *string, zbx_json_ty
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type)
 		*p++ = '"';
 
-	for (sptr = (NULL != string ? string : buffer); (!str_len || sptr - string < str_len) && '\0' != *sptr; sptr++)
+	for (sptr = (NULL != string ? string : buffer); (!str_len || (size_t)(sptr - string) < str_len) &&
+			'\0' != *sptr; sptr++)
 	{
 		switch (*sptr)
 		{
