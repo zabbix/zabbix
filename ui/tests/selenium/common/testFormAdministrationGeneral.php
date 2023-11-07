@@ -151,9 +151,9 @@ class testFormAdministrationGeneral extends CWebTest {
 	/**
 	 * Test for checking configuration form.
 	 *
-	 * @ param array      $data        data provider
-	 * @ param boolean    $other       if is Other configuration parameters form
-	 * @ param boolean    $timeouts    if it Timeouts configuration form
+	 * @param array      $data        data provider
+	 * @param boolean    $other       if is Other configuration parameters form
+	 * @param boolean    $timeouts    if it Timeouts configuration form
 	 */
 	public function executeCheckForm($data, $other = false, $timeouts = false) {
 		$this->page->login()->open($this->config_link);
