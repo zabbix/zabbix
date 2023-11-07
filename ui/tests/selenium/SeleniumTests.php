@@ -190,7 +190,7 @@ require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
 require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
-require_once dirname(__FILE__).'/reports/testPageReportsTriggerTop.php';
+require_once dirname(__FILE__) . '/reports/testPageReportsTopTriggers.php';
 require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 
@@ -275,6 +275,7 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 //require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralTimeouts.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
@@ -472,7 +473,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsAudit');
 		$suite->addTestSuite('testPageReportsNotifications');
 		$suite->addTestSuite('testPageReportsSystemInformation');
-		$suite->addTestSuite('testPageReportsTriggerTop');
+		$suite->addTestSuite('testPageReportsTopTriggers');
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
 
@@ -558,6 +559,7 @@ class SeleniumTests {
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
+		$suite->addTestSuite('testFormAdministrationGeneralTimeouts');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
 		$suite->addTestSuite('testFormAdministrationHousekeeper');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');

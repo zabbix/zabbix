@@ -427,7 +427,7 @@ switch ($data['popup_type']) {
 						.getElementById(this.dataset.dstfld1)
 						.dispatchEvent(new CustomEvent("help_items.paste"));
 
-					updateItemFormElements();
+					window.updateItemFormElements && updateItemFormElements();
 
 					if (this.dataset.dstfld2 in values) {
 						popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld2]: values[this.dataset.dstfld2]});

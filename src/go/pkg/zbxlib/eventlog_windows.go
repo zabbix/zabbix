@@ -193,6 +193,7 @@ import (
 	"errors"
 	"time"
 	"unsafe"
+
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/tls"
 
@@ -232,52 +233,55 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	var tlsConfig *tls.Config
 	var err error
-	var ctlsConfig C.zbx_config_tls_t;
-	var ctlsConfig_p *C.zbx_config_tls_t;
+	var ctlsConfig C.zbx_config_tls_t
+	var ctlsConfig_p *C.zbx_config_tls_t
 
 	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
-		result := &EventLogResult{
+		res := &EventLogResult{
 			Ts:    time.Now(),
 			Error: err,
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, res)
+
+		log.Tracef("Calling C function \"free_eventlog_result()\"")
+		C.free_eventlog_result(result)
 
 		return
 	}
 
-	cPSKIdentity := (C.CString)(tlsConfig.PSKIdentity)
-	cPSKKey := (C.CString)(tlsConfig.PSKKey)
-	cCAFile := (C.CString)(tlsConfig.CAFile)
-	cCRLFile := (C.CString)(tlsConfig.CRLFile)
-	cCertFile := (C.CString)(tlsConfig.CertFile)
-	cKeyFile := (C.CString)(tlsConfig.KeyFile)
-	cServerCertIssuer := (C.CString)(tlsConfig.ServerCertIssuer)
-	cServerCertSubject := (C.CString)(tlsConfig.ServerCertSubject)
+	if nil != tlsConfig {
+		cPSKIdentity := (C.CString)(tlsConfig.PSKIdentity)
+		cPSKKey := (C.CString)(tlsConfig.PSKKey)
+		cCAFile := (C.CString)(tlsConfig.CAFile)
+		cCRLFile := (C.CString)(tlsConfig.CRLFile)
+		cCertFile := (C.CString)(tlsConfig.CertFile)
+		cKeyFile := (C.CString)(tlsConfig.KeyFile)
+		cServerCertIssuer := (C.CString)(tlsConfig.ServerCertIssuer)
+		cServerCertSubject := (C.CString)(tlsConfig.ServerCertSubject)
 
-	defer func() {
-		log.Tracef("Calling C function \"free(cPSKIdentity)\"")
-		C.free(unsafe.Pointer(cPSKIdentity))
-		log.Tracef("Calling C function \"free(cPSKKey)\"")
-		C.free(unsafe.Pointer(cPSKKey))
-		log.Tracef("Calling C function \"free(cCAFile)\"")
-		C.free(unsafe.Pointer(cCAFile))
-		log.Tracef("Calling C function \"free(cCRLFile)\"")
-		C.free(unsafe.Pointer(cCRLFile))
-		log.Tracef("Calling C function \"free(cCertFile)\"")
-		C.free(unsafe.Pointer(cCertFile))
-		log.Tracef("Calling C function \"free(cKeyFile)\"")
-		C.free(unsafe.Pointer(cKeyFile))
-		log.Tracef("Calling C function \"free(cServerCertIssuer)\"")
-		C.free(unsafe.Pointer(cServerCertIssuer))
-		log.Tracef("Calling C function \"free(cServerCertSubject)\"")
-		C.free(unsafe.Pointer(cServerCertSubject))
-	}()
+		defer func() {
+			log.Tracef("Calling C function \"free(cPSKIdentity)\"")
+			C.free(unsafe.Pointer(cPSKIdentity))
+			log.Tracef("Calling C function \"free(cPSKKey)\"")
+			C.free(unsafe.Pointer(cPSKKey))
+			log.Tracef("Calling C function \"free(cCAFile)\"")
+			C.free(unsafe.Pointer(cCAFile))
+			log.Tracef("Calling C function \"free(cCRLFile)\"")
+			C.free(unsafe.Pointer(cCRLFile))
+			log.Tracef("Calling C function \"free(cCertFile)\"")
+			C.free(unsafe.Pointer(cCertFile))
+			log.Tracef("Calling C function \"free(cKeyFile)\"")
+			C.free(unsafe.Pointer(cKeyFile))
+			log.Tracef("Calling C function \"free(cServerCertIssuer)\"")
+			C.free(unsafe.Pointer(cServerCertIssuer))
+			log.Tracef("Calling C function \"free(cServerCertSubject)\"")
+			C.free(unsafe.Pointer(cServerCertSubject))
+		}()
 
-	if (nil != tlsConfig) {
 		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
 		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
 			cPSKIdentity, cPSKKey, cCAFile, cCRLFile, cCertFile, cKeyFile, cServerCertIssuer,
-			cServerCertSubject);
+			cServerCertSubject)
 		ctlsConfig_p = &ctlsConfig
 	}
 

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
@@ -37,6 +38,12 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		'Enable audit logging' => true,
 		'Enable internal housekeeping' => true,
 		'Data storage period' => '400d'
+	];
+
+	public $db_default_values = [
+		'auditlog_enabled' => 1,
+		'hk_audit_mode' => 1,
+		'hk_audit' => '365d'
 	];
 
 	/**
@@ -104,7 +111,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => false
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '0',
 						'hk_audit' => '365d'
@@ -118,7 +125,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => false
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '0',
 						'hk_audit' => '365d'
@@ -133,7 +140,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '365d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '365d'
@@ -148,7 +155,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '365d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '365d'
@@ -163,7 +170,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1440m'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1440m'
@@ -178,7 +185,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13140000m'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '13140000m'
@@ -193,7 +200,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13139999m'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '13139999m'
@@ -208,7 +215,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '24h'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '24h'
@@ -223,7 +230,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '219000h'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '219000h'
@@ -238,7 +245,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '218999h'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '218999h'
@@ -253,7 +260,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1d'
@@ -268,7 +275,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1w'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1w'
@@ -283,7 +290,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '86400s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '86400s'
@@ -298,7 +305,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400000s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788400000s'
@@ -313,7 +320,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400000s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788400000s'
@@ -328,7 +335,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788399999s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788399999s'
@@ -343,7 +350,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '9125d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '9125d'
@@ -358,7 +365,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1303w'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1303w'
@@ -596,30 +603,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * @dataProvider getUpdateValueData
 	 */
 	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
-		}
-
-		$this->page->login()->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
-		$form = $this->query('id:audit-settings')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['fields']);
-		$form->submit()->waitUntilReloaded();
-
-		if ($data['expected'] === TEST_GOOD) {
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$form->checkValue($data['fields']);
-
-			// Check DB configuration.
-			$this->assertEquals($data['db_check'],  CDBHelper::getRow('SELECT auditlog_enabled, hk_audit_mode, hk_audit FROM config'));
-
-			// Reset back to default values.
-			$form->query('id:resetDefaults')->one()->click();
-			COverlayDialogElement::find()->waitUntilVisible()->one()->query('button:Reset defaults')->one()->click();
-			$form->submit()->waitUntilReloaded();
-		}
-		else {
-			$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
-		}
+		$this->executeCheckForm($data);
 	}
 }
