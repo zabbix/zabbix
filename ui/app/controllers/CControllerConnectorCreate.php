@@ -64,7 +64,9 @@ class CControllerConnectorCreate extends CController {
 				'timeout' =>		'required|not_empty'
 			];
 
-			if ($this->getInput('data_type') == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+			$data_type = $this->getInput('data_type', ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES);
+
+			if ($data_type == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
 				$fields['item_value_type'] = 'required';
 			}
 
@@ -72,7 +74,7 @@ class CControllerConnectorCreate extends CController {
 				$fields['token'] = 'required|not_empty';
 			}
 
-			if ($this->getInput('max_attempts') > 1) {
+			if ($this->getInput('max_attempts', DB::getDefault('connector', 'max_attempts')) > 1) {
 				$fields['attempt_interval'] = 'required|not_empty';
 			}
 

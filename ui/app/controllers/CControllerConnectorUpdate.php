@@ -65,7 +65,9 @@ class CControllerConnectorUpdate extends CController {
 				'timeout' =>		'required|not_empty'
 			];
 
-			if ($this->getInput('data_type') == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+			$data_type = $this->getInput('data_type', ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES);
+
+			if ($data_type == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
 				$fields['item_value_type'] = 'required';
 			}
 
@@ -73,7 +75,7 @@ class CControllerConnectorUpdate extends CController {
 				$fields['token'] = 'required|not_empty';
 			}
 
-			if ($this->getInput('max_attempts') > 1) {
+			if ($this->getInput('max_attempts', DB::getDefault('connector', 'max_attempts')) > 1) {
 				$fields['attempt_interval'] = 'required|not_empty';
 			}
 
@@ -120,8 +122,8 @@ class CControllerConnectorUpdate extends CController {
 			'tags' => []
 		];
 
-		$this->getInputs($connector, ['connectorid', 'name', 'protocol', 'url', 'max_senders', 'timeout',
-			'http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'tags_evaltype'
+		$this->getInputs($connector, ['connectorid', 'name', 'protocol', 'url', 'max_senders', 'timeout', 'http_proxy',
+			'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'tags_evaltype'
 		]);
 
 		switch ($connector['authtype']) {
