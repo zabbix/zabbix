@@ -657,7 +657,7 @@ if ($data['action'] === 'user.edit') {
 			foreach ($data['modules'] as $moduleid => $module_name) {
 				$elements[] = (new CSpan($module_name))->addClass(
 					array_key_exists($moduleid, $data['disabled_moduleids'])
-					|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
+							|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
 						? ZBX_STYLE_STATUS_GREY
 						: ZBX_STYLE_STATUS_GREEN
 				);
@@ -677,8 +677,8 @@ if ($data['action'] === 'user.edit') {
 		$permissions_form_list
 			->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
 			->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
-				$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			)))
+					$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
 			);
@@ -872,8 +872,8 @@ $html_page
 
 if ($data['action'] === 'user.edit') {
 	(new CScriptTag('view.init('.json_encode([
-			'userid' => $data['userid'] ?: null
-		]).');'))
+		'userid' => $data['userid'] ?: null
+	]).');'))
 		->setOnDocumentReady()
 		->show();
 }
