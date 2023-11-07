@@ -745,7 +745,7 @@ static void	html_get_charset_content(const char *data, char **charset, char **co
 	}
 }
 
-static char	*get_media_type_charset(const char *content_type, char *body, size_t size)
+static char	*determine_charset(const char *content_type, char *body, size_t size)
 {
 	const char	*ptr;
 	char		*charset = NULL;
@@ -806,7 +806,7 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 		content_type = type->value;
 	}
 
-	charset = get_media_type_charset(content_type, *body, *size);
+	charset = determine_charset(content_type, *body, *size);
 
 	if (0 != strcmp(charset, "UTF-8"))
 	{
