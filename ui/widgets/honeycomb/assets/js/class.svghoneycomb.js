@@ -67,6 +67,13 @@ class CSVGHoneycomb {
 	#svg;
 
 	/**
+	 * Unique ID of root SVG element.
+	 *
+	 * @type {string}
+	 */
+	#svg_id;
+
+	/**
 	 * SVG group element implementing scaling and fitting of its contents inside the root SVG element.
 	 *
 	 * @type {SVGGElement}
@@ -219,7 +226,10 @@ class CSVGHoneycomb {
 		this.#config = config;
 		this.#padding = padding;
 
+		this.#svg_id = CSVGHoneycomb.#getUniqueId();
+
 		this.#svg = d3.create('svg:svg')
+			.attr('id', this.#svg_id)
 			.attr('class', CSVGHoneycomb.ZBX_STYLE_CLASS)
 			.on('click', (e) => this.#onClickSvg(e));
 
@@ -228,8 +238,6 @@ class CSVGHoneycomb {
 		this.#font_family = this.#svg.style('font-family');
 
 		this.#createContainers();
-
-		CSVGHoneycomb.ID_COUNTER++;
 	}
 
 	/**
@@ -572,7 +580,7 @@ class CSVGHoneycomb {
 
 		const filter = defs
 			.append('svg:filter')
-			.attr('id', CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW)
+			.attr('id', `${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW}-${this.#svg_id}`)
 			.attr('width', '200%')
 			.attr('height', '200%')
 			.attr('x', '-50%')
@@ -612,7 +620,7 @@ class CSVGHoneycomb {
 			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
 			.data(d => d)
 			.join('svg:g')
-			.attr('id', d => `${CSVGHoneycomb.ZBX_STYLE_CELL}-${d.itemid}-${CSVGHoneycomb.ID_COUNTER}`)
+			.attr('id', d => `${CSVGHoneycomb.ZBX_STYLE_CELL}-${d.itemid}-${this.#svg_id}`)
 			.attr('class', (d) => {
 				let result = CSVGHoneycomb.ZBX_STYLE_CELL;
 
@@ -954,12 +962,12 @@ class CSVGHoneycomb {
 
 		this.#elements.popped_cell
 			.select('path')
-			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW})`)
+			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW}-${this.#svg_id})`)
 			.style('stroke', stroke_color)
 			.style('stroke-width', 1);
 
 		this.#svg
-			.select(`#${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW} feDropShadow`)
+			.select(`#${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED_SHADOW}-${this.#svg_id} feDropShadow`)
 			.attr('stdDeviation', (this.#radius_outer * this.#scale) / (this.#scale * 10))
 	};
 
@@ -1087,5 +1095,14 @@ class CSVGHoneycomb {
 		this.#canvas_context.font = `${font_size}px ${this.#font_family}`;
 
 		return this.#canvas_context.measureText(text).width;
+	}
+
+	/**
+	 * Get unique ID.
+	 *
+	 * @returns {string}
+	 */
+	static #getUniqueId() {
+		return `CSVGHoneycomb-${this.ID_COUNTER++}`;
 	}
 }
