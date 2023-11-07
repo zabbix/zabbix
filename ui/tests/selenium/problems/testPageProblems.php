@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
- * @backup profiles, users
+ * @backup profiles
  *
  * @onBefore prepareProblemsData
  */
@@ -52,52 +52,37 @@ class testPageProblems extends CWebTest {
 		 */
 		DBexecute('UPDATE users SET refresh=999 WHERE username='.zbx_dbstr('Admin'));
 
-		// Create hostgroup for hosts with items triggers.
+		// Create host group for hosts with item and trigger.
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Page']]);
-		$groupid = $hostgroups['groupids'][0];
 
-		// Create host for items and triggers.
+		// Create host.
 		$hosts = CDataHelper::call('host.create', [
 			'host' => 'Host for Problems Page',
-			'groups' => [['groupid' => $groupid]]
+			'groups' => [['groupid' => $hostgroups['groupids'][0]]]
 		]);
-		$hostid = $hosts['hostids'][0];
 
 		// Create item on previously created host.
 		$items = CDataHelper::call('item.create',[
-			'hostid' => $hostid,
+			'hostid' => $hosts['hostids'][0],
 			'name' => 'Age problem item',
 			'key_' => 'trap',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_FLOAT
 		]);
-		$itemid = $items['itemids'][0];
 
 		// Create trigger based on item.
-		$triggers = CDataHelper::call('trigger.create', [
+		CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Trigger for Age problem',
 				'expression' => 'last(/Host for Problems Page/trap)=0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE
 			]
 		]);
-		$triggerid = $triggers['triggerids'][0];
 
 		// Create event.
-		CDataHelper::addItemData($itemid, 0);
-
 		$time = time();
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (200100, 0, 0, '.
-				zbx_dbstr($triggerid).', '.$time.', 0, 1, '.zbx_dbstr('Trigger for Age problem').', '.TRIGGER_SEVERITY_AVERAGE.')'
-		);
-
-		// Create problem.
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (200100, 0, 0, '.
-				zbx_dbstr($triggerid).', '.$time.', 0, '.zbx_dbstr('Trigger for Age problem').', '.TRIGGER_SEVERITY_AVERAGE.')'
-		);
-
-		// Change trigger's state to Problem.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description ='.zbx_dbstr('Trigger for icon test'));
+		CDataHelper::addItemData($items['itemids'][0], 0);
+		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
 	}
 
 	public function testPageProblems_Layout() {
@@ -120,39 +105,47 @@ class testPageProblems extends CWebTest {
 				'Tags', 'Show tags', 'Tag display priority', 'Show operational data', 'Compact view',
 				'Show details'], $filter_form->getLabels()->asText()
 		);
-		$filter_form->getRequiredLabels([]);
+
+		// Check complicated labels.
+		foreach (['By me', 'Tag name', 'Show timeline', 'Highlight whole row'] as $label) {
+			$this->assertTrue($filter_form->query('xpath://label[text()='.CXPathHelper::escapeQuotes($label)
+					.']')->one()->isVisible()
+			);
+		}
+
+		$this->assertEquals([], $filter_form->getRequiredLabels());
 
 		$fields_values = [
-			'Show' => ['value' => 'Recent problems', 'enabled' => true],
-			'id:groupids_0_ms' => ['value' => '', 'enabled' => true, 'placeholder' => 'type here to search'],
-			'id:hostids_0_ms' => ['value' => '', 'enabled' => true, 'placeholder' => 'type here to search'],
-			'id:triggerids_0_ms' => ['value' => '', 'enabled' => true, 'placeholder' => 'type here to search'],
-			'Problem' => ['value' => '', 'enabled' => true, 'maxlength' => 255],
-			'Not classified' => ['value' => false, 'enabled' => true],
-			'Information' => ['value' => false, 'enabled' => true],
-			'Warning' => ['value' => false, 'enabled' => true],
-			'Average' => ['value' => false, 'enabled' => true],
-			'High' => ['value' => false, 'enabled' => true],
-			'Disaster' => ['value' => false, 'enabled' => true],
-			'name:age_state' => ['value' => false, 'enabled' => true],
+			'Show' => ['value' => 'Recent problems'],
+			'id:groupids_0_ms' => ['value' => '', 'placeholder' => 'type here to search'],
+			'id:hostids_0_ms' => ['value' => '', 'placeholder' => 'type here to search'],
+			'id:triggerids_0_ms' => ['value' => '', 'placeholder' => 'type here to search'],
+			'Problem' => ['value' => '', 'maxlength' => 255],
+			'Not classified' => ['value' => false],
+			'Information' => ['value' => false],
+			'Warning' => ['value' => false],
+			'Average' => ['value' => false],
+			'High' => ['value' => false],
+			'Disaster' => ['value' => false],
+			'name:age_state' => ['value' => false],
 			'name:age' => ['value' => 14, 'enabled' => false],
-			'Show symptoms' => ['value' => false, 'enabled' => true],
-			'Show suppressed problems' => ['value' => false, 'enabled' => true],
-			'Acknowledgement status' => ['value' => 'All', 'enabled' => true],
+			'Show symptoms' => ['value' => false],
+			'Show suppressed problems' => ['value' => false],
+			'Acknowledgement status' => ['value' => 'All'],
 			'id:acknowledged_by_me_0' => ['value' => false, 'enabled' => false],
-			'name:inventory[0][field]' => ['value' => 'Type', 'enabled' => true],
-			'name:inventory[0][value]' => ['value' => '', 'enabled' => true, 'maxlength' => 255],
-			'id:evaltype_0' => ['value' => 'And/Or', 'enabled' => true],
-			'name:tags[0][tag]' => ['value' => '', 'enabled' => true, 'placeholder' => 'tag', 'maxlength' => 255],
-			'id:tags_00_operator' => ['value' => 'Contains', 'enabled' => true],
-			'id:tags_00_value' => ['value' => '', 'enabled' => true, 'placeholder' => 'value', 'maxlength' => 255],
-			'Show tags' => ['value' => 3, 'enabled' => true],
-			'id:tag_name_format_0' => ['value' => 'Full', 'enabled' => true],
-			'Tag display priority' => ['value' => '', 'enabled' => true, 'placeholder' => 'comma-separated list', 'maxlength' => 255],
-			'Show operational data' => ['value' => 'None', 'enabled' => true],
-			'Compact view' => ['value' => false, 'enabled' => true],
-			'Show details' => ['value' => false, 'enabled' => true],
-			'id:show_timeline_0' => ['value' => true, 'enabled' => true],
+			'name:inventory[0][field]' => ['value' => 'Type'],
+			'name:inventory[0][value]' => ['value' => '', 'maxlength' => 255],
+			'id:evaltype_0' => ['value' => 'And/Or'],
+			'name:tags[0][tag]' => ['value' => '', 'placeholder' => 'tag', 'maxlength' => 255],
+			'id:tags_00_operator' => ['value' => 'Contains'],
+			'id:tags_00_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255],
+			'Show tags' => ['value' => 3],
+			'id:tag_name_format_0' => ['value' => 'Full'],
+			'Tag display priority' => ['value' => '', 'placeholder' => 'comma-separated list', 'maxlength' => 255],
+			'Show operational data' => ['value' => 'None'],
+			'Compact view' => ['value' => false],
+			'Show details' => ['value' => false],
+			'id:show_timeline_0' => ['value' => true],
 			'id:highlight_row_0' => ['value' => false, 'enabled' => false]
 		];
 
@@ -160,14 +153,12 @@ class testPageProblems extends CWebTest {
 			$field = $filter_form->getField($label);
 			$this->assertEquals($attributes['value'], $field->getValue());
 			$this->assertTrue($field->isVisible());
-			$this->assertTrue($field->isEnabled($attributes['enabled']));
+			$this->assertTrue($field->isEnabled(CTestArrayHelper::get($attributes, 'enabled', true)));
 
-			if (array_key_exists('placeholder', $attributes)) {
-				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
-			}
-
-			if (array_key_exists('maxlength', $attributes)) {
-				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
+			foreach (['placeholder', 'maxlength'] as $attribute) {
+				if (array_key_exists($attribute, $attributes)) {
+					$this->assertEquals($attributes[$attribute], $field->getAttribute($attribute));
+				}
 			}
 		}
 
@@ -181,12 +172,12 @@ class testPageProblems extends CWebTest {
 		];
 
 		foreach ($segmented_radios as $field => $labels) {
-			$this->assertEquals($labels,  $filter_form->getField($field)->asSegmentedRadio()->getLabels()->asText());
+			$this->assertEquals($labels, $filter_form->getField($field)->asSegmentedRadio()->getLabels()->asText());
 		}
 
 		$dropdowns = [
 			'name:inventory[0][field]' => ['Type', 'Type (Full details)', 'Name', 'Alias', 'OS', 'OS (Full details)',
-					'OS (Short)', 'Serial number A', 'Serial number B', 'Tag', 'Asset tag',  'MAC address A',
+					'OS (Short)', 'Serial number A', 'Serial number B', 'Tag', 'Asset tag', 'MAC address A',
 					'MAC address B', 'Hardware', 'Hardware (Full details)', 'Software', 'Software (Full details)',
 					'Software application A', 'Software application B', 'Software application C', 'Software application D',
 					'Software application E', 'Contact', 'Location', 'Location latitude', 'Location longitude',
@@ -237,17 +228,17 @@ class testPageProblems extends CWebTest {
 			if ($show === 'History') {
 				$age_field->waitUntilNotVisible();
 				$fields_values['Show']['value'] = 'History';
-				$fields_values['name:age_state']['visible'] = false;
-				$fields_values['name:age_state']['enabled'] = false;
-				$fields_values['name:age']['visible'] = false;
+				$attribute_status = false;
 			}
 			else {
 				$age_field->waitUntilVisible();
 				$fields_values['Show']['value'] = 'Problems';
-				$fields_values['name:age_state']['visible'] = true;
-				$fields_values['name:age_state']['enabled'] = true;
-				$fields_values['name:age']['visible'] = true;
+				$attribute_status = true;
 			}
+
+			$fields_values['name:age_state']['visible'] = $attribute_status;
+			$fields_values['name:age_state']['enabled'] = $attribute_status;
+			$fields_values['name:age']['visible'] = $attribute_status;
 
 			foreach ($checked_elements as $query => $state) {
 				$this->assertTrue($this->query($query)->one()->isEnabled($state));
@@ -256,7 +247,7 @@ class testPageProblems extends CWebTest {
 			foreach ($fields_values as $label => $attributes) {
 				$field = $filter_form->getField($label);
 				$this->assertTrue($field->isVisible(CTestArrayHelper::get($attributes, 'visible', true)));
-				$this->assertTrue($field->isEnabled($attributes['enabled']));
+				$this->assertTrue($field->isEnabled(CTestArrayHelper::get($attributes, 'enabled', true)));
 			}
 		}
 
@@ -303,41 +294,65 @@ class testPageProblems extends CWebTest {
 		$table->waitUntilReloaded();
 
 		$dependant_headers = [
-			['label' => 'Show', 'value' => 'Recent problems', 'headers' => ['Recovery time', 'Status', 'Info', 'Host',
-					'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			[
+				'label' => 'Show',
+				'value' => 'Recent problems',
+				'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' => 'Show', 'value' => 'History', 'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem',
-				'Duration', 'Update', 'Actions', 'Tags']
+			[
+				'label' => 'Show',
+				'value' => 'History',
+				'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' => 'Show', 'value' => 'Problems', 'headers' => ['Info', 'Host', 'Problem', 'Duration',
-					'Update', 'Actions', 'Tags']
+			[
+				'label' => 'Show',
+				'value' => 'Problems',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' => 'Show tags', 'value' => 'None', 'headers' => ['Info', 'Host', 'Problem', 'Duration',
-					'Update', 'Actions']
+			[
+				'label' => 'Show tags',
+				'value' => 'None',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions']
 			],
-			['label' => 'Show tags', 'value' => 1, 'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update',
-					'Actions', 'Tags']
+			[
+				'label' => 'Show tags',
+				'value' => 1,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' => 'Show tags', 'value' => 2, 'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update',
-					'Actions', 'Tags']
+			[
+				'label' => 'Show tags',
+				'value' => 2,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' => 'Show tags', 'value' => 3, 'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update',
-					'Actions', 'Tags']
+			[
+				'label' => 'Show tags',
+				'value' => 3,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' =>'Show operational data', 'value' => 'None', 'headers' => ['Info', 'Host', 'Problem',  'Duration',
-					'Update', 'Actions', 'Tags']
+			[
+				'label' => 'Show operational data',
+				'value' => 'None',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' =>'Show operational data', 'value' => 'Separately', 'headers' => ['Info', 'Host', 'Problem',
-					'Operational data', 'Duration', 'Update', 'Actions', 'Tags']
+			[
+				'label' => 'Show operational data',
+				'value' => 'Separately',
+				'headers' => ['Info', 'Host', 'Problem', 'Operational data', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' =>'Show operational data', 'value' => 'With problem name', 'headers' => ['Info', 'Host',
-					'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			[
+				'label' => 'Show operational data',
+				'value' => 'With problem name',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' =>'id:show_timeline_0', 'value' => false, 'headers' => [ 'Info', 'Host', 'Problem', 'Duration',
-					'Update', 'Actions', 'Tags']
+			[
+				'label' => 'id:show_timeline_0',
+				'value' => false,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			['label' =>'id:show_timeline_0', 'value' => true, 'headers' => ['Info', 'Host', 'Problem', 'Duration',
-					'Update', 'Actions', 'Tags']
+			[
+				'label' => 'id:show_timeline_0',
+				'value' => true,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			]
 		];
 
@@ -359,11 +374,11 @@ class testPageProblems extends CWebTest {
 		));
 
 		// Check Mass update button.
-		$button_state = $this->query('button:Mass update')->one()->isClickable();
-		$this->assertEquals(false, $button_state);
+		$mass_update_button = $this->query('button:Mass update')->one();
+		$this->assertFalse($mass_update_button->isClickable());
 		$table->getRow(0)->select();
 		$this->assertSelectedCount(1);
-		$this->assertEquals(false, $button_state);
+		$mass_update_button->waitUntilClickable();
 	}
 
 	public static function getFilterData() {
@@ -954,6 +969,7 @@ class testPageProblems extends CWebTest {
 						'Problem' => 'Test trigger',
 						'High' => true,
 						'Average' => true,
+						'Show symptoms' => true,
 						'Acknowledgement status' => 'Unacknowledged',
 						'Host inventory' => [
 							'action' => USER_ACTION_UPDATE, 'index' => 0,
@@ -1236,7 +1252,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Show' => 'Problems',
 						'Not classified' => true,
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
@@ -1251,7 +1267,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Severity' => 'Warning',
 						'Acknowledgement status' => 'Unacknowledged',
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1268,7 +1284,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Acknowledgement status' => 'Acknowledged',
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'result' => [
 						['Problem' => '4_trigger_Average'],
@@ -1283,11 +1299,36 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Acknowledgement status' => 'Acknowledged',
 						'id:acknowledged_by_me_0' => true,
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'result' => [
 						['Problem' => '3_trigger_Average'],
 						['Problem' => '2_trigger_Information']
+					]
+				]
+			],
+			// #41 Compact view.
+			[
+				[
+					'fields' => [
+						'Problem' => '1_trigger_Disaster',
+						'id:compact_view_0' => true
+					],
+					'result' => [
+						['Problem' => '1_trigger_Disaster']
+					]
+				]
+			],
+			// #42 Highlight whole row.
+			[
+				[
+					'fields' => [
+						'Problem' => '1_trigger_Average',
+						'id:compact_view_0' => true,
+						'id:highlight_row_0' => true
+					],
+					'result' => [
+						['Problem' => '1_trigger_Average']
 					]
 				]
 			]
@@ -1315,12 +1356,30 @@ class testPageProblems extends CWebTest {
 		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
-		$problem_count = array_key_exists('fields', $data)
-			? (CTestArrayHelper::get($data['fields'], 'Show timeline') ? (count($data['result']) - 1) :  count($data['result']))
-			:  count($data['result']);
+		// Check "Compact view" and "Highlight whole row" filter checkboxes.
+		$compact_selector = 'xpath://table[contains(@class, "compact-view")]';
+		$highlight_selector = 'xpath://tr[contains(@class, "-bg")]';
+		if (array_key_exists('fields', $data) && CTestArrayHelper::get($data['fields'], 'id:compact_view_0', false)) {
+			$this->assertTrue($this->query($compact_selector)->exists());
+
+			$this->assertEquals(CTestArrayHelper::get($data['fields'], 'id:highlight_row_0', false),
+					$this->query($highlight_selector)->exists()
+			);
+		}
+		else {
+			foreach ([$compact_selector, $highlight_selector] as $selector) {
+				$this->assertFalse($this->query($selector)->exists());
+			}
+		}
+
+		// If Show timeline = true, it adds one more row to the result table.
+		$problem_count = (array_key_exists('fields', $data) && CTestArrayHelper::get($data['fields'], 'Show timeline'))
+			? count($data['result']) - 1
+			: count($data['result']);
+
 		$this->assertTableStats($problem_count);
 
-		$dialog = $this->query('xpath://div[@class="overlay-dialogue"]');
+		$dialog_selector = 'xpath://div[@class="overlay-dialogue"]';
 		if (array_key_exists('check_trigger_description', $data)) {
 			foreach ($data['check_trigger_description'] as $i => $description) {
 				$cell = $table->getRow($i)->getColumn('Problem');
@@ -1330,7 +1389,7 @@ class testPageProblems extends CWebTest {
 				}
 				else {
 					$cell->query('tag:button')->waitUntilClickable()->one()->click();
-					$description_dialog = $dialog->waitUntilVisible()->one();
+					$description_dialog = $this->query($dialog_selector)->waitUntilVisible()->one();
 					$this->assertEquals($description, $description_dialog->getText());
 					$description_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 					$description_dialog->waitUntilNotPresent();
@@ -1349,7 +1408,7 @@ class testPageProblems extends CWebTest {
 				else {
 					$this->assertTrue($tick->exists());
 					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
-					$action_dialog = $dialog->waitUntilVisible()->one();
+					$action_dialog = $this->query($dialog_selector)->waitUntilVisible()->one();
 					$this->assertTableData($action, 'xpath://div[@class="overlay-dialogue"]//table');
 					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 					$action_dialog->waitUntilNotPresent();
@@ -1366,7 +1425,7 @@ class testPageProblems extends CWebTest {
 				}
 				else {
 					$arrow->one()->click();
-					$dependency_dialog = $dialog->one()->waitUntilVisible();
+					$dependency_dialog = $this->query($dialog_selector)->one()->waitUntilVisible();
 					$this->assertEquals("Depends on\n".$dependency, $dependency_dialog->getText());
 					$dependency_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 					$dependency_dialog->waitUntilNotPresent();
@@ -1380,7 +1439,7 @@ class testPageProblems extends CWebTest {
 					? 'xpath:.//button[@class="btn-icon zi-more"]'
 					: 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($tag).']';
 				$table->getRow(0)->getColumn('Tags')->query($selector)->one()->click();
-				$popup = $dialog->one()->waitUntilVisible();
+				$popup = $this->query($dialog_selector)->one()->waitUntilVisible();
 				$this->assertEquals($text, $popup->getText());
 				$popup->query('xpath:.//button[@title="Close"]')->one()->click();
 				$popup->waitUntilNotPresent();
@@ -1397,7 +1456,7 @@ class testPageProblems extends CWebTest {
 
 		if (array_key_exists('check_suppressed', $data)) {
 			$table->getRow(0)->getColumn('Info')->query('tag:button')->one()->click();
-			$suppressed_dialog = $dialog->one()->waitUntilVisible();
+			$suppressed_dialog = $this->query($dialog_selector)->one()->waitUntilVisible();
 			$this->assertEquals($data['check_suppressed'], $suppressed_dialog->getText());
 			$suppressed_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 			$suppressed_dialog->waitUntilNotPresent();
