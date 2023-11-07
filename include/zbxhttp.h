@@ -48,6 +48,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		char **error);
 char	*zbx_http_parse_header(char **headers);
+char	*zbx_determine_charset(const char *content_type, char *body, size_t size);
 void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated);
 
 int	zbx_http_get(const char *url, const char *header, long timeout, char **out, long *response_code, char **error);
