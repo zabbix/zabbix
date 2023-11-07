@@ -151,6 +151,61 @@ static int	parse_attribute_name_value(const char *data, size_t pos, zbx_strloc_t
 	return SUCCEED;
 }
 
+static size_t	parse_html_attributes(const char *data, char **content, char **charset)
+{
+	size_t		pos = 0;
+	zbx_strloc_t	loc_name, loc_op, loc_value, loc_content;
+	int		http_equiv_content_found = 0, content_found = 0;
+
+	pos = skip_spaces(data, pos);
+
+	while (1)
+	{
+		if (FAIL == parse_attribute_name_value(data, pos, &loc_name, &loc_op, &loc_value))
+			break;
+
+		pos = skip_spaces(data, loc_value.r + 1);
+		if (0 == str_loc_cmp(data, &loc_name, "http-equiv", ZBX_CONST_STRLEN("http-equiv")))
+		{
+			if (0 == str_loc_cmp(data, &loc_value, "\"content-type\"",
+					ZBX_CONST_STRLEN("\"content-type\"")) ||
+					0 == str_loc_cmp(data, &loc_value, "content-type",
+					ZBX_CONST_STRLEN("content-type")))
+			{
+				http_equiv_content_found = 1;
+			}
+		}
+		else if (0 == str_loc_cmp(data, &loc_name, "content", ZBX_CONST_STRLEN("content")))
+		{
+			loc_content = loc_value;
+			content_found = 1;
+		}
+		else if (0 == str_loc_cmp(data, &loc_name, "charset", ZBX_CONST_STRLEN("charset")))
+		{
+			*charset = str_loc_dup(data, &loc_value);
+			zbx_lrtrim(*charset, " \"");
+			return pos;
+		}
+	}
+
+	if (1 == http_equiv_content_found && 1 == content_found)
+	{
+		*content = str_loc_dup(data, &loc_content);
+		zbx_lrtrim(*content, " \"");
+	}
+
+	return pos;
+}
+
+static void	html_get_charset_content(const char *data, char **charset, char **content)
+{
+	while (NULL == *charset && NULL == *content && NULL != (data = strstr(data, "<meta")))
+	{
+		data += ZBX_CONST_STRLEN("<meta");
+		data += parse_html_attributes(data, content, charset);
+	}
+}
+
 #define ZBX_TSPECIALS	"()<>@,;:\"/[]?="
 #define ZBX_CONTENT_TOKEN_CHARLIST ZBX_TSPECIALS	" "
 
@@ -316,61 +371,6 @@ static char	*parse_content(const char *data)
 	}
 
 	return NULL;
-}
-
-static size_t	parse_html_attributes(const char *data, char **content, char **charset)
-{
-	size_t		pos = 0;
-	zbx_strloc_t	loc_name, loc_op, loc_value, loc_content;
-	int		http_equiv_content_found = 0, content_found = 0;
-
-	pos = skip_spaces(data, pos);
-
-	while (1)
-	{
-		if (FAIL == parse_attribute_name_value(data, pos, &loc_name, &loc_op, &loc_value))
-			break;
-
-		pos = skip_spaces(data, loc_value.r + 1);
-		if (0 == str_loc_cmp(data, &loc_name, "http-equiv", ZBX_CONST_STRLEN("http-equiv")))
-		{
-			if (0 == str_loc_cmp(data, &loc_value, "\"content-type\"",
-					ZBX_CONST_STRLEN("\"content-type\"")) ||
-					0 == str_loc_cmp(data, &loc_value, "content-type",
-					ZBX_CONST_STRLEN("content-type")))
-			{
-				http_equiv_content_found = 1;
-			}
-		}
-		else if (0 == str_loc_cmp(data, &loc_name, "content", ZBX_CONST_STRLEN("content")))
-		{
-			loc_content = loc_value;
-			content_found = 1;
-		}
-		else if (0 == str_loc_cmp(data, &loc_name, "charset", ZBX_CONST_STRLEN("charset")))
-		{
-			*charset = str_loc_dup(data, &loc_value);
-			zbx_lrtrim(*charset, " \"");
-			return pos;
-		}
-	}
-
-	if (1 == http_equiv_content_found && 1 == content_found)
-	{
-		*content = str_loc_dup(data, &loc_content);
-		zbx_lrtrim(*content, " \"");
-	}
-
-	return pos;
-}
-
-static void	html_get_charset_content(const char *data, char **charset, char **content)
-{
-	while (NULL == *charset && NULL == *content && NULL != (data = strstr(data, "<meta")))
-	{
-		data += ZBX_CONST_STRLEN("<meta");
-		data += parse_html_attributes(data, content, charset);
-	}
 }
 
 char	*zbx_determine_charset(const char *content_type, char *body, size_t size)
