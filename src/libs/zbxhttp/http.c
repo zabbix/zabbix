@@ -395,56 +395,36 @@ clean:
 	return ret;
 }
 
-static char	*get_media_parameter(const char *str, const char *key, size_t key_len)
+static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
 {
-	const char	*ptr, *next;
-	char		*charset = NULL;
-
-	for (;;str = next + 1)
-	{
-		if (NULL == (ptr = strchr(str, '=')))
-			break;
-
-		ptr++;
-
-		if (NULL != (next = strchr(str, ';')))
-		{
-			if (next <= ptr)
-				break;
-		}
-
-		for (;' ' == *str; str++);
-
-		if (0 == zbx_strncasecmp(str, key, key_len))
-		{
-			if (NULL != next)
-			{
-				size_t	alloc_len = 0, offset = 0;
-
-				zbx_strncpy_alloc(&charset, &alloc_len, &offset, ptr, next - ptr - 1);
-			}
-			else
-				charset = zbx_strdup(NULL, ptr);
-			break;
-		}
-
-		if (NULL == next)
-			break;
-	}
-
-	return charset;
+	ZBX_RETURN_IF_NOT_EQUAL(loc->r - loc->l + 1, text_len);
+	return zbx_strncasecmp(src + loc->l, text, text_len);
 }
 
+static char	*str_loc_dup(const char *src, const zbx_strloc_t *loc)
+{
+	char	*str;
+	size_t	len;
+
+	len = loc->r - loc->l + 1;
+	str = zbx_malloc(NULL, len + 1);
+	memcpy(str, src + loc->l, len);
+	str[len] = '\0';
+
+	return str;
+}
+
+#define ZBX_ATTRIBUTE_NAME_CHARLIST	" \"'=<>`/"
 static int	parse_attribute_name(const char *data, size_t pos, zbx_strloc_t *loc)
 {
 	const char	*ptr = data + pos;
 
-	if (NULL != strchr(" \"'=<>`/", *ptr))
+	if (NULL != strchr(ZBX_ATTRIBUTE_NAME_CHARLIST, *ptr))
 		return FAIL;
 
 	while ('\0' != *(++ptr))
 	{
-		if (' ' == *ptr || '=' == *ptr)
+		if (NULL != strchr(ZBX_ATTRIBUTE_NAME_CHARLIST, *ptr))
 			break;
 	}
 
@@ -453,6 +433,7 @@ static int	parse_attribute_name(const char *data, size_t pos, zbx_strloc_t *loc)
 
 	return SUCCEED;
 }
+#undef ZBX_ATTRIBUTE_NAME_CHARLIST
 
 static size_t	skip_spaces(const char *data, size_t pos)
 {
@@ -475,6 +456,7 @@ static int	parse_attribute_op(const char *data, size_t pos, zbx_strloc_t *loc)
 	return FAIL;
 }
 
+#define ZBX_UNQUOTED_ATTRIBUTE_VALUE_CHARLIST	" \"'=<>`"
 static int	parse_attribute_value(const char *data, size_t pos, zbx_strloc_t *loc)
 {
 	const char	*ptr;
@@ -493,31 +475,33 @@ static int	parse_attribute_value(const char *data, size_t pos, zbx_strloc_t *loc
 		charlist = "'";
 		quoted = 1;
 	}
-	else if (NULL == strchr(" \"'=<>`", *ptr))
+	else if (NULL == strchr(ZBX_UNQUOTED_ATTRIBUTE_VALUE_CHARLIST, *ptr))
 	{
 		quoted = 0;
-		charlist = " \"'=<>`";
+		charlist = ZBX_UNQUOTED_ATTRIBUTE_VALUE_CHARLIST;
 	}
 	else
 		return FAIL;
 
 	loc->l = pos;
 
-	while (NULL == strchr(charlist, *(++ptr)))
+	while (NULL == strchr(charlist, *(++ptr)));
+
+	if (1 == quoted)
 	{
 		if ('\0' == *ptr)
 			return FAIL;
-	}
 
-	if (1 == quoted)
 		loc->r = (size_t)(ptr - data);
+	}
 	else
 		loc->r = (size_t)(ptr - data) - 1;
 
 	return SUCCEED;
 }
+#undef ZBX_UNQUOTED_ATTRIBUTE_VALUE_CHARLIST
 
-static int	parse_attribute_key_value(const char *data, size_t pos, zbx_strloc_t *loc_name, zbx_strloc_t *loc_op,
+static int	parse_attribute_name_value(const char *data, size_t pos, zbx_strloc_t *loc_name, zbx_strloc_t *loc_op,
 		zbx_strloc_t *loc_value)
 {
 	if (SUCCEED != parse_attribute_name(data, pos, loc_name))
@@ -539,23 +523,171 @@ static int	parse_attribute_key_value(const char *data, size_t pos, zbx_strloc_t 
 	return SUCCEED;
 }
 
-static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
+#define ZBX_TSPECIALS	"()<>@,;:\"/[]?="
+#define ZBX_CONTENT_TOKEN_CHARLIST ZBX_TSPECIALS	" "
+
+static int	parse_content_name(const char *data, size_t pos, zbx_strloc_t *loc)
 {
-	ZBX_RETURN_IF_NOT_EQUAL(loc->r - loc->l + 1, text_len);
-	return zbx_strncasecmp(src + loc->l, text, text_len);
+	const char	*ptr = data + pos;
+
+	if (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *ptr))
+		return FAIL;
+
+	while ('\0' != *(++ptr))
+	{
+		if (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *ptr))
+			break;
+	}
+
+	loc->l = pos;
+	loc->r = (size_t)(ptr - data) - 1;
+
+	return SUCCEED;
 }
 
-static char	*str_loc_dup(const char *src, const zbx_strloc_t *loc)
+static int	parse_content_op(const char *data, size_t pos, zbx_strloc_t *loc)
 {
-	char	*str;
-	size_t	len;
+	if ('=' == data[pos])
+	{
+		loc->l = pos;
+		loc->r = pos;
 
-	len = loc->r - loc->l + 1;
-	str = zbx_malloc(NULL, len + 1);
-	memcpy(str, src + loc->l, len);
-	str[len] = '\0';
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	parse_quoted_content_value(const char *data, size_t pos, zbx_strloc_t *loc)
+{
+	const char	*ptr;
+
+	ptr = data + pos;
+
+	if ('"' != *ptr)
+		return FAIL;
+
+	loc->l = pos;
+
+	while ('"' != *(++ptr))
+	{
+		if ('\\' == *ptr)
+		{
+			ptr++;
+
+			if ('\\' != *ptr && 'n' != *ptr && '"' != *ptr)
+				return FAIL;
+			continue;
+		}
+		if ('\0' == *ptr)
+			return FAIL;
+	}
+
+	loc->r = (size_t)(ptr - data);
+
+	return SUCCEED;
+}
+
+static int	parse_content_value(const char *data, size_t pos, zbx_strloc_t *loc)
+{
+	const char	*ptr;
+
+	ptr = data + pos;
+
+	if ('"' == *ptr)
+		return parse_quoted_content_value(data, pos, loc);
+	else if (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *ptr))
+		return FAIL;
+
+	loc->l = pos;
+
+	while (NULL == strchr(ZBX_CONTENT_TOKEN_CHARLIST, *(++ptr)));
+
+	loc->r = (size_t)(ptr - data) - 1;
+
+	return SUCCEED;
+}
+
+#undef ZBX_CONTENT_TOKEN_CHARLIST
+#undef ZBX_TSPECIALS
+
+static int	parse_content_key_value(const char *data, size_t pos, zbx_strloc_t *loc_name, zbx_strloc_t *loc_op,
+		zbx_strloc_t *loc_value)
+{
+	if (SUCCEED != parse_content_name(data, pos, loc_name))
+		return FAIL;
+
+	pos = skip_spaces(data, loc_name->r + 1);
+
+	if (SUCCEED != parse_content_op(data, pos, loc_op))
+		return FAIL;
+
+	pos = skip_spaces(data, loc_op->r + 1);
+
+	if (SUCCEED != parse_content_value(data, pos, loc_value))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static char	*str_loc_unquote_dyn(const char *src, const zbx_strloc_t *loc)
+{
+	char		*str, *ptr;
+
+	src += loc->l + 1;
+
+	str = ptr = zbx_malloc(NULL, loc->r - loc->l);
+
+	while ('"' != *src)
+	{
+		if ('\\' == *src)
+		{
+			switch (*(++src))
+			{
+				case '\\':
+					*ptr++ = '\\';
+					break;
+				case 'n':
+					*ptr++ = '\n';
+					break;
+				case '"':
+					*ptr++ = '"';
+					break;
+			}
+		}
+		else
+			*ptr++ = *src;
+		src++;
+	}
+	*ptr = '\0';
 
 	return str;
+}
+
+static char	*parse_content(const char *data)
+{
+	size_t		pos = 0;
+	zbx_strloc_t	loc_name, loc_op, loc_value;
+
+	pos = skip_spaces(data, pos);
+
+	while (1)
+	{
+		if (FAIL == parse_content_key_value(data, pos, &loc_name, &loc_op, &loc_value))
+			break;
+
+		pos = skip_spaces(data, loc_value.r + 1);
+
+		if (0 == str_loc_cmp(data, &loc_name, "charset", ZBX_CONST_STRLEN("charset")))
+		{
+			if ('"' == *(data + loc_value.l))
+				return str_loc_unquote_dyn(data, &loc_value);
+
+			return str_loc_dup(data, &loc_value);
+		}
+	}
+
+	return NULL;
 }
 
 static size_t	parse_html_attributes(const char *data, char **content, char **charset)
@@ -566,40 +698,47 @@ static size_t	parse_html_attributes(const char *data, char **content, char **cha
 
 	pos = skip_spaces(data, pos);
 
-	while ('>' != data[pos])
+	while (1)
 	{
-		if (FAIL == parse_attribute_key_value(data, pos, &loc_name, &loc_op, &loc_value))
+		if (FAIL == parse_attribute_name_value(data, pos, &loc_name, &loc_op, &loc_value))
 			break;
 
 		pos = skip_spaces(data, loc_value.r + 1);
-
-		if (0 == str_loc_cmp(data, &loc_name, "http-equiv", ZBX_CONST_STRLEN("http-equiv")) &&
-				0 == str_loc_cmp(data, &loc_value, "\"content-type\"",
-				ZBX_CONST_STRLEN("\"content-type\"")))
+		if (0 == str_loc_cmp(data, &loc_name, "http-equiv", ZBX_CONST_STRLEN("http-equiv")))
 		{
-			http_equiv_content_found = 1;
+			if (0 == str_loc_cmp(data, &loc_value, "\"content-type\"",
+					ZBX_CONST_STRLEN("\"content-type\"")) ||
+					0 == str_loc_cmp(data, &loc_value, "content-type",
+					ZBX_CONST_STRLEN("content-type")))
+			{
+				http_equiv_content_found = 1;
+			}
 		}
 		else if (0 == str_loc_cmp(data, &loc_name, "content", ZBX_CONST_STRLEN("content")))
 		{
 			loc_content = loc_value;
 			content_found = 1;
 		}
-		else if (0 == str_loc_cmp(data, &loc_name, "charset", ZBX_CONST_STRLEN("\"charset\"")))
+		else if (0 == str_loc_cmp(data, &loc_name, "charset", ZBX_CONST_STRLEN("charset")))
 		{
 			*charset = str_loc_dup(data, &loc_value);
+			zbx_lrtrim(*charset, " \"");
 			return pos;
 		}
 	}
 
 	if (1 == http_equiv_content_found && 1 == content_found)
+	{
 		*content = str_loc_dup(data, &loc_content);
+		zbx_lrtrim(*content, " \"");
+	}
 
 	return pos;
 }
 
 static void	html_get_charset_content(const char *data, char **charset, char **content)
 {
-	while (NULL != (data = strstr(data, "<meta")) && NULL == *charset && NULL == *content)
+	while (NULL == *charset && NULL == *content && NULL != (data = strstr(data, "<meta")))
 	{
 		data += ZBX_CONST_STRLEN("<meta");
 		data += parse_html_attributes(data, content, charset);
@@ -613,41 +752,34 @@ static char	*get_media_type_charset(const char *content_type, char *body, size_t
 
 	if (NULL != content_type)
 	{
-		for (;' ' == *content_type; content_type++);
-
 		if (NULL != (ptr = strchr(content_type, ';')))
-			charset = get_media_parameter(ptr + 1, "charset", ZBX_CONST_STRLEN("charset"));
+			charset = parse_content(ptr + 1);
 	}
+
+	char	*content = NULL;
+
+	html_get_charset_content(body, &charset, &content);
+
+	if (NULL != content && NULL == charset)
+	{
+		if (NULL != (ptr = strchr(content, ';')))
+			charset = parse_content(ptr + 1);
+	}
+
+	zbx_free(content);
 
 	if (NULL == charset)
 	{
-		char	*content = NULL;
+		const char	*bom_encoding = get_bom_econding(body, size);
 
-		html_get_charset_content(body, &charset, &content);
-
-		if (NULL != content && NULL == charset)
-		{
-			if (NULL != (ptr = strchr(content, ';')))
-			{
-				charset = get_media_parameter(ptr + 1, "charset",
-					ZBX_CONST_STRLEN("charset"));
-			}
-		}
-
-		zbx_free(content);
-
-		if (NULL == charset)
-		{
-			const char	*bom_encoding = get_bom_econding(body, size);
-
-			if ('\0' != *bom_encoding)
-				charset = zbx_strdup(NULL, bom_encoding);
-			else if (SUCCEED == zbx_is_utf8(body))
-				charset = zbx_strdup(NULL, "UTF-8");
-			else
-				charset = zbx_strdup(NULL, "WINDOWS-1252");
-		}
+		if ('\0' != *bom_encoding)
+			charset = zbx_strdup(NULL, bom_encoding);
+		else if (SUCCEED == zbx_is_utf8(body))
+			charset = zbx_strdup(NULL, "UTF-8");
+		else
+			charset = zbx_strdup(NULL, "WINDOWS-1252");
 	}
+	
 
 	zbx_lrtrim(charset, " ");
 	zbx_strupper(charset);
@@ -681,7 +813,7 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 	{
 		char	*converted;
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "converting from charset '%s'", charset);
+		zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
 
 		converted = convert_to_utf8(*body, *size, charset);
 		zbx_free(*body);
