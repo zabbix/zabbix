@@ -471,10 +471,12 @@ err:
 int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
-	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
+	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL, *line;
+	int		f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts = zbx_time();
+	ssize_t		nbytes;
+	void		*saveptr = NULL;
 
 	if (6 < request->nparam)
 	{
@@ -540,7 +542,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
+	while (0 < (nbytes = zbx_buf_readln(f, buf, sizeof(buf), encoding, &line, &saveptr)))
 	{
 		char	*err_msg;
 
@@ -553,7 +555,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
+		if (NULL == (utf8 = zbx_convert_to_utf8(line, nbytes, encoding, &err_msg)))
 		{
 			SET_MSG_RESULT(result, err_msg);
 			goto err;
@@ -593,6 +595,8 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 err:
+	zbx_free(saveptr);
+
 	if (-1 != f)
 		close(f);
 
@@ -601,11 +605,13 @@ err:
 
 int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*filename, *regexp, *tmp, encoding[32];
+	char		*filename, *regexp, *tmp, encoding[32], *line;
 	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
-	int		nbytes, res, f = -1, ret = SYSINFO_RET_FAIL;
+	int		res, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts = zbx_time();
+	ssize_t		nbytes;
+	void		*saveptr = NULL;
 
 	if (5 < request->nparam)
 	{
@@ -672,7 +678,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	res = 0;
 
-	while (0 == res && 0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
+	while (0 == res && 0 < (nbytes = zbx_buf_readln(f, buf, sizeof(buf), encoding, &line, &saveptr)))
 	{
 		char	*err_msg;
 
@@ -685,7 +691,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
+		if (NULL == (utf8 = zbx_convert_to_utf8(line, nbytes, encoding, &err_msg)))
 		{
 			SET_MSG_RESULT(result, err_msg);
 			goto err;
@@ -715,6 +721,8 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 err:
+	zbx_free(saveptr);
+
 	if (-1 != f)
 		close(f);
 

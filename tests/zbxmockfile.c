@@ -20,10 +20,15 @@
 #define fopen	__real_fopen
 #define fclose	__real_fclose
 #define fgets	__real_fgets
+#define lseek	__real_lseek
+#define close	__real_close
+#include <unistd.h>
 #include <stdio.h>
 #undef fopen
 #undef fclose
 #undef fgets
+#undef lseek
+#undef close
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
@@ -49,6 +54,9 @@ int	__wrap_fclose(FILE *fp);
 char	*__wrap_fgets(char *s, int size, FILE *stream);
 int	__wrap_fstat(int __fildes, struct stat *__stat_buf);
 int	__wrap_connect(int socket, void *addr, socklen_t address_len);
+int	__wrap_poll(struct pollfd *pds, int nfds, int timeout);
+off_t	__wrap_lseek(int fd, off_t offset, int whence);
+int	__wrap_close(int fd);
 ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte);
 int	__wrap_open(const char *path, int oflag, ...);
 int	__wrap_stat(const char *path, struct stat *buf);
@@ -206,6 +214,25 @@ int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 	return nfds;
 }
 
+static const char	*frag_data = NULL;
+static const char	*frag_pos = NULL;
+static size_t		frag_sz = 0;
+
+static int	next_fragment(void)
+{
+	zbx_mock_handle_t	fragment;
+	zbx_mock_error_t	error;
+
+	if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(fragments, &fragment))
+		return 0;	/* no more data */
+
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &frag_data, &frag_sz)))
+		fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
+	frag_pos = frag_data;
+
+	return 1;
+}
+
 int	__wrap_open(const char *path, int oflag, ...)
 {
 	if (SUCCEED == is_profiler_path(path))
@@ -220,6 +247,7 @@ int	__wrap_open(const char *path, int oflag, ...)
 	}
 
 	fragments = zbx_mock_get_parameter_handle("in.fragments");
+	next_fragment();
 
 	return INT_MAX;
 }
@@ -235,39 +263,73 @@ int	__wrap_open(const char *path, int oflag, ...)
  ******************************************************************************/
 ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 {
-	static int		remaining_length;
-	static const char	*data;
-	zbx_mock_error_t	error;
-	zbx_mock_handle_t	fragment;
-	size_t			length;
+	size_t	mv_len;
 
 	ZBX_UNUSED(fildes);
 
-	if (0 == remaining_length)
+	if (frag_pos >= frag_data + frag_sz)
 	{
-		if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(fragments, &fragment))
-			return 0;	/* no more data */
+		if (1 != next_fragment())
+			return 0;
+	}
 
-		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &data, &length)))
-			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
+	if ((ssize_t)nbyte < (frag_data + frag_sz) - frag_pos)
+	{
+		mv_len = nbyte;
 	}
 	else
-		length = remaining_length;
-
-	if (nbyte < length)
 	{
-		remaining_length = length - nbyte;
-		length = nbyte;
+		mv_len = (frag_data + frag_sz) - frag_pos;
 	}
-	else
-		remaining_length = 0;
 
-	memcpy(buf, data, length);
+	memcpy(buf, frag_pos, mv_len);
 
-	if (0 != remaining_length)
-		data += length;
+	frag_pos += mv_len;
 
-	return length;
+	return mv_len;
+}
+
+off_t	__wrap_lseek(int fd, off_t offset, int whence)
+{
+	const char	*new_pos;
+
+	if (fd != INT_MAX)
+		return __real_lseek(fd, offset, whence);
+
+	switch(whence)
+	{
+		case SEEK_END:
+			new_pos = (frag_data + frag_sz) + offset;
+			break;
+		case SEEK_CUR:
+			new_pos = frag_pos + offset;
+			break;
+		case SEEK_SET:
+			new_pos = frag_data + offset;
+			break;
+		default:
+			errno = EINVAL;
+			goto error;
+	}
+
+	if (new_pos < frag_data || new_pos > frag_data + frag_sz)
+	{
+		errno = EOVERFLOW;
+		goto error;
+	}
+
+	frag_pos = new_pos;
+
+	return frag_pos - frag_data;
+error:
+	return (off_t)-1;
+}
+
+int	__wrap_close(int fd)
+{
+	if (fd != INT_MAX) return __real_close(fd);
+
+	return 0;
 }
 
 int	__wrap_stat(const char *path, struct stat *buf)

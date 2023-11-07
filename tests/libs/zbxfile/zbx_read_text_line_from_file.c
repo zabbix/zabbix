@@ -17,38 +17,46 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <fcntl.h>
+
+#include "zbxfile.h"
+
 #include "zbxcommon.h"
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockassert.h"
 #include "zbxmockutil.h"
-#include "zbxmockhelper.h"
 
-char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected)
+void	zbx_mock_test_entry(void **state)
 {
-	zbx_mock_error_t	error;
-	zbx_mock_handle_t	fragment, fragments;
-	const char		*value;
-	size_t			length, offset = 0;
-	char			*buffer;
+	int		f, lines = 0;
+	const char	*encoding, *result;
+	ssize_t		nbytes, line_count;
+	uint64_t	bufsz;
 
-	buffer = zbx_malloc(NULL, expected);
+	ZBX_UNUSED(state);
 
-	fragments = zbx_mock_get_parameter_handle(path);
+	encoding = zbx_mock_get_parameter_string("in.encoding");
+	bufsz = zbx_mock_get_parameter_uint64("in.bufsz");
 
-	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(fragments, &fragment))
+	line_count = zbx_mock_get_parameter_uint64("out.line_count");
+	result = zbx_mock_get_parameter_string("out.result");
+
+	f = zbx_open("", O_RDWR); /* in.fragments */
+	zbx_mock_assert_int_ne("Cannot open file:", -1, f);
+
+	char	buf[bufsz+1];
+
+	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, bufsz, encoding)))
 	{
-		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &value, &length)))
-			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
-
-		if (0 != expected && offset + length > expected)
-			fail_msg("Incorrect message size");
-
-		memcpy(buffer + offset, value, length);
-		offset += length;
+		buf[nbytes] = '\0';
+		printf("Line: %s\n", buf);
+		lines++;
 	}
 
-	if (0 != expected && offset != expected)
-		fail_msg("Assembled message is smaller:" ZBX_FS_UI64 " than expected:" ZBX_FS_UI64, offset, expected);
+	zbx_mock_assert_int_eq("Read lines", line_count, lines);
+	zbx_mock_assert_int_eq("Read result", atoi(result), nbytes);
 
-	return buffer;
+	close(f);
 }
