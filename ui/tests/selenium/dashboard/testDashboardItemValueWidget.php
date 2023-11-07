@@ -22,24 +22,26 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard
  *
  * @onBefore prepareDashboardData
  *
- * @dataSource WebScenarios
+ * @dataSource WebScenarios, AllItemValueTypes
  */
 class testDashboardItemValueWidget extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -208,7 +210,11 @@ class testDashboardItemValueWidget extends CWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-	public function testDashboardItemValueWidget_Layout() {
+	/**
+	 * Test to check Item Value Widget.
+	 * Check authentication form fields layout.
+	 */
+	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
@@ -1415,5 +1421,26 @@ class testDashboardItemValueWidget extends CWebTest {
 			);
 			$index++;
 		}
+	}
+
+	/**
+	 * Test function for assuring that binary items are not available in Item Value widget.
+	 */
+	public function testDashboardItemValueWidget_CheckAvailableItems() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dialog =  CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
+		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
+		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
+		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+
+		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
+
+
+		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill('Host for all item value types');
+		$table->waitUntilReloaded();
+		$this->assertTableDataColumn(['Character item', 'Float item', 'Log item',
+				'Text item', 'Unsigned item', 'Unsigned_dependent item']
+		);
 	}
 }

@@ -19,21 +19,25 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
+ * @dataSource AllItemValueTypes
+ *
  * @backup widget, profiles
  */
 class testDashboardGraphPrototypeWidget extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -498,6 +502,25 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		}
 
 		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
+	}
+
+	/**
+	 * Test function for assuring that binary items are not available in Graph prototype widget.
+	 */
+	public function testDashboardGraphPrototypeWidget_CheckAvailableItems() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
+		$dialog =  CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
+		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph prototype')]);
+		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$host_item_dialog->query('xpath://label[@for="source_type_1"]')->one()->click();
+		$dialog->query('button:Select')->one()->click()->waitUntilReady();
+		$table = $this->query('xpath://div[@class="overlay-dialogue modal modal-popup modal-popup-generic"]//table')
+				->asTable()->one()->waitUntilVisible();
+		$host_item_dialog->query('xpath://div[@class="table-forms-td-right"]//div[@class="multiselect-control"]')
+				->asMultiselect()->one()->fill('Host for all item value types');
+		$table->waitUntilReloaded();
+		$this->assertTableDataColumn(['Float item prototype', 'Unsigned item prototype',
+				'Unsigned_dependent item prototype']);
 	}
 }
 

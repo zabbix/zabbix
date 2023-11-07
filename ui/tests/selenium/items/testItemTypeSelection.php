@@ -131,7 +131,19 @@ class testItemTypeSelection extends CWebTest {
 					],
 					'hint' => true,
 					'hint_text' => 'This type of information may not match the key.',
-					'type' => 'Log'
+					'automatic_type' => 'Text'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Type' => 'Dependent item',
+						'Name' => 'Binary',
+						'Key' => 'Binary_item_type_for_dependent_item[{#KEY}]',
+						'Type of information' => 'Binary'
+					],
+					'type' => 'Binary',
+					'hint' => false
 				]
 			]
 		];
@@ -159,31 +171,40 @@ class testItemTypeSelection extends CWebTest {
 	 */
 	public function checkItemTypeSelection($data, $prototype = false) {
 		$link = ($prototype)
-			? 'zabbix.php?action=item.prototype.list&parent_discoveryid='.self::LLDID.'&context=host'
-			: 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::HOSTID;
+			? 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLDID.'&context=host'
+			: 'items.php?form=create&hostid='.self::HOSTID.'&context=host';
 
 		$this->page->login()->open($link)->waitUntilReady();
-		$this->query('button:'.($prototype ? 'Create item prototype' : 'Create item'))->one()->click();
-		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+		$form = $this->query('id', ($prototype) ? 'item-prototype-form' : 'item-form')->asForm()->waitUntilReady()->one();
 
 		// Make names unique for items and prototypes.
 		$data['fields']['Name'] = $data['fields']['Name'].microtime();
+		if (CTestArrayHelper::get($data['fields'], 'Type of information') === 'Binary' && !$prototype) {
+			$data['fields']['Master item'] = 'testFormItem';
+		}
+
 		$form->fill($data['fields']);
 
 		// Check hintbox text.
 		if (CTestArrayHelper::get($data, 'hint')) {
-			$icon = $this->query('class:js-hint')->waitUntilClickable()->one();
+			$icon = $this->query('id:js-item-type-hint')->waitUntilClickable()->one();
 			$icon->click();
 			$this->assertEquals($data['hint_text'],
 					$form->query('xpath://div[@class="hintbox-wrap"]')->waitUntilPresent()->one()->getText()
 			);
 		}
 		elseif (CTestArrayHelper::get($data, 'hint') === false) {
-			$this->assertFalse($form->query('class:js-hint')->waitUntilPresent()->one()->isVisible());
+			$this->assertFalse($form->query('id:js-item-type-hint')->waitUntilPresent()->one()->isVisible());
 		}
 		else {
 			// Check that type changed to automatic.
 			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
+		}
+
+		// Check dependent item type for item prototype, select Master item manually.
+		if (CTestArrayHelper::get($data['fields'], 'Type of information') === 'Binary' && $prototype) {
+			$this->query('xpath://button[@name="button"][normalize-space()="Select"]')->one()->click();
+			COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link:Master Item')->one()->click();
 		}
 
 		$form->submit();
@@ -195,9 +216,19 @@ class testItemTypeSelection extends CWebTest {
 					' AND name ='.zbx_dbstr($data['fields']['Name'])
 		);
 
-		$this->page->open($link)->waitUntilReady();
-		$this->query('link:'.$data['fields']['Name'])->one()->click();
+		$saved_link = ($prototype)
+			? 'disc_prototypes.php?form=update&parent_discoveryid='.self::LLDID.'&itemid='.$id.'&context=host'
+			: 'items.php?form=update&hostid='.self::HOSTID.'&itemid='.$id.'&context=host';
+
+		$this->page->open($saved_link)->waitUntilReady();
+
 		$form->invalidate();
+		if (CTestArrayHelper::get($data['fields'], 'Type of information') === 'Binary') {
+			$data['fields']['Master item'] = $prototype
+				? 'Host for host prototype tests: Master Item'
+				: 'Simple form test host: testFormItem';
+		}
+
 		$form->checkValue($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'hint')) {
@@ -212,26 +243,24 @@ class testItemTypeSelection extends CWebTest {
 			$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype updated' : 'Item updated');
 
 			// Check that custom type remained in saved form.
-			$this->page->open($link)->waitUntilReady();
-			$this->query('link:'.$data['fields']['Name'])->one()->click();
+			$this->page->open($saved_link)->waitUntilReady();
 			$form->invalidate();
 			$this->assertEquals($data['fields']['Type of information'], $form->getField('Type of information')->getValue());
 
-			// Check that type is the same when preprocessing is cleared.
+			// Check that type changes to automatic when preprocessing is cleared.
 			$form->selectTab('Preprocessing');
 			$form->query('xpath:.//li[@data-step="0"]')->waitUntilPresent()->one()->query('button:Remove')
 					->waitUntilClickable()->one()->click();
 
 			$form->selectTab(($prototype) ? 'Item prototype' : 'Item');
-			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
+			$this->assertEquals($data['automatic_type'], $form->getField('Type of information')->getValue());
 
 			// Check saved form.
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype updated' : 'Item updated');
-			$this->page->open($link)->waitUntilReady();
-			$this->query('link:'.$data['fields']['Name'])->one()->click();
+			$this->page->open($saved_link)->waitUntilReady();
 			$form->invalidate();
-			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
+			$this->assertEquals($data['automatic_type'], $form->getField('Type of information')->getValue());
 		}
 		else {
 			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());

@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 /**
  * @backup widget, profiles
  *
+ * @dataSource AllItemValueTypes
+ *
  * @onBefore setDefaultWidgetType
  */
 class testDashboardGraphWidget extends CWebTest {
@@ -39,7 +41,8 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				'class' => CTagBehavior::class,
 				'tag_selector' => 'id:tags_table_tags'
-			]
+			],
+			CTableBehavior::class
 		];
 	}
 
@@ -2739,6 +2742,21 @@ class testDashboardGraphWidget extends CWebTest {
 		// Check Data set names in created widget configuration form.
 		$data_set_labels = $form->query('xpath:.//label[@class="sortable-drag-handle js-dataset-label"]')->all()->asText();
 		$this->assertEquals($displayed_data['Data sets'], array_values($data_set_labels));
+	}
+
+	/**
+	 * Test function for assuring that text, log, binary and char items are not available in Graph widget.
+	 */
+	public function testDashboardGraphWidget_CheckAvailableItems() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$dialog =  CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
+		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph')]);
+		$dialog->query('xpath:.//div[@id="data_set"]//div[4]//ul[1]//li[1]//button[1]')->one()->waitUntilClickable()->click();
+		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
+		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill('Host for all item value types');
+		$table->waitUntilReloaded();
+		$this->assertTableDataColumn(['Float item', 'Unsigned item', 'Unsigned_dependent item']);
 	}
 
 	/**

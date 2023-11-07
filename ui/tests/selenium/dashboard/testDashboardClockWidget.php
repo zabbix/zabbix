@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup widget, profiles
  *
+ * @dataSource AllItemValueTypes
+ *
  * @onBefore prepareClockWidgetData
  */
 
@@ -232,7 +234,7 @@ class testDashboardClockWidget extends CWebTest {
 			/**
 			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
 			 * which requires to select item of the "Host", in this case array_splice function allows us to put
-			 * this fields name into the array. Positive offset (4) starts from the beginning of the array,
+			 * this fields name into the array. Positive offset (5) starts from the beginning of the array,
 			 * while - (0) length parameter - specifies how many elements will be removed.
 			 */
 			if ($type === 'Host time') {
@@ -957,6 +959,8 @@ class testDashboardClockWidget extends CWebTest {
 	 *
 	 * @param array      $data      data provider
 	 * @param boolean    $update    true if update scenario, false if create
+	 *
+	 * @dataProvider getClockWidgetCommonData
 	 */
 	public function checkFormClockWidget($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -1209,5 +1213,23 @@ class testDashboardClockWidget extends CWebTest {
 			' ON w.widgetid=wf.widgetid'.
 			' WHERE w.name='.zbx_dbstr('DeleteClock')
 		));
+	}
+
+	/**
+	 * Check if binary items are not available for Clock widget.
+	 */
+	public function testDashboardClockWidget_CheckAvailableItems() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for updating clock widgets']);
+		$dialog =  CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
+		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
+		$dialog->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
+		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
+		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
+		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill('Host for all item value types');
+		$table->waitUntilReloaded();
+		$this->assertTableDataColumn(['Character item', 'Float item', 'Log item',
+				'Text item', 'Unsigned item', 'Unsigned_dependent item']);
 	}
 }

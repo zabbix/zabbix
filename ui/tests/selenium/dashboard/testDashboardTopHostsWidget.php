@@ -22,15 +22,16 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @dataSource TopHostsWidget
+ * @dataSource TopHostsWidget, AllItemValueTypes
  *
  * @backup widget, profiles
  *
  * @onAfter clearData
  */
-class testDashboardTopHostsWidget extends CWebTest {
+class testDashboardTopHostsWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TagBehavior to the test.
@@ -41,7 +42,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				'class' => CTagBehavior::class,
 				'tag_selector' => 'id:tags_table_tags'
-			]
+			],
+			CTableBehavior::class
 		];
 	}
 
@@ -2513,6 +2515,15 @@ class testDashboardTopHostsWidget extends CWebTest {
 			}
 		}
 		unset($value);
+	}
+
+	/**
+	 * Test function for assuring that binary items are not available in Top hosts widget.
+	 */
+	public function testDashboardTopHostsWidget_CheckAvailableItems() {
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
+		$this->checkAvailableItems($url, 'Top hosts');
 	}
 
 	/**

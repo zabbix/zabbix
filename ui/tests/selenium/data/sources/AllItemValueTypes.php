@@ -34,8 +34,16 @@ class AllItemValueTypes {
 		]);
 		$hostids = CDataHelper::getIds('host');
 
-		// Create items.
-		$items_data = [];
+		CDataHelper::call('discoveryrule.create', [
+			'name' => 'LLD rule for item types',
+			'key_' => 'lld_rule',
+			'hostid' => $hostids['Host for all item value types'],
+			'type' => ITEM_TYPE_TRAPPER
+		]);
+		$lldid = CDataHelper::getIds('name');
+
+		// Create item prototypes.
+		$item_prototype_data = [];
 		$value_types = [
 			'Float' => ITEM_VALUE_TYPE_FLOAT,
 			'Character' => ITEM_VALUE_TYPE_STR,
@@ -43,6 +51,43 @@ class AllItemValueTypes {
 			'Unsigned' =>ITEM_VALUE_TYPE_UINT64,
 			'Text' => ITEM_VALUE_TYPE_TEXT
 		];
+
+		$dependent_items = [
+			'Binary' => ITEM_VALUE_TYPE_BINARY,
+			'Unsigned_dependent' => ITEM_VALUE_TYPE_UINT64
+		];
+
+		foreach ($value_types as $name => $type) {
+			$item_prototype_data[] = [
+				'hostid' => $hostids[self::HOST],
+				'ruleid' => $lldid['LLD rule for item types'],
+				'name' => $name.' item prototype',
+				'key_' => $name.'_item_prototype_[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => $type
+			];
+		}
+		CDataHelper::call('itemprototype.create', $item_prototype_data);
+		$simple_itemprototypeids = CDataHelper::getIds('name');
+
+		// Add dependent item prototype.
+		$dependent_item_prototype_data = [];
+
+		foreach ($dependent_items as $name => $type) {
+			$dependent_item_prototype_data[] = [
+				'hostid' => $hostids[self::HOST],
+				'ruleid' => $lldid['LLD rule for item types'],
+				'name' => $name.' item prototype',
+				'key_' => $name.'_item_prototype_[{#KEY}]',
+				'type' => ITEM_TYPE_DEPENDENT,
+				'value_type' => $type,
+				'master_itemid' => $simple_itemprototypeids['Float item prototype']
+			];
+		}
+		CDataHelper::call('itemprototype.create', $dependent_item_prototype_data);
+
+		// Create items.
+		$items_data = [];
 
 		foreach ($value_types as $name => $type) {
 			$items_data[] = [
@@ -78,6 +123,9 @@ class AllItemValueTypes {
 		$dependent_itemids = CDataHelper::getIds('name');
 		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids);
 
-		return $itemids;
+		return [
+			'hostid' => $hostids,
+			'itemids' => $itemids
+		];
 	}
 }
