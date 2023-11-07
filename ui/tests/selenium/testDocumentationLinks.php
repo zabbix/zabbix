@@ -2608,7 +2608,6 @@ class testDocumentationLinks extends CWebTest {
 				[
 					'url' => 'zabbix.php?action=timeouts.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
-
 				]
 			]
 		];
