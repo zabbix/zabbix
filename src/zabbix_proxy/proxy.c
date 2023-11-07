@@ -60,7 +60,6 @@
 #include "zbx_rtc_constants.h"
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
-#include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
@@ -68,8 +67,7 @@
 #include "zbxsnmptrapper.h"
 
 #ifdef HAVE_OPENIPMI
-#include "../zabbix_server/ipmi/ipmi_manager.h"
-#include "../zabbix_server/ipmi/ipmi_poller.h"
+#include "zbxipmi.h"
 #endif
 
 const char	*progname = NULL;
@@ -1724,10 +1722,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
 				thread_args.args = &ipmimanager_args;
-				zbx_thread_start(ipmi_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_ipmi_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				zbx_thread_start(ipmi_poller_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_ipmi_poller_thread, &thread_args, &threads[i]);
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_TASKMANAGER:

@@ -17,18 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_ssh.h"
-#include "ssh_run.h"
-
-#if defined(HAVE_SSH2) || defined(HAVE_SSH)
+#include "zbxpoller.h"
 
 #include "zbxsysinfo.h"
+#include "telnet_run.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
-int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
-	const char	*port, *dns, *encoding, *ssh_options;
+	const char	*port, *encoding, *dns;
 
 	zbx_init_agent_request(&request);
 
@@ -38,15 +40,15 @@ int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESUL
 		goto out;
 	}
 
-#define SSH_RUN_KEY	"ssh.run"
-	if (0 != strcmp(SSH_RUN_KEY, get_rkey(&request)))
+#define TELNET_RUN_KEY	"telnet.run"
+	if (0 != strcmp(TELNET_RUN_KEY, get_rkey(&request)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 		goto out;
 	}
-#undef SSH_RUN_KEY
+#undef TELNET_RUN_KEY
 
-	if (5 < get_rparams_num(&request))
+	if (4 < get_rparams_num(&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto out;
@@ -58,10 +60,10 @@ int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESUL
 		item->interface.addr = item->interface.dns_orig;
 	}
 
-	if (NULL == item->interface.addr || '\0' == *(item->interface.addr))
+	if (NULL == item->interface.addr ||'\0' == *(item->interface.addr))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL,
-				"SSH checks must have IP parameter or the host interface to be specified."));
+				"Telnet checks must have IP parameter or the host interface to be specified."));
 		goto out;
 	}
 
@@ -74,16 +76,13 @@ int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESUL
 		}
 	}
 	else
-		item->interface.port = ZBX_DEFAULT_SSH_PORT;
+		item->interface.port = ZBX_DEFAULT_TELNET_PORT;
 
 	encoding = get_rparam(&request, 3);
-	ssh_options = get_rparam(&request, 4);
 
-	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options), item->timeout,
-			config_source_ip);
+	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding), item->timeout, config_source_ip);
 out:
 	zbx_free_agent_request(&request);
 
 	return ret;
 }
-#endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH) */
