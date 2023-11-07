@@ -134,6 +134,10 @@ class C64ImportConverter extends CConverter {
 		foreach ($items as &$item) {
 			$item += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
 
+			if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
+				$item['params'] = self::convertExpression($item['params']);
+			}
+
 			if ($item['type'] !== CXmlConstantName::HTTP_AGENT && $item['type'] !== CXmlConstantName::SCRIPT) {
 				unset($item['timeout']);
 			}
@@ -142,11 +146,6 @@ class C64ImportConverter extends CConverter {
 
 			if (array_key_exists('triggers', $item)) {
 				$item['triggers'] = self::convertTriggers($item['triggers']);
-			}
-
-			if (array_key_exists('type', $item) &&
-					$item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
-				$item['params'] = self::convertExpression($item['params']);
 			}
 		}
 		unset($item);
@@ -190,6 +189,11 @@ class C64ImportConverter extends CConverter {
 		foreach ($item_prototypes as &$item_prototype) {
 			$item_prototype += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
 
+			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
+					&& array_key_exists('params', $item_prototype)) {
+				$item_prototype['params'] = self::convertExpression($item_prototype['params']);
+			}
+
 			if ($item_prototype['type'] !== CXmlConstantName::HTTP_AGENT
 					&& $item_prototype['type'] !== CXmlConstantName::SCRIPT) {
 				unset($item_prototype['timeout']);
@@ -199,11 +203,6 @@ class C64ImportConverter extends CConverter {
 
 			if (array_key_exists('trigger_prototypes', $item_prototype)) {
 				$item_prototype['trigger_prototypes'] = self::convertTriggers($item_prototype['trigger_prototypes']);
-			}
-
-			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
-					&& array_key_exists('params', $item_prototype)) {
-				$item_prototype['params'] = self::convertExpression($item_prototype['params']);
 			}
 		}
 		unset($item_prototype);
