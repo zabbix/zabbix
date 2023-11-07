@@ -206,7 +206,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
-				(new CWidgetFieldRangeControl('legend_lines', _('Number of rows'),
+				(new CWidgetFieldRangeControl('legend_lines', _('Max number of rows'),
 					self::LEGEND_LINES_MIN, self::LEGEND_LINES_MAX
 				))
 					->setDefault(self::LEGEND_LINES_MIN)
