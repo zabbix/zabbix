@@ -54,6 +54,10 @@ class C64ImportConverter extends CConverter {
 			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
 		}
 
+		if (array_key_exists('media_types', $data['zabbix_export'])) {
+			$data['zabbix_export']['media_types'] = self::convertMediaTypes($data['zabbix_export']['media_types']);
+		}
+
 		return $data;
 	}
 
@@ -121,6 +125,31 @@ class C64ImportConverter extends CConverter {
 		unset($map);
 
 		return $maps;
+	}
+
+	/**
+	 * Convert media types.
+	 *
+	 * @param array $media_types
+	 *
+	 * @return array
+	 */
+	private static function convertMediaTypes(array $media_types): array {
+		foreach ($media_types as &$media_type) {
+			if (array_key_exists('message_templates', $media_type)) {
+				foreach ($media_type['message_templates'] as &$message_template) {
+					foreach (['subject', 'message'] as $field) {
+						if (array_key_exists($field, $message_template)) {
+							$message_template[$field] = self::convertExpression($message_template[$field]);
+						}
+					}
+				}
+				unset($message_template);
+			}
+		}
+		unset($media_type);
+
+		return $media_types;
 	}
 
 	/**
