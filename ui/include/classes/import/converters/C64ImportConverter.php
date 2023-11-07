@@ -145,7 +145,7 @@ class C64ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('type', $item) &&
-				$item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
+					$item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
 				$item['params'] = self::convertExpression($item['params']);
 			}
 		}
@@ -202,7 +202,7 @@ class C64ImportConverter extends CConverter {
 			}
 
 			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
-				&& array_key_exists('params', $item_prototype)) {
+					&& array_key_exists('params', $item_prototype)) {
 				$item_prototype['params'] = self::convertExpression($item_prototype['params']);
 			}
 		}
@@ -345,7 +345,7 @@ class C64ImportConverter extends CConverter {
 		foreach ($tokens as $token) {
 			foreach ($token['data']['parameters'] as $parameter) {
 				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
-					&& strpos($parameter['match'], '\\') !== false) {
+						&& strpos($parameter['match'], '\\') !== false) {
 					$convert_parameters[] = $parameter;
 				}
 			}
