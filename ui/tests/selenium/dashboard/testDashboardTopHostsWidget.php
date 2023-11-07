@@ -2947,7 +2947,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 */
 	public function testDashboardTopHostsWidget_TimePeriodFilter($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				CDataHelper::get('TopHostsWidget.dashboardids.Zoom filter check')
+				CDataHelper::get('TopHostsWidget.dashboardids.top_host_zoom_filter')
 		);
 		$dashboard = CDashboardElement::find()->one();
 
@@ -3008,7 +3008,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			' WHERE dashboard_pageid'.
 			' IN (SELECT dashboard_pageid'.
 				' FROM dashboard_page'.
-				' WHERE dashboardid='.CDataHelper::get('TopHostsWidget.dashboardids.Zoom filter check').
+				' WHERE dashboardid='.CDataHelper::get('TopHostsWidget.dashboardids.top_host_zoom_filter').
 			')'
 		);
 	}
