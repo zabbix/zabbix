@@ -208,6 +208,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Execute script?'
 					],
@@ -269,6 +270,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Execute script?'
 					],
@@ -523,6 +525,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -555,6 +558,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -595,6 +599,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Execute script?'
 					]
@@ -626,6 +631,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Execute script?'
 					]
@@ -670,6 +676,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -706,6 +713,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -729,6 +737,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -771,6 +780,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -826,6 +836,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -862,6 +873,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => false
 					]
 				]
@@ -965,6 +977,7 @@ class testFormAlertsScripts extends CWebTest {
 						'User group' => 'Zabbix administrators',
 						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
 						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => 'open url?'
 					]
@@ -1052,6 +1065,10 @@ class testFormAlertsScripts extends CWebTest {
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
 			$this->openScriptForm($id, false);
 
+			if(array_key_exists('Advanced configuration', $data['fields'])) {
+				$form->fill(['Advanced configuration' => true]);
+			}
+
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
@@ -1098,7 +1115,7 @@ class testFormAlertsScripts extends CWebTest {
 	private function checkConfirmation($data, $form) {
 		if (CTestArrayHelper::get($data['fields'], 'Enable confirmation') === false) {
 			$this->assertFalse($form->query('id:confirmation')->one()->isEnabled());
-			$this->assertFalse($form->query('id:test-confirmation')->one()->isEnabled());
+			$this->assertFalse($form->query('id:test_confirmation')->one()->isEnabled());
 		}
 
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
@@ -1453,6 +1470,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
 						'URL' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}'
 					],
@@ -1468,6 +1486,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
 						'URL' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}'
 					],
@@ -1484,6 +1503,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
 						'URL' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},{EVENT.STATUS},{EVENT.VALUE}',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},'.
 								'{EVENT.STATUS},{EVENT.VALUE}'
@@ -1500,6 +1520,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
 						'URL' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},{EVENT.STATUS},{EVENT.VALUE}',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},'.
 								'{EVENT.STATUS},{EVENT.VALUE}'
@@ -1517,6 +1538,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
 						'URL' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}'
 					],
@@ -1532,6 +1554,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
 						'URL' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}',
+						'Advanced configuration' => true,
 						'Enable confirmation' => true,
 						'Confirmation text' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}'
 					],
@@ -1572,6 +1595,7 @@ class testFormAlertsScripts extends CWebTest {
 		$this->assertEquals($data['resolved_macros'], $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$popup->close();
+//		sleep(60);
 
 		// Check that script link is not present in the context menu for other manual action.
 		$table->query('link', $without_script)->one()->click();
