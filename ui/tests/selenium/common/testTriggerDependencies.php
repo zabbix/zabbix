@@ -117,7 +117,7 @@ class testTriggerDependencies extends CWebTest {
 
 		// TODO: rewrite foreach part after ZBX-23623 fix. Example can be checked in task comments.
 		foreach ($data['result'] as $result) {
-			$table->findRow('Name', $trigger_name, true)->getColumn('Name')->query('link:'.$result)->exists();
+			$table->findRow('Name', $trigger_name, true)->getColumn('Name')->query('link', $result)->exists();
 		}
 
 		// Open just created/updated trigger and navigate to dependencies tab.
@@ -133,7 +133,7 @@ class testTriggerDependencies extends CWebTest {
 	 * Add trigger dependence - host trigger, simple trigger
 	 *
 	 * @param array $values			host/template name and trigger name.
-	 * @param string $button		Add or Add host trigger - button selector.
+	 * @param string $button		Add, Add host trigger or Add prototype - button text.
 	 */
 	protected function addDependence($values, $button) {
 		foreach ($values as $host_name => $triggers) {
@@ -150,8 +150,9 @@ class testTriggerDependencies extends CWebTest {
 
 			// Check-in (add) triggers for dependence and submit
 			foreach ($triggers as $trigger) {
-				$dialog->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($trigger)."]/../preceding-sibling::td/input")
-						->asCheckbox()->one()->check();
+				$dialog->asTable()->findRows(function ($row) use ($trigger) {
+					return $row->getColumn('Name')->query('tag:a')->one()->getText() === $trigger;
+				})->select();
 			}
 
 			$dialog->getFooter()->query('button:Select')->one()->click();
