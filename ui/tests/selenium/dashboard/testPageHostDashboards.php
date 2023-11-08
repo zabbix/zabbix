@@ -138,12 +138,6 @@ class testPageHostDashboards extends CWebTest {
 			$this->assertTrue($dashboard_navigation->query('xpath:.//button/span[text()="'.$status.' slideshow"]')->one()->isDisplayed());
 			$dashboard_navigation->query('xpath:.//button['.CXPathHelper::fromClass('btn-dashboard-toggle-slideshow').']')->one()->click();
 		}
-
-		// Check Slideshow button.
-		foreach (['class:btn-dashboard-toggle-slideshow', 'xpath://span[text()="Start slideshow"]',
-				'xpath://span[text()="Stop slideshow"]'] as $selector) {
-			$this->assertTrue($this->query($selector)->exists());
-		}
 	}
 
 	/**
