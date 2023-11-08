@@ -2774,6 +2774,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
 
 	zbx_init_agent_request(&request);
+	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
 
 	if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 	{
@@ -2795,8 +2796,6 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
-	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
-
 	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
@@ -2804,21 +2803,22 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
-	if ((0 == request.nparam || (1 == request.nparam && '\0' == *(request.params[0]))) &&
-			ZBX_SNMP_WALK == snmp_context->snmp_oid_type)
+	if (0 == request.nparam || (1 == request.nparam && '\0' == *(request.params[0])))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid parameters: at least one OID is expected."));
-		ret = CONFIG_ERROR;
-		goto out;
-	}
-	else if ((0 == request.nparam || (1 == request.nparam && '\0' == *(request.params[0]))) &&
-			ZBX_SNMP_GET == snmp_context->snmp_oid_type &&
-			SUCCEED != snmp_bulkwalk_parse_param(item->snmp_oid, &snmp_context->param_oids, error,
-			sizeof(error)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-		ret = CONFIG_ERROR;
-		goto out;
+		if (ZBX_SNMP_WALK == snmp_context->snmp_oid_type)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid parameters: at least one OID is expected."));
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+
+		if (SUCCEED != snmp_bulkwalk_parse_param(item->snmp_oid, &snmp_context->param_oids, error,
+				sizeof(error)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+			ret = CONFIG_ERROR;
+			goto out;
+		}
 	}
 	else if (SUCCEED != snmp_bulkwalk_parse_params(&request, &snmp_context->param_oids, error, sizeof(error)))
 	{
