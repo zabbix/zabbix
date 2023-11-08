@@ -33,7 +33,7 @@ window.widget_gauge_form = new class {
 	init({thresholds_colors}) {
 		this.#form = document.getElementById('widget-dialogue-form');
 
-		this.#form.addEventListener('change', (e) => this.#updateForm(e.target));
+		this.#form.addEventListener('change', () => this.#updateForm());
 
 		$thresholds_table.on('afterremove.dynamicRows', () => this.#updateForm());
 
@@ -57,7 +57,7 @@ window.widget_gauge_form = new class {
 		this.#updateForm();
 	}
 
-	#updateForm(trigger = null) {
+	#updateForm() {
 		const description_show = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
 		const value_show = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
 		const needle_show = document.getElementById(`show_${<?= Widget::SHOW_NEEDLE ?>}`);
@@ -74,12 +74,6 @@ window.widget_gauge_form = new class {
 		needle_show.disabled = (!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked;
 
 		scale_show.disabled = (!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked;
-
-		if ([description_show, value_show, needle_show, scale_show, value_arc_show].filter((checkbox) =>
-				checkbox.checked && !checkbox.disabled).length === 0) {
-			trigger.checked = true;
-			this.#updateForm(trigger);
-		}
 
 		for (const element of this.#form.querySelectorAll('.fields-group-description')) {
 			element.style.display = description_show.checked ? '' : 'none';

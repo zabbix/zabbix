@@ -5,6 +5,7 @@ go 1.19
 require (
 	git.zabbix.com/ap/plugin-support v1.2.2-0.20231019104243-5e35258ac957
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Microsoft/go-winio v0.6.1
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
 	github.com/chromedp/chromedp v0.8.7
@@ -21,6 +22,7 @@ require (
 	github.com/mediocregopher/radix/v3 v3.8.1
 	github.com/memcachier/mc/v3 v3.0.3
 	github.com/miekg/dns v1.1.50
+	github.com/google/go-cmp v0.4.0
 	github.com/omeid/go-yarn v0.0.1
 	github.com/sokurenko/go-netstat v1.0.0
 	golang.org/x/sys v0.11.0
