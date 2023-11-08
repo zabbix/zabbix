@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINFO_COMMON_IP_REVERSE_H
 #define ZABBIX_SYSINFO_COMMON_IP_REVERSE_H
 
-#include "config.h"
+#include "zbxcommon.h"
 
 int	zbx_ip_reverse(const char *src_ip, char **dst_ip, char **error);
 

@@ -105,7 +105,7 @@ int	zbx_inet_pton(int af, const char *src, void *dst)
 {
 	struct sockaddr_storage	ss;
 	int			size = sizeof(ss);
-	char			src_copy[INET6_ADDRSTRLEN+1];
+	char			src_copy[INET6_ADDRSTRLEN + 1];
 
 	memset(&ss, '\0', sizeof(ss));
 	ss.ss_family = af;

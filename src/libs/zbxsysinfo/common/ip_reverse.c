@@ -20,7 +20,6 @@
 #include "ip_reverse.h"
 
 #include "zbxip.h"
-#include "zbxstr.h"
 #include "zbxcomms.h"
 
 static void	reverse_digits(short unsigned int a, char s2[8])
@@ -38,13 +37,23 @@ static void	reverse_digits(short unsigned int a, char s2[8])
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Creates a new IP, from the provided one, that is suitabe for the  *
+ *          reverse DNS lookup (PTR record type). IP needs to be reversed and *
+ *          supplied in the special format for such queries. If the IP        *
+ *          already is in the acceptable format - this will be detected, and  *
+ *          new IP copy will not be changed, the returned IP will be          *
+ *          identical to the supplied one. Otherwise, this functions attempts *
+ *          to reverse and format it.                                         *
+ *                                                                            *
  * Parameters:                                                                *
  *         src_ip - [IN]                                                      *
- *         dst_ip - [OUT]                                                     *
+ *         dst_ip - [OUT] newly allocated string IP that is suitable to be    *
+ *                        supplied to reverse DNS lookup                      *
  *         error  - [OUT]                                                     *
  *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
- * allocates memory                                                           *
+ * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_ip_reverse(const char *src_ip, char **dst_ip, char **error)
