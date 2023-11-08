@@ -48,7 +48,7 @@
 int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
-	const char	*param2, *param3;
+	const char	*param2;
 
 	nparams = get_rparams_num(request);
 
@@ -271,6 +271,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 	else if (0 == strcmp(param1, "vps"))
 	{
 		zbx_vps_monitor_stats_t	stats;
+		const char		*param3;
 
 		zbx_vps_monitor_get_stats(&stats);
 
