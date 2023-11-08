@@ -869,7 +869,8 @@ class CItem extends CItemGeneral {
 
 				$upd_itemids[$i] = $item['itemid'];
 
-				if (array_key_exists('name', $upd_item)) {
+				if (array_key_exists('name', $upd_item)
+						&& in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
 					$upd_items_rtname[] = [
 						'values' => ['name_resolved' => $upd_item['name']],
 						'where' => ['itemid' => $item['itemid']]
