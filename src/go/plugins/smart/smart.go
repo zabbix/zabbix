@@ -43,6 +43,10 @@ const (
 	attributeDiscovery = "smart.attribute.discovery"
 )
 
+var impl Plugin
+
+var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
+
 // Options -
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -54,11 +58,9 @@ type Options struct {
 type Plugin struct {
 	plugin.Base
 	options Options
+	ctl     SmartController
 }
 
-var impl Plugin
-
-var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -69,6 +71,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
+
+	p.ctl = NewSmartCtl(p.Logger, p.options.Path, p.options.Timeout)
 }
 
 // Validate -

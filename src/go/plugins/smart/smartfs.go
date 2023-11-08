@@ -260,13 +260,13 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 }
 
 // executeSingle returns device data for single device from smartctl based on provided path.
-func (p *Plugin) executeSingle(path string) (device []byte, err error) {
-	device, err = p.executeSmartctl(fmt.Sprintf("-a %s -j", path), false)
+func (p *Plugin) executeSingle(path string) ([]byte, error) {
+	out, err := p.ctl.Execute("-a", path, "-j")
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute smartctl: %w.", err)
 	}
 
-	return
+	return out, nil
 }
 
 // executeBase executed runners for basic devices retrieved from smartctl.
@@ -377,18 +377,19 @@ func (r *runner) waitForRaidExecution(done chan struct{}) {
 // Currently supported versions are 7.1 and above.
 // It returns an error if there is an issue with getting or parsing results from smartctl.
 func (p *Plugin) checkVersion() error {
-	var smartctl smartctl
-
 	if !versionCheckNeeded() {
 		return nil
 	}
 
-	info, err := p.executeSmartctl("-j -V", true)
+	out, err := p.ctl.Execute("-j", "-V")
 	if err != nil {
 		return fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 	}
 
-	if err = json.Unmarshal(info, &smartctl); err != nil {
+	var smartctl smartctl
+
+	err = json.Unmarshal(out, &smartctl)
+	if err != nil {
 		return zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
@@ -455,7 +456,7 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 			return
 		}
 
-		devices, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j", name), false)
+		devices, err := r.plugin.ctl.Execute("-a", name, "-j")
 		if err != nil {
 			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 			return
@@ -527,7 +528,7 @@ runner:
 				continue runner
 			}
 
-			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
+			device, err := r.plugin.ctl.Execute("-a", name, "-j")
 			if err != nil {
 				r.plugin.Tracef(
 					"stopped looking for RAID devices of %s type, err: %s",
@@ -608,7 +609,7 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 			continue
 		}
 
-		device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
+		device, err := r.plugin.ctl.Execute("-a", name, "-j")
 		if err != nil {
 			r.plugin.Tracef(
 				"failed to get megaraid device with name %s, %s", name, err.Error(),
@@ -737,12 +738,12 @@ func (dp *deviceParser) checkErr() (err error) {
 // Returns a separate slice for both normal and raid devices.
 // It returns an error if there is an issue with getting or parsing results from smartctl.
 func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
-	basicTmp, err := p.scanDevices("--scan -j")
+	basicTmp, err := p.scanDevices("--scan", "-j")
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %w.", err)
 	}
 
-	raidTmp, err := p.scanDevices("--scan -d sat -j")
+	raidTmp, err := p.scanDevices("--scan", "-d", "sat", "-j")
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %w.", err)
 	}
@@ -783,39 +784,27 @@ loop:
 // It parses the smartctl data into a slice with deviceInfo.
 // The data is sorted based on device name in alphabet order.
 // It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) scanDevices(args string) ([]deviceInfo, error) {
-	var d devices
-
-	devices, err := p.executeSmartctl(args, false)
+func (p *Plugin) scanDevices(args ...string) ([]deviceInfo, error) {
+	out, err := p.ctl.Execute(args...)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = json.Unmarshal(devices, &d); err != nil {
+	var d devices
+
+	err = json.Unmarshal(out, &d)
+	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
-	var names []string
-	for _, info := range d.Info {
-		names = append(names, info.InfoName)
-	}
+	sort.SliceStable(
+		d.Info,
+		func(i, j int) bool {
+			return d.Info[i].Name < d.Info[j].Name
+		},
+	)
 
-	sort.Strings(names)
-
-	var out []deviceInfo
-
-names:
-	for _, name := range names {
-		for _, info := range d.Info {
-			if name == info.InfoName {
-				out = append(out, info)
-
-				continue names
-			}
-		}
-	}
-
-	return out, nil
+	return d.Info, nil
 }
 
 func init() {
