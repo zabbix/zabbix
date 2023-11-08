@@ -3194,7 +3194,7 @@ static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 
 	if (FAIL == zbx_variant_convert(arg, ZBX_VARIANT_STR))
 	{
-		*error = zbx_dsprintf(*error, "failed to convert variant value of type '%s' to string", zbx_variant_type_desc(arg));
+		*error = zbx_dsprintf(*error, "unknown exception of type '%s'", zbx_variant_type_desc(arg));
 		zabbix_log(LOG_LEVEL_CRIT, *error);
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
