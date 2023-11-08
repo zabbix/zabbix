@@ -18,11 +18,11 @@ require (
 	github.com/goburrow/modbus v0.1.0
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.34.0
+	github.com/google/go-cmp v0.5.9
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/mediocregopher/radix/v3 v3.8.1
 	github.com/memcachier/mc/v3 v3.0.3
 	github.com/miekg/dns v1.1.50
-	github.com/google/go-cmp v0.4.0
 	github.com/omeid/go-yarn v0.0.1
 	github.com/sokurenko/go-netstat v1.0.0
 	golang.org/x/sys v0.11.0
