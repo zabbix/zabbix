@@ -1,5 +1,4 @@
 <?php
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -23,6 +22,8 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
+
 
 /**
  * @backup dashboard
@@ -31,7 +32,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @dataSource WebScenarios, AllItemValueTypes
  */
-class testDashboardItemValueWidget extends CWebTest {
+class testDashboardItemValueWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -282,7 +283,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		];
 
 		// Merge all Advanced fields into one array.
-		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background colour']);
+		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background color']);
 
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);
@@ -927,7 +928,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '99',
 						'id:units_bold' => true,
-						'Background colour' => 'FFAAAA',
+						'Background color' => 'FFAAAA',
 						'xpath://button[@id="lbl_desc_color"]/..' => 'AABBCC',
 						'xpath://button[@id="lbl_value_color"]/..' => 'CC11CC',
 						'xpath://button[@id="lbl_units_color"]/..' => 'BBCC55',
@@ -1427,20 +1428,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	 * Test function for assuring that binary items are not available in Item Value widget.
 	 */
 	public function testDashboardItemValueWidget_CheckAvailableItems() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dialog =  CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
-		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
-		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
-		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-
-
-		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
-
-
-		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill('Host for all item value types');
-		$table->waitUntilReloaded();
-		$this->assertTableDataColumn(['Character item', 'Float item', 'Log item',
-				'Text item', 'Unsigned item', 'Unsigned_dependent item']
-		);
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+		$this->checkAvailableItems($url, 'Item value');
 	}
 }

@@ -43,6 +43,9 @@ class testWidgets extends CWebTest {
 			$dialog->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
 			$dialog->query('button:Select')->one()->waitUntilClickable()->click();
 		}
+		elseif ($widget === 'Item value') {
+			$dialog->query('button:Select')->one()->waitUntilClickable()->click();
+		}
 
 		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$host_item_dialog->query('button:Select')->one()->waitUntilClickable()->click();
