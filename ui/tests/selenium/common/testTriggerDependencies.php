@@ -76,7 +76,6 @@ class testTriggerDependencies extends CWebTest {
 		// Dependencies buttons.
 		$trigger_dependencies = [
 			'dependencies' => 'Add',
-			'host_dependencies' => 'Add host trigger',
 			'prototype_dependencies' => 'Add prototype'
 		];
 
@@ -140,7 +139,7 @@ class testTriggerDependencies extends CWebTest {
 		$this->query('name:triggersForm')->asForm()->one()->selectTab('Dependencies');
 
 		// Take all hosts->triggers from Name column and check that created/updated hosts->trigger exists.
-		$this->assertEquals($data['result'], $this->getTableColumnData('Name', 'id:dependency-table'));
+		$this->assertEquals($data['result'], $this->getTableColumnData('Name', 'id:dependenciesTab'));
 	}
 
 	/**

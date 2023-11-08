@@ -62,7 +62,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$template_triggers = CDataHelper::call('trigger.create', [
 			[
 				'description' => 'trigger linked',
-				'expression' => 'last(/Template that linked to host/everything_2)=0'
+				'expression' => '{Template that linked to host:everything_2.last()}=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $template_triggers);
@@ -83,11 +83,11 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$trigger_prototype = CDataHelper::call('triggerprototype.create', [
 			[
 				'description' => 'trigger prototype linked{#KEY}',
-				'expression' => 'last(/Template that linked to host/linking_prot_[{#KEY}])=0'
+				'expression' => '{Template that linked to host:linking_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'trigger prototype linked update{#KEY}',
-				'expression' => 'last(/Template that linked to host/linking_prot_[{#KEY}])=0'
+				'expression' => '{Template that linked to host:linking_prot_[{#KEY}].last()}=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $trigger_prototype);
@@ -95,6 +95,16 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$host_result = CDataHelper::createHosts([
 			[
 				'host' => 'Host with linked template',
+				'interfaces' => [
+					[
+						'type' => 1,
+						'main' => 1,
+						'useip' => 1,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
 				'templates' => ['templateid' => $templateids['Template that linked to host']],
 				'groups' => [['groupid' => 4]],
 				'items' => [
@@ -117,6 +127,16 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			],
 			[
 				'host' => 'Host with everything',
+				'interfaces' => [
+					[
+						'type' => 1,
+						'main' => 1,
+						'useip' => 1,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
 				'templates' => ['templateid' => $templateids['Template that linked to host']],
 				'groups' => [['groupid' => 4]],
 				'items' => [
@@ -144,23 +164,23 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$host_triggers = CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Host trigger update',
-				'expression' => 'last(/Host with everything/host_item_1)=0'
+				'expression' => '{Host with everything:host_item_1.last()}=0'
 			],
 			[
 				'description' => 'Host trigger everything',
-				'expression' => 'last(/Host with everything/host_item_1)=0'
+				'expression' => '{Host with everything:host_item_1.last()}=0'
 			],
 			[
 				'description' => 'Host trigger everything 2',
-				'expression' => 'last(/Host with everything/host_item_1)=0'
+				'expression' => '{Host with everything:host_item_1.last()}=0'
 			],
 			[
 				'description' => 'Host trigger 2',
-				'expression' => 'last(/Host with linked template/host_item_2)=0'
+				'expression' => '{Host with linked template:host_item_2.last()}=0'
 			],
 			[
 				'description' => 'Host trigger with dependence',
-				'expression' => 'last(/Host with everything/host_item_1)=0'
+				'expression' => '{Host with everything:host_item_1.last()}=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $host_triggers);
@@ -198,23 +218,23 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$host_trigger_prototype = CDataHelper::call('triggerprototype.create', [
 			[
 				'description' => 'Host trigger prototype update{#KEY}',
-				'expression' => 'last(/Host with everything/host_everything_prot_[{#KEY}])=0'
+				'expression' => '{Host with everything:host_everything_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'Host trigger prot simple{#KEY}',
-				'expression' => 'last(/Host with everything/host_everything_prot_[{#KEY}])=0'
+				'expression' => '{Host with everything:host_everything_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'Host trigger prot simple_2{#KEY}',
-				'expression' => 'last(/Host with everything/host_everything_prot_[{#KEY}])=0'
+				'expression' => '{Host with everything:host_everything_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'Host trigger prot for linked{#KEY}',
-				'expression' => 'last(/Host with linked template/host_linking_prot_[{#KEY}])=0'
+				'expression' => '{Host with linked template:host_linking_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'Host trigger prot for linked update{#KEY}',
-				'expression' => 'last(/Host with linked template/host_linking_prot_[{#KEY}])=0'
+				'expression' => '{Host with linked template:host_linking_prot_[{#KEY}].last()}=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $host_trigger_prototype);
@@ -305,7 +325,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$this->page->waitUntilReady();
 
 		// Creating new trigger - expression is mandatory.
-		$this->triggerCreateUpdate($data, 'Trigger added', 'last(/Host with everything/host_item_1)=0');
+		$this->triggerCreateUpdate($data, 'Trigger added', '{Host with everything:host_item_1.last()}=0');
 	}
 
 	public static function getTriggerUpdateData() {
@@ -318,9 +338,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 					'dependencies' => [
 						'Host with everything' => ['Host trigger update']
 					],
-					'error_message' => 'Trigger "Host trigger update" cannot depend on the trigger'.
-						' "Host trigger update", because a circular linkage'.
-						' ("Host trigger update" -> "Host trigger update") would occur.'
+					'error_message' => 'Cannot create dependency on trigger itself.'
 				]
 			],
 			// #1 dependencies on trigger that depends on updated trigger.
@@ -331,10 +349,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 					'dependencies' => [
 						'Host with everything' => ['Host trigger with dependence']
 					],
-					'error_message' => 'Trigger "Host trigger update" cannot depend on the trigger'.
-						' "Host trigger with dependence", because a circular linkage'.
-						' ("Host trigger with dependence" -> "Host trigger update" -> "Host trigger with dependence")'.
-						' would occur.'
+					'error_message' => 'Cannot create circular dependencies.'
 				]
 			]
 		];
@@ -363,8 +378,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 					'dependencies' => [
 						'Host with everything' => ['trigger linked']
 					],
-					'error_message' => 'Trigger "trigger linked" cannot depend on the trigger "trigger linked", because'.
-						' a circular linkage ("trigger linked" -> "trigger linked") would occur.'
+					'error_message' => 'Cannot create dependency on trigger itself.'
 				]
 			]
 		];
@@ -447,7 +461,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 
 		// Creating new trigger prototype - expression is mandatory.
 		$this->triggerCreateUpdate($data, 'Trigger prototype added',
-				'last(/Host with everything/host_everything_prot_[{#KEY}])=0'
+				'{Host with everything:host_everything_prot_[{#KEY}].last()}=0'
 		);
 	}
 
@@ -461,9 +475,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 					'prototype_dependencies' => [
 						'Host trigger prototype update{#KEY}'
 					],
-					'error_message' => 'Trigger prototype "Host trigger prototype update{#KEY}" cannot depend on the'.
-						' trigger prototype "Host trigger prototype update{#KEY}", because a circular linkage ("Host'.
-						' trigger prototype update{#KEY}" -> "Host trigger prototype update{#KEY}") would occur.'
+					'error_message' => 'Cannot create dependency on trigger prototype itself.'
 				]
 			]
 		];
@@ -495,9 +507,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 					'prototype_dependencies' => [
 						'trigger prototype linked update{#KEY}'
 					],
-					'error_message' => 'Trigger prototype "trigger prototype linked update{#KEY}" cannot depend on the'.
-						' trigger prototype "trigger prototype linked update{#KEY}", because a circular linkage'.
-						' ("trigger prototype linked update{#KEY}" -> "trigger prototype linked update{#KEY}") would occur.'
+					'error_message' => 'Cannot create dependency on trigger prototype itself.'
 				]
 			],
 			// #1 dependencies on one correct trigger prototype.

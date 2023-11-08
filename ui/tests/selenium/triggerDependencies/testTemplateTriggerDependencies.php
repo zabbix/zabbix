@@ -128,35 +128,35 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		$template_triggers = CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Template trigger update',
-				'expression' => 'last(/Template with everything/everything)=0'
+				'expression' => '{Template with everything:everything.last()}=0'
 			],
 			[
 				'description' => 'trigger simple',
-				'expression' => 'last(/Template with everything/everything)=0'
+				'expression' => '{Template with everything:everything.last()}=0'
 			],
 			[
 				'description' => 'trigger simple_2',
-				'expression' => 'last(/Template with everything/everything)=0'
+				'expression' => '{Template with everything:everything.last()}=0'
 			],
 			[
 				'description' => 'trigger linked',
-				'expression' => 'last(/Template that linked to host/everything_2)=0'
+				'expression' => '{Template that linked to host:everything_2.last()}=0'
 			],
 			[
 				'description' => 'trigger template linked',
-				'expression' => 'last(/Template that linked to template/linked_temp)=0'
+				'expression' => '{Template that linked to template:linked_temp.last()}=0'
 			],
 			[
 				'description' => 'trigger template linked update',
-				'expression' => 'last(/Template that linked to template/linked_temp)=0'
+				'expression' => '{Template that linked to template:linked_temp.last()}=0'
 			],
 			[
 				'description' => 'Template that depends on trigger',
-				'expression' => 'last(/Template with everything/everything)=0'
+				'expression' => '{Template with everything:everything.last()}=0'
 			],
 			[
 				'description' => 'trigger that depends on linked trigger',
-				'expression' => 'last(/Template that linked to template/linked_temp)=0'
+				'expression' => '{Template that linked to template:linked_temp.last()}=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $template_triggers);
@@ -198,19 +198,19 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		$trigger_prototype = CDataHelper::call('triggerprototype.create', [
 			[
 				'description' => 'Template trigger prototype update{#KEY}',
-				'expression' => 'last(/Template with everything/everything_prot_[{#KEY}])=0'
+				'expression' => '{Template with everything:everything_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'trigger prototype simple{#KEY}',
-				'expression' => 'last(/Template with everything/everything_prot_[{#KEY}])=0'
+				'expression' => '{Template with everything:everything_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'trigger prototype template{#KEY}',
-				'expression' => 'last(/Template that linked to template/template_prot_[{#KEY}])=0'
+				'expression' => '{Template that linked to template:template_prot_[{#KEY}].last()}=0'
 			],
 			[
 				'description' => 'trigger prototype template update{#KEY}',
-				'expression' => 'last(/Template that linked to template/template_prot_[{#KEY}])=0'
+				'expression' => '{Template that linked to template:template_prot_[{#KEY}].last()}=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $trigger_prototype);
@@ -219,6 +219,16 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		$host_result = CDataHelper::createHosts([
 			[
 				'host' => 'Host with everything',
+				'interfaces' => [
+					[
+						'type' => 1,
+						'main' => 1,
+						'useip' => 1,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
 				'templates' => ['templateid' => self::$templateids['Template that linked to host']],
 				'groups' => [['groupid' => 4]],
 				'items' => [
@@ -247,11 +257,11 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		$host_triggers = CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Host trigger everything',
-				'expression' => 'last(/Host with everything/host_item_1)=0'
+				'expression' => '{Host with everything:host_item_1.last()}=0'
 			],
 			[
 				'description' => 'Host trigger everything 2',
-				'expression' => 'last(/Host with everything/host_item_1)=0'
+				'expression' => '{Host with everything:host_item_1.last()}=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $host_triggers);
@@ -268,24 +278,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $host_item_prototype);
-	}
-
-	public static function getTriggerCreateBadData() {
-		return [
-			// #0 dependencies on parent templates trigger.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Depends on linked trigger',
-					'dependencies' => [
-						'Template that linked to template' => ['trigger template linked']
-					],
-					'error_message' => 'Trigger "Depends on linked trigger" cannot depend on the trigger "trigger'.
-						' template linked" from the template "Template that linked to template", because dependencies'.
-						' on triggers from the parent template are not allowed.'
-				]
-			]
-		];
 	}
 
 	public static function getTriggerCreateData() {
@@ -341,32 +333,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					]
 				]
 			],
-			// #4 dependencies on hosts trigger.
-			[
-				[
-					'name' => 'Depends on hosts trigger',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
-					'result' => [
-						'Host with everything: Host trigger everything'
-					]
-				]
-			],
-			// #5 dependencies on two hosts trigger.
-			[
-				[
-					'name' => 'Depends on two hosts trigger',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything', 'Host trigger everything 2']
-					],
-					'result' => [
-						'Host with everything: Host trigger everything',
-						'Host with everything: Host trigger everything 2'
-					]
-				]
-			],
-			// #6 dependencies on linked trigger from another template.
+			// #4 dependencies on linked trigger from another template.
 			[
 				[
 					'name' => 'Depends on trigger that linked from another template',
@@ -378,23 +345,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					]
 				]
 			],
-			// #7 dependencies on trigger from template and trigger from host.
-			[
-				[
-					'name' => 'Depends on trigger from template and host',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
-					'dependencies' => [
-						'Template with everything' => ['trigger simple']
-					],
-					'result' => [
-						'Host with everything: Host trigger everything',
-						'Template with everything: trigger simple'
-					]
-				]
-			],
-			// #8 dependencies on trigger that linked to this template.
+			// #5 dependencies on trigger that linked to this template.
 			[
 				[
 					'name' => 'Depends on trigger that linked to this template',
@@ -412,7 +363,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 	/**
 	 * Create trigger on template with dependencies.
 	 *
-	 * @dataProvider getTriggerCreateBadData
 	 * @dataProvider getTriggerCreateData
 	 */
 	public function testTemplateTriggerDependencies_TriggerCreate($data) {
@@ -423,7 +373,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		$this->page->waitUntilReady();
 
 		// Creating new template trigger - expression is mandatory.
-		$this->triggerCreateUpdate($data, 'Trigger added', 'last(/Template with everything/everything)=0',
+		$this->triggerCreateUpdate($data, 'Trigger added', '{Template with everything:everything.last()}=0',
 				'Cannot add trigger'
 		);
 	}
@@ -438,24 +388,10 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'dependencies' => [
 						'Template with everything' => ['Template trigger update']
 					],
-					'error_message' => 'Trigger "Template trigger update" cannot depend on the trigger "Template trigger update",'.
-						' because a circular linkage ("Template trigger update" -> "Template trigger update") would occur.'
+					'error_message' => 'Cannot create dependency on trigger itself.'
 				]
 			],
-			// #1 dependencies on parent templates trigger.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Depends on linked trigger',
-					'dependencies' => [
-						'Template that linked to template' => ['trigger template linked']
-					],
-					'error_message' => 'Trigger "Template trigger update" cannot depend on the trigger "trigger'.
-						' template linked" from the template "Template that linked to template", because dependencies'.
-						' on triggers from the parent template are not allowed.'
-				]
-			],
-			// #2 dependencies on dependent trigger.
+			// #1 dependencies on dependent trigger.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -463,9 +399,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'dependencies' => [
 						'Template with everything' => ['Template that depends on trigger']
 					],
-					'error_message' => 'Trigger "Template trigger update" cannot depend on the trigger "Template that'.
-						' depends on trigger", because a circular linkage ("Template that depends on trigger" ->'.
-						' "Template trigger update" -> "Template that depends on trigger") would occur.'
+					'error_message' => 'Cannot create circular dependencies.'
 				]
 			]
 		];
@@ -495,9 +429,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'dependencies' => [
 						'Template with everything' => ['trigger template linked update']
 					],
-					'error_message' => 'Trigger "trigger template linked update" cannot depend on the trigger'.
-						' "trigger template linked update", because a circular linkage ("trigger template'.
-						' linked update" -> "trigger template linked update") would occur.'
+					'error_message' => 'Cannot create dependency on trigger itself.'
 				]
 			],
 			// #1 depends on linked trigger that already depends on this trigger.
@@ -507,23 +439,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'dependencies' => [
 						'Template with everything' => ['trigger that depends on linked trigger']
 					],
-					'error_message' => 'Trigger "trigger template linked update" cannot depend on the trigger'.
-						' "trigger that depends on linked trigger", because a circular linkage ("trigger that depends'.
-						' on linked trigger" -> "trigger template linked update" -> "trigger that depends on linked'.
-						' trigger") would occur.'
-				]
-			],
-			// #2 dependencies on parent templates trigger.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Depends on linked trigger',
-					'dependencies' => [
-						'Template that linked to template' => ['trigger template linked']
-					],
-					'error_message' => 'Trigger "trigger template linked update" cannot depend on the trigger "trigger'.
-						' template linked" from the template "Template that linked to template", because dependencies'.
-						' on triggers from the parent template are not allowed.'
+					'error_message' => 'Cannot create circular dependencies.'
 				]
 			]
 		];
@@ -549,10 +465,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			// #0 dependencies on trigger from template, host and trigger prototype.
 			[
 				[
-					'name' => 'Depends on trigger, hosts trigger and prototype_{#KEY}',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
+					'name' => 'Depends on trigger and prototype_{#KEY}',
 					'dependencies' => [
 						'Template with everything' => ['trigger simple']
 					],
@@ -560,7 +473,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						'trigger prototype simple{#KEY}'
 					],
 					'result' => [
-						'Host with everything: Host trigger everything',
 						'Template with everything: trigger prototype simple{#KEY}',
 						'Template with everything: trigger simple'
 					]
@@ -596,7 +508,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 
 		// Creating new template trigger prototype - expression is mandatory.
 		$this->triggerCreateUpdate($data, 'Trigger prototype added',
-				'last(/Template with everything/everything_prot_[{#KEY}])=0'
+				'{Template with everything:everything_prot_[{#KEY}].last()}=0'
 		);
 	}
 
@@ -610,9 +522,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'prototype_dependencies' => [
 						'Template trigger prototype update{#KEY}'
 					],
-					'error_message' => 'Trigger prototype "Template trigger prototype update{#KEY}" cannot depend on the trigger'.
-						' prototype "Template trigger prototype update{#KEY}", because a circular linkage ("Template'.
-						' trigger prototype update{#KEY}" -> "Template trigger prototype update{#KEY}") would occur.'
+					'error_message' => 'Cannot create dependency on trigger prototype itself'
 				]
 			]
 		];
@@ -644,17 +554,12 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					'prototype_dependencies' => [
 						'trigger prototype template update{#KEY}'
 					],
-					'error_message' => 'Trigger prototype "trigger prototype template update{#KEY}" cannot depend on the trigger'.
-						' prototype "trigger prototype template update{#KEY}", because a circular linkage'.
-						' ("trigger prototype template update{#KEY}" -> "trigger prototype template update{#KEY}") would occur.'
+					'error_message' => 'Cannot create dependency on trigger prototype itself.'
 				]
 			],
-			// #1 depends on trigger, host trigger, prototype trigger.
+			// #1 depends on trigger and prototype trigger.
 			[
 				[
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
 					'dependencies' => [
 						'Template with everything' => ['trigger simple']
 					],
@@ -662,7 +567,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						'trigger prototype template{#KEY}'
 					],
 					'result' => [
-						'Host with everything: Host trigger everything',
 						'Template with everything: trigger prototype template{#KEY}',
 						'Template with everything: trigger simple'
 					]
