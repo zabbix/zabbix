@@ -116,18 +116,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'searchByAny' => true
 		]);
 
+		if (!$items) {
+			$cells['no_data'] = true;
+
+			return $cells;
+		}
+
 		foreach ($items as &$item) {
 			$item['hostname'] = $item['hosts'][0]['name'];
 		}
 		unset($item);
 
 		CArrayHelper::sort($items, ['hostname', 'name']);
-
-		if (!$items) {
-			$cells['no_data'] = true;
-
-			return $cells;
-		}
 
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$history = Manager::History()->getLastValues($items, 1, $history_period);
