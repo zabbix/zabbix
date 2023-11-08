@@ -1264,17 +1264,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve supported macros used in map element label as well as in URL names and values.
 	 *
-	 * @param array        $selements[]
-	 * @param int          $selements[]['elementtype']
-	 * @param int          $selements[]['elementsubtype']
-	 * @param string       $selements[]['label']
-	 * @param array        $selements[]['urls']
-	 * @param string       $selements[]['urls'][]['name']
-	 * @param string       $selements[]['urls'][]['url']
-	 * @param int | array  $selements[]['elementid']
-	 * @param array        $options
-	 * @param bool         $options[resolve_element_label]  Resolve macros in map element label.
-	 * @param bool         $options[resolve_element_urls]   Resolve macros in map element url name and value.
+	 * @param array  $selements[]
+	 * @param int    $selements[]['elementtype']
+	 * @param int    $selements[]['elementsubtype']
+	 * @param array  $selements[]['elemments']
+	 * @param string $selements[]['label']
+	 * @param array  $selements[]['urls']
+	 * @param string $selements[]['urls'][]['name']
+	 * @param string $selements[]['urls'][]['url']
+	 * @param array  $options
+	 * @param bool   $options[resolve_element_label]  Resolve macros in map element label.
+	 * @param bool   $options[resolve_element_urls]   Resolve macros in map element url name and value.
 	 *
 	 * @return array
 	 */
