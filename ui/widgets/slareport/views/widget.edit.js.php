@@ -38,7 +38,7 @@ window.widget_slareport_form = new class {
 			title: <?= json_encode(_('Service')) ?>,
 			exclude_serviceids,
 			multiple: 0
-		}, {dialogueid: 'services'});
+		}, {dialogueid: 'services', dialogue_class: 'modal-popup-generic'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
