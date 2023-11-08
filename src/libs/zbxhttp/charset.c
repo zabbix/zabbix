@@ -170,7 +170,9 @@ static size_t	parse_html_attributes(const char *data, char **content, char **cha
 			if (0 == str_loc_cmp(data, &loc_value, "\"content-type\"",
 					ZBX_CONST_STRLEN("\"content-type\"")) ||
 					0 == str_loc_cmp(data, &loc_value, "content-type",
-					ZBX_CONST_STRLEN("content-type")))
+					ZBX_CONST_STRLEN("content-type")) ||
+					0 == str_loc_cmp(data, &loc_value, "'content-type'",
+					ZBX_CONST_STRLEN("'content-type'")))
 			{
 				http_equiv_content_found = 1;
 			}
@@ -183,7 +185,7 @@ static size_t	parse_html_attributes(const char *data, char **content, char **cha
 		else if (0 == str_loc_cmp(data, &loc_name, "charset", ZBX_CONST_STRLEN("charset")))
 		{
 			*charset = str_loc_dup(data, &loc_value);
-			zbx_lrtrim(*charset, " \"");
+			zbx_lrtrim(*charset, " \"'");
 			return pos;
 		}
 	}
@@ -191,7 +193,7 @@ static size_t	parse_html_attributes(const char *data, char **content, char **cha
 	if (1 == http_equiv_content_found && 1 == content_found)
 	{
 		*content = str_loc_dup(data, &loc_content);
-		zbx_lrtrim(*content, " \"");
+		zbx_lrtrim(*content, " \"'");
 	}
 
 	return pos;

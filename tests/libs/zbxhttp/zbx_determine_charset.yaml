@@ -2,138 +2,117 @@
 test case: ISO-8859-1
 in:
   encoding: 'text/html; charset=ISO-8859-1'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - "¡±ÁÑáñÿ\x00"
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
 test case: ISO-8859-1 without ;
 in:
   encoding: 'text/html charset=ISO-8859-1'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'WINDOWS-1252'
   return: SUCCEED
 ---
 test case: ISO-8859-1 charset with spaces
 in:
   encoding: ' text/html ; charset = ISO-8859-1 '
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
 test case: ISO-8859-1 charset empty
 in:
   encoding: 'text/html;'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'WINDOWS-1252'
   return: SUCCEED
 ---
 test case: ISO-8859-1 charset special symbol
 in:
   encoding: 'text/html;=ISO-8859-1'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'WINDOWS-1252'
   return: SUCCEED
 ---
 test case: ISO-8859-1 charset special symbol
 in:
   encoding: 'text/html;=ISO-8859-1'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'WINDOWS-1252'
   return: SUCCEED
 ---
 test case: ISO-8859-1 quoted
 in:
   encoding: 'text/html; charset="ISO-8859-1"'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
 test case: ISO-8859-1 quoted/unquote
 in:
   encoding: 'text/html; charset="\"ISO-8859-1\""'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: '"ISO-8859-1"'
   return: SUCCEED
 ---
 test case: ISO-8859-1 quoted/unquote last
 in:
   encoding: 'text/html; charset="ISO-8859-1\\"'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'ISO-8859-1\'
   return: SUCCEED
 ---
 test case: ISO-8859-1 quoted but no matching quote
 in:
   encoding: 'text/html; charset="ISO-8859-1'
-  buffer_length: 7
   buffer: &buffer
-    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF'
+    - '\xA1\xB1\xC1\xD1\xE1\xF1\xFF\x00'
 out:
-  expected_result_buffer_length: 14
   expected_result_buffer:
-    - '¡±ÁÑáñÿ'
+    - '¡±ÁÑáñÿ\x00'
   encoding: 'WINDOWS-1252'
   return: SUCCEED
 ### html
 ---
-test case: ISO-8859-1
+test case: ISO-8859-1 charset
 in:
   encoding: 'text/html'
-  buffer_length: 279
   buffer: &buffer
     - '<!DOCTYPE html>
 <html>
@@ -151,9 +130,8 @@ in:
 The content of the document......\xA1\xB1\xC1\xD1\xE1\xF1\xFF
 
 </body>
-</html>'
+</html>\x00'
 out:
-  expected_result_buffer_length: 286
   expected_result_buffer:
     - '<!DOCTYPE html>
 <html>
@@ -171,14 +149,13 @@ out:
 The content of the document......¡±ÁÑáñÿ
 
 </body>
-</html>'
+</html>\x00'
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
-test case: ISO-8859-1 http-equiv
+test case: ISO-8859-1 http-equiv content
 in:
   encoding: 'text/html'
-  buffer_length: 322
   buffer: &buffer
     - '<!DOCTYPE html>
 <html>
@@ -196,9 +173,8 @@ in:
 The content of the document......\xA1\xB1\xC1\xD1\xE1\xF1\xFF
 
 </body>
-</html>'
+</html>\x00'
 out:
-  expected_result_buffer_length: 329
   expected_result_buffer:
     - '<!DOCTYPE html>
 <html>
@@ -216,40 +192,143 @@ out:
 The content of the document......¡±ÁÑáñÿ
 
 </body>
-</html>'
+</html>\x00'
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
 test case: meta cut off
 in:
   encoding: 'text/html'
-  buffer_length: 57
   buffer: &buffer
     - '<!DOCTYPE html>
 <html>
 <head>
   <title>zabbix</title>
-  <meta'
+  <meta\x00'
 out:
-  expected_result_buffer_length: 57
-  expected_result_buffer:
+  expected_result_buffer: *buffer
+  encoding: 'UTF-8'
+  return: SUCCEED
+---
+test case: meta cut off attribute name
+in:
+  encoding: 'text/html'
+  buffer: &buffer
     - '<!DOCTYPE html>
 <html>
 <head>
   <title>zabbix</title>
-  <meta'
+  <meta content\x00'
+out:
+  expected_result_buffer: *buffer
   encoding: 'UTF-8'
+  return: SUCCEED
+---
+test case: meta cut off attribute name after equal
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content=\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'UTF-8'
+  return: SUCCEED
+---
+test case: meta attribute name without value
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content http-equiv="foo" charset=iso-8859-1\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value in double quote
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value in double quote not terminated
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'UTF-8'
+  return: SUCCEED
+---
+test case: meta attribute value in single quote
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - "<!DOCTYPE html>\n
+<html>\n
+<head>\n
+  <title>zabbix</title>\n
+  <meta content='text/html; charset=ISO-8859-1' http-equiv='Content-Type'\x00"
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value in single quote not terminated
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - "<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content='text/html; charset=ISO-8859-1' http-equiv='Content-Type\x00"
+out:
+  expected_result_buffer: *buffer
+  encoding: 'UTF-8'
+  return: SUCCEED
+---
+test case: meta attribute value unquoted
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv=Content-Type\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
 test case: empty text nothing happens
 # empty text
 in:
   encoding: ''
-  buffer_length: 0
   buffer: buffer
     - ''
 out:
-  expected_result_buffer_length: 0
   expected_result_buffer: expected_result_buffer ''
   encoding: 'UTF-8'
   return: SUCCEED
@@ -257,11 +336,9 @@ out:
 test case: bom is not added to plain data utf8 assumed
 in:
   encoding: ''
-  buffer_length: 6
   buffer: &buffer
-    - '\x11\x11\x11\x11\x11\x11'
+    - '\x11\x11\x11\x11\x11\x11\x00'
 out:
-  expected_result_buffer_length: 6
   expected_result_buffer: *buffer
   encoding: 'UTF-8'
   return: SUCCEED
@@ -269,13 +346,11 @@ out:
 test case: utf8 bom is removed
 in:
   encoding: ''
-  buffer_length: 9
   buffer:
-    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11\x00'
 out:
-  expected_result_buffer_length: 6
   expected_result_buffer:
-    - '\x11\x11\x11\x11\x11\x11'
+    - '\x11\x11\x11\x11\x11\x11\x00'
   encoding: 'UTF-8'
   return: SUCCEED
 
@@ -283,39 +358,32 @@ out:
 test case: utf8 bom is removed2
 in:
   encoding: ''
-  buffer_length: 9
   buffer: &buffer
-    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11\x00'
 out:
   encoding: 'UTF-8'
-  expected_result_buffer_length: 9
   expected_result_buffer: *buffer
   return: FAIL
-
 ---
 test case: utf8 bom is removed with encoding specified
 in:
   encoding: 'text/html; charset=UTF-8'
-  buffer_length: 9
   buffer:
-    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11\x00'
 out:
   encoding: 'UTF-8'
-  expected_result_buffer_length: 6
   expected_result_buffer:
-    - '\x11\x11\x11\x11\x11\x11'
+    - '\x11\x11\x11\x11\x11\x11\x00'
   return: SUCCEED
 
 ---
 test case: utf8 bom is removed empty text
 in:
   encoding: ''
-  buffer_length: 3
   buffer:
-    - '\xEF\xBB\xBF'
+    - '\xEF\xBB\xBF\x00'
 out:
   encoding: 'UTF-8'
-  expected_result_buffer_length: 0
   expected_result_buffer:
     - ''
   return: SUCCEED
@@ -331,14 +399,12 @@ test case: utf16 LE bom is removed
 #
 in:
   encoding: ''
-  buffer_length: 6
   buffer:
-    - '\xFF\xFE\x11\x00\x11\x00'
+    - '\xFF\xFE\x11\x00\x11\x00\x00'
 out:
   encoding: 'UTF-16LE'
-  expected_result_buffer_length: 2
   expected_result_buffer:
-    - '\x11\x11'
+    - '\x11\x11\x00'
   return: SUCCEED
 
 ---
@@ -348,26 +414,22 @@ test case: utf16 LE noBOM with encoding
 #
 in:
   encoding: 'text/html; charset=UTF-16LE'
-  buffer_length: 4
   buffer:
-    - '\x11\x00\x11\x00'
+    - '\x11\x00\x11\x00\x00'
 out:
   encoding: 'UTF-16LE'
-  expected_result_buffer_length: 2
   expected_result_buffer:
-    - '\x11\x11'
+    - '\x11\x11\x00'
   return: SUCCEED
 
 ---
 test case: utf16 LE bom is removed empty text
 in:
   encoding: ''
-  buffer_length: 2
   buffer:
-    - '\xFF\xFE'
+    - '\xFF\xFE\x00'
 out:
   encoding: 'UTF-16LE'
-  expected_result_buffer_length: 0
   expected_result_buffer:
     - ''
   return: SUCCEED
@@ -383,40 +445,34 @@ test case: utf16 BE bom is removed
 #
 in:
   encoding: ''
-  buffer_length: 6
   buffer:
-    - '\xFE\xFF\x00\x11\x00\x11'
+    - '\xFE\xFF\x00\x11\x00\x11\x00'
 out:
   encoding: 'UTF-16BE'
-  expected_result_buffer_length: 2
   expected_result_buffer:
-    - '\x11\x11'
+    - '\x11\x11\x00'
   return: SUCCEED
 
 ---
 test case: utf16 BE noBOM with enconding
 in:
   encoding: 'text/html; charset=UTF-16BE'
-  buffer_length: 4
   buffer:
-    - '\x00\x11\x00\x11'
+    - '\x00\x11\x00\x11\x00'
 out:
   encoding: 'UTF-16BE'
-  expected_result_buffer_length: 2
   expected_result_buffer:
-    - '\x11\x11'
+    - '\x11\x11\x00'
   return: SUCCEED
 
 ---
 test case: utf16 BE bom is removed empty text
 in:
   encoding: ''
-  buffer_length: 2
   buffer:
-    - '\xFE\xFF'
+    - '\xFE\xFF\x00'
 out:
   encoding: 'UTF-16BE'
-  expected_result_buffer_length: 0
   expected_result_buffer:
     - ''
   return: SUCCEED
@@ -442,12 +498,10 @@ test case: utf32 LE bom is removed incorrect guess conversion to utf16
 #
 in:
   encoding: ''
-  buffer_length: 8
   buffer:
-    - '\xFF\xFE\x00\x00\x11\x00\x00\x00'
+    - '\xFF\xFE\x00\x00\x11\x00\x00\x00\x00'
 out:
   encoding: 'UTF-16LE'
-  expected_result_buffer_length: 0
   expected_result_buffer:
     - ''
   return: SUCCEED
