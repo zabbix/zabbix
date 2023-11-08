@@ -54,8 +54,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$has_custom_time_period = $this->hasInput('has_custom_time_period'); // TODO ????
-
 		$pie_chart_options = [
 			'data_sets' => array_values($this->fields_values['ds']),
 			'data_source' => $this->fields_values['source'],
