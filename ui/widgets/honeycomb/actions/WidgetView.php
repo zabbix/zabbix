@@ -230,9 +230,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'value' => $item['value'],
 					'is_numeric' => $item['value_type'] == ITEM_VALUE_TYPE_FLOAT
 						|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64,
-					'is_binary_units' => isBinaryUnits($item['units']),
-					'hint_text' => $item['hosts'][0]['name'].': '.$item['name'].': '.
-						formatHistoryValue($item['value'], $item)
+					'is_binary_units' => isBinaryUnits($item['units'])
 				];
 			}
 		}
