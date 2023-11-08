@@ -158,6 +158,12 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 // Monitoring.
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
+// Multiselects.
+require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
+
 // Network discovery.
 require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
 require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
@@ -300,7 +306,6 @@ require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
-require_once dirname(__FILE__).'/testMultiselect.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
@@ -443,6 +448,12 @@ class SeleniumTests {
 
 		// Monitoring.
 		$suite->addTestSuite('testPageMonitoringLatestData');
+
+		// Multiselects.
+		$suite->addTestSuite('testMultiselects');
+		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
+		$suite->addTestSuite('testMultiselectsLatestData');
+		$suite->addTestSuite('testMultiselectsProblems');
 
 		// Network discovery.
 		$suite->addTestSuite('testFormNetworkDiscovery');
@@ -588,7 +599,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
-		$suite->addTestSuite('testMultiselect');
 		$suite->addTestSuite('testTemplateInheritance');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testTriggerExpressions');
