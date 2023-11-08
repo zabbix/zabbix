@@ -76,7 +76,6 @@ class testTriggerDependencies extends CWebTest {
 		// Dependencies buttons.
 		$trigger_dependencies = [
 			'dependencies' => 'Add',
-			'host_dependencies' => 'Add host trigger',
 			'prototype_dependencies' => 'Add prototype'
 		];
 

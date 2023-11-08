@@ -341,32 +341,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					]
 				]
 			],
-			// #4 dependencies on hosts trigger.
-			[
-				[
-					'name' => 'Depends on hosts trigger',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
-					'result' => [
-						'Host with everything: Host trigger everything'
-					]
-				]
-			],
-			// #5 dependencies on two hosts trigger.
-			[
-				[
-					'name' => 'Depends on two hosts trigger',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything', 'Host trigger everything 2']
-					],
-					'result' => [
-						'Host with everything: Host trigger everything',
-						'Host with everything: Host trigger everything 2'
-					]
-				]
-			],
-			// #6 dependencies on linked trigger from another template.
+			// #4 dependencies on linked trigger from another template.
 			[
 				[
 					'name' => 'Depends on trigger that linked from another template',
@@ -378,23 +353,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					]
 				]
 			],
-			// #7 dependencies on trigger from template and trigger from host.
-			[
-				[
-					'name' => 'Depends on trigger from template and host',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
-					'dependencies' => [
-						'Template with everything' => ['trigger simple']
-					],
-					'result' => [
-						'Host with everything: Host trigger everything',
-						'Template with everything: trigger simple'
-					]
-				]
-			],
-			// #8 dependencies on trigger that linked to this template.
+			// #5 dependencies on trigger that linked to this template.
 			[
 				[
 					'name' => 'Depends on trigger that linked to this template',
@@ -549,10 +508,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			// #0 dependencies on trigger from template, host and trigger prototype.
 			[
 				[
-					'name' => 'Depends on trigger, hosts trigger and prototype_{#KEY}',
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
+					'name' => 'Depends on trigger and prototype_{#KEY}',
 					'dependencies' => [
 						'Template with everything' => ['trigger simple']
 					],
@@ -560,7 +516,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						'trigger prototype simple{#KEY}'
 					],
 					'result' => [
-						'Host with everything: Host trigger everything',
 						'Template with everything: trigger prototype simple{#KEY}',
 						'Template with everything: trigger simple'
 					]
@@ -649,12 +604,9 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						' ("trigger prototype template update{#KEY}" -> "trigger prototype template update{#KEY}") would occur.'
 				]
 			],
-			// #1 depends on trigger, host trigger, prototype trigger.
+			// #1 depends on trigger, prototype trigger.
 			[
 				[
-					'host_dependencies' => [
-						'Host with everything' => ['Host trigger everything']
-					],
 					'dependencies' => [
 						'Template with everything' => ['trigger simple']
 					],
@@ -662,7 +614,6 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						'trigger prototype template{#KEY}'
 					],
 					'result' => [
-						'Host with everything: Host trigger everything',
 						'Template with everything: trigger prototype template{#KEY}',
 						'Template with everything: trigger simple'
 					]
