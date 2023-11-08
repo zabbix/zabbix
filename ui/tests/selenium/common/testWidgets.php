@@ -34,6 +34,9 @@ class testWidgets extends CWebTest {
 		$dialog =  CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
 		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
 		$class = 'class:multiselect-control';
+		$item_types = [
+			'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'
+		];
 
 		if ($widget === 'Top hosts') {
 			$dialog->query('id:add')->one()->waitUntilClickable()->click();
@@ -46,15 +49,17 @@ class testWidgets extends CWebTest {
 		elseif ($widget === 'Item value') {
 			$dialog->query('button:Select')->one()->waitUntilClickable()->click();
 		}
+		elseif ($widget === 'Graph') {
+			//$dialog->query('button:Select')->one()->waitUntilClickable()->click();
+			$dialog->query('xpath:.//div[@id="data_set"]//div[4]//ul[1]//li[1]//button[1]')->one()->waitUntilClickable()->click();
+			$item_types = ['Float item', 'Unsigned item', 'Unsigned_dependent item'];
+		}
 
 		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$host_item_dialog->query('button:Select')->one()->waitUntilClickable()->click();
 		COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$host_item_dialog->query($class)->asMultiselect()->one()->fill('Host for all item value types');
 		COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$this->assertTableDataColumn(['Character item', 'Float item', 'Log item',
-				'Text item', 'Unsigned item', 'Unsigned_dependent item'],
-				'Name', 'xpath://form[@name="itemform"]//table'
-		);
+		$this->assertTableDataColumn($item_types,'Name', 'xpath://form[@name="itemform"]//table');
 	}
 }
