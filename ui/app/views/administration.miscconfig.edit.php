@@ -109,7 +109,7 @@ $from_list = (new CFormList())
 			->setEnabled($data['validate_uri_schemes'] == 1)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Enable X-Frame-Options HTTP header')))->setAsteriskMark(),
+	->addRow((new CLabel(_('Use X-Frame-Options HTTP header')))->setAsteriskMark(),
 		(new CCheckBox('x_frame_header_enabled'))
 			->setUncheckedValue('0')
 			->setChecked($data['x_frame_header_enabled'] == 1)
