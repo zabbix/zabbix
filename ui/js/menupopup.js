@@ -1571,7 +1571,7 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 					}
 				}
 				else {
-					item.clickCallback = () => window.open(data.params.url, '_blank');
+					item.url = data.params.url;
 				}
 			}
 
@@ -1637,18 +1637,36 @@ function openManualinputDialogue(item, data) {
 				else {
 					item.url = response.result.url;
 
-					if (response.result.confirmation === '') {
-						window.open(item.url, '_blank');
-					}
-					else {
-						if (confirm(response.result.confirmation)) {
+					try {
+						new URL(item.url);
+
+						if (response.result.confirmation === '') {
 							window.open(item.url, '_blank');
 						}
+						else {
+							if (confirm(response.result.confirmation)) {
+								window.open(item.url, '_blank');
+							}
+						}
+
+						overlayDialogueDestroy(overlay.dialogueid);
+					}
+					catch (error) {
+						for (const element of form.parentNode.children) {
+							if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+								element.parentNode.removeChild(element);
+							}
+						}
+
+						const message = t('Invalid URL') + ': ' + item.url;
+						const message_box = makeMessageBox('bad', [message])[0];
+
+						form.parentNode.insertBefore(message_box, form);
 					}
 				}
 			})
 			.catch((exception) => {
-				console.log('Could not retrieve macro values:', exception);
+				console.log(exception);
 			});
 	});
 }
