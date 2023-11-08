@@ -40,6 +40,7 @@ window.services_popup = new class {
 
 			PopUp('popup.services', getFormFields(filter_form), {
 				dialogueid: 'services',
+				dialogue_class: 'modal-popup-generic',
 				trigger_element: e.target
 			});
 		}, {passive: false});
@@ -51,6 +52,7 @@ window.services_popup = new class {
 
 			PopUp('popup.services', getFormFields(filter_form), {
 				dialogueid: 'services',
+				dialogue_class: 'modal-popup-generic',
 				trigger_element: e.target
 			});
 		}, {passive: false});
