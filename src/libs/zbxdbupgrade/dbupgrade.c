@@ -1595,7 +1595,4 @@ int	zbx_dbupgrade_drop_trigger_function_on_update(const char *table_name, const 
 {
 	return dbupgrade_drop_trigger_function(table_name, indexed_column_name, function);
 }
-
-
-
 #endif
