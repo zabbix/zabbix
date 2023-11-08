@@ -388,7 +388,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					if ($result['truncated']) {
 						$output['truncated_message'] = _s('First %1$s of %2$s shown.',
 							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
-							convertUnits(['value' => $result['output_size'], 'units' => 'B'])
+							convertUnits(['value' => $result['original_size'], 'units' => 'B'])
 						);
 					}
 				}
@@ -479,7 +479,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							if ($step['truncated']) {
 								$step['truncated_message'] = _s('First %1$s of %2$s shown.',
 									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
-									convertUnits(['value' => $step['output_size'], 'units' => 'B'])
+									convertUnits(['value' => $step['original_size'], 'units' => 'B'])
 								);
 							}
 
@@ -491,7 +491,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					}
 
 					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params'],
-						$step['truncated'], $step['output_size']
+						$step['truncated'], $step['original_size']
 					);
 
 					// Latest executed step due to the error or end of preprocessing.
@@ -518,8 +518,11 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							$final_result['result_htmlencoded'] = true;
 						}
 
-						if (array_key_exists('truncated_message', $output)) {
-							$final_result['truncated_message'] = $output['truncated_message'];
+						if ($result['truncated']) {
+							$final_result['truncated_message'] = _s('First %1$s of %2$s shown.',
+								convertUnits(['value' => strlen($result['result']), 'units' => 'B']),
+								convertUnits(['value' => $result['original_size'], 'units' => 'B'])
+							);
 						}
 
 						if ($valuemap) {
