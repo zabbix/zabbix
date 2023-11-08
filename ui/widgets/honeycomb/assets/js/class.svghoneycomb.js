@@ -562,10 +562,6 @@ class CSVGHoneycomb {
 		this.#elements.popped_cell = this.#g_scalable
 			.append('svg:g')
 			.attr('class', `${CSVGHoneycomb.ZBX_STYLE_CELL} ${CSVGHoneycomb.ZBX_STYLE_CELL_POPPED}`)
-			.attr('data-hintbox', 1)
-			.attr('data-hintbox-static', 1)
-			.attr('data-hintbox-track-mouse', 1)
-			.attr('data-hintbox-delay', 0)
 			.on('mouseleave', () => this.#popInCell());
 
 		this.#elements.popped_cell_simple = null;
@@ -937,7 +933,6 @@ class CSVGHoneycomb {
 		this.#elements.popped_cell
 			.datum(this.#elements.popped_cell_simple.datum())
 			.html(this.#elements.popped_cell_simple.html())
-			.attr('data-hintbox-contents', d => d.hint_text)
 			.attr('transform',
 				`translate(${popped_translate_x} ${popped_translate_y}) scale(${scale_popped})`
 			)
@@ -978,7 +973,6 @@ class CSVGHoneycomb {
 		this.#elements.popped_cell
 			.style('display', 'none')
 			.attr('transform', '')
-			.attr('data-hintbox-contents', '')
 			.html('')
 			.datum(null);
 
