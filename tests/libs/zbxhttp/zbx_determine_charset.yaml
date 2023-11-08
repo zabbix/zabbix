@@ -220,6 +220,27 @@ The content of the document......¡±ÁÑáñÿ
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
+test case: meta cut off
+in:
+  encoding: 'text/html'
+  buffer_length: 57
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta'
+out:
+  expected_result_buffer_length: 57
+  expected_result_buffer:
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta'
+  encoding: 'UTF-8'
+  return: SUCCEED
+---
 test case: empty text nothing happens
 # empty text
 in:
