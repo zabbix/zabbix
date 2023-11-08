@@ -31,18 +31,14 @@ function local_showHeader(array $data): void {
 	if (strcasecmp($data['config']['x_frame_options'], 'null') !== 0) {
 		$x_frame_options = trim($data['config']['x_frame_options']);
 
-		if ($x_frame_options === '' || strcasecmp($x_frame_options, 'SAMEORIGIN') === 0) {
+		if (strcasecmp($x_frame_options, 'SAMEORIGIN') === 0) {
 			header('X-Frame-Options: SAMEORIGIN');
 		}
 		elseif (strcasecmp($x_frame_options, 'DENY') === 0) {
 			header('X-Frame-Options: DENY');
 		}
 		else {
-			$allowed_urls = explode(',', $x_frame_options);
-			$allowed_urls[] = $_SERVER['HTTP_HOST'];
-			$allowed_urls = array_unique($allowed_urls);
-
-			header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
+			header('Content-Security-Policy: frame-ancestors '.$x_frame_options);
 		}
 	}
 

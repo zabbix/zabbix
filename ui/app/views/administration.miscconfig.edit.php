@@ -109,12 +109,18 @@ $from_list = (new CFormList())
 			->setEnabled($data['validate_uri_schemes'] == 1)
 			->setAriaRequired()
 	)
+	->addRow((new CLabel(_('Enable X-Frame-Options HTTP header')))->setAsteriskMark(),
+		(new CCheckBox('x_frame_header_enabled'))
+			->setUncheckedValue('0')
+			->setChecked($data['x_frame_header_enabled'] == 1)
+	)
 	->addRow((new CLabel(_('X-Frame-Options HTTP header'), 'x_frame_options'))->setAsteriskMark(),
 		(new CTextBox('x_frame_options', $data['x_frame_options'], false,
 			DB::getFieldLength('config', 'x_frame_options')
 		))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
+			->setEnabled($data['x_frame_header_enabled'] == 1)
 	)
 	->addRow(_('Use iframe sandboxing'),
 		(new CCheckBox('iframe_sandboxing_enabled'))
@@ -177,6 +183,7 @@ $from_list = (new CFormList())
 
 $form = (new CForm())
 	->setName('otherForm')
+	->setId('other_form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.update')
 		->getUrl()
