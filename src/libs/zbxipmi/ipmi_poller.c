@@ -21,8 +21,6 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "ipmi_poller.h"
-
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -30,6 +28,7 @@
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
 #include "zbxtime.h"
+#include "zbxipmi.h"
 
 #define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
 
@@ -163,7 +162,7 @@ static void	ipmi_poller_process_command_request(zbx_ipc_async_socket_t *socket, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
+ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args)
 {
 	char			*error = NULL;
 	zbx_ipc_async_socket_t	ipmi_socket;

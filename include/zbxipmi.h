@@ -17,12 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_TELNET_H
-#define ZABBIX_CHECKS_TELNET_H
+#ifndef ZABBIX_ZBXIPMI_H
+#define ZABBIX_ZBXIPMI_H
 
-#include "module.h"
+#ifdef HAVE_OPENIPMI
+
 #include "zbxcacheconfig.h"
 
-int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
+typedef struct
+{
+	int	config_timeout;
+	int	config_unavailable_delay;
+	int	config_unreachable_period;
+	int	config_unreachable_delay;
+}
+zbx_thread_ipmi_manager_args;
+
+ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args);
+ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args);
+
+int	zbx_ipmi_test_item(const zbx_dc_item_t *item, char **info);
+
+int	zbx_ipmi_execute_command(const zbx_dc_host_t *host, const char *command, char *error, size_t max_error_len);
+
+#endif /* HAVE_OPENIPMI */
 
 #endif

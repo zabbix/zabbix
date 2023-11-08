@@ -17,14 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_AGENT_H
-#define ZABBIX_CHECKS_AGENT_H
+#ifndef ZABBIX_IPMI_H
+#define ZABBIX_IPMI_H
 
-#include "module.h"
 #include "zbxcacheconfig.h"
-#include "zbxcomms.h"
+#include "zbxtypes.h"
+#include "config.h"
 
-int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
-void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result);
+#ifdef HAVE_OPENIPMI
+
+int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error);
+
+#endif
 
 #endif

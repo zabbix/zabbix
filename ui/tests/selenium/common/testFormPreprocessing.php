@@ -2120,6 +2120,8 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Take a screenshot to test draggable object position of preprocessing steps.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
+			// TODO: Added updateViewport due to not centered screenshot for an item's preprocessing
+			// which makes unclear if result is correct.
 			$this->page->updateViewport();
 			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'Preprocessing'.$this->link);
 		}

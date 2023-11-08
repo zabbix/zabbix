@@ -354,7 +354,8 @@ void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uin
 	}
 }
 
-zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const zbx_vector_ptr_t *event_severities)
+zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data,
+		const zbx_vector_event_severity_ptr_t *event_severities)
 {
 	zbx_uint32_t		size;
 	unsigned char		*ptr;
@@ -366,9 +367,10 @@ zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, size);
 
 	ptr += zbx_serialize_value(ptr, event_severities->values_num);
+
 	for (i = 0; i < event_severities->values_num; i++)
 	{
-		es = (zbx_event_severity_t *)event_severities->values[i];
+		es = event_severities->values[i];
 
 		ptr += zbx_serialize_value(ptr, es->eventid);
 		ptr += zbx_serialize_value(ptr, es->severity);
@@ -377,19 +379,20 @@ zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const 
 	return size;
 }
 
-void	zbx_service_deserialize_event_severities(const unsigned char *data, zbx_vector_ptr_t *event_severities)
+void	zbx_service_deserialize_event_severities(const unsigned char *data,
+		zbx_vector_event_severity_ptr_t *event_severities)
 {
 	int			i, es_num;
 	zbx_event_severity_t	*es;
 
 	data += zbx_deserialize_value(data, &es_num);
-	zbx_vector_ptr_reserve(event_severities, (size_t)es_num);
+	zbx_vector_event_severity_ptr_reserve(event_severities, (size_t)es_num);
 
 	for (i = 0; i < es_num; i++)
 	{
 		es = (zbx_event_severity_t *)zbx_malloc(NULL, sizeof(zbx_event_severity_t));
 		data += zbx_deserialize_value(data, &es->eventid);
 		data += zbx_deserialize_value(data, &es->severity);
-		zbx_vector_ptr_append(event_severities, es);
+		zbx_vector_event_severity_ptr_append(event_severities, es);
 	}
 }

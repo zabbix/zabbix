@@ -279,6 +279,7 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 //require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralTimeouts.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
@@ -565,6 +566,7 @@ class SeleniumTests {
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
+		$suite->addTestSuite('testFormAdministrationGeneralTimeouts');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
 		$suite->addTestSuite('testFormAdministrationHousekeeper');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
