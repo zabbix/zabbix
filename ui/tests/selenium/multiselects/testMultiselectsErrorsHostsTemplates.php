@@ -26,6 +26,9 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
  */
 class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 
+	const HOST = 'Template inheritance test host';
+	const TEMPLATE = 'AIX by Zabbix agent';
+
 	public static function getCheckDialogsData() {
 		return [
 			// #0.
@@ -147,7 +150,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 
 		if (array_key_exists('sub_object', $data)) {
 			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
-					->findRow('Name', ($data['object'] === 'Hosts') ? 'Template inheritance test host' : 'AIX by Zabbix agent')
+					->findRow('Name', ($data['object'] === 'Hosts') ? self::HOST : self::TEMPLATE)
 					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 

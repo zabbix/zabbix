@@ -23,6 +23,12 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 class testMultiselectDialogs extends CWebTest {
 
+	/**
+	 * Function for opening multiselects in a form and check their contents.
+	 *
+	 * @param CFormElement    $form            form where checks are performed
+	 * @param array           $multiselects    multiselect fields to be checked
+	 */
 	protected function checkMultiselectDialogs($form, $multiselects) {
 		foreach ($multiselects as $multiselect) {
 			$count = count($multiselect);
@@ -44,6 +50,9 @@ class testMultiselectDialogs extends CWebTest {
 		}
 	}
 
+	/**
+	 * Function for closing all opened multiselect dialogs one by one.
+	 */
 	protected function closeMultiselectDialogs() {
 		$dialogs = COverlayDialogElement::find()->all();
 
@@ -52,6 +61,12 @@ class testMultiselectDialogs extends CWebTest {
 		}
 	}
 
+	/**
+	 * Function for checking dialog title and error absence in it.
+	 *
+	 * @param COverlayDialogElement    $dialog    dialog form where checks are performed
+	 * @param string                   $title     title of a dialog
+	 */
 	protected function checkErrorsAndTitle($dialog, $title) {
 		$this->assertEquals($title, $dialog->getTitle());
 
