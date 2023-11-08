@@ -22,7 +22,6 @@
 namespace Widgets\Item\Actions;
 
 use API,
-	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CMacrosResolverHelper,
@@ -83,19 +82,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$show = array_flip($this->fields_values['show']);
 
-		/*
-		 * Select original item name in several cases: if user is in normal dashboards or in template dashboards when
-		 * user is in view mode to display that item name in widget name. Item name should be select only if it is not
-		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
-		 */
-		if ($this->getInput('name', '') === '') {
-			if (!$this->isTemplateDashboard() || ($this->fields_values['override_hostid'] && $tmp_items)) {
+		if ($this->getInput('name', '') === '' && !$this->isTemplateDashboard()) {
+			if ($this->fields_values['override_hostid'] && $tmp_items) {
 				$options['output'][] = 'name_resolved';
 			}
 
-			if (!$this->isTemplateDashboard()) {
-				$options['selectHosts'] = ['name'];
-			}
+			$options['selectHosts'] = ['name'];
 		}
 
 		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
@@ -202,7 +194,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_BINARY:
 						$value = $value_type == ITEM_VALUE_TYPE_BINARY
 							? italic(_('binary value'))
-							: formatHistoryValue($last_value, $items[$itemid], false);
+							: formatHistoryValue($last_value, $item, false);
 
 						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
 								&& $last_value !== $prev_value) {
@@ -220,15 +212,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 
-			if ($this->getInput('name', '') === '') {
-				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+			if ($this->getInput('name', '') === '' && !$this->isTemplateDashboard()) {
+				if ($this->fields_values['override_hostid']) {
 					// Resolve original item name when user is in normal dashboards or template dashboards view mode.
-					$name = $items[$itemid]['name_resolved'];
+					$name = $item['name_resolved'];
 				}
 
-				if (!$this->isTemplateDashboard()) {
-					$name = $items[$itemid]['hosts'][0]['name'].NAME_DELIMITER.$name;
-				}
+				$name = $item['hosts'][0]['name'].NAME_DELIMITER.$name;
 			}
 
 			/*

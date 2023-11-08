@@ -54,7 +54,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$has_custom_time_period = $this->hasInput('has_custom_time_period');
+		$has_custom_time_period = $this->hasInput('has_custom_time_period'); // TODO ????
 
 		$pie_chart_options = [
 			'data_sets' => array_values($this->fields_values['ds']),
@@ -334,7 +334,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 		}
 
-		$colors = getColorVariations('#' . $data_set['color'], count($items));
+		$colors = getColorVariations('#'.$data_set['color'], count($items));
 
 		unset($data_set['hosts'], $data_set['items'], $data_set['color']);
 

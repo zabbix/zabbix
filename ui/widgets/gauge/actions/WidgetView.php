@@ -33,8 +33,6 @@ use API,
 
 use Widgets\Gauge\Widget;
 
-use Zabbix\Core\CWidget;
-
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function init(): void {

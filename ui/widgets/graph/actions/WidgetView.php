@@ -212,7 +212,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$items = API::Item()->get([
-					'output' => [$this->isTemplateDashboard() ? 'name' : 'name_resolved', 'key_', 'delay', 'hostid'],
+					'output' => [!$this->isTemplateDashboard() ? 'name_resolved' : 'name', 'key_', 'delay', 'hostid'],
 					'selectHosts' => ['name'],
 					'itemids' => $resourceid,
 					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
@@ -220,10 +220,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 				$item = reset($items);
 
-				if ($item) {
-					if (!$this->isTemplateDashboard()) {
-						$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
-					}
+				if ($item && !$this->isTemplateDashboard()) {
+					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
 				}
 				else {
 					$is_resource_available = false;

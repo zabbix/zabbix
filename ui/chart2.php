@@ -48,12 +48,12 @@ if (!check_fields($fields)) {
 }
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
-$resolve_macros = getRequest('resolve_macros', 0);
+$resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 /*
  * Permissions
  */
-$db_graphs = API::Graph()->get([
+$dbGraph = API::Graph()->get([
 	'output' => API_OUTPUT_EXTEND,
 	'selectGraphItems' => API_OUTPUT_EXTEND,
 	'selectHosts' => ['hostid', 'name', 'host'],
@@ -63,11 +63,11 @@ $db_graphs = API::Graph()->get([
 	'graphids' => $_REQUEST['graphid']
 ]);
 
-if (!$db_graphs) {
+if (!$dbGraph) {
 	access_deny();
 }
 
-$dbGraph = reset($db_graphs);
+$dbGraph = reset($dbGraph);
 
 if ($resolve_macros) {
 	$dbGraph['items'] = CArrayHelper::renameObjectsKeys($dbGraph['items'], ['name_resolved' => 'name']);

@@ -50,7 +50,7 @@ if (!check_fields($fields)) {
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $itemIds = getRequest('itemids');
-$resolve_macros = getRequest('resolve_macros', 0);
+$resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 /*
  * Permissions

@@ -114,7 +114,7 @@ elseif (hasRequest('i') || hasRequest('items')) {
 
 	CArrayHelper::sort($items, ['sortorder']);
 
-	$resolve_macros = getRequest('resolve_macros', 0);
+	$resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 	$options = [
 		'output' => ['itemid', 'type', 'name', 'master_itemid', 'delay', 'units', 'hostid', 'history', 'trends',
