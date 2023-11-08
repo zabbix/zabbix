@@ -100,7 +100,7 @@ if ($item['itemid']) {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete selected item?'),
+			'confirmation' => _('Delete item prototype?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
