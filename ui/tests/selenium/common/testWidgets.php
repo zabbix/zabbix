@@ -1,4 +1,5 @@
 <?php
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -50,9 +51,13 @@ class testWidgets extends CWebTest {
 			$dialog->query('button:Select')->one()->waitUntilClickable()->click();
 		}
 		elseif ($widget === 'Graph') {
-			//$dialog->query('button:Select')->one()->waitUntilClickable()->click();
 			$dialog->query('xpath:.//div[@id="data_set"]//div[4]//ul[1]//li[1]//button[1]')->one()->waitUntilClickable()->click();
 			$item_types = ['Float item', 'Unsigned item', 'Unsigned_dependent item'];
+		}
+		elseif ($widget === 'Graph prototype') {
+			$dialog->query('xpath://label[@for="source_type_1"]')->one()->waitUntilClickable()->click();
+			$class = 'xpath://div[@class="table-forms-td-right"]//div[@class="multiselect-control"]';
+			$item_types = ['Float item prototype', 'Unsigned item prototype','Unsigned_dependent item prototype'];
 		}
 
 		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
