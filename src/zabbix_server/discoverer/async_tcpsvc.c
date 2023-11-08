@@ -26,6 +26,7 @@
 #include "zbxsysinfo.h"
 #include "../poller/async_poller.h"
 #include "zbxpoller.h"
+#include "zbx_discoverer_constants.h"
 
 static const char	*get_tcpsvc_step_string(zbx_zabbix_tcpsvc_step_t step)
 {
@@ -95,40 +96,8 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 	if (0 != (event & EV_TIMEOUT))
 	{
-		tcpsvc_context->item.ret = TIMEOUT_ERROR;
-
-		if (NULL != dnserr)
-		{
-			SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
-					" failed: Cannot resolve address: %s", dnserr));
-			goto stop;
-		}
-
-		switch (tcpsvc_context->step)
-		{
-			case ZABBIX_TCPSVC_STEP_CONNECT_WAIT:
-				SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
-						" failed: cannot establish TCP connection to [[%s]:%hu]:"
-						" timed out", tcpsvc_context->item.interface.addr,
-						tcpsvc_context->item.interface.port));
-				break;
-			case ZABBIX_TCPSVC_STEP_TLS_WAIT:
-				SET_MSG_RESULT(&tcpsvc_context->item.result,
-						zbx_dsprintf(NULL, "net.tcp.service check failed: TCP successful, cannot"
-						" establish TLS to [[%s]:%hu]: timed out",
-						tcpsvc_context->item.interface.addr,
-						tcpsvc_context->item.interface.port));
-				break;
-			case ZABBIX_TCPSVC_STEP_RECV:
-				SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
-						" failed: cannot read response: timed out"));
-				break;
-			case ZABBIX_TCPSVC_STEP_SEND:
-				SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
-						" failed: cannot send: timed out"));
-				break;
-		}
-
+		SET_UI64_RESULT(&tcpsvc_context->item.result, 0);
+		tcpsvc_context->item.ret = SUCCEED;
 		goto stop;
 	}
 
@@ -137,11 +106,8 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 		if (0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 				0 != errnum)
 		{
-			SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
-					" failed: Cannot establish TCP connection to [[%s]:%hu]: %s",
-					tcpsvc_context->item.interface.addr, tcpsvc_context->item.interface.port,
-					zbx_strerror(errnum)));
-			tcpsvc_context->item.ret = NETWORK_ERROR;
+			SET_UI64_RESULT(&tcpsvc_context->item.result, 0);
+			tcpsvc_context->item.ret = SUCCEED;
 			goto stop;
 		}
 
@@ -169,9 +135,10 @@ void	zbx_async_check_tcpsvc_clean(zbx_tcpsvc_context *tcpsvc_context)
 	zbx_free_agent_result(&tcpsvc_context->item.result);
 }
 
-int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
+int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RESULT *result,
+		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
+		struct evdns_base *dnsbase, const char *config_source_ip,
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	zbx_tcpsvc_context	*tcpsvc_context = zbx_malloc(NULL, sizeof(zbx_tcpsvc_context));
 
@@ -186,6 +153,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async
 	tcpsvc_context->item.hostid = item->host.hostid;
 	tcpsvc_context->item.value_type = item->value_type;
 	tcpsvc_context->item.flags = item->flags;
+	tcpsvc_context->svc_type = svc_type;
 	zbx_strlcpy(tcpsvc_context->item.host, item->host.host, sizeof(tcpsvc_context->item.host));
 	tcpsvc_context->item.interface = item->interface;
 	tcpsvc_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
@@ -216,6 +184,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async
 	else
 		tcpsvc_context->server_name = NULL;
 #endif
+
 	zbx_socket_clean(&tcpsvc_context->s);
 	zbx_tcp_send_context_init(tcpsvc_context->item.key, strlen(tcpsvc_context->item.key), (size_t)item->timeout,
 		ZBX_TCP_PROTOCOL, &tcpsvc_context->tcp_send_context);
