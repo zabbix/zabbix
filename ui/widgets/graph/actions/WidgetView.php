@@ -220,8 +220,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 				$item = reset($items);
 
-				if ($item && !$this->isTemplateDashboard()) {
-					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+				if ($item) {
+					if (!$this->isTemplateDashboard()) {
+						$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+					}
 				}
 				else {
 					$is_resource_available = false;
