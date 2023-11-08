@@ -99,7 +99,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 
 			$cause_eventids_with_symptoms = [];
-			$symptom_data['problems'] = [];
+			$symptom_data = ['problems' => []];
 
 			if ($data['problems']) {
 				$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
@@ -146,50 +146,64 @@ class WidgetView extends CControllerDashboardWidgetView {
 				unset($problem);
 
 				if ($cause_eventids_with_symptoms) {
-					// Get all symptoms for given cause event IDs.
-					$symptom_data = CScreenProblem::getData([
-						'show_symptoms' => true,
-						'show_suppressed' => true,
-						'cause_eventid' => $cause_eventids_with_symptoms,
-						'show' => $this->fields_values['show'],
-						'show_opdata' => $this->fields_values['show_opdata']
-					], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
-
-					if ($symptom_data['problems']) {
-						$symptom_data = CScreenProblem::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $sortfield,
-							$sortorder
-						);
-
-						// Filter does not matter.
-						$symptom_data = CScreenProblem::makeData($symptom_data, [
+					foreach ($cause_eventids_with_symptoms as $cause_eventid) {
+						// Get all symptoms for given cause event ID.
+						$_symptom_data = CScreenProblem::getData([
+							'show_symptoms' => true,
+							'show_suppressed' => true,
+							'cause_eventid' => $cause_eventid,
 							'show' => $this->fields_values['show'],
-							'show_opdata' => $this->fields_values['show_opdata'],
-							'details' => 0
-						], true);
+							'show_opdata' => $this->fields_values['show_opdata']
+						], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
-						$data['users'] += $symptom_data['users'];
-						$data['correlations'] += $symptom_data['correlations'];
+						if ($_symptom_data['problems']) {
+							$_symptom_data = CScreenProblem::sortData($_symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT,
+								$sortfield, $sortorder
+							);
 
-						foreach ($symptom_data['actions'] as $key => $actions) {
-							$data['actions'][$key] += $actions;
-						}
+							/*
+							 * Since getData returns +1 more in order to show the "+" sign for paging or sortData should
+							 * not cut off any excess problems, in order to display actual limit of symptoms, one more
+							 * slice is necessary.
+							 */
+							$_symptom_data['problems'] = array_slice($_symptom_data['problems'], 0,
+								ZBX_PROBLEM_SYMPTOM_LIMIT, true
+							);
 
-						if ($symptom_data['triggers']) {
-							// Add hosts from symptoms to the list.
-							$data['triggers_hosts'] += getTriggersHostsList($symptom_data['triggers']);
+							// Filter does not matter.
+							$_symptom_data = CScreenProblem::makeData($_symptom_data, [
+								'show' => $this->fields_values['show'],
+								'show_opdata' => $this->fields_values['show_opdata'],
+								'details' => 0
+							], true);
 
-							// Store all known triggers in one place.
-							$data['triggers'] += $symptom_data['triggers'];
-						}
+							$data['users'] += $_symptom_data['users'];
+							$data['correlations'] += $_symptom_data['correlations'];
 
-						foreach ($data['problems'] as &$problem) {
-							foreach ($symptom_data['problems'] as $symptom) {
-								if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
-									$problem['symptoms'][] = $symptom;
+							foreach ($_symptom_data['actions'] as $key => $actions) {
+								$data['actions'][$key] += $actions;
+							}
+
+							if ($_symptom_data['triggers']) {
+								// Add hosts from symptoms to the list.
+								$data['triggers_hosts'] += getTriggersHostsList($_symptom_data['triggers']);
+
+								// Store all known triggers in one place.
+								$data['triggers'] += $_symptom_data['triggers'];
+							}
+
+							foreach ($data['problems'] as &$problem) {
+								foreach ($_symptom_data['problems'] as $symptom) {
+									if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
+										$problem['symptoms'][] = $symptom;
+									}
 								}
 							}
+							unset($problem);
+
+							// Combine symptom problems, to show tags later at some point.
+							$symptom_data['problems'] += $_symptom_data['problems'];
 						}
-						unset($problem);
 					}
 				}
 			}
