@@ -1285,7 +1285,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'check-for-not-supported-value-error-matches[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Check for not supported value', 'parameter_1' => 'error matches'/*, 'parameter_2' => '^test.*$'*/]
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$']
 					]
 				]
 			],
@@ -1297,21 +1297,83 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'check-for-not-supported-value-error-does-not-match[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match'/*, 'parameter_2' => '^test.*$'*/]
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => '^test.*$']
 					]
 				]
 			],
-
-
-
-
-
+			// Throttling - Discard unchanged.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Add all preprocessing',
-						'Key' => 'item.all.preprocessing[{#KEY}]'
+						'Name' => 'Discard unchanged',
+						'Key' => 'discard-unchanged[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged']
+					]
+				]
+			],
+			// Throttling - Discard unchanged with heartbeat.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat',
+						'Key' => 'discard-unchanged[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '2']
+					]
+				]
+			],
+			// All steps at once.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'All steps at once',
+						'Key' => 'all-steps-at-once[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
+						['type' => 'Right trim', 'parameter_1' => 'abc'],
+						['type' => 'Left trim', 'parameter_1' => 'def'],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'XML to JSON'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
+						['type' => 'Custom multiplier', 'parameter_1' => '123'],
+						['type' => 'Simple change'],
+						['type' => 'Boolean to decimal'],
+						['type' => 'Octal to decimal'],
+						['type' => 'Hexadecimal to decimal'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
+						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test', 'parameter_2' => 'abc'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name']
+					]
+				]
+			],
+			// Many steps for screenshot.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Many steps for screenshot',
+						'Key' => 'many-steps-for-screenshot[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for not supported value'],
@@ -1336,80 +1398,89 @@ abstract class testFormPreprocessing extends CWebTest {
 					'screenshot' => true
 				]
 			],
+			// Unicode symbols.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Add symbols preprocessing',
-						'Key' => 'item.symbols.preprocessing[{#KEY}]'
+						'Name' => 'Unicode symbols',
+						'Key' => 'unicode-symbols[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Replace', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '1a!@#$%^&*()-='],
-						['type' => 'Right trim', 'parameter_1' => '1a!@#$%^&*()-='],
-						['type' => 'Left trim', 'parameter_1' => '2b!@#$%^&*()-='],
-						['type' => 'Trim', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'XML XPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'Custom multiplier', 'parameter_1' => '4.0E+14'],
-						['type' => 'Regular expression', 'parameter_1' => '5d!@#$%^&*()-=', 'parameter_2' => '6e!@#$%^&*()-='],
+						['type' => 'Regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_2' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Replace', 'parameter_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_2' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Trim', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Right trim', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Left trim', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'XML XPath', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'JSONPath', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'CSV to JSON','parameter_1' => '<', 'parameter_2' => '<'],
+						['type' => 'SNMP walk value', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_table_1_2' => '<!@"\'&nbsp;🙂🙃'],
 						['type' => 'JavaScript', 'parameter_1' => '5d!@#$%^&*()-='],
-						['type' => 'Matches regular expression', 'parameter_1' => '7f!@#$%^&*()-='],
-						['type' => 'Does not match regular expression', 'parameter_1' => '8g!@#$%^&*()-='],
-						['type' => 'Check for error in JSON', 'parameter_1' => '9h!@#$%^&*()-='],
-						['type' => 'Check for error in XML', 'parameter_1' => '0i!@#$%^&*()-='],
-						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-=']
+						['type' => 'Matches regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Does not match regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in JSON', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in XML', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_2' => '<!@"\'&nbsp;🙂🙃']
 					]
 				]
 			],
+			// Duplicate steps.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Add the same preprocessing',
-						'Key' => 'item.theSamePpreprocessing[{#KEY}]'
+						'Name' => 'Duplicate steps',
+						'Key' => 'duplicate-steps[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
-						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
-						['type' => 'Change per second'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
+						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
-						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
-						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
-						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
-						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
 						['type' => 'XML to JSON'],
 						['type' => 'XML to JSON'],
-						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
-						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
-						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 						['type' => 'Boolean to decimal'],
 						['type' => 'Boolean to decimal'],
 						['type' => 'Octal to decimal'],
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'In range', 'parameter_1' => '-5.5', 'parameter_2' => '10'],
-						['type' => 'In range', 'parameter_1' => '-5.5', 'parameter_2' => '10'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
-						['type' => 'Matches regular expression', 'parameter_1' => 'test_expression'],
-						['type' => 'Matches regular expression', 'parameter_1' => 'test_expression'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'not_expression'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'not_expression'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '/path'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '/path'],
-						['type' => 'Check for error in XML', 'parameter_1' => '/path/xml'],
-						['type' => 'Check for error in XML', 'parameter_1' => '/path/xml'],
-						['type' => 'Check for error using regular expression', 'parameter_1' => 'regexp', 'parameter_2' => '\1'],
-						['type' => 'Check for error using regular expression', 'parameter_1' => 'regexp', 'parameter_2' => '\1']
+						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
+						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test', 'parameter_2' => 'abc'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test', 'parameter_2' => 'abc']
 					]
 				]
 			],

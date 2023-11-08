@@ -47,7 +47,8 @@ class CPreprocessingBehavior extends CBehavior {
 			],
 			[
 				'name'		=> 'parameter_2',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "[params][1]")]',
+				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "[params][1]")]|'.
+						'.//input[contains(@name, "[params][1]")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
