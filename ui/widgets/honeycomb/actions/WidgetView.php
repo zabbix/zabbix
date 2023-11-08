@@ -22,6 +22,7 @@
 namespace Widgets\Honeycomb\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CMacrosResolverHelper,
@@ -112,10 +113,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'name' => self::processItemPattern($this->fields_values['items'])
 			],
 			'searchWildcardsEnabled' => true,
-			'searchByAny' => true,
-			'sortfield' => 'name',
-			'sortorder' => ZBX_SORT_UP
+			'searchByAny' => true
 		]);
+
+		foreach ($items as &$item) {
+			$item['hostname'] = $item['hosts'][0]['name'];
+		}
+		unset($item);
+
+		CArrayHelper::sort($items, ['hostname', 'name']);
 
 		if (!$items) {
 			$cells['no_data'] = true;
