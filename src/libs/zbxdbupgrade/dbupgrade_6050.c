@@ -1758,19 +1758,23 @@ static int	DBpatch_6050148(void)
 
 static int	DBpatch_6050149(void)
 {
-	return DBdrop_trigger("items_name_upper_insert", "items");
+	return zbx_dbupgrade_drop_trigger_on_insert("items", "name_upper");
 }
 
 static int	DBpatch_6050150(void)
 {
-	return DBdrop_trigger("items_name_upper_update", "items");
+	return zbx_dbupgrade_drop_trigger_on_update("items", "name_upper");
 }
 
 static int	DBpatch_6050151(void)
 {
-	return DBdrop_function("items_name_upper_upper");
+	return zbx_dbupgrade_drop_trigger_function_on_insert("items", "name_upper", "upper");
 }
 
+static int	DBpatch_6050152(void)
+{
+	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
+}
 #endif
 
 DBPATCH_START(6050)
@@ -1927,5 +1931,6 @@ DBPATCH_ADD(6050148, 0, 1)
 DBPATCH_ADD(6050149, 0, 1)
 DBPATCH_ADD(6050150, 0, 1)
 DBPATCH_ADD(6050151, 0, 1)
+DBPATCH_ADD(6050152, 0, 1)
 
 DBPATCH_END()

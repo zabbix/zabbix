@@ -87,10 +87,17 @@ int	DBdrop_function(const char *function_name);
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
+int	zbx_dbupgrade_drop_trigger_on_insert(const char *table_name, const char *indexed_column_name);
+int	zbx_dbupgrade_drop_trigger_function_on_insert(const char *table_name, const char *indexed_column_name,
+		const char *function);
 
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
+int	zbx_dbupgrade_drop_trigger_on_update(const char *table_name, const char *indexed_column_name);
+int	zbx_dbupgrade_drop_trigger_function_on_update(const char *table_name, const char *indexed_column_name,
+		const char *function);
+
 #endif /* !HAVE_SQLITE3 */
 
 unsigned char	DBget_program_type(void);
