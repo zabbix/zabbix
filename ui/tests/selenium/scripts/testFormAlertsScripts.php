@@ -1235,7 +1235,8 @@ class testFormAlertsScripts extends CWebTest {
 		// Check fields' lengths.
 		$field_maxlength = ['Name' => 255, 'Timeout' => 32, 'Description' => 65535, 'Menu path' => 255,
 			'Confirmation text' => 255, 'Commands' => 65535, 'URL' => 2048, 'Username' => 64, 'Password' => 64,
-			'Port' => 64, 'Public key file' => 64, 'Private key file' => 64, 'Key passphrase' => 64, 'Command' => 65535
+			'Port' => 64, 'Public key file' => 64, 'Private key file' => 64, 'Key passphrase' => 64, 'Command' => 65535,
+			'Input prompt' => 255, 'Default input string' => 255, 'Input validation rule' => 2048, 'Dropdown options' => 2048
 		];
 		foreach ($field_maxlength as $input => $value) {
 			$this->assertEquals($value, $form->getField($input)->getAttribute('maxlength'));
@@ -1244,6 +1245,8 @@ class testFormAlertsScripts extends CWebTest {
 		// Check fields' placeholders.
 		$this->assertEquals('script', $form->getField('Script')->query('xpath:.//input[@type="text"]')->one()->getAttribute('placeholder'));
 		$this->assertEquals('<sub-menu/sub-menu/...>', $form->getField('Menu path')->getAttribute('placeholder'));
+		$this->assertEquals('regular expression', $form->getField('Input validation rule')->getAttribute('placeholder'));
+		$this->assertEquals('comma-separated list', $form->getField('Dropdown options')->getAttribute('placeholder'));
 
 		// Check dropdown options.
 		$user_groups = CDBHelper::getColumn('SELECT name FROM usrgrp ORDER BY name', 'name');
@@ -1261,7 +1264,8 @@ class testFormAlertsScripts extends CWebTest {
 			'Scope' => ['Action operation', 'Manual host action', 'Manual event action'],
 			'Type' => ['URL', 'Webhook', 'Script', 'SSH', 'Telnet', 'IPMI'],
 			'Execute on' => ['Zabbix agent', 'Zabbix server (proxy)', 'Zabbix server'],
-			'Required host permissions' => ['Read', 'Write']
+			'Required host permissions' => ['Read', 'Write'],
+			'Input type' => ['String', 'Dropdown']
 		];
 		foreach ($segmented_elements as $field => $options) {
 			$this->assertEquals($options, $form->getField($field)->getLabels()->asText());
@@ -1279,14 +1283,64 @@ class testFormAlertsScripts extends CWebTest {
 		$script_dialog->waitUntilNotVisible();
 		$form->checkValue(['Script' => '']);
 
-		// Check "Confirmation" dialog window.
-		$form->fill(['Scope' => 'Manual host action', 'Enable confirmation' => true, 'Confirmation text' => 'test']);
-		$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$this->assertEquals('Execution confirmation', $dialog->getTitle());
-		$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
-		$dialog->query('button:Cancel')->one()->click();
-		$dialog->waitUntilNotVisible();
+		// Check "Confirmation" and "Manual input" dialog windows.
+		$scenarios = [
+			'confirmation' => [
+				'Scope' => 'Manual host action',
+				'Advanced configuration' => true,
+				'Enable confirmation' => true,
+				'Confirmation text' => 'test'
+			],
+			'input_string' => [
+				'Enable user input' => true,
+				'Input prompt' => 'test',
+				'Default input string' => 'v1.2',
+				'Input validation rule' => 'v[0-9]+\.[0-9]+'
+			],
+			'input_dropdown' => [
+				'Input prompt' => '{HOST.CONN}',
+				'Input type' => 'Dropdown',
+				'Dropdown options' => 'a,b,,c'
+			]
+		];
+		foreach ($scenarios as $scenario => $parameters) {
+			$form->fill($parameters);
+			$this->query('button:'.(($scenario === 'confirmation') ? 'Test confirmation' : 'Test user input'))
+					->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$this->assertEquals((($scenario === 'confirmation') ? 'Execution confirmation' : 'Manual input'), $dialog->getTitle());
+
+			if ($scenario === 'confirmation') {
+				$this->assertEquals($parameters['Confirmation text'], $dialog->query('class:confirmation-msg')
+						->one()->getText()
+				);
+			}
+			else {
+				$this->assertEquals($parameters['Input prompt'], $dialog->query('class:wordbreak')->one()->getText());
+			}
+
+			if ($scenario === 'input_dropdown') {
+				$this->assertEquals(['a', 'b', '', 'c'], $dialog->query('name:manualinput')->asDropdown()->one()
+						->getOptions()->asText()
+				);
+			}
+
+			if ($scenario === 'input_string') {
+				$this->assertEquals($parameters['Default input string'], $dialog->query('id:manualinput')
+						->one()->getValue()
+				);
+				$this->assertTrue($dialog->query('button:Test')->one()->isEnabled());
+			}
+			else {
+				$this->assertFalse($dialog->query('button:'.(($scenario === 'confirmation') ? 'Execute' : 'Test'))
+						->one()->isEnabled()
+				);
+			}
+
+			$dialog->query('button:Cancel')->one()->click();
+			$dialog->waitUntilNotVisible();
+		}
+
 		$modal->close();
 	}
 
