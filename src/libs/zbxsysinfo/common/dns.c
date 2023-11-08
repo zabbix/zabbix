@@ -18,8 +18,10 @@
 **/
 
 #include "dns.h"
-#include "zbxsysinfo.h"
+#include "ip_reverse.h"
 #include "../sysinfo.h"
+
+#include "zbxsysinfo.h"
 
 #include "zbxtime.h"
 #include "zbxstr.h"
