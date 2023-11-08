@@ -328,13 +328,13 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 	for (i = 0; i < bypass_first; i++)
 	{
 		zbx_json_addobject(json, NULL);
+
 		truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1],
 			ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
+				truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
 
-		if (truncated) {
-			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
-		}
 		zbx_json_close(json);
 	}
 
@@ -372,11 +372,10 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 				truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
 						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
 						ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-				if (truncated) {
-					zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-					zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
-				}
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
+						truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false",
+						ZBX_JSON_TYPE_TRUE);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
 			}
 			else
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
@@ -396,11 +395,9 @@ err:
 			truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
 					zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
 					ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-			if (truncated) {
-				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
-			}
+			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
+					truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
 		}
 		else
 			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
