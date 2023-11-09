@@ -1020,7 +1020,8 @@ class testFormAlertsScripts extends CWebTest {
 	 * @param int		$id       id of the script in case of updating
 	 */
 	private function checkScripts($data, $update, $id = null) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		if ($expected === TEST_BAD) {
 			$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 			$old_hash = CDBHelper::getHash($sql);
 		}
@@ -1051,7 +1052,7 @@ class testFormAlertsScripts extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$title = ($update) ? 'Cannot update script' : 'Cannot add script';
 			$this->assertMessage(TEST_BAD, $title, $data['details']);
 			// Check that DB hash is not changed.
@@ -1145,7 +1146,13 @@ class testFormAlertsScripts extends CWebTest {
 			'Host group' => 'Selected',
 			'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 			'Required host permissions' => 'Write',
-			'Enable confirmation' => true
+			'Advanced configuration' => true,
+			'Enable user input' => true,
+			'Input prompt' => 'Insert value',
+			'Default input string' => 'v1.1',
+			'Input validation rule' => 'v[0-9]+\.[0-9]+',
+			'Enable confirmation' => true,
+			'Confirmation text' => 'Your configuration will be updated. Are you sure?'
 		]);
 		$modal->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
@@ -1354,8 +1361,19 @@ class testFormAlertsScripts extends CWebTest {
 			'default' => ['Host group' => 'All']
 		];
 		$common_manual_scope = [
-			'fields' => ['Menu path', 'User group', 'Required host permissions', 'Enable confirmation', 'Confirmation text'],
-			'default' => ['User group' => 'All', 'Required host permissions' => 'Read', 'Enable confirmation' => false]
+			'fields' => ['Menu path', 'User group', 'Required host permissions', 'Advanced configuration'],
+			'default' => ['User group' => 'All', 'Required host permissions' => 'Read', 'Enable user input' => false,
+				'Input prompt' => '', 'Input type' => 'String', 'Default input string' => '', 'Input validation rule' => '',
+				'Enable confirmation' => false, 'Confirmation text' => ''
+			],
+			'advanced_fields' => ['Enable user input', 'Input prompt', 'Input type', 'Default input string', 'Input validation rule',
+				'Enable confirmation', 'Confirmation text'
+			],
+			'advanced_fields_dropdown' => ['Enable user input', 'Input prompt', 'Input type', 'Dropdown options',
+				'Enable confirmation', 'Confirmation text'
+			],
+			'input_string_required' => ['Input prompt', 'Input validation rule', 'Confirmation text'],
+			'input_dropdown_required' => ['Input prompt', 'Dropdown options', 'Confirmation text']
 		];
 		$types = [
 			'Webhook' => [
@@ -1403,11 +1421,20 @@ class testFormAlertsScripts extends CWebTest {
 			if ($scope === 'Action operation') {
 				$scope_fields = $common_all_scopes['fields'];
 				$scope_default = $common_all_scopes['default'];
+				$scope_required = $common_all_scopes['required'];
 			}
 			else {
 				$form->fill(['Scope' => $scope]);
-				$scope_fields = array_merge($common_all_scopes['fields'], $common_manual_scope['fields']);
+
+				$scope_fields = array_merge($common_all_scopes['fields'], $common_manual_scope['fields'],
+						$common_manual_scope['advanced_fields']
+				);
+				$scope_fields_dropdown = array_merge($common_all_scopes['fields'], $common_manual_scope['fields'],
+						$common_manual_scope['advanced_fields_dropdown']
+				);
 				$scope_default = array_merge($common_all_scopes['default'], $common_manual_scope['default']);
+				$scope_required = array_merge($common_all_scopes['required'], $common_manual_scope['input_string_required']);
+				$scope_required_dropdown = array_merge($common_all_scopes['required'], $common_manual_scope['input_dropdown_required']);
 			}
 
 			foreach ($types as $type => $type_fields) {
@@ -1418,6 +1445,19 @@ class testFormAlertsScripts extends CWebTest {
 
 				$form->fill(['Type' => $type]);
 
+				if ($scope === 'Manual host action' || $scope === 'Manual event action') {
+					// Check advanced configuration default value.
+					$form->checkValue(['Advanced configuration' => false]);
+
+
+					// Check that the 'Advanced configuration' additional fields are hidden.
+					foreach ($common_manual_scope['advanced_fields'] as $label) {
+						$this->assertFalse($form->getLabel($label)->isDisplayed());
+					}
+
+					$form->fill(['Advanced configuration' => true]);
+				}
+
 				// Check visible fields.
 				$this->assertEqualsCanonicalizing(array_merge($scope_fields, $type_fields['fields']),
 						$form->getLabels(CElementFilter::VISIBLE)->asText()
@@ -1426,8 +1466,11 @@ class testFormAlertsScripts extends CWebTest {
 				// Check default values.
 				$form->checkValue(array_merge($scope_default, $type_fields['default']));
 
-				// Check required fields.
-				$this->assertEqualsCanonicalizing(array_merge($common_all_scopes['required'], $type_fields['required']),
+				if ($scope === 'Manual host action' || $scope === 'Manual event action') {
+						$form->fill(['Enable user input' => true, 'Enable confirmation' => true]);
+				}
+
+				$this->assertEqualsCanonicalizing(array_merge($scope_required, $type_fields['required']),
 						$form->getRequiredLabels()
 				);
 
@@ -1438,12 +1481,45 @@ class testFormAlertsScripts extends CWebTest {
 					$this->assertEqualsCanonicalizing(array_merge($scope_fields, $type_fields['fields_public_key']),
 							$form->getLabels(CElementFilter::VISIBLE)->asText()
 					);
-					$this->assertEqualsCanonicalizing(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
+					$this->assertEqualsCanonicalizing(array_merge($scope_required, $type_fields['required_public_key']),
 							$form->getRequiredLabels()
 					);
 
 					// Reset the value of the "Authentication method" field.
 					$form->fill(['Authentication method' => 'Password']);
+				}
+
+				// Check required fields when 'Input type' is 'Dropdown'.
+				if ($scope === 'Manual host action' || $scope === 'Manual event action') {
+					$form->fill(['Input type' => 'Dropdown']);
+
+
+					$this->assertEqualsCanonicalizing(array_merge($scope_fields_dropdown, $type_fields['fields']),
+							$form->getLabels(CElementFilter::VISIBLE)->asText()
+					);
+
+					if ($type === 'SSH') {
+						$form->fill(['Authentication method' => 'Public key']);
+						$this->assertEqualsCanonicalizing(array_merge($scope_fields_dropdown, $type_fields['fields_public_key']),
+								$form->getLabels(CElementFilter::VISIBLE)->asText()
+						);
+						$this->assertEqualsCanonicalizing(array_merge($scope_required_dropdown, $type_fields['required_public_key']),
+								$form->getRequiredLabels()
+						);
+
+						// Reset the value of the "Authentication method" field.
+						$form->fill(['Authentication method' => 'Password']);
+					}
+					else {
+						$this->assertEqualsCanonicalizing(array_merge($scope_required_dropdown, $type_fields['required']),
+								$form->getRequiredLabels()
+						);
+					}
+
+					// Change advanced configuration to default state.
+					$form->fill(['Input type' => 'String', 'Enable user input' => false, 'Enable confirmation' => false,
+							'Advanced configuration' => false]
+					);
 				}
 			}
 		}
