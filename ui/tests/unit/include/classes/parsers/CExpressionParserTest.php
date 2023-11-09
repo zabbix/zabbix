@@ -2242,10 +2242,10 @@ class CExpressionParserTest extends TestCase {
 	public static function dataProviderTokens() {
 		return [
 			[
-				'((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 )',
+				'((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
 				[
-					'match' => '((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 )',
-					'length' => 310,
+					'match' => '((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
+					'length' => 353,
 					'tokens' => [
 						[
 							'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
@@ -2654,6 +2654,18 @@ class CExpressionParserTest extends TestCase {
 									]
 								]
 							]
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
+							'pos' => 311,
+							'match' => 'or',
+							'length' => 2
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_MACRO,
+							'pos' => 314,
+							'match' => '{{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
+							'length' => 39
 						]
 					]
 				],
