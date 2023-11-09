@@ -58,6 +58,11 @@ zabbix_agentd \- Zabbix agent daemon
 .B \-R
 .I runtime\-option
 .br
+.B zabbix_agentd
+.RB [ \-c
+.IR config\-file ]
+.B \-T
+.br
 .B zabbix_agentd \-h
 .br
 .B zabbix_agentd \-V
