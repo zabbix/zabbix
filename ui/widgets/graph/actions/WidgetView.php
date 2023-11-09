@@ -220,13 +220,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 				$item = reset($items);
 
-				if ($item) {
-					if (!$this->isTemplateDashboard()) {
-						$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
-					}
-				}
-				else {
+				if (!$item) {
 					$is_resource_available = false;
+				}
+				elseif (!$this->isTemplateDashboard()) {
+					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
 				}
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
