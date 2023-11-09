@@ -395,7 +395,7 @@ final class CItemData {
 			'zabbix[proxy_buffer,buffer,<mode>]',
 			'zabbix[proxy_buffer,state,current]',
 			'zabbix[proxy_buffer,state,changes]',
-			'zabbix[vps,written]',
+			'zabbix[vps,<stats>,<mode>]',
 		],
 		ITEM_TYPE_DB_MONITOR => [
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
@@ -2985,8 +2985,8 @@ final class CItemData {
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
 				]
 			],
-			'zabbix[vps,written]' => [
-				'description' => _('Returns total number of synced values'),
+			'zabbix[vps,<stats>,<mode>]' => [
+				'description' => _('Returns VPS (values per second) monitor statistics. Valid statistics are: written (mode: total), limit, status, overcommit (mode: pavailable, available, limit).'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
