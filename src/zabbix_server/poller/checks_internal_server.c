@@ -322,6 +322,12 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 
+		if (0 == stats.values_limit)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "VPS throttling is disabled."));
+			goto out;
+		}
+
 		if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "pavailable"))
 		{
 			SET_DBL_RESULT(result, (double)(stats.overcommit_limit - stats.overcommit) * 100 /
