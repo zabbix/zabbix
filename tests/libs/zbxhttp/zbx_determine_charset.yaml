@@ -108,6 +108,16 @@ out:
     - '¡±ÁÑáñÿ\x00'
   encoding: 'WINDOWS-1252'
   return: SUCCEED
+---
+test case: No encoding but is utf-8
+in:
+  encoding: ''
+  buffer: &buffer
+    - '¡±ÁÑáñÿ\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'UTF-8'
+  return: SUCCEED
 ### html
 ---
 test case: ISO-8859-1 charset
@@ -266,6 +276,34 @@ out:
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
+test case: meta attribute value in double quote with spaces
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content = " text/html; charset = ISO-8859-1 " http-equiv = "Content-Type"\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute charser in double quote with spaces
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta charset = " ISO-8859-1 "\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
 test case: meta attribute value in double quote not terminated
 in:
   encoding: 'text/html'
@@ -289,6 +327,90 @@ in:
 <head>\n
   <title>zabbix</title>\n
   <meta content='text/html; charset=ISO-8859-1' http-equiv='Content-Type'\x00"
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value charset with spaces
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta charset = "iso-8859-1"\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value charset two times
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta charset = "iso-8859-1" charset = "iso-8859-1"\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: http-eq and http-eq
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: http-eq and meta attribute value charset
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" charset="iso-8859-1"\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value charset and http-eq
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta charset="iso-8859-1" content="text/html; charset=UTF-8" http-equiv="Content-Type" \x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value in single quote with spaces
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - "<!DOCTYPE html>\n
+<html>\n
+<head>\n
+  <title>zabbix</title>\n
+  <meta content = 'text/html; charset = ISO-8859-1' http-equiv = 'Content-Type'\x00"
 out:
   expected_result_buffer: *buffer
   encoding: 'ISO-8859-1'
@@ -320,6 +442,30 @@ in:
 out:
   expected_result_buffer: *buffer
   encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: meta attribute value unquoted with spaces
+in:
+  encoding: 'text/html'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content= "text/html; charset = ISO-8859-1" http-equiv = Content-Type \x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
+test case: HTML in JSON
+in:
+  encoding: 'application/json'
+  buffer: &buffer
+    - '{"id": "<meta charset=\x5c"iso-8859-1\x5c"}\x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: '\'
   return: SUCCEED
 ---
 test case: empty text nothing happens
