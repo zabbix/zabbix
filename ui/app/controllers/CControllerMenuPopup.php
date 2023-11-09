@@ -841,10 +841,6 @@ class CControllerMenuPopup extends CController {
 				$scripts_by_events = API::Script()->getScriptsByEvents(['eventid' => $event['eventid']]);
 			}
 
-			if (!$scripts_by_events) {
-				return [];
-			}
-
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
 			$scripts = [];
 			$urls = [];
