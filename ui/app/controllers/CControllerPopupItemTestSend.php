@@ -387,7 +387,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 					if ($result['truncated']) {
 						$output['truncated_message'] = _s('First %1$s of %2$s shown.',
-							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
+							convertUnits(['value' => ceil(strlen($output['value']) / 1024) * 1024, 'units' => 'B']),
 							convertUnits(['value' => $result['original_size'], 'units' => 'B'])
 						);
 					}
@@ -478,7 +478,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						else {
 							if ($step['truncated']) {
 								$step['truncated_message'] = _s('First %1$s of %2$s shown.',
-									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
+									convertUnits(['value' => ceil(strlen($step['result']) / 1024) * 1024, 'units' => 'B']),
 									convertUnits(['value' => $step['original_size'], 'units' => 'B'])
 								);
 							}
@@ -520,7 +520,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 						if ($result['truncated']) {
 							$final_result['truncated_message'] = _s('First %1$s of %2$s shown.',
-								convertUnits(['value' => strlen($result['result']), 'units' => 'B']),
+								convertUnits(['value' => ceil(strlen($result['result']) / 1024) * 1024, 'units' => 'B']),
 								convertUnits(['value' => $result['original_size'], 'units' => 'B'])
 							);
 						}

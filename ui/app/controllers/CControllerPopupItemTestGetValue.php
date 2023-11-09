@@ -237,7 +237,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 				if ($result['truncated']) {
 					$output['truncated_message'] = _s('First %1$s of %2$s shown.',
-						convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
+						convertUnits(['value' => ceil(strlen($output['value']) / 1024) * 1024, 'units' => 'B']),
 						convertUnits(['value' => $result['original_size'], 'units' => 'B'])
 					);
 				}
