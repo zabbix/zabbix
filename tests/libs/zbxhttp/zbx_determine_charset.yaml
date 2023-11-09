@@ -206,6 +206,49 @@ The content of the document......¡±ÁÑáñÿ
   encoding: 'ISO-8859-1'
   return: SUCCEED
 ---
+test case: ISO-8859-1 http-equiv content invalid charset supplied in header
+in:
+  encoding: 'text/html; charset=UTF-8'
+  buffer: &buffer
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description"
+        content="line1
+        line2,
+        line3." />
+  <meta name="keywords" content="W3C, HTML, CSS, SVG, Web standards">
+</head>
+<body>
+
+The content of the document......\xA1\xB1\xC1\xD1\xE1\xF1\xFF
+
+</body>
+</html>\x00'
+out:
+  expected_result_buffer:
+    - '<!DOCTYPE html>
+<html>
+<head>
+  <title>zabbix</title>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description"
+        content="line1
+        line2,
+        line3." />
+  <meta name="keywords" content="W3C, HTML, CSS, SVG, Web standards">
+</head>
+<body>
+
+The content of the document......¡±ÁÑáñÿ
+
+</body>
+</html>\x00'
+  encoding: 'UTF-8'
+  return: FAIL
+---
 test case: meta cut off
 in:
   encoding: 'text/html'
