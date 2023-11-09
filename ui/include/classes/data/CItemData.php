@@ -2986,7 +2986,7 @@ final class CItemData {
 				]
 			],
 			'zabbix[vps,written]' => [
-				'description' => _('Returns total number of synced values'),
+				'description' => _('Returns total number of history values written to database.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
