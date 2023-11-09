@@ -95,6 +95,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return exportDnsRecord(params)
 	case "net.dns.perf":
 		return exportDnsPerf(params)
+	case "net.dns.get":
+		return exportDnsGet(params)
 	default:
 		err = zbxerr.ErrorUnsupportedMetric
 
@@ -527,5 +529,6 @@ func init() {
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.perf", "Measures DNS query time in seconds.",
 		"net.dns.record", "Performs a DNS query.",
+		"net.dns.get", "Performs a better DNS query.",
 	)
 }
