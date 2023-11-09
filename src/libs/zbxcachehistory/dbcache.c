@@ -3930,7 +3930,21 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	{
 		zbx_log_t	log;
 
-		zbx_variant_convert(value, ZBX_VARIANT_STR);
+		if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_STR))
+		{
+			char	*error;
+
+			error = zbx_dsprintf(NULL, "Failed to add new variant value to the cache:"
+					" conversion of a variant (%s) to string has failed.",
+					zbx_variant_type_desc(value));
+
+			zabbix_log(LOG_LEVEL_CRIT, error);
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			dc_local_add_history_notsupported(itemid, &ts, error, lastlogsize, mtime, value_flags);
+
+			return;
+		}
 
 		log.logeventid = value_opt->logeventid;
 		log.severity = value_opt->severity;

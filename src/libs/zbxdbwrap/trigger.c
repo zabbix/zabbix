@@ -160,7 +160,13 @@ static int	db_trigger_expand_macros(const zbx_db_trigger *trigger, zbx_eval_cont
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (ZBX_VARIANT_NONE != token->value.type)
 				{
-					zbx_variant_convert(&token->value, ZBX_VARIANT_STR);
+					if (FAIL == zbx_variant_convert(&token->value, ZBX_VARIANT_STR))
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "Failed to convert variant value of type '%s' to string",
+								zbx_variant_type_desc(&token->value));
+						THIS_SHOULD_NEVER_HAPPEN;
+						return FAIL;
+					}
 					value = token->value.data.str;
 					zbx_variant_set_none(&token->value);
 					break;

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -102,8 +103,10 @@ class testInheritanceItem extends CLegacyWebTest {
 		$this->query('button:Create item')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$form->getField('Name')->fill($data['name']);
-		$form->getField('Key')->fill($data['key']);
+		$form->fill([
+			'Name' => $data['name'],
+			'Key' => $data['key']
+		]);
 		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {
