@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "log.h"
+#include "zbxeval.h"
 
 extern unsigned char	program_type;
 
@@ -510,6 +511,121 @@ static int	DBpatch_6000043(void)
 	return DBcreate_index("users", "users_3", "roleid", 0);
 }
 
+static int	DBpatch_6000044(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	char		*sql = NULL, *params = NULL, *item_filter = NULL, *time_period = NULL, *hist_func = NULL,
+			*aggr_func = NULL, *error = NULL;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* ITEM_TYPE_CALCULATED = 15 */
+	result = DBselect("select itemid,params from items where type=15 and params like '%%last_foreach%%'");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		int			seconds;
+		zbx_eval_context_t	ctx;
+
+		if (FAIL == zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: error parsing calculated item formula '%s' for itemid %s",
+					__func__, row[1], row[0]);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_free(item_filter);
+		zbx_free(time_period);
+		zbx_free(hist_func);
+		zbx_free(aggr_func);
+
+		for (int i = 0; i < ctx.stack.values_num; i++)
+		{
+			zbx_eval_token_t	*token = &ctx.stack.values[i];
+
+			switch(token->type)
+			{
+				case ZBX_EVAL_TOKEN_ARG_PERIOD:
+					time_period = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
+					break;
+				case ZBX_EVAL_TOKEN_ARG_QUERY:
+					item_filter = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
+					break;
+				case ZBX_EVAL_TOKEN_HIST_FUNCTION:
+					hist_func = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
+					break;
+				case ZBX_EVAL_TOKEN_FUNCTION:
+					aggr_func = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
+					break;
+			}
+		}
+
+		if (NULL == time_period || FAIL == is_time_suffix(time_period, &seconds, ZBX_LENGTH_UNLIMITED) ||
+				0 != seconds)
+		{
+			continue;
+		}
+
+		if (NULL == item_filter)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: cannot get item filter from formula '%s' for itemid %s",
+					__func__, row[1], row[0]);
+			continue;
+		}
+
+		if (NULL == hist_func)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: cannot get history function from formula '%s' for itemid %s",
+					__func__, row[1], row[0]);
+			continue;
+		}
+
+		if (0 != strcmp("last_foreach", hist_func))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: unexpected history function '%s' got from formula '%s' for"
+					" itemid %s, must be 'last_foreach'", __func__, hist_func, row[1], row[0]);
+			continue;
+		}
+
+		if (NULL == aggr_func)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: cannot get aggregate function from formula '%s' for itemid"
+					" %s", __func__, row[1], row[0]);
+			continue;
+		}
+
+		params = zbx_dsprintf(params, "%s(last_foreach(%s))", aggr_func, item_filter);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update items set params='%s' where itemid=%s;\n", params, row[0]);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(params);
+	zbx_free(sql);
+	zbx_free(item_filter);
+	zbx_free(time_period);
+	zbx_free(hist_func);
+	zbx_free(aggr_func);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6000)
@@ -560,5 +676,6 @@ DBPATCH_ADD(6000040, 0, 0)
 DBPATCH_ADD(6000041, 0, 0)
 DBPATCH_ADD(6000042, 0, 0)
 DBPATCH_ADD(6000043, 0, 0)
+DBPATCH_ADD(6000044, 0, 0)
 
 DBPATCH_END()
