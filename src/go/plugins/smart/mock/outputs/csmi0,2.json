@@ -1,22 +1,11 @@
 {
-  "json_format_version": [
-    1,
-    0
-  ],
+  "json_format_version": [1, 0],
   "smartctl": {
-    "version": [
-      7,
-      3
-    ],
+    "version": [7, 3],
     "svn_revision": "5338",
     "platform_info": "x86_64-w64-mingw32-2016-1607",
     "build_info": "(sf-7.3-1)",
-    "argv": [
-      "smartctl",
-      "-a",
-      "/dev/csmi0,2",
-      "-j"
-    ],
+    "argv": ["smartctl", "-a", "/dev/csmi0,2", "-j"],
     "drive_database_version": {
       "string": "7.3/5319"
     },
@@ -108,10 +97,7 @@
       }
     },
     "capabilities": {
-      "values": [
-        123,
-        3
-      ],
+      "values": [123, 3],
       "exec_offline_immediate_supported": true,
       "offline_is_aborted_upon_new_cmd": false,
       "offline_surface_scan_supported": true,
