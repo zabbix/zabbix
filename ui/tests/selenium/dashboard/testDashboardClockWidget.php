@@ -277,9 +277,9 @@ class testDashboardClockWidget extends testWidgets {
 				// Open "Advanced configuration" block to check its fields.
 				$form->fill(['Advanced configuration' => true]);
 
-				// Check that only Background color and Time fields are visible (because only Time checkbox is checked).
+				// Check that only Background colour and Time fields are visible (because only Time checkbox is checked).
 				// There are two labels "Time zone", so the xpath is used for the container.
-				foreach (['Background color' => true, 'Date' => false, 'Time' => true,
+				foreach (['Background colour' => true, 'Date' => false, 'Time' => true,
 							'xpath:.//div[@class="fields-group fields-group-tzone"]' => false] as $name => $visible) {
 					$this->assertTrue($form->getField($name)->isVisible($visible));
 				}
@@ -628,7 +628,7 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_2' => false,
 						'id:show_3' => false,
 						'Advanced configuration' => true,
-						'Background color' => 'FFEB3B',
+						'Background colour' => 'FFEB3B',
 						'id:date_size' => '50',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => 'F57F17'
@@ -650,7 +650,7 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_2' => true,
 						'id:show_3' => false,
 						'Advanced configuration' => true,
-						'Background color' => '7B1FA2',
+						'Background colour' => '7B1FA2',
 						'id:date_size' => '15',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '002B4D',
@@ -677,7 +677,7 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_2' => true,
 						'id:show_3' => false,
 						'Advanced configuration' => true,
-						'Background color' => '43A047',
+						'Background colour' => '43A047',
 						'id:date_size' => '55',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '64B5F6',
@@ -704,7 +704,7 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background color' => 'C62828',
+						'Background colour' => 'C62828',
 						'id:date_size' => '40',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => 'FDD835',
@@ -737,7 +737,7 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background color' => '001819',
+						'Background colour' => '001819',
 						'id:date_size' => '33',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
@@ -880,7 +880,7 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background color' => '001819',
+						'Background colour' => '001819',
 						'id:date_size' => '333',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
@@ -918,7 +918,7 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_2' => true,
 						'id:show_3' => true,
 						'Advanced configuration' => true,
-						'Background color' => '001819',
+						'Background colour' => '001819',
 						'id:date_size' => '33',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
@@ -1157,7 +1157,7 @@ class testDashboardClockWidget extends testWidgets {
 				'id:show_2' => false,
 				'id:show_3' => false,
 				'Advanced configuration' => true,
-				'Background color' => '001819'
+				'Background colour' => '001819'
 			]);
 		}
 
