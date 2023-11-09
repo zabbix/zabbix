@@ -61,7 +61,6 @@ type Plugin struct {
 	ctl     SmartController
 }
 
-
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
