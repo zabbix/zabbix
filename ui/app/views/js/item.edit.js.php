@@ -26,7 +26,6 @@
 ?>
 (() => {
 const CSRF_TOKEN_NAME = <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>;
-const HOST_STATUS_MONITORED = <?= HOST_STATUS_MONITORED ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
@@ -36,7 +35,6 @@ const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
 const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
-const ITEM_TYPE_TRAPPER = <?= ITEM_TYPE_TRAPPER ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
@@ -101,6 +99,12 @@ window.item_edit_form = new class {
 	}
 
 	initForm(field_switches) {
+		const updateSortOrder = function() {
+			let index = 0;
+
+			this.querySelectorAll('[name$="[sortorder]"]').forEach(node => node.value = index++);
+		}
+
 		new CViewSwitcher('allow_traps', 'change', field_switches.for_traps);
 		new CViewSwitcher('authtype', 'change', field_switches.for_authtype);
 		new CViewSwitcher('http_authtype', 'change', field_switches.for_http_auth_type);
@@ -150,12 +154,14 @@ window.item_edit_form = new class {
 
 		jQuery('#query-fields-table').dynamicRows({
 			sortable: true,
+			sortableOptions: {update: updateSortOrder},
 			template: '#query-field-row-tmpl',
 			rows: this.form_data.query_fields,
 			allow_empty: true
 		}).sortable({disabled: this.form_readonly, update: update_sortorder});
 		jQuery('#headers-table').dynamicRows({
 			sortable: true,
+			sortableOptions: {update: updateSortOrder},
 			template: '#item-header-row-tmpl',
 			rows: this.form_data.headers,
 			allow_empty: true
@@ -177,7 +183,7 @@ window.item_edit_form = new class {
 
 	initItemPrototypeForm() {
 		let node;
-		const master_item = this.form.querySelector('.multiselect-control:has(#master_itemid)');
+		const master_item = this.form.querySelector('#master_itemid').closest('.multiselect-control');
 
 		node = document.createElement('div');
 		node.classList.add(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -197,7 +203,7 @@ window.item_edit_form = new class {
 		this.field.key.addEventListener('keyup', this.#keyChangeHandler.bind(this));
 		this.field.key_button?.addEventListener('click', this.#keySelectClickHandler.bind(this));
 		this.field.snmp_oid.addEventListener('keyup', this.updateFieldsVisibility.bind(this));
-		this.field.type.addEventListener('click', this.#typeChangeHandler.bind(this));
+		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
 		this.form.addEventListener('click', e => {
@@ -227,7 +233,7 @@ window.item_edit_form = new class {
 					}
 
 					if (url.pairs.length) {
-						const dynamic_rows = jQuery('#query-fields-table').dynamicRows();
+						const dynamic_rows = jQuery('#query-fields-table').data('dynamicRows');
 
 						dynamic_rows.addRows(url.pairs);
 						dynamic_rows.removeRows(row => [].filter.call(
@@ -294,13 +300,12 @@ window.item_edit_form = new class {
 	}
 
 	clone() {
-		const el = document.createElement('input');
+		this.overlay.setLoading();
 
-		el.type = 'hidden';
-		el.name = 'clone';
-		el.value = 1;
-		this.form.appendChild(el);
-		reloadPopup(this.form, this.actions.form);
+		PopUp(this.actions.form, {clone: 1, ...this.#getFormFields()}, {
+			dialogueid: this.overlay.dialogueid,
+			dialogue_class: 'modal-popup-large'
+		});
 	}
 
 	create() {
@@ -432,6 +437,18 @@ window.item_edit_form = new class {
 
 					break;
 
+				case 'delay_flex':
+					for (const [i, custom_interval] of Object.entries(fields.delay_flex)) {
+						fields.delay_flex[i] = {
+							type: custom_interval.type,
+							delay: custom_interval.delay.trim(),
+							schedule: custom_interval.schedule.trim(),
+							period: custom_interval.period.trim()
+						}
+					}
+
+					break;
+
 				case 'tags':
 					fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 						if (!('type' in tag) || (tag.type & ZBX_PROPERTY_OWN)) {
@@ -450,6 +467,10 @@ window.item_edit_form = new class {
 
 					break;
 			}
+		}
+
+		if (fields.preprocessing) {
+			fields.preprocessing = Object.entries(fields.preprocessing).map(p => p[1]);
 		}
 
 		return fields;
@@ -523,10 +544,6 @@ window.item_edit_form = new class {
 			: this.testable_item_types.indexOf(type) != -1;
 	}
 
-	#isExecutableItem() {
-		return this.host.status == HOST_STATUS_MONITORED && this.field.type.value != ITEM_TYPE_TRAPPER;
-	}
-
 	#isFormModified() {
 		const fields = this.#getFormFields(this.form);
 
@@ -545,7 +562,6 @@ window.item_edit_form = new class {
 
 	#updateActionButtons() {
 		this.footer.querySelector('.js-test-item')?.toggleAttribute('disabled', !this.#isTestableItem());
-		this.footer.querySelector('.js-execute-item')?.toggleAttribute('disabled', !this.#isExecutableItem());
 	}
 
 	#updateCustomIntervalVisibility() {
@@ -593,6 +609,7 @@ window.item_edit_form = new class {
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 			});
 	}
 
@@ -779,7 +796,7 @@ window.item_edit_form = new class {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 
 		const overlay = PopUp(parameters.action, parameters, {
-			dialogueid: 'item-form',
+			dialogueid: this.overlay.dialogueid,
 			dialogue_class: 'modal-popup-large'
 		});
 

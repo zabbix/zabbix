@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemGeneral.php';
@@ -579,9 +580,11 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextNotPresent('Parent items');
 		}
 
+		$this->assertTrue($form->getField('Name')->isDisplayed());
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 		$this->assertEquals('true', $form->getField('Name')->getAttribute('autofocus'));
 
+		$this->assertTrue($form->getField('Type')->isDisplayed());
 		$type_field = $form->getField('Type')->asDropdown();
 		if (!isset($templateid)) {
 			$options = $type_field->getOptions()->asText();
@@ -617,6 +620,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$type = $type_field->getText();
 		}
 
+		$this->assertTrue($form->getField('Key')->isDisplayed());
 		$this->assertEquals(2048, $form->getField('Key')->getAttribute('maxlength'));
 
 		if (!isset($templateid)) {
@@ -706,6 +710,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($type == 'Database monitor') {
+			$this->assertTrue($form->getField('SQL query')->isDisplayed());
 			$this->assertEquals(7, $form->getField('SQL query')->getAttribute('rows'));
 			$this->zbxTestAssertElementValue('params_ap', '');
 		}
@@ -715,6 +720,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
+			$this->assertTrue($form->getField('Executed script')->isDisplayed());
 			$this->assertEquals(7, $form->getField('Executed script')->getAttribute('rows'));
 		}
 		else {
@@ -723,6 +729,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($type == 'Calculated') {
+			$this->assertTrue($form->getField('Formula')->isDisplayed());
 			$this->assertEquals(7, $form->getField('Formula')->getAttribute('rows'));
 		}
 		else {
@@ -731,6 +738,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($type == 'IPMI agent') {
+			$this->assertTrue($form->getField('IPMI sensor')->isDisplayed());
 			$this->assertEquals(128, $form->getField('IPMI sensor')->getAttribute('maxlength'));
 		}
 		else {
@@ -751,13 +759,16 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		if ($type == 'Simple check' || $type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent'
 				|| $type == 'Database monitor') {
+			$this->assertTrue($form->query('id', ['username', 'password'])->one()->isDisplayed());
 			$this->assertEquals(255, $form->getField('User name')->getAttribute('maxlength'));
 
 			if ($authtype == 'Public key') {
+				$this->assertTrue($form->getField('Key passphrase')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Key passphrase')->getAttribute('maxlength'));
 				$this->assertFalse($form->query('name:password')->one()->isDisplayed());
 			}
 			else {
+				$this->assertTrue($form->getField('Password')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Password')->getAttribute('maxlength'));
 			}
 		}
@@ -766,6 +777,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if	($type == 'SSH agent' && $authtype == 'Public key') {
+			$this->assertTrue($form->getField('Public key file')->isDisplayed());
+			$this->assertTrue($form->getField('Private key file')->isDisplayed());
 			$this->assertEquals(64, $form->getField('Public key file')->getAttribute('maxlength'));
 			$this->assertEquals(64, $form->getField('Private key file')->getAttribute('maxlength'));
 		}
@@ -774,6 +787,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if	($type === 'SNMP agent') {
+			$this->assertTrue($form->getField('SNMP OID')->isDisplayed());
 			$this->assertEquals(512, $form->getField('SNMP OID')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
 				$this->assertEquals('walk[OID1,OID2,...]', $form->getField('SNMP OID')->getAttribute('placeholder'));
@@ -792,7 +806,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$hint->waitUntilNotPresent();
 		}
 		else {
-			$this->assertFalse($form->query('id:snmp_oid')->one()->isDisplayed());
+			$this->assertFalse($form->getField('SNMP OID')->isDisplayed());
 		}
 
 		switch ($type) {
@@ -808,13 +822,14 @@ class testFormItemPrototype extends CLegacyWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 			case 'Calculated':
+				$this->assertTrue($form->getField('Update interval')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Update interval')->getAttribute('maxlength'));
 				if (!isset($itemid)) {
 					$form->checkValue(['Update interval' => '1m']);
 				}
 				break;
 			default:
-				$this->assertFalse($form->query('id:delay')->one()->isDisplayed());
+				$this->assertFalse($form->getField('Update interval')->isDisplayed());
 		}
 
 		if (!isset($templateid)) {
@@ -872,26 +887,29 @@ class testFormItemPrototype extends CLegacyWebTest {
 			);
 		}
 
-		$this->assertEquals(255, $form->getField('History storage period')->getAttribute('maxlength'));
-		$this->assertEquals('90d', $form->getField('History storage period')->getAttribute('value'));
+		$this->assertTrue($form->getField('History')->isDisplayed());
+		$this->assertEquals(255, $form->getField('History')->getAttribute('maxlength'));
+		$this->assertEquals('90d', $form->getField('History')->getAttribute('value'));
 
 		if (!isset($itemid)) {
-			$this->assertEquals('90d', $form->getField('History storage period')->getAttribute('value'));
+			$this->assertEquals('90d', $form->getField('History')->getAttribute('value'));
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->assertEquals(255, $form->getField('Trend storage period')->getAttribute('maxlength'));
+			$this->assertTrue($form->getField('Trends')->isDisplayed());
+			$this->assertEquals(255, $form->getField('Trends')->getAttribute('maxlength'));
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('trends', '365d');
+				$this->assertEquals('365d', $form->getField('Trends')->getValue());
 			}
 		}
 		else {
-			$this->assertFalse($form->query('id:trends')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Trends')->isDisplayed());
 		}
 
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
 			$this->zbxTestTextPresent('Value mapping');
 			$valuemap_field = $form->getField('Value mapping');
+			$this->assertTrue($valuemap_field->isDisplayed());
 			if (!isset($templateid)) {
 				$this->assertEquals('', $valuemap_field->getValue());
 
@@ -950,24 +968,27 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->assertFalse($this->query('xpath://label[text()="Value mapping"]')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Value mapping')->isDisplayed());
 		}
 
 		if ($type == 'Zabbix trapper') {
+			$this->assertTrue($form->getField('Allowed hosts')->isDisplayed());
 			$this->assertEquals(255, $form->getField('Allowed hosts')->getAttribute('maxlength'));
 		}
 		else {
-			$this->assertFalse($form->query('id:trapper_hosts')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Allowed hosts')->isDisplayed());
 		}
 
 		if ($value_type == 'Log') {
+			$this->assertTrue($form->getField('Log time format')->isDisplayed());
 			$this->assertEquals(64, $form->getField('Log time format')->getAttribute('maxlength'));
 		}
 		else {
-			$this->assertFalse($form->query('id:logtimefmt')->one()->isDisplayed());
+			$this->assertFalse($form->getField('Log time format')->isDisplayed());
 		}
 
 		$this->zbxTestTextNotPresent(['Applications','New application']);
+		$this->assertTrue($form->getField('Description')->isDisplayed());
 		$this->assertEquals(7, $form->getField('Description')->getAttribute('rows'));
 		$this->assertTrue($form->getField('Create enabled')->asCheckbox()->isSelected());
 		$this->assertEquals('Cancel', $dialog_footer->query('button:Cancel')->one()->getText());
@@ -1130,7 +1151,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'delay' => '-30',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": a time unit is expected.'
+						'Incorrect value for field "delay": a time unit is expected'
 					]
 				]
 			],
@@ -1879,7 +1900,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
 						'Invalid parameter "/1/username": cannot be empty.'
-//						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -1893,7 +1913,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
 						'Invalid parameter "/1/username": cannot be empty.'
-//						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],

@@ -317,39 +317,16 @@ class CItemGeneralHelper {
 		}
 
 		if ($input['type'] == ITEM_TYPE_HTTPAGENT) {
+			$field_map['http_authtype'] = 'authtype';
+			$field_map['http_username'] = 'username';
+			$field_map['http_password'] = 'password';
+
 			$input['query_fields'] = prepareItemQueryFields($input['query_fields']);
 			$input['headers'] = prepareItemHeaders($input['headers']);
 		}
 		else {
 			$input['query_fields'] = [];
 			$input['headers'] = [];
-		}
-
-		// ITEM_TYPE_SCRIPT parameters.
-		if ($input['parameters']) {
-			$parameters = [];
-
-			foreach ($input['parameters'] as $parameter) {
-				if ($parameter['name'] !== '' || $parameter['value'] !== '') {
-					$parameters[] = $parameter;
-				}
-			}
-
-			$input['parameters'] = $parameters;
-		}
-
-		$params_field = [
-			ITEM_TYPE_SCRIPT => 'script',
-			ITEM_TYPE_SSH => 'params_es',
-			ITEM_TYPE_TELNET => 'params_es',
-			ITEM_TYPE_DB_MONITOR => 'params_ap',
-			ITEM_TYPE_CALCULATED => 'params_f'
-		];
-		$input['params'] = '';
-
-		if (array_key_exists($input['type'], $params_field)) {
-			$field = $params_field[$input['type']];
-			$input['params'] = $input[$field];
 		}
 
 		if ($input['type'] == ITEM_TYPE_SSH && $input['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
@@ -368,32 +345,109 @@ class CItemGeneralHelper {
 			$input['timeout'] = DB::getDefault('items', 'timeout');
 		}
 
-		if ($input['tags']) {
-			$tags = [];
-
-			foreach ($input['tags'] as $tag) {
-				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-					// Skip inherited tags.
-					continue;
-				}
-
-				if ($tag['tag'] !== '' || $tag['value'] !== '') {
-					$tags[] = [
-						'tag' => $tag['tag'],
-						'value' => $tag['value']
-					];
-				}
-			}
-
-			$input['tags'] = $tags;
-		}
-
 		if ($input['preprocessing']) {
-			CArrayHelper::sort($input['preprocessing'], ['sortorder']);
 			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
 		}
 
+		if ($input['delay_flex']) {
+			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $input['delay_flex']);
+		}
+
 		return CArrayHelper::renameKeys($input, $field_map);
+	}
+
+	/**
+	 * Normalize and clean form data.
+	 *
+	 * @param array $input  Form data.
+	 *
+	 * @return array normalized form data.
+	 */
+	public static function normalizeFormData(array $input): array {
+		$tags = [];
+
+		foreach ($input['tags'] as $tag) {
+			if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+				// Skip inherited tags.
+				continue;
+			}
+
+			if ($tag['tag'] !== '' || $tag['value'] !== '') {
+				$tags[] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+		}
+
+		$input['tags'] = $tags;
+		$custom_intervals = [];
+
+		foreach ($input['delay_flex'] as $interval) {
+			if ($interval['type'] == ITEM_DELAY_FLEXIBLE
+					&& $interval['delay'] === '' && $interval['period'] === '') {
+				continue;
+			}
+
+			if ($interval['type'] == ITEM_DELAY_SCHEDULING && $interval['schedule'] === '') {
+				continue;
+			}
+
+			$custom_intervals[] = $interval;
+		};
+
+		$input['delay_flex'] = $custom_intervals;
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+		$input['params'] = '';
+
+		if (array_key_exists($input['type'], $params_field)) {
+			$field = $params_field[$input['type']];
+			$input['params'] = $input[$field];
+		}
+
+		$query_fields = [];
+		$headers = [];
+
+		if ($input['type'] == ITEM_TYPE_HTTPAGENT) {
+			foreach ($input['query_fields'] as $query_field) {
+				if ($query_field['name'] !== '' || $query_field['value'] !== '') {
+					$query_fields[] = $query_field;
+				}
+			}
+
+			foreach ($input['headers'] as $header) {
+				if ($header['name'] !== '' || $header['value'] !== '') {
+					$headers[] = $header;
+				}
+			}
+
+			CArrayHelper::sort($query_fields, ['sortorder']);
+			CArrayHelper::sort($headers, ['sortorder']);
+		}
+		else if ($input['type'] == ITEM_TYPE_SCRIPT) {
+			$parameters = [];
+
+			foreach ($input['parameters'] as $parameter) {
+				if ($parameter['name'] !== '' || $parameter['value'] !== '') {
+					$parameters[] = $parameter;
+				}
+			}
+
+			$input['parameters'] = $parameters;
+		}
+
+		$input['query_fields'] = array_values($query_fields);
+		$input['headers'] = array_values($headers);
+		CArrayHelper::sort($input['preprocessing'], ['sortorder']);
+		$input['preprocessing'] = array_values($input['preprocessing']);
+
+		return $input;
 	}
 
 	/**

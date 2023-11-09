@@ -280,15 +280,21 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					continue;
 				}
 
-				$texts_having_macros = [];
+				$texts_having_macros = array_merge(
+					array_column($inputs[$field], 'name'),
+					array_column($inputs[$field], 'value')
+				);
+				$texts_having_macros = array_filter($texts_having_macros, static function(string $str): bool {
+					return (strstr($str, '{') !== false);
+				});
 
-				foreach ($inputs[$field] as $entry) {
-					if (strpos($entry['name'], '{') !== false) {
-						$texts_having_macros[] = $entry['name'];
-					}
+				if ($texts_having_macros) {
+					$supported_macros = array_merge_recursive($supported_macros, $macros);
+					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
 
-					if (strpos($entry['value'], '{') !== false) {
-						$texts_having_macros[] = $entry['value'];
+					if ($support_lldmacros) {
+						$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
 					}
 				}
 

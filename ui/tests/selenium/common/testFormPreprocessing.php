@@ -46,6 +46,10 @@ abstract class testFormPreprocessing extends CWebTest {
 	public $button;
 	public $fail_message;
 
+	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
+	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
+	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule' -> 'testInheritanceItemPrototypePreprocessing'
+	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 	const CLONE_PREPROCESSING = [
 		[
 			'type' => '1',
@@ -1343,7 +1347,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus to JSON user macros in parameter',
+						'Name' => 'Item Prometeus to JSON user macros in parameter 1',
 						'Key' => 'json-prometeus-macros-1[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1355,7 +1359,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus to JSON user macros in parameter',
+						'Name' => 'Item Prometeus to JSON user macros in parameter 2',
 						'Key' => 'json-prometeus-macros-2[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1367,7 +1371,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus to JSON user macros in parameters',
+						'Name' => 'Item Prometeus to JSON user macros in parameters 3',
 						'Key' => 'json-prometeus-macros-3[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1379,7 +1383,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus to JSON user macros in parameters',
+						'Name' => 'Item Prometeus to JSON user macros in parameters 4',
 						'Key' => 'json-prometeus-macros-4[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1914,7 +1918,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus user macros in parameters',
+						'Name' => 'Item Prometeus user macros in parameters 1',
 						'Key' => 'prometeus-macros-1[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1930,7 +1934,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus user macros in parameters',
+						'Name' => 'Item Prometeus user macros in parameters 2',
 						'Key' => 'prometeus-macros-2[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1942,7 +1946,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus user macros in parameters',
+						'Name' => 'Item Prometeus user macros in parameters 3',
 						'Key' => 'prometeus-macros-3[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1954,7 +1958,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus user macros in parameters',
+						'Name' => 'Item Prometeus user macros in parameters 4',
 						'Key' => 'prometeus-macros-4[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -1990,7 +1994,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus function sum',
+						'Name' => 'Item Prometeus function sum 1',
 						'Key' => 'prometeus-function-sum[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -2006,7 +2010,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Item Prometeus function min',
+						'Name' => 'Item Prometeus function min 2',
 						'Key' => 'prometeus-function-min[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -2082,12 +2086,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 
-		if ($lld == true) {
-			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		}
-		else{
-			$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
-		}
+		$form = $lld
+			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
+			: COverlayDialogElement::find()->one()->waitUntilready()->asForm();
 
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
@@ -2120,6 +2121,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Take a screenshot to test draggable object position of preprocessing steps.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
+			// TODO: Added updateViewport due to not centered screenshot for an item's preprocessing
+			// which makes unclear if result is correct.
+			$this->page->updateViewport();
 			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'Preprocessing'.$this->link);
 		}
 
@@ -2465,7 +2469,7 @@ abstract class testFormPreprocessing extends CWebTest {
 		$item_name = CDBHelper::getValue('SELECT name FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
 
 		if ($lld == true) {
-			$this->page->open($this->ready_link.$id);
+			$this->page->open($this->ready_link.$itemid);
 		}
 		else {
 			$this->page->open($this->link)->waitUntilReady();
@@ -2847,14 +2851,17 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Open original item on host and get its' preprocessing steps.
 		$this->page->login()->open($link);
 
-		if ($item !== 'Discovery rule') {
-			$item_name = CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? '15094' : '99102'));
+		if ($item === 'Discovery rule') {
+			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
+		else {
+			$item_name = ($item === 'Item')
+				? CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEMID : self::CLONE_ITEMID))
+				: CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEM_PROTOTYPE : self::CLONE_ITEM_PROTOTYPEID));
+
 			$this->query('link', $item_name)->one()->click();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $dialog->asForm();
-		}
-		else {
-			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		}
 
 		if ($templated) {
@@ -2868,8 +2875,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->selectTab($item);
 
 		// Clone item.
-		if ($item !== 'Discovery rule') {
+		if ($item === 'Item' || $item === 'Item prototype') {
 			$dialog->getFooter()->query('button:Clone')->one()->click();
+			COverlayDialogElement::find()->one()->waitUntilReady();
 		}
 		else {
 			$form->query('button:Clone')->waitUntilPresent()->one()->click();

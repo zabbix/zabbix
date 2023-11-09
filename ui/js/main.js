@@ -285,7 +285,11 @@ var hintBox = {
 				e.preventDefault();
 			}
 
-			if ($target.data('hintbox-preload') && $target.data('hintbox-contents') === '') {
+			if ($target[0].dataset.hintboxPreload !== '' && $target[0].dataset.hintboxContents === '') {
+				if (e.type === 'mousemove') {
+					return;
+				}
+
 				clearTimeout(hintBox.preload_hint_timer);
 
 				// Manually trigger preloaderCloseHandler for the previous preloader.
@@ -871,6 +875,8 @@ function getConditionFormula(conditions, evalType) {
 	 * - counter 				- number to start row enumeration from
 	 * - dataCallback			- function to generate the data passed to the template
 	 * - remove_next_sibling	- remove also next element
+	 * - sortable				- enable jQuery UI sortable initialization
+	 * - sortableOptions		- additional options to pass to jQuery UI sortable initialization
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
@@ -881,10 +887,6 @@ function getConditionFormula(conditions, evalType) {
 	 * @param options
 	 */
 	$.fn.dynamicRows = function(options) {
-		if ('dynamicRows' in $(this).data()) {
-			return $(this).data('dynamicRows');
-		}
-
 		options = $.extend({}, {
 			template: '',
 			row: '.form_row',
@@ -990,6 +992,10 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', false);
 				}
 
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
+				}
+
 				table.trigger('afteradd.dynamicRows', options);
 			});
 
@@ -1005,6 +1011,10 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', true);
 
 					table.trigger('afteradd.dynamicRows', options);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 			});
 
@@ -1131,72 +1141,6 @@ function getConditionFormula(conditions, evalType) {
 }(jQuery));
 
 jQuery(function ($) {
-	var verticalHeaderTables = {};
-
-	$.fn.makeVerticalRotation = function() {
-		this.each(function(i) {
-			var table = $(this);
-
-			if (table.data('rotated') == 1) {
-				return;
-			}
-			table.data('rotated', 1);
-
-			var cellsToRotate = $('.vertical_rotation', table),
-				betterCells = [];
-
-			// insert spans
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					text = $('<span>', {
-						text: cell.html()
-					}).css({'white-space': 'nowrap'});
-
-				cell.text('').append(text);
-			});
-
-			// rotate cells
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					span = cell.children(),
-					height = cell.height(),
-					width = span.width(),
-					transform = (width / 2) + 'px ' + (width / 2) + 'px';
-
-				var css = {};
-
-				css['transform-origin'] = transform;
-				css['-webkit-transform-origin'] = transform;
-				css['-moz-transform-origin'] = transform;
-				css['-o-transform-origin'] = transform;
-
-				var divInner = $('<div>', {
-					'class': 'vertical_rotation_inner'
-				})
-					.css(css)
-					.append(span.text());
-
-				var div = $('<div>', {
-					height: width,
-					width: height
-				})
-					.append(divInner);
-
-				betterCells.push(div);
-			});
-
-			cellsToRotate.each(function(i) {
-				$(this).html(betterCells[i]);
-			});
-
-			table.on('remove', function() {
-				delete verticalHeaderTables[table.attr('id')];
-			});
-
-			verticalHeaderTables[table.attr('id')] = table;
-		});
-	};
-
 	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
 		$('.wrapper').scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');

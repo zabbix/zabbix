@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -36,9 +37,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	const DISCOVERY_RULEID			= 133800;	// 'Simple form test host' => 'testFormDiscoveryRule'
 	const TEMPL_INHERITANCE_RULEID	= 15011;	//'testInheritanceDiscoveryRule'
 	const HOST_INHERITANCE_RULEID	= 15016;	// 'Template inheritance test host' -> 'testInheritanceDiscoveryRule'
-	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule' -> 'testInheritanceItemPrototypePreprocessing'
 	const CLONE_RULEID				= 133800;	// 'Host for triggers filtering' -> 'Discovery rule for triggers filtering'
-	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 
 	public function getItemPrototypePrometheusData() {
 		return array_merge($this->getPrometheusData(), [
@@ -78,7 +77,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Prometheus to JSON LLD macro in parameter 1 ',
+						'Name' => 'Prometheus to JSON LLD macro in parameter 1',
 						'Key' => 'json-parameter-macro-1[{#KEY}]'
 					],
 					'preprocessing' => [

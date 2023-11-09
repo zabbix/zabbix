@@ -179,7 +179,7 @@ class CWidgetFormView {
 					// Submit button is needed to enable submit event on Enter on inputs.
 					->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)),
 				implode('', $this->templates),
-				$this->javascript ? new CScriptTag($this->javascript) : ''
+				(new CScriptTag('ZABBIX.Dashboard.initWidgetPropertiesForm();'))->addItem($this->javascript)
 			]),
 			'buttons' => [
 				[

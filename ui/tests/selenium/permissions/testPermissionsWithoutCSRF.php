@@ -166,7 +166,6 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
-					'incorrect_request' => true,
 					'overlay' => 'item_update'
 				]
 			],
@@ -175,7 +174,6 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
-					'incorrect_request' => true,
 					'overlay' => 'create'
 				]
 			],
@@ -701,7 +699,19 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 	public static function getCheckTokenData() {
 		return [
-			// #0 Correct token (update global macros).
+			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL (update LLD).
+			[
+				[
+					'token' => true,
+					'token_url' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host',
+					'db' => 'SELECT * FROM items',
+					'link' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host&name=test'.
+						'&description=&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT'.
+						'&lifetime=1&formula=test&evaltype=1&update=Update&_csrf_token=',
+					'error' => self::INCORRECT_REQUEST
+				]
+			],
+			// #1 Correct token (update global macros).
 			[
 				[
 					'token' => true,
@@ -715,7 +725,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #1 Correct token (create graph).
+			// #2 Correct token (create graph).
 			[
 				[
 					'token' => true,
@@ -726,7 +736,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'error' => self::INCORRECT_REQUEST
 				]
 			],
-			// #2 No token.
+			// #3 No token.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -748,7 +758,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #3 Empty token.
+			// #4 Empty token.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -780,7 +790,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #4 Incorrect token.
+			// #5 Incorrect token.
 			[
 				[
 					'db' => 'SELECT * FROM config',

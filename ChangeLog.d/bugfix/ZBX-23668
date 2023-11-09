@@ -1,0 +1,1 @@
+.......PS. [ZBX-23668] added overflow check when converting string variant to ui64 (dgoloscapov)

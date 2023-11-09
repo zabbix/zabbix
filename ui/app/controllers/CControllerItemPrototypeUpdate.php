@@ -70,8 +70,8 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 	}
 
 	protected function getInputForApi(): array {
-		$input = parent::getInputForApi();
-
+		$input = $this->getFormValues();
+		$input = CItemPrototypeHelper::convertFormInputForApi($input);
 		[$db_item] = API::ItemPrototype()->get([
 			'output' => ['templateid', 'flags'],
 			'selectHosts' => ['status'],

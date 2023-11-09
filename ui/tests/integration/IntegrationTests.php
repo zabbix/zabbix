@@ -47,6 +47,7 @@ require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 require_once dirname(__FILE__).'/testDiscoveryRules.php';
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
+require_once dirname(__FILE__).'/testItemTimeouts.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -85,6 +86,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
 		$suite->addTestSuite('testHistoryPush');
+		$suite->addTestSuite('testItemTimeouts');
 
 		return $suite;
 	}

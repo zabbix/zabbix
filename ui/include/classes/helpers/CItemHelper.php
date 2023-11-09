@@ -75,16 +75,12 @@ class CItemHelper extends CItemGeneralHelper {
 	 */
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
-
-		if (!array_key_exists('parent_items', $item)) {
-			$item['parent_items'] = makeItemTemplatesHtml(
-				$item['itemid'],
-				getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
-				ZBX_FLAG_DISCOVERY_NORMAL,
-				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-			);
-		}
-
+		$item['parent_items'] = makeItemTemplatesHtml(
+			$item['itemid'],
+			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
+			ZBX_FLAG_DISCOVERY_NORMAL,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => false
@@ -108,24 +104,6 @@ class CItemHelper extends CItemGeneralHelper {
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Convert form submitted data to be ready to send to API for update or create operation.
-	 *
-	 * @param array $input  Array of form input fields.
-	 */
-	public static function convertFormInputForApi(array $input): array {
-		$input = parent::convertFormInputForApi($input);
-
-		if ($input['delay_flex']) {
-			$custom_intervals = $input['delay_flex'];
-			// isValidCustomIntervals is used to filter out custom intervals with empty value, not for validation.
-			isValidCustomIntervals($custom_intervals);
-			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
-		}
-
-		return $input;
 	}
 
 	/**

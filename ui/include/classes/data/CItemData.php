@@ -36,6 +36,7 @@ final class CItemData {
 			'kernel.openfiles',
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
@@ -141,6 +142,7 @@ final class CItemData {
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 			'mqtt.get[<broker_url>,topic,<username>,<password>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
@@ -257,7 +259,7 @@ final class CItemData {
 			'vmware.dc.tags.get[url,id]',
 			'vmware.dvswitch.discovery[url]',
 			'vmware.dvswitch.fetchports.get[url,uuid,<filter>,<mode>]',
-			'vmware.eventlog[url,<mode>]',
+			'vmware.eventlog[url,<mode>,<severity>]',
 			'vmware.fullname[url]',
 			'vmware.hv.alarms.get[url,uuid]',
 			'vmware.hv.cluster.name[url,uuid]',
@@ -495,8 +497,15 @@ final class CItemData {
 	 * @return array
 	 */
 	public static function filterSwitchingConfiguration(): array {
+		$all_item_types = -1;
+
 		return [
 			'for_type' => [
+				$all_item_types => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
 				ITEM_TYPE_CALCULATED => [
 					'js-filter-delay-label',
 					'js-filter-delay-field',
@@ -586,6 +595,39 @@ final class CItemData {
 	 * @return array
 	 */
 	public static function fieldSwitchingConfiguration(array $data): array {
+		if ($data['is_discovery_rule']) {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey'
+				]
+			];
+		}
+		else {
+			$for_authtype = [
+				ITEM_AUTHTYPE_PASSWORD => [
+					'js-item-password-label',
+					'js-item-password-field',
+					'password'
+				],
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-label',
+					'js-item-private-key-field',
+					'privatekey',
+					'js-item-public-key-label',
+					'js-item-public-key-field',
+					'publickey',
+					'js-item-passphrase-label',
+					'js-item-passphrase-field',
+					'passphrase'
+				]
+			];
+		}
+
 		return [
 			// Ids to toggle when the field 'type' is changed.
 			'for_type' => [
@@ -883,24 +925,7 @@ final class CItemData {
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.
-			'for_authtype' => [
-				ITEM_AUTHTYPE_PASSWORD => [
-					'js-item-password-label',
-					'js-item-password-field',
-					'password'
-				],
-				ITEM_AUTHTYPE_PUBLICKEY => [
-					'js-item-private-key-label',
-					'js-item-private-key-field',
-					'privatekey',
-					'js-item-public-key-label',
-					'js-item-public-key-field',
-					'publickey',
-					'js-item-passphrase-label',
-					'js-item-passphrase-field',
-					'passphrase'
-				]
-			],
+			'for_authtype' => $for_authtype,
 			'for_http_auth_type' => [
 				ZBX_HTTP_AUTH_BASIC => [
 					'js-item-http-username-label',
@@ -1183,6 +1208,14 @@ final class CItemData {
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.record',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.record'
+				]
+			],
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
+				'description' => _('Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.perf',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.perf'
 				]
 			],
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
@@ -1982,8 +2015,8 @@ final class CItemData {
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.dvswitch.fetchports'
 				]
 			],
-			'vmware.eventlog[url,<mode>]' => [
-				'description' => _('VMware event log, "url" - VMware service URL, "mode"- all (default), skip - skip processing of older data'),
+			'vmware.eventlog[url,<mode>,<severity>]' => [
+				'description' => _('VMware event log, "url" - VMware service URL, "mode"- all (default) or skip - skip processing of older data, "severity" - filtering is disabled by default or "error,warning,info,user" in any combination'),
 				'value_type' => ITEM_VALUE_TYPE_LOG,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.eventlog'

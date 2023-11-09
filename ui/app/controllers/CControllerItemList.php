@@ -62,8 +62,7 @@ class CControllerItemList extends CControllerItem {
 			'subfilter_tags'			=> 'array',
 			'sort'						=> 'in name,key_,delay,history,trends,type,status',
 			'sortorder'					=> 'in '.implode(',', [ZBX_SORT_DOWN.','.ZBX_SORT_UP]),
-			'page'						=> 'ge 1',
-			'uncheck'					=> 'in 1'
+			'page'						=> 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -108,6 +107,7 @@ class CControllerItemList extends CControllerItem {
 			'types' => item_type2str(),
 			'triggers' => [],
 			'trigger_parent_templates' => [],
+			'filtered_count' => 0,
 			'tags' => [],
 			'parent_templates' => [],
 			'check_now_types' => checkNowAllowedTypes(),
@@ -119,6 +119,7 @@ class CControllerItemList extends CControllerItem {
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 
 		$items = $this->getItems($data['context'], $filter);
+		$data['filtered_count'] = count($items);
 		[$items, $subfilter_fields] = $this->getItemsAndSubfilter($items, $this->getSubfilter($items, $filter));
 		$data['subfilter'] = static::sortSubfilter($subfilter_fields);
 		$items = $this->sortItems($items, ['sort' => $filter['sort'], 'sortorder' => $filter['sortorder']]);
@@ -171,8 +172,17 @@ class CControllerItemList extends CControllerItem {
 			$values = [];
 
 			foreach ($subfilter['values'] as $value => $count) {
-				$label = $subfilter['labels'][$value] ?? $value;
-				$sort = $subfilter['sort'][$value] ?? $label;
+				$label = $value;
+				$sort = $value;
+
+				if (array_key_exists('labels', $subfilter) && array_key_exists($value, $subfilter['labels'])) {
+					$label = $subfilter['labels'][$value];
+				}
+
+				if (array_key_exists('sort', $subfilter) && array_key_exists($value, $subfilter['sort'])) {
+					$sort = $subfilter['sort'][$value];
+				}
+
 				$values[] = [
 					'value' => $value,
 					'count' => $count,
@@ -324,7 +334,7 @@ class CControllerItemList extends CControllerItem {
 			],
 			[
 				'key' => 'subfilter_hosts',
-				'label' => _('Hosts'),
+				'label' => _('Hosts')
 			],
 			[
 				'key' => 'subfilter_types',

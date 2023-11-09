@@ -579,6 +579,8 @@ class CItem extends CItemGeneral {
 		self::updatePreprocessing($items);
 		self::updateTags($items);
 
+		self::extractHttpFields($items);
+
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ITEM, $items);
 
 		foreach ($items as &$item) {

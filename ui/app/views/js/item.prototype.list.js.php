@@ -242,12 +242,7 @@
 				postMessageDetails('error', response.error.messages);
 			}
 			else if ('success' in response) {
-				const parent_discoveryid = (new Curl(location.href)).getArgument('parent_discoveryid');
-
-				if (parent_discoveryid !== '') {
-					uncheckTableRows(parent_discoveryid);
-				}
-
+				chkbxRange.clearSelectedOnFilterChange();
 				postMessageOk(response.success.title);
 
 				if ('messages' in response.success) {

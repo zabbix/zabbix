@@ -569,7 +569,6 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 				->setArgument('action', 'item.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('uncheck', '1')
 				->setArgument('context', 'template');
 		}
 
@@ -2207,7 +2206,7 @@ function prepareItemHeaders(array $headers): array {
 		}
 	}
 
-	return $headers;
+	return array_values($headers);
 }
 
 /**

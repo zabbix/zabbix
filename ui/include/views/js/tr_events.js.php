@@ -87,6 +87,7 @@
 
 		events: {
 			elementSuccess(e) {
+				let new_href = location.href;
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -95,9 +96,17 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
+
+					if (data.success.action === 'delete') {
+						// If item or trigger is deleted redirect to problems page.
+						let list_url = new Curl('zabbix.php');
+
+						list_url.setArgument('action', 'problem.view');
+						new_href = list_url.getUrl();
+					}
 				}
 
-				location.href = location.href;
+				location.href = new_href;
 			}
 		}
 	};

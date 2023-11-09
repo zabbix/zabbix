@@ -146,7 +146,7 @@ $formgrid = (new CFormGrid())
 				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH .'px;')
 		))->setId('js-item-query-fields-field')
 	])
 	->addItem([
@@ -271,7 +271,7 @@ $formgrid = (new CFormGrid())
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
 					]))->addClass('form_row')
-				),
+				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
@@ -424,7 +424,8 @@ $formgrid = (new CFormGrid())
 	]);
 
 if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
-	$interface = $data['host']['interfaces'][$item['interfaceid']] ?? [];
+	$interface = array_key_exists($item['interfaceid'], $data['host']['interfaces'])
+		? $data['host']['interfaces'][$item['interfaceid']] : [];
 
 	if ($item['discovered']) {
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
@@ -655,8 +656,7 @@ $formgrid
 						],
 						(new CTextBox('delay_flex[#{rowNum}][period]', '#{period}', $item['discovered']))
 							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
-						(new CButtonLink(_('Remove')))
-							->addClass('element-table-remove')
+						$item['discovered'] ? null : (new CButtonLink(_('Remove')))->addClass('element-table-remove')
 					]))->addClass('form_row')
 				)
 			]))
@@ -725,11 +725,11 @@ if ($data['source'] === 'item' && $data['config']['hk_history_global']
 }
 
 $formgrid->addItem([
-	(new CLabel([_('History storage period'), $hint], 'history'))->setAsteriskMark(),
+	(new CLabel([_('History'), $hint], 'history'))->setAsteriskMark(),
 	new CFormField([
 		(new CRadioButtonList('history_mode', (int) $item['history_mode']))
-			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
-			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+			->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 			->setReadonly($item['discovered'])
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -758,13 +758,13 @@ if ($data['source'] === 'item' && $data['config']['hk_trends_global']
 
 $formgrid
 	->addItem([
-		(new CLabel([_('Trend storage period'), $hint], 'trends'))
+		(new CLabel([_('Trends'), $hint], 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
 			(new CRadioButtonList('trends_mode', (int) $item['trends_mode']))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
-				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
+				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setReadonly($item['discovered'])
 				->setModern(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

@@ -29,15 +29,12 @@ $this->addJsFile('items.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
-if ($data['uncheck']) {
-	uncheckTableRows('item');
-}
-
 $filter = new CPartial('item.list.filter', [
 	'action' => $data['action'],
 	'context' => $data['context'],
 	'filter_data' => $data['filter_data'],
 	'subfilter' => $data['subfilter'],
+	'filtered_count' => $data['filtered_count'],
 	'types' => $data['types']
 ]);
 
@@ -188,7 +185,7 @@ foreach ($data['items'] as $item) {
 					'backurl' => $list_url
 				])
 			),
-		$data['hostid'] != 0 ? null : $item['hosts'][0]['host'],
+		$data['hostid'] != 0 ? null : $item['hosts'][0]['name'],
 		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$item['triggers']
 			? [
@@ -265,7 +262,9 @@ if ($data['context'] === 'template') {
 	unset($buttons['execute'], $buttons['clearhistory']);
 }
 
-$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item'));
+$form->addItem(new CActionButtonList('action', 'itemids', $buttons,
+	'items_'.(array_key_exists('hostid', $data) ? $data['hostid'] : 0))
+);
 
 (new CHtmlPage())
 	->setTitle(_('Items'))

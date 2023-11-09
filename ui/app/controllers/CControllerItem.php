@@ -38,9 +38,9 @@ abstract class CControllerItem extends CController {
 	 */
 	protected static function getValidationFields(): array {
 		return [
-			'name'					=> 'db items.name|not_empty',
+			'name'					=> 'db items.name',
 			'type'					=> 'in '.implode(',', array_keys(item_type2str())),
-			'key'					=> 'db items.key_|not_empty',
+			'key'					=> 'db items.key_',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
 			'url'					=> 'db items.url',
 			'query_fields'			=> 'array',
@@ -103,21 +103,54 @@ abstract class CControllerItem extends CController {
 	}
 
 	/**
-	 * Additional validation for update and create actions.
+	 * Additional validation for user input consumed by create and update actions.
 	 *
 	 * @return bool
 	 */
 	protected function validateInputEx(): bool {
 		$ret = true;
+		$type = $this->getInput('type', -1);
+		$fields = array_fill_keys(['name', 'key'], '');
+		$this->getInputs($fields, array_keys($fields));
 
-		if ($this->hasInput('type') && $this->hasInput('key')) {
-			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
+		foreach ($fields as $field => $value) {
+			if ($value === '') {
+				$ret = false;
+				error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+			}
+		}
+
+		if (isItemExampleKey($type, $this->getInput('key', ''))) {
+			$ret = false;
 		}
 
 		$delay_flex = $this->getInput('delay_flex', []);
 
-		if ($ret && $delay_flex) {
-			$ret = isValidCustomIntervals($delay_flex);
+		if ($delay_flex && !isValidCustomIntervals($delay_flex)) {
+			$ret = false;
+		}
+
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => false
+		]);
+
+		if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+				&& !($type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($this->getInput('key', ''), 'mqtt.get', 8) == 0)
+				&& $simple_interval_parser->parse($this->getInput('delay', '')) != CParser::PARSE_SUCCESS) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('a time unit is expected')));
+			$ret = false;
+		}
+
+		$timeout_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+		];
+
+		if (in_array($type, $timeout_types)
+				&& $this->getInput('custom_timeout', -1) == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
+				&& $simple_interval_parser->parse($this->getInput('timeout', '')) != CParser::PARSE_SUCCESS) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
+			$ret = false;
 		}
 
 		return $ret && $this->validateRefferedObjects();
@@ -161,11 +194,11 @@ abstract class CControllerItem extends CController {
 	}
 
 	/**
-	 * Get form input data to be sent to API.
+	 * Get form fields value normalized.
 	 *
-	 * @return array
+	 * @return array form fields data.
 	 */
-	protected function getInputForApi(): array {
+	protected function getFormValues(): array {
 		$unchecked_values = [
 			'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
 			'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
@@ -176,7 +209,8 @@ abstract class CControllerItem extends CController {
 		];
 		$input = $unchecked_values + CItemHelper::getDefaults();
 		$this->getInputs($input, array_keys($input));
+		$input = CItemHelper::normalizeFormData($input);
 
-		return CItemHelper::convertFormInputForApi($input);
+		return $input;
 	}
 }

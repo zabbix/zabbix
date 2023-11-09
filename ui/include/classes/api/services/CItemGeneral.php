@@ -96,11 +96,6 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected const INHERIT_CHUNK_SIZE = 1000;
 
-	protected const HTTP_FIELD_TYPES = [
-		'headers' => ZBX_HTTPFIELD_HEADER,
-		'query_fields' => ZBX_HTTPFIELD_QUERY_FIELD
-	];
-
 	/**
 	 * @abstract
 	 *

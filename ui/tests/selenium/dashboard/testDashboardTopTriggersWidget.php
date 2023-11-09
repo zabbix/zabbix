@@ -1473,9 +1473,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						// Check 2-level menu links.
 						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
 						$this->assertEquals($menu_level2, $item_link->getText());
-						$this->assertStringContainsString($attribute, str_contains($attribute, 'menu-popup-item')
-							? $item_link->getAttribute('class')
-							: $item_link->getAttribute('href')
+						$this->assertStringContainsString($attribute,
+								$item_link->getAttribute(($attribute === 'menu-popup-item') ? 'class' : 'href')
 						);
 					}
 				}

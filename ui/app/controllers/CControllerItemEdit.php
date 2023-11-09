@@ -60,9 +60,11 @@ class CControllerItemEdit extends CControllerItem {
 
 	public function doAction() {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
-		$item = $this->getItem($host);
+		$item = $this->hasInput('clone') ? $this->getClone($host) : $this->getItem($host);
+		$item['context'] = $this->getInput('context');
 		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
-		$item['inherited_timeout'] = $inherited_timeouts[$item['type']] ?? '';
+		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited_timeouts)
+			? $inherited_timeouts[$item['type']] : '';
 
 		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
 			$item['timeout'] = $item['inherited_timeout'];
@@ -101,6 +103,7 @@ class CControllerItemEdit extends CControllerItem {
 			'host' => $host,
 			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
+			'executable_item_types' => checkNowAllowedTypes(),
 			'inherited_timeouts' => $inherited_timeouts,
 			'interface_types' => itemTypeInterface(),
 			'inventory_fields' => $inventory_fields,
@@ -170,43 +173,67 @@ class CControllerItemEdit extends CControllerItem {
 	}
 
 	/**
+	 * Get item form input for clone action.
+	 *
+	 * @param array $host  Item host data.
+	 *
+	 * @return array item clone form data.
+	 */
+	protected function getClone(array $host): array {
+		$item = [
+			'itemid' => 0,
+			'templateid' => 0,
+			'hostid' => $host['hostid'],
+			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+			'parent_items' => [],
+			'discovered' => false,
+			'templated' => false,
+			'inventory_link' => 0
+		] + $this->getFormValues();
+
+		if ($item['valuemapid']) {
+			$valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name', 'hostid'],
+				'valuemapids' => [$item['valuemapid']]
+			]);
+			$valuemap = $valuemap ? reset($valuemap) : [];
+
+			if ($valuemap && $valuemap['hostid'] != $host['hostid']) {
+				$valuemap = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name', 'hostid'],
+					'search' => ['name' => $valuemap['name']],
+					'filter' => ['hostid' => $host['hostid']]
+				]);
+				$valuemap = $valuemap ? reset($valuemap) : [];
+			}
+
+			$item['valuemap'] = $valuemap;
+			$item['valuemapid'] = $valuemap ? $valuemap['valuemapid'] : 0;
+		}
+
+		if ($item['master_itemid']) {
+			$master_item = API::Item()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $item['master_itemid'],
+				'webitems' => true
+			]);
+			$item['master_item'] = $master_item ? reset($master_item) : [];
+		}
+
+		return $item;
+	}
+
+	/**
 	 * Get form data for item from database.
 	 *
-	 * @param array $host
+	 * @param array $host  Item host data.
 	 *
-	 * @return array
+	 * @return array item form data.
 	 */
 	protected function getItem(array $host): array {
 		$item = [];
 
-		if ($this->hasInput('clone')) {
-			$item = [
-				'itemid' => 0,
-				'templateid' => 0,
-				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-				'parent_items' => [],
-				'discovered' => false,
-				'templated' => false,
-				'inventory_link' => 0
-			] + $this->getInputForApi();
-
-			if ($item['valuemapid'] && $this->getInput('templateid', 0)) {
-				$item_valuemap = API::ValueMap()->get([
-					'output' => ['name'],
-					'valuemapids' => [$item['valuemapid']]
-				]);
-
-				if ($item_valuemap) {
-					$host_valuemap = API::ValueMap()->get([
-						'output' => ['valuemapid'],
-						'search' => ['name' => $item_valuemap[0]['name']],
-						'filter' => ['hostid' => $host['hostid']]
-					]);
-					$item['valuemapid'] = $host_valuemap ? $host_valuemap[0]['valuemapid'] : 0;
-				}
-			}
-		}
-		elseif ($this->hasInput('itemid')) {
+		if ($this->hasInput('itemid')) {
 			[$item] = API::Item()->get([
 				'output' => [
 					'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
@@ -224,12 +251,10 @@ class CControllerItemEdit extends CControllerItem {
 				'selectTags' => ['tag', 'value'],
 				'itemids' => [$this->getInput('itemid')]
 			]);
-		}
-
-		if ($item) {
 			$item = CItemHelper::convertApiInputForForm($item);
 		}
-		else {
+
+		if (!$item) {
 			$item = CItemHelper::getDefaults();
 			$item['hostid'] = $host['hostid'];
 
@@ -247,8 +272,6 @@ class CControllerItemEdit extends CControllerItem {
 				}
 			}
 		}
-
-		$item['context'] = $this->getInput('context');
 
 		return $item;
 	}

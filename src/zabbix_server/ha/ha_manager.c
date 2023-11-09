@@ -247,7 +247,6 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 {
 	va_list	args;
 	size_t	len;
-	int	rv;
 
 	/* don't override errors */
 	if (ZBX_NODE_STATUS_ERROR == info->ha_status)
@@ -255,14 +254,8 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 
 	va_start(args, fmt);
 
-	if (0 > (rv = zbx_vsnprintf_check_len(fmt, args)))
-	{
-		va_end(args);
-
-		return;
-	}
-
-	len = (size_t)rv + 1;
+	/* zbx_vsnprintf_check_len() cannot return negative result */
+	len = (size_t)zbx_vsnprintf_check_len(fmt, args) + 1;
 
 	va_end(args);
 
