@@ -208,7 +208,7 @@ The content of the document......¡±ÁÑáñÿ
 ---
 test case: ISO-8859-1 http-equiv content invalid charset supplied in header
 in:
-  encoding: 'text/html; charset=UTF-8'
+  encoding: 'text/html;charset=UTF-8'
   buffer: &buffer
     - '<!DOCTYPE html>
 <html>
