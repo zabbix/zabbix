@@ -51,9 +51,8 @@ window.connector_edit_popup = new class {
 
 	_updateForm() {
 		const data_type = this.form.querySelector('[name="data_type"]:checked').value;
-		const item_value_type = this.form.querySelectorAll('.js-field-item-value-type');
 
-		for (const element of item_value_type) {
+		for (const element of this.form.querySelectorAll('.js-field-item-value-types')) {
 			element.style.display = data_type == <?= ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES ?> ? '' : 'none';
 		}
 
@@ -80,8 +79,7 @@ window.connector_edit_popup = new class {
 		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
 		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
 
-		this.form.querySelector('[name="attempt_interval"]')
-			.disabled = this.form.querySelector('[name="max_attempts"]').value <= 1;
+		this.form.querySelector('#attempt_interval').disabled = this.form.querySelector('#max_attempts').value <= 1;
 	}
 
 	clone({title, buttons}) {
@@ -112,8 +110,8 @@ window.connector_edit_popup = new class {
 			fields.connectorid = this.connectorid;
 		}
 
-		const fields_to_trim = ['name', 'url', 'username', 'token', 'timeout', 'http_proxy', 'ssl_cert_file',
-			'ssl_key_file', 'description'
+		const fields_to_trim = ['name', 'url', 'username', 'token', 'attempt_interval', 'timeout', 'http_proxy',
+			'ssl_cert_file','ssl_key_file', 'description'
 		];
 		for (const field of fields_to_trim) {
 			if (field in fields) {

@@ -37,17 +37,8 @@ class CConnector extends CApiService {
 
 	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type',
 		'max_records', 'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype',
-		'username',	'password',	'token', 'verify_peer',	'verify_host', 'ssl_cert_file', 'ssl_key_file',
-		'ssl_key_password',	'description', 'status', 'tags_evaltype'
-	];
-
-	private array $filter_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type',
-		'max_records', 'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype',
-		'username', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'status', 'tags_evaltype'
-	];
-
-	private array $search_fields = ['name', 'url', 'attempt_interval', 'timeout', 'http_proxy', 'username', 'token',
-		'ssl_cert_file', 'ssl_key_file', 'description'
+		'username', 'password', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file',
+		'ssl_key_password', 'description', 'status', 'tags_evaltype'
 	];
 
 	/**
@@ -67,8 +58,8 @@ class CConnector extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'connectorids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => $this->filter_fields],
-			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => $this->search_fields],
+			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type', 'max_records', 'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype', 'username', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'status', 'tags_evaltype']],
+			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'url', 'attempt_interval', 'timeout', 'http_proxy', 'username', 'token', 'ssl_cert_file', 'ssl_key_file', 'description']],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>				['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
@@ -209,8 +200,8 @@ class CConnector extends CApiService {
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5', 'default' => DB::getDefault('connector', 'max_attempts')],
 			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY , 'in' => '1:10'],
-										['else' => true, 'type' => API_TIME_UNIT, 'in' => '5']
+										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:10'],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '5s']
 			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
@@ -339,6 +330,10 @@ class CConnector extends CApiService {
 		$db_defaults = DB::getDefaults('connector');
 
 		foreach ($connectors as &$connector) {
+			if ($connector['data_type'] != ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+				$connector += ['item_value_type' => $db_defaults['item_value_type']];
+			}
+
 			if ($connector['authtype'] == ZBX_HTTP_AUTH_NONE || $connector['authtype'] == ZBX_HTTP_AUTH_BEARER) {
 				$connector += [
 					'username' => $db_defaults['username'],
@@ -348,10 +343,6 @@ class CConnector extends CApiService {
 
 			if ($connector['authtype'] != ZBX_HTTP_AUTH_BEARER) {
 				$connector += ['token' => $db_defaults['token']];
-			}
-
-			if ($connector['data_type'] != ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
-				$connector += ['item_value_type' => $db_defaults['item_value_type']];
 			}
 
 			if ($connector['max_attempts'] <= 1) {
@@ -375,7 +366,7 @@ class CConnector extends CApiService {
 			'max_attempts' =>		['type' => API_INT32, 'in' => '1:5'],
 			'attempt_interval' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:10'],
-										['else' => true, 'type' => API_TIME_UNIT, 'in' => '5']
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '5s']
 			]],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],

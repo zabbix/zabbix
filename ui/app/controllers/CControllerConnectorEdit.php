@@ -86,30 +86,7 @@ class CControllerConnectorEdit extends CController {
 	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('connector');
 
-		$all_item_value_types = [ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT, ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
-			ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG, ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR, ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT
-		];
-
-		rsort($all_item_value_types);
-
 		if ($this->connector !== null) {
-			$checked_item_value_types = [];
-
-			$item_value_type = (int) $this->connector['item_value_type'];
-
-			if (array_key_exists('item_value_type', $this->connector)) {
-				foreach ($all_item_value_types as $value_type) {
-					if ($item_value_type - $value_type >= 0) {
-						$checked_item_value_types[] = $value_type;
-						$item_value_type -= $value_type;
-					}
-
-					if ($item_value_type === 0) {
-						break;
-					}
-				}
-			}
-
 			$data = [
 				'connectorid' => $this->connector['connectorid'],
 				'form' => [
@@ -117,7 +94,7 @@ class CControllerConnectorEdit extends CController {
 					'protocol' => $this->connector['protocol'],
 					'data_type' => (int) $this->connector['data_type'],
 					'url' => $this->connector['url'],
-					'item_value_type' => $checked_item_value_types,
+					'item_value_types' => (int) $this->connector['item_value_type'],
 					'authtype' => (int) $this->connector['authtype'],
 					'username' => $this->connector['username'],
 					'password' => $this->connector['password'],
@@ -157,7 +134,7 @@ class CControllerConnectorEdit extends CController {
 					'protocol' => (int) $db_defaults['protocol'],
 					'data_type' => (int) $db_defaults['data_type'],
 					'url' => $db_defaults['url'],
-					'item_value_type' => $all_item_value_types,
+					'item_value_type' => $db_defaults['item_value_type'],
 					'authtype' => (int) $db_defaults['authtype'],
 					'username' => $db_defaults['username'],
 					'password' => $db_defaults['password'],

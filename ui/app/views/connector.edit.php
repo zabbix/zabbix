@@ -24,24 +24,6 @@
  * @var array $data
  */
 
-$item_value_type_options = [
-	['value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64, 'label' => _('Numeric (unsigned)'),
-		'checked' => in_array(ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64, $data['form']['item_value_type'])
-	],
-	['value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR, 'label' => _('Character'),
-		'checked' => in_array(ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR, $data['form']['item_value_type'])
-	],
-	['value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT, 'label' => _('Text'),
-		'checked' => in_array(ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT, $data['form']['item_value_type'])
-	],
-	['value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT, 'label' => _('Numeric (float)'),
-		'checked' => in_array(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT, $data['form']['item_value_type'])
-	],
-	['value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG, 'label' => _('Log'),
-		'checked' => in_array(ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG, $data['form']['item_value_type'])
-	]
-];
-
 $form = (new CForm('post'))
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('connector')))->removeId())
 	->setId('connector-form')
@@ -135,14 +117,41 @@ $form_grid = (new CFormGrid())
 		])
 	)
 	->addItem([
-		(new CLabel(_('Type of information'), 'item_value_type'))
+		(new CLabel(_('Type of information'), 'item_value_types'))
 			->setAsteriskMark()
-			->addClass('js-field-item-value-type'),
+			->addClass('js-field-item-value-types'),
 		(new CFormField(
-			(new CCheckBoxList('item_value_type'))
-				->setOptions($item_value_type_options)
+			(new CCheckBoxList('item_value_types'))
+				->setOptions([
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
+						'label' => _('Numeric (unsigned)'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_types']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT,
+						'label' => _('Numeric (float)'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_types']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR,
+						'label' => _('Character'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_types']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG,
+						'label' => _('Log'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_types']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT,
+						'label' => _('Text'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_types']
+					]
+				])
+				->setVertical()
 				->setColumns(3)
-		))->addClass('js-field-item-value-type')
+		))->addClass('js-field-item-value-types')
 	])
 	->addItem([
 		new CLabel(_('HTTP authentication'), 'authtype-focusable'),
@@ -220,7 +229,9 @@ $form_grid = (new CFormGrid())
 			->addItem([
 				(new CLabel(_('Attempt interval'), 'attempt_interval'))->setAsteriskMark(),
 				new CFormField(
-					(new CTextBox('attempt_interval', $data['form']['attempt_interval']))
+					(new CTextBox('attempt_interval', $data['form']['attempt_interval'], false,
+						DB::getFieldLength('connector', 'attempt_interval')
+					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
 				)

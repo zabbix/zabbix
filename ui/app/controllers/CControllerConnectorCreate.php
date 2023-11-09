@@ -31,7 +31,7 @@ class CControllerConnectorCreate extends CController {
 			'protocol' =>			'db connector.protocol|in '.ZBX_STREAMING_PROTOCOL_V1,
 			'data_type' =>			'db connector.data_type|in '.implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]),
 			'url' =>				'required|not_empty|db connector.url',
-			'item_value_type' =>	'array',
+			'item_value_types' =>	'array',
 			'authtype' =>			'db connector.authtype|in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER]),
 			'username' =>			'db connector.username',
 			'password' =>			'db connector.password',
@@ -67,7 +67,7 @@ class CControllerConnectorCreate extends CController {
 			$data_type = $this->getInput('data_type', ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES);
 
 			if ($data_type == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
-				$fields['item_value_type'] = 'required';
+				$fields['item_value_types'] = 'required';
 			}
 
 			if ($this->getInput('authtype', ZBX_HTTP_AUTH_NONE) == ZBX_HTTP_AUTH_BEARER) {
@@ -125,6 +125,10 @@ class CControllerConnectorCreate extends CController {
 			'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'tags_evaltype'
 		]);
 
+		if ($connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+			$connector['item_value_type'] = array_sum($this->getInput('item_value_types'));
+		}
+
 		switch ($connector['authtype']) {
 			case ZBX_HTTP_AUTH_BASIC:
 			case ZBX_HTTP_AUTH_NTLM:
@@ -135,10 +139,6 @@ class CControllerConnectorCreate extends CController {
 
 			case ZBX_HTTP_AUTH_BEARER:
 				$connector['token'] = $this->getInput('token');
-		}
-
-		if ($connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
-			$connector['item_value_type'] = array_sum($this->getInput('item_value_type'));
 		}
 
 		if ($connector['max_attempts'] > 1) {
