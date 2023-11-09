@@ -1588,8 +1588,8 @@ button {
 
 .dashboard-navigation {
   display: flex;
-  margin-top: 10px;
-  padding-bottom: 2px; }
+  margin-top: 2px;
+  margin-bottom: 6px; }
   .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.btn-dashboard-previous-page, .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.btn-dashboard-next-page {
     display: inline-block; }
 
