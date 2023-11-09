@@ -66,7 +66,7 @@ ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_GET)
 
 static int	CONFIG_GET_TIMEOUT = CONFIG_GET_TIMEOUT_MAX;
 
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"Get data from Zabbix agent.",
 	"",
 	"General options:",

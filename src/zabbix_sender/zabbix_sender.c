@@ -148,7 +148,7 @@ static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 #define CONFIG_SENDER_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MIN)
 #define CONFIG_SENDER_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MAX)
 
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
 	"General options:",

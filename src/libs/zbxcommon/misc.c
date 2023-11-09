@@ -236,6 +236,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  *          80-column terminal                                                *
  *                                                                            *
  * Parameters:  usage_message - [IN]                                          *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_print_usage(const char **usage_message)
 {

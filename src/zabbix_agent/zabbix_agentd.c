@@ -47,8 +47,8 @@ static char	*zbx_config_listen_ip = NULL;
 static int	zbx_config_refresh_active_checks = 5;
 ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
 static int	config_log_level = LOG_LEVEL_WARNING;
-static int	zbx_config_buffer_size= 100;
-static int	zbx_config_buffer_send= 5;
+static int	zbx_config_buffer_size = 100;
+static int	zbx_config_buffer_send = 5;
 static int	zbx_config_max_lines_per_second	= 20;
 static int	zbx_config_eventlog_max_lines_per_second = 20;
 static char	*config_load_module_path = NULL;
@@ -229,7 +229,7 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
-int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
+static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_POLLER */
 	0, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
