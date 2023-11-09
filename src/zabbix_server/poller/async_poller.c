@@ -238,6 +238,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			poller_config->clear_cache = 0;
 		}
 	}
+#else
+	ZBX_UNUSED(zbx_progname);
 #endif
 
 	zbx_async_manager_queue_get(poller_config->manager, &poller_items);
