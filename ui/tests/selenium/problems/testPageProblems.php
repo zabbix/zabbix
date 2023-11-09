@@ -76,13 +76,36 @@ class testPageProblems extends CWebTest {
 				'description' => 'Trigger for Age problem',
 				'expression' => 'last(/Host for Problems Page/trap)=0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'Problem trap>10 [Symptom]',
+				'expression' => 'last(/Host for Problems Page/trap)>10',
+				'priority' => TRIGGER_SEVERITY_WARNING
+			],
+			[
+				'description' => 'Problem trap>100 [Cause]',
+				'expression' => 'last(/Host for Problems Page/trap)>150',
+				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 
-		// Create event.
+		// Create event with recent age.
 		$time = time();
-		CDataHelper::addItemData($items['itemids'][0], 0);
+		CDataHelper::addItemData($items['itemids'][0], [0,20,150]);
 		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
+	}
+
+	public function prepareCauseAndSymptoms() {
+		// Create problems.
+		CDBHelper::setTriggerProblem('Problem trap>10 [Symptom]', TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem('Problem trap>100 [Cause]', TRIGGER_VALUE_TRUE);
+
+		// Set cause and symptoms.
+		$causeid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>100 [Cause]'));
+		$symptomid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
+		DBexecute('UPDATE problem SET cause_eventid='.$causeid.' WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
+		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.$symptomid.','.$causeid.')');
+		DBexecute('UPDATE event_symptom SET cause_eventid='.$causeid.' WHERE eventid='.$symptomid);
 	}
 
 	public function testPageProblems_Layout() {
@@ -369,7 +392,8 @@ class testPageProblems extends CWebTest {
 		// Check that some unfiltered data is displayed in the table.
 		$this->assertTableStats(CDBHelper::getCount(
 				'SELECT null FROM problem'.
-				' WHERE eventid'.
+				' WHERE cause_eventid IS NULL'.
+				' AND eventid'.
 					' NOT IN (SELECT eventid FROM event_suppress)'
 		));
 
@@ -1501,5 +1525,70 @@ class testPageProblems extends CWebTest {
 		$this->assertEquals($start_rows_count, $reset_count);
 		$this->assertTableStats($reset_count);
 		$this->assertEquals($start_contents, $this->getTableColumnData('Problem'));
+	}
+
+	public static function getCauseSymptomsData() {
+		return [
+			// #0 Show symptoms false.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Problems Page',
+						'Show symptoms' => false
+					],
+					'result' => [
+						['Problem' => 'Problem trap>100 [Cause]'],
+						['Problem' => 'Problem trap>10 [Symptom]'],
+						['Problem' => 'Trigger for Age problem']
+					]
+				]
+			],
+			// #1 Show symptoms true.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Problems Page',
+						'Show symptoms' => true
+					],
+					'result' => [
+						['Problem' => 'Problem trap>100 [Cause]'],
+						['Problem' => 'Problem trap>10 [Symptom]'],
+						['Problem' => 'Problem trap>10 [Symptom]'],
+						['Problem' => 'Trigger for Age problem']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @onBeforeOnce prepareCauseAndSymptoms
+	 *
+	 * @dataProvider getCauseSymptomsData
+	 */
+	public function testPageProblems_FilterCauseSymptoms($data) {
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+		$form->fill($data['fields']);
+		$form->submit();
+		$table->waitUntilReloaded();
+		$this->assertTableData($data['result']);
+		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
+		);
+
+		$symptom_xpath = 'xpath:.//span[(@title="Symptom")]';
+
+		// For Cause problem arrow icon is not present at all.
+		$this->assertFalse($table->getRow(0)->query($symptom_xpath)->exists());
+
+		// For both cases Symptom arrow icon is not visible for the collapsed problem.
+		$this->assertFalse($table->getRow(1)->query($symptom_xpath)->one()->isVisible());
+
+		// When Symptom is present in the table it is marked with Symptom arrow icon.
+		if ($data['fields']['Show symptoms']) {
+			$this->assertTrue($table->getRow(2)->query($symptom_xpath)->one()->isVisible());
+		}
 	}
 }
