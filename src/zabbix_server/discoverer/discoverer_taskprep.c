@@ -107,6 +107,12 @@ static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 	case SVC_SNMPv2c:
 	case SVC_SNMPv3:
 	case SVC_TCP:
+	case SVC_SMTP:
+	case SVC_FTP:
+	case SVC_POP:
+	case SVC_NNTP:
+	case SVC_IMAP:
+	case SVC_HTTP:
 		return SUCCEED;
 	default:
 		return FAIL;

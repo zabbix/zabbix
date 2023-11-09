@@ -30,6 +30,7 @@
 #include "zbxip.h"
 #include "zbxcomms.h"
 #include "cfg.h"
+#include "zbx_discoverer_constants.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
@@ -300,6 +301,34 @@ static int	validate_nntp(const char *line)
 static int	validate_imap(const char *line)
 {
 	return 0 == strncmp(line, "* OK", 4) ? ZBX_TCP_EXPECT_OK : ZBX_TCP_EXPECT_FAIL;
+}
+
+int	zbx_check_service_validate(const unsigned char svc_type, const char *data)
+{
+	int	ret;
+
+	switch (svc_type)
+	{
+	case SVC_SMTP:
+		ret = validate_smtp(data);
+		break;
+	case SVC_FTP:
+		ret = validate_ftp(data);
+		break;
+	case SVC_POP:
+		ret = validate_pop(data);
+		break;
+	case SVC_NNTP:
+		ret = validate_nntp(data);
+		break;
+	case SVC_IMAP:
+		ret = validate_imap(data);
+		break;
+	default:
+		ret = ZBX_TCP_EXPECT_FAIL;
+	}
+
+	return ZBX_TCP_EXPECT_OK == ret ? SUCCEED : FAIL;
 }
 
 int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)

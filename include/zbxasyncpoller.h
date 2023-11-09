@@ -51,7 +51,8 @@ zbx_async_resolve_reverse_dns_t;
 typedef int (*zbx_async_task_process_cb_t)(short event, void *data, int *fd, const char *addr, char *dnserr);
 typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
-void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
+zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event);
+void			zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
 		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
 #endif
 #endif

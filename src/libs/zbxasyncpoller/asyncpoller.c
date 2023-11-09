@@ -236,4 +236,16 @@ void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase
 
 	evdns_getaddrinfo(dnsbase, addr, NULL, &hints, async_dns_event, task);
 }
+
+zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event)
+{
+	if (POLLIN & event)
+		return ZBX_ASYNC_TASK_READ;
+
+	if (POLLOUT & event)
+		return ZBX_ASYNC_TASK_WRITE;
+
+	return ZBX_ASYNC_TASK_STOP;
+}
+
 #endif

@@ -42,17 +42,6 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 	}
 }
 
-static zbx_async_task_state_t	get_task_state_for_event(short event)
-{
-	if (POLLIN & event)
-		return ZBX_ASYNC_TASK_READ;
-
-	if (POLLOUT & event)
-		return ZBX_ASYNC_TASK_WRITE;
-
-	return ZBX_ASYNC_TASK_STOP;
-}
-
 static int	agent_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
@@ -174,8 +163,11 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 						agent_context->tls_arg1, agent_context->tls_arg2,
 						agent_context->server_name, &event_new, &error))
 				{
-					if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
+					if (ZBX_ASYNC_TASK_STOP != (
+							state = zbx_async_poller_get_task_state_for_event(event_new)))
+					{
 						return state;
+					}
 
 					SET_MSG_RESULT(&agent_context->item.result,
 							zbx_dsprintf(NULL, "Get value from agent failed:"
@@ -200,8 +192,11 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			if (SUCCEED != zbx_tcp_send_context(&agent_context->s, &agent_context->tcp_send_context,
 					&event_new))
 			{
-				if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
+				if (ZBX_ASYNC_TASK_STOP != (
+						state = zbx_async_poller_get_task_state_for_event(event_new)))
+				{
 					return state;
+				}
 
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: cannot send: %s", zbx_socket_strerror()));
@@ -231,7 +226,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				break;
 			}
 
-			if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
+			if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
 				return state;
 
 			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed:"

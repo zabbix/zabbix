@@ -26,7 +26,6 @@
 typedef enum
 {
 	ZABBIX_TCPSVC_STEP_CONNECT_WAIT = 0,
-	ZABBIX_TCPSVC_STEP_TLS_WAIT,
 	ZABBIX_TCPSVC_STEP_SEND,
 	ZABBIX_TCPSVC_STEP_RECV
 }
@@ -45,6 +44,7 @@ typedef struct
 	const char			*config_source_ip;
 	int				config_timeout;
 	unsigned char			svc_type;
+	int				(*validate_func)(const unsigned char, const char *);
 	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
 	zbx_async_rdns_step_t		rdns_step;
 	char				*reverse_dns;
