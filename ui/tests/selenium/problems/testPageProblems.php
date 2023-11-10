@@ -78,6 +78,18 @@ class testPageProblems extends CWebTest {
 				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
+				'description' => 'Trigger for Age problem 1 day',
+				'expression' => 'last(/Host for Problems Page/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
+			],
+			[
+				'description' => 'Trigger for Age problem 1 month',
+				'expression' => 'last(/Host for Problems Page/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
+			],
+			[
 				'description' => 'Problem trap>10 [Symptom]',
 				'expression' => 'last(/Host for Problems Page/trap)>10',
 				'priority' => TRIGGER_SEVERITY_WARNING
@@ -91,8 +103,25 @@ class testPageProblems extends CWebTest {
 
 		// Create event with recent age.
 		$time = time();
-		CDataHelper::addItemData($items['itemids'][0], [0,20,150]);
+		CDataHelper::addItemData($items['itemids'][0], [0, 20, 150]);
 		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
+		CDBHelper::setTriggerProblem('Trigger for Age problem 1 day', TRIGGER_VALUE_TRUE,
+				['clock' => $time - 86400]);
+		CDBHelper::setTriggerProblem('Trigger for Age problem 1 month', TRIGGER_VALUE_TRUE,
+				['clock' => $time - 2.628e+6]
+		);
+
+		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
+		$monthid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 month'));
+
+		// Close problems to check time selector filter tab.
+		foreach ([$dayid, $monthid] as $eventid) {
+			CDataHelper::call('event.acknowledge', [
+				'eventids' => $eventid,
+				'action' => 1,
+				'message' => 'Closed problem'
+			]);
+		}
 	}
 
 	public function prepareCauseAndSymptoms() {
@@ -168,8 +197,8 @@ class testPageProblems extends CWebTest {
 			'Show operational data' => ['value' => 'None'],
 			'Compact view' => ['value' => false],
 			'Show details' => ['value' => false],
-			'id:show_timeline_0' => ['value' => true],
-			'id:highlight_row_0' => ['value' => false, 'enabled' => false]
+			'Show timeline' => ['value' => true],
+			'Highlight whole row' => ['value' => false, 'enabled' => false]
 		];
 
 		foreach ($fields_values as $label => $attributes) {
@@ -232,7 +261,7 @@ class testPageProblems extends CWebTest {
 				'xpath://button[contains(@class, "js-btn-time-left")]' => true,
 				'button:Zoom out' => true,
 				'xpath://button[contains(@class, "js-btn-time-right")]' => false,
-				'xpath://a[contains(@class, "zi-clock")]' => true
+				'xpath://a[text()="Last 1 hour"]' => true
 			],
 			'Problems' => [
 				'xpath://button[@data-action="selectPrevTab"]' => true,
@@ -241,7 +270,7 @@ class testPageProblems extends CWebTest {
 				'xpath://button[contains(@class, "js-btn-time-left")]' => false,
 				'button:Zoom out' => false,
 				'xpath://button[contains(@class, "js-btn-time-right")]' => false,
-				'xpath://a[contains(@class, "zi-clock")]' => false
+				'xpath://a[text()="Last 1 hour"]' => false
 			]
 		];
 
@@ -299,10 +328,10 @@ class testPageProblems extends CWebTest {
 		foreach ([true, false] as $state) {
 			$filter_form->fill(['Compact view' => $state]);
 
-			foreach (['Show operational data', 'Show details', 'id:show_timeline_0'] as $field) {
+			foreach (['Show operational data', 'Show details', 'Show timeline'] as $field) {
 				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
 			}
-			$this->assertTrue($filter_form->getField('id:highlight_row_0')->isEnabled($state));
+			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled($state));
 		}
 
 		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])
@@ -368,12 +397,12 @@ class testPageProblems extends CWebTest {
 				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
 			[
-				'label' => 'id:show_timeline_0',
+				'label' => 'Show timeline',
 				'value' => false,
 				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
 			[
-				'label' => 'id:show_timeline_0',
+				'label' => 'Show timeline',
 				'value' => true,
 				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			]
@@ -383,7 +412,7 @@ class testPageProblems extends CWebTest {
 			$filter_form->fill([$field['label'] => $field['value']]);
 			$filter_form->submit();
 			$table->waitUntilReloaded();
-			$start_headers = ($field['label'] === 'id:show_timeline_0' && !$field['value'])
+			$start_headers = ($field['label'] === 'Show timeline' && !$field['value'])
 				? ['', 'Time', 'Severity']
 				: ['', 'Time', '', '', 'Severity'];
 			$this->assertEquals(array_merge($start_headers, $field['headers']), $table->getHeadersText());
@@ -710,7 +739,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => 'Zabbix servers',
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -731,7 +760,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => 'Zabbix servers',
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -752,7 +781,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Host group for tag permissions', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -774,7 +803,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Host group for tag permissions', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -798,7 +827,7 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -808,6 +837,8 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -849,7 +880,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -871,7 +902,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -896,7 +927,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -919,7 +950,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -941,7 +972,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -964,7 +995,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'id:show_timeline_0' => false
+						'Show timeline' => false
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -1004,7 +1035,7 @@ class testPageProblems extends CWebTest {
 						'Tag display priority' => 'Tag4',
 						'Show operational data' => 'Separately',
 						'Show details' => true,
-						'id:show_timeline_0' => true,
+						'Show timeline' => true,
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -1347,12 +1378,65 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Problem' => '1_trigger_Average',
+						'Hosts' => '1_trigger_Average',
 						'id:compact_view_0' => true,
-						'id:highlight_row_0' => true
+						'Highlight whole row' => true
 					],
 					'result' => [
 						['Problem' => '1_trigger_Average']
+					]
+				]
+			],
+			// #43 Time selector 1 day.
+			[
+				[
+					'fields' => [
+						'Show' => 'History',
+						'Hosts' => 'Host for Problems Page',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'id:from' => 'now-1d',
+						'id:to' => 'now'
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem']
+					]
+				]
+			],
+			// #44 Time selector 2 weeks.
+			[
+				[
+					'fields' => [
+						'Show' => 'History',
+						'Hosts' => 'Host for Problems Page',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'id:from' => 'now-2w',
+						'id:to' => 'now'
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day']
+					]
+				]
+			],
+			// #45 Time selector Last 1 year.
+			[
+				[
+					'fields' => [
+						'Show' => 'History',
+						'Hosts' => 'Host for Problems Page',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'link' => 'Last 1 year'
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
 					]
 				]
 			]
@@ -1377,6 +1461,22 @@ class testPageProblems extends CWebTest {
 		}
 
 		$form->submit();
+
+		if (array_key_exists('time_selector', $data)) {
+			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();
+			$this->query('class:time-quick-range')->waitUntilVisible()->one();
+			$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
+
+			if (CTestArrayHelper::get($data['time_selector'], 'link')) {
+				$form->query('link', $data['time_selector']['link'])->waitUntilClickable()->one()->click();
+			}
+			else {
+				$form->fill($data['time_selector']);
+			}
+
+			$this->query('button:Apply')->one()->click();
+		}
+
 		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
@@ -1386,7 +1486,7 @@ class testPageProblems extends CWebTest {
 		if (array_key_exists('fields', $data) && CTestArrayHelper::get($data['fields'], 'id:compact_view_0', false)) {
 			$this->assertTrue($this->query($compact_selector)->exists());
 
-			$this->assertEquals(CTestArrayHelper::get($data['fields'], 'id:highlight_row_0', false),
+			$this->assertEquals(CTestArrayHelper::get($data['fields'], 'Highlight whole row', false),
 					$this->query($highlight_selector)->exists()
 			);
 		}
@@ -1493,7 +1593,7 @@ class testPageProblems extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
-		$form->fill(['id:show_timeline_0' => false]);
+		$form->fill(['Show timeline' => false]);
 		$form->submit();
 		$table->waitUntilReloaded();
 		$start_rows_count = $table->getRows()->count();
@@ -1517,7 +1617,7 @@ class testPageProblems extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 
-		$form->fill(['id:show_timeline_0' => false]);
+		$form->fill(['Show timeline' => false]);
 		$form->submit();
 		$table->waitUntilReloaded();
 
@@ -1534,12 +1634,15 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Hosts' => 'Host for Problems Page',
-						'Show symptoms' => false
+						'Show symptoms' => false,
+						'Show timeline' => false
 					],
 					'result' => [
 						['Problem' => 'Problem trap>100 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]'],
-						['Problem' => 'Trigger for Age problem']
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
 					]
 				]
 			],
@@ -1548,13 +1651,16 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Hosts' => 'Host for Problems Page',
-						'Show symptoms' => true
+						'Show symptoms' => true,
+						'Show timeline' => false
 					],
 					'result' => [
 						['Problem' => 'Problem trap>100 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]'],
 						['Problem' => 'Problem trap>10 [Symptom]'],
-						['Problem' => 'Trigger for Age problem']
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
 					]
 				]
 			]
@@ -1570,11 +1676,19 @@ class testPageProblems extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+
+		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = true.
+		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
+		);
+
 		$form->fill($data['fields']);
 		$form->submit();
 		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
-		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+
+		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = false.
+		$this->assertEquals(['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
 				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
 		);
 
