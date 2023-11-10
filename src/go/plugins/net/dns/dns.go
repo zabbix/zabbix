@@ -47,6 +47,7 @@ const (
 	fourthParam
 	fifthParam
 	sixthParam
+	seventhParam
 )
 
 type options struct {

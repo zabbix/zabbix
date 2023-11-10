@@ -12,6 +12,16 @@ import (
 	"github.com/miekg/dns"
 )
 
+type f struct {
+	name string
+	val bool
+}
+
+type dnsGetOptions struct {
+	options
+	flags []f
+}
+
 var dnsTypesGet = map[string]uint16{
 	"None": dns.TypeNone,
 	"A": dns.TypeA,
@@ -148,14 +158,14 @@ func parseAnswersGet(answers []dns.RR) string {
 		out += fmt.Sprintf(" %-8s ", dns.Type(a.Header().Rrtype).String())
 
 		// switch rr := a.(type) {
-		// 	out += 
+		// 	out +=
 		// }
 
 		// fmt.Println("OMEGA X222: %s",a.String())
 
 		s := fmt.Sprintf("OMEGA X999: %s", reflect.TypeOf(a))
 		log.Infof(s)
-		
+
 		out += a.String()
 
 		if i != answersNum-1 {
@@ -176,14 +186,60 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 		return nil, zbxerr.New("Cannot perform DNS query.")
 	}
 
-	
 	return parseAnswersGet(answer), nil
-}	
+}
 
+func (o *dnsGetOptions) setFlags(flags string) error {
 
+	flags = "," + flags
 
-func parseParamasGet(params []string) (o options, err error) {
+	o.flags = []f {
+		f{"cdflag", false},
+			f{"rdflag", true},
+			f{"dnssec", false},
+			f{"nsid", false},
+			f{"edns0", true},
+			f{"aaflag", false},
+			f{"adflag", false},
+		}
+
+	helperFunc := func(flag f) error {
+		noXflag := strings.Contains(flags, ",no"+flag.name)
+		Xflag := strings.Contains(flags, ","+flag.name)
+
+		if (noXflag && Xflag) {
+			return zbxerr.New("Invalid flags combination, cannot use no" + flag.name + " and " + flag.name +
+					" together")
+		}
+
+		if (!flag.val) {
+			flag.val = Xflag
+		} else {
+			flag.val = noXflag
+		}
+
+		return nil
+	}
+
+	for _, i := range o.flags {
+		err := helperFunc(i)
+		if (err != nil) {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func parseParamasGet(params []string) (o dnsGetOptions, err error) {
 	switch len(params) {
+	case seventhParam:
+		err = o.setFlags(params[seventhParam-1])
+		if err != nil {
+			return
+		}
+
+		fallthrough
 	case sixthParam:
 		err = o.setProtocol(params[sixthParam-1])
 		if err != nil {
@@ -268,12 +324,12 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	log.Infof("AGS Extra: %s", resp.Extra)
 
 	log.Infof("AGS RCODE: %d", resp.Rcode)
-	
+
 	return resp.Answer, nil
 }
 
 
-func (o *options) setDNSTypeGet(dnsType string) error {
+func (o *dnsGetOptions) setDNSTypeGet(dnsType string) error {
 	if dnsType == "" {
 		return nil
 	}
@@ -302,7 +358,7 @@ func runQueryGet(resolver, domain, net string, record uint16, timeout time.Durat
 	if *six {
 		c.Net = "udp6"
 	}
-	
+
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
 			Authoritative:     *aa,
@@ -383,4 +439,3 @@ func shortRR(r dns.RR) dns.RR {
 	}
 	return r
 }
-
