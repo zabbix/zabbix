@@ -752,8 +752,6 @@ class CHttpTestManager {
 									'values' => $upd_field,
 									'where' => ['httptest_fieldid' => $db_field['httptest_fieldid']]
 								];
-
-								$field['httptest_fieldid'] = $db_field['httptest_fieldid'];
 							}
 						}
 						else {
