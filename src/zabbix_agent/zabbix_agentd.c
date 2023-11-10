@@ -491,17 +491,17 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* ----------------------    --------	*/
 	/* -  -  -  -  -  -  -  -	0x00	*/
 	/* T  -  -  -  -  -  -  -	0x80	*/
-	/*    p  -  -  -  -  -  -	0x40	*/
-	/*    -  t  -  -  -  -  -	0x20	*/
-	/*    -  -  i  -  -  -  -	0x10	*/
-	/*    -  -  -  d  -  -  -	0x08	*/
-	/*    -  -  -  -  s  -  -	0x04	*/
-	/*    -  -  -  -  -  x  -	0x02	*/
-	/*    -  -  i  -  -  -  m	0x11	*/
-	/*    -  -  -  d  -  -  m	0x09	*/
-	/*    -  -  -  -  s  -  m	0x05	*/
-	/*    -  -  -  -  -  x  m	0x03	*/
-	/*    -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
+	/* -  p  -  -  -  -  -  -	0x40	*/
+	/* -  -  t  -  -  -  -  -	0x20	*/
+	/* -  -  -  i  -  -  -  -	0x10	*/
+	/* -  -  -  -  d  -  -  -	0x08	*/
+	/* -  -  -  -  -  s  -  -	0x04	*/
+	/* -  -  -  -  -  -  x  -	0x02	*/
+	/* -  -  -  i  -  -  -  m	0x11	*/
+	/* -  -  -  -  d  -  -  m	0x09	*/
+	/* -  -  -  -  -  s  -  m	0x05	*/
+	/* -  -  -  -  -  -  x  m	0x03	*/
+	/* -  -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
 
 	if (0 < opt_count['T'])
 		opt_mask |= 0x80;
@@ -1499,9 +1499,6 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
-
-	if (ZBX_TASK_TEST_CONFIG == t.task)
-		printf("Validating configuration file \"%s\"\n", config_file);
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
 	/* into windows event log while zabbix_log is not ready */
@@ -1519,14 +1516,13 @@ int	main(int argc, char **argv)
 
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
-			SUCCEED != zbx_socket_start(&error))
+			ZBX_TASK_TEST_CONFIG != t.task && SUCCEED != zbx_socket_start(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 #endif
-
 	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
@@ -1578,6 +1574,7 @@ int	main(int argc, char **argv)
 			break;
 #endif
 		case ZBX_TASK_TEST_CONFIG:
+			printf("Validating configuration file \"%s\"\n", config_file);
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			load_aliases(CONFIG_ALIASES);
 			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
