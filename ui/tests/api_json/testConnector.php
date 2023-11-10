@@ -385,16 +385,25 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
 			],
-			'Test connector.create: invalid "attempt_interval" (not in range) where "max_attempts" equals 1' => [
+			'Test connector.create: invalid "attempt_interval" (not default) where "max_attempts" equals 1' => [
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
 					'max_attempts' => 1,
 					'attempt_interval' => '10s'
 				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be 5.'
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be 5s.'
 			],
-			'Test connector.create: invalid "attempt_interval" (empty string)' => [
+			'Test connector.create: invalid "attempt_interval" (empty string) 1' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 1,
+					'attempt_interval' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
+			],
+			'Test connector.create: invalid "attempt_interval" (empty string) 2' => [
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
@@ -1711,14 +1720,6 @@ class testConnector extends CAPITest {
 			],
 
 			// Check "attempt_interval".
-			'Test connector.create: invalid "attempt_interval" (not in range)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'max_attempts' => 2,
-					'attempt_interval' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
-			],
 			'Test connector.create: invalid "attempt_interval" (not in range) where "max_attempts" equals 1' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
@@ -1730,10 +1731,18 @@ class testConnector extends CAPITest {
 			'Test connector.create: invalid "attempt_interval" (empty string)' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
-					'max_attempts' => 2,
+					'max_attempts' => 1,
 					'attempt_interval' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
+			],
+			'Test connector.create: invalid "attempt_interval" (not in range)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 2,
+					'attempt_interval' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
 			],
 			'Test connector.create: invalid "attempt_interval" (string)' => [
 				'connector' => [
