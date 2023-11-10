@@ -55,7 +55,10 @@ void	zbx_mock_test_entry(void **state)
 			0 != memcmp(result_buffer, expected_result_buffer, expected_result_buffer_length))
 	{
 		if (SUCCEED == expected_result)
-			fail_msg("Expected the same result but there are differences");
+		{
+			fail_msg("Expected the same result but there are differences expected len:%d actual:%d result '%s'",
+					expected_result_buffer_length, strlen(result_buffer), result_buffer);
+		}
 
 		zbx_free(expected_result_buffer);
 		zbx_free(result_buffer);

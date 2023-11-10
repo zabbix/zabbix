@@ -1,4 +1,14 @@
 ---
+test case: Empty but with header
+in:
+  encoding: 'text/html; charset=ISO-8859-1'
+  buffer: &buffer
+    - 'x00'
+out:
+  expected_result_buffer: *buffer
+  encoding: 'ISO-8859-1'
+  return: SUCCEED
+---
 test case: ISO-8859-1
 in:
   encoding: 'text/html; charset=ISO-8859-1'
