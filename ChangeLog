@@ -371,11 +371,19 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.9rc1
 
 New features:
+...G.....T [ZBXNEXT-8705] implemented new tablespace item to retrieve percentage about current tablespace usage from max for both Oracle templates (knaglis)
+...G...... [ZBXNEXT-8708] add version metric to oracle plugin in Zabbix agent 2 (rzvejs)
 .......PS. [ZBXNEXT-8729] updated max supported TimescaleDB version to 2.12 (mprihodko)
 .........T [ZBXNEXT-8522] added HPE iLO by HTTP template (drasikhov)
 .........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-23621] fixed snmp discovery looping forever with empty trend response (wiper)
+...G...... [ZBX-23644] fixed Zabbix agent compilation on AIX (Andris)
+..F....... [ZBX-23525] fixed template tab name in template configuration form (agriscenko)
+.D........ [ZBX-23620] reordered sub-templates in READMEs of Acronis, Control-M and Openstack templates (knaglis)
+.........T [ZBX-23381] fixed unit for metric FreeStorageSpace in JavaScript AWS RDS instance by HTTP template (egordymov)
+..F....... [ZBX-23269] fixed sizes of loading modals (apoga)
 ..F....... [ZBX-22400] fixed Web scenarios configuration form to display parent web scenarios on page refresh (ddauksa)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 ..F....... [ZBX-23290] fixed gap in the filter by tags on Monitoring > Latest data page (agriscenko)
