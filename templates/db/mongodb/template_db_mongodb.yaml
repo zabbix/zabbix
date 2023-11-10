@@ -874,7 +874,7 @@ zabbix_export:
                   value: notice
         - uuid: c5679875dc254ddd833ee40ef4a2b3cf
           name: 'MongoDB: MongoDB version'
-          key: mongodb.version
+          key: 'mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           delay: 15m
           history: 7d
           trends: '0'
@@ -889,7 +889,7 @@ zabbix_export:
               value: application
           triggers:
             - uuid: 0856e13b7e7644c5b353fcfa577acb51
-              expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version))>0'
+              expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"],#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]))>0'
               name: 'MongoDB: Version has changed'
               event_name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
