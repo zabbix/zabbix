@@ -1034,8 +1034,7 @@ class testPageProblems extends CWebTest {
 						'id:tag_name_format_0' => 'Shortened',
 						'Tag display priority' => 'Tag4',
 						'Show operational data' => 'Separately',
-						'Show details' => true,
-						'Show timeline' => true
+						'Show details' => true
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -1278,19 +1277,46 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #35 Age filter.
+			// #35 Age filter - 999.
 			[
 				[
 					'fields' => [
 						'id:age_state_0' => true,
-						'name:age' => 999
+						'name:age' => 999,
+						'Show timeline' => false
 					],
 					'result' => [
-						['Problem' => 'Trigger for Age problem']
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
 					]
 				]
 			],
-			// #36 History.
+			// #36 Age filter - 0.
+			[
+				[
+					'fields' => [
+						'id:age_state_0' => true,
+						'name:age' => 0
+					],
+					'result' => []
+				]
+			],
+			// #37 Age filter - 1.
+			[
+				[
+					'fields' => [
+						'id:age_state_0' => true,
+						'name:age' => 10,
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day']
+					]
+				]
+			],
+			// #38 History.
 			[
 				[
 					'fields' => [
@@ -1301,7 +1327,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #37 Problems.
+			// #39 Problems.
 			[
 				[
 					'fields' => [
@@ -1316,7 +1342,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #38 Unacknowledged.
+			// #40 Unacknowledged.
 			[
 				[
 					'fields' => [
@@ -1334,7 +1360,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #39 Acknowledged.
+			// #41 Acknowledged.
 			[
 				[
 					'fields' => [
@@ -1348,7 +1374,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #40 Acknowledged by me.
+			// #42 Acknowledged by me.
 			[
 				[
 					'fields' => [
@@ -1362,7 +1388,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #41 Compact view.
+			// #43 Compact view.
 			[
 				[
 					'fields' => [
@@ -1374,7 +1400,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #42 Highlight whole row.
+			// #44 Highlight whole row.
 			[
 				[
 					'fields' => [
@@ -1387,7 +1413,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #43 Time selector 1 day.
+			// #45 Time selector 1 day.
 			[
 				[
 					'fields' => [
@@ -1404,7 +1430,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #44 Time selector 2 weeks.
+			// #46 Time selector 2 weeks.
 			[
 				[
 					'fields' => [
@@ -1422,7 +1448,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #45 Time selector Last 1 year.
+			// #47 Time selector Last 1 year.
 			[
 				[
 					'fields' => [
@@ -1466,6 +1492,7 @@ class testPageProblems extends CWebTest {
 			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();
 			$this->query('class:time-quick-range')->waitUntilVisible()->one();
 			$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
+			$this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
 			if (CTestArrayHelper::get($data['time_selector'], 'link')) {
 				$form->query('link', $data['time_selector']['link'])->waitUntilClickable()->one()->click();
@@ -1477,8 +1504,7 @@ class testPageProblems extends CWebTest {
 			$this->query('button:Apply')->one()->click();
 		}
 
-//		$table->waitUntilReloaded();
-		$this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
 		// Check "Compact view" and "Highlight whole row" filter checkboxes.
