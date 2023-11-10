@@ -116,7 +116,7 @@ class CControllerScriptUpdate extends CController {
 				}
 				else {
 					$script['manualinput_validator'] = $this->getInput('manualinput_validator', '');
-					$script['manualinput_default_value'] = trim($this->getInput('manualinput_default_value', ''));
+					$script['manualinput_default_value'] = trim($this->getInput('manualinput_default_value'));
 				}
 			}
 		}

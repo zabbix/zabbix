@@ -3042,6 +3042,19 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
 			],
+			'Test script.create invalid "manualinput_prompt" field type when "manualinput" is enabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 123,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2'
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": a character string is expected.'
+			],
 			'Test script.create "manualinput_prompt" field empty when manual input is enabled' => [
 				'script' => [
 					'name' => 'API create script',
@@ -3054,6 +3067,58 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '1,2'
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.'
+			],
+			'Test script.create invalid "manualinput_prompt" field type (integer) when "manualinput" is enabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 123,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2'
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": a character string is expected.'
+			],
+			'Test script.create invalid "manualinput_prompt" field type (array) when "manualinput" is enabled' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => [],
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2'
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": a character string is expected.'
+			],
+			'Test script.create invalid "manualinput_validator_type" field type (array)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => [],
+					'manualinput_validator' => 'validator'
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": an integer is expected.'
+			],
+			'Test script.create invalid "manualinput_validator_type" field type (array)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => 'asd',
+					'manualinput_validator' => 'validator'
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": an integer is expected.'
 			],
 			'Test script.create "manualinput_validator" field empty when manualinput validator type is string' => [
 				'script' => [
@@ -3080,6 +3145,32 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => ''
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.'
+			],
+			'Test script.create invalid "manualinput_validator" field type (integer)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => 55555
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
+			],
+			'Test script.create invalid "manualinput_validator" field type (array)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => []
+				],
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
 			],
 			'Test script.create "manualinput_validator" field for input type string (invalid regular expression - square brackets)' => [
 				'script' => [
@@ -3227,7 +3318,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_prompt' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
 			],
 			'Test script.create invalid "manualinput_validator_type" field type for scope host' => [
 				'script' => [
@@ -3237,7 +3328,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_validator_type' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
 			],
 			'Test script.create invalid "manualinput_validator" field type for scope host' => [
 				'script' => [
@@ -3247,9 +3338,9 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_validator' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
 			],
-			'Test script.create invalid "manualinput_default_value" field type for scope host' => [
+			'Test script.create unexpected "manualinput_default_value" field for scope host' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -3257,7 +3348,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_default_value' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
 			]
 		];
 	}
@@ -6168,28 +6259,28 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_manualinput',
 					'manualinput_prompt' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
 			],
 			'Test script.update invalid "manualinput_validator_type" value' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
 					'manualinput_validator_type' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
 			],
 			'Test script.update invalid "manualinput_validator" value' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
 					'manualinput_validator' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
 			],
 			'Test script.update invalid "manualinput_default_value" value' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
 					'manualinput_default_value' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
 			],
 			'Test script.update invalid "manualinput_prompt" value (empty string)' => [
 				'script' => [
@@ -6263,11 +6354,33 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
 			],
+			'Test script.update incorrect "manualinput_validator" when changing scope' => [
+				'script' => [
+					'scriptid' => 'update_scope_action_to_host_with_manualinput',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '[[[[[',
+					'manualinput_default_value' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_prompt" is missing.'
+			],
+			'Test script.update missing "manualinput_prompt" when changing scope' => [
+				'script' => [
+					'scriptid' => 'update_scope_action_to_host_with_manualinput',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+					'manualinput_validator' => '1,2,3'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_prompt" is missing.'
+			],
 			'Test script.update unexpected "manualinput_default_value" when changing scope' => [
 				'script' => [
 					'scriptid' => 'update_scope_action_to_host_with_manualinput',
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,2,3',
 					'manualinput_default_value' => 'abc'
@@ -6279,26 +6392,26 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_scope_action_to_host_with_manualinput',
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '[[[[[',
 					'manualinput_default_value' => 'abc'
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[[": "Compilation failed: missing terminating ] for character class at offset 5".'
 			],
-			'Test script.update unexpected "manualinput" for scope action when changing scope from event' => [
+			'Test script.update missing "manualinput_prompt" for scope event' => [
 				'script' => [
 					'scriptid' => 'update_scope_event',
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
-					'manualinput_validator' => '1,2,3',
-					'manualinput_default_value' => 'abc'
+					'manualinput_validator' => '1,2,3'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_prompt" is missing.'
 			],
 			'Test script.update unexpected "manualinput_default_value" for scope event' => [
 				'script' => [
 					'scriptid' => 'update_scope_event',
+					'manualinput_prompt' => 'prompt text',
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,2,3',
@@ -10331,10 +10444,10 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents for same event 2 times' => [
 				'request' => [
 					[
-						'eventid' => '20',
+						'eventid' => '20'
 					],
 					[
-						'eventid' => '20',
+						'eventid' => '20'
 					]
 				],
 				'expected_result' => [],
