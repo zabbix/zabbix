@@ -126,27 +126,27 @@ $form_grid = (new CFormGrid())
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
 						'label' => _('Numeric (unsigned)'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_types']
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_type']
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT,
 						'label' => _('Numeric (float)'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_types']
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_type']
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR,
 						'label' => _('Character'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_types']
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_type']
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG,
 						'label' => _('Log'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_types']
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_type']
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT,
 						'label' => _('Text'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_types']
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']
 					]
 				])
 				->setVertical()
