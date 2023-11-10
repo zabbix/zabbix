@@ -57,12 +57,12 @@ class CControllerScriptUserInputEdit extends CController {
 	protected function doAction(): void {
 		$data = [
 			'manualinput_prompt' => $this->getInput('manualinput_prompt', ''),
-			'manualinput_default_value' => $this->getInput('manualinput_default_value', ''),
-			'manualinput_validator' => $this->getInput('manualinput_validator', ''),
-			'user' => ['debug_mode' => $this->getDebugMode()],
-			'test' => $this->hasInput('test'),
 			'manualinput_validator_type' => $this->getInput('manualinput_validator_type'),
-			'confirmation' => $this->hasInput('confirmation') && $this->getInput('confirmation') !== ''
+			'manualinput_validator' => $this->getInput('manualinput_validator', ''),
+			'manualinput_default_value' => $this->getInput('manualinput_default_value', ''),
+			'confirmation' => $this->hasInput('confirmation') && $this->getInput('confirmation') !== '',
+			'test' => $this->hasInput('test'),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		if ($data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {

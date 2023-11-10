@@ -102,9 +102,10 @@ class CControllerScriptUpdate extends CController {
 			$script['confirmation'] = $this->getInput('confirmation', '');
 			$script['usrgrpid'] = $this->getInput('usrgrpid', 0);
 
-			$script['manualinput'] = $this->hasInput('manualinput')
-				? ZBX_SCRIPT_MANUALINPUT_ENABLED
-				: ZBX_SCRIPT_MANUALINPUT_DISABLED;
+			$script['manualinput'] =
+				$this->getInput('manualinput', ZBX_SCRIPT_MANUALINPUT_DISABLED) == ZBX_SCRIPT_MANUALINPUT_ENABLED
+					? ZBX_SCRIPT_MANUALINPUT_ENABLED
+					: ZBX_SCRIPT_MANUALINPUT_DISABLED;
 
 			if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');

@@ -2628,7 +2628,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
 	 * and user data macros.
 	 *
-	 * @param array $data                        Array of unersolved macros.
+	 * @param array $data                        Array of unresolved macros.
 	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
 	 * @param array $data[<hostid>][<scriptid>]  Script fields to resolve macros for.
 	 *
@@ -2641,7 +2641,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *             61 => array(
 	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
-	 *                 'manualinput' => 'Execute script for {HOST.HOST}?'
+	 *                 'manualinput_prompt' => 'Add manualinput value for script execution with {HOST.HOST}:'
+	 *             ),
+	 *             42 => array(
+	 *                 'manualinput_prompt' => 'Enter port number',
+	 *                 'url' => 'http://localhost:{MANUALINPUT}',
+	 *                 'manualinput_value' => '8080'
 	 *             )
 	 *         )
 	 *     )
@@ -2655,8 +2660,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *             61 => array (
 	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
-	 *                 'manualinput' => 'Execute script for Zabbix server?'
-	 *             )
+	 *                 'manualinput_prompt' => 'Add manualinput value for script execution with Zabbix server:
+	 *             ),
+	 *            42 => array(
+	 *                 'manualinput_prompt' => 'Enter port number',
+	 *                 'url' => 'http://localhost:8080',
+	 *                 'manualinput_value' => '8080'
+	 *            )
 	 *         )
 	 *     )
 	 *
@@ -2706,7 +2716,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 					else {
 						foreach ($_macros as $key => $__macros) {
-							// $key = 'host', 'interface', 'user_data' and 'inventory'
+							// $key = 'host', 'interface', 'user_data', 'inventory' and 'manualinput'
 							foreach ($__macros as $macro) {
 								if (!in_array($macro, $matched_macros[$type][$key])) {
 									$matched_macros[$type][$key][] = $macro;
@@ -2809,7 +2819,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *             61 => array(
 	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
-	 *                 'manualinput' => 'Execute script for {HOST.HOST}?'
+	 *                 'manualinput_prompt' => 'Execute script for {HOST.HOST}?'
+	 *             ),
+	 *             42 => array(
+	 *                 'url' => 'http://localhost:{MANUALINPUT}',
+	 *                 'manualinput_value' => '8080'
 	 *             )
 	 *         )
 	 *     )
@@ -2823,7 +2837,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *             61 => array (
 	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
-	 *                 'manualinput' => 'Execute script for Zabbix server?'
+	 *                 'manualinput_prompt' => 'Execute script for Zabbix server?'
+	 *             ),
+	 *             42 => array(
+	 *                 'url' => 'http://localhost:8080',
+	 *                 'manualinput_value' => '8080'
 	 *             )
 	 *         )
 	 *     )
@@ -2885,7 +2903,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 						case 'macros':
 							foreach ($_macros as $key => $__macros) {
-								// $key = 'host', 'interface', 'inventory', 'event' and 'user_data'
+								// $key = 'host', 'interface', 'inventory', 'event', 'user_data' and 'manualinput'
 								foreach ($__macros as $macro) {
 									if (!in_array($macro, $matched_macros[$type][$key])) {
 										$matched_macros[$type][$key][] = $macro;

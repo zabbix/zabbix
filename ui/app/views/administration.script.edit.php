@@ -332,15 +332,15 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Enable user input'), 'manualinput')),
 			new CFormField(
-				(new CCheckBox('manualinput'))->setChecked($data['manualinput'])
+				(new CCheckBox('manualinput'))->setChecked($data['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED)
 			)
 		])
 		->addItem([
 			(new CLabel(_('Input prompt'), 'manualinput_prompt')),
 			new CFormField([
 				(new CTextBox('manualinput_prompt', $data['manualinput_prompt'], false,
-					DB::getFieldLength('scripts', 'manualinput_prompt'))
-				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					DB::getFieldLength('scripts', 'manualinput_prompt')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
 				(new CButton('test_user_input', _('Test user input')))->addClass(ZBX_STYLE_BTN_GREY)
 			])
@@ -358,17 +358,17 @@ $form_grid
 			new CLabel(_('Default input string'), 'manualinput_default_value'),
 			new CFormField([
 				(new CTextBox('manualinput_default_value', $data['manualinput_default_value'], false,
-					DB::getFieldLength('scripts', 'manualinput_default_value'))
-				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					DB::getFieldLength('scripts', 'manualinput_default_value')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			])
 		])
 		->addItem([
 			new CLabel(_('Dropdown options'), 'dropdown_options'),
 			new CFormField([
 				(new CTextBox('dropdown_options', $dropdown_options, false,
-					DB::getFieldLength('scripts', 'manualinput_validator'))
-				)
-					->setAttribute('placeholder', 'comma-separated list')
+					DB::getFieldLength('scripts', 'manualinput_validator')
+				))
+					->setAttribute('placeholder', _('comma-separated list'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			])
 		])
@@ -376,8 +376,8 @@ $form_grid
 			new CLabel(_('Input validation rule'), 'manualinput_validator'),
 			new CFormField([
 				(new CTextBox('manualinput_validator', $validation_rule, false,
-					DB::getFieldLength('scripts', 'manualinput_validator'))
-				)->setAttribute('placeholder', 'regular expression')
+					DB::getFieldLength('scripts', 'manualinput_validator')
+				))->setAttribute('placeholder', _('regular expression'))
 			])
 		])
 		->addItem([
@@ -390,8 +390,8 @@ $form_grid
 			(new CLabel(_('Confirmation text'), 'confirmation')),
 			new CFormField([
 				(new CTextBox('confirmation', $data['confirmation'], false,
-					DB::getFieldLength('scripts', 'confirmation'))
-				)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					DB::getFieldLength('scripts', 'confirmation')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
 				(new CButton('test_confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 			])

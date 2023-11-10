@@ -77,12 +77,12 @@ class CControllerScriptUserInputCheck extends CController {
 			]);
 
 			if (!$regex_validator->validate($manualinput_validator)) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
+				error(_s('Incorrect value for field "%1$s": %2$s.','manualinput_validator',
 					$regex_validator->getError())
 				);
 			}
 			elseif ($manualinput_validator === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('manualinput_validator'),
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator',
 					_('Expression cannot be empty')
 				));
 			}

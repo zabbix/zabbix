@@ -419,7 +419,7 @@ window.script_edit_popup = new class {
 
 	/**
 	 * Displays or hides and enables or disables user input fields in the Advanced configuration.
-	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION.
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_EVENTS.
 	 *
 	 * @param {object} event  The event object.
 	 */
@@ -443,12 +443,12 @@ window.script_edit_popup = new class {
 		input_type.querySelectorAll('input').forEach((element) => element.disabled = !this.user_input_checked);
 
 		if (this.user_input_checked) {
-			document.querySelector('label[for="manualinput_prompt"]').classList
-				.add(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+			this.form.querySelector('label[for="manualinput_prompt"]').classList
+				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 		else {
-			document.querySelector('label[for="manualinput_prompt"]').classList
-				.remove(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+			this.form.querySelector('label[for="manualinput_prompt"]').classList
+				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 
 		input_type.onchange = (e) => {
@@ -487,11 +487,11 @@ window.script_edit_popup = new class {
 
 		if (this.user_input_checked) {
 			document.querySelector(`label[for="${validator.name}"]`).classList
-				.add(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 		else {
 			document.querySelector(`label[for="${validator.name}"]`).classList
-				.remove(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 
 		const updateTestUserInput = () => test_user_input.disabled = !(
@@ -507,7 +507,7 @@ window.script_edit_popup = new class {
 
 	/**
 	 * Displays or hides confirmation fields in the popup based on the value of selected scope.
-	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION.
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_EVENT.
 	 *
 	 * @param {object} event  The event object.
 	 */
@@ -520,8 +520,7 @@ window.script_edit_popup = new class {
 		const test_confirmation = this.form.querySelector('#test_confirmation');
 
 		if (this.confirmation) {
-			document.querySelector('label[for="confirmation"]').classList
-				.add(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+			this.form.querySelector('label[for="confirmation"]').classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 
 			confirmation.removeAttribute('disabled');
 
@@ -532,8 +531,8 @@ window.script_edit_popup = new class {
 			confirmation.dispatchEvent(new Event('keyup'));
 		}
 		else {
-			document.querySelector('label[for="confirmation"]').classList
-				.remove(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+			this.form.querySelector('label[for="confirmation"]').classList
+				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 			confirmation.setAttribute('disabled', 'disabled');
 			test_confirmation.setAttribute('disabled', 'disabled');
 		}

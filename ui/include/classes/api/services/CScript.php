@@ -716,7 +716,6 @@ class CScript extends CApiService {
 		}
 
 		$validation_rules = ['type' => API_OBJECT, 'fields' => []];
-		$validation_fields = [];
 		$script_manualinput_fields = [];
 		$path = '/'.($index + 1);
 
@@ -793,6 +792,7 @@ class CScript extends CApiService {
 
 				$script['manualinput_default_value'] = $default_input;
 			}
+
 			if (array_key_exists('manualinput_validator_type', $script)
 					&& $script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
 					&& array_key_exists('manualinput_validator', $script)) {
@@ -1306,7 +1306,7 @@ class CScript extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'hostid' =>			['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
-			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => '255']
+			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
 		]];
 
 		foreach ($options as $index => $option) {
@@ -1456,7 +1456,7 @@ class CScript extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'eventid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
-			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => '255', 'default' => '']
+			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value'), 'default' => '']
 		]];
 
 		foreach ($options as $index => $option) {

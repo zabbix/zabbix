@@ -50,8 +50,8 @@ else {
 		->addItem(
 			new CFormField(
 				(new CTextBox('manualinput', $data['manualinput_default_value'], false,
-					DB::getFieldLength('scripts', 'manualinput_default_value'))
-				)
+					DB::getFieldLength('scripts', 'manualinput_default_value')
+				))
 					->addStyle('margin-top: 8px;')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
