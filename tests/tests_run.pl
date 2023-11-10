@@ -71,11 +71,7 @@ sub launch($$$)
 		{
 			my $current_dir = getcwd();
 			chdir $path;
-			#eval {run3('./' . $filename, \$in, \$out, \$err)};
-			print $test_case->{'name'} . "\n";
-			eval {run3('valgrind --trace-children=yes --track-origins=yes --max-stackframe=4000000 --read-var-info=yes ./' . $filename, \$in, \$out, \$err)};
-			print $err;
-			print $out;
+			eval {run3('./' . $filename, \$in, \$out, \$err)};
 			chdir $current_dir;
 		}
 		else
