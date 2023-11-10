@@ -392,7 +392,7 @@ class testConnector extends CAPITest {
 					'max_attempts' => 1,
 					'attempt_interval' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval":  value must be "5s".'
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be "5s".'
 			],
 			'Test connector.create: invalid "attempt_interval" (boolean) where "max_attempts" equals 1' => [
 				'connector' => [
