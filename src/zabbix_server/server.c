@@ -1239,9 +1239,9 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 != opt_t && (0 != opt_r || 0 != opt_f))
+	if (0 != opt_t && 0 != opt_r)
 	{
-		zbx_error("option \"-T\" or \"--test-config\" can only be specified alone or with \"-c\"");
+		zbx_error("option \"-T\" or \"--test-config\" cannot be specified with \"-R\"");
 		exit(EXIT_FAILURE);
 	}
 
