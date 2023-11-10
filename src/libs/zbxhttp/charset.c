@@ -113,7 +113,8 @@ static int	parse_attribute_value(const char *data, size_t pos, zbx_strloc_t *loc
 
 	loc->l = pos;
 
-	while (NULL == strchr(charlist, *(++ptr)));
+	while (NULL == strchr(charlist, *(++ptr)))
+		;
 
 	if (1 == quoted)
 	{
@@ -209,7 +210,7 @@ static void	html_get_charset_content(const char *data, char **charset, char **co
 }
 
 #define ZBX_TSPECIALS			"()<>@,;:\"/[]?="
-#define ZBX_CONTENT_TOKEN_CHARLIST	ZBX_TSPECIALS " "
+#define ZBX_CONTENT_TOKEN_CHARLIST	ZBX_TSPECIALS " \r\n"
 
 static int	parse_content_name(const char *data, size_t pos, zbx_strloc_t *loc)
 {
@@ -218,11 +219,8 @@ static int	parse_content_name(const char *data, size_t pos, zbx_strloc_t *loc)
 	if (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *ptr))
 		return FAIL;
 
-	while ('\0' != *(++ptr))
-	{
-		if (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *ptr))
-			break;
-	}
+	while (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *(++ptr)))
+		;
 
 	loc->l = pos;
 	loc->r = (size_t)(ptr - data) - 1;
@@ -248,10 +246,6 @@ static int	parse_quoted_content_value(const char *data, size_t pos, zbx_strloc_t
 	const char	*ptr;
 
 	ptr = data + pos;
-
-	if ('"' != *ptr)
-		return FAIL;
-
 	loc->l = pos;
 
 	while ('"' != *(++ptr))
@@ -286,7 +280,8 @@ static int	parse_content_value(const char *data, size_t pos, zbx_strloc_t *loc)
 
 	loc->l = pos;
 
-	while (NULL == strchr(ZBX_CONTENT_TOKEN_CHARLIST, *(++ptr)));
+	while (NULL == strchr(ZBX_CONTENT_TOKEN_CHARLIST, *(++ptr)))
+		;
 
 	loc->r = (size_t)(ptr - data) - 1;
 
