@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"encoding/json"
 	"flag"
-	"time"
 	"fmt"
 	"strings"
 	"git.zabbix.com/ap/plugin-support/log"
@@ -12,14 +11,10 @@ import (
 	"github.com/miekg/dns"
 )
 
-type f struct {
-	name string
-	val bool
-}
-
 type dnsGetOptions struct {
 	options
-	flags []f
+	//flags []f
+	flags map[string]bool
 }
 
 var dnsTypesGet = map[string]uint16{
@@ -113,33 +108,9 @@ var dnsTypesGet = map[string]uint16{
 }
 
 var (
-	//dnskey       *dns.DNSKEY
-	short        = flag.Bool("short", false, "abbreviate long DNSSEC records")
-	dnssec       = flag.Bool("dnssec", false, "request DNSSEC records")
-	//query        = flag.Bool("question", false, "show question")
-	//check        = flag.Bool("check", false, "check internal DNSSEC consistency")
 	six          = flag.Bool("6", false, "use IPv6 only")
 	four         = flag.Bool("4", false, "use IPv4 only")
-	//anchor       = flag.String("anchor", "", "use the DNSKEY in this file as trust anchor")
-	//tsig         = flag.String("tsig", "", "request tsig with key: [hmac:]name:key")
-	//port         = flag.Int("port", 53, "port number to use")
-	//laddr        = flag.String("laddr", "", "local address to use")
-	aa           = flag.Bool("aa", false, "set AA flag in query")
-	ad           = flag.Bool("ad", false, "set AD flag in query")
-	cd           = flag.Bool("cd", false, "set CD flag in query")
-	rd           = flag.Bool("rd", true, "set RD flag in query")
-	//fallback     = flag.Bool("fallback", false, "fallback to 4096 bytes bufsize and after that TCP")
-	//tcp          = flag.Bool("tcp", false, "TCP mode, multiple queries are asked over the same connection")
-	//timeoutDial  = flag.Duration("timeout-dial", 2*time.Second, "Dial timeout")
-	//timeoutRead  = flag.Duration("timeout-read", 2*time.Second, "Read timeout")
-	//timeoutWrite = flag.Duration("timeout-write", 2*time.Second, "Write timeout")
-	nsid         = flag.Bool("nsid", false, "set edns nsid option")
-	//	client       = flag.String("client", "", "set edns client-subnet option")
-	//opcode       = flag.String("opcode", "query", "set opcode to query|update|notify")
-	//rcode        = flag.String("rcode", "success", "set rcode to noerror|formerr|nxdomain|servfail|...")
 )
-
-
 
 func parseAnswersGet(answers []dns.RR) string {
 	var out string
@@ -193,38 +164,30 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 
 	flags = "," + flags
 
-	o.flags = []f {
-		f{"cdflag", false},
-			f{"rdflag", true},
-			f{"dnssec", false},
-			f{"nsid", false},
-			f{"edns0", true},
-			f{"aaflag", false},
-			f{"adflag", false},
+	o.flags = map[string]bool {
+		"cdflag": false,
+			"rdflag": true,
+			"dnssec": false,
+			"nsid": false,
+			"edns0": true,
+			"aaflag": false,
+			"adflag": false,
 		}
 
-	helperFunc := func(flag f) error {
-		noXflag := strings.Contains(flags, ",no"+flag.name)
-		Xflag := strings.Contains(flags, ","+flag.name)
+	for key, val := range o.flags {
+
+		noXflag := strings.Contains(flags, ",no" + key)
+		Xflag := strings.Contains(flags, "," + key)
 
 		if (noXflag && Xflag) {
-			return zbxerr.New("Invalid flags combination, cannot use no" + flag.name + " and " + flag.name +
+			return zbxerr.New("Invalid flags combination, cannot use no" + key + " and " + key +
 					" together")
 		}
 
-		if (!flag.val) {
-			flag.val = Xflag
+		if (!val) {
+			o.flags[key] = Xflag
 		} else {
-			flag.val = noXflag
-		}
-
-		return nil
-	}
-
-	for _, i := range o.flags {
-		err := helperFunc(i)
-		if (err != nil) {
-			return err
+			o.flags[key] = noXflag
 		}
 	}
 
@@ -293,10 +256,9 @@ func parseParamasGet(params []string) (o dnsGetOptions, err error) {
 	return
 }
 
-
-
 func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
+
 	options, err := parseParamasGet(params)
 	if err != nil {
 		return nil, err
@@ -304,7 +266,8 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 
 	var resp *dns.Msg
 	for i := 1; i <= options.count; i++ {
-		resp, err = runQueryGet(options.ip, options.name, options.protocol, options.dnsType, options.timeout)
+		resp, err = runQueryGet(&options)
+
 		if err != nil {
 			continue
 		}
@@ -318,12 +281,13 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
 	log.Infof("AGS Question: %s", resp.Question)
-	resp_x, _ := json.Marshal(resp.Answer)
-	log.Infof("AGS Answer: %s", resp_x)
-	log.Infof("AGS Ns: %s", resp.Ns)
-	log.Infof("AGS Extra: %s", resp.Extra)
+	resp_answer, _ := json.Marshal(resp.Answer)
 
-	log.Infof("AGS RCODE: %d", resp.Rcode)
+	log.Infof("AGS Answer: %s", resp_answer)
+	// log.Infof("AGS Ns: %s", resp.Ns)
+	// log.Infof("AGS Extra: %s", resp.Extra)
+
+	// log.Infof("AGS RCODE: %d", resp.Rcode)
 
 	return resp.Answer, nil
 }
@@ -344,7 +308,15 @@ func (o *dnsGetOptions) setDNSTypeGet(dnsType string) error {
 	return nil
 }
 
-func runQueryGet(resolver, domain, net string, record uint16, timeout time.Duration) (*dns.Msg, error) {
+func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
+
+	resolver := o.ip
+	domain := o.name
+	net := o.protocol
+	record := o.dnsType
+	timeout := o.timeout
+	flags := o.flags
+
 	c := new(dns.Client)
 	c.Net = net
 	c.DialTimeout = timeout
@@ -361,10 +333,10 @@ func runQueryGet(resolver, domain, net string, record uint16, timeout time.Durat
 
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
-			Authoritative:     *aa,
-			AuthenticatedData: *ad,
-			CheckingDisabled:  *cd,
-			RecursionDesired:  *rd,
+			Authoritative:      flags["aaflag"],
+			AuthenticatedData: flags["adflag"],
+			CheckingDisabled:  false,
+			RecursionDesired:  flags["rdflag"],
 			Opcode:           dns.OpcodeQuery,
 			Rcode:            dns.RcodeSuccess,
 		},
@@ -375,18 +347,18 @@ func runQueryGet(resolver, domain, net string, record uint16, timeout time.Durat
 
 
 	///
-	if *dnssec || *nsid /*|| *client != ""*/ {
+	if flags["dnssec"] || flags["nsid"] /*|| *client != ""*/ {
 		o := &dns.OPT{
 			Hdr: dns.RR_Header{
 				Name:   ".",
 				Rrtype: dns.TypeOPT,
 			},
 		}
-		if *dnssec {
+		if flags["dnssec"] {
 			o.SetDo()
 			o.SetUDPSize(dns.DefaultMsgSize)
 		}
-		if *nsid {
+		if flags["nsid"] {
 			e := &dns.EDNS0_NSID{
 				Code: dns.EDNS0NSID,
 			}
@@ -398,44 +370,8 @@ func runQueryGet(resolver, domain, net string, record uint16, timeout time.Durat
 		m.Extra = append(m.Extra, o)
 	}
 
-	if *short {
-		shortenMsg(m)
-	}
-
-	///
-
 
 	r, _, err := c.Exchange(m, resolver)
 
 	return r, err
-}
-
-// shortenMsg walks trough message and shortens Key data and Sig data.
-func shortenMsg(in *dns.Msg) {
-	for i, answer := range in.Answer {
-		in.Answer[i] = shortRR(answer)
-	}
-	for i, ns := range in.Ns {
-		in.Ns[i] = shortRR(ns)
-	}
-	for i, extra := range in.Extra {
-		in.Extra[i] = shortRR(extra)
-	}
-}
-
-func shortRR(r dns.RR) dns.RR {
-	switch t := r.(type) {
-	case *dns.DS:
-		t.Digest = "..."
-	case *dns.DNSKEY:
-		t.PublicKey = "..."
-	case *dns.RRSIG:
-		t.Signature = "..."
-	case *dns.NSEC3:
-		t.Salt = "." // Nobody cares
-		if len(t.TypeBitMap) > 5 {
-			t.TypeBitMap = t.TypeBitMap[1:5]
-		}
-	}
-	return r
 }
