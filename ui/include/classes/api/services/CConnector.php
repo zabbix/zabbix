@@ -82,6 +82,10 @@ class CConnector extends CApiService {
 
 		$db_connectors = [];
 
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $this->output_fields;
+		}
+
 		$resource = DBselect($this->createSelectQuery('connector', $options), $options['limit']);
 
 		while ($row = DBfetch($resource)) {
