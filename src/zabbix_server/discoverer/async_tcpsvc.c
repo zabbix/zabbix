@@ -215,7 +215,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 				break;
 			}
 
-			if (SVC_TCP == tcpsvc_context->svc_type || SVC_HTTP == tcpsvc_context->svc_type)
+			if (0 == tcpsvc_context->tcp_send_context.send_len)
 			{
 				SET_UI64_RESULT(&tcpsvc_context->item.result, 1);
 				tcpsvc_context->item.ret = SUCCEED;
