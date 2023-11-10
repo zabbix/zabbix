@@ -370,7 +370,7 @@ static char	*parse_content(const char *data)
 	return NULL;
 }
 
-char	*zbx_determine_charset(const char *content_type, char *body, size_t size)
+char	*zbx_determine_charset(const char *content_type, char *body, size_t len)
 {
 	const char	*ptr;
 	char		*charset = NULL, *content = NULL;
@@ -381,7 +381,7 @@ char	*zbx_determine_charset(const char *content_type, char *body, size_t size)
 			charset = parse_content(ptr + 1);
 	}
 
-	if (NULL == charset && 0 == size)
+	if (NULL == charset && 0 == len)
 		charset = zbx_strdup(NULL, "UTF-8");
 
 	html_get_charset_content(body, &charset, &content);
@@ -396,7 +396,7 @@ char	*zbx_determine_charset(const char *content_type, char *body, size_t size)
 
 	if (NULL == charset)
 	{
-		const char	*bom_encoding = get_bom_econding(body, size);
+		const char	*bom_encoding = get_bom_econding(body, len);
 
 		if ('\0' != *bom_encoding)
 			charset = zbx_strdup(NULL, bom_encoding);
