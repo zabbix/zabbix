@@ -208,8 +208,8 @@ static void	html_get_charset_content(const char *data, char **charset, char **co
 	}
 }
 
-#define ZBX_TSPECIALS	"()<>@,;:\"/[]?="
-#define ZBX_CONTENT_TOKEN_CHARLIST ZBX_TSPECIALS	" "
+#define ZBX_TSPECIALS			"()<>@,;:\"/[]?="
+#define ZBX_CONTENT_TOKEN_CHARLIST	ZBX_TSPECIALS " "
 
 static int	parse_content_name(const char *data, size_t pos, zbx_strloc_t *loc)
 {
@@ -378,10 +378,7 @@ static char	*parse_content(const char *data)
 char	*zbx_determine_charset(const char *content_type, char *body, size_t size)
 {
 	const char	*ptr;
-	char		*charset = NULL;
-
-	if (0 == size)
-		charset = zbx_strdup(NULL, "UTF-8");
+	char		*charset = NULL, *content = NULL;
 
 	if (NULL != content_type)
 	{
@@ -389,7 +386,8 @@ char	*zbx_determine_charset(const char *content_type, char *body, size_t size)
 			charset = parse_content(ptr + 1);
 	}
 
-	char	*content = NULL;
+	if (NULL == charset && 0 == size)
+		charset = zbx_strdup(NULL, "UTF-8");
 
 	html_get_charset_content(body, &charset, &content);
 
