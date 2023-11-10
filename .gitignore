@@ -150,6 +150,7 @@ tests/libs/zbxcommon/zbx_dyn_escape_string
 tests/libs/zbxcommon/zbx_get_report_nextcheck
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
+tests/libs/zbxcommon/zbx_function_param_parse_ext
 tests/libs/zbxcommon/zbx_get_week_number
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_json_to_xml

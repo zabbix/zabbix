@@ -537,7 +537,10 @@ function getMenuPopupDashboard(options, trigger_element) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.list', parameters, {trigger_element});
+					PopUp('popup.scheduledreport.list', parameters, {
+						dialogue_class: 'modal-popup-generic',
+						trigger_element
+					});
 				},
 				disabled: !options.has_related_reports
 			}
@@ -549,7 +552,10 @@ function getMenuPopupDashboard(options, trigger_element) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.edit', parameters, {trigger_element});
+					PopUp('popup.scheduledreport.edit', parameters, {
+						dialogue_class: 'modal-popup-generic',
+						trigger_element
+					});
 				}
 			});
 		}

@@ -304,7 +304,7 @@ void	zbx_audit_flush(void)
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
 
 	zbx_db_insert_prepare(&db_insert_audit, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
-			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", NULL);
+			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", (char *)NULL);
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{

@@ -178,6 +178,64 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 	return written_len;
 }
 
+#if defined(__hpux)
+#include "log.h"
+	/* On HP-UX 11.23 vsnprintf(NULL, 0, fmt, args) cannot be used to     */
+	/* determine the required buffer size - the result is program crash   */
+	/* (ZBX-23404). Also, it returns -1 if buffer is too small.           */
+	/* On HP-UX 11.31 vsnprintf() works as expected.                      */
+	/* Agent can be compiled on HP-UX 11.23 but can be running on         */
+	/* HP-UX 11.31 - it needs to adapt to vsnprintf() at runtime.         */
+
+static int	vsnprintf_small_buf_test(const char *fmt, ...)
+{
+	char	buf[4];	/* large enough to store "ABC"+'\0' without corrupting stack */
+	int	res;
+	va_list	args;
+
+	va_start(args, fmt);
+	/* vsnprintf() with too small buffer, only "A"+'\0' can fit */
+	res = vsnprintf(buf, sizeof(buf) - 2, fmt, args);
+	va_end(args);
+
+	return res;
+}
+
+#define VSNPRINTF_UNKNOWN	-1
+#define VSNPRINTF_NOT_C99	0
+#define VSNPRINTF_IS_C99	1
+
+static int	test_vsnprintf(void)
+{
+	int	res = vsnprintf_small_buf_test("%s", "ABC");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "vsnprintf() returned %d", res);
+
+	if (0 < res)
+		return VSNPRINTF_IS_C99;
+	else if (-1 == res)
+		return VSNPRINTF_NOT_C99;
+
+	zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", res);
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+int	zbx_hpux_vsnprintf_is_c99(void)
+{
+	static int	is_c99_vsnprintf = VSNPRINTF_UNKNOWN;
+
+	if (VSNPRINTF_UNKNOWN == is_c99_vsnprintf)
+		is_c99_vsnprintf = test_vsnprintf();
+
+	return (VSNPRINTF_IS_C99 == is_c99_vsnprintf) ? SUCCEED : FAIL;
+}
+#undef VSNPRINTF_UNKNOWN
+#undef VSNPRINTF_NOT_C99
+#undef VSNPRINTF_IS_C99
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Secure version of snprintf function.                              *
@@ -194,6 +252,50 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 {
 	va_list	args;
 	size_t	avail_len, written_len;
+
+#if defined(__hpux)
+	if (SUCCEED != zbx_hpux_vsnprintf_is_c99())
+	{
+#define INITIAL_ALLOC_LEN	128
+		int	bytes_written = 0;
+
+		if (NULL == *str)
+		{
+			*alloc_len = INITIAL_ALLOC_LEN;
+			*str = (char *)zbx_malloc(NULL, *alloc_len);
+			*offset = 0;
+		}
+
+		while (1)
+		{
+			avail_len = *alloc_len - *offset;
+			va_start(args, fmt);
+			bytes_written = vsnprintf(*str + *offset, avail_len, fmt, args);
+			va_end(args);
+
+			if (0 <= bytes_written)
+				break;
+
+			if (-1 == bytes_written)
+			{
+				*alloc_len *= 2;
+				*str = (char *)zbx_realloc(*str, *alloc_len);
+				continue;
+			}
+
+			zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", bytes_written);
+
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+		*offset += bytes_written;
+
+		return;
+#undef INITIAL_ALLOC_LEN
+	}
+	/* HP-UX vsnprintf() looks C99-compliant, proceed with common implementation */
+#endif
 retry:
 	if (NULL == *str)
 	{
@@ -2948,6 +3050,28 @@ static int	function_parse_name(const char *expr, size_t *length)
  ******************************************************************************/
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
+	zbx_function_param_parse_ext(expr, 0, 0, param_pos, length, sep_pos);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse function parameter                                          *
+ *                                                                            *
+ * Parameters: expr           - [IN] pre-validated function parameter list    *
+ *             allowed_macros - [IN] bitmask of macros allowed in function    *
+ *                                   parameters (seeZBX_TOKEN_* defines)      *
+ *             esc_bs         - [IN] 0 - don't escape backslashes in strings  *
+ *             param_pos      - [OUT] the parameter position, excluding       *
+ *                                    leading whitespace                      *
+ *             length         - [OUT] the parameter length including trailing *
+ *                                    whitespace for unquoted parameter       *
+ *             sep_pos        - [OUT] the parameter separator character       *
+ *                                    (',' or '\0' or ')') position           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos)
+{
 	const char	*ptr = expr;
 
 	/* skip the leading whitespace */
@@ -2958,8 +3082,22 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 
 	if ('"' == *ptr)	/* quoted parameter */
 	{
-		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
+		for (ptr++; '"' != *ptr; ptr++)
 		{
+			if ('\\' == *ptr)
+			{
+				if ('"' == ptr[1])
+				{
+					ptr++;
+					continue;
+				}
+
+				if (ZBX_BACKSLASH_ESC_OFF == esc_bs)
+					continue;
+
+				ptr++;
+			}
+
 			if ('\0' == *ptr)
 			{
 				*length = ptr - expr - *param_pos;
@@ -2975,14 +3113,68 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 	}
 	else	/* unquoted parameter */
 	{
-		for (ptr = expr; '\0' != *ptr && ')' != *ptr && ',' != *ptr; ptr++)
-			;
+		zbx_token_t	token;
 
-		*length = ptr - expr - *param_pos;
+		for (ptr = expr; ; ptr++)
+		{
+			switch (*ptr)
+			{
+				case '\0':
+				case ')':
+				case ',':
+					*length = ptr - expr - *param_pos;
+					goto out;
+				case '{':
+					if (SUCCEED == zbx_token_find(ptr, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+							0 == token.loc.l && 0 != (allowed_macros & token.type))
+					{
+						ptr += token.loc.r;
+					}
+					break;
+			}
+		}
 	}
 out:
 	*sep_pos = ptr - expr;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse trigger function parameter                                  *
+ *                                                                            *
+ * Parameters: expr      - [IN] pre-validated function parameter list         *
+ *             param_pos - [OUT] the parameter position, excluding leading    *
+ *                               whitespace                                   *
+ *             length    - [OUT] the parameter length including trailing      *
+ *                               whitespace for unquoted parameter            *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or '\0' or ')') position                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO, ZBX_BACKSLASH_ESC_OFF, param_pos, length, sep_pos);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse trigger prototype function parameter                        *
+ *                                                                            *
+ * Parameters: expr      - [IN] pre-validated function parameter list         *
+ *             param_pos - [OUT] the parameter position, excluding leading    *
+ *                               whitespace                                   *
+ *             length    - [OUT] the parameter length including trailing      *
+ *                               whitespace for unquoted parameter            *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or '\0' or ')') position                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO | ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
+			ZBX_BACKSLASH_ESC_OFF, param_pos, length, sep_pos);
+}
+
 
 /******************************************************************************
  *                                                                            *

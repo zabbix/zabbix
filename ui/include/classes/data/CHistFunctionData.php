@@ -325,7 +325,9 @@ final class CHistFunctionData {
 		]],
 		'last_foreach' => [[
 			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'in' => ['avg', 'count', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+				'sumofsquares', 'varpop', 'varsamp'
+			],
 			'parameters' => ['count' => 1],
 			'position' => 0
 		]],

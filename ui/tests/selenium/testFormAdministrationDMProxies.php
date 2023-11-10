@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
@@ -37,6 +38,15 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 	private $proxy_host = 'Zabbix server';
 	private $passive_proxy_host = 'H1';
 	private $passive_proxy_name = 'passive_proxy_name1';
+
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	public function testFormAdministrationDMProxies_CheckLayout() {
 
@@ -350,10 +360,11 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		$this->zbxTestClickWait('clone');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('Proxy');
 		$this->zbxTestInputTypeOverwrite('host', $newname);
 		$this->zbxTestClickButton('proxy.create');
-		$this->zbxTestTextPresent('Proxy added');
+		$this->assertMessage(TEST_GOOD, 'Proxy added');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);
