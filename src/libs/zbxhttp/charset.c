@@ -50,11 +50,8 @@ static int	parse_attribute_name(const char *data, size_t pos, zbx_strloc_t *loc)
 	if (NULL != strchr(ZBX_ATTRIBUTE_NAME_CHARLIST, *ptr))
 		return FAIL;
 
-	while ('\0' != *(++ptr))
-	{
-		if (NULL != strchr(ZBX_ATTRIBUTE_NAME_CHARLIST, *ptr))
-			break;
-	}
+	while (NULL == strchr(ZBX_ATTRIBUTE_NAME_CHARLIST, *(++ptr)))
+		;
 
 	loc->l = pos;
 	loc->r = (size_t)(ptr - data) - 1;
