@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-04-08 16:14+0000\n"
+"PO-Revision-Date: 2023-11-04 08:07+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2268,8 +2268,8 @@ msgstr[1] "No es poden pas desactivar els tipus de suport"
 #: app/controllers/CControllerModuleUpdate.php:146
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot desactivar el mòdul"
+msgstr[1] "No es poden desactivar els mòduls"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -2338,8 +2338,8 @@ msgstr[1] "No es poden pas activar els tipus de suport"
 #: app/controllers/CControllerModuleUpdate.php:142
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot activar el mòdul"
+msgstr[1] "No es poden activar els mòduls"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -2942,7 +2942,7 @@ msgstr "No es pot pas actualitzar el tipus de suport"
 
 #: app/controllers/CControllerModuleUpdate.php:139
 msgid "Cannot update module"
-msgstr ""
+msgstr "No es pot actualitzar el mòdul"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -11464,8 +11464,8 @@ msgstr[1] "Mòduls esborrats: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:134
 msgid "Module disabled"
 msgid_plural "Modules disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Mòdul desactivat"
+msgstr[1] "Mòduls desactivats"
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -11477,8 +11477,8 @@ msgstr[1] "Mòduls desactivats: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:131
 msgid "Module enabled"
 msgid_plural "Modules enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Mòdul activat"
+msgstr[1] "Mòduls activats"
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
@@ -11489,7 +11489,7 @@ msgstr[1] "Mòduls activats: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:128
 msgid "Module updated"
-msgstr ""
+msgstr "Mòdul actualitzat"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
