@@ -283,10 +283,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		$httpTest_fields = ['variables', 'headers'];
+		$httptest_fields = ['variables', 'headers'];
 
-		foreach ($httpTest_fields as $httpTest_field) {
-			foreach ($httpTest[$httpTest_field] as &$field) {
+		foreach ($httptest_fields as $httptest_field) {
+			foreach ($httpTest[$httptest_field] as &$field) {
 				$field['name'] = trim($field['name']);
 				$field['value'] = trim($field['value']);
 			}
