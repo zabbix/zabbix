@@ -3937,6 +3937,19 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: sorting function to sort Datastore names vector by name           *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_dsname_compare_uuid(const void *d1, const void *d2)
+{
+	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t * const *)d1;
+	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
+
+	return strcmp(ds1->uuid, ds2->uuid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_init_hv                                           *
  *                                                                            *
  * Purpose: initialize vmware hypervisor object                               *
