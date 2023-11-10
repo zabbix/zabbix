@@ -376,6 +376,33 @@ class testConnector extends CAPITest {
 			],
 
 			// Check "attempt_interval".
+			'Test connector.create: invalid "attempt_interval" (not default) where "max_attempts" equals 1' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 1,
+					'attempt_interval' => '10s'
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be "5s".'
+			],
+			'Test connector.create: invalid "attempt_interval" (empty string) 1 where "max_attempts" equals 1' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 1,
+					'attempt_interval' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval":  value must be "5s".'
+			],
+			'Test connector.create: invalid "attempt_interval" (boolean) where "max_attempts" equals 1' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 1,
+					'attempt_interval' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": a character string is expected.'
+			],
 			'Test connector.create: invalid "attempt_interval" (not in range)' => [
 				'connector' => [
 					'name' => 'API create connector',
@@ -384,24 +411,6 @@ class testConnector extends CAPITest {
 					'attempt_interval' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
-			],
-			'Test connector.create: invalid "attempt_interval" (not default) where "max_attempts" equals 1' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'max_attempts' => 1,
-					'attempt_interval' => '10s'
-				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be 5s.'
-			],
-			'Test connector.create: invalid "attempt_interval" (empty string) 1' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'max_attempts' => 1,
-					'attempt_interval' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
 			],
 			'Test connector.create: invalid "attempt_interval" (empty string) 2' => [
 				'connector' => [
@@ -1720,23 +1729,31 @@ class testConnector extends CAPITest {
 			],
 
 			// Check "attempt_interval".
-			'Test connector.create: invalid "attempt_interval" (not in range) where "max_attempts" equals 1' => [
+			'Test connector.update: invalid "attempt_interval" (not in range) where "max_attempts" equals 1' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'max_attempts' => 1,
 					'attempt_interval' => '10s'
 				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be 5.'
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be "5s".'
 			],
-			'Test connector.create: invalid "attempt_interval" (empty string)' => [
+			'Test connector.update: invalid "attempt_interval" (empty string) where "max_attempts" equals 1' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'max_attempts' => 1,
 					'attempt_interval' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be "5s".'
 			],
-			'Test connector.create: invalid "attempt_interval" (not in range)' => [
+			'Test connector.update: invalid "attempt_interval" (boolean) where "max_attempts" equals 1' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 1,
+					'attempt_interval' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": a character string is expected.'
+			],
+			'Test connector.update: invalid "attempt_interval" (not in range)' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'max_attempts' => 2,
@@ -1744,7 +1761,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
 			],
-			'Test connector.create: invalid "attempt_interval" (string)' => [
+			'Test connector.update: invalid "attempt_interval" (string)' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'max_attempts' => 2,
@@ -1752,7 +1769,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
 			],
-			'Test connector.create: invalid "attempt_interval" (boolean)' => [
+			'Test connector.update: invalid "attempt_interval" (boolean)' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'max_attempts' => 2,
