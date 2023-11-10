@@ -759,7 +759,7 @@ class CHttpTestManager {
 						else {
 							$ins_fields[] = [
 								'httptestid' => $httptest['httptestid'],
-								'type' => ($httptest_field === 'variables')
+								'type' => $httptest_field === 'variables'
 									? ZBX_HTTPFIELD_VARIABLE
 									: ZBX_HTTPFIELD_HEADER
 							] + $field;
