@@ -20,14 +20,13 @@
 package smart
 
 import (
-	"fmt"
+	"context"
 	"os/exec"
 	"runtime"
 	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/zbxcmd"
 )
 
 var _ SmartController = (*SmartCtl)(nil)
@@ -69,24 +68,22 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 		return nil, err
 	}
 
-	executable := fmt.Sprintf(
-		"sudo -n %s %s", s.commandPath, strings.Join(args, " "),
-	)
+	cmd := "sudo"
+	cmdArgs := append([]string{"-n", s.commandPath}, args...)
 
 	if runtime.GOOS == "windows" {
-		executable = fmt.Sprintf(
-			"%s %s", s.commandPath, strings.Join(args, " "),
-		)
+		cmd = s.commandPath
+		cmdArgs = args
 	}
 
-	s.logr.Tracef("executing smartctl command: %s", executable)
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
+	defer cancel()
 
-	out, err := zbxcmd.Execute(executable, s.timeout, "")
-	if err != nil {
-		return nil, err
-	}
+	s.logr.Tracef(
+		"executing smartctl command: %s %s", cmd, strings.Join(args, " "),
+	)
 
-	s.logr.Tracef("command %s smartctl raw response: %s", executable, out)
-
-	return []byte(out), nil
+	// don't wrap to preserve exit code allowing caller to handle exit code non
+	// zero and retrieve stdout/stderr.
+	return exec.CommandContext(ctx, cmd, cmdArgs...).CombinedOutput()
 }
