@@ -1,12 +1,27 @@
 Changes for 7.0.0alpha8
 
 New features:
+..F....... [ZBXNEXT-8486] moved items and item prototypes to mvc model and refactored edit forms to modal forms (gcalenko)
+...G.....T [ZBXNEXT-8705] implemented new tablespace item to retrieve percentage about current tablespace usage from max for both Oracle templates (knaglis)
+...G...... [ZBXNEXT-5401] implemented net.dns.perf key; thanks to Robert Young (arimdjonoks)
+...G...... [ZBXNEXT-8708] add version metric to oracle plugin in Zabbix agent 2 (rzvejs)
+..F....... [ZBXNEXT-8741] improved "Show" checkbox list behaviour in Clock, Gauge and Item value widgets (agriscenko, averza)
 .........T [ZBXNEXT-8568] added new proxy memory buffer metrics to Zabbix proxy health templates (drasikhov)
 .........T [ZBXNEXT-8522] added HPE iLO by HTTP template (drasikhov)
 .........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
 .........T [ZBXCTR-20] added scheme for metrics endpoints (ebbex)
 
 Bug fixes:
+..F....... [ZBX-23269] fixed sizes of loading modals (apoga)
+.......PS. [ZBX-23621] fixed snmp discovery looping forever with empty trend response (wiper)
+.......PS. [ZBX-23668] added overflow check when converting string variant to ui64 (dgoloscapov)
+..F....... [ZBX-23525] fixed template tab name in template configuration form (agriscenko)
+.......PS. [ZBX-23670] fixed timeout misbehavior in simple checks (dgoloscapov)
+..F....... [ZBX-22829] fixed discovery rule checks editing (apoga)
+.D........ [ZBX-23620] reordered sub-templates in READMEs of Acronis, Control-M and Openstack templates (knaglis)
+.........T [ZBX-23381] fixed unit for metric FreeStorageSpace in JavaScript AWS RDS instance by HTTP template (egordymov)
+.........T [ZBX-23660] fixed widgets in FortiGate by HTTP template (abakaldin)
+..F....... [ZBX-23472] fixed preload hintboxes loading (apoga)
 ..F....... [ZBX-22400] fixed Web scenarios configuration form to display parent web scenarios on page refresh (ddauksa)
 ..F....... [ZBX-23290] fixed gap in the filter by tags on Monitoring > Latest data page (agriscenko)
 ..F....... [ZBX-23399] fixed browser console errors when mass updating host and removing all value mappings (agriscenko)
