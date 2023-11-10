@@ -254,15 +254,6 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		return
 	}
 
-	if args.verbose {
-		fatalExit(
-			"",
-			errors.New(
-				"verbose parameter can be specified only with test or print parameters",
-			),
-		)
-	}
-
 	var logType int
 	switch agent.Options.LogType {
 	case "system":

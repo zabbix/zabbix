@@ -180,16 +180,28 @@ func validateMultipleAgentFlag() bool {
 
 func validateExclusiveFlags(args *Arguments) error {
 	var (
-		defaultFlagSet    = args.test != "" || args.print || args.verbose
-		exclusiveFlagsSet = []bool{svcInstallFlag, svcUninstallFlag, svcStartFlag, svcStopFlag, args.testConfig}
-		count             int
+		exclusiveFlagsSet = []bool{
+			svcInstallFlag,
+			svcUninstallFlag,
+			svcStartFlag,
+			svcStopFlag,
+			args.print,
+			args.test != "",
+			args.runtimeCommand != "",
+			args.testConfig,
+		}
+		count int
 	)
+
+	if args.verbose && !(args.test != "" || args.print) {
+		return errors.New("Verbose parameter can be specified only with test or print parameters")
+	}
 
 	for _, exclusiveFlagSet := range exclusiveFlagsSet {
 		if exclusiveFlagSet {
 			count++
 		}
-		if count >= 2 || (exclusiveFlagSet && defaultFlagSet) {
+		if count >= 2 {
 			return errors.New("mutually exclusive options used, use help '-help'('-h'), for additional information")
 		}
 	}
