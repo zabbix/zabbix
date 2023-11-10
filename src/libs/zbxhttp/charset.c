@@ -127,21 +127,23 @@ static int	parse_attribute_value(const char *data, size_t pos, zbx_strloc_t *loc
 }
 #undef ZBX_UNQUOTED_ATTRIBUTE_VALUE_CHARLIST
 
-static int	parse_attribute_name_value(const char *data, size_t pos, zbx_strloc_t *loc_name, zbx_strloc_t *loc_op,
+static int	parse_attribute_name_value(const char *data, size_t pos, zbx_strloc_t *loc_name,
 		zbx_strloc_t *loc_value)
 {
+	zbx_strloc_t	loc_op;
+
 	if (SUCCEED != parse_attribute_name(data, pos, loc_name))
 		return FAIL;
 
 	pos = skip_spaces(data, loc_name->r + 1);
 
-	if (SUCCEED != parse_attribute_op(data, pos, loc_op))
+	if (SUCCEED != parse_attribute_op(data, pos, &loc_op))
 	{
-		*loc_value = *loc_op = *loc_name;
+		*loc_value = *loc_name;
 		return SUCCEED;
 	}
 
-	pos = skip_spaces(data, loc_op->r + 1);
+	pos = skip_spaces(data, loc_op.r + 1);
 
 	if (SUCCEED != parse_attribute_value(data, pos, loc_value))
 		return FAIL;
@@ -152,14 +154,14 @@ static int	parse_attribute_name_value(const char *data, size_t pos, zbx_strloc_t
 static size_t	parse_html_attributes(const char *data, char **content, char **charset)
 {
 	size_t		pos = 0;
-	zbx_strloc_t	loc_name, loc_op, loc_value, loc_content;
+	zbx_strloc_t	loc_name, loc_value, loc_content;
 	int		http_equiv_content_found = 0, content_found = 0;
 
 	pos = skip_spaces(data, pos);
 
 	while (1)
 	{
-		if (FAIL == parse_attribute_name_value(data, pos, &loc_name, &loc_op, &loc_value))
+		if (FAIL == parse_attribute_name_value(data, pos, &loc_name, &loc_value))
 			break;
 
 		pos = skip_spaces(data, loc_value.r + 1);
@@ -288,18 +290,19 @@ static int	parse_content_value(const char *data, size_t pos, zbx_strloc_t *loc)
 #undef ZBX_CONTENT_TOKEN_CHARLIST
 #undef ZBX_TSPECIALS
 
-static int	parse_content_key_value(const char *data, size_t pos, zbx_strloc_t *loc_name, zbx_strloc_t *loc_op,
-		zbx_strloc_t *loc_value)
+static int	parse_content_key_value(const char *data, size_t pos, zbx_strloc_t *loc_name, zbx_strloc_t *loc_value)
 {
+	zbx_strloc_t	loc_op;
+
 	if (SUCCEED != parse_content_name(data, pos, loc_name))
 		return FAIL;
 
 	pos = skip_spaces(data, loc_name->r + 1);
 
-	if (SUCCEED != parse_content_op(data, pos, loc_op))
+	if (SUCCEED != parse_content_op(data, pos, &loc_op))
 		return FAIL;
 
-	pos = skip_spaces(data, loc_op->r + 1);
+	pos = skip_spaces(data, loc_op.r + 1);
 
 	if (SUCCEED != parse_content_value(data, pos, loc_value))
 		return FAIL;
@@ -344,13 +347,13 @@ static char	*str_loc_unquote_dyn(const char *src, const zbx_strloc_t *loc)
 static char	*parse_content(const char *data)
 {
 	size_t		pos = 0;
-	zbx_strloc_t	loc_name, loc_op, loc_value;
+	zbx_strloc_t	loc_name, loc_value;
 
 	pos = skip_spaces(data, pos);
 
 	while (1)
 	{
-		if (FAIL == parse_content_key_value(data, pos, &loc_name, &loc_op, &loc_value))
+		if (FAIL == parse_content_key_value(data, pos, &loc_name, &loc_value))
 			break;
 
 		pos = skip_spaces(data, loc_value.r + 1);
