@@ -96,45 +96,96 @@ $from_list = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
-	->addRow(_('Validate URI schemes'),
-		(new CCheckBox('validate_uri_schemes'))
-			->setUncheckedValue('0')
-			->setChecked($data['validate_uri_schemes'] == 1)
+	->addRow(new CLabel(_('Validate URI schemes'), 'validate_uri_schemes'), [
+			(new CCheckBox('validate_uri_schemes'))
+				->setUncheckedValue('0')
+				->setChecked($data['validate_uri_schemes'] == 1),
+			(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes'], false,
+				DB::getFieldLength('config', 'uri_valid_schemes')
+			))
+				->setAttribute('placeholder', _('Valid URI schemes'))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setEnabled($data['validate_uri_schemes'] == 1)
+				->setAriaRequired()
+		]
 	)
-	->addRow((new CLabel(_('Valid URI schemes'), 'uri_valid_schemes')),
-		(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes'], false,
-			DB::getFieldLength('config', 'uri_valid_schemes')
-		))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setEnabled($data['validate_uri_schemes'] == 1)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Use X-Frame-Options HTTP header')))->setAsteriskMark(),
-		(new CCheckBox('x_frame_header_enabled'))
-			->setUncheckedValue('0')
-			->setChecked($data['x_frame_header_enabled'] == 1)
-	)
-	->addRow((new CLabel(_('X-Frame-Options HTTP header'), 'x_frame_options'))->setAsteriskMark(),
-		(new CTextBox('x_frame_options', $data['x_frame_options'], false,
-			DB::getFieldLength('config', 'x_frame_options')
-		))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAriaRequired()
-			->setEnabled($data['x_frame_header_enabled'] == 1)
-	)
-	->addRow(_('Use iframe sandboxing'),
+	->addRow(
+		(new CLabel([_('Use X-Frame-Options HTTP header'),
+			makeHelpIcon([
+				_('X-Frame-Options HTTP header supported values:'),
+				(new CList(
+					[
+						new CListItem([
+							(new CSpan('SAMEORIGIN'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' (',
+							_('default'),
+							') ',
+							_('or'),
+							(new CSpan('\'self\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' ',
+							_('(must be single-quoted) - the page can only be displayed in a frame on the same origin as the page itself'),
+							';'
+						]),
+						new CListItem([
+							(new CSpan('DENY'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' ',
+							_('or'),
+							' ',
+							(new CSpan('\'none\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' ',
+							_('(must be single-quoted)- the page cannot be displayed in a frame, regardless of the site attempting to do so').
+							';'
+						]),
+						new CListItem([
+							(new CSpan('null'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' - ',
+							_('disable X-Frame-Options HTTP header (not recommended)').';'
+						]),
+						new CListItem([
+							_('a string of space-separated hostnames; adding'),
+							' ',
+							(new CSpan('\'self\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' ',
+							_('(must be single-quoted) to the list will allow the page to be displayed in a frame on the same origin as the page itself'),
+							'. ',
+							_('Note that using'),
+							(new CSpan('\'self\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' ',
+							_('or'),
+							' ',
+							(new CSpan('\'none\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+							' ',
+							_('without single quotes will result in them being regarded as hostnames'),
+							'.'
+						])
+					]
+				))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		], 'x_frame_header_enabled'))->setAsteriskMark(),
+		[
+			(new CCheckBox('x_frame_header_enabled'))
+				->setUncheckedValue('0')
+				->setChecked($data['x_frame_header_enabled'] == 1),
+			(new CTextBox('x_frame_options', $data['x_frame_options'], false,
+				DB::getFieldLength('config', 'x_frame_options')
+			))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('placeholder', _('X-Frame-Options HTTP header'))
+				->setAriaRequired()
+				->setEnabled($data['x_frame_header_enabled'] == 1)
+	])
+	->addRow(new CLabel(_('Use iframe sandboxing'), 'iframe_sandboxing_enabled'), [
 		(new CCheckBox('iframe_sandboxing_enabled'))
 			->setUncheckedValue('0')
-			->setChecked($data['iframe_sandboxing_enabled'] == 1)
-	)
-	->addRow((new CLabel(_('Iframe sandboxing exceptions'), 'iframe_sandboxing_exceptions')),
+			->setChecked($data['iframe_sandboxing_enabled'] == 1),
 		(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
 			DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
 		))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
 			->setEnabled($data['iframe_sandboxing_enabled'] == 1)
 			->setAriaRequired()
-	)
+	])
 	->addRow((new CTag('h4', true, _('Communication with Zabbix server')))->addClass('input-section-header'))
 	->addRow(
 		(new CLabel(_('Network timeout'), 'socket_timeout'))->setAsteriskMark(),
