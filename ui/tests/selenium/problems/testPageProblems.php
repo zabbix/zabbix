@@ -1035,7 +1035,7 @@ class testPageProblems extends CWebTest {
 						'Tag display priority' => 'Tag4',
 						'Show operational data' => 'Separately',
 						'Show details' => true,
-						'Show timeline' => true,
+						'Show timeline' => true
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -1367,7 +1367,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Problem' => '1_trigger_Disaster',
-						'id:compact_view_0' => true
+						'Compact view' => true
 					],
 					'result' => [
 						['Problem' => '1_trigger_Disaster']
@@ -1378,8 +1378,8 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Hosts' => '1_trigger_Average',
-						'id:compact_view_0' => true,
+						'Problem' => '1_trigger_Average',
+						'Compact view' => true,
 						'Highlight whole row' => true
 					],
 					'result' => [
@@ -1477,13 +1477,14 @@ class testPageProblems extends CWebTest {
 			$this->query('button:Apply')->one()->click();
 		}
 
-		$table->waitUntilReloaded();
+//		$table->waitUntilReloaded();
+		$this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$this->assertTableData($data['result']);
 
 		// Check "Compact view" and "Highlight whole row" filter checkboxes.
 		$compact_selector = 'xpath://table[contains(@class, "compact-view")]';
 		$highlight_selector = 'xpath://tr[contains(@class, "-bg")]';
-		if (array_key_exists('fields', $data) && CTestArrayHelper::get($data['fields'], 'id:compact_view_0', false)) {
+		if (array_key_exists('fields', $data) && CTestArrayHelper::get($data['fields'], 'Compact view', false)) {
 			$this->assertTrue($this->query($compact_selector)->exists());
 
 			$this->assertEquals(CTestArrayHelper::get($data['fields'], 'Highlight whole row', false),
