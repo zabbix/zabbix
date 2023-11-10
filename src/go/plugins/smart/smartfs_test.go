@@ -21,12 +21,137 @@ package smart
 
 import (
 	"errors"
+	stdlog "log"
+	"os"
 	"testing"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"github.com/google/go-cmp/cmp"
 	"zabbix.com/plugins/smart/mock"
 )
+
+func Test_runner_executeBase(t *testing.T) {
+	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
+
+	type expectation struct {
+		args []string
+		err  error
+		out  []byte
+	}
+
+	type fields struct {
+		plugin      *Plugin
+		devices     map[string]deviceParser
+		jsonDevices map[string]jsonDevice
+	}
+
+	type args struct {
+		basicDev   []deviceInfo
+		jsonRunner bool
+	}
+
+	tests := []struct {
+		name            string
+		expectations    []expectation
+		fields          fields
+		args            args
+		wantJsonDevices map[string]jsonDevice
+		wantDevices     map[string]deviceParser
+		wantErr         bool
+	}{
+		{
+			"+valid",
+			[]expectation{
+				{
+					args: []string{"-a", "/dev/csmi0", "-j"},
+					err:  nil,
+					out:  mock.OutputAllDiscInfoCSMI,
+				},
+			},
+			fields{
+				jsonDevices: map[string]jsonDevice{},
+				devices:     map[string]deviceParser{},
+			},
+			args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/csmi0",
+						InfoName: "/dev/csmi0",
+						DevType:  "ata",
+					},
+				},
+				false,
+			},
+			map[string]jsonDevice{},
+			map[string]deviceParser{},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			cpuCount = 1
+
+			m := &mock.MockController{}
+
+			for _, e := range tt.expectations {
+				m.ExpectExecute().
+					WithArgs(e.args...).
+					WillReturnOutput(e.out).
+					WillReturnError(e.err)
+			}
+
+			log.New("test")
+
+			r := &runner{
+				plugin: &Plugin{
+					ctl:  m,
+					Base: plugin.Base{Logger: log.New("test")},
+				},
+				names:       make(chan string, 10),
+				err:         make(chan error, 10),
+				done:        make(chan struct{}),
+				devices:     tt.fields.devices,
+				jsonDevices: tt.fields.jsonDevices,
+			}
+
+			defer func() {
+				close(r.err)
+			}()
+
+			err := r.executeBase(tt.args.basicDev, tt.args.jsonRunner)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf(
+					"runner.executeBase() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
+			}
+			if diff := cmp.Diff(tt.wantJsonDevices, r.jsonDevices); diff != "" {
+				t.Fatalf(
+					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
+					diff,
+				)
+			}
+			if diff := cmp.Diff(tt.wantDevices, r.devices); diff != "" {
+				t.Fatalf(
+					"runner.executeBase() devices mismatch (-want +got):\n%s",
+					diff,
+				)
+			}
+			if err := m.ExpectationsWhereMet(); err != nil {
+				t.Fatalf(
+					"runner.executeBase() expectations where not met, error = %v",
+					err,
+				)
+			}
+		})
+	}
+}
 
 func Test_evaluateVersion(t *testing.T) {
 	type args struct {
@@ -47,7 +172,11 @@ func Test_evaluateVersion(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := evaluateVersion(tt.args.versionDigits); (err != nil) != tt.wantErr {
-				t.Errorf("evaluateVersion() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"evaluateVersion() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -84,14 +213,50 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		wantErr bool
 		wantMsg string
 	}{
-		{"+no_err", fields{smartctlField{Messages: nil, ExitStatus: 0}}, false, ""},
-		{"+no_err", fields{smartctlField{Messages: nil, ExitStatus: 4}}, false, ""},
-		{"+warning", fields{smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 3}}, true, "barfoo"},
-		{"-error_status_one", fields{smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 1}}, true, "barfoo"},
-		{"-error_status_two", fields{smartctlField{Messages: []message{{"foobar"}}, ExitStatus: 2}}, true, "foobar"},
+		{
+			"+no_err",
+			fields{smartctlField{Messages: nil, ExitStatus: 0}},
+			false,
+			"",
+		},
+		{
+			"+no_err",
+			fields{smartctlField{Messages: nil, ExitStatus: 4}},
+			false,
+			"",
+		},
+		{
+			"+warning",
+			fields{
+				smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 3},
+			},
+			true,
+			"barfoo",
+		},
+		{
+			"-error_status_one",
+			fields{
+				smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 1},
+			},
+			true,
+			"barfoo",
+		},
+		{
+			"-error_status_two",
+			fields{
+				smartctlField{Messages: []message{{"foobar"}}, ExitStatus: 2},
+			},
+			true,
+			"foobar",
+		},
 		{
 			"-two_err",
-			fields{smartctlField{Messages: []message{{"foobar"}, {"barfoo"}}, ExitStatus: 2}},
+			fields{
+				smartctlField{
+					Messages:   []message{{"foobar"}, {"barfoo"}},
+					ExitStatus: 2,
+				},
+			},
 			true,
 			"foobar, barfoo",
 		},
@@ -108,11 +273,19 @@ func Test_deviceParser_checkErr(t *testing.T) {
 			dp := deviceParser{Smartctl: tt.fields.Smartctl}
 			err := dp.checkErr()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("deviceParser.checkErr() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"deviceParser.checkErr() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 
 			if (err != nil) && err.Error() != tt.wantMsg {
-				t.Errorf("deviceParser.checkErr() error message = %v, want %v", err, tt.wantErr)
+				t.Errorf(
+					"deviceParser.checkErr() error message = %v, want %v",
+					err,
+					tt.wantErr,
+				)
 			}
 		})
 	}
@@ -311,7 +484,11 @@ func TestPlugin_getDevices(t *testing.T) {
 
 			gotBasic, gotRaid, gotMegaraid, err := p.getDevices()
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("Plugin.getDevices() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf(
+					"Plugin.getDevices() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 			}
 			if diff := cmp.Diff(
 				tt.wantBasic, gotBasic,

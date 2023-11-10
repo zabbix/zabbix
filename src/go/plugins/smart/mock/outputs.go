@@ -14,4 +14,7 @@ var (
 
 	//go:embed outputs/scan_type_sat.json
 	OutputScanTypeSAT []byte
+
+	//go:embed outputs/all_disc_info_csmi.json
+	OutputAllDiscInfoCSMI []byte
 )
