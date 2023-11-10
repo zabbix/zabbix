@@ -219,7 +219,7 @@ static int	parse_content_name(const char *data, size_t pos, zbx_strloc_t *loc)
 	if (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *ptr))
 		return FAIL;
 
-	while (NULL != strchr(ZBX_CONTENT_TOKEN_CHARLIST, *(++ptr)))
+	while (NULL == strchr(ZBX_CONTENT_TOKEN_CHARLIST, *(++ptr)))
 		;
 
 	loc->l = pos;
