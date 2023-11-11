@@ -22,7 +22,8 @@
 require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 
 /**
- * Test for assuring that bug from ZBX-23302 is not reproducing.
+ * Test for assuring that bug from ZBX-23302 is not reproducing, respectively
+ * that multiselects' dialogs do not contain any errors before and after filling.
  */
 class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 
