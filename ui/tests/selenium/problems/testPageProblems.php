@@ -1492,7 +1492,7 @@ class testPageProblems extends CWebTest {
 			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();
 			$this->query('class:time-quick-range')->waitUntilVisible()->one();
 			$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+			$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
 			if (CTestArrayHelper::get($data['time_selector'], 'link')) {
 				$form->query('link', $data['time_selector']['link'])->waitUntilClickable()->one()->click();
