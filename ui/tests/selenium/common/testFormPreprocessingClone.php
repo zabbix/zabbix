@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -250,7 +251,7 @@ class testFormPreprocessingClone extends CWebTest {
 
 		// Get item key and preprocessing.
 		$item_key = CDBHelper::getValue('SELECT key_ FROM items WHERE itemid ='.$this->itemid);
-		$this->page->login()->open('zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$this->hostid.
+		$this->page->open('zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$this->hostid.
 				'&context='.$context);
 		$this->query('link:'.CDBHelper::getValue('SELECT name FROM items WHERE itemid ='.$this->itemid))->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilPresent()->asForm()->selectTab('Preprocessing');
@@ -262,7 +263,7 @@ class testFormPreprocessingClone extends CWebTest {
 
 		// Get item prototype key and preprocessing.
 		$item_prototype_key = CDBHelper::getValue('SELECT key_ FROM items WHERE itemid ='.$this->item_prototypeid);
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$this->lldid.'&context='.$context);
+		$this->page->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$this->lldid.'&context='.$context);
 		$this->query('link:'.CDBHelper::getValue('SELECT name FROM items WHERE itemid ='.$this->item_prototypeid))
 				->one()->click();
 		COverlayDialogElement::find()->one()->asForm()->waitUntilPresent()->selectTab('Preprocessing');
@@ -288,7 +289,7 @@ class testFormPreprocessingClone extends CWebTest {
 		// Get new cloned item id and assert item preprocessing.
 		$new_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid ='.$cloned_hostid.' AND key_ ='.
 				zbx_dbstr($item_key));
-		$this->page->login()->open('zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$cloned_hostid.
+		$this->page->open('zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$cloned_hostid.
 				'&context='.$context);
 		$this->query('link:'.CDBHelper::getValue('SELECT name FROM items WHERE itemid ='.$new_itemid))->one()->click();
 		COverlayDialogElement::find()->one()->asForm()->waitUntilPresent()->selectTab('Preprocessing');
@@ -304,7 +305,7 @@ class testFormPreprocessingClone extends CWebTest {
 		// Get new cloned item prototype id and assert item prototype preprocessing.
 		$new_item_prototypeid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid ='.$cloned_hostid.
 				' AND key_ ='.zbx_dbstr($item_prototype_key));
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$new_lldid.'&context='.$context);
+		$this->page->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$new_lldid.'&context='.$context);
 		$this->query('link:'.CDBHelper::getValue('SELECT name FROM items WHERE itemid ='.$new_item_prototypeid))->one()
 				->click();
 		COverlayDialogElement::find()->one()->asForm()->waitUntilPresent()->selectTab('Preprocessing');

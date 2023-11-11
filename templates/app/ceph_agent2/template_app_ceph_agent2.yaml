@@ -1252,6 +1252,7 @@ zabbix_export:
               key: 'ceph.pool["{#POOLNAME}",percent_used]'
               delay: '0'
               history: 7d
+              value_type: FLOAT
               units: '%'
               description: 'The percentage of the storage used per pool.'
               preprocessing:

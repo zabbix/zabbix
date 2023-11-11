@@ -128,7 +128,7 @@ if ($item['itemid']) {
 
 	$buttons[] = [
 		'title' => _('Delete'),
-		'confirmation' => _('Delete selected item?'),
+		'confirmation' => _('Delete item?'),
 		'class' => ZBX_STYLE_BTN_ALT,
 		'keepOpen' => true,
 		'isSubmit' => false,
