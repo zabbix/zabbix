@@ -248,10 +248,10 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 		{
 			case ZBX_IPC_CONNECTOR_REQUEST:
 				worker_process_request(&socket, connector_worker_args_in->config_source_ip,
-				connector_worker_args_in->config_ssl_ca_location,
-				connector_worker_args_in->config_ssl_cert_location,
-				connector_worker_args_in->config_ssl_key_location,
-				&message, &connector_data_points, &processed_num);
+						connector_worker_args_in->config_ssl_ca_location,
+						connector_worker_args_in->config_ssl_cert_location,
+						connector_worker_args_in->config_ssl_key_location,
+						&message, &connector_data_points, &processed_num);
 				connections_num++;
 				break;
 		}
