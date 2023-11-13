@@ -44,6 +44,8 @@ class CSVGHoneycomb {
 
 	static TEXT_BASELINE = 0.8;
 
+	static TRANSITION_DURATION = 300;
+
 	/**
 	 * Widget configuration.
 	 *
@@ -1043,7 +1045,7 @@ class CSVGHoneycomb {
 
 			const corner_count = 6;
 			const corner_radius = 0.075;
-			const handle_distance111 = corner_radius - (corner_radius * 0.5);
+			const handle_distance = corner_radius - (corner_radius * 0.5);
 			const offset = Math.PI / 2;
 
 			const corners = d3.range(corner_count).map(side => {
@@ -1061,8 +1063,8 @@ class CSVGHoneycomb {
 				return {
 					start: getPositionOnLine(prev, curr, 0.5),
 					start_curve: getPositionOnLine(prev, curr, 1 - corner_radius),
-					handle_1: getPositionOnLine(prev, curr, 1 - handle_distance111),
-					handle_2: getPositionOnLine(curr, next, handle_distance111),
+					handle_1: getPositionOnLine(prev, curr, 1 - handle_distance),
+					handle_2: getPositionOnLine(curr, next, handle_distance),
 					end_curve: getPositionOnLine(curr, next, corner_radius)
 				};
 			});
