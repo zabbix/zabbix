@@ -32,21 +32,22 @@
  * @return {jQuery}
  */
 function makeStepResult(step) {
-	if (typeof step.error !== 'undefined') {
+	if ('error' in step) {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(_('<empty string>')) ?>}
+			{error: step.error || <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>}
 		));
 	}
-	else if (typeof step.result === 'undefined' || step.result === null) {
+	else if (step.result === undefined || step.result === null) {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('No value')) ?>);
 	}
 	else if (step.result === '') {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
 	}
+	else if ('warning' in step) {
+		return jQuery(new Template(jQuery('#preprocessing-step-result-warning').html()).evaluate(step));
+	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
-		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
-			jQuery.extend({result: step.result})
-		));
+		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(step));
 	}
 	else {
 		return jQuery('<span>').text(step.result);
@@ -205,6 +206,10 @@ function itemGetValueTest(overlay) {
 				<?php endif ?>
 
 				jQuery('#value', $form).multilineInput('value', ret.value);
+				jQuery('#value_warning', $form)
+					.toggle('warning' in ret)
+					.addClass('js-retrieved')
+					.attr('data-hintbox-contents', ret.warning);
 
 				if (typeof ret.eol !== 'undefined') {
 					jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -295,6 +300,10 @@ function itemCompleteTest(overlay) {
 			<?php endif ?>
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
+			jQuery('#value_warning', $form)
+				.toggle('warning' in ret)
+				.addClass('js-retrieved')
+				.attr('data-hintbox-contents', ret.warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -481,6 +490,8 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+				$('#value_warning.js-retrieved').show();
+
 				$not_supported.prop('disabled', true);
 
 				<?php if ($data['show_prev']): ?>
@@ -548,6 +559,8 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
+				$('#value_warning').hide();
+
 				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
 				$not_supported.prop('disabled', false);
 

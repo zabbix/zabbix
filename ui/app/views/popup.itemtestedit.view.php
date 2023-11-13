@@ -260,7 +260,12 @@ if ($data['is_item_testable']) {
 }
 
 $form_grid->addItem([
-	new CLabel(_('Value'), 'value'),
+	new CLabel([
+		_('Value'),
+		makeWarningIcon('#{warning}')
+			->setId('value_warning')
+			->addStyle('display: none;')
+	], 'value'),
 	new CFormField(
 		(new CMultilineInput('value', '', [
 			'disabled' => false,
@@ -397,6 +402,19 @@ $templates = [
 			))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+		),
+	(new CTag('script', true))
+		->setAttribute('type', 'text/x-jquery-tmpl')
+		->setId('preprocessing-step-result-warning')
+		->addItem(
+			(new CDiv([
+				(new CDiv('#{result}'))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setHint('#{result}', 'hintbox-wrap'),
+				makeWarningIcon('#{warning}')
+			]))
+				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; display: inline-flex;')
 		),
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')

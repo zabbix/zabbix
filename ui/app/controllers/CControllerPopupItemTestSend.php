@@ -367,6 +367,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$preproc_test_data['value'] = $result['result'];
 					$output['value'] = $result['result'];
 					$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
+
+					if ($result['truncated']) {
+						$output['warning'] = _s('First %1$s of %2$s shown.',
+							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
+							convertUnits(['value' => $result['original_size'], 'units' => 'B'])
+						);
+					}
 				}
 
 				if (array_key_exists('error', $result) && $result['error'] !== '') {
@@ -429,9 +436,20 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 							$step['result'] = $preproc_test_data['value'];
 						}
+						else {
+							if ($step['truncated']) {
+								$step['warning'] = _s('First %1$s of %2$s shown.',
+									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
+									convertUnits(['value' => $step['original_size'], 'units' => 'B'])
+								);
+							}
+
+						}
 					}
 
-					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params']);
+					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params'],
+						$step['truncated'], $step['original_size']
+					);
 
 					// Latest executed step due to the error or end of preprocessing.
 					$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
@@ -449,6 +467,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							),
 							'result' => $result['result']
 						];
+
+						if ($result['truncated']) {
+							$output['final']['warning'] = _s('First %1$s of %2$s shown.',
+								convertUnits(['value' => strlen($result['result']), 'units' => 'B']),
+								convertUnits(['value' => $result['original_size'], 'units' => 'B'])
+							);
+						}
 
 						if ($valuemap) {
 							$output['mapped_value'] = CValueMapHelper::applyValueMap($preproc_test_data['value_type'],
