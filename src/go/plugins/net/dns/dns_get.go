@@ -281,9 +281,51 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
 	log.Infof("AGS Question: %s", resp.Question)
-	resp_answer, _ := json.Marshal(resp.Answer)
 
+	resp_answer, _ := json.Marshal(resp.Answer)
 	log.Infof("AGS Answer: %s", resp_answer)
+
+
+	resultG := make(map[string][]interface{})
+
+	log.Infof("#######################################\n\n\n\n")
+
+	for _, ii := range resp.Answer {
+		h := ii.Header() // RR_Header
+		log.Infof("AGS H: ->%s<-\n", h)
+
+
+
+		fmt.Printf("111")
+
+		result := make(map[string]interface{})
+
+		value := reflect.ValueOf(ii)
+		typeOf := value.Type()
+		// *dns.A
+
+		log.Infof("RECORD TYPE: %s", typeOf)
+
+		if value.Kind() == reflect.Ptr {
+			value = value.Elem()
+		}
+
+		for j := 0; j < value.NumField(); j++ {
+
+			fieldValue := value.Field(j)
+			fieldType := value.Type().Field(j)
+			fieldName := fieldType.Name
+			resFieldValue := fieldValue.Interface()
+			result[fieldName] = resFieldValue
+		}
+
+		resultG["answer_section"] = append(resultG["answer_section"], result)
+	}
+	log.Infof("###################\n\n\n")
+
+	aG, _ := json.Marshal(resultG)
+	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
+
 	// log.Infof("AGS Ns: %s", resp.Ns)
 	// log.Infof("AGS Extra: %s", resp.Extra)
 
