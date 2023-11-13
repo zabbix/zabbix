@@ -376,8 +376,16 @@
 				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
 					dcheck.name += ' (' + dcheck.ports + ')';
 				}
+
 				if (dcheck.key_) {
 					dcheck.name += ' "' + dcheck.key_ + '"';
+				}
+
+				if (dcheck.dcheckid === undefined) {
+					dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val()
+					|| '<?= ZBX_DISCOVERY_DNS ?>';
+					dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val()
+					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 				}
 
 				if (hasDCheckDuplicates()) {
