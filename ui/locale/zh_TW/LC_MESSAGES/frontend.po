@@ -15306,6 +15306,10 @@ msgstr "百分比線(左)"
 msgid "Percentile line (right)"
 msgstr "百分比線(右)"
 
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr ""
@@ -22866,6 +22870,13 @@ msgstr ""
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
+msgstr ""
+
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
 msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87

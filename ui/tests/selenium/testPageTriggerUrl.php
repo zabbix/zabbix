@@ -178,17 +178,15 @@ class testPageTriggerUrl extends CWebTest {
 			if (is_array($links)) {
 				$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
 				$this->assertEquals(array_keys($links), [$item_link->getText()]);
-				$this->assertStringContainsString(array_values($links)[0], str_contains(array_values($links)[0], 'menu-popup-item')
-						? $item_link->getAttribute('class')
-						: $item_link->getAttribute('href')
+				$this->assertStringContainsString(array_values($links)[0],
+						$item_link->getAttribute((array_values($links)[0] === 'menu-popup-item') ? 'class' : 'href')
 				);
 			}
 			else {
 				// Check 1-level menu links.
 				if ($links !== '') {
-					$this->assertStringContainsString($links, ($links === 'menu-popup-item')
-							? $trigger_popup->getItem($menu)->getAttribute('class')
-							: $trigger_popup->getItem($menu)->getAttribute('href')
+					$this->assertStringContainsString($links,
+							$trigger_popup->getItem($menu)->getAttribute($links === 'menu-popup-item' ? 'class' : 'href')
 					);
 				}
 			}

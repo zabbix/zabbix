@@ -65,7 +65,7 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  password:'%s'", item->password);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_contextname:'%s'", item->snmpv3_contextname);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  jmx_endpoint:'%s'", item->jmx_endpoint);
-		zbx_log_handle(LOG_LEVEL_TRACE, "  timeout:'%s'", item->timeout);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  timeout: %d", item->timeout);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  url:'%s'", item->url);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  query_fields:'%s'", item->query_fields);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  posts:'%s'", ZBX_NULL2STR(item->posts));

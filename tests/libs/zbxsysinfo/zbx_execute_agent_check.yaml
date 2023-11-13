@@ -60,6 +60,11 @@ in:
   in_command: net.dns.record[,zabbix.com]
   flags: 4
 ---
+test case: successfully called net_dns_perf function
+in:
+  in_command: net.dns.perf[,zabbix.com]
+  flags: 4
+---
 test case: successfully called net_tcp_port function
 in:
   in_command: net.tcp.port[,80]
