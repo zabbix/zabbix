@@ -26,7 +26,7 @@
 
 $form = (new CForm())
 	->setId('script-userinput-form')
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 	$form

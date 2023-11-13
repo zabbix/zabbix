@@ -1620,10 +1620,14 @@ function openManualinputDialogue(item, data) {
 		}
 
 		const form = document.getElementById('script-userinput-form');
+		this.overlay = overlays_stack.getById('script-userinput-form');
 
 		fetch(curl.getUrl())
 			.then((response) => response.json())
 			.then((response) => {
+				this.overlay.unsetLoading();
+				document.querySelector('[name="manualinput"]').focus();
+
 				for (const element of form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -1643,14 +1647,14 @@ function openManualinputDialogue(item, data) {
 
 						if (response.result.confirmation === '') {
 							window.open(item.url, '_blank');
+							overlayDialogueDestroy(overlay.dialogueid);
 						}
 						else {
 							if (confirm(response.result.confirmation)) {
 								window.open(item.url, '_blank');
+								overlayDialogueDestroy(overlay.dialogueid);
 							}
 						}
-
-						overlayDialogueDestroy(overlay.dialogueid);
 					}
 					catch (e) {
 						for (const element of form.parentNode.children) {

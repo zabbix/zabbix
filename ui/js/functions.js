@@ -565,6 +565,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 			}
 
 			const form = document.getElementById('script-userinput-form');
+			this.overlay = overlays_stack.getById('script-userinput-form');
 
 			fetch(curl.getUrl())
 				.then((response) => response.json())
@@ -581,23 +582,23 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 						form.parentNode.insertBefore(message_box, form);
 					}
 					else {
-						overlayDialogueDestroy(overlay.dialogueid);
-
 						confirmation = response.result.confirmation;
 
 						if (confirmation === '') {
 							execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
+							overlayDialogueDestroy(overlay.dialogueid);
 						}
 						else {
 							showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid,
-								csrf_token, e.detail.data.manualinput
+								csrf_token, e.detail.data.manualinput, overlay.dialogueid
 							);
 						}
 					}
 				})
 				.catch((exception) => {
 					console.log('Could not retrieve macro values:', exception);
-				});
+				})
+				.finally(() => this.overlay.unsetLoading());
 		});
 	}
 	else if (confirmation.length > 0) {
@@ -644,16 +645,17 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
 /**
  * Display script execution confirmation dialogue.
  *
- * @param {string}      confirmation     Confirmation text.
- * @param {string|null} hostid           Host ID.
- * @param {string|null} eventid          Event ID.
- * @param {Node}        trigger_element  UI element that was clicked to open overlay dialogue.
- * @param {string}      scriptid         Script ID.
- * @param {string}      csrf_token       CSRF token.
- * @param {string|null} manualinput      Manualinput value.
+ * @param {string}      confirmation         Confirmation text.
+ * @param {string|null} hostid               Host ID.
+ * @param {string|null} eventid              Event ID.
+ * @param {Node}        trigger_element      UI element that was clicked to open overlay dialogue.
+ * @param {string}      scriptid             Script ID.
+ * @param {string}      csrf_token           CSRF token.
+ * @param {string|null} manualinput          Manualinput value.
+ * @param {string|null} overlay_dialogue_id  Manualinput overlay dialogue id or null, if manualinput is not enabled.
  */
 function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
-		manualinput = null) {
+		manualinput = null, overlay_dialogue_id = null) {
 	overlayDialogue({
 		'title': t('Execution confirmation'),
 		'content': jQuery('<span>')
@@ -673,6 +675,10 @@ function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element
 				'focused': (hostid !== null || eventid !== null),
 				'action': () => {
 					execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element);
+
+					if (overlay_dialogue_id) {
+						overlayDialogueDestroy(overlay_dialogue_id);
+					}
 				}
 			}
 		]

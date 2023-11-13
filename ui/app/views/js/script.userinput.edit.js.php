@@ -57,9 +57,9 @@ window.script_userinput_popup = new class {
 		}
 
 		curl.setArgument('action', 'script.userinput.check');
+		this.overlay.recoverFocus();
 
 		this.#post(curl.getUrl(), fields);
-		this.overlay.recoverFocus();
 	}
 
 	submit() {
@@ -72,8 +72,9 @@ window.script_userinput_popup = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'script.userinput.check');
+
+		this.overlay.setLoading();
 		this.#post(curl.getUrl(), fields);
-		this.overlay.recoverFocus();
 	}
 
 	#post(url, data) {
@@ -93,9 +94,13 @@ window.script_userinput_popup = new class {
 				}
 
 				if ('error' in response) {
+					this.overlay.unsetLoading();
+					this.overlay.recoverFocus();
+
 					throw {error: response.error};
 				}
 				else if ('success' in response) {
+					this.overlay.unsetLoading();
 					messages = response.success.messages;
 
 					const message_box = makeMessageBox('good', messages)[0];
@@ -126,7 +131,6 @@ window.script_userinput_popup = new class {
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => this.overlay.unsetLoading());
+			});
 	}
 }
