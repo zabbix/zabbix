@@ -278,12 +278,12 @@ $form_grid->addItem([
 			->setId('value_warning')
 			->addStyle('display: none;')
 	], 'value'),
-	new CFormField([
+	new CFormField(
 		(new CMultilineInput('value', '', [
 			'disabled' => false,
 			'readonly' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]),
+	),
 
 	new CLabel(_('Time'), 'time'),
 	new CFormField(
