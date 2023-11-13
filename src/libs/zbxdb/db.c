@@ -866,6 +866,12 @@ out:
 	if (ZBX_DB_OK != ret)
 		goto out;
 
+	if (0 < (ret = zbx_db_execute("pragma foreign_keys=on")))
+		ret = ZBX_DB_OK;
+
+	if (ZBX_DB_OK != ret)
+		goto out;
+
 	if (0 < (ret = zbx_db_execute("pragma temp_store=2")))
 		ret = ZBX_DB_OK;
 
