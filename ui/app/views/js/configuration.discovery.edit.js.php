@@ -383,9 +383,9 @@
 
 				if (dcheck.dcheckid === undefined) {
 					dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val()
-					|| '<?= ZBX_DISCOVERY_DNS ?>';
+						|| '<?= ZBX_DISCOVERY_DNS ?>';
 					dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val()
-					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
+						|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 				}
 
 				if (hasDCheckDuplicates()) {
