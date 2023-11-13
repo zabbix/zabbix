@@ -1203,7 +1203,7 @@ class testScripts extends CAPITest {
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
-				'manualinput_validator' => 'dashboard.list, script.list',
+				'manualinput_validator' => 'dashboard.list, script.list'
 			],
 
 			// script.getScriptsByEvents
@@ -1275,7 +1275,7 @@ class testScripts extends CAPITest {
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
-				'manualinput_validator' => 'dashboard.list, script.list',
+				'manualinput_validator' => 'dashboard.list, script.list'
 			],
 
 			// script.create - to check existing names and menu paths.
