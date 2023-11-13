@@ -55,6 +55,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
+
 	zbxlib.SetMaxLinesPerSecond(p.options.MaxLinesPerSecond)
 }
 
@@ -105,7 +106,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
-	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob)
+	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob, ctx.ItemID())
 	data.lastcheck = now
 
 	if len(logitem.Results) != 0 {
@@ -132,4 +133,6 @@ func init() {
 		"logrt", "Log file monitoring with log rotation support.",
 		"log.count", "Count of matched lines in log file monitoring.",
 		"logrt.count", "Count of matched lines in log file monitoring with log rotation support.")
+
+	impl.SetHandleTimeout(true)
 }

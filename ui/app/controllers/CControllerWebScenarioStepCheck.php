@@ -124,8 +124,8 @@ class CControllerWebScenarioStepCheck extends CController {
 					$ret = false;
 				}
 
-				if ($field === 'variables') {
-					if ($pair['name'] !== '' && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
+				if ($field === 'variables' && $pair['name'] !== '') {
+					if (preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
 						error(_s('Incorrect value for field "%1$s": %2$s.', $field.'/'.($i + 1).'/name',
 							_('is not enclosed in {} or is malformed')
 						));

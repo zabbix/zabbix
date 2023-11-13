@@ -82,6 +82,8 @@ $form-search-icon-color: #b1b1b1;
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
+$input-disabled-placeholder-color: #404040;
+
 // Search form
 $form-search-bg-color: #191919;
 
@@ -130,6 +132,9 @@ $gauge-empty-color: #383838;
 $gauge-fill-color: #69808d;
 $gauge-needle-fill-color: #f2f2f2;
 $gauge-needle-stroke-color: #f2f2f2;
+
+// Pie chart.
+$pie-chart-arc-no-data-color: #383838;
 
 // Statuses
 $problem-unack-fg-color: #ff3333;
@@ -336,22 +341,6 @@ $toc-title-bg-color: #4f4f4f;
 
 .totals-list {
 	color: darken($font-color, 85%);
-}
-
-// Widget "Host availability".
-.host-avail-widget {
-
-	&.list-table {
-		color: darken($font-color, 85%);
-
-		tbody th {
-			color: $font-color;
-		}
-	}
-
-	.host-avail-total {
-		color: $font-color;
-	}
 }
 
 .breadcrumbs {

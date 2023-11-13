@@ -31,5 +31,7 @@ void	op_host_del(const zbx_db_event *event);
 void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg);
 void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg);
 void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode);
+void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
+		zbx_vector_uint64_t *del_optagids);
 
 #endif

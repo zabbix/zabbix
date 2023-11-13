@@ -24,6 +24,7 @@
  * @var array $data
  */
 
+$this->addJsFile('d3.v7.min.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
@@ -36,7 +37,12 @@ $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget-field.checkbox-list.js');
+$this->addJsFile('class.widget-field.multiselect.js');
+$this->addJsFile('class.widget-field.time-period.js');
+$this->addJsFile('class.widget-select.popup.js');
 $this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('class.coverride.js');
@@ -124,7 +130,7 @@ $html_page
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
-		'time_period' => $data['time_period'],
+		'dashboard_time_period' => $data['dashboard_time_period'],
 		'page' => $data['page']
 	]).');
 '))

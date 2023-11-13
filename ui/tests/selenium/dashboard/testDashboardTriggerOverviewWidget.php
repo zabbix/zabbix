@@ -20,8 +20,9 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -31,16 +32,18 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardTriggerOverviewWidget extends CWebTest {
 
-	use TagTrait;
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
 	}
 
 	private static $dashboardid;
@@ -52,7 +55,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	private static $icon_host = 'Host for triggers filtering';
 
 	private static $background_classes = [
-		'1_trigger_Average' => 'normal-bg cursor-pointer js-blink',
+		'1_trigger_Average' => 'normal-bg cursor-pointer blink',
 		'1_trigger_Disaster' => 'disaster-bg',
 		'1_trigger_High' => 'high-bg',
 		'1_trigger_Not_classified' => 'na-bg',
@@ -642,7 +645,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Hosts location' => 'Top'
 		]);
 
-		$this->setTagSelector('id:tags_table_tags');
 		$this->setTags([['name' => 'webhook', 'operator' => 'Equals', 'value' => '1']]);
 
 		// Save or cancel widget.
@@ -675,7 +677,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testDashboardSlaReportWidget_Delete() {
+	public function testDashboardTriggerOverviewWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget(self::$delete_widget);
@@ -727,8 +729,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$row = $dashboard->getWidget(self::$update_widget)->getContent()->asTable()->findRow('Hosts', self::$icon_host);
 
 		foreach ($popup_content as $trigger => $dependency) {
-			// Locate hint and check table headers in hint.
-			$hint_table = $row->getColumn($trigger)->query('class:hint-box')->one()->asTable();
+			// Hover hint and check table headers in hint.
+			$row->getColumn($trigger)->query('tag:button')->one()->hoverMouse();
+			$hint_table = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one()
+					->query('class:list-table')->one()->asTable();
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 
 			// Gather data from rows and compare result with reference.
@@ -771,7 +775,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data,'tags', false)) {
-			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 

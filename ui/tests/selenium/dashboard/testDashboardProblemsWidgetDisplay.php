@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup config, hstgrp, widget
@@ -30,20 +31,26 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardProblemsWidgetDisplay extends CWebTest {
 
-	use TableTrait;
-
-	private static $dashboardid;
-	private static $time;
-	protected static $acktime;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
+
+	protected static $dashboardid;
+	protected static $time;
+	protected static $acktime;
+	protected static $cause_problemid;
+	protected static $symptom_problemid;
+	protected static $symptom_problemid2;
+	protected static $eventid_for_widget_text;
+	protected static $eventid_for_widget_unsigned;
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -125,61 +132,51 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$symptoms_itemids = CDataHelper::getIds('name');
 
 		// Create triggers based on items.
-		$problem_triggers = CDataHelper::call('trigger.create', [
+		CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Trigger for widget 1 float',
 				'expression' => 'last(/Host for Problems Widgets/float)=0',
 				'opdata' => 'Item value: {ITEM.LASTVALUE}',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => 'Trigger for widget 1 char',
 				'expression' => 'last(/Host for Problems Widgets/char)=0',
-				'priority' => 1,
+				'priority' => TRIGGER_SEVERITY_INFORMATION,
 				'manual_close' => 1
 			],
 			[
 				'description' => 'Trigger for widget 2 log',
 				'expression' => 'last(/Host for Problems Widgets/log)=0',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Trigger for widget 2 unsigned',
 				'expression' => 'last(/Host for Problems Widgets/unsigned)=0',
 				'opdata' => 'Item value: {ITEM.LASTVALUE}',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => 'Trigger for widget text',
 				'expression' => 'last(/Host for Problems Widgets/text)=0',
-				'priority' => 4
-			]
-		]);
-		$this->assertArrayHasKey('triggerids', $problem_triggers);
-		$problem_triggerids = CDataHelper::getIds('description');
-
-		$symptoms_triggers = CDataHelper::call('trigger.create', [
+				'priority' => TRIGGER_SEVERITY_HIGH
+			],
 			[
-				'description' => 'Cause problem 1',
+				'description' => 'Cause problem',
 				'expression' => 'last(/Host for Cause and Symptoms/trap1)=0',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_INFORMATION
+			],
+			[
+				'description' => 'Symptom problem',
+				'expression' => 'last(/Host for Cause and Symptoms/trap2)=0',
+				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
 				'description' => 'Symptom problem 2',
-				'expression' => 'last(/Host for Cause and Symptoms/trap2)=0',
-				'priority' => 1
-			],
-			[
-				'description' => 'Symptom problem 3',
 				'expression' => 'last(/Host for Cause and Symptoms/trap3)=0',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			]
 		]);
-		$this->assertArrayHasKey('triggerids', $symptoms_triggers);
-		$symptoms_triggerids = CDataHelper::getIds('description');
-
-		// Create events and problems.
-		self::$time = time();
 
 		foreach (array_values($problem_itemids) as $itemid) {
 			CDataHelper::addItemData($itemid, 0);
@@ -189,62 +186,58 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			CDataHelper::addItemData($itemid, 0);
 		}
 
-		$i = 0;
-		foreach ($problem_triggerids as $name => $id) {
-			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
-			);
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
-			);
-			$i++;
+		// Create events and problems.
+		self::$time = time();
+		foreach (CDataHelper::getIds('description') as $name => $id) {
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 		}
-
-		$j = 0;
-		foreach ($symptoms_triggerids as $name => $id) {
-			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-					(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
-			);
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-					(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
-			);
-			$j++;
-		}
-
-		// Change triggers' state to Problem.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget 1 float').', '.
-				zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
-				zbx_dbstr('Trigger for widget text').', '.zbx_dbstr('Cause problem 1').', '.
-				zbx_dbstr('Symptom problem 2').', '.zbx_dbstr('Symptom problem 3').')'
-		);
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
+		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.
 				zbx_dbstr('Trigger for widget 1 char')
 		);
 
+		// Get event ids.
+		$eventids = [];
+		$event_names = [
+			'Cause problem', 'Symptom problem', 'Symptom problem 2', 'Trigger for widget text', 'Trigger for widget 2 unsigned'
+		];
+		foreach ($event_names as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
+		}
+
+		self::$cause_problemid = $eventids['Cause problem'];
+		self::$symptom_problemid = $eventids['Symptom problem'];
+		self::$symptom_problemid2 = $eventids['Symptom problem 2'];
+		self::$eventid_for_widget_text = $eventids['Trigger for widget text'];
+		self::$eventid_for_widget_unsigned = $eventids['Trigger for widget 2 unsigned'];
+
 		// Set cause and symptoms.
-		DBexecute('UPDATE problem SET cause_eventid = 1009850 WHERE name IN ('.zbx_dbstr('Symptom problem 2').', '.
-				zbx_dbstr('Symptom problem 3').')'
+		DBexecute('UPDATE problem SET cause_eventid='.self::$cause_problemid.' WHERE name IN ('.
+				zbx_dbstr('Symptom problem').', '.zbx_dbstr('Symptom problem 2').')'
 		);
-		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES (1009851, 1009850)');
-		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES (1009852, 1009850)');
+		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.self::$symptom_problemid.', '.
+				self::$cause_problemid.')'
+		);
+		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.self::$symptom_problemid2.', '.
+				self::$cause_problemid.')'
+		);
 
 		// Suppress the problem: 'Trigger for widget text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES '.
-				'(100990, 1009954, NULL, 0)'
+				'(100990, '.self::$eventid_for_widget_text.', NULL, 0)'
 		);
 
 		// Acknowledge the problem: 'Trigger for widget 2 unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
-			'eventids' => 1009953,
+			'eventids' => self::$eventid_for_widget_unsigned,
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
 
 		$event = CDataHelper::call('event.get', [
-			'eventids' => 1009953,
-			'select_acknowledges' => ['clock']
+			'eventids' => self::$eventid_for_widget_unsigned,
+			'selectAcknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
@@ -614,7 +607,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 unsigned',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => 'Item value: 0'
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 log',
@@ -626,7 +619,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 1 float',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => 'Item value: 0'
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
@@ -646,7 +639,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 1 char'],
-						['Problem • Severity' => "Trigger for widget 1 float (Item value: \n0)"]
+						['Problem • Severity' => 'Trigger for widget 1 float (Item value: 0)']
 					]
 				]
 			],
@@ -674,9 +667,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show symptoms' => false
 					],
 					'result' => [
-						['Problem • Severity' => 'Cause problem 1'],
-						['Problem • Severity' => 'Symptom problem 3'],
-						['Problem • Severity' => 'Symptom problem 2']
+						['Problem • Severity' => 'Cause problem'],
+						['Problem • Severity' => 'Symptom problem 2'],
+						['Problem • Severity' => 'Symptom problem']
 					],
 					'headers' => ['', '', 'Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
 							'Duration', 'Update', 'Actions'
@@ -692,11 +685,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show symptoms' => true
 					],
 					'result' => [
-						['Problem • Severity' => 'Symptom problem 3'],
 						['Problem • Severity' => 'Symptom problem 2'],
-						['Problem • Severity' => 'Cause problem 1'],
-						['Problem • Severity' => 'Symptom problem 3'],
-						['Problem • Severity' => 'Symptom problem 2']
+						['Problem • Severity' => 'Symptom problem'],
+						['Problem • Severity' => 'Cause problem'],
+						['Problem • Severity' => 'Symptom problem 2'],
+						['Problem • Severity' => 'Symptom problem']
 					],
 					'headers' => ['', '', 'Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
 							'Duration', 'Update', 'Actions'
@@ -790,7 +783,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							$row->assertValues($hint_rows[$i]);
 						}
 
-						$hint->close();
+						// TODO: remove 'if' statement after fix ZBX-23472
+						if ($class !== 'zi-bullet-right-with-content') {
+							$hint->close();
+						}
 					}
 				}
 			}

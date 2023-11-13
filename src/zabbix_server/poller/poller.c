@@ -20,15 +20,12 @@
 #include "poller.h"
 #include "zbxexpression.h"
 
-#include "checks_agent.h"
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
 #include "checks_db.h"
-#include "checks_ssh.h"
-#include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
 #include "checks_http.h"
@@ -47,243 +44,9 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
-
-/******************************************************************************
- *                                                                            *
- * Purpose: write interface availability changes into database                *
- *                                                                            *
- * Parameters: data        - [IN/OUT] the serialized availability data        *
- *             data_alloc  - [IN/OUT] the serialized availability data size   *
- *             data_alloc  - [IN/OUT] the serialized availability data offset *
- *             ia          - [IN] the interface availability data             *
- *                                                                            *
- * Return value: SUCCEED - the availability changes were written into db      *
- *               FAIL    - no changes in availability data were detected      *
- *                                                                            *
- ******************************************************************************/
-static int	update_interface_availability(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_interface_availability_t *ia)
-{
-	if (FAIL == zbx_interface_availability_is_set(ia))
-		return FAIL;
-
-	zbx_availability_serialize_interface(data, data_alloc, data_offset, ia);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get interface availability data                                   *
- *                                                                            *
- * Parameters: dc_interface - [IN] the interface                              *
- *             ia           - [OUT] the interface availability data           *
- *                                                                            *
- ******************************************************************************/
-static void	interface_get_availability(const zbx_dc_interface_t *dc_interface, zbx_interface_availability_t *ia)
-{
-	zbx_agent_availability_t	*availability = &ia->agent;
-
-	availability->flags = ZBX_FLAGS_AGENT_STATUS;
-
-	availability->available = dc_interface->available;
-	availability->error = zbx_strdup(NULL, dc_interface->error);
-	availability->errors_from = dc_interface->errors_from;
-	availability->disable_until = dc_interface->disable_until;
-
-	ia->interfaceid = dc_interface->interfaceid;
-}
-
-/********************************************************************************
- *                                                                              *
- * Purpose: sets interface availability data                                    *
- *                                                                              *
- * Parameters: dc_interface - [IN/OUT] the interface                            *
- *             ia           - [IN] the interface availability data              *
- *                                                                              *
- *******************************************************************************/
-static void	interface_set_availability(zbx_dc_interface_t *dc_interface, const zbx_interface_availability_t *ia)
-{
-	const zbx_agent_availability_t	*availability = &ia->agent;
-	unsigned char			*pavailable;
-	int				*perrors_from, *pdisable_until;
-	char				*perror;
-
-	pavailable = &dc_interface->available;
-	perror = dc_interface->error;
-	perrors_from = &dc_interface->errors_from;
-	pdisable_until = &dc_interface->disable_until;
-
-	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
-		*pavailable = availability->available;
-
-	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
-		zbx_strlcpy(perror, availability->error, ZBX_INTERFACE_ERROR_LEN_MAX);
-
-	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
-		*perrors_from = availability->errors_from;
-
-	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
-		*pdisable_until = availability->disable_until;
-}
-
-static int	interface_availability_by_item_type(unsigned char item_type, unsigned char interface_type)
-{
-	if ((ITEM_TYPE_ZABBIX == item_type && INTERFACE_TYPE_AGENT == interface_type) ||
-			(ITEM_TYPE_SNMP == item_type && INTERFACE_TYPE_SNMP == interface_type) ||
-			(ITEM_TYPE_JMX == item_type && INTERFACE_TYPE_JMX == interface_type) ||
-			(ITEM_TYPE_IPMI == item_type && INTERFACE_TYPE_IPMI == interface_type))
-		return SUCCEED;
-
-	return FAIL;
-}
-
-static const char	*item_type_agent_string(zbx_item_type_t item_type)
-{
-	switch (item_type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return "Zabbix agent";
-		case ITEM_TYPE_SNMP:
-			return "SNMP agent";
-		case ITEM_TYPE_IPMI:
-			return "IPMI agent";
-		case ITEM_TYPE_JMX:
-			return "JMX agent";
-		default:
-			return "generic";
-	}
-}
-
-/********************************************************************************
- *                                                                              *
- * Purpose: activate item interface                                             *
- *                                                                              *
- * Parameters: ts         - [IN] the timestamp                                  *
- *             item       - [IN/OUT] the item                                   *
- *             data       - [IN/OUT] the serialized availability data           *
- *             data_alloc - [IN/OUT] the serialized availability data size      *
- *             data_alloc - [IN/OUT] the serialized availability data offset    *
- *             ts         - [IN] the timestamp                                  *
- *                                                                              *
- *******************************************************************************/
-void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
-		char *host, unsigned char **data, size_t *data_alloc, size_t *data_offset)
-{
-	zbx_interface_availability_t	in, out;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__func__, interface->interfaceid, itemid, (int)type);
-
-	zbx_interface_availability_init(&in, interface->interfaceid);
-	zbx_interface_availability_init(&out, interface->interfaceid);
-
-	if (FAIL == interface_availability_by_item_type((unsigned char)type, interface->type))
-		goto out;
-
-	interface_get_availability(interface, &in);
-
-	if (FAIL == zbx_dc_interface_activate(interface->interfaceid, ts, &in.agent, &out.agent))
-		goto out;
-
-	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
-		goto out;
-
-	interface_set_availability(interface, &out);
-
-	if (ZBX_INTERFACE_AVAILABLE_TRUE == in.agent.available)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
-				item_type_agent_string(type), host);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": interface became available",
-				item_type_agent_string(type), host);
-	}
-out:
-	zbx_interface_availability_clean(&out);
-	zbx_interface_availability_clean(&in);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/***********************************************************************************
- *                                                                                 *
- * Purpose: deactivate item interface                                              *
- *                                                                                 *
- * Parameters: ts                 - [IN] timestamp                                 *
- *             item               - [IN/OUT] item                                  *
- *             data               - [IN/OUT] serialized availability data          *
- *             data_alloc         - [IN/OUT] serialized availability data size     *
- *             data_alloc         - [IN/OUT] serialized availability data offset   *
- *             ts                 - [IN] timestamp                                 *
- *             unavailable_delay  - [IN]                                           *
- *             unreachable_period - [IN]                                           *
- *             unreachable_delay  - [IN]                                           *
- *             error              - [IN/OUT]                                       *
- *                                                                                 *
- ***********************************************************************************/
-void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
-		char *host, char *key_orig, unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		int unavailable_delay, int unreachable_period, int unreachable_delay, const char *error)
-{
-	zbx_interface_availability_t	in, out;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__func__, interface->interfaceid, itemid, type);
-
-	zbx_interface_availability_init(&in, interface->interfaceid);
-	zbx_interface_availability_init(&out, interface->interfaceid);
-
-	if (FAIL == interface_availability_by_item_type((unsigned char)type, interface->type))
-		goto out;
-
-	interface_get_availability(interface, &in);
-
-	if (FAIL == zbx_dc_interface_deactivate(interface->interfaceid, ts, unavailable_delay, unreachable_period,
-			unreachable_delay, &in.agent, &out.agent, error))
-	{
-		goto out;
-	}
-
-	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
-		goto out;
-
-	interface_set_availability(interface, &out);
-
-	if (0 == in.agent.errors_from)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
-				" first network error, wait for %d seconds",
-				item_type_agent_string(type), key_orig, host,
-				out.agent.disable_until - ts->sec);
-	}
-	else if (ZBX_INTERFACE_AVAILABLE_FALSE != in.agent.available)
-	{
-		if (ZBX_INTERFACE_AVAILABLE_FALSE != out.agent.available)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
-					" another network error, wait for %d seconds",
-					item_type_agent_string(type), key_orig, host,
-					out.agent.disable_until - ts->sec);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
-					" interface unavailable",
-					item_type_agent_string(type), host);
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __func__,
-			out.agent.errors_from, out.agent.available);
-out:
-	zbx_interface_availability_clean(&out);
-	zbx_interface_availability_clean(&in);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
+#include "zbxpreproc.h"
+#include "zbxsysinfo.h"
+#include "zbxpoller.h"
 
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
@@ -292,7 +55,7 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 }
 
 static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	int	res = FAIL;
 
@@ -301,8 +64,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = get_value_agent(item, config_comms->config_timeout, config_comms->config_source_ip,
-					result);
+			res = zbx_agent_get_value(item, config_comms->config_source_ip, program_type, result);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -313,7 +75,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
-			res = get_value_db(item, config_comms->config_timeout, result);
+			res = get_value_db(item, result);
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
@@ -322,19 +84,18 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			/* external checks use their own timeouts */
-			res = get_value_external(item, config_comms->config_timeout, result);
+			res = get_value_external(item, result);
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			res = get_value_ssh(item, config_comms->config_timeout, config_comms->config_source_ip, result);
+			res = zbx_ssh_get_value(item, config_comms->config_source_ip, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			res = get_value_telnet(item, config_comms->config_timeout, config_comms->config_source_ip,
-					result);
+			res = zbx_telnet_get_value(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
@@ -442,7 +203,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		unsigned char expand_macros)
 {
 	int			i;
-	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX];
+	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
 	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -492,6 +253,31 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 		switch (items[i].type)
 		{
+			case ITEM_TYPE_ZABBIX:
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+			case ITEM_TYPE_SIMPLE:
+			case ITEM_TYPE_EXTERNAL:
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+			case ITEM_TYPE_SNMP:
+			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_HTTPAGENT:
+				ZBX_STRDUP(timeout, items[i].timeout_orig);
+				break;
+		}
+
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_ZABBIX:
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (ZBX_MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+				break;
 			case ITEM_TYPE_SNMP:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
@@ -530,18 +316,20 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
+					zbx_free(timeout);
 					continue;
 				}
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
 				break;
 			case ITEM_TYPE_SCRIPT:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
-
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON,
-						NULL, 0);
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].script_params,
 						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
@@ -585,6 +373,10 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
 				break;
 			case ITEM_TYPE_JMX:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -607,7 +399,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_HTTPAGENT:
 				if (ZBX_MACRO_EXPAND_YES == expand_macros)
 				{
-					ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
 					ZBX_STRDUP(items[i].url, items[i].url_orig);
 					ZBX_STRDUP(items[i].status_codes, items[i].status_codes_orig);
 					ZBX_STRDUP(items[i].http_proxy, items[i].http_proxy_orig);
@@ -619,8 +410,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					ZBX_STRDUP(items[i].query_fields, items[i].query_fields_orig);
 
 					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].timeout,
+							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &timeout,
 							ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
 							&items[i].host, &items[i], NULL, NULL, NULL, NULL, NULL,
 							&items[i].url, ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
@@ -630,6 +422,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot encode URL into punycode"));
 					errcodes[i] = CONFIG_ERROR;
+					zbx_free(timeout);
 					continue;
 				}
 
@@ -637,6 +430,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 					errcodes[i] = CONFIG_ERROR;
+					zbx_free(timeout);
 					continue;
 				}
 
@@ -651,6 +445,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						{
 							SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
 							errcodes[i] = CONFIG_ERROR;
+							zbx_free(timeout);
 							continue;
 						}
 						break;
@@ -691,7 +486,29 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
+			case ITEM_TYPE_EXTERNAL:
+				if (ZBX_MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+				break;
 		}
+
+		if (NULL != timeout)
+		{
+			int	timeout_sec = 0;
+
+			if (FAIL == zbx_validate_item_timeout(timeout, &timeout_sec, error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+			}
+			else
+				items[i].timeout = timeout_sec;
+		}
+		zbx_free(timeout);
 	}
 
 	zbx_free(port);
@@ -704,7 +521,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, unsigned char program_type)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -723,8 +540,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout,
-				config_comms->config_source_ip);
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -736,7 +552,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 	{
 		if (SUCCEED == errcodes[0])
 			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
-				config_startup_time);
+				config_startup_time, program_type);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -765,7 +581,6 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].snmp_oid);
 				break;
 			case ITEM_TYPE_HTTPAGENT:
-				zbx_free(items[i].timeout);
 				zbx_free(items[i].url);
 				zbx_free(items[i].query_fields);
 				zbx_free(items[i].status_codes);
@@ -775,9 +590,6 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].ssl_key_password);
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
-				break;
-			case ITEM_TYPE_SCRIPT:
-				zbx_free(items[i].timeout);
 				break;
 			case ITEM_TYPE_SSH:
 				zbx_free(items[i].publickey);
@@ -812,6 +624,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  *             config_unavailable_delay   - [IN]                                   *
  *             config_unreachable_period  - [IN]                                   *
  *             config_unreachable_delay   - [IN]                                   *
+ *             program_type               - [IN]                                   *
  *                                                                                 *
  * Return value: number of items processed                                         *
  *                                                                                 *
@@ -821,7 +634,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  **********************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
-		int config_unreachable_delay)
+		int config_unreachable_delay, unsigned char program_type)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
@@ -846,7 +659,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_vector_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
-	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time);
+	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
+			program_type);
 
 	zbx_timespec(&timespec);
 
@@ -1023,12 +837,19 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					old_total_sec);
 		}
 
-		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
-				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
-				poller_args_in->config_unreachable_period, poller_args_in->config_unreachable_delay);
-		total_sec += zbx_time() - sec;
+		if (ZBX_POLLER_TYPE_INTERNAL == poller_type || FAIL == zbx_vps_monitor_capped())
+		{
+			processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
+					poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
+					poller_args_in->config_unreachable_period,
+					poller_args_in->config_unreachable_delay, info->program_type);
 
-		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
+			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
+		}
+		else
+			sleeptime = POLLER_DELAY;
+
+		total_sec += zbx_time() - sec;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
@@ -1039,9 +860,13 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			}
 			else
 			{
-				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
+				const char	*ext;
+
+				ext = (ZBX_POLLER_TYPE_INTERNAL == poller_type ? "" : zbx_vps_monitor_status());
+
+				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec%s]",
 					get_process_type_string(process_type), process_num, processed, total_sec,
-					sleeptime);
+					sleeptime, ext);
 				old_processed = processed;
 				old_total_sec = total_sec;
 			}

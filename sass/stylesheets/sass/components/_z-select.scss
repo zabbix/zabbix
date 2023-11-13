@@ -1,5 +1,5 @@
-z-select,
-.z-select {
+.z-select,
+z-select {
 	display: inline-grid;
 
 	&:focus {
@@ -10,7 +10,7 @@ z-select,
 		font-style: italic;
 	}
 
-	button.focusable {
+	.focusable {
 		position: relative;
 		width: 100%;
 		height: 24px;
@@ -126,20 +126,16 @@ z-select,
 	}
 
 	&[disabled] {
-		button {
-			pointer-events: none;
+		.focusable {
 			@extend %form-disabled;
+
+			pointer-events: none;
 		}
 	}
 
 	&[readonly] {
-		button {
-			@extend %form-disabled;
-			color: $font-color !important;
-
-			&:focus {
-				border-color: $form-focus-border-color;
-			}
+		.focusable {
+			@extend %form-readonly;
 		}
 	}
 }

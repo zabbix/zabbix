@@ -1422,7 +1422,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 		alarmid = zbx_db_get_maxid_num("service_alarms", alarms->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "service_alarms", "servicealarmid", "serviceid", "value", "clock",
-				NULL);
+				(char *)NULL);
 
 		for (i = 0; i < alarms->values_num; i++)
 		{
@@ -1467,7 +1467,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 		service_problemid = zbx_db_get_maxid_num("service_problem", service_problems_new->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "service_problem", "service_problemid", "eventid", "serviceid",
-				"severity", NULL);
+				"severity", (char *)NULL);
 
 		for (i = 0; i < service_problems_new->values_num; i++)
 		{
@@ -2039,15 +2039,16 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 		goto out;
 
 	zbx_db_insert_prepare(&db_insert_events, "events", "eventid", "source", "object", "objectid", "clock", "value",
-			"ns", "name", "severity", NULL);
+			"ns", "name", "severity", (char *)NULL);
 	zbx_db_insert_prepare(&db_insert_problem, "problem", "eventid", "source", "object", "objectid", "clock", "ns",
-			"name", "severity", NULL);
+			"name", "severity", (char *)NULL);
 
-	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
-	zbx_db_insert_prepare(&db_insert_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", (char *)NULL);
+	zbx_db_insert_prepare(&db_insert_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value",
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
-			NULL);
+			(char *)NULL);
 
 	eventid = zbx_db_get_maxid_num("events", events_num);
 
@@ -2219,9 +2220,9 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 	/* insert recovery events */
 
 	zbx_db_insert_prepare(&db_insert_events, "events", "eventid", "source", "object", "objectid", "clock", "value",
-			"ns", "name", "severity", NULL);
+			"ns", "name", "severity", (char *)NULL);
 
-	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", (char *)NULL);
 
 	eventid = zbx_db_get_maxid_num("events", problem_service.values_num);
 
@@ -2276,7 +2277,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 	sql_offset = 0;
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", NULL);
+	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", (char *)NULL);
 
 	for (i = 0; i < recoveries.values_num; i++)
 	{
@@ -2376,7 +2377,7 @@ static void	db_update_service_events(zbx_service_manager_t *manager, const zbx_v
 		goto out;
 
 	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
-			"servicealarmid", NULL);
+			"servicealarmid", (char *)NULL);
 
 	for (i = 0; i < updates->values_num; i++)
 	{
@@ -2934,9 +2935,9 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
  * Purpose: update service_problem table with the changed event severities    *
  *                                                                            *
  ******************************************************************************/
-static int	db_update_service_problems(const zbx_vector_ptr_t *event_severities)
+static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *event_severities)
 {
-	int	i, txn_rc;
+	int	txn_rc;
 	char	*sql = NULL;
 	size_t	sql_alloc = 0;
 
@@ -2947,9 +2948,9 @@ static int	db_update_service_problems(const zbx_vector_ptr_t *event_severities)
 		zbx_db_begin();
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = 0; i < event_severities->values_num; i++)
+		for (int i = 0; i < event_severities->values_num; i++)
 		{
-			zbx_event_severity_t	*es = (zbx_event_severity_t *)event_severities->values[i];
+			zbx_event_severity_t	*es = event_severities->values[i];
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update service_problem set severity=%d where eventid=" ZBX_FS_UI64 ";\n",
@@ -2977,12 +2978,12 @@ static int	db_update_service_problems(const zbx_vector_ptr_t *event_severities)
  ******************************************************************************/
 static void	process_event_severities(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager)
 {
-	zbx_vector_ptr_t	event_severities;
-	int			i, j, severities_num;
+	zbx_vector_event_severity_ptr_t	event_severities;
+	int				severities_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%u" , __func__, message->size);
 
-	zbx_vector_ptr_create(&event_severities);
+	zbx_vector_event_severity_ptr_create(&event_severities);
 
 	zbx_service_deserialize_event_severities(message->data, &event_severities);
 	severities_num = event_severities.values_num;
@@ -2993,9 +2994,9 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 		goto out;
 	}
 
-	for (i = 0; i < event_severities.values_num; i++)
+	for (int i = 0; i < event_severities.values_num; i++)
 	{
-		zbx_event_severity_t		*es = (zbx_event_severity_t *)event_severities.values[i];
+		zbx_event_severity_t		*es = event_severities.values[i];
 		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local, **pevent;
 		zbx_service_problem_index_t	*pi, pi_local;
 
@@ -3013,17 +3014,17 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 		if (NULL == (pi = zbx_hashset_search(&service_manager->service_problems_index, &pi_local)))
 			continue;
 
-		for (j = 0; j < pi->services.values_num; j++)
+		for (int j = 0; j < pi->services.values_num; j++)
 		{
-			zbx_service_t	*service = (zbx_service_t *)pi->services.values[j];
+			zbx_service_t	*service = pi->services.values[j];
 			service_update_event_severity(service_manager, service, es->eventid, es->severity);
 		}
 	}
 
 	db_update_services(service_manager);
 out:
-	zbx_vector_ptr_clear_ext(&event_severities, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&event_severities);
+	zbx_vector_event_severity_ptr_clear_ext(&event_severities, zbx_event_severity_free);
+	zbx_vector_event_severity_ptr_destroy(&event_severities);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() severities_num:%d", __func__, severities_num);
 }
@@ -3084,11 +3085,9 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 
 static void	service_manager_free(zbx_service_manager_t *service_manager)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+	for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
 		zbx_free(service_manager->severities[i]);
 
 	zbx_hashset_destroy(&service_manager->service_rules);
@@ -3138,12 +3137,10 @@ static void	dump_actions(zbx_hashset_t *actions)
 	zbx_hashset_iter_reset(actions, &iter);
 	while (NULL != (action = (zbx_service_action_t *)zbx_hashset_iter_next(&iter)))
 	{
-		int	i;
-
 		zabbix_log(LOG_LEVEL_TRACE, "  actionid:" ZBX_FS_UI64 " evaltype:%d formula:%s", action->actionid,
 						action->evaltype, action->formula);
 
-		for (i = 0; i < action->conditions.values_num; i++)
+		for (int i = 0; i < action->conditions.values_num; i++)
 		{
 			condition = (zbx_service_action_condition_t *)action->conditions.values[i];
 

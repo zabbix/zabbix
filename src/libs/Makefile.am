@@ -2,6 +2,7 @@
 
 DIST_SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \
@@ -39,6 +40,7 @@ DIST_SUBDIRS = \
 	zbxicmpping \
 	zbxip \
 	zbxipcservice \
+	zbxipmi \
 	zbxjson \
 	zbxkvs \
 	zbxlog \
@@ -49,16 +51,19 @@ DIST_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxregexp \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxsysinfo \
 	zbxstats \
 	zbxstr \
@@ -106,15 +111,18 @@ SERVER_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -126,6 +134,9 @@ SERVER_SUBDIRS = \
 	zbxvault \
 	zbxversion \
 	zbxxml
+if HAVE_IPMI
+SERVER_SUBDIRS += zbxipmi
+endif
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -156,6 +167,7 @@ PROXY_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
@@ -163,7 +175,9 @@ PROXY_SUBDIRS = \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
+	zbxscripts \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -175,11 +189,15 @@ PROXY_SUBDIRS = \
 	zbxvault \
 	zbxversion \
 	zbxxml
+if HAVE_IPMI
+PROXY_SUBDIRS += zbxipmi
+endif
 endif
 endif
 
 SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxcommon \
@@ -208,6 +226,7 @@ SUBDIRS = \
 	zbxodbc \
 	zbxparam \
 	zbxregexp \
+	zbxscripts \
 	zbxsysinfo \
 	zbxstr \
 	zbxthreads \

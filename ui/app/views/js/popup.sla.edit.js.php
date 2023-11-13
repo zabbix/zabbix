@@ -139,7 +139,8 @@ window.sla_edit_popup = new class {
 		}
 
 		const overlay = PopUp('popup.sla.excludeddowntime.edit', popup_params, {
-			dialogueid: 'sla_excluded_downtime_edit'
+			dialogueid: 'sla_excluded_downtime_edit',
+			dialogue_class: 'modal-popup-medium'
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
@@ -178,7 +179,7 @@ window.sla_edit_popup = new class {
 		this._post(curl.getUrl(), {slaids: [this.slaid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

@@ -34,7 +34,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxpreproc.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"
@@ -172,6 +171,12 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_get_history_compression_age(void);
+
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
+{
+	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
+		zbx_free(opt->source);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -376,7 +381,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
-			"value_max", NULL);
+			"value_max", (char *)NULL);
 
 	for (i = 0; i < trends_num; i++)
 	{
@@ -441,7 +446,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct itemid"
+				"select itemid"
 				" from %s"
 				" where clock>=%d and",
 				table_name, clocks[j]);
@@ -2567,6 +2572,8 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
 
+	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
+
 	zbx_vector_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2676,9 +2683,9 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		DCinventory_value_add(inventory_values, item, h);
 
-		if (0 != item->host.proxy_hostid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
+		if (0 != item->host.proxyid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
 		{
-			zbx_uint64_pair_t	p = {item->host.proxy_hostid, h->ts.sec};
+			zbx_uint64_pair_t	p = {item->host.proxyid, h->ts.sec};
 
 			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
@@ -3925,7 +3932,21 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	{
 		zbx_log_t	log;
 
-		zbx_variant_convert(value, ZBX_VARIANT_STR);
+		if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_STR))
+		{
+			char	*error;
+
+			error = zbx_dsprintf(NULL, "Failed to add new variant value to the cache:"
+					" conversion of a variant (%s) to string has failed.",
+					zbx_variant_type_desc(value));
+
+			zabbix_log(LOG_LEVEL_CRIT, error);
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			dc_local_add_history_notsupported(itemid, &ts, error, lastlogsize, mtime, value_flags);
+
+			return;
+		}
 
 		log.logeventid = value_opt->logeventid;
 		log.severity = value_opt->severity;
@@ -3981,6 +4002,8 @@ void	zbx_dc_flush_history(void)
 	cache->history_num += item_values_num;
 
 	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
 	item_values_num = 0;
 	string_values_offset = 0;

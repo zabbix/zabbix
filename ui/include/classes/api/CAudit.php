@@ -38,6 +38,7 @@ class CAudit {
 	public const ACTION_LOGIN_FAILED = 9;
 	public const ACTION_HISTORY_CLEAR = 10;
 	public const ACTION_CONFIG_REFRESH = 11;
+	public const ACTION_PUSH = 12;
 
 	/**
 	 * Audit resources.
@@ -87,6 +88,7 @@ class CAudit {
 	public const RESOURCE_TEMPLATE_GROUP = 50;
 	public const RESOURCE_CONNECTOR = 51;
 	public const RESOURCE_LLD_RULE = 52;
+	public const RESOURCE_HISTORY = 53;
 
 	/**
 	 * Audit details actions.
@@ -132,7 +134,7 @@ class CAudit {
 		self::RESOURCE_MAINTENANCE => 'maintenances',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
 		self::RESOURCE_MODULE => 'module',
-		self::RESOURCE_PROXY => 'hosts',
+		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCENARIO => 'httptest',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
@@ -186,7 +188,7 @@ class CAudit {
 		self::RESOURCE_MAINTENANCE => 'name',
 		self::RESOURCE_MEDIA_TYPE => 'name',
 		self::RESOURCE_MODULE => 'id',
-		self::RESOURCE_PROXY => 'host',
+		self::RESOURCE_PROXY => 'name',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCENARIO => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
@@ -364,6 +366,7 @@ class CAudit {
 		'action.operations.opgroup' => 'opgroup',
 		'action.operations.optemplate' => 'optemplate',
 		'action.operations.opinventory' => 'opinventory',
+		'action.operations.optag' => 'optag',
 		'action.recovery_operations' => 'operations',
 		'action.recovery_operations.opmessage' => 'opmessage',
 		'action.recovery_operations.opmessage_grp' => 'opmessage_grp',
@@ -476,6 +479,7 @@ class CAudit {
 		'action.operations.opcommand_hst' => 'opcommand_hstid',
 		'action.operations.opgroup' => 'opgroupid',
 		'action.operations.optemplate' => 'optemplateid',
+		'action.operations.optag' => 'optagid',
 		'action.recovery_operations' => 'operationid',
 		'action.recovery_operations.opmessage_grp' => 'opmessage_grpid',
 		'action.recovery_operations.opmessage_usr' => 'opmessage_usrid',

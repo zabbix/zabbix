@@ -67,7 +67,7 @@ class CScript extends CApiService {
 			'password', 'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
 		];
 		$group_fields = ['groupid', 'name', 'flags', 'uuid'];
-		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxy_hostid', 'inventory_mode', 'flags',
+		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxyid', 'inventory_mode', 'flags',
 			'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status',
 			'maintenance_type', 'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'
 		];
@@ -1047,7 +1047,8 @@ class CScript extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $zabbix_server->executeScript($data['scriptid'], self::$userData['sessionid'],
+
+		$result = $zabbix_server->executeScript($data['scriptid'], self::getAuthIdentifier(),
 			$is_event ? null : $data['hostid'],
 			$is_event ? $data['eventid'] : null
 		);
@@ -1364,9 +1365,10 @@ class CScript extends CApiService {
 
 		// Adding actions.
 		if ($options['selectActions'] !== null && $options['selectActions'] !== API_OUTPUT_COUNT) {
-			foreach ($result as $scriptid => &$row) {
+			foreach ($result as &$row) {
 				$row['actions'] = [];
 			}
+			unset($row);
 
 			$action_scriptids = [];
 

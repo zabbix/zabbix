@@ -18,21 +18,47 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup config, widget
+ *
+ * @dataSource AllItemValueTypes
  *
  * @onBefore prepareDashboardData
  */
 class testDashboardGaugeWidget extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
-	CONST HOST = 'Host for gauge widget';
-	CONST DELETE_GAUGE = 'Gauge for deleting';
+	const HOST = 'Host for all item value types';
+	const DELETE_GAUGE = 'Gauge for deleting';
+	const GAUGE_ITEM = 'Float item';
+
+	/**
+	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
+	 * because it can change.
+	 */
+	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+			' w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_hostid';
 
 	/**
 	 * Id of the dashboard where gauge widget is created and updated.
@@ -41,92 +67,59 @@ class testDashboardGaugeWidget extends CWebTest {
 	 */
 	protected static $dashboardid;
 
-	private static $update_gauge = 'Gauge for updating';
+	protected static $update_gauge = 'Gauge for updating';
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Get Thresholds table element with mapping set.
 	 *
-	 * @return array
+	 * @return CMultifieldTable
 	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
+	protected function getThresholdsTable() {
+		return $this->query('id:thresholds-table')->asMultifieldTable([
+			'mapping' => [
+				'' => [
+					'name' => 'color',
+					'selector' => 'class:color-picker',
+					'class' => 'CColorPickerElement'
+				],
+				'Threshold' => [
+					'name' => 'threshold',
+					'selector' => 'xpath:./input',
+					'class' => 'CElement'
+				]
+			]
+		])->waitUntilVisible()->one();
 	}
 
-	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_hostid';
-
 	public function prepareDashboardData() {
-		CDataHelper::call('host.create', [
-			'host' => 'Host for gauge widget',
-			'groups' => [['groupid' => 4]]
-		]);
-		$hostids = CDataHelper::getIds('host');
-
-		// Create triggers based on items.
-		$items_data = [];
-		$value_types = [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
-				ITEM_VALUE_TYPE_TEXT
-		];
-
-		foreach ($value_types as $i => $type) {
-			$items_data[] = [
-				'hostid' => $hostids['Host for gauge widget'],
-				'name' => $i.' Item for gauge widget',
-				'key_' => 'trap'.$i,
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => $type
-			];
-		}
-
-		CDataHelper::call('item.create', $items_data);
-		$itemids = CDataHelper::getIds('name');
+		// Add item data to move needle on Gauge.
+		CDataHelper::addItemData(CDataHelper::get('AllItemValueTypes.Float item'), 50);
 
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Gauge widget dashboard',
 			'auto_start' => 0,
 			'pages' => [
 				[
-					'name' => 'First Page',
-					'display_period' => 3600,
+					'name' => 'Gauge test page',
 					'widgets' => [
 						[
 							'type' => 'gauge',
-							'name' => 'Gauge for updating',
+							'name' => self::$update_gauge,
 							'x' => 0,
 							'y' => 0,
 							'width' => 11,
 							'height' => 5,
-							'view_mode' => 0,
 							'fields' => [
 								[
-									'type' => '4',
+									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 									'name' => 'itemid',
-									'value' => $itemids['0 Item for gauge widget']
-								],
-								[
-									'type' => '1',
-									'name' => 'min',
-									'value' => '0'
-								],
-								[
-									'type' => '1',
-									'name' => 'max',
-									'value' => '100'
+									'value' => CDataHelper::get('AllItemValueTypes.Float item')
 								]
 							]
 						],
 						[
 							'type' => 'gauge',
-							'name' => 'Gauge for deleting',
+							'name' => self::DELETE_GAUGE,
 							'x' => 11,
 							'y' => 0,
 							'width' => 11,
@@ -134,23 +127,16 @@ class testDashboardGaugeWidget extends CWebTest {
 							'view_mode' => 0,
 							'fields' => [
 								[
-									'type' => '4',
+									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 									'name' => 'itemid',
-									'value' => $itemids['0 Item for gauge widget']
-								],
-								[
-									'type' => '1',
-									'name' => 'min',
-									'value' => '0'
-								],
-								[
-									'type' => '1',
-									'name' => 'max',
-									'value' => '100'
+									'value' => CDataHelper::get('AllItemValueTypes.Float item')
 								]
 							]
 						]
 					]
+				],
+				[
+					'name' => 'Screenshot page'
 				]
 			]
 		]);
@@ -161,19 +147,16 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	public function testDashboardGaugeWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
-
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
+		$form = $dialog->asForm();
 		$this->assertEquals('Add widget', $dialog->getTitle());
-
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
-		$dialog->waitUntilReady();
 
 		// Check default fields.
 		$fields = [
 			'Name' => ['value' => '', 'placeholder' => 'default', 'maxlength' => 255, 'enabled' => true, 'visible' => true],
 			'Refresh interval' => ['value' => 'Default (1 minute)', 'enabled' => true, 'visible' => true],
-			'id:show_header' => ['value' => true, 'enabled' => true, 'visible' => true, 'visible' => true],
+			'Show header' => ['value' => true, 'enabled' => true, 'visible' => true],
 			'id:itemid_ms' => ['value' => '', 'placeholder' => 'type here to search', 'enabled' => true, 'visible' => true],
 			'Min' => ['value' => 0, 'maxlength' => 255, 'enabled' => true, 'visible' => true],
 			'Max' => ['value' => 100, 'maxlength' => 255, 'enabled' => true, 'visible' => true],
@@ -182,6 +165,13 @@ class testDashboardGaugeWidget extends CWebTest {
 			'xpath:.//input[@id="value_arc_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => true],
 			'xpath:.//input[@id="empty_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => true],
 			'xpath:.//input[@id="bg_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => true],
+
+			// Show.
+			'id:show_1' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Description.
+			'id:show_2' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Value.
+			'id:show_3' => ['value' => false, 'enabled' => true, 'visible' => true], // Show Needle.
+			'id:show_4' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Scale.
+			'id:show_5' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Value arc.
 
 			'Angle' => ['value' => '180°', 'enabled' => true, 'labels' => ['180°', '270°'], 'visible' => false],
 
@@ -195,9 +185,10 @@ class testDashboardGaugeWidget extends CWebTest {
 			// Value.
 			'id:decimal_places' => ['value' => 2, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 			'id:value_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			'id:value_arc' => ['value' => true, 'enabled' => true, 'visible' => false],
 			'id:value_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'xpath:.//input[@id="value_color"]/..' => ['color' => '', 'enabled' => true, 'visible' => false],
+
+			// Value arc.
 			'id:value_arc_size' => ['value' => 20, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 
 			// Units.
@@ -205,26 +196,28 @@ class testDashboardGaugeWidget extends CWebTest {
 			'id:units' => ['value' => '', 'maxlength' => 2048, 'enabled' => true, 'visible' => false],
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
+			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
 			'xpath:.//input[@id="units_color"]/..'=> ['color' => '', 'enabled' => true, 'visible' => false],
 
 			// Needle.
-			'id:needle_show' => ['value' => false, 'enabled' => true, 'visible' => false],
 			'xpath:.//input[@id="needle_color"]/..' => ['color' => '', 'enabled' => false, 'visible' => false],
 
 			// Scale.
-			'id:scale_show' => ['value' => true, 'enabled' => true, 'visible' => false],
-			'id:scale_size' => ['value' => 10, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
-			'id:scale_decimal_places' => ['value' => 0, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 			'id:scale_show_units' => ['value' => true, 'enabled' => true, 'visible' => false],
+			'id:scale_size' => ['value' => 15, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
+			'id:scale_decimal_places' => ['value' => 0, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 
 			// Tresholds.
 			'id:th_show_labels' => ['value' => false, 'enabled' => false, 'visible' => false],
 			'id:th_show_arc' => ['value' => false, 'enabled' => false, 'visible' => false],
-			'id:th_arc_size' => ['value' => 10, 'maxlength' => 3, 'enabled' => false, 'visible' => false],
+			'id:th_arc_size' => ['value' => 5, 'maxlength' => 3, 'enabled' => false, 'visible' => false],
 
-			'Enable host selection' => ['value' => false, 'enabled' => true, 'visible' => true]
+			'id:override_hostid_ms' => [
+				'value' => false, 'placeholder' => 'type here to search', 'enabled' => true, 'visible' => true
+			]
 		];
 
+		$not_visible = [];
 		foreach ($fields as $label => $attributes) {
 			if (array_key_exists('color', $attributes)) {
 				$this->assertEquals($attributes['color'], $form->query($label)->asColorPicker()->one()->getValue());
@@ -249,6 +242,11 @@ class testDashboardGaugeWidget extends CWebTest {
 			if (array_key_exists('labels', $attributes)) {
 				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
 			}
+
+			// Show Needle is unchecked and Needle color remains invisible by default.
+			if ($attributes['visible'] === false && $label !== 'xpath:.//input[@id="needle_color"]/..') {
+				$not_visible[] = $label;
+			}
 		}
 
 		// Check  Advanced configuration's fields visibility.
@@ -264,8 +262,14 @@ class testDashboardGaugeWidget extends CWebTest {
 			'Position' => 'Position is ignored for s, uptime and unixtime units.'
 		];
 
+		// Check Position dropdown options.
+		$this->assertEquals(['Before value', 'Above value', 'After value', 'Below value'],
+				$form->getField('id:units_pos')->getOptions()->asText()
+		);
+
 		foreach ($hints as $label => $text) {
-			$form->getLabel($label)->query('xpath:.//button[@data-hintbox]')->one()->click(true);
+			// Force click is needed because the label might be hidden under the scrolled part of the form.
+			$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click(true);
 			$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
 			$this->assertEquals($text, $hint->one()->getText());
 			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
@@ -273,58 +277,11 @@ class testDashboardGaugeWidget extends CWebTest {
 		}
 
 		// Check visible fields.
-		$visible_fields = [
-			'Angle',
-
-			// Description.
-			'id:description', 'id:desc_size', 'id:desc_v_pos', 'id:desc_bold', 'xpath:.//input[@id="desc_color"]/..',
-
-			// Value.
-			'id:decimal_places', 'id:value_bold', 'id:value_arc', 'id:value_size',
-			'xpath:.//input[@id="value_color"]/..', 'id:value_arc_size',
-
-			// Units.
-			'id:units_show', 'id:units', 'id:units_size', 'id:units_pos', 'id:units_bold', 'xpath:.//input[@id="units_color"]/..',
-
-			// Needle.
-			'id:needle_show', 'xpath:.//input[@id="needle_color"]/..',
-
-			// Scale.
-			'id:scale_show', 'id:scale_show_units', 'id:scale_decimal_places', 'id:scale_size',
-
-			// Treshold.
-			'id:th_show_labels', 'id:th_show_arc', 'id:th_arc_size'
-		];
-
-		foreach ($visible_fields as $visible_field) {
+		foreach ($not_visible as $visible_field) {
 			$this->assertTrue($form->getField($visible_field)->isVisible());
 		}
 
-		// Check disabled/enabled fields.
-		$editable_fields = [
-			'id:units_show' => [
-				'status' => false,
-				'depending' => ['id:units', 'id:units_size', 'id:units_pos', 'id:units_bold', 'xpath:.//input[@id="units_color"]/..']
-			],
-			'id:needle_show' => [
-				'status' => true,
-				'depending' => ['xpath:.//input[@id="needle_color"]/..']
-			],
-			'id:scale_show' => [
-				'status' => false,
-				'depending' =>  ['id:scale_show_units', 'id:scale_decimal_places', 'id:scale_size']
-			]
-		];
-
-		foreach ($editable_fields as $switch => $parameters) {
-			$form->fill([$switch => $parameters['status']]);
-
-			foreach ($parameters['depending'] as $visible_field) {
-				$this->assertTrue($form->getField($visible_field)->isEnabled($parameters['status']));
-			}
-		}
-
-		// Check Treshold parameters.
+		// Check Threshold parameters.
 		$threshold_field = $form->getField('Thresholds');
 		$threshold_field->query('button:Add')->one()->waitUntilClickable()->click();
 		$threshold_input ='id:thresholds_0_threshold';
@@ -332,6 +289,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		$inputs = [
 			'xpath:.//input[@id="thresholds_0_color"]/..',
 			$threshold_input,
+			'button:Add',
 			'button:Remove'
 		];
 
@@ -353,14 +311,124 @@ class testDashboardGaugeWidget extends CWebTest {
 		$form->fill(['id:th_show_arc' => true]);
 		$this->assertTrue($form->getField('id:th_arc_size')->isEnabled());
 
+		// Uncheck Show arc for further checkboxes testing.
+		$form->fill(['id:th_show_arc' => false]);
+
 		// Check fields' labels and required fields.
-		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colors',
-				'Advanced configuration', 'Angle', 'Description', 'Value', 'Needle', 'Scale', 'Thresholds',
-				'Enable host selection'],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colours',
+				'Show', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
+				'Thresholds', 'Override host'],
 				$form->getLabels()->asText()
 		);
 
-		$this->assertEquals(['Item', 'Min', 'Max'], $form->getRequiredLabels());
+		$this->assertEquals(['Item', 'Min', 'Max', 'Show', 'Description'], $form->getRequiredLabels());
+
+		// Check visible and enabled fields dependency.
+		$dependent_fields = [
+			'id:units_show' => [ // Unnamed checkbox under Value field.
+				'status' => false,
+				'depending' => [
+					'editable' => ['id:units', 'id:units_size', 'id:units_pos', 'id:units_bold',
+							'xpath:.//input[@id="units_color"]/..', 'id:scale_show_units']
+				]
+			],
+			'id:show_1' => [ // Show Description.
+				'status' => false,
+				'depending' =>
+					[
+						'visible' => ['id:description', 'id:desc_size', 'id:desc_v_pos', 'id:desc_bold',
+								'xpath:.//input[@id="desc_color"]/..']
+					]
+			],
+			'id:show_2' => [ // Show Value.
+				'status' => false,
+				'depending' => [
+					'visible' => ['id:decimal_places', 'id:value_bold', 'id:value_size',
+							'xpath:.//input[@id="value_color"]/..', 'id:units_show', 'id:units', 'id:units_size',
+							'id:units_pos', 'id:units_bold', 'xpath:.//input[@id="value_color"]/..'
+					]
+				]
+			],
+			'id:show_3' => [ // Show Needle.
+			'status' => true,
+			'depending' => [
+					'visible' => ['xpath:.//input[@id="needle_color"]/..']
+				]
+			],
+			'id:show_4' => [ // Show Scale.
+				'status' => false,
+				'depending' => [
+					'visible' => ['id:scale_show_units', 'id:scale_decimal_places', 'id:scale_size']
+				]
+			],
+			'id:show_5' => [ // Show Value arc.
+				'status' => false,
+				'depending' => [
+					'editable' => ['id:show_3', 'id:show_4'],
+					'visible' =>  ['id:value_arc_size']
+				]
+			]
+		];
+
+		foreach ($dependent_fields as $switch => $parameters) {
+			$form->fill([$switch => $parameters['status']]);
+
+			foreach ($parameters['depending'] as $parameter => $labels) {
+				foreach ($labels as $label) {
+					$field = $form->getField($label);
+					($parameter === 'editable')
+						? $this->assertTrue($field->isEnabled($parameters['status']))
+						: $this->assertTrue($field->isVisible($parameters['status']));
+				}
+			}
+		}
+
+		// Check Show and Show arc dependency.
+		foreach ([true, false] as $show_arc) {
+			$form->fill(['id:th_show_arc' => $show_arc]);
+
+			$show = [
+				'id:show_1' => true, // Description.
+				'id:show_2' => true, // Value.
+				'id:show_3' => true, // Needle.
+				'id:show_4' => true, // Scale.
+				'id:show_5' => true  // Value arc.
+			];
+
+			if (!$show_arc)  {
+				$show['id:show_3'] = false;
+				$show['id:show_4'] = false;
+			}
+
+			foreach ($show as $field => $enabled) {
+				$this->assertTrue($form->getField($field)->isEnabled($enabled));
+			}
+		}
+
+		// Check Override host field.
+		$override = $form->getField('Override host');
+		$popup_menu_selector = 'xpath:.//button[contains(@class, "zi-chevron-down")]';
+
+		foreach (['button:Select', $popup_menu_selector] as $button) {
+			$this->assertTrue($override->query($button)->one()->isClickable());
+		}
+
+		$menu = $override->query($popup_menu_selector)->asPopupButton()->one()->getMenu();
+		$this->assertEquals(['Widget', 'Dashboard'], $menu->getItems()->asText());
+
+		$override->query($popup_menu_selector)->asPopupButton()->one()->getMenu()->select('Dashboard');
+		$form->checkValue(['Override host' => 'Dashboard']);
+		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+				->one()->isVisible()
+		);
+
+		$override->query('button:Select')->waitUntilCLickable()->one()->click();
+		$dialogs = COverlayDialogElement::find()->all();
+		$this->assertEquals('Widget', $dialogs->last()->getTitle());
+
+		for ($i = $dialogs->count() - 1; $i >= 0; $i--) {
+			$dialogs->get($i)->close(true);
+		}
 	}
 
 	public static function getWidgetCommonData() {
@@ -380,7 +448,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 0,
 						'Max' => 0
 					],
@@ -394,7 +462,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 0,
 						'Max' => 0,
 						'id:desc_size' => 0,
@@ -406,7 +474,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => 0
 					],
 					'Thresholds' => [
-						['value' => '10']
+						['threshold' => '10']
 					],
 					'error' => [
 						'Invalid parameter "Description size": value must be one of 1-100.',
@@ -423,7 +491,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => str_repeat(9,255),
 						'Max' => str_repeat(9,255)
 					],
@@ -435,7 +503,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 10,
 						'Max' => 3
 					],
@@ -447,7 +515,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => '',
 						'Max' => '',
 						'id:desc_size' => '',
@@ -461,7 +529,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => ''
 					],
 					'Thresholds' => [
-						['value' => '10']
+						['threshold' => '10']
 					],
 					'error' => [
 						'Invalid parameter "Min": cannot be empty.',
@@ -480,7 +548,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 'text',
 						'Max' => 'test',
 						'id:desc_size' => 'abc',
@@ -494,7 +562,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => 'abc'
 					],
 					'Thresholds' => [
-						['value' => 'test']
+						['threshold' => 'test']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -513,7 +581,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => '2t',
 						'Max' => '3y',
 						'id:desc_size' => '1a',
@@ -527,11 +595,12 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => '1a'
 					],
 					'Thresholds' => [
-						['value' => '1', 'color' => 'ERERER']
+						['threshold' => '1', 'color' => 'ERERER']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
-						'Invalid parameter "Thresholds/1/color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "Max": a number is expected.',
+						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -540,7 +609,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 'そこ',
 						'Max' => 'ߘ',
 						'id:desc_size' => '۞',
@@ -554,7 +623,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => 'Ä'
 					],
 					'Thresholds' => [
-						['value' => 'ß']
+						['threshold' => 'ß']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -575,7 +644,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => '𒀐',
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => '😁',
 						'Max' => '🙂',
 						'id:desc_size' => '😅',
@@ -589,17 +658,16 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => '😽'
 					],
 					'Thresholds' => [
-						['value' => '𒉹']
+						['threshold' => '11']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
 						'Invalid parameter "Description size": value must be one of 1-100.',
 						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Units size": value must be one of 1-100.',
 						'Invalid parameter "Scale size": value must be one of 1-100.',
-						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -609,7 +677,23 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '1 Item for gauge widget',
+						'Name' => 'Character in Threshold',
+						'Item' => self::GAUGE_ITEM
+					],
+					'Thresholds' => [
+						['threshold' => '😽']
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			// #11 Too big numbers in decimal places.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => self::GAUGE_ITEM,
 						'id:decimal_places' => '900',
 						'id:scale_decimal_places' => '900'
 					],
@@ -619,19 +703,36 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-			// #11 All fields successful case.
+			// #12
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => self::GAUGE_ITEM,
+						'id:show_1' => false, // Description.
+						'id:show_2' => false, // Value.
+						'id:show_3' => false, // Needle.
+						'id:show_4' => false, // Scale.
+						'id:show_5' => false  // Value arc.
+					],
+					'error' => [
+						'Invalid parameter "Show": at least one option must be selected.'
+					]
+				]
+			],
+			// #13 All fields successful case.
 			[
 				[
 					'fields' => [
 						'Name' => '😁🙂𒀐',
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 99,
 						'Max' => 88888,
 						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
 						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
 						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
 						'Angle' => '270°',
-						'Description' => '𒀐 New test Description 😁🙂😁🙂',
+						'id:description' => '𒀐 New test Description 😁🙂😁🙂',
 						'id:desc_size' => 30,
 						'id:desc_bold' => true,
 						'id:desc_v_pos' => 'Top',
@@ -640,30 +741,28 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:value_size' => 50,
 						'id:value_bold' => true,
 						'xpath:.//input[@id="value_color"]/..' => '283593',
-						'id:value_arc' => true,
+						'id:show_5' => true, // Show Value arc.
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Above value',
 						'xpath:.//input[@id="units_color"]/..' => '4E342E',
-						'id:needle_show' => true,
+						'id:show_3' => true, // Show Needle.
 						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
 						'id:scale_size' => 33,
 						'id:scale_decimal_places' => 8,
 						'id:th_show_arc' => true,
 						'id:th_arc_size' => 85,
 						'id:th_show_labels' => true,
-						'id:th_show_arc' => true,
-						'id:th_arc_size' => 99,
-						'Enable host selection' => true
+						'Override host' => 'Dashboard'
 					],
 					'Thresholds' => [
-						['value' => '555', 'color' => '1976D2']
+						['threshold' => '555', 'color' => '1976D2']
 					]
 				]
 			],
-			// #12 Multiple thresholds.
+			// #14 Multiple thresholds.
 			[
 				[
 					'fields' => [
@@ -671,25 +770,57 @@ class testDashboardGaugeWidget extends CWebTest {
 						'Min' => 15,
 						'Max' => 200,
 						'Refresh interval' => '30 seconds',
-						'Item' => '1 Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'id:units_pos' => 'Before value'
 					],
 					'Thresholds' => [
-						['value' => '30', 'color' => '03A9F4'],
-						['value' => '50', 'color' => '283593']
+						['threshold' => '30', 'color' => '03A9F4'],
+						['threshold' => '50', 'color' => '283593']
 					]
 				]
 			],
-			// #13 False default checkboxes.
+			// #15 False default checkboxes.
 			[
 				[
 					'fields' => [
 						'Name' => 'False default checkboxes',
-						'Item' => '1 Item for gauge widget',
-						'id:show_header' => false,
-						'id:value_arc' => false,
-						'id:units_show' => false,
-						'id:scale_show' => false
+						'Item' => self::GAUGE_ITEM,
+						'Show header' => false,
+						'id:show_5' => true, // Show Value arc.
+						'id:show_1' => false, // Show Description.
+						'id:show_2' => false, // Show Value.
+						'id:show_3' => false, // Show Needle.
+						'id:show_4' => false // Show Scale.
+					]
+				]
+			],
+			// #16 False default checkboxes - vol.2.
+			[
+				[
+					'fields' => [
+						'Name' => 'False default checkboxes 2',
+						'Item' => self::GAUGE_ITEM,
+						'Show header' => false,
+						'id:show_1' => true, // Show Description.
+						'id:show_3' => false, // Show Needle.
+						'id:show_4' => false, // Show Scale.
+						'id:show_2' => false, // Show Value.
+						'id:show_5' => false // Show Value arc.
+					]
+				]
+			],
+			// #17 False default checkboxes - vol.3.
+			[
+				[
+					'fields' => [
+						'Name' => 'False default checkboxes 3',
+						'Item' => self::GAUGE_ITEM,
+						'Show header' => false,
+						'id:show_2' => true, // Show Value.
+						'id:show_3' => false, // Show Needle.
+						'id:show_4' => false, // Show Scale.
+						'id:show_1' => false, // Show Description.
+						'id:show_5' => false // Show Value arc.
 					]
 				]
 			]
@@ -698,11 +829,12 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	public static function getWidgetCreateData() {
 		return [
-			// #14 Minimal required fields.
+			// #18 Minimal required fields.
 			[
 				[
 					'fields' => [
-						'Item' => '1 Item for gauge widget'
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => false
 					]
 				]
 			]
@@ -713,8 +845,8 @@ class testDashboardGaugeWidget extends CWebTest {
 	 *
 	 * @backupOnce widget
 	 *
-	 * @dataProvider getWidgetCreateData
 	 * @dataProvider getWidgetCommonData
+	 * @dataProvider getWidgetCreateData
 	 */
 	public function testDashboardGaugeWidget_Create($data) {
 		$this->checkFormGaugeWidget($data);
@@ -735,7 +867,7 @@ class testDashboardGaugeWidget extends CWebTest {
 	 */
 	public function checkFormGaugeWidget($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->sql);
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -746,7 +878,7 @@ class testDashboardGaugeWidget extends CWebTest {
 			? $dashboard->getWidget(self::$update_gauge)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		COverlayDialogElement::find()->one()->waitUntilReady();
+		COverlayDialogElement::find()->one();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
 
 		if ($update && CTestArrayHelper::get($data['fields'], 'Item') === '') {
@@ -756,52 +888,22 @@ class testDashboardGaugeWidget extends CWebTest {
 		$form->fill(['Advanced configuration' => true]);
 
 		if (array_key_exists('Thresholds', $data)) {
-			$thresholds_field = $form->getField('Thresholds');
-
 			// To update Thresholds previously saved values should be removed.
-			$removed = false;
 			if ($update) {
-				$remove_buttons = $thresholds_field->query('button:Remove');
-
-				for ($j = 0; $j < $remove_buttons->count(); $j++) {
-					$thresholds_field->query('id:thresholds_'.$j.'_remove')->one()->click();
-					$removed = true;
-				}
+				$this->getThresholdsTable()->clear();
 			}
 
-			foreach ($data['Thresholds'] as $i => $threshold) {
-				// If Thresholds were previously removed, indexes' counts continue from the last removed number.
-				if ($removed) {
-					$i = $i + $j;
-				}
-
-				$thresholds_field->query('button:Add')->one()->waitUntilClickable()->click();
-
-				if (array_key_exists('value', $threshold)) {
-					$form->fill(['id:thresholds_'.$i.'_threshold' => $threshold['value']]);
-				}
-
-				if (array_key_exists('color', $threshold)) {
-					$form->query('xpath:.//input[@id="thresholds_'.$i.'_color"]/..')->asColorPicker()->one()
-							->fill($threshold['color']);
-				}
-			}
+			$this->getThresholdsTable()->fill($data['Thresholds']);
 		}
 
 		$form->fill($data['fields']);
-
-		if (array_key_exists('show_header', $data)) {
-			$form->getField('id:show_header')->fill($data['show_header']);
-		}
-
-		$values = $form->getFields()->asValues();
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 
 			// Check that DB hash is not changed.
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			COverlayDialogElement::ensureNotPresent();
@@ -820,32 +922,43 @@ class testDashboardGaugeWidget extends CWebTest {
 				$header = $update ? self::$update_gauge : self::HOST.': '.$data['fields']['Item'];
 			}
 
-			$dashboard->getWidget($header)->waitUntilReady();
+			$dashboard->getWidget($header);
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 			$saved_form = $dashboard->getWidget($header)->edit();
 
-			// Check widget form fields and values in frontend.
-			$saved_form->fill(['Advanced configuration' => true]);
-			$this->assertEquals($values, $saved_form->getFields()->asValues());
+			if (array_key_exists('Item', $data['fields'])) {
+				$data['fields']['Item'] = self::HOST.': '.$data['fields']['Item'];
+			}
 
-			if (array_key_exists('show_header', $data)) {
-				$saved_form->checkValue(['id:show_header' => $data['show_header']]);
+			// Check that Advanced configuration is false by default.
+			$saved_form->checkValue(['Advanced configuration' => false]);
+
+			// Open Advanced configuration if it is not defined as false in data provider.
+			if (CTestArrayHelper::get($data['fields'], 'Advanced configuration', true)) {
+				$saved_form->fill(['Advanced configuration' => true]);
+			}
+
+			// Check saved fields in form.
+			$saved_form->checkValue($data['fields']);
+
+			if (array_key_exists('Thresholds', $data)) {
+				$this->getThresholdsTable()->checkValue($data['Thresholds']);
 			}
 
 			// Check that widget is saved in DB.
 			$this->assertEquals(1,
 				CDBHelper::getCount('SELECT * FROM widget w'.
 					' WHERE EXISTS ('.
-					'SELECT NULL'.
-					' FROM dashboard_page dp'.
-					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-					' AND dp.dashboardid='.self::$dashboardid.
-					' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
+						'SELECT NULL'.
+						' FROM dashboard_page dp'.
+						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+							' AND dp.dashboardid='.self::$dashboardid.
+							' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
 				));
 
-			// Write new name to updated widget name.
+			// Write new name to the updated widget name.
 			if ($update) {
 				self::$update_gauge = $header;
 			}
@@ -907,8 +1020,8 @@ class testDashboardGaugeWidget extends CWebTest {
 	 * @param boolean $create            true if create scenario, false if update
 	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
 	 */
-	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
-		$old_hash = CDBHelper::getHash($this->sql);
+	protected function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
+		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -921,11 +1034,11 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
-		if (!$create) {
-			$values = $form->getFields()->asValues();
+		if ($create) {
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
 		}
 		else {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
+			$values = $form->getValues();
 		}
 
 		if ($cancel || !$save_dashboard) {
@@ -950,7 +1063,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		if (!$cancel) {
-			$dashboard->getWidget(!$save_dashboard ? 'new name' : self::$update_gauge)->waitUntilReady();
+			$dashboard->getWidget($save_dashboard ? self::$update_gauge : 'new name')->waitUntilReady();
 		}
 
 		if ($save_dashboard) {
@@ -965,11 +1078,11 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
-			$this->assertEquals($values, $dashboard->getWidget(self::$update_gauge)->edit()->getFields()->asValues());
+			$this->assertEquals($values, $dashboard->getWidget(self::$update_gauge)->edit()->getValues());
 		}
 
 		// Check that DB hash is not changed.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function testDashboardGaugeWidget_Delete() {
@@ -977,8 +1090,6 @@ class testDashboardGaugeWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady()->edit();
 		$widget = $dashboard->getWidget(self::DELETE_GAUGE);
 		$this->assertTrue($widget->isEditable());
-		// TODO: should be investigated and removed after DEV-2566, currently failing on Jenkins without sleep
-		sleep(2);
 		$dashboard->deleteWidget(self::DELETE_GAUGE);
 		$widget->waitUntilNotPresent();
 		$dashboard->save();
@@ -995,37 +1106,166 @@ class testDashboardGaugeWidget extends CWebTest {
 	}
 
 	/**
-	 * Test function for assuring that text, log and char items are not available in Gauge widget.
+	 * Test function for assuring that text, log, binary and char items are not available in Gauge widget.
 	 */
 	public function testDashboardGaugeWidget_CheckAvailableItems() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$dashboard->edit()->addWidget()->asForm();
-		$dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		$dialog =  $dashboard->edit()->addWidget()->asForm();
 		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
 		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
 		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
 		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST);
 		$table->waitUntilReloaded();
+		$this->assertTableDataColumn(['Float item', 'Unsigned item', 'Unsigned_dependent item']);
+	}
 
-		$visible_items = [
-			'0 Item for gauge widget',
-			'1 Item for gauge widget'
+	public static function getScreenshotsData() {
+		return [
+			// #0 Minimal settings with value.
+			[
+				[
+					'screenshot_id' => 'Empty gauge with data',
+					'fields' => [
+						'Item' => self::GAUGE_ITEM
+					]
+				]
+			],
+			// #1 Minimal settings No data.
+			[
+				[
+					'screenshot_id' => 'Empty gauge with no data',
+					'fields' => [
+						'Item' => 'Unsigned item'
+					]
+				]
+			],
+			// #2 All settings + Threshold default color.
+			[
+				[
+					'screenshot_id' => 'Full gauge',
+					'fields' => [
+						'Name' => 'All settings',
+						'Item' => self::GAUGE_ITEM,
+						'Min' => 20,
+						'Max' => 300,
+						'xpath:.//input[@id="value_arc_color"]/..' => 'FFCDD2',
+						'xpath:.//input[@id="empty_color"]/..' => '26C6DA',
+						'xpath:.//input[@id="bg_color"]/..' => 'FFF9C4',
+						'Angle' => '270°',
+						'id:description' => 'Screenshot Description 😁🙂😁🙂',
+						'id:desc_size' => 8,
+						'id:desc_bold' => true,
+						'id:desc_v_pos' => 'Top',
+						'xpath:.//input[@id="desc_color"]/..' => '303F9F',
+						'id:decimal_places' => 3,
+						'id:value_size' => 17,
+						'id:value_bold' => true,
+						'xpath:.//input[@id="value_color"]/..' => '00796B',
+						'id:show_5' => true, // Show Value arc.
+						'id:value_arc_size' => 35,
+						'id:units' => 'Bytes 😁',
+						'id:units_size' => 12,
+						'id:units_bold' => true,
+						'id:units_pos' => 'Below value',
+						'xpath:.//input[@id="units_color"]/..' => '6D4C41',
+						'id:show_3' => true,
+						'xpath:.//input[@id="needle_color"]/..' => 'FF0000',
+						'id:scale_size' => 11,
+						'id:scale_decimal_places' => 2,
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 40,
+						'id:th_show_labels' => true
+					],
+					'Thresholds' => [
+						['threshold' => '100']
+					]
+				]
+			],
+			// #3 Macros in description + Thresholds with color.
+			[
+				[
+					'screenshot_id' => 'Gauge with two thresholds',
+					'fields' => [
+						'Name' => 'All settings + treshholds',
+						'Item' => self::GAUGE_ITEM,
+						'Min' => 1,
+						'Max' => 300,
+						'id:description' => '{HOST.NAME} {ITEM.NAME}',
+						'id:desc_size' => 5,
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 40,
+						'id:th_show_labels' => true
+					],
+					'Thresholds' => [
+						['threshold' => '100', 'color' => '4000FF'],
+						['threshold' => '200', 'color' => 'E91E63']
+					]
+				]
+			],
+			// #4 More macros in description.
+			[
+				[
+					'screenshot_id' => 'More macros',
+					'fields' => [
+						'Name' => 'Macros',
+						'Item' => self::GAUGE_ITEM,
+						'id:description' => '{HOST.CONN} {ITEM.KEY}',
+						'id:desc_size' => 5
+					]
+				]
+			],
+			// #5 User macros in description.
+			[
+				[
+					'screenshot_id' => 'User macro',
+					'fields' => [
+						'Name' => 'User macro',
+						'Item' => self::GAUGE_ITEM,
+						'id:description' => '{$A} {INVENTORY.ALIAS}',
+						'id:desc_size' => 5
+					]
+				]
+			]
 		];
+	}
 
-		$not_visible_items = [
-			'2 Item for gauge widget',
-			'3 Item for gauge widget',
-			'4 Item for gauge widget'
-		];
+	/**
+	 * Test function for assuring that form settings affect Gauge image.
+	 *
+	 * @dataProvider getScreenshotsData
+	 */
+	public function testDashboardGaugeWidget_Screenshots($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		$dashboard->selectPage('Screenshot page');
+		$dashboard->invalidate();
+		$dialog = $dashboard->edit()->addWidget()->asForm();
+		$dialog->fill([
+			'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+			'Advanced configuration' => true
+		]);
 
-		foreach ($visible_items as $visible_item) {
-			$this->assertTrue($host_item_dialog->query('link', $visible_item)->one()->isClickable());
+		if (array_key_exists('Thresholds', $data)) {
+			$this->getThresholdsTable()->fill($data['Thresholds']);
 		}
 
-		foreach ($not_visible_items as $invisible_item) {
-			$this->assertFalse($host_item_dialog->query('link', $invisible_item)->exists());
-		}
+		$dialog->fill($data['fields']);
+		$dialog->submit();
+		COverlayDialogElement::ensureNotPresent();
+
+		$header = array_key_exists('Name', $data['fields'])
+			? $data['fields']['Name']
+			: self::HOST.': '.$data['fields']['Item'];
+
+		// Wait until widget with header appears on the Dashboard.
+		$dashboard->save();
+		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
+		$this->page->removeFocus();
+
+		// Sleep waits until the gauge is animated.
+		sleep(1);
+		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 }

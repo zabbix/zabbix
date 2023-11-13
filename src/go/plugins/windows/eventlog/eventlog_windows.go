@@ -22,6 +22,7 @@ package eventlog
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -68,6 +69,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, key)
 	}
 	meta := ctx.Meta()
+	isCountItem := false
+
 	var data *metadata
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
@@ -89,6 +92,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	}
 
+	if strings.HasSuffix(key, ".count") {
+		isCountItem = true
+	}
+
 	if ctx.Output().PersistSlotsAvailable() == 0 {
 		p.Warningf("buffer is full, cannot store persistent value")
 		return nil, nil
@@ -106,25 +113,36 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	logitem := zbxlib.EventLogItem{Results: make([]*zbxlib.EventLogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
-	zbxlib.ProcessEventLogCheck(data.blob, &logitem, refresh, grxp.Cblob)
+	zbxlib.ProcessEventLogCheck(data.blob, &logitem, refresh, grxp.Cblob, isCountItem)
 	data.lastcheck = now
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))
 		for i, r := range logitem.Results {
-			results[i].Itemid = ctx.ItemID()
-			results[i].Value = r.Value
-			results[i].EventSource = r.EventSource
-			results[i].EventID = r.EventID
-			results[i].EventSeverity = r.EventSeverity
-			results[i].EventTimestamp = r.EventTimestamp
-			results[i].Error = r.Error
-			results[i].Ts = r.Ts
-			results[i].LastLogsize = &r.LastLogsize
-			results[i].Persistent = true
+			if !isCountItem {
+				results[i].Itemid = ctx.ItemID()
+				results[i].Value = r.Value
+				results[i].EventSource = r.EventSource
+				results[i].EventID = r.EventID
+				results[i].EventSeverity = r.EventSeverity
+				results[i].EventTimestamp = r.EventTimestamp
+				results[i].Error = r.Error
+				results[i].Ts = r.Ts
+				results[i].LastLogsize = &r.LastLogsize
+				results[i].Persistent = true
+			} else {
+				results[i].Itemid = ctx.ItemID()
+				results[i].Value = r.Value
+				results[i].Ts = r.Ts
+				results[i].Error = r.Error
+				results[i].LastLogsize = &r.LastLogsize
+			}
 		}
-		return results, nil
+		result = results
+
+		return result, nil
 	}
+
 	return nil, nil
 }
 
@@ -132,4 +150,7 @@ var impl Plugin
 
 func init() {
 	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog", "Windows event log file monitoring.")
+	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog.count", "Windows event log file monitoring.")
+
+	impl.SetHandleTimeout(true)
 }

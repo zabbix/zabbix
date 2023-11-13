@@ -54,22 +54,30 @@ require_once dirname(__FILE__).'/dashboard/testDashboardGaugeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidgetSelectedHosts.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardPlainTextWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardTopTriggersWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardURLWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardList.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testPageHostDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
+
+// Event correlation.
+require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
+require_once dirname(__FILE__).'/eventCorrelation/testPageEventCorrelation.php';
 
 // Filter tabs.
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
@@ -97,6 +105,8 @@ require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupStandalo
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroup.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupSearchPage.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupStandalone.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageHostGroups.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageTemplateGroups.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
@@ -136,6 +146,10 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Maintenance
+require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
+require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
+
 // Media types.
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
@@ -144,6 +158,16 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 
 // Monitoring.
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
+
+// Multiselects.
+require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
+
+// Network discovery.
+require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
+require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
 require_once dirname(__FILE__).'/permissions/testPermissionsWithoutCSRF.php';
@@ -173,7 +197,7 @@ require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
 require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
-require_once dirname(__FILE__).'/reports/testPageReportsTriggerTop.php';
+require_once dirname(__FILE__) . '/reports/testPageReportsTopTriggers.php';
 require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 
@@ -213,6 +237,10 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 require_once dirname(__FILE__).'/templates/testFormTemplate.php';
 require_once dirname(__FILE__).'/templates/testPageTemplates.php';
 
+// Trigger dependence
+require_once dirname(__FILE__).'/triggerDependencies/testHostTriggerDependencies.php';
+require_once dirname(__FILE__).'/triggerDependencies/testTemplateTriggerDependencies.php';
+
 // Users.
 require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
@@ -220,25 +248,28 @@ require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
-require_once dirname(__FILE__).'/testExecuteNow.php';
+// Web scenarios.
+require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
+require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
+
+require_once dirname(__FILE__).'/testExecuteNow.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
-require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
-require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
-require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -255,17 +286,15 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 //require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralTimeouts.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
-require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
-require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -273,18 +302,13 @@ require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWeb.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWebStep.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
-require_once dirname(__FILE__).'/testMultiselect.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 require_once dirname(__FILE__).'/testTimezone.php';
-require_once dirname(__FILE__).'/testTriggerDependencies.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -332,22 +356,30 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
+		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPages');
+		$suite->addTestSuite('testDashboardPlainTextWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardSlaReportWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
+		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
 		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageDashboardList');
 		$suite->addTestSuite('testPageDashboardWidgets');
+		$suite->addTestSuite('testPageHostDashboards');
 		$suite->addTestSuite('testPageTemplateDashboards');
+
+		// Event correlation.
+		$suite->addTestSuite('testFormEventCorrelation');
+		$suite->addTestSuite('testPageEventCorrelation');
 
 		// Filter tabs.
 		$suite->addTestSuite('testFormFilterHosts');
@@ -375,6 +407,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplateGroup');
 		$suite->addTestSuite('testFormTemplateGroupSearchPage');
 		$suite->addTestSuite('testFormTemplateGroupStandalone');
+		$suite->addTestSuite('testPageHostGroups');
+		$suite->addTestSuite('testPageTemplateGroups');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
@@ -417,6 +451,16 @@ class SeleniumTests {
 		// Monitoring.
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
+		// Multiselects.
+		$suite->addTestSuite('testMultiselects');
+		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
+		$suite->addTestSuite('testMultiselectsLatestData');
+		$suite->addTestSuite('testMultiselectsProblems');
+
+		// Network discovery.
+		$suite->addTestSuite('testFormNetworkDiscovery');
+		$suite->addTestSuite('testPageNetworkDiscovery');
+
 		// Permissions.
 		$suite->addTestSuite('testPermissionsWithoutCSRF');
 		$suite->addTestSuite('testTagBasedPermissions');
@@ -445,7 +489,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsAudit');
 		$suite->addTestSuite('testPageReportsNotifications');
 		$suite->addTestSuite('testPageReportsSystemInformation');
-		$suite->addTestSuite('testPageReportsTriggerTop');
+		$suite->addTestSuite('testPageReportsTopTriggers');
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
 
@@ -485,12 +529,23 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageTemplates');
 
+		// Trigger dependence
+		$suite->addTestSuite('testHostTriggerDependencies');
+		$suite->addTestSuite('testTemplateTriggerDependencies');
+
 		// Users.
 		$suite->addTestSuite('testFormUser');
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testPageUsers');
+
+		// Web scenarios.
+		$suite->addTestSuite('testFormWebScenario');
+		$suite->addTestSuite('testFormWebScenarioStep');
+		$suite->addTestSuite('testInheritanceWeb');
+		$suite->addTestSuite('testPageMonitoringWeb');
+		$suite->addTestSuite('testPageMonitoringWebDetails');
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
@@ -499,7 +554,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationGeneralModules');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
-		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageTriggers');
@@ -510,7 +564,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
-		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
@@ -519,7 +572,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
-		$suite->addTestSuite('testPageMonitoringWeb');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
@@ -527,17 +579,16 @@ class SeleniumTests {
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
+		$suite->addTestSuite('testFormAdministrationGeneralTimeouts');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
 		$suite->addTestSuite('testFormAdministrationHousekeeper');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
-		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
@@ -545,18 +596,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
-		$suite->addTestSuite('testFormWeb');
-		$suite->addTestSuite('testFormWebStep');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceTrigger');
-		$suite->addTestSuite('testInheritanceWeb');
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
-		$suite->addTestSuite('testMultiselect');
 		$suite->addTestSuite('testTemplateInheritance');
 		$suite->addTestSuite('testTimezone');
-		$suite->addTestSuite('testTriggerDependencies');
 		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testUrlParameters');

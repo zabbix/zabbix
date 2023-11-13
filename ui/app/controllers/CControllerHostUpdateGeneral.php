@@ -37,7 +37,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			'status'			=> 'required|db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
 										HOST_STATUS_NOT_MONITORED
 									]),
-			'proxy_hostid'		=> 'db hosts.proxy_hostid',
+			'proxyid'		    => 'db hosts.proxyid',
 			'interfaces'		=> 'array',
 			'mainInterfaces'	=> 'array',
 			'groups'			=> 'required|array',

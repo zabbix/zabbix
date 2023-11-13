@@ -74,7 +74,7 @@ window.templategroup_edit_popup = new class {
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

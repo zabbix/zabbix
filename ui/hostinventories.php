@@ -25,12 +25,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
+$page['scripts'] = ['multilineinput.js', 'items.js'];
 
 $hostId = getRequest('hostid', 0);
-
-if ($hostId > 0) {
-	$page['web_layout_mode'] = CViewHelper::loadLayoutMode();
-}
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

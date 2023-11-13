@@ -397,7 +397,7 @@ static int	save_events(void)
 	}
 
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
-			"name", "severity", NULL);
+			"name", "severity", (char *)NULL);
 
 	eventid = zbx_db_get_maxid_num("events", num);
 
@@ -428,7 +428,7 @@ static int	save_events(void)
 		if (0 == insert_tags)
 		{
 			zbx_db_insert_prepare(&db_insert_tags, "event_tag", "eventtagid", "eventid", "tag", "value",
-					NULL);
+					(char *)NULL);
 			insert_tags = 1;
 		}
 
@@ -516,7 +516,7 @@ static void	save_problems(void)
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", "clock", "ns",
-				"name", "severity", NULL);
+				"name", "severity", (char *)NULL);
 
 		for (j = 0; j < problems.values_num; j++)
 		{
@@ -535,7 +535,7 @@ static void	save_problems(void)
 			int	k;
 
 			zbx_db_insert_prepare(&db_insert, "problem_tag", "problemtagid", "eventid", "tag", "value",
-					NULL);
+					(char *)NULL);
 
 			for (j = 0; j < problems.values_num; j++)
 			{
@@ -582,7 +582,7 @@ static void	save_event_recovery(void)
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", "correlationid", "c_eventid",
-			"userid", NULL);
+			"userid", (char *)NULL);
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
@@ -2026,15 +2026,14 @@ void	zbx_events_update_itservices(void)
  ******************************************************************************/
 static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uint64_t *maintenanceids)
 {
-	zbx_vector_ptr_t		event_queries;
-	int				i, j;
-	zbx_event_suppress_query_t	*query;
+	zbx_vector_event_suppress_query_ptr_t		event_queries;
+	zbx_event_suppress_query_t			*query;
 
 	/* prepare query data  */
 
-	zbx_vector_ptr_create(&event_queries);
+	zbx_vector_event_suppress_query_ptr_create(&event_queries);
 
-	for (i = 0; i < event_refs->values_num; i++)
+	for (int i = 0; i < event_refs->values_num; i++)
 	{
 		zbx_db_event	*event = (zbx_db_event *)event_refs->values[i];
 
@@ -2050,7 +2049,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 		zbx_vector_uint64_pair_create(&query->maintenances);
 
-		zbx_vector_ptr_append(&event_queries, query);
+		zbx_vector_event_suppress_query_ptr_append(&event_queries, query);
 	}
 
 	if (0 != event_queries.values_num)
@@ -2062,13 +2061,13 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 				SUCCEED == zbx_db_lock_maintenanceids(maintenanceids))
 		{
 			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
-					"maintenanceid", "suppress_until", NULL);
+					"maintenanceid", "suppress_until", (char *)NULL);
 
-			for (j = 0; j < event_queries.values_num; j++)
+			for (int j = 0; j < event_queries.values_num; j++)
 			{
-				query = (zbx_event_suppress_query_t *)event_queries.values[j];
+				query = event_queries.values[j];
 
-				for (i = 0; i < query->maintenances.values_num; i++)
+				for (int i = 0; i < query->maintenances.values_num; i++)
 				{
 					/* when locking maintenances not-locked (deleted) maintenance ids */
 					/* are removed from the maintenanceids vector                   */
@@ -2093,16 +2092,16 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 			zbx_db_insert_clean(&db_insert);
 		}
 
-		for (j = 0; j < event_queries.values_num; j++)
+		for (int j = 0; j < event_queries.values_num; j++)
 		{
-			query = (zbx_event_suppress_query_t *)event_queries.values[j];
+			query = event_queries.values[j];
 			/* reset tags vector to avoid double freeing copied tag name/value pointers */
 			zbx_vector_tags_clear(&query->tags);
 		}
-		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
+		zbx_vector_event_suppress_query_ptr_clear_ext(&event_queries, zbx_event_suppress_query_free);
 	}
 
-	zbx_vector_ptr_destroy(&event_queries);
+	zbx_vector_event_suppress_query_ptr_destroy(&event_queries);
 }
 
 /******************************************************************************

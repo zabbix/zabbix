@@ -19,19 +19,19 @@
 **/
 
 
+use Widgets\TrigOver\Includes\ViewHelper;
+
 /**
  * @var CPartial $this
- * @var array $data
+ * @var array    $data
  */
 
-$table = (new CTableInfo())
-	->makeVerticalRotation()
-	->setHeadingColumn(0);
+$table = (new CTableInfo())->setHeadingColumn(0);
 
 $headings[] = _('Triggers');
 foreach ($data['hosts_by_name'] as $hostname => $hostid) {
-	$headings[] = (new CColHeader($hostname))
-		->addClass('vertical_rotation')
+	$headings[] = (new CSpan($hostname))
+		->addClass(ZBX_STYLE_TEXT_VERTICAL)
 		->setTitle($hostname);
 }
 
@@ -48,7 +48,7 @@ foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
 		}
 
 		if ($trigger) {
-			$row[] = getTriggerOverviewCell($trigger, $data['dependencies']);
+			$row[] = ViewHelper::getTriggerOverviewCell($trigger, $data['dependencies']);
 		}
 		else {
 			$row[] = new CCol();

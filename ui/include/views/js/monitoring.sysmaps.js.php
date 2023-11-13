@@ -80,7 +80,10 @@ function createFontSelect(string $name): CSelect {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP_SMALL)
 				->setTitle(_('Help'))
-				->setTarget('_blank')
+				->setTarget('_blank'),
+			(new CSimpleButton())
+				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
+				->setTitle(_('Close'))
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('formDragHandler')
@@ -185,8 +188,9 @@ function createFontSelect(string $name): CSelect {
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 					], 'triggerListRow')
-					->addRow((new CLabel(_('New triggers'), 'elementNameTriggers_ms')),
-						(new CDiv([
+					->addRow(
+						(new CLabel(_('New triggers'), 'elementNameTriggers_ms')),
+						[
 							(new CMultiSelect([
 								'name' => 'elementNameTriggers',
 								'object_name' => 'triggers',
@@ -202,11 +206,10 @@ function createFontSelect(string $name): CSelect {
 									]
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-							new CDiv(
-								(new CButtonLink(_('Add')))->setId('newSelementTriggers')
-						)]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+							(new CButtonLink(_('Add')))
+								->setId('newSelementTriggers')
+								->addStyle('margin-top: 5px;')
+						],
 						'triggerSelectRow'
 					)
 					->addRow((new CLabel(_('Map'), 'elementNameMap_ms'))->setAsteriskMark(),
@@ -340,7 +343,10 @@ function createFontSelect(string $name): CSelect {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP_SMALL)
 				->setTitle(_('Help'))
-				->setTarget('_blank')
+				->setTarget('_blank'),
+			(new CSimpleButton())
+				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
+				->setTitle(_('Close'))
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('shapeDragHandler')
@@ -499,7 +505,10 @@ function createFontSelect(string $name): CSelect {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP_SMALL)
 				->setTitle(_('Help'))
-				->setTarget('_blank')
+				->setTarget('_blank'),
+			(new CSimpleButton())
+				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
+				->setTitle(_('Close'))
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massShapeDragHandler')
@@ -629,7 +638,10 @@ function createFontSelect(string $name): CSelect {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP_SMALL)
 				->setTitle(_('Help'))
-				->setTarget('_blank')
+				->setTarget('_blank'),
+			(new CSimpleButton())
+				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
+				->setTitle(_('Close'))
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massDragHandler')

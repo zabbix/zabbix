@@ -118,17 +118,21 @@ class CControllerActionCreate extends CController {
 					unset($condition['formulaid']);
 				}
 
-				if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_SUPPRESSED) {
 					unset($condition['value']);
 				}
 
-				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
+				if ($condition['conditiontype'] != ZBX_CONDITION_TYPE_EVENT_TAG_VALUE) {
 					unset($condition['value2']);
 				}
 			}
 			unset($condition);
 
 			$action['filter'] = $filter;
+		}
+
+		if (array_key_exists('formula', $filter)) {
+			$action['filter']['conditions'] = CConditionHelper::sortConditionsByFormula($action['filter']);
 		}
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {

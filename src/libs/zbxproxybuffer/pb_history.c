@@ -579,7 +579,7 @@ static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_
 
 		zbx_db_insert_prepare(&db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
-				"write_clock", NULL);
+				"write_clock", (char *)NULL);
 		do
 		{
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
@@ -740,7 +740,7 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
-				"write_clock", NULL);
+				"write_clock", (char *)NULL);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

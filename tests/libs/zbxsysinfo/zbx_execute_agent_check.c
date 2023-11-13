@@ -41,6 +41,7 @@ int	__wrap_vfs_file_cksum(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_dir_size(const char *command, AGENT_RESULT *result);
 int	__wrap_net_dns(const char *command, AGENT_RESULT *result);
 int	__wrap_net_dns_record(const char *command, AGENT_RESULT *result);
+int	__wrap_net_dns_perf(const char *command, AGENT_RESULT *result);
 int	__wrap_net_tcp_port(const char *command, AGENT_RESULT *result);
 int	__wrap_system_users_num(const char *command, AGENT_RESULT *result);
 
@@ -74,7 +75,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_metrics();
 
-	zbx_execute_agent_check(in_command_string, flags_uint32, &result);
+	zbx_execute_agent_check(in_command_string, flags_uint32, &result, 3);
 
 	if (NULL != (p = strchr(in_command_string, '[')))
 		zbx_strlcpy(key, in_command_string, p - in_command_string + 1);
@@ -202,6 +203,16 @@ int	__wrap_net_dns_record(const char *command, AGENT_RESULT *result)
 	ZBX_UNUSED(result);
 
 	called_key = "net.dns.record";
+
+	return SUCCEED;
+}
+
+int	__wrap_net_dns_perf(const char *command, AGENT_RESULT *result)
+{
+	ZBX_UNUSED(command);
+	ZBX_UNUSED(result);
+
+	called_key = "net.dns.perf";
 
 	return SUCCEED;
 }

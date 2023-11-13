@@ -218,7 +218,6 @@ $form_grid
 					->addClass(ZBX_STYLE_CELL)
 					->addClass(ZBX_STYLE_CELL_EXPRESSION)
 					->addStyle('width: 100%;')
-					->addStyle('white-space: initial;')
 			]
 		))->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	])

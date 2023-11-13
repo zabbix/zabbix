@@ -179,7 +179,7 @@ window.maintenance_edit = new class {
 		this._post(curl.getUrl(), post_data, (response) => {
 			overlayDialogueDestroy(this._overlay.dialogueid);
 
-			this._dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this._dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

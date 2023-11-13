@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -28,7 +28,14 @@ require_once dirname(__FILE__).'/traits/MacrosTrait.php';
  */
 class testInheritanceHostPrototype extends CLegacyWebTest {
 
-	use MacrosTrait;
+	/**
+	 * Attach MacrosBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMacrosBehavior::class];
+	}
 
 	public static function getLayoutData() {
 		return [
@@ -66,16 +73,16 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
-					'SELECT hostid'.
-					' FROM items'.
-					' WHERE templateid IS NOT NULL'.
-					' AND name='.zbx_dbstr($data['discovery']).
+						'SELECT hostid'.
+						' FROM items'.
+						' WHERE templateid IS NOT NULL'.
+						' AND name='.zbx_dbstr($data['discovery']).
 				')'
 		);
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="proxy_hostid"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="proxyid"][@readonly]');
 
 		// Check layout at Groups tab.
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list disabled"]');
@@ -214,24 +221,24 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	private function sqlForHostPrototypeCompare($data) {
 		$sql = 'SELECT host, status, name, ipmi_authtype,'.
-				' ipmi_privilege, ipmi_username, ipmi_password,'.
-				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
-				' tls_psk_identity, tls_psk, auto_compress, flags'.
-				' FROM hosts'.
-				' WHERE flags=2 AND hostid IN ('.
-					'SELECT hostid'.
-					' FROM host_discovery'.
-					' WHERE parent_itemid IN ('.
-						'SELECT itemid'.
-						' FROM items'.
-						' WHERE hostid in ('.
+						' ipmi_privilege, ipmi_username, ipmi_password,'.
+						' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
+						' tls_psk_identity, tls_psk, flags'.
+						' FROM hosts'.
+						' WHERE flags=2 AND hostid IN ('.
 							'SELECT hostid'.
-							' FROM hosts'.
-							' WHERE host='.zbx_dbstr($data).
+							' FROM host_discovery'.
+							' WHERE parent_itemid IN ('.
+								'SELECT itemid'.
+								' FROM items'.
+								' WHERE hostid in ('.
+									'SELECT hostid'.
+									' FROM hosts'.
+									' WHERE host='.zbx_dbstr($data).
+								')'.
+							')'.
 						')'.
-					')'.
-				')'.
-				' ORDER BY host, name';
+						' ORDER BY host, name';
 
 		return CDBHelper::getHash($sql);
 	}
@@ -362,7 +369,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->assertEquals($prototype_on_template, $prototype_on_host);
 	}
 
-		public static function getCloneData() {
+	public static function getCloneData() {
 		return [
 			[
 				[
@@ -580,7 +587,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		);
 	}
 
-		public static function getDeleteData() {
+	public static function getDeleteData() {
 		return [
 			[
 				[

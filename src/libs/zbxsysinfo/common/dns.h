@@ -92,5 +92,6 @@
 
 int	net_dns(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_dns_record(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_dns_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_NET_H */

@@ -129,7 +129,7 @@ class CControllerActionList extends CController {
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 				'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
-				'opconditions', 'opmessage_usr', 'opmessage_grp'
+				'opconditions', 'opmessage_usr', 'opmessage_grp', 'optag'
 			],
 			'actionids' => array_column($data['actions'], 'actionid'),
 			'preservekeys' => true

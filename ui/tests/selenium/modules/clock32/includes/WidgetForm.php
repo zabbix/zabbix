@@ -32,6 +32,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTimeZone
@@ -50,6 +51,20 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_DATE_SIZE = 20;
 	private const DEFAULT_TIME_SIZE = 30;
 	private const DEFAULT_TIMEZONE_SIZE = 20;
+
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->getFieldValue('clock_type') == Widget::TYPE_DIGITAL && !$this->getFieldValue('show')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+		}
+
+		return $errors;
+	}
 
 	public function addFields(): self {
 		$time_type = array_key_exists('time_type', $this->values) ? $this->values['time_type'] : null;
@@ -134,6 +149,9 @@ class WidgetForm extends CWidgetForm {
 					Widget::TIMEZONE_SHORT => _('Short'),
 					Widget::TIMEZONE_FULL => _('Full')
 				]))->setDefault(Widget::TIMEZONE_SHORT)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

@@ -37,6 +37,11 @@ class CTrigger extends CTriggerGeneral {
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname'];
 
+	public const OUTPUT_FIELDS = ['triggerid', 'expression', 'description', 'url', 'status', 'value', 'priority',
+		'lastchange', 'comments', 'error', 'templateid', 'type', 'state', 'flags', 'recovery_mode',
+		'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name'
+	];
+
 	/**
 	 * Get Triggers data.
 	 *

@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup widget, profiles
@@ -29,28 +30,32 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGraphWidget extends CWebTest {
 
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
 	}
 
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
+
+	const DASHBOARD_URL = 'zabbix.php?action=dashboard.view&dashboardid=1030';
 
 	/*
 	 * Set "Graph" as default widget type.
@@ -105,7 +110,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @browsers chrome
 	 */
 	public function testDashboardGraphWidget_FormLayout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
@@ -130,9 +135,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Check validation of graph widget fields.
 	 */
 	private function validate($data, $tab) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Widget name'));
 
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set'));
@@ -171,7 +176,7 @@ class testDashboardGraphWidget extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public static function getDatasetValidationData() {
@@ -200,7 +205,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000!'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -210,7 +215,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000 '
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -356,7 +361,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 '
 						]
 					],
-					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -499,36 +504,35 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '',
 						'To' => ''
 					],
 					'error' => [
-						'Invalid parameter "From": cannot be empty.',
-						'Invalid parameter "To": cannot be empty.'
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 15:53:07',
 						'To' => ''
 					],
-					'error' => 'Invalid parameter "To": cannot be empty.'
+					'error' => 'Invalid parameter "Time period/To": cannot be empty.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": cannot be empty.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": cannot be empty.'
 					]
 				]
 			],
@@ -536,87 +540,84 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '1',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": a time is expected.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 15:53:07',
 						'To' => 'abc'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '5:53:06 2021-07-31',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": a time is expected.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-02-30 00:00:00',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": a time is expected.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021-25-09 00:00:00'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021.07.31 15:53:07'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 12:53:00',
 						'To' => 'now-s'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			// Time range validation
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 12:53:00',
 						'To' => '2021-07-04 12:52:59'
 					],
@@ -626,7 +627,7 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
@@ -636,7 +637,7 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-58s',
 						'To' => 'now'
 					],
@@ -707,7 +708,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Axes' => [
 						'id:lefty_min' => '10',
-						'id:lefty_max' => '5'
+						'id:lefty_max' => '5',
+						'id:lefty_units' => 'Auto'
 					],
 					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -716,7 +718,9 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Axes' => [
 						'id:lefty_min' => '-5',
-						'id:lefty_max' => '-10'
+						'id:lefty_max' => '-10',
+						'id:lefty_units' => 'Static',
+						'id:lefty_static_units' => 500
 					],
 					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -757,7 +761,9 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Axes' => [
 						'id:righty_min' => '10',
-						'id:righty_max' => '5'
+						'id:righty_max' => '5',
+						'id:righty_units' => 'Static',
+						'id:righty_static_units' => 500
 					],
 					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -771,7 +777,8 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Axes' => [
 						'id:righty_min' => '-5',
-						'id:righty_max' => '-10'
+						'id:righty_max' => '-10',
+						'id:righty_units' => 'Auto'
 					],
 					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -908,7 +915,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'Overrides' => [
 						[
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
@@ -921,11 +928,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000!',
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -934,11 +941,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000 ',
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -1073,7 +1080,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'item' => 'Two item'
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/2": at least one override option must be specified.'
+					'error' => 'Invalid parameter "Overrides": at least one override option must be specified.'
 				]
 			],
 			[
@@ -1088,7 +1095,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
@@ -1173,7 +1180,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'host' => '*',
 						'item' => '*'
 					],
-					'error' => 'Invalid parameter "Overrides/1": at least one override option must be specified.'
+					'error' => 'Invalid parameter "Overrides": at least one override option must be specified.'
 				]
 			]
 		]);
@@ -1198,7 +1205,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Widget name' => 'Test cases for update',
 					'remove_override_options' => true,
-					'error' => 'Invalid parameter "Overrides/1": at least one override option must be specified.'
+					'error' => 'Invalid parameter "Overrides": at least one override option must be specified.'
 				]
 			],
 			[
@@ -1305,7 +1312,8 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => ',Zabbix Server',
 							'item' => ', Agent ping',
 							'options' => [
-								['Draw', 'Bar']
+								['Draw', 'Bar'],
+								['Missing data', 'Last known']
 							]
 						],
 						[
@@ -1332,10 +1340,11 @@ class testDashboardGraphWidget extends CWebTest {
 						'host' => ['Zabbix*', 'one', 'two'],
 						'item' => ['Agent*', 'one', 'two'],
 						'Draw' => 'Bar',
-						'Y-axis' => 'Right'
+						'Y-axis' => 'Right',
+						'Approximation' => 'avg'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-1w',
 						'To' => 'now'
 					],
@@ -1370,6 +1379,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => '*',
 							'item' => '*',
+							'Stacked' => true,
 							'Width' => '0',
 							'Transparency' => '0',
 							'Fill' => '0',
@@ -1387,13 +1397,27 @@ class testDashboardGraphWidget extends CWebTest {
 							'Time shift' => '788400000',
 							'Aggregation function' => 'sum',
 							'Aggregation interval' => '788400000'
+						],
+						[
+							'host' => 'Three host',
+							'item' => 'Three item',
+							'Y-axis' => 'Right',
+							'Stacked' => true,
+							'Width' => '10',
+							'Transparency' => '10',
+							'Fill' => '10',
+							'Missing data' => 'Last known',
+							'Time shift' => '788400000',
+							'Aggregation function' => 'sum',
+							'Aggregation interval' => '788400000',
+							'Approximation' => 'min'
 						]
 					],
 					'Displaying options' => [
 						'History data selection' => 'Trends'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-59s',
 						'To' => 'now'
 					],
@@ -1444,6 +1468,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Aggregation interval' => '1',
 							'Aggregate' => 'Data set',
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
+							'Approximation' => 'max',
 							'Data set label' => 'Staircase graph'
 						],
 						[
@@ -1461,7 +1486,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'History data selection' => 'History'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2018-11-15',
 						'To' => '2018-11-15 14:20:00'
 					],
@@ -1475,7 +1500,8 @@ class testDashboardGraphWidget extends CWebTest {
 						'id:righty_units' => 'Static'
 					],
 					'Legend' => [
-						'Number of rows' => '5'
+						'Number of rows' => '5',
+						'Display min/max/avg' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -1498,7 +1524,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '-5s',
 							'color' => '000000',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1515,7 +1541,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '5s',
 							'color' => 'FFFFFF',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '1'],
 								['Draw', 'Points'],
 								['Transparency', '2'],
@@ -1539,7 +1565,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardGraphWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 
 		$this->fillForm($data, $form);
@@ -1581,7 +1607,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'Y-axis' => 'Right'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-1w',
 						'To' => 'now'
 					],
@@ -1641,7 +1667,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'History data selection' => 'Trends'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-59s',
 						'To' => 'now'
 					],
@@ -1749,7 +1775,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'History data selection' => 'History'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2018-11-15',
 						'To' => '2018-11-15 14:20'
 					],
@@ -1767,7 +1793,8 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Legend' => [
 						'Show legend' => true,
-						'Number of rows' => '5'
+						'Number of rows' => '5',
+						'Display min/max/avg' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -1790,7 +1817,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '-5s',
 							'color' => '000000',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1807,7 +1834,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '5s',
 							'color' => 'FFFFFF',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '1'],
 								['Draw', 'Bar'],
 								['Transparency', '2'],
@@ -1832,7 +1859,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @backup widget
 	 */
 	public function testDashboardGraphWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration('Test cases for update');
 
 		$this->fillForm($data, $form);
@@ -1853,15 +1880,15 @@ class testDashboardGraphWidget extends CWebTest {
 	 */
 	public function testDashboardGraphWidget_SimpleUpdate() {
 		$name = 'Test cases for simple update and deletion';
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget($name);
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -2147,9 +2174,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getDashboardCancelData
 	 */
 	public function testDashboardGraphWidget_cancelDashboardUpdate($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
@@ -2162,7 +2189,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$dashboard->cancelEditing();
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public static function getWidgetCancelData() {
@@ -2201,9 +2228,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getDashboardCancelData
 	 */
 	public function testDashboardGraphWidget_cancelWidgetEditing($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
@@ -2219,7 +2246,7 @@ class testDashboardGraphWidget extends CWebTest {
 				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -2228,7 +2255,7 @@ class testDashboardGraphWidget extends CWebTest {
 	public function testDashboardGraphWidget_Delete() {
 		$name = 'Test cases for simple update and deletion';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($name);
 		$this->assertEquals(true, $widget->isEditable());
@@ -2251,7 +2278,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Test disabled fields in "Data set" tab.
 	 */
 	public function testDashboardGraphWidget_DatasetDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 
 		foreach (['Line', 'Points', 'Staircase', 'Bar'] as $option) {
@@ -2283,34 +2310,258 @@ class testDashboardGraphWidget extends CWebTest {
 	}
 
 	/*
-	 * Test "From" and "To" fields in tab "Time period" by check/uncheck "Set custom time period".
+	 * Test "From" and "To" fields in tab "Time period" by setting 'Time period' to 'Custom'.
 	 */
 	public function testDashboardGraphWidget_TimePeriodDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Time period');
-
 		$fields = ['From', 'To'];
-		$this->assertEnabledFields($fields, false);
 
-		$form->fill(['Set custom time period' => true]);
+		foreach ($fields as $field) {
+			$this->assertFalse($form->getField($field)->isDisplayed());
+		}
+		$form->fill(['Time period' => 'Custom']);
+
+		foreach ($fields as $field) {
+			$this->assertTrue($form->getField($field)->isDisplayed());
+		}
 		$this->assertEnabledFields($fields, true);
 	}
 
 	/*
 	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
 	 */
-	public function testDashboardGraphWidget_LegendDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+	public function testDashboardGraphWidget_LegendFieldValidation() {
+		$this->page->login()->open(self::DASHBOARD_URL);
+		$fields = ['Number of rows', 'Display min/max/avg', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
-		$this->assertEnabledFields('Number of rows');
+		$this->assertEnabledFields($fields);
 		$form->fill(['Show legend' => false]);
-		$this->assertEnabledFields('Number of rows', false);
+		$this->assertEnabledFields($fields, false);
+		$form->fill(['Show legend' => true, 'Display min/max/avg' => true]);
+		$this->assertEnabledFields('Number of columns', false);
+
+		foreach (['lines' => 2, 'columns' => 1] as $id => $maxlength) {
+			$this->assertEquals($maxlength, $form->getField('id:legend_'.$id)->getAttribute('maxlength'));
+		}
+
+		$field_attributes = [
+			'Number of rows' => [
+				'min' => 1,
+				'max' => 10
+			],
+			'Number of columns' => [
+				'min' => 1,
+				'max' => 4
+			]
+		];
+
+		foreach ($field_attributes as $field_name => $attributes) {
+			$element = $form->getField($field_name)->query('xpath:.//input[@type="range"]')->one();
+
+			foreach ($attributes as $attribute_name => $attribute_value) {
+				$this->assertEquals($attribute_value, $element->getAttribute($attribute_name));
+			}
+		}
+	}
+
+	public static function getSlidebarData () {
+		return [
+			[
+				[
+					'fields' => [
+						'Number of rows' => 1,
+						'Number of columns' => 1
+					],
+					'expected' => [
+						'Number of rows' => 1,
+						'Number of columns' => 1
+					],
+					'range_percentage' => [
+						'Number of rows' => 0,
+						'Number of columns' => 0
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Number of rows' => 10,
+						'Number of columns' => 4
+					],
+					'expected' => [
+						'Number of rows' => 10,
+						'Number of columns' => 4
+					],
+					'range_percentage' => [
+						'Number of rows' => 100,
+						'Number of columns' => 100
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Number of rows' => 0,
+						'Number of columns' => 0
+					],
+					'expected' => [
+						'Number of rows' => 1,
+						'Number of columns' => 1
+					],
+					'range_percentage' => [
+						'Number of rows' => 0,
+						'Number of columns' => 0
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Number of rows' => 11,
+						'Number of columns' => 5
+					],
+					'expected' => [
+						'Number of rows' => 10,
+						'Number of columns' => 4
+					],
+					'range_percentage' => [
+						'Number of rows' => 100,
+						'Number of columns' => 100
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Number of rows' => -1,
+						'Number of columns' => -1
+					],
+					'expected' => [
+						'Number of rows' => 1,
+						'Number of columns' => 1
+					],
+					'range_percentage' => [
+						'Number of rows' => 0,
+						'Number of columns' => 0
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Number of rows' => 'a',
+						'Number of columns' => 'a'
+					],
+					'expected' => [
+						'Number of rows' => 1,
+						'Number of columns' => 4
+					],
+					'range_percentage' => [
+						'Number of rows' => 0,
+						'Number of columns' => 100
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Number of rows' => 6,
+						'Number of columns' => 3
+					],
+					'expected' => [
+						'Number of rows' => 6,
+						'Number of columns' => 3
+					],
+					'range_percentage' => [
+						'Number of rows' => 55.5556,
+						'Number of columns' => 66.6667
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check data insertion in percentile fields data inputs and their display in range controls in Legend tab.
+	 *
+	 * @dataProvider getSlidebarData
+	 */
+	// TODO: Uncomment the below scenario when DEV-2709 will be fixed.
+//	public function testDashboardGraphWidget_LegendRangeControlsValidation($data) {
+//		$this->page->login()->open(self::DASHBOARD_URL);
+//		$form = $this->openGraphWidgetConfiguration();
+//		$form->selectTab('Legend');
+//		$form->fill($data['fields']);
+//
+//		// Check the resulting value in input element and check positioning of the range control thumb element.
+//		foreach ($data['expected'] as $field_name => $value) {
+//			$field = $form->getField($field_name);
+//			$this->assertEquals($value, $field->query('xpath:.//input[@type="text"]')->one()->getValue());
+//
+//			$this->assertEquals('left: '.$data['range_percentage'][$field_name].'%;', $field->query('class:range-control-thumb')
+//					->one()->getAttribute('style')
+//			);
+//		}
+//	}
+
+	/**
+	 * Check "Displaying options" tab layout.
+	 */
+	public function testDashboardGraphWidget_DisplayingOptionsFieldValidation() {
+		$this->page->login()->open(self::DASHBOARD_URL);
+		$form = $this->openGraphWidgetConfiguration();
+		$form->selectTab('Displaying options');
+
+		$type_field = $form->getField('History data selection');
+		$this->assertEquals(['Auto', 'History', 'Trends'], $type_field->getLabels()->asText());
+		$this->assertEquals('Auto', $type_field->getSelected());
+
+		$checkbox_states = [
+			'Simple triggers' => true,
+			'Working time' => true,
+			'id:percentile_left' => true,
+			'id:percentile_right' => false
+		];
+
+		// Check default values of checkboxes and their states.
+		foreach ($checkbox_states as $field => $state) {
+			$field = $form->getField($field);
+			$this->assertTrue($field->isEnabled($state));
+			$this->assertEquals(false, $field->getValue());
+		}
+
+		// Check default values, states and attributes of input elements.
+		foreach (['id:percentile_left_value', 'id:percentile_right_value'] as $input_selector) {
+			$input = $form->getField($input_selector);
+			$this->assertFalse($input->isEnabled());
+			$this->assertEquals('', $input->getValue());
+
+			foreach (['maxlength' => 2048, 'placeholder' => 'value'] as $attribute => $value) {
+				$this->assertEquals($value, $input->getAttribute($attribute));
+			}
+		}
+
+		// Switch Y axis to the rightside of the graph.
+		$form->selectTab('Data set');
+		$form->query('xpath://label[@for="ds_0_axisy_1"]')->one()->click();
+		$form->selectTab('Displaying options');
+
+		// Check that left percentile line is disabled and right percintile line is enabled.
+		foreach (['percentile_left' => false, 'percentile_right' => true] as $field_id => $enabled) {
+			$this->assertTrue($form->getField('id:'.$field_id)->isEnabled($enabled));
+
+			if ($enabled) {
+				$form->getField('id:'.$field_id)->fill(true);
+				$this->assertTrue($form->getField('id:'.$field_id.'_value')->isEnabled());
+			}
+		}
 	}
 
 	public function testDashboardGraphWidget_ProblemsDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Problems');
 
@@ -2321,7 +2572,7 @@ class testDashboardGraphWidget extends CWebTest {
 			'id:tags_0_operator',		// Tag operator.
 			'id:tags_0_value',			// Tag value
 			'id:tags_0_remove',			// Tag remove button.
-			'id:tags_add'				// Tagg add button.
+			'id:tags_add'				// Tag add button.
 		];
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
 
@@ -2380,7 +2631,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getAxesDisabledFieldsData
 	 */
 	public function testDashboardGraphWidget_AxesDisabledFields($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 
 		$form->fill($data['Data set']);
@@ -2449,6 +2700,9 @@ class testDashboardGraphWidget extends CWebTest {
 					'Aggregation interval' => '24h',
 					'Aggregate' => 'Data set'
 				]
+			],
+			'Legend' => [
+				'Show aggregation function' => true
 			]
 		];
 		$displayed_data = [
@@ -2463,7 +2717,7 @@ class testDashboardGraphWidget extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 
 		// Check hint next to the "Data set label" field.

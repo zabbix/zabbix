@@ -32,7 +32,8 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Dashboards',
-					'page' => 'Dashboards'
+					'page' => 'Dashboards',
+					'header' => 'Global view'
 				]
 			],
 			[
@@ -119,8 +120,8 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Triggers top 100',
-					'header' => '100 busiest triggers'
+					'page' => 'Top 100 triggers',
+					'header' => 'Top 100 triggers'
 				]
 			],
 			[

@@ -4016,7 +4016,7 @@ class testScripts extends CAPITest {
 					'selectHosts' => ['abc']
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/selectHosts/1": value must be one of "hostid", "host", "name", "description", "status", "proxy_hostid", "inventory_mode", "flags", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "tls_connect", "tls_accept", "tls_issuer", "tls_subject".'
+				'expected_error' => 'Invalid parameter "/selectHosts/1": value must be one of "hostid", "host", "name", "description", "status", "proxyid", "inventory_mode", "flags", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "tls_connect", "tls_accept", "tls_issuer", "tls_subject".'
 			],
 
 			// Check "selectActions" option.

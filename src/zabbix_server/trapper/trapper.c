@@ -44,7 +44,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "version.h"
-#include "../scripts/scripts.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -118,12 +118,18 @@ zbx_status_section_t;
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		int config_timeout)
 {
-	char	*info = NULL;
+	char	*info = NULL, *ext = NULL;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		ext = "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\"" ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}";
+		info = zbx_strdup(info, "data collection is paused");
+		ret = FAIL;
+	}
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -138,7 +144,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zbx_process_command_results(jp);
 
-	zbx_send_response_same(sock, ret, info, config_timeout);
+	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
 	zbx_free(info);
 
@@ -160,7 +166,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 	if (SUCCEED != (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 	}
 	else if (!ZBX_IS_RUNNING())
 	{
@@ -198,12 +204,12 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
-				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
+				" \"%s\": %s", proxy.name, sock->peer, proxy.allowed_addresses, error);
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "ignoring heartbeat from active proxy \"%s\" at \"%s\": proxy heartbeats"
-			" are deprecated", proxy.host, sock->peer);
+			" are deprecated", proxy.name, sock->peer);
 out:
 	zbx_free(error);
 
@@ -397,7 +403,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			for (i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
-				zbx_uint64_t		id = item->proxy_hostid;
+				zbx_uint64_t		id = item->proxyid;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
@@ -988,7 +994,7 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	if (FAIL == zbx_dc_get_host_by_hostid(&dc_host, hostid))
 		return FAIL;
 
-	if (0 != dc_host.proxy_hostid || HOST_STATUS_NOT_MONITORED == dc_host.status)
+	if (0 != dc_host.proxyid || HOST_STATUS_NOT_MONITORED == dc_host.status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
@@ -1096,7 +1102,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_get_config_forks_f get_config_forks)
 {
 	int	ret = SUCCEED;
 
@@ -1150,7 +1157,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
-						config_comms->config_source_ip);
+						config_comms->config_trapper_timeout, config_comms->config_source_ip,
+						get_config_forks, zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1180,7 +1188,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time);
+			{
+				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
+						zbx_get_program_type_cb());
+			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
 		{
@@ -1213,6 +1224,12 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
 					ZBX_FS_UI64 " for XML protocol received from \"%s\"", bytes_received,
 					(zbx_uint64_t)ZBX_GIBIBYTE, sock->peer);
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_vps_monitor_capped())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot accept data: data collection has been paused.");
 			return FAIL;
 		}
 
@@ -1272,15 +1289,16 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_get_config_forks_f get_config_forks)
 {
 	ssize_t	bytes_received;
 
-	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
+	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, config_comms->config_trapper_timeout, ZBX_TCP_LARGE)))
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
-			events_cbs, proxydata_frequency);
+			events_cbs, proxydata_frequency, get_config_forks);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1330,8 +1348,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		int		snmp_reload = 0;
 #endif
 
-		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
-				get_process_type_string(process_type), process_num, sec);
+		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection%s]",
+				get_process_type_string(process_type), process_num, sec, zbx_vps_monitor_status());
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
@@ -1376,7 +1394,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,
-					trapper_args_in->proxydata_frequency);
+					trapper_args_in->proxydata_frequency,
+					trapper_args_in->get_process_forks_cb_arg);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

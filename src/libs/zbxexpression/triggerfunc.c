@@ -484,7 +484,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 
 		evaluate_item.itemid = item->itemid;
 		evaluate_item.value_type = item->value_type;
-		evaluate_item.proxy_hostid = item->host.proxy_hostid;
+		evaluate_item.proxyid = item->host.proxyid;
 		evaluate_item.host = item->host.host;
 		evaluate_item.key_orig = item->key_orig;
 

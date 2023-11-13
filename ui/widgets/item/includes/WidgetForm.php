@@ -34,6 +34,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
@@ -79,6 +80,18 @@ class WidgetForm extends CWidgetForm {
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
+		if ($errors) {
+			return $errors;
+		}
+
+		$show = $this->getFieldValue('show');
+
+		if (!$show) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+
+			return $errors;
+		}
+
 		// Check if one of the objects (description, value or time) occupies same space.
 		$fields = [
 			['show' => Widget::SHOW_DESCRIPTION, 'h_pos' => 'desc_h_pos', 'v_pos' => 'desc_v_pos'],
@@ -87,7 +100,6 @@ class WidgetForm extends CWidgetForm {
 		];
 
 		$fields_count = count($fields);
-		$show = $this->getFieldValue('show');
 
 		for ($i = 0; $i < $fields_count - 1; $i++) {
 			if (!in_array($fields[$i]['show'], $show)) {
@@ -259,9 +271,8 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

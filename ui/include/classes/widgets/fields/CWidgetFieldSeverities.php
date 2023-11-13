@@ -23,11 +23,9 @@ namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
 
-	public function __construct(string $name, string $label = null) {
-		parent::__construct($name, $label);
+	public const DEFAULT_VIEW = \CWidgetFieldSeveritiesView::class;
 
-		$this->setExValidationRules(
-			['in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))
-		]);
+	public function __construct(string $name, string $label = null) {
+		parent::__construct($name, $label, range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
 	}
 }
