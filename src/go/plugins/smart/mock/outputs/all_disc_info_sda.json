@@ -1,0 +1,93 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 1],
+    "svn_revision": "5022",
+    "platform_info": "x86_64-w64-mingw32-w10-b19045",
+    "build_info": "(sf-7.1-1)",
+    "argv": ["smartctl", "-a", "/dev/sda", "-j"],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sda",
+    "info_name": "/dev/sda",
+    "type": "nvme",
+    "protocol": "NVMe"
+  },
+  "model_name": "SAMSUNG MZVL21T0HCLR-00BH1",
+  "serial_number": "S641NX0T509005",
+  "firmware_version": "HPS3NGXH",
+  "nvme_pci_vendor": {
+    "id": 5197,
+    "subsystem_id": 5197
+  },
+  "nvme_ieee_oui_identifier": 9528,
+  "nvme_total_capacity": 1024209543168,
+  "nvme_unallocated_capacity": 0,
+  "nvme_controller_id": 6,
+  "nvme_number_of_namespaces": 1,
+  "nvme_namespaces": [
+    {
+      "id": 1,
+      "size": {
+        "blocks": 2000409264,
+        "bytes": 1024209543168
+      },
+      "capacity": {
+        "blocks": 2000409264,
+        "bytes": 1024209543168
+      },
+      "utilization": {
+        "blocks": 832162560,
+        "bytes": 426067230720
+      },
+      "formatted_lba_size": 512,
+      "eui64": {
+        "oui": 9528,
+        "ext_id": 777954286242
+      }
+    }
+  ],
+  "user_capacity": {
+    "blocks": 2000409264,
+    "bytes": 1024209543168
+  },
+  "logical_block_size": 512,
+  "local_time": {
+    "time_t": 1699623404,
+    "asctime": "Fri Nov 10 15:36:44 2023 FLEST"
+  },
+  "smart_status": {
+    "passed": true,
+    "nvme": {
+      "value": 0
+    }
+  },
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 35,
+    "available_spare": 100,
+    "available_spare_threshold": 5,
+    "percentage_used": 0,
+    "data_units_read": 18501943,
+    "data_units_written": 13550804,
+    "host_reads": 255917753,
+    "host_writes": 288323322,
+    "controller_busy_time": 1564,
+    "power_cycles": 321,
+    "power_on_hours": 679,
+    "unsafe_shutdowns": 66,
+    "media_errors": 0,
+    "num_err_log_entries": 0,
+    "warning_temp_time": 0,
+    "critical_comp_time": 0,
+    "temperature_sensors": [35, 44]
+  },
+  "temperature": {
+    "current": 35
+  },
+  "power_cycle_count": 321,
+  "power_on_time": {
+    "hours": 679
+  }
+}
