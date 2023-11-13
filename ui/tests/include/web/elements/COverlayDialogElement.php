@@ -95,10 +95,24 @@ class COverlayDialogElement extends CElement {
 
 	/**
 	 * Close overlay dialog.
+	 *
+	 * @param boolean $cancel    true if cancel button, false if close (x) button
 	 */
-	public function close() {
-		$this->query('class:overlay-close-btn')->one()->click();
-		$this->ensureNotPresent();
+	public function close($cancel = false) {
+		$count = COverlayDialogElement::find()->all()->count();
+		if ($cancel) {
+			$this->getFooter()->query('button:Cancel')->one()->click();
+		}
+		else {
+			$this->query('class:overlay-close-btn')->one()->click();
+		}
+
+		if ($count === 1) {
+			self::ensureNotPresent();
+		}
+		else {
+			$this->waitUntilNotPresent();
+		}
 	}
 
 	/**
