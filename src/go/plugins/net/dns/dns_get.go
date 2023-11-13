@@ -116,7 +116,7 @@ func parseAnswersGet(answers []dns.RR) string {
 	var out string
 	answersNum := len(answers)
 
-	log.Infof("AGS 111")
+	log.Infof("AGS 111\n")
 	//	fmt.Println("AGS answersNum: %d", answersNum)
 	//fmt.Println("AGS 222")
 
@@ -285,7 +285,6 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	resp_answer, _ := json.Marshal(resp.Answer)
 	log.Infof("AGS Answer: %s", resp_answer)
 
-
 	resultG := make(map[string][]interface{})
 
 	log.Infof("#######################################\n\n\n\n")
@@ -293,10 +292,6 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	for _, ii := range resp.Answer {
 		h := ii.Header() // RR_Header
 		log.Infof("AGS H: ->%s<-\n", h)
-
-
-
-		fmt.Printf("111")
 
 		result := make(map[string]interface{})
 
@@ -310,14 +305,49 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 			value = value.Elem()
 		}
 
+		resFieldAggregatedValues := make(map[string]interface{})
+
 		for j := 0; j < value.NumField(); j++ {
 
 			fieldValue := value.Field(j)
 			fieldType := value.Type().Field(j)
 			fieldName := fieldType.Name
-			resFieldValue := fieldValue.Interface()
-			result[fieldName] = resFieldValue
+
+			log.Infof("FIELD_NAME Z: %s", fieldName)
+			if fieldName == "Hdr" {
+
+				valueH := fieldValue
+				typeOfH := valueH.Type()
+				// *dns.A
+				log.Infof("RECORD TYPE: %s", typeOfH)
+				if valueH.Kind() == reflect.Ptr {
+					valueH = valueH.Elem()
+				}
+
+				for jH := 0; jH < valueH.NumField(); jH++ {
+					fieldValueH := valueH.Field(jH)
+					fieldTypeH := valueH.Type().Field(jH)
+					fieldNameH := fieldTypeH.Name
+					log.Infof("AGS fieldValueH: -%s<-", fieldValueH.Interface())
+					log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
+					log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
+					n := strings.ToLower(fieldNameH)
+
+					if (n == "rrtype") {
+						n = "type"
+					}
+
+					result[n] = fieldValueH.Interface()
+				}
+			} else {
+				resFieldValue := fieldValue.Interface()
+				//result[strings.ToLower(fieldName)] = resFieldValue
+				n := strings.ToLower(fieldName)
+				resFieldAggregatedValues[n] = resFieldValue
+			}
 		}
+
+		result["rdata"] = resFieldAggregatedValues
 
 		resultG["answer_section"] = append(resultG["answer_section"], result)
 	}
