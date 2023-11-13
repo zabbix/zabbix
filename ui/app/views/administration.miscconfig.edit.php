@@ -121,6 +121,7 @@ $from_list = (new CFormList())
 							_('default'),
 							') ',
 							_('or'),
+							' ',
 							(new CSpan('\'self\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
 							' ',
 							_('(must be single-quoted) - the page can only be displayed in a frame on the same origin as the page itself'),
@@ -135,11 +136,6 @@ $from_list = (new CFormList())
 							' ',
 							_('(must be single-quoted)- the page cannot be displayed in a frame, regardless of the site attempting to do so').
 							';'
-						]),
-						new CListItem([
-							(new CSpan('null'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' - ',
-							_('disable X-Frame-Options HTTP header (not recommended)').';'
 						]),
 						new CListItem([
 							_('a string of space-separated hostnames; adding'),
