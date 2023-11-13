@@ -133,6 +133,10 @@ class WidgetForm extends CWidgetForm {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _s('value must be greater than "%1$s"', $min));
 		}
 
+		if (!$this->getFieldValue('show')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+		}
+
 		$min_threshold = null;
 		$max_threshold = null;
 
@@ -193,11 +197,12 @@ class WidgetForm extends CWidgetForm {
 					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_SCALE,
 						Widget::SHOW_VALUE_ARC
 					])
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
 					->setDefault('{ITEM.NAME}')
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('desc_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))

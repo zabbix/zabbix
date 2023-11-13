@@ -50,6 +50,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.dir.get[/var/log]`,
 		`net.dns[,zabbix.com]`,
 		`net.dns.record[,zabbix.com]`,
+		`net.dns.perf[,zabbix.com]`,
 		`net.tcp.dns[,zabbix.com]`,
 		`net.tcp.dns.query[,zabbix.com]`,
 		`net.tcp.port[,80]`,

@@ -3,8 +3,6 @@
 noinst_LIBRARIES = libzbxpoller.a libzbxpoller_server.a libzbxpoller_proxy.a
 
 libzbxpoller_a_SOURCES = \
-	checks_agent.c \
-	checks_agent.h \
 	checks_calculated.c \
 	checks_calculated.h \
 	checks_db.c \
@@ -25,13 +23,6 @@ libzbxpoller_a_SOURCES = \
 	checks_simple_vmware.h \
 	checks_snmp.c \
 	checks_snmp.h \
-	ssh_run.h \
-	checks_ssh.c \
-	checks_ssh.h \
-	telnet_run.c \
-	telnet_run.h \
-	checks_telnet.c \
-	checks_telnet.h \
 	async_poller.c \
 	async_poller.h \
 	async_agent.h \
@@ -47,14 +38,6 @@ libzbxpoller_a_SOURCES = \
 	poller.c \
 	poller.h
 
-if HAVE_SSH
-libzbxpoller_a_SOURCES += ssh_run.c
-endif
-
-if HAVE_SSH2
-libzbxpoller_a_SOURCES += ssh2_run.c
-endif
-
 libzbxpoller_server_a_SOURCES = \
 	checks_internal.h \
 	checks_internal_server.c
@@ -69,8 +52,6 @@ libzbxpoller_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxcachehistory \
 	-I$(top_srcdir)/src/libs/zbxcachevalue \
 	$(SNMP_CFLAGS) \
-	$(SSH2_CFLAGS) \
-	$(SSH_CFLAGS) \
 	$(LIBXML2_CFLAGS) \
 	$(TLS_CFLAGS) \
 	$(LIBEVENT_CFLAGS)
