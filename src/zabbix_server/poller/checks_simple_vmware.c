@@ -111,8 +111,8 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, 
  *                                                                            *
  * Purpose: return id of dsname data from vector with uuid or name            *
  *                                                                            *
- * Parameters: hv_dsnames   - [IN] the vector with all hv Datastores          *
- *             uuid_or_name - [IN] the name or uuid of Datastore              *
+ * Parameters: hv_dsnames   - [IN] vector with all hv Datastores              *
+ *             uuid_or_name - [IN] name or uuid of Datastore                  *
  *                                                                            *
  * Return value:                                                              *
  *        id   - the operation has completed successfully                     *
