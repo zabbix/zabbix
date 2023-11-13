@@ -355,12 +355,11 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputType('history', '54d');
 		$this->zbxTestInputType('trends', '55d');
 		$this->zbxTestInputType('description', 'description');
-		$form->getField('Value mapping')->fill('Template value mapping');
+		$form->fill(['Value mapping' => 'Template value mapping']);
 		$this->zbxTestCheckboxSelect('status', false);
 		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
-		$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-			->one()->click();
+		$form->getFieldContainer('Custom intervals')->query('button:Add')->waitUntilClickable()->one()->click();
 
 		$dialog->getFooter()->query('button:Add')->one()->click();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
@@ -387,7 +386,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->assertEquals(['Template value mapping'], $overlay->asForm()->getField('Value mapping')->getValue());
+		$overlay->asForm()->checkValue(['Value mapping' => 'Template value mapping']);
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);

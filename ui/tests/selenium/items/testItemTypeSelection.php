@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
@@ -213,7 +214,7 @@ class testItemTypeSelection extends CWebTest {
 
 			// Check that custom type remained in saved form.
 			$this->page->open($link)->waitUntilReady();
-			$this->query('link:'.$data['fields']['Name'])->one()->click();
+			$this->query('link', $data['fields']['Name'])->one()->click();
 			$form->invalidate();
 			$this->assertEquals($data['fields']['Type of information'], $form->getField('Type of information')->getValue());
 
@@ -229,12 +230,10 @@ class testItemTypeSelection extends CWebTest {
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype updated' : 'Item updated');
 			$this->page->open($link)->waitUntilReady();
-			$this->query('link:'.$data['fields']['Name'])->one()->click();
+			$this->query('link', $data['fields']['Name'])->one()->click();
 			$form->invalidate();
-			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
 		}
-		else {
-			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
-		}
+
+		$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
 	}
 }

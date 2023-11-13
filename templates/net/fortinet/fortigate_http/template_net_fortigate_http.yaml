@@ -3535,15 +3535,6 @@ zabbix_export:
                       value:
                         host: 'FortiGate by HTTP'
                         key: fgate.cpu.util
-                    - type: INTEGER
-                      name: th_arc_size
-                      value: '5'
-                    - type: STRING
-                      name: min
-                      value: '0'
-                    - type: STRING
-                      name: max
-                      value: '100'
                     - type: STRING
                       name: thresholds.0.color
                       value: 0EC9AC
@@ -3583,18 +3574,6 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
-                    - type: INTEGER
-                      name: graph_time
-                      value: '1'
-                    - type: INTEGER
-                      name: legend_statistic
-                      value: '1'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '2'
                     - type: STRING
                       name: ds.0.color
                       value: 1976D2
@@ -3613,15 +3592,21 @@ zabbix_export:
                     - type: STRING
                       name: ds.1.items.0
                       value: fgate.item.fs_free
-                    - type: INTEGER
-                      name: working_time
-                      value: '1'
-                    - type: STRING
-                      name: time_from
-                      value: now-1d
                     - type: STRING
                       name: lefty_min
                       value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: time_period.from
+                      value: now-1d
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
                 - type: item
                   name: 'API availability'
                   x: '4'
@@ -3681,9 +3666,6 @@ zabbix_export:
                     - type: INTEGER
                       name: decimal_size
                       value: '40'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '2'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -3757,9 +3739,6 @@ zabbix_export:
                     - type: INTEGER
                       name: decimal_size
                       value: '40'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '2'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -3804,15 +3783,6 @@ zabbix_export:
                       value:
                         host: 'FortiGate by HTTP'
                         key: fgate.memory.util
-                    - type: INTEGER
-                      name: th_arc_size
-                      value: '5'
-                    - type: STRING
-                      name: min
-                      value: '0'
-                    - type: STRING
-                      name: max
-                      value: '100'
                     - type: STRING
                       name: thresholds.0.color
                       value: 0EC9AC
@@ -3891,6 +3861,27 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '40'
+                - type: problems
+                  x: '12'
+                  'y': '8'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: acknowledgement_status
+                      value: '1'
+                    - type: INTEGER
+                      name: show
+                      value: '3'
+                    - type: INTEGER
+                      name: show_opdata
+                      value: '2'
+                    - type: INTEGER
+                      name: show_tags
+                      value: '1'
+                    - type: STRING
+                      name: tag_priority
+                      value: scope
                 - type: gauge
                   name: 'Disk utilization'
                   x: '16'
@@ -3912,15 +3903,6 @@ zabbix_export:
                       value:
                         host: 'FortiGate by HTTP'
                         key: fgate.fs.util
-                    - type: INTEGER
-                      name: th_arc_size
-                      value: '5'
-                    - type: STRING
-                      name: min
-                      value: '0'
-                    - type: STRING
-                      name: max
-                      value: '100'
                     - type: STRING
                       name: thresholds.0.color
                       value: 0EC9AC
@@ -3999,27 +3981,6 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '40'
-                - type: problems
-                  x: '12'
-                  'y': '8'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: show.0
-                      value: '3'
-                    - type: INTEGER
-                      name: show_tags
-                      value: '1'
-                    - type: INTEGER
-                      name: show_opdata
-                      value: '2'
-                    - type: INTEGER
-                      name: acknowledgement_status
-                      value: '1'
-                    - type: STRING
-                      name: tag_priority
-                      value: scope
         - uuid: a1c7206d9312486b9d09dc9ef34ed98e
           name: 'FortiGate: Statistics'
           pages:
