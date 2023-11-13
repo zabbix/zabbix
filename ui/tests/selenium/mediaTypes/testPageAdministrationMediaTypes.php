@@ -32,6 +32,9 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  */
 class testPageAdministrationMediaTypes extends CWebTest {
 
+	const ZABBIX_ADMIN_GROUPID = 7;
+	const EMAIL_MEDIATYPEID = 1;
+
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
@@ -52,14 +55,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				'name' => 'Action with email',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => []
 				],
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					]
 				]
 			]
@@ -653,55 +656,53 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 	}
 
-	protected function updateActions() {
-		for ($i=0; $i<5; $i++) {
-			$this->getIdAndUpdateAction($i);
-		}
-	}
-
 	/**
 	 * Function for getting the id of an Action and update it for changing all operations to one particular Media type,
 	 * in case if some action operations were set to -All- media types.
-	 * Possible sources of events are: 0 - trigger, 1 - discovery, 2 - autoregistration, 3 - internal, 4 - service action.
-	 *
-	 * @param integer	$sourceid    the code of an action source
 	 */
-	protected function getIdAndUpdateAction($sourceid) {
-		$actionids = CDBHelper::getColumn('SELECT actionid FROM actions'.
-				' WHERE eventsource='.zbx_dbstr($sourceid),
-				'actionid'
-		);
+	protected function getIdAndUpdateAction() {
+		$update_info = [
+			[
+				'operationtype' => OPERATION_TYPE_MESSAGE,
+				'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+				'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+			]
+		];
 
-		$update_info =[[
-			'operationtype' => OPERATION_TYPE_MESSAGE,
-			'opmessage' => ['mediatypeid' => 1],
-			'opmessage_grp' => [['usrgrpid' => 7]]
-		]];
+		foreach([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
+				EVENT_SOURCE_SERVICE] as $sourceid) {
+			$actionids = CDBHelper::getColumn('SELECT actionid FROM actions WHERE eventsource='.zbx_dbstr($sourceid), 'actionid');
 
-		foreach ($actionids as $actionid) {
-			if ($sourceid === 0 || $sourceid === 4) {
-				$update_data = [
-					'actionid' => $actionid,
-					'operations' => $update_info,
-					'recovery_operations' => $update_info,
-					'update_operations' => $update_info
-				];
-			}
-			elseif ($sourceid === 3) {
-				$update_data = [
-						'actionid' => $actionid,
-						'operations' => $update_info,
-						'recovery_operations' => $update_info
-					];
-			}
-			else {
-				$update_data = [
-					'actionid' => $actionid,
-					'operations' => $update_info
-				];
-			}
+			foreach ($actionids as $actionid) {
+				switch ($sourceid) {
+					case EVENT_SOURCE_TRIGGERS:
+					case EVENT_SOURCE_SERVICE:
+						$update_data = [
+							'actionid' => $actionid,
+							'operations' => $update_info,
+							'recovery_operations' => $update_info,
+							'update_operations' => $update_info
+						];
+						break;
 
-			CDataHelper::call('action.update', $update_data);
+					case EVENT_SOURCE_INTERNAL:
+						$update_data = [
+							'actionid' => $actionid,
+							'operations' => $update_info,
+							'recovery_operations' => $update_info
+						];
+						break;
+
+					case EVENT_SOURCE_DISCOVERY:
+					case EVENT_SOURCE_AUTOREGISTRATION:
+						$update_data = [
+							'actionid' => $actionid,
+							'operations' => $update_info
+						];
+				}
+
+				CDataHelper::call('action.update', $update_data);
+			}
 		}
 	}
 
@@ -865,7 +866,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	}
 
 	/**
-	 * @onBeforeOnce updateActions
+	 * @onBeforeOnce getIdAndUpdateAction
 	 *
 	 * @dataProvider getActionsColumnData
 	 */
@@ -875,22 +876,22 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$column_actions = [];
 			foreach ($data['actions'] as $action) {
 				$mediatypeid = CTestArrayHelper::get($action,'mediatypeid',
-						CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($data['name'])
-				));
+						CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($data['name']))
+				);
 
 				CDataHelper::call('action.create', [
 					[
 						'name' => $action['name'],
 						'eventsource' => EVENT_SOURCE_TRIGGERS,
 						'filter' => [
-							'evaltype' => 0,
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => []
 						],
 						$action['operation'] => [
 							[
 								'operationtype' => OPERATION_TYPE_MESSAGE,
 								'opmessage' => ['mediatypeid' => $mediatypeid],
-								'opmessage_grp' => [['usrgrpid' => 7]]
+								'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 							]
 						]
 					]

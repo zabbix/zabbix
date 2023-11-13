@@ -21,6 +21,12 @@
 
 class Actions {
 
+	const ZABBIX_ADMIN_GROUPID = 7;
+	const ADMIN_USERID = 1;
+	const EMAIL_MEDIATYPEID = 1;
+	const REBOOT_SCRIPTID = 4;
+	const CURRENT_HOST = 0;
+
 	/**
 	 * Create data for all Actions related tests (also used in Media types, Reports and Services tests, etc).
 	 *
@@ -33,7 +39,7 @@ class Actions {
 				'name' => 'Service action',
 				'eventsource' => EVENT_SOURCE_SERVICE,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_SERVICE_NAME,
@@ -50,8 +56,8 @@ class Actions {
 				'operations' => [
 					[
 						'operationtype' => ZBX_CONDITION_TYPE_HOST_GROUP,
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_usr' => [['userid' => 1]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_usr' => [['userid' => self::ADMIN_USERID]]
 					]
 				],
 				'recovery_operations' => [
@@ -61,16 +67,16 @@ class Actions {
 							'default_msg' => 0,
 							'subject' => 'Subject',
 							'message' => 'Message',
-							'mediatypeid' => 1
+							'mediatypeid' => self::EMAIL_MEDIATYPEID
 						],
-						'opmessage_usr' => [['userid' => 1]]
+						'opmessage_usr' => [['userid' => self::ADMIN_USERID]]
 					]
 				],
 				'update_operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					]
 				]
 			],
@@ -79,14 +85,14 @@ class Actions {
 				'name' => 'Minimal trigger action',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => []
 				],
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => 4],
-						'opcommand_hst' => [['hostid' => 0]]
+						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					]
 				]
 			],
@@ -95,7 +101,7 @@ class Actions {
 				'esc_period' => '60s',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
@@ -122,12 +128,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TEMPLATE,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 10081
+							'value' => 10081 // Windows by Zabbix agent.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TEMPLATE,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 10001
+							'value' => 10001 // Linux by Zabbix agent.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TIME_PERIOD,
@@ -142,27 +148,27 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_LESS_EQUAL,
-							'value' => 4
+							'value' => TRIGGER_SEVERITY_HIGH
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_MORE_EQUAL,
-							'value' => 3
+							'value' => TRIGGER_SEVERITY_AVERAGE
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 2
+							'value' => TRIGGER_SEVERITY_WARNING
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 5
+							'value' => TRIGGER_SEVERITY_DISASTER
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 1
+							'value' => TRIGGER_SEVERITY_INFORMATION
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_NAME,
@@ -177,32 +183,32 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 13485
+							'value' => 13485 // Utilization of unreachable poller processes is high.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 99252
+							'value' => 99252 // First test trigger with tag priority.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 10084
+							'value' => 10084 // ЗАББИКС Сервер.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 99134
+							'value' => 99134 // Available host.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 4
+							'value' => 4 // Zabbix servers.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 2
+							'value' => 2 // Linux servers.
 						]
 					]
 				],
@@ -216,16 +222,16 @@ class Actions {
 							[
 								'conditiontype' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => "0"
+								'value' => '0' // Acknowledged - NO.
 							],
 							[
 								'conditiontype' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => "1"
+								'value' => '1' // Acknowledged - YES.
 							]
 						],
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
@@ -235,16 +241,16 @@ class Actions {
 							[
 								'conditiontype' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => "0"
+								'value' => '0' // Acknowledged - NO.
 							]
 						],
 						'opmessage' => [
 							'default_msg' => 0,
 							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
 							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
-							'mediatypeid' => 1
+							'mediatypeid' => self::EMAIL_MEDIATYPEID
 						],
-						'opmessage_usr' => [['userid' => 1]]
+						'opmessage_usr' => [['userid' => self::ADMIN_USERID]]
 					]
 				]
 			],
@@ -253,7 +259,7 @@ class Actions {
 				'name' => 'Autoregistration action 1',
 				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
@@ -268,12 +274,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 20001
+							'value' => 20001 // Proxy for Actions.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 20000
+							'value' => 20000 // Proxy for Discovery rule.
 						]
 					]
 				],
@@ -284,27 +290,27 @@ class Actions {
 							'default_msg' => 0,
 							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
 							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
-							'mediatypeid' => 1
+							'mediatypeid' => self::EMAIL_MEDIATYPEID
 						],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => 4],
-						'opcommand_hst' => [['hostid' => 0]]
+						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_GROUP_ADD,
-						'opgroup' => [['groupid' => 5]]
+						'opgroup' => [['groupid' => 5]] // Discovered hosts.
 					],
 					[
 						'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
-						'optemplate' => [['templateid' => 10001]]
+						'optemplate' => [['templateid' => 10001]] // Linux by Zabbix agent.
 					]
 				]
 			],
@@ -313,7 +319,7 @@ class Actions {
 				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 				'status' => ACTION_STATUS_DISABLED,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
@@ -328,12 +334,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 20001
+							'value' => 20001 // Proxy for Actions.
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 20000
+							'value' => 20000 // Proxy for Discovery rule.
 						]
 					]
 				],
@@ -344,19 +350,19 @@ class Actions {
 							'default_msg' => 0,
 							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
 							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
-							'mediatypeid' => 1
+							'mediatypeid' => self::EMAIL_MEDIATYPEID
 						],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => 4],
-						'opcommand_hst' => [['hostid' => 0]]
+						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					]
 				]
 			],
@@ -364,14 +370,14 @@ class Actions {
 				'name' => 'Simple action',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => []
 				],
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					]
 				]
 			],
@@ -379,14 +385,14 @@ class Actions {
 				'name' => 'Trigger action 2',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => []
 				],
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 1],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					]
 				]
 			],
@@ -394,14 +400,14 @@ class Actions {
 				'name' => 'Trigger action 3',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => []
 				],
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 3],
-						'opmessage_grp' => [['usrgrpid' => 7]]
+						'opmessage' => ['mediatypeid' => 3], // SMS.
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
 					]
 				]
 			]
@@ -417,42 +423,42 @@ class Actions {
 		]);
 
 		// Add Actions to Action Log in database.
-		DBexecute("INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES ".
-			" (101, 0, 0, 13545, 1329724790, 1, 0, 0);"
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES '.
+				' (101, 0, 0, 13545, 1329724790, 1, 0, 0);'
 		);
 
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-			" message, status, retries, error, esc_step, alerttype, parameters) VALUES ".
-			"(1, ".zbx_dbstr($actionids['Trigger action 2']).", 101, 1, 1329724800, 1, 'igor.danoshaites@zabbix.com',".
-			"'PROBLEM: Value of item key1 > 5', 'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: ".
-			" PROBLEM Last value: 6', 1, 0, '', 1, 0, ''),".
-			"(2, ".zbx_dbstr($actionids['Trigger action 2']).", 101, 1, 1329724810, 1, 'igor.danoshaites@zabbix.com', ".
-			"'PROBLEM: Value of item key1 > 6','Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: ".
-			" PROBLEM', 1, 0, '', 1, 0, ''),".
-			"(3, ".zbx_dbstr($actionids['Trigger action 2']).", 101, 1, 1329724820, 1, 'igor.danoshaites@zabbix.com',".
-			"'PROBLEM: Value of item key1 > 7', 'Event at 2012.02.20 10:00:20 Hostname: H1 Value of item key1 > 7:".
-			" PROBLEM', 1, 0, '', 1, 0, ''),".
-			"(4, ".zbx_dbstr($actionids['Trigger action 2']).", 101, 1, 1329724830, 1, 'igor.danoshaites@zabbix.com',".
-			"'PROBLEM: Value of item key1 > 10', 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM',".
-			" 2, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused', 1, 0, ''),".
-			"(5, ".zbx_dbstr($actionids['Trigger action 2']).", 101, 1, 1329724840, 1, 'igor.danoshaites@zabbix.com', ".
-			"'PROBLEM: Value of item key1 > 20', 'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: ".
-			" PROBLEM', 0, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: ".
-			"[111] Connection refused', 1, 0, ''),".
-			"(6, ".zbx_dbstr($actionids['Trigger action 2']).", 101, NULL, 1329724850, NULL, '', '',".
-			"'Command: H1:ls -la', 1, 0, '', 1, 1, ''),".
-			"(7, ".zbx_dbstr($actionids['Trigger action 2']).", 101, NULL, 1329724860, NULL, '', '',".
-			"'Command: H1:ls -la', 1, 0, '', 1, 1, ''),".
-			"(130, ".zbx_dbstr($actionids['Trigger action 2']).", 101, 9, 1597440000, 3, 'igor.danoshaites@zabbix.com',".
-			"'time_subject_2', 'time_message_', 1, 0, '', 1, 0, ''),".
-			"(131, ".zbx_dbstr($actionids['Trigger action 3']).", 101, 1, 1329724870, 10, 'test.test@zabbix.com',".
-			"'subject here', 'message here', 1, 0, '', 1, 0, ''),".
-			"(132, ".zbx_dbstr($actionids['Trigger action 3']).", 101, 9, 1329724880, 3, '77777777', 'subject here',".
-			"'message here', 1, 0, '', 1, 0, ''),".
-			"(133, ".zbx_dbstr($actionids['Trigger action 3']).", 101, 9, 1329724890, 3, '77777777', 'subject_no_space',".
-			"'message_no_space', 1, 0, '', 1, 0, ''),".
-			"(134, ".zbx_dbstr($actionids['Trigger action 3']).", 101, 1, 1597439400, 3, 'igor.danoshaites@zabbix.com',".
-			"'time_subject_1', 'time_message_1', 1, 0, '', 1, 0, '')"
+		DBexecute('INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, '.
+				' message, status, retries, error, esc_step, alerttype, parameters) VALUES '.
+				'(1, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724800, 1, \'igor.danoshaites@zabbix.com\','.
+				'\'PROBLEM: Value of item key1 > 5\', \'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: '.
+				' PROBLEM Last value: 6\', 1, 0, \'\', 1, 0, \'\'),'.
+				'(2, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724810, 1, \'igor.danoshaites@zabbix.com\', '.
+				'\'PROBLEM: Value of item key1 > 6\',\'Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: '.
+				' PROBLEM\', 1, 0, \'\', 1, 0, \'\'),'.
+				'(3, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724820, 1, \'igor.danoshaites@zabbix.com\','.
+				'\'PROBLEM: Value of item key1 > 7\', \'Event at 2012.02.20 10:00:20 Hostname: H1 Value of item key1 > 7:'.
+				' PROBLEM\', 1, 0, \'\', 1, 0, \'\'),'.
+				'(4, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724830, 1, \'igor.danoshaites@zabbix.com\','.
+				'\'PROBLEM: Value of item key1 > 10\', \'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM\','.
+				' 2, 0, \'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused\', 1, 0, \'\'),'.
+				'(5, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724840, 1, \'igor.danoshaites@zabbix.com\', '.
+				'\'PROBLEM: Value of item key1 > 20\', \'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: '.
+				' PROBLEM\', 0, 0, \'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: '.
+				'[111] Connection refused\', 1, 0, \'\'),'.
+				'(6, '.zbx_dbstr($actionids['Trigger action 2']).', 101, NULL, 1329724850, NULL, \'\', \'\','.
+				'\'Command: H1:ls -la\', 1, 0, \'\', 1, 1, \'\'),'.
+				'(7, '.zbx_dbstr($actionids['Trigger action 2']).', 101, NULL, 1329724860, NULL, \'\', \'\','.
+				'\'Command: H1:ls -la\', 1, 0, \'\', 1, 1, \'\'),'.
+				'(130, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 9, 1597440000, 3, \'igor.danoshaites@zabbix.com\','.
+				'\'time_subject_2\', \'time_message_\', 1, 0, \'\', 1, 0, \'\'),'.
+				'(131, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 1, 1329724870, 10, \'test.test@zabbix.com\','.
+				'\'subject here\', \'message here\', 1, 0, \'\', 1, 0, \'\'),'.
+				'(132, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 9, 1329724880, 3, \'77777777\', \'subject here\','.
+				'\'message here\', 1, 0, \'\', 1, 0, \'\'),'.
+				'(133, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 9, 1329724890, 3, \'77777777\', \'subject_no_space\','.
+				'\'message_no_space\', 1, 0, \'\', 1, 0, \'\'),'.
+				'(134, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 1, 1597439400, 3, \'igor.danoshaites@zabbix.com\','.
+				'\'time_subject_1\', \'time_message_1\', 1, 0, \'\', 1, 0, \'\')'
 		);
 
 		return $actionids;

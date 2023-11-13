@@ -35,8 +35,6 @@ class testPageAlertsScripts extends CWebTest {
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
-	 * @dataSource Actions
-	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
