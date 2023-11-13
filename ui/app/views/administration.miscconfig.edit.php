@@ -116,42 +116,17 @@ $from_list = (new CFormList())
 				(new CList(
 					[
 						new CListItem([
-							(new CSpan('SAMEORIGIN'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' (',
-							_('default'),
-							') ',
-							_('or'),
-							' ',
-							(new CSpan('\'self\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' ',
-							_('(must be single-quoted) - the page can only be displayed in a frame on the same origin as the page itself'),
+							_s('%1$s (default) or %2$s (must be single-quoted) - the page can only be displayed in a frame on the same origin as the page itself', 'SAMEORIGIN', '\'self\''),
 							';'
 						]),
 						new CListItem([
-							(new CSpan('DENY'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' ',
-							_('or'),
-							' ',
-							(new CSpan('\'none\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' ',
-							_('(must be single-quoted)- the page cannot be displayed in a frame, regardless of the site attempting to do so').
+							_s('%1$s (default) or %2$s (must be single-quoted) - the page cannot be displayed in a frame, regardless of the site attempting to do so', 'DENY', '\'none\'').
 							';'
 						]),
 						new CListItem([
-							_('a string of space-separated hostnames; adding'),
-							' ',
-							(new CSpan('\'self\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' ',
-							_('(must be single-quoted) to the list will allow the page to be displayed in a frame on the same origin as the page itself'),
-							'. ',
-							_('Note that using'),
-							(new CSpan('\'self\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' ',
-							_('or'),
-							' ',
-							(new CSpan('\'none\''))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-							' ',
-							_('without single quotes will result in them being regarded as hostnames'),
+							_s('a string of space-separated hostnames; adding %1$s (must be single-quoted) to the list will allow the page to be displayed in a frame on the same origin as the page itself', '\'self\''),
+							'; ',
+							_s('Note that using %1$s or %2$s without single quotes will result in them being regarded as hostnames', '\'self\'', '\'none\''),
 							'.'
 						])
 					]
