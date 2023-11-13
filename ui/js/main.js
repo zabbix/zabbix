@@ -285,7 +285,7 @@ var hintBox = {
 				e.preventDefault();
 			}
 
-			if ($target[0].dataset.hintboxPreload && $target[0].dataset.hintboxContents === '') {
+			if ($target[0].dataset.hintboxPreload !== '' && $target[0].dataset.hintboxContents === '') {
 				if (e.type === 'mousemove') {
 					return;
 				}
