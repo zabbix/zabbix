@@ -538,6 +538,10 @@ static int	DBpatch_6000044(void)
 			continue;
 		}
 
+		/* only the formulas having 4 tokens need to be fixed */
+		if (4 != ctx.stack.values_num)
+			continue;
+
 		zbx_free(item_filter);
 		zbx_free(time_period);
 		zbx_free(hist_func);
@@ -601,7 +605,7 @@ static int	DBpatch_6000044(void)
 		params = zbx_dsprintf(params, "%s(last_foreach(%s))", aggr_func, item_filter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update items set params='%s' where itemid=%s;\n", params, row[0]);
+				"update items set params='%s' where itemid=%s;\n", params, row[0]);
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
