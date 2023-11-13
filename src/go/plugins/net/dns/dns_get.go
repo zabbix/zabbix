@@ -256,40 +256,29 @@ func parseParamasGet(params []string) (o dnsGetOptions, err error) {
 	return
 }
 
-func getDNSAnswersGet(params []string) ([]dns.RR, error) {
-	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
-
-	options, err := parseParamasGet(params)
-	if err != nil {
-		return nil, err
+func reverseMap(m map[string]uint16) map[interface{}]string {
+	n := make(map[interface{}]string, len(m))
+	for k, v := range m {
+		n[v] = k
 	}
+	return n
+}
 
-	var resp *dns.Msg
-	for i := 1; i <= options.count; i++ {
-		resp, err = runQueryGet(&options)
+var dnsTypesGetReverse = reverseMap(dnsTypesGet)
 
-		if err != nil {
-			continue
-		}
+var dnsClassesGet = map[interface{}]string{
+	1:"IN",
+	3:"CH",
+	4:"HS",
+	254:"NONE",
+	255:"ANY",
+}
 
-		break
-	}
-
-	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
-	}
-
-	log.Infof("AGS HEADER: %s", resp.MsgHdr)
-	log.Infof("AGS Question: %s", resp.Question)
-
-	resp_answer, _ := json.Marshal(resp.Answer)
-	log.Infof("AGS Answer: %s", resp_answer)
+func parseRespAnswer(respAnswer []dns.RR) {
 
 	resultG := make(map[string][]interface{})
 
-	log.Infof("#######################################\n\n\n\n")
-
-	for _, ii := range resp.Answer {
+	for _, ii := range respAnswer {
 		h := ii.Header() // RR_Header
 		log.Infof("AGS H: ->%s<-\n", h)
 
@@ -325,19 +314,36 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 				}
 
 				for jH := 0; jH < valueH.NumField(); jH++ {
-					fieldValueH := valueH.Field(jH)
+					fieldValueH := valueH.Field(jH).Interface()
 					fieldTypeH := valueH.Type().Field(jH)
 					fieldNameH := fieldTypeH.Name
-					log.Infof("AGS fieldValueH: -%s<-", fieldValueH.Interface())
+					log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
 					log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
 					log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
 					n := strings.ToLower(fieldNameH)
 
 					if (n == "rrtype") {
 						n = "type"
+						log.Infof("SUBARU 1 in: %d", fieldValueH)
+						fieldValueH = dnsTypesGetReverse[fieldValueH]
+						log.Infof("SUBARU 2 res: %s", fieldValueH)
+					} else if (n == "class") {
+						// if (fieldValueH==1) {
+						// 	fieldValueH = "IN"
+						// } else if (fieldValueH==3){
+						// 	fieldValueH = "CH"
+						// } else if (fieldValueH==4){
+						// 	fieldValueH = "HS"
+						// } else if (fieldValueH==254) {
+						// 	fieldValueH = "NONE"
+						// } else if (fieldValueH ==255){
+						// 	fieldValueH = "ANY"
+						// }
+						log.Infof("JEEP 1 in: %d", fieldValueH)
+						fieldValueH = dnsClassesGet[int(fieldValueH)]
+						log.Infof("JEEP 2 in: %s", fieldValueH)
 					}
-
-					result[n] = fieldValueH.Interface()
+					result[n] = fieldValueH
 				}
 			} else {
 				resFieldValue := fieldValue.Interface()
@@ -355,6 +361,40 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 
 	aG, _ := json.Marshal(resultG)
 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
+}
+
+func getDNSAnswersGet(params []string) ([]dns.RR, error) {
+	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
+
+	options, err := parseParamasGet(params)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp *dns.Msg
+	for i := 1; i <= options.count; i++ {
+		resp, err = runQueryGet(&options)
+
+		if err != nil {
+			continue
+		}
+
+		break
+	}
+
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	log.Infof("AGS HEADER: %s", resp.MsgHdr)
+	log.Infof("AGS Question: %s", resp.Question)
+
+	resp_answer, _ := json.Marshal(resp.Answer)
+	log.Infof("AGS Answer: %s", resp_answer)
+
+	log.Infof("#######################################\n\n\n\n")
+
+	parseRespAnswer(resp.Answer)
 
 	// log.Infof("AGS Ns: %s", resp.Ns)
 	// log.Infof("AGS Extra: %s", resp.Extra)
