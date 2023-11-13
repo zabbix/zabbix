@@ -36,12 +36,12 @@ class Actions {
 					'evaltype' => 0,
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_SERVICE_NAME,
+							'conditiontype' => ZBX_CONDITION_TYPE_SERVICE_NAME,
 							'operator' => CONDITION_OPERATOR_LIKE,
 							'value' => 'Service name'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_EVENT_TAG,
+							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG,
 							'operator' => CONDITION_OPERATOR_LIKE,
 							'value' => 'Service tag name'
 						]
@@ -49,7 +49,7 @@ class Actions {
 				],
 				'operations' => [
 					[
-						'operationtype' => CONDITION_TYPE_HOST_GROUP,
+						'operationtype' => ZBX_CONDITION_TYPE_HOST_GROUP,
 						'opmessage' => ['mediatypeid' => 1],
 						'opmessage_usr' => [['userid' => 1]]
 					]
@@ -98,109 +98,109 @@ class Actions {
 					'evaltype' => 0,
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
 							'operator' => CONDITION_OPERATOR_NOT_LIKE,
 							'value' => 'PostgreSQL',
 							'value2' => 'Database'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
 							'operator' => CONDITION_OPERATOR_LIKE,
 							'value' => 'MYSQL',
 							'value2' => 'Database'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => '',
 							'value2' => 'MySQL'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'conditiontype' => ZBX_CONDITION_TYPE_SUPPRESSED,
 							'operator' => CONDITION_OPERATOR_YES
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TEMPLATE,
+							'conditiontype' => ZBX_CONDITION_TYPE_TEMPLATE,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 							'value' => 10081
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TEMPLATE,
+							'conditiontype' => ZBX_CONDITION_TYPE_TEMPLATE,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 10001
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
+							'conditiontype' => ZBX_CONDITION_TYPE_TIME_PERIOD,
 							'operator' => CONDITION_OPERATOR_NOT_IN,
 							'value' => '6-7,08:00-18:00'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
+							'conditiontype' => ZBX_CONDITION_TYPE_TIME_PERIOD,
 							'operator' => CONDITION_OPERATOR_IN,
 							'value' => '1-7,00:00-24:00'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_LESS_EQUAL,
 							'value' => 4
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_MORE_EQUAL,
 							'value' => 3
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 							'value' => 2
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 5
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 1
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_NAME,
 							'operator' => CONDITION_OPERATOR_NOT_LIKE,
 							'value' => 'DB2'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_NAME,
 							'operator' => CONDITION_OPERATOR_LIKE,
 							'value' => 'Oracle'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 							'value' => 13485
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 99252
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_HOST,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 							'value' => 10084
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_HOST,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 99134
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 							'value' => 4
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 2
 						]
@@ -214,12 +214,12 @@ class Actions {
 						'esc_step_to' => 2,
 						'opconditions' => [
 							[
-								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+								'conditiontype' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'value' => "0"
 							],
 							[
-								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+								'conditiontype' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'value' => "1"
 							]
@@ -233,7 +233,7 @@ class Actions {
 						'esc_step_to' => 6,
 						'opconditions' => [
 							[
-								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+								'conditiontype' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'value' => "0"
 							]
@@ -256,22 +256,22 @@ class Actions {
 					'evaltype' => 0,
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_HOST_NAME,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
 							'operator' => CONDITION_OPERATOR_NOT_LIKE,
 							'value' => 'DB2'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_HOST_NAME,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
 							'operator' => CONDITION_OPERATOR_LIKE,
 							'value' => 'MYSQL'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_PROXY,
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 							'value' => 20001
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_PROXY,
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 20000
 						]
@@ -316,22 +316,22 @@ class Actions {
 					'evaltype' => 0,
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_HOST_NAME,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
 							'operator' => CONDITION_OPERATOR_NOT_LIKE,
 							'value' => 'DB2'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_HOST_NAME,
+							'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
 							'operator' => CONDITION_OPERATOR_LIKE,
 							'value' => 'MYSQL'
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_PROXY,
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 							'value' => 20001
 						],
 						[
-							'conditiontype' => CONDITION_TYPE_PROXY,
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => 20000
 						]
