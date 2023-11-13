@@ -411,7 +411,7 @@ $form->addItem([
 		(new CDiv(
 			(new CSpan('#{result}'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->setHint('#{result_hint}', 'hintbox-wrap')
+				->setHint('#{result}', 'hintbox-wrap')
 		))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
@@ -421,7 +421,7 @@ $form->addItem([
 			(new CDiv('#{result}'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-				->setHint('#{result_hint}', 'hintbox-wrap'),
+				->setHint('#{result}', 'hintbox-wrap'),
 			makeWarningIcon('#{warning}')
 		]))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; display: inline-flex;')
@@ -432,7 +432,7 @@ $form->addItem([
 			(new CDiv(
 				(new CSpan('#{failed}'))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint('#{failed_hint}', 'hintbox-wrap')
+					->setHint('#{failed}', 'hintbox-wrap')
 			))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)

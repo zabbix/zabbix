@@ -45,13 +45,9 @@ function makeStepResult(step) {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
 	}
 	else if ('warning' in step) {
-		step.result_hint = jQuery.escapeHtml(step.result);
-
 		return jQuery(new Template(jQuery('#preprocessing-step-result-warning').html()).evaluate(step));
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
-		step.result_hint = jQuery.escapeHtml(step.result);
-
 		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(step));
 	}
 	else {
@@ -396,13 +392,13 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
-					]) ?>, {failed: step.result, failed_hint: jQuery.escapeHtml(step.result)})));
+					]) ?>, {failed: step.result})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set error to')
-					]) ?>, {failed: step.failed, failed_hint: jQuery.escapeHtml(step.failed)})));
+					]) ?>, {failed: step.failed})));
 					break;
 			}
 		}
