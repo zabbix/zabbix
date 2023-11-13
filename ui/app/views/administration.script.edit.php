@@ -377,7 +377,9 @@ $form_grid
 			new CFormField([
 				(new CTextBox('manualinput_validator', $validation_rule, false,
 					DB::getFieldLength('scripts', 'manualinput_validator')
-				))->setAttribute('placeholder', _('regular expression'))
+				))
+					->setAttribute('placeholder', _('regular expression'))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			])
 		])
 		->addItem([
