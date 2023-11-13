@@ -721,7 +721,7 @@ class CScript extends CApiService {
 
 		if ($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
 			$validation_fields = [
-				'manualinput' => ['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED])],
+				'manualinput' => ['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED])]
 			];
 
 			if (array_key_exists('manualinput', $script) && $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
@@ -763,10 +763,12 @@ class CScript extends CApiService {
 			if (array_key_exists('manualinput_validator_type', $script) &&
 					$script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
 				$default_input = array_key_exists('manualinput_default_value', $script)
-					? trim($script['manualinput_default_value'])
+					? $script['manualinput_default_value']
 					: '';
 
-				$regular_expression = '/'.str_replace('/', '\/', $script['manualinput_validator'] ?? '').'/';
+				$regular_expression = array_key_exists('manualinput_validator', $script)
+					? '/'.str_replace('/', '\/', $script['manualinput_validator']).'/'
+					: '';
 
 				if ($script['manualinput_validator'] === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -796,7 +798,9 @@ class CScript extends CApiService {
 			if (array_key_exists('manualinput_validator_type', $script)
 					&& $script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
 					&& array_key_exists('manualinput_validator', $script)) {
-				$manualinput_validator = array_map('trim', explode(',', $script['manualinput_validator'] ?? ''));
+				$manualinput_validator = array_key_exists('manualinput_validator', $script)
+					? array_map('trim', explode(',', $script['manualinput_validator']))
+					: [];
 
 				if (array_unique($manualinput_validator) !== $manualinput_validator) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,

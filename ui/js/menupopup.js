@@ -321,7 +321,8 @@ function getMenuPopupHost(options, trigger_element) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid, options.eventid,
-				options.csrf_token)
+				options.csrf_token
+			)
 		});
 	}
 
@@ -1651,7 +1652,7 @@ function openManualinputDialogue(item, data) {
 
 						overlayDialogueDestroy(overlay.dialogueid);
 					}
-					catch (error) {
+					catch (e) {
 						for (const element of form.parentNode.children) {
 							if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 								element.parentNode.removeChild(element);
@@ -1659,14 +1660,23 @@ function openManualinputDialogue(item, data) {
 						}
 
 						const message = t('Invalid URL') + ': ' + item.url;
-						const message_box = makeMessageBox('bad', [message])[0];
+						const message_box = makeMessageBox('bad', [message], t('Cannot open URL'))[0];
 
 						form.parentNode.insertBefore(message_box, form);
 					}
 				}
 			})
 			.catch((exception) => {
-				console.log(exception);
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				const title = t('Unexpected server error.');
+				const message_box = makeMessageBox('bad', [exception], title)[0];
+
+				form.parentNode.insertBefore(message_box, form);
 			});
 	});
 }

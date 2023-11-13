@@ -34,12 +34,13 @@ class CControllerScriptUserInputCheck extends CController {
 			'test' =>						'in 1'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateManualinputFields();
 
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+						'title' => _('Invalid input'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				], JSON_THROW_ON_ERROR)]))->disableView()
@@ -54,9 +55,22 @@ class CControllerScriptUserInputCheck extends CController {
 	}
 
 	protected function doAction(): void {
+		$output = [];
+
+		if ($this->hasInput('test')) {
+			$output['success']['messages'] = [_('User input has been successfully tested.')];
+			$output['success']['test'] = true;
+		}
+		else {
+			$output = ['data' => ['manualinput' => $this->getInput('manualinput')]];
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
+	}
+
+	protected function validateManualinputFields(): bool {
 		$manualinput = $this->getInput('manualinput');
 		$manualinput_validator = $this->getInput('manualinput_validator');
-		$output = [];
 
 		if ($this->getInput('manualinput_validator_type') == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 			$user_input_values = array_map('trim', explode(',', $manualinput_validator));
@@ -78,8 +92,8 @@ class CControllerScriptUserInputCheck extends CController {
 
 			if (!$regex_validator->validate($manualinput_validator)) {
 				error(_s('Incorrect value for field "%1$s": %2$s.','manualinput_validator',
-					$regex_validator->getError())
-				);
+					$regex_validator->getError()
+				));
 			}
 			elseif ($manualinput_validator === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator',
@@ -93,19 +107,6 @@ class CControllerScriptUserInputCheck extends CController {
 			}
 		}
 
-		if (!hasErrorMessages()) {
-			if ($this->hasInput('test')) {
-				$output['success']['messages'] = [_('User input has been successfully tested.')];
-				$output['success']['test'] = true;
-			}
-			else {
-				$output = ['data' => ['manualinput' => $manualinput]];
-			}
-		}
-		elseif ($messages = get_and_clear_messages()) {
-			$output['error']['messages'] = array_column($messages, 'message');
-		}
-
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
+		return !hasErrorMessages();
 	}
 }

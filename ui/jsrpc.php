@@ -844,45 +844,51 @@ switch ($data['method']) {
 	case 'get_scripts_by_hosts':
 		$result = '';
 
-		$scripts = API::Script()->getScriptsByHosts([
-			'hostid' => $data['hostid'],
-			'scriptid' => $data['scriptid'],
-			'manualinput' => $data['manualinput']
-		]);
+		if (array_key_exists('hostid', $data) && is_scalar($data['hostid'])) {
+			$scripts = API::Script()->getScriptsByHosts([
+				'hostid' => $data['hostid'],
+				'scriptid' => $data['scriptid'],
+				'manualinput' => $data['manualinput']
+			]);
 
-		$errors = CMessageHelper::getMessages();
+			$errors = CMessageHelper::getMessages();
 
-		if ($errors) {
-			$result = [
-				'error' => array_values(array_column($errors, 'message'))
-			];
+			if ($errors) {
+				$result = [
+					'error' => array_values(array_column($errors, 'message'))
+				];
+			}
+
+			if ($scripts) {
+				$result = $scripts[$data['hostid']][0];
+			}
 		}
 
-		if ($scripts) {
-			$result = $scripts[$data['hostid']][0];
-		}
 		break;
 
 	case 'get_scripts_by_events':
 		$result = '';
 
-		$scripts = API::Script()->getScriptsByEvents([
-			'eventid' => $data['eventid'],
-			'scriptid' => $data['scriptid'],
-			'manualinput' => $data['manualinput']
-		]);
+		if (array_key_exists('hostid', $data) && is_scalar($data['hostid'])) {
+			$scripts = API::Script()->getScriptsByEvents([
+				'eventid' => $data['eventid'],
+				'scriptid' => $data['scriptid'],
+				'manualinput' => $data['manualinput']
+			]);
 
-		$errors = CMessageHelper::getMessages();
+			$errors = CMessageHelper::getMessages();
 
-		if ($errors) {
-			$result = [
-				'error' => array_values(array_column($errors, 'message'))
-			];
+			if ($errors) {
+				$result = [
+					'error' => array_values(array_column($errors, 'message'))
+				];
+			}
+
+			elseif ($scripts) {
+				$result = $scripts[$data['eventid']][0];
+			}
 		}
 
-		elseif ($scripts) {
-			$result = $scripts[$data['eventid']][0];
-		}
 		break;
 
 	default:

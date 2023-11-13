@@ -91,7 +91,6 @@ class CControllerScriptUpdate extends CController {
 		$script = [];
 		$output = [];
 
-		$this->getInputs($script, ['scriptid', 'name', 'description', 'groupid']);
 
 		$script['scope'] = $this->getInput('scope', ZBX_SCRIPT_SCOPE_ACTION);
 		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_WEBHOOK);

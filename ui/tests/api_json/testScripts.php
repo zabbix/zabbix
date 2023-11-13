@@ -1104,7 +1104,7 @@ class testScripts extends CAPITest {
 				'command' => 'reboot server'
 			],
 			'update_manualinput' => [
-				'name' => 'API test script.update manualinput (success)',
+				'name' => 'API test script.update manual input (success)',
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => 'reboot server'
@@ -1193,6 +1193,18 @@ class testScripts extends CAPITest {
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => '1,2,3,4,5'
 			],
+			'get_hosts_url_with_manualinput' => [
+				'name' => 'API test script.getScriptsByHosts - URL with manual input',
+				'type' => ZBX_SCRIPT_TYPE_URL,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+				'host_access' => PERM_READ_WRITE,
+				'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+				'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+				'manualinput_validator' => 'dashboard.list, script.list',
+			],
 
 			// script.getScriptsByEvents
 			'get_events_url' => [
@@ -1252,6 +1264,18 @@ class testScripts extends CAPITest {
 				'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => '1,2,3,4,5'
+			],
+			'get_events_url_with_manualinput' => [
+				'name' => 'API test script.getScriptsByEvents - URL with manual input',
+				'type' => ZBX_SCRIPT_TYPE_URL,
+				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+				'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+				'host_access' => PERM_READ_WRITE,
+				'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+				'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+				'manualinput_validator' => 'dashboard.list, script.list',
 			],
 
 			// script.create - to check existing names and menu paths.
@@ -3008,7 +3032,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
 			],
-			'Test script.create unexpected "manualinput_default_value" field when manualinput is disabled' => [
+			'Test script.create unexpected "manualinput_default_value" field when "manualinput" is disabled' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
@@ -3030,7 +3054,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
 			],
-			'Test script.create unexpected "manualinput_default_value" field when manualinput" type is set to dropdown' => [
+			'Test script.create unexpected "manualinput_default_value" field when "manualinput" type is set to dropdown' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -3619,7 +3643,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Check create with manualinput.
-			'Test script.create successful custom type script with manualinput (string "manualinput" type)' => [
+			'Test script.create successful custom type script with "manualinput" (string "manualinput" type)' => [
 				'script' => [
 					[
 						'name' => 'API create manual host action script with string type manual input',
@@ -3635,7 +3659,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test script.create successful custom type script with manualinput (dropdown "manualinput" type)' => [
+			'Test script.create successful custom type script with "manualinput" (dropdown "manualinput" type)' => [
 				'script' => [
 					[
 						'name' => 'API create manual event action script with dropdown type manual input',
@@ -4906,12 +4930,20 @@ class testScripts extends CAPITest {
 						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
 					],
 					[
+						'name' => 'API test script.getScriptsByHosts - URL with manual input',
+						'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}'
+					],
+					[
 						'name' => 'API test script.getScriptsByEvents - URL',
 						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
 					],
 					[
 						'name' => 'API test script.getScriptsByEvents - URL cause',
 						'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}'
+					],
+					[
+						'name' => 'API test script.getScriptsByEvents - URL with manual input',
+						'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}'
 					]
 				],
 				'expected_error' => null
@@ -6342,7 +6374,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: \d.'
 			],
-			'Test script.update invalid scope change with manualinput parameters' => [
+			'Test script.update invalid scope change with "manualinput" parameters' => [
 				'script' => [
 					'scriptid' => 'update_manualinput_params',
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -8600,31 +8632,31 @@ class testScripts extends CAPITest {
 					'has.hostid:scriptid' => [
 						// Superadmin has all scripts available.
 						'plain_r' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
-							'get_hosts_script'
+							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'plain_d' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
-							'get_hosts_script'
+							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
-							'get_hosts_script'
+							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'macros_r_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
-							'get_hosts_script'
+							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook', 'get_hosts_ssh',
-							'get_hosts_script'
+							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'interface_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh', 'get_hosts_script'
+							'get_hosts_ssh', 'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'interface_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh', 'get_hosts_script'
+							'get_hosts_ssh', 'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh', 'get_hosts_script'
+							'get_hosts_ssh', 'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_webhook',
-							'get_hosts_ssh', 'get_hosts_script'
+							'get_hosts_ssh', 'get_hosts_script', 'get_hosts_url_with_manualinput'
 						]
 					],
 					'scripts' => [
@@ -8775,6 +8807,34 @@ class testScripts extends CAPITest {
 							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
 							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
 							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_url_with_manualinput',
+							'name' => 'API test script.getScriptsByHosts - URL with manual input',
+							'command' => '',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => 'dashboard.list, script.list',
 							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 							'manualinput_default_value' => ''
 						]
@@ -9099,21 +9159,35 @@ class testScripts extends CAPITest {
 						// Regular admin does not have all scripts available.
 						'plain_r' => ['get_hosts_url', 'get_hosts_ipmi'],
 						'plain_d' => [],
-						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
+						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'],
 						'macros_r_2' => ['get_hosts_url', 'get_hosts_ipmi'],
-						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
-						'interface_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
-						'interface_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
-						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
-						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script']
+						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'interface_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'interface_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						]
 					],
 					'!has.hostid:scriptid' => [
-						'plain_r' => ['get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'plain_r' => ['get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'],
 						'plain_d' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ipmi', 'get_hosts_ssh',
-							'get_hosts_script'
+							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'macros_rw_1' => ['get_hosts_webhook'],
-						'macros_r_2' => ['get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'macros_r_2' => ['get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
 						'macros_rw_3' => ['get_hosts_webhook'],
 						'interface_rw_1' => ['get_hosts_webhook'],
 						'interface_rw_2' => ['get_hosts_webhook'],
@@ -9238,6 +9312,34 @@ class testScripts extends CAPITest {
 							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
 							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
 							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_url_with_manualinput',
+							'name' => 'API test script.getScriptsByHosts - URL with manual input',
+							'command' => '',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => 'dashboard.list, script.list',
 							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 							'manualinput_default_value' => ''
 						]
@@ -9531,21 +9633,35 @@ class testScripts extends CAPITest {
 						// Regular user does not have all scripts available.
 						'plain_r' => ['get_hosts_url', 'get_hosts_webhook'],
 						'plain_d' => [],
-						'macros_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
+						'macros_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
 						'macros_r_2' => ['get_hosts_url', 'get_hosts_webhook'],
-						'macros_rw_3' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
-						'interface_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
-						'interface_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
-						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script'],
-						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script']
+						'macros_rw_3' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'interface_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'interface_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'inventory_rw_1' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
+						'inventory_rw_2' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						]
 					],
 					'!has.hostid:scriptid' => [
 						'plain_r' => ['get_hosts_ipmi', 'get_hosts_ssh'],
 						'plain_d' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ipmi', 'get_hosts_ssh',
-							'get_hosts_script'
+							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
 						'macros_rw_1' => ['get_hosts_ipmi'],
-						'macros_r_2' => ['get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script'],
+						'macros_r_2' => ['get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
+							'get_hosts_url_with_manualinput'
+						],
 						'macros_rw_3' => ['get_hosts_ipmi'],
 						'interface_rw_1' => ['get_hosts_ipmi'],
 						'interface_rw_2' => ['get_hosts_ipmi'],
@@ -9669,6 +9785,34 @@ class testScripts extends CAPITest {
 							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
 							'manualinput_prompt' => 'Prompt text with {HOST.HOST} and {MANUALINPUT} macros',
 							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_hosts_url_with_manualinput',
+							'name' => 'API test script.getScriptsByHosts - URL with manual input',
+							'command' => '',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_HOST,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => 'dashboard.list, script.list',
 							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 							'manualinput_default_value' => ''
 						]
@@ -10325,7 +10469,13 @@ class testScripts extends CAPITest {
 		}
 		unset($request['login']);
 
-		$request = self::resolveIds($request);
+		$request = zbx_toArray($request);
+
+		// Replace ID placeholders with real IDs.
+		foreach ($request as &$options) {
+			$options = self::resolveIds($options);
+		}
+		unset($options);
 
 		if ($expected_error === null) {
 			foreach ($expected_result['scripts'] as &$script) {
@@ -10336,8 +10486,6 @@ class testScripts extends CAPITest {
 			$expected_result = self::resolveMacros($expected_result);
 			$expected_result = self::resolveComplexIds($expected_result);
 		}
-
-		$request = zbx_toArray($request);
 
 		$result = $this->call('script.getScriptsByHosts', $request, $expected_error);
 
@@ -10525,37 +10673,48 @@ class testScripts extends CAPITest {
 					'has.eventid:scriptid' => [
 						// Superadmin has all scripts available.
 						'plain_rw_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'plain_r_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'macros_rw_single_1_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'interface_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'inventory_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'macros_rw_symptom' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						]
 					],
 					'scripts' => [
@@ -10737,6 +10896,34 @@ class testScripts extends CAPITest {
 							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
 								.'macros',
 							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_url_with_manualinput',
+							'name' => 'API test script.getScriptsByEvents - URL with manual input',
+							'command' => '',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => 'dashboard.list, script.list',
 							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 							'manualinput_default_value' => ''
 						]
@@ -11216,39 +11403,42 @@ class testScripts extends CAPITest {
 					'has.eventid:scriptid' => [
 						// Regular admin does not have all scripts available.
 						'plain_rw_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'plain_d_single_d' => [],
 						'plain_r_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_url_cause'],
 						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_rw_single_1_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'interface_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'inventory_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_d_cause' => [],
 						'macros_rw_symptom' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						]
 					],
 					'!has.eventid:scriptid' => [
 						'plain_rw_single_d' => ['get_events_webhook'],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
-						'plain_r_single_d' => ['get_events_webhook', 'get_events_ssh', 'get_events_script'],
+						'plain_r_single_d' => ['get_events_webhook', 'get_events_ssh', 'get_events_script',
+							'get_events_url_with_manualinput'
+						],
 						'plain_rw_r_dual_d' => ['get_events_webhook'],
 						'macros_rw_single_1_h' => ['get_events_webhook'],
 						'macros_rw_r_dual_1_2_h' => ['get_events_webhook'],
@@ -11256,7 +11446,8 @@ class testScripts extends CAPITest {
 						'interface_rw_dual_a' => ['get_events_webhook'],
 						'inventory_rw_dual_a' => ['get_events_webhook'],
 						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'macros_rw_symptom' => ['get_events_webhook']
 					],
@@ -11410,6 +11601,34 @@ class testScripts extends CAPITest {
 							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
 								.'macros',
 							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_url_with_manualinput',
+							'name' => 'API test script.getScriptsByEvents - URL with manual input',
+							'command' => '',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => 'dashboard.list, script.list',
 							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 							'manualinput_default_value' => ''
 						]
@@ -11812,39 +12031,41 @@ class testScripts extends CAPITest {
 					'has.eventid:scriptid' => [
 						// Regular user does not have all scripts available.
 						'plain_rw_single_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'plain_d_single_d' => [],
 						'plain_r_single_d' => ['get_events_url', 'get_events_webhook', 'get_events_url_cause'],
 						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_rw_single_1_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'interface_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'inventory_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						],
 						'macros_d_cause' => [],
 						'macros_rw_symptom' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
-							'get_events_url_cause', 'get_events_script'
+							'get_events_url_cause', 'get_events_script', 'get_events_url_with_manualinput'
 						]
 					],
 					'!has.eventid:scriptid' => [
 						'plain_rw_single_d' => ['get_events_ipmi'],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
-						'plain_r_single_d' => ['get_events_ipmi', 'get_events_ssh', 'get_events_script'],
+						'plain_r_single_d' => ['get_events_ipmi', 'get_events_ssh', 'get_events_script',
+							'get_events_url_with_manualinput'],
 						'plain_rw_r_dual_d' => ['get_events_ipmi'],
 						'macros_rw_single_1_h' => ['get_events_ipmi'],
 						'macros_rw_r_dual_1_2_h' => ['get_events_ipmi'],
@@ -11852,7 +12073,8 @@ class testScripts extends CAPITest {
 						'interface_rw_dual_a' => ['get_events_ipmi'],
 						'inventory_rw_dual_a' => ['get_events_ipmi'],
 						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh', 'get_events_url_cause', 'get_events_script'
+							'get_events_ssh', 'get_events_url_cause', 'get_events_script',
+							'get_events_url_with_manualinput'
 						],
 						'macros_rw_symptom' => ['get_events_ipmi']
 					],
@@ -12004,6 +12226,34 @@ class testScripts extends CAPITest {
 							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} '
 								.'macros',
 							'manualinput_validator' => '1,2,3,4,5',
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
+							'manualinput_default_value' => ''
+						],
+						[
+							'scriptid' => 'get_events_url_with_manualinput',
+							'name' => 'API test script.getScriptsByEvents - URL with manual input',
+							'command' => '',
+							'host_access' => (string) PERM_READ_WRITE,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$DOESNOTEXIST}, {HOST.HOST}, {MANUALINPUT}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_ENABLED,
+							'manualinput_prompt' => 'Prompt text with {$DOESNOTEXIST}, {HOST.HOST} and {MANUALINPUT} macros',
+							'manualinput_validator' => 'dashboard.list, script.list',
 							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 							'manualinput_default_value' => ''
 						]
@@ -12852,8 +13102,13 @@ class testScripts extends CAPITest {
 		}
 		unset($request['login']);
 
+		$request = zbx_toArray($request);
+
 		// Replace ID placeholders with real IDs.
-		$request = self::resolveIds($request);
+		foreach ($request as &$options) {
+			$options = self::resolveIds($options);
+		}
+		unset($options);
 
 		if ($expected_error === null) {
 			foreach ($expected_result['scripts'] as &$script) {
@@ -13056,14 +13311,18 @@ class testScripts extends CAPITest {
 	 * @return array
 	 */
 	private static function resolveIds(array $request): array {
-		// For script.get, script.update and script.execute methods. Same fields are checked in "filter" as well.
+		/**
+		 * For script.get, script.update, script.execute and getScriptsByHosts/Events methods.
+		 * Same fields are checked in "filter" as well.
+		*/
 		$request_ = array_key_exists('filter', $request) ? $request['filter'] : $request;
 
 		foreach (['scriptid', 'hostid', 'eventid', 'usrgrpid', 'groupid'] as $field) {
 			// Do not compare != 0 (it will not work) or !== 0 or !== '0' (avoid type check here).
 			if (is_array($request_) && array_key_exists($field, $request_) && $request_[$field] !== ''
 					&& $request_[$field] != '0' && $request_[$field] != 999999 && $request_[$field] !== null
-					&& !is_array($request_[$field])) {
+					&& !is_array($request_[$field])
+					&& array_key_exists($request_[$field], self::$data[$field.'s'])) {
 				$request_[$field] = self::$data[$field.'s'][$request_[$field]];
 			}
 		}
@@ -13074,20 +13333,6 @@ class testScripts extends CAPITest {
 		else {
 			$request = $request_;
 		}
-
-		// For getScriptsByHosts/Events methods.
-		if (array_column($request, 'hostid') || array_column($request, 'eventid')) {
-			foreach ($request as &$object) {
-				foreach (['hostid', 'eventid', 'scriptid'] as $field) {
-					if (array_key_exists($field, $object) && $object[$field] != '0' && $object[$field] !== ''
-							&& $object[$field] !== null && !is_array($object[$field])
-							&& array_key_exists($object[$field], self::$data[$field.'s'])) {
-						$object[$field] = self::$data[$field.'s'][$object[$field]];
-					}
-				}
-			}
-		}
-		unset($object);
 
 		// For script.get method.
 		foreach (['scriptids', 'groupids', 'eventids', 'hostids', 'usrgrpids', 'actionids'] as $field) {
