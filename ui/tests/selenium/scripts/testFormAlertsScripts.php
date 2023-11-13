@@ -160,203 +160,6 @@ class testFormAlertsScripts extends CWebTest {
 	 */
 	public function getScriptsData() {
 		return [
-			// Webhook.
-			[
-				[
-					'fields' => [
-						'Name' => 'Minimal script',
-						'Script' => 'java script'
-					]
-				]
-			],
-			// Remove trailing spaces.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Name' => 'Test trailing spaces',
-						'Type' => 'Webhook',
-						'Script' => 'Webhook Script'
-					],
-					'Parameters' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => 'name',
-							'Value' => '   trimmed    value    '
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => '   trimmed     name    ',
-							'Value' => 'value'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max webhook',
-						'Scope' => 'Manual host action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'Webhook',
-						'Script' => 'Webhook Script',
-						'Timeout' => '60s',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => true,
-						'Confirmation text' => 'Execute script?'
-					],
-					'Parameters' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => 'host',
-							'Value' => '{HOST.HOST}'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => 'var',
-							'Value' => 'Value'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max webhook 2',
-						'Scope' => 'Action operation',
-						'Type' => 'Webhook',
-						'Script' => 'Webhook Script',
-						'Timeout' => '60s',
-						'Description' => 'Test description',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Zabbix servers'
-					],
-					'Parameters' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => 'host',
-							'Value' => '{HOST.HOST}'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => 'var',
-							'Value' => 'Value'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max webhook 3',
-						'Scope' => 'Manual event action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'Webhook',
-						'Script' => 'Webhook Script',
-						'Timeout' => '60s',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => true,
-						'Confirmation text' => 'Execute script?'
-					],
-					'Parameters' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => 'host',
-							'Value' => '{HOST.HOST}'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => 'var',
-							'Value' => 'Value'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Test parameters',
-						'Type' => 'Webhook',
-						'Script' => 'Webhook Script',
-						'Timeout' => '1s'
-					],
-					'Parameters' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => '!@#$%^&*()_+<>,.\/',
-							'Value' => '!@#$%^&*()_+<>,.\/'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => str_repeat('n', 255),
-							'Value' => str_repeat('v', 2048)
-						],
-						[
-							'Name' => '{$MACRO:A}',
-							'Value' => '{$MACRO:A}'
-						],
-						[
-							'Name' => '{$USERMACRO}',
-							'Value' => ''
-						],
-						[
-							'Name' => '{HOST.HOST}'
-						],
-						[
-							'Name' => 'Имя',
-							'Value' => 'Значение'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Webhook false confirmation',
-						'Script' => 'webhook',
-						'Script' => 'java script',
-						'Enable confirmation' => false
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Timeout test 1',
-						'Script' => 'java script',
-						'Timeout' => '1'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Timeout test 60',
-						'Script' => 'java script',
-						'Timeout' => '60'
-					]
-				]
-			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -365,15 +168,6 @@ class testFormAlertsScripts extends CWebTest {
 						'Name' => 'Timeout test 0',
 						'Script' => 'java script',
 						'Timeout' => '0'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Timeout test 1m',
-						'Script' => 'java script',
-						'Timeout' => '1m'
 					]
 				]
 			],
@@ -510,59 +304,6 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Script.
-			[
-				[
-					'fields' => [
-						'Name' => 'Max script',
-						'Scope' => 'Manual host action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max script 2',
-						'Scope' => 'Action operation',
-						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max script 3',
-						'Scope' => 'Manual event action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
-					]
-				]
-			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -585,58 +326,6 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// IPMI.
-			[
-				[
-					'fields' => [
-						'Name' => 'Max IPMI',
-						'Scope' => 'Manual host action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'IPMI',
-						'Command' => 'IPMI command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => true,
-						'Confirmation text' => 'Execute script?'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max IPMI 2',
-						'Scope' => 'Action operation',
-						'Type' => 'IPMI',
-						'Command' => 'IPMI command',
-						'Description' => 'Test description',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Discovered hosts'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max IPMI 3',
-						'Scope' => 'Manual event action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'IPMI',
-						'Command' => 'IPMI command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => true,
-						'Confirmation text' => 'Execute script?'
-					]
-				]
-			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -656,132 +345,6 @@ class testFormAlertsScripts extends CWebTest {
 						'Name' => 'IPMI empty command',
 						'Type' => 'IPMI',
 						'Command' => ''
-					]
-				]
-			],
-			// SSH.
-			[
-				[
-					'fields' => [
-						'Name' => 'Max SSH',
-						'Scope' => 'Manual host action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'SSH',
-						'Username' => 'test',
-						'Password' => 'test_password',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max SSH 2',
-						'Scope' => 'Action operation',
-						'Type' => 'SSH',
-						'Username' => 'test',
-						'Password' => 'test_password',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max SSH 3',
-						'Scope' => 'Manual event action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'SSH',
-						'Username' => 'test',
-						'Password' => 'test_password',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max SSH 4',
-						'Scope' => 'Manual event action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'SSH',
-						'Authentication method' => 'Public key',
-						'Username' => 'test',
-						'Public key file' => 'public_key_file',
-						'Private key file' => 'private_key_file',
-						'Key passphrase' => 'key_passphrase',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max SSH 5',
-						'Scope' => 'Action operation',
-						'Type' => 'SSH',
-						'Authentication method' => 'Public key',
-						'Username' => 'test',
-						'Public key file' => 'public_key_file',
-						'Private key file' => 'private_key_file',
-						'Key passphrase' => 'key_passphrase',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max SSH 6',
-						'Scope' => 'Manual host action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'SSH',
-						'Authentication method' => 'Public key',
-						'Username' => 'test',
-						'Public key file' => 'public_key_file',
-						'Private key file' => 'private_key_file',
-						'Key passphrase' => 'key_passphrase',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
 					]
 				]
 			],
@@ -816,65 +379,6 @@ class testFormAlertsScripts extends CWebTest {
 						'Type' => 'SSH',
 						'Commands' => 'SSH empty username',
 						'Username' => ''
-					]
-				]
-			],
-			// Telnet
-			[
-				[
-					'fields' => [
-						'Name' => 'Max Telnet',
-						'Scope' => 'Manual host action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'Telnet',
-						'Username' => 'test',
-						'Password' => 'test_password',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max Telnet 2',
-						'Scope' => 'Action operation',
-						'Type' => 'Telnet',
-						'Username' => 'test',
-						'Password' => 'test_password',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Max Telnet 3',
-						'Scope' => 'Manual event action',
-						'Menu path' => 'path_1/path_2',
-						'Type' => 'Telnet',
-						'Username' => 'test',
-						'Password' => 'test_password',
-						'Port' => '81',
-						'Commands' => 'Script command',
-						'Description' => 'Test description',
-						'User group' => 'Selenium user group',
-						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
-						'Required host permissions' => 'Write',
-						'Advanced configuration' => true,
-						'Enable confirmation' => false
 					]
 				]
 			],
@@ -962,6 +466,726 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
+			// User input fields validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid input prompt',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'http://zabbix.com',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input validation rule' => '^$' // should match an empty string.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid input prompt',
+						'Scope' => 'Manual event action',
+						'Type' => 'Webhook',
+						'Script' => 'ping localhost',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => ' ',
+						'Input validation rule' => '^$' // should match an empty string.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: ^$.',
+					'fields' => [
+						'Name' => 'invalid default input string - not match empty string',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'test empty input',
+						'Default input string' => 'test',
+						'Input validation rule' => '^$' // should match an empty string.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: ^.*@.*\..*$.',
+					'fields' => [
+						'Name' => 'invalid default input string - not match an email input',
+						'Scope' => 'Manual host action',
+						'Type' => 'SSH',
+						'Username' => 'localhost',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'test email input',
+						'Default input string' => 'a$a.lv',
+						'Input validation rule' => '^.*@.*\..*$' // should match an email.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid input validation rule',
+						'Scope' => 'Manual event action',
+						'Type' => 'Telnet',
+						'Username' => 'localhost',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'test'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid input validation rule',
+						'Scope' => 'Manual host action',
+						'Type' => 'IPMI',
+						'Command' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'test',
+						'Input validation rule' => '  '
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid dropdown options',
+						'Scope' => 'Manual host action',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input type' => 'Dropdown',
+						'Input prompt' => 'test'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid dropdown options',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input type' => 'Dropdown',
+						'Input prompt' => 'test',
+						'Dropdown options' => ' '
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.',
+					'fields' => [
+						'Name' => 'invalid dropdown options',
+						'Scope' => 'Manual host action',
+						'Type' => 'Webhook',
+						'Script' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input type' => 'Dropdown',
+						'Input prompt' => 'test',
+						'Dropdown options' => ','
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.',
+					'fields' => [
+						'Name' => 'invalid dropdown options',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input type' => 'Dropdown',
+						'Input prompt' => 'test',
+						'Dropdown options' => 'a,,b,,c'
+					]
+				]
+			],
+			// Confirmation text validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "confirmation": cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid confirmation text',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'https://zabbix.com/',
+						'Advanced configuration' => true,
+						'Enable confirmation' => true
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "confirmation": cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid confirmation text',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Commands' => 'ping 127.0.0.1',
+						'Advanced configuration' => true,
+						'Enable confirmation' => true,
+						'Confirmation text' => ''
+					]
+				]
+			],
+			// Webhook.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Minimal script',
+						'Script' => 'java script'
+					]
+				]
+			],
+			// Remove trailing spaces.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'fields' => [
+						'Name' => 'Test trailing spaces',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'name',
+							'Value' => '   trimmed    value    '
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   trimmed     name    ',
+							'Value' => 'value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max webhook',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max webhook 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Zabbix servers'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max webhook 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Test parameters',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '1s'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '!@#$%^&*()_+<>,.\/',
+							'Value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => str_repeat('n', 255),
+							'Value' => str_repeat('v', 2048)
+						],
+						[
+							'Name' => '{$MACRO:A}',
+							'Value' => '{$MACRO:A}'
+						],
+						[
+							'Name' => '{$USERMACRO}',
+							'Value' => ''
+						],
+						[
+							'Name' => '{HOST.HOST}'
+						],
+						[
+							'Name' => 'Имя',
+							'Value' => 'Значение'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Webhook false confirmation',
+						'Script' => 'webhook',
+						'Script' => 'java script',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Timeout test 1',
+						'Script' => 'java script',
+						'Timeout' => '1'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Timeout test 60',
+						'Script' => 'java script',
+						'Timeout' => '60'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Timeout test 1m',
+						'Script' => 'java script',
+						'Timeout' => '1m'
+					]
+				]
+			],
+			// Script.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max script',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max script 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max script 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			// IPMI.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max IPMI',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max IPMI 2',
+						'Scope' => 'Action operation',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max IPMI 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					]
+				]
+			],
+			// SSH.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max SSH',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max SSH 2',
+						'Scope' => 'Action operation',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max SSH 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max SSH 4',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max SSH 5',
+						'Scope' => 'Action operation',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max SSH 6',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			// Telnet.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max Telnet',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max Telnet 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Max Telnet 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Advanced configuration' => true,
+						'Enable confirmation' => false
+					]
+				]
+			],
+			// URL.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -991,6 +1215,203 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
 						'URL' => 'zabbix.php?action=script.list'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'User input type string',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'http://zabbix.com',
+						'Open in a new window' => false,
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Test version?',
+						'Default input string' => 'Zabbix 7.0.0 alpha',
+						'Input validation rule' => 'Zabbix [0-9]+\.[0-9]\.[0-9]+ alpha'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'User input type string - empty string',
+						'Scope' => 'Manual event action',
+						'Type' => 'Webhook',
+						'Script' => 'ping localhost',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'empty string',
+						'Default input string' => '',
+						'Input validation rule' => '^$' // should match an empty string.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'User input type - dropdown',
+						'Scope' => 'Manual host action',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'dropdown values',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '.*,,A'
+					]
+				]
+			],
+			// User manual input cases with UTF-8 4-byte characters.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🔔User input type string with UTF-8 4-byte characters🔔',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Username' => 'zabbix',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'string values 🚩',
+						'Input type' => 'String',
+						'Default input string' => '⚠️',
+						'Input validation rule' => '⚠️'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '❌User input type dropdown with UTF-8 4-byte characters❌',
+						'Scope' => 'Manual host action',
+						'Type' => 'Telnet',
+						'Username' => 'zabbix',
+						'Commands' => 'test',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'dropdown values 📌',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '📌,⚠️,❌'
+					]
+				]
+			],
+			// User manual input cases with maxlength.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => STRING_255,
+						'Scope' => 'Manual host action',
+						'Type' => 'IPMI',
+						'Command' => 'ping localhost',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => STRING_255,
+						'Input type' => 'String',
+						'Default input string' => STRING_255,
+						'Input validation rule' => str_repeat('.*|.*|.*', 256)
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => str_repeat('TEST_', 51),
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => STRING_2048,
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => STRING_255,
+						'Input type' => 'Dropdown',
+						'Dropdown options' => STRING_128.','.STRING_64.','.str_repeat('tests', 12)
+					]
+				]
+			],
+			// User manual input cases with macro.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Open Zabbix page',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'http://localhost/ui/zabbix.php?action={MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Enable confirmation' => true,
+						'Input prompt' => 'Zabbix page to open:',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => 'dashboard.view,discovery.view',
+						'Confirmation text' => 'Are you sure you want to open {MANUALINPUT} page?'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Ping count',
+						'Scope' => 'Manual host action',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server',
+						'Commands' => 'ping -c {MANUALINPUT} {HOST.CONN};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Enable confirmation' => true,
+						'Input prompt' => 'Add ping count',
+						'Input type' => 'String',
+						'Default input string' => '5',
+						'Input validation rule' => '\b[1-9]\b',
+						'Confirmation text' => 'Are you sure you want to execute ping script with value {MANUALINPUT}?'
+					]
+				]
+			],
+			// Check that manual input fields leading and trailing spaces and are trimmed.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'fields' => [
+						'Name' => 'Trim check for dropdown input type',
+						'Scope' => 'Manual host action',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Commands' => 'ping localhost;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => '  Add spaces  ',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => ' Q,A '
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'fields' => [
+						'Name' => 'Trim check for string input type',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server',
+						'Commands' => 'ping localhost;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => '  Add spaces  ',
+						'Input type' => 'String',
+						'Default input string' => ' 5 ',
+						'Input validation rule' => ' \b[1-9]\b '
 					]
 				]
 			]
@@ -1032,7 +1453,6 @@ class testFormAlertsScripts extends CWebTest {
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Parameters')) {
-
 			// Remove action and index fields for create case.
 			if ($update === false) {
 				foreach ($data['Parameters'] as &$parameter) {
@@ -1055,6 +1475,7 @@ class testFormAlertsScripts extends CWebTest {
 		if ($expected === TEST_BAD) {
 			$title = ($update) ? 'Cannot update script' : 'Cannot add script';
 			$this->assertMessage(TEST_BAD, $title, $data['details']);
+
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
@@ -1062,12 +1483,18 @@ class testFormAlertsScripts extends CWebTest {
 			$title = ($update) ? 'Script updated' : 'Script added';
 			$this->assertMessage(TEST_GOOD, $title);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name'])));
+
 			// Check the results in form.
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
 			$this->openScriptForm($id, false);
 
 			if(array_key_exists('Advanced configuration', $data['fields'])) {
 				$form->fill(['Advanced configuration' => true]);
+			}
+
+			// Trim trailing and leading spaces in expected values before comparison.
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				$this->trimArray($data);
 			}
 
 			$form->invalidate();
@@ -1079,19 +1506,6 @@ class testFormAlertsScripts extends CWebTest {
 			}
 
 			if (CTestArrayHelper::get($data, 'Parameters')) {
-
-				if (CTestArrayHelper::get($data, 'trim', false) === true) {
-					// Remove trailing spaces from name and value.
-					foreach ($data['Parameters'] as $i => &$fields) {
-						foreach (['Name', 'Value'] as $parameter) {
-							if (array_key_exists($parameter, $fields)) {
-								$fields[$parameter] = trim($fields[$parameter]);
-							}
-						}
-					}
-					unset($fields);
-				}
-
 				// Remove action and index fields for asserting.
 				if ($update === true) {
 					foreach ($data['Parameters'] as &$parameter) {
@@ -1741,7 +2155,7 @@ class testFormAlertsScripts extends CWebTest {
 	 *
 	 * @return COverlayDialogElement
 	 */
-	protected function openScriptForm($id = null, $login = true){
+	protected function openScriptForm($id = null, $login = true) {
 		if ($login) {
 			$this->page->login()->open('zabbix.php?action=script.list');
 		}
@@ -1757,5 +2171,22 @@ class testFormAlertsScripts extends CWebTest {
 		}
 
 		return COverlayDialogElement::find()->one()->waitUntilReady();
+	}
+
+	/**
+	 * Recursive function for trimming all values in multi-level array.
+	 *
+	 * @param array    $array    array to be trimmed
+	 */
+	protected function trimArray(&$array) {
+		foreach ($array as &$value) {
+			if (!is_array($value)) {
+				$value = trim($value);
+			}
+			else {
+				$this->trimArray($value);
+			}
+		}
+		unset($value);
 	}
 }
