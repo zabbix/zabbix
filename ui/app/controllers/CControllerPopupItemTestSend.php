@@ -386,8 +386,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
 
 					if ($result['truncated']) {
-						$output['truncated_message'] = _s('First %1$s of %2$s shown.',
-							convertUnits(['value' => ceil(strlen($output['value']) / 1024) * 1024, 'units' => 'B']),
+						$output['warning'] = _s('First %1$s of %2$s shown.',
+							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
 							convertUnits(['value' => $result['original_size'], 'units' => 'B'])
 						);
 					}
@@ -477,15 +477,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						}
 						else {
 							if ($step['truncated']) {
-								$step['truncated_message'] = _s('First %1$s of %2$s shown.',
-									convertUnits(['value' => ceil(strlen($step['result']) / 1024) * 1024, 'units' => 'B']),
+								$step['warning'] = _s('First %1$s of %2$s shown.',
+									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
 									convertUnits(['value' => $step['original_size'], 'units' => 'B'])
 								);
-							}
-
-							if (is_string($step['result'])) {
-								$step['result'] = htmlspecialchars($step['result']);
-								$step['result_htmlencoded'] = true;
 							}
 						}
 					}
@@ -513,14 +508,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'result' => $result['result']
 						];
 
-						if (is_string($final_result['result'])) {
-							$final_result['result'] = htmlspecialchars($final_result['result']);
-							$final_result['result_htmlencoded'] = true;
-						}
-
 						if ($result['truncated']) {
-							$final_result['truncated_message'] = _s('First %1$s of %2$s shown.',
-								convertUnits(['value' => ceil(strlen($result['result']) / 1024) * 1024, 'units' => 'B']),
+							$final_result['warning'] = _s('First %1$s of %2$s shown.',
+								convertUnits(['value' => strlen($result['result']), 'units' => 'B']),
 								convertUnits(['value' => $result['original_size'], 'units' => 'B'])
 							);
 						}
@@ -545,10 +535,11 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							->addClass(ZBX_STYLE_GREY)
 							->toString();
 					}
+
+					$output['final'] = $final_result;
 				}
 
 				$output['steps'] = $preproc_test_data['steps'];
-				$output['final'] = $final_result;
 			}
 
 			if ($messages = get_and_clear_messages()) {

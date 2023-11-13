@@ -6577,7 +6577,7 @@ svg {
   margin: 0;
   transform: rotate(180deg); }
 
-.display-none, .table-forms > li.display-none, .overlay-dialogue .form-grid .display-none {
+.display-none, .table-forms > li.display-none {
   display: none; }
 
 .visibility-hidden {

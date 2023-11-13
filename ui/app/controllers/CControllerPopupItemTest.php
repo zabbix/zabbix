@@ -1295,7 +1295,6 @@ abstract class CControllerPopupItemTest extends CController {
 		return $value;
 	}
 
-
 	/**
 	 * Validates interface object in context of current item type.
 	 *
