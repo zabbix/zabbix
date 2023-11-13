@@ -2572,6 +2572,8 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
 
+	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
+
 	zbx_vector_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -4000,6 +4002,8 @@ void	zbx_dc_flush_history(void)
 	cache->history_num += item_values_num;
 
 	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
 	item_values_num = 0;
 	string_values_offset = 0;
