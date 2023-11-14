@@ -869,7 +869,7 @@ switch ($data['method']) {
 	case 'get_scripts_by_events':
 		$result = '';
 
-		if (array_key_exists('hostid', $data) && is_scalar($data['hostid'])) {
+		if (array_key_exists('eventid', $data) && is_scalar($data['eventid'])) {
 			$scripts = API::Script()->getScriptsByEvents([
 				'eventid' => $data['eventid'],
 				'scriptid' => $data['scriptid'],
