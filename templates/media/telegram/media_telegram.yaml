@@ -1,7 +1,8 @@
 zabbix_export:
   version: '6.4'
   media_types:
-    - name: Telegram
+    - 
+      name: Telegram
       type: WEBHOOK
       parameters:
         - name: event_tags
@@ -19,7 +20,7 @@ zabbix_export:
         - name: To
           value: '-4000308527'
         - name: Token
-          value: '6830784455:AAHGh3UUpJEuEFigw63F_A7cqbzTV9-VOW4'
+          value: 'Put token here'
       script: |
         var 
             result = {tags: {}},
