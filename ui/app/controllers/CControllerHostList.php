@@ -265,10 +265,22 @@ class CControllerHostList extends CController {
 			'hostids' => array_column($hosts, 'hostid')
 		]);
 
+		$db_items_passive_count = API::Item()->get([
+			'groupCount' => true,
+			'countOutput' => true,
+			'filter' => ['type' => ITEM_TYPE_ZABBIX],
+			'hostids' => array_column($hosts, 'hostid')
+		]);
+
 		$item_active_by_hostid = [];
+		$item_passive_by_hostid = [];
 
 		foreach ($db_items_active_count as $value) {
 			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
+		}
+
+		foreach ($db_items_passive_count as $value) {
+			$item_passive_by_hostid[$value['hostid']] = $value['rowscount'];
 		}
 
 		// Selecting linked templates to templates linked to hosts.
@@ -322,6 +334,9 @@ class CControllerHostList extends CController {
 				];
 			}
 			unset($host['active_available']);
+
+			$host['passive_checks'] = array_key_exists($host['hostid'], $item_passive_by_hostid)
+				&& $item_passive_by_hostid[$host['hostid']] > 0;
 
 			if ($host['proxyid']) {
 				$proxyids[$host['proxyid']] = $host['proxyid'];

@@ -41,6 +41,8 @@ class CHostAvailability extends CTag {
 
 	protected $type_interfaces = [];
 
+	protected $passive_checks = false;
+
 	public function __construct() {
 		parent::__construct('div', true);
 		$this->addClass(ZBX_STYLE_STATUS_CONTAINER);
@@ -102,18 +104,35 @@ class CHostAvailability extends CTag {
 		return $hint_table;
 	}
 
+	/**
+	 * Sets the value if the host passive checks exist
+	 *
+	 * @param bool $value has passive check items.
+	 *
+	 * @return CHostAvailability
+	 */
+	public function setPassiveChecks(bool $value): CHostAvailability {
+		$this->passive_checks = $value;
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
 		foreach ($this->type_interfaces as $type => $interfaces) {
-			if (!$interfaces || !array_key_exists($type, static::LABELS)) {
-				continue;
-			}
-
-			// Add active checks to agent interfaces.
-			if ($type == INTERFACE_TYPE_AGENT) {
+			if ($type == INTERFACE_TYPE_AGENT && count($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]) > 0) {
 				$interfaces = array_merge($interfaces, $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
-			}
 
-			$status = getInterfaceAvailabilityStatus($interfaces);
+				$status = $this->passive_checks
+					? getInterfaceAvailabilityStatus($interfaces)
+					: getInterfaceAvailabilityStatus($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
+			}
+			else {
+				if (!$interfaces || !array_key_exists($type, static::LABELS)) {
+					continue;
+				}
+
+				$status = getInterfaceAvailabilityStatus($interfaces);
+			}
 
 			$this->addItem((new CSpan(static::LABELS[$type]))
 				->addClass(static::COLORS[$status])

@@ -629,8 +629,13 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 
 /**
  * Create HTML helper element for host interfaces availability.
+ *
+ * @param array $host_interfaces
+ * @param bool $passive_checks
+ *
+ * @return CHostAvailability
  */
-function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks = true): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -649,7 +654,9 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 		];
 	}
 
-	return (new CHostAvailability())->setInterfaces($interfaces);
+	return (new CHostAvailability())
+		->setInterfaces($interfaces)
+		->setPassiveChecks($passive_checks);
 }
 
 /**
