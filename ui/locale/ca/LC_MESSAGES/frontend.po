@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 13:43+0300\n"
+"POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-09-27 10:32+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
@@ -13641,6 +13641,14 @@ msgstr "Nou equip"
 msgid "New host group"
 msgstr "Nou grup d'equips"
 
+#: app/views/item.edit.php:218
+msgid "New item"
+msgstr ""
+
+#: app/views/item.prototype.edit.php:191
+msgid "New item prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
@@ -15453,6 +15461,10 @@ msgstr "Línia percentil (esquerra)"
 #: widgets/svggraph/includes/WidgetForm.php:264
 msgid "Percentile line (right)"
 msgstr "Línia percentil (dreta)"
+
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -21487,6 +21499,10 @@ msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datast
 msgstr "Estadístiques d'escriptura del magatzem de dades de VMware, \"url\" - URL del servei de VMware, \"datastore\" - nom del magatzem de dades, \"mode\" - latència / latència màxima: mitjana o màxima"
 
 #: include/classes/data/CItemData.php:1890
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
 msgstr "Registre d'esdeveniments de VMware, \"url\" - URL del servei de VMware, \"mode\" - tot (per defecte), omet - omet el processament de dades antigues"
 
@@ -23045,6 +23061,13 @@ msgstr "asin() - L'arc sinus d'un valor com a angle, expressat en radians"
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
 msgstr "s'ha de triar com a mínim un dia de la setmana"
+
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"

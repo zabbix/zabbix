@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 13:43+0300\n"
+"POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-09-22 06:10+0000\n"
 "Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
 "Language-Team: none\n"
@@ -13641,6 +13641,14 @@ msgstr "מארח חדש"
 msgid "New host group"
 msgstr "קבוצת מארחים חדשה"
 
+#: app/views/item.edit.php:218
+msgid "New item"
+msgstr ""
+
+#: app/views/item.prototype.edit.php:191
+msgid "New item prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
@@ -15453,6 +15461,10 @@ msgstr "קו אחוזון (שמאל)"
 #: widgets/svggraph/includes/WidgetForm.php:264
 msgid "Percentile line (right)"
 msgstr "קו אחוזון (ימין)"
+
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -21487,6 +21499,10 @@ msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datast
 msgstr ""
 
 #: include/classes/data/CItemData.php:1890
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
 msgstr ""
 
@@ -23045,6 +23061,13 @@ msgstr "asin()‎ - הסינוס ההפוך של ערך כזווית, מבוטא
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
 msgstr "יש לבחור לפחות יום אחד בשבוע"
+
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"

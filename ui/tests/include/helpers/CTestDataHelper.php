@@ -28,6 +28,12 @@ class CTestDataHelper {
 
 	/**
 	 * Create objects using API.
+	 * Usually only the object's "name/key" need to be provided. Some defaults (e.g. item's type, value_type) are mixed
+	 * in and the "parent ID" property (e.g. host's groupid, item's hostid, etc.), if not specified, inferred by using
+	 * the last known such object's ID. Previously defined objects can be linked by their reference ID, f.e.:
+	 * `'master_itemid' => ':item:key.of.master.item'`.
+	 *
+	 * Call CTestDataHelper::cleanUp() to delete objects defined here along with child objects created during the test.
 	 *
 	 * @param array $objects
 	 */
@@ -285,7 +291,6 @@ class CTestDataHelper {
 			$_items = [];
 
 			foreach ($items as $i => $item) {
-
 				self::$objectids['items'][$item['key_']][$host_refs[$i]] = array_shift($result['itemids']);
 
 				if (array_key_exists($i, $dep_items)) {

@@ -1304,6 +1304,17 @@ reduce_max_vars:
 			goto next;
 		}
 
+		if (NULL == response->variables)
+		{
+			if (1 >= level && 1 < max_vars)
+				goto reduce_max_vars;
+
+			zbx_strlcpy(error, "No values received.", max_error_len);
+			ret = NOTSUPPORTED;
+			running = 0;
+			goto next;
+		}
+
 		/* process response */
 		for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 		{
@@ -2146,11 +2157,17 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		goto out;
 	}
 
-	if (ZBX_SNMP_GET == snmp_oid_type && NULL == response->variables)
+	if (NULL == response->variables)
 	{
-		zbx_snprintf(error, max_error_len, "No variables");
-		ret = NOTSUPPORTED;
+		if (ZBX_SNMP_GET == snmp_oid_type)
+		{
+			zbx_snprintf(error, max_error_len, "No variables");
+			ret = NOTSUPPORTED;
+		}
+
 		bulkwalk_context->running = 0;
+
+		goto out;
 	}
 
 	for (var = response->variables; NULL != var; var = var->next_variable)
