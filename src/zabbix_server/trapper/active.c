@@ -647,6 +647,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zbx_remote_commans_prepare_to_send(&json, hostid);
 
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HISTORY_UPLOAD, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED,
+				ZBX_JSON_TYPE_STRING);
+	}
+
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
 
