@@ -3,7 +3,9 @@ PATCHES = \
 	  history_pk_log.sql \
 	  history_pk_text.sql \
 	  history_pk_str.sql \
-	  history_pk_uint.sql
+	  history_pk_uint.sql \
+	  trends_pk.sql \
+	  history_pk_prepare.sql
 
 if DBSCHEMA
 all: $(PATCHES)
@@ -22,6 +24,12 @@ history_pk_str.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
 
 history_pk_uint.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
 	$(top_srcdir)/create/bin/gen_history_pk.pl timescaledb history_uint with_compression > $@
+
+trends_pk.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
+	$(top_srcdir)/create/bin/gen_history_pk.pl timescaledb trends with_compression > $@
+
+history_pk_prepare.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
+	$(top_srcdir)/create/bin/gen_history_pk.pl timescaledb > $@
 
 clean:
 	rm -f $(PATCHES)

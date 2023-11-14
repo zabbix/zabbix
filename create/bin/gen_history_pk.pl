@@ -7,6 +7,7 @@ my ($db, $table, $tsdb_compression) = @ARGV;
 
 my @dbs = ('mysql', 'oracle', 'postgresql', 'timescaledb');
 my @tables = ('history', 'history_uint', 'history_str', 'history_log', 'history_text');
+my @tables_compressed = ('history', 'history_uint', 'history_str', 'history_log', 'history_text', 'trends');
 
 my %mysql = (
 	'alter_table' => 'RENAME TABLE %TBL TO %TBL_old;',
@@ -94,7 +95,7 @@ my %postgresql = (
 	'alter_table' => 'ALTER TABLE %TBL RENAME TO %TBL_old;',
 	'create_table_begin' => 'CREATE TABLE %TBL (',
 	'create_table_end' => ');',
-	'pk_constraint' => "\t" . 'PRIMARY KEY (itemid,clock,ns)',
+	'pk_constraint' => "\t" . 'PRIMARY KEY (%HISTPK)',
 	'history' => <<'HEREDOC'
 	itemid                   bigint                                    NOT NULL,
 	clock                    integer         DEFAULT '0'               NOT NULL,
@@ -129,13 +130,21 @@ HEREDOC
 	value                    text            DEFAULT ''                NOT NULL,
 	ns                       integer         DEFAULT '0'               NOT NULL,
 HEREDOC
+	, 'trends' => <<'HEREDOC'
+	itemid                   bigint                                    NOT NULL,
+	clock                    integer         DEFAULT '0'               NOT NULL,
+	num                      integer         DEFAULT '0'               NOT NULL,
+	value_min                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,
+	value_avg                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,
+	value_max                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,'
+HEREDOC
 );
 
 my $tsdb_compress_sql = <<'HEREDOC'
 	PERFORM set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
 
 	ALTER TABLE %HISTTBL
-	SET (timescaledb.compress,timescaledb.compress_segmentby='itemid',timescaledb.compress_orderby='clock,ns');
+	SET (timescaledb.compress,timescaledb.compress_segmentby='itemid',timescaledb.compress_orderby='%COMPRESS_ORDERBY');
 
 	SELECT add_compression_policy('%HISTTBL', (
 		SELECT extract(epoch FROM (config::json->>'compress_after')::interval)
@@ -174,7 +183,7 @@ BEGIN
 		SELECT integer_interval FROM timescaledb_information.dimensions WHERE hypertable_name='%HISTTBL_old'
 	), migrate_data => true);
 
-	INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
+	INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (%HISTPK) DO NOTHING;
 
 %COMPRESS
 END $$;
@@ -191,12 +200,21 @@ sub output_table {
 
 	my $create_table = @$db{'create_table_begin'};
 	$create_table =~ s/%TBL/$tbl/g;
-
+	
 	my $pk_constraint = @$db{'pk_constraint'};
 	if ($pk_substitute_tbl == 1)
 	{
 		my $utbl = uc($tbl);
 		$pk_constraint =~ s/%UTBL/$utbl/g;
+	}
+
+	if ($tbl eq 'trends')
+	{
+		$pk_constraint =~ s/%HISTPK/itemid,clock/g;
+	}
+	else
+	{
+		$pk_constraint =~ s/%HISTPK/itemid,clock,ns/g;
 	}
 
 	my $create_table_end = @$db{'create_table_end'};
@@ -212,6 +230,17 @@ sub output_tsdb {
 	my ($tbl) = @_;
 
 	my $tsdb_out = $tsdb;
+
+	if ($tbl eq 'trends')
+	{
+		$tsdb_compress_sql =~ s/%COMPRESS_ORDERBY/clock/g;
+		$tsdb_out =~ s/%HISTPK/itemid,clock/g;
+	}
+	else
+	{
+		$tsdb_compress_sql =~ s/%COMPRESS_ORDERBY/clock,ns/g;
+		$tsdb_out =~ s/%HISTPK/itemid,clock,ns/g;
+	}
 
 	if (not(defined $tsdb_compression))
 	{
@@ -235,17 +264,11 @@ sub output_tsdb {
 sub validate_args {
 	die 'No arguments were provided' if (!$db);
 	die 'Wrong database was provided' if (! grep { $_ eq $db } @dbs);
-
-	if ($db eq 'timescaledb')
-	{
-		die 'Table name should be provided to generate timescaledb per-table migration script' if (!$table);
-		die 'Non-existent table name was provided' if (! grep { $_ eq $table } @tables);
-	}
 }
 
 validate_args();
 
-if ($db eq 'timescaledb')
+if ($db eq 'timescaledb' && (defined $tsdb_compression))
 {
 	output_tsdb($table);
 }
@@ -274,9 +297,9 @@ else
 	}
 	elsif ($db eq 'timescaledb')
 	{
-		foreach my $tbl (@tables)
+		foreach my $tbl (@tables_compressed)
 		{
-			output_tsdb($tbl);
+			output_table(\%postgresql, $tbl, 0);
 		}
 	}
 }
