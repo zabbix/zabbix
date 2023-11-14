@@ -96,8 +96,10 @@ static int	DBpatch_6050008(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("history", "value", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
-
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("history", &field))
+		return SUCCEED;
+#endif
 	return DBmodify_field_type("history", &field, &field);
 }
 
@@ -111,8 +113,10 @@ static int	DBpatch_6050009(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_min", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
-
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
+		return SUCCEED;
+#endif
 	return DBmodify_field_type("trends", &field, &field);
 }
 
@@ -126,7 +130,10 @@ static int	DBpatch_6050010(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_avg", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
+		return SUCCEED;
+#endif
 
 	return DBmodify_field_type("trends", &field, &field);
 }
@@ -137,6 +144,9 @@ static int	DBpatch_6050011(void)
 
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
+		return SUCCEED;
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
 #endif /* defined(HAVE_ORACLE) */
 
