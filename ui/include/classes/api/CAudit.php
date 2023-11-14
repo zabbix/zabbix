@@ -392,7 +392,6 @@ class CAudit {
 		'dashboard.pages.widgets.fields' => 'widget_field',
 		'discoveryrule.filter' => 'items',
 		'discoveryrule.filter.conditions' => 'item_condition',
-		'discoveryrule.headers' => 'virtual.field',
 		'discoveryrule.lld_macro_paths' => 'lld_macro_path',
 		'discoveryrule.overrides' => 'lld_override',
 		'discoveryrule.overrides.filter' => 'lld_override',
@@ -409,7 +408,6 @@ class CAudit {
 		'discoveryrule.overrides.operations.optrends' => 'lld_override_optrends',
 		'discoveryrule.parameters' => 'item_parameter',
 		'discoveryrule.preprocessing' => 'item_preproc',
-		'discoveryrule.query_fields' => 'virtual.field',
 		'hostgroup.hosts' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
@@ -419,16 +417,12 @@ class CAudit {
 		'hostprototype.tags' => 'host_tag',
 		'hostprototype.templates' => 'hosts_templates',
 		'iconmap.mappings' => 'icon_mapping',
-		'item.headers' => 'virtual.field',
 		'item.parameters' => 'item_parameter',
 		'item.preprocessing' => 'item_preproc',
 		'item.tags' => 'item_tag',
-		'item.query_fields' => 'virtual.field',
-		'itemprototype.headers' => 'virtual.field',
 		'itemprototype.parameters' => 'item_parameter',
 		'itemprototype.preprocessing' => 'item_preproc',
 		'itemprototype.tags' => 'item_tag',
-		'itemprototype.query_fields' => 'virtual.field',
 		'maintenance.groups' => 'maintenances_groups',
 		'maintenance.hosts' => 'maintenances_hosts',
 		'maintenance.tags' => 'maintenance_tag',
@@ -932,11 +926,13 @@ class CAudit {
 		$table_name = self::TABLE_NAMES[$resource];
 
 		if ($object_path !== self::API_NAMES[$resource]) {
-			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[self::getAbstractPath($object_path)];
+			$abstract_object_path = self::getAbstractPath($object_path);
 
-			if ($table_name === 'virtual.field') {
+			if (!array_key_exists($abstract_object_path, self::NESTED_OBJECTS_TABLE_NAMES)) {
 				return false;
 			}
+
+			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[self::getAbstractPath($object_path)];
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];

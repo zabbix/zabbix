@@ -43,7 +43,7 @@ class CItemTypeHttpAgent extends CItemType {
 		return [
 			'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
 			'query_fields' =>		['type' => API_OBJECTS, 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>				['type' => API_STRING_UTF8]
 			]],
 			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]), 'default' => DB::getDefault('items', 'request_method')],
@@ -54,7 +54,7 @@ class CItemTypeHttpAgent extends CItemType {
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')]
 			]],
 			'headers' =>			['type' => API_OBJECTS, 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>				['type' => API_STRING_UTF8]
 			]],
 			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'status_codes')],
@@ -90,7 +90,7 @@ class CItemTypeHttpAgent extends CItemType {
 		return [
 			'url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
 			'query_fields' =>			['type' => API_OBJECTS, 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>				['type' => API_STRING_UTF8]
 			]],
 			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD])],
@@ -101,7 +101,7 @@ class CItemTypeHttpAgent extends CItemType {
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')]
 			]],
 			'headers' =>			['type' => API_OBJECTS, 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>				['type' => API_STRING_UTF8]
 			]],
 			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'status_codes')],

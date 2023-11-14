@@ -293,6 +293,8 @@ class CItemPrototype extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
+			self::prepareItemsForApi($result);
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
 			$result = $this->unsetExtraFields($result, ['name_upper']);
@@ -417,7 +419,9 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $items
 	 */
 	public static function createForce(array &$items): void {
-		$itemids = DB::insert('items', self::encodeHttpFields($items));
+		self::prepareItemsForDb($items);
+		$itemids = DB::insert('items', $items);
+		self::prepareItemsForApi($items);
 
 		$ins_items_discovery = [];
 		$host_statuses = [];
@@ -505,7 +509,6 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		self::extractHttpFields($db_items);
 		self::addInternalFields($db_items);
 
 		foreach ($items as $i => &$item) {
@@ -659,8 +662,10 @@ class CItemPrototype extends CItemGeneral {
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
 
+		self::prepareItemsForDb($items, $db_items);
+
 		foreach ($items as $i => &$item) {
-			$upd_item = DB::getUpdatedValues('items', CItemHelper::encodeHttpFields($item), $db_items[$item['itemid']]);
+			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
 			if ($upd_item) {
 				$upd_items[] = [
@@ -696,6 +701,8 @@ class CItemPrototype extends CItemGeneral {
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
+
+		self::prepareItemsForApi($items, $db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
@@ -809,7 +816,7 @@ class CItemPrototype extends CItemGeneral {
 			return;
 		}
 
-		self::extractHttpFields($db_items);
+		self::prepareItemsForApi($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];
@@ -819,12 +826,6 @@ class CItemPrototype extends CItemGeneral {
 
 			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
 				$item += ['parameters' => []];
-			}
-			elseif ($db_item['type'] == ITEM_TYPE_HTTPAGENT) {
-				$item += [
-					'headers' => [],
-					'query_fields' => []
-				];
 			}
 
 			$items[] = $item + [
@@ -838,16 +839,8 @@ class CItemPrototype extends CItemGeneral {
 		$items = array_values($db_items);
 
 		foreach ($items as &$item) {
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = array_values($item['headers']);
-			}
-
 			if (array_key_exists('parameters', $item)) {
 				$item['parameters'] = array_values($item['parameters']);
-			}
-
-			if (array_key_exists('query_fields', $item)) {
-				$item['query_fields'] = array_values($item['query_fields']);
 			}
 
 			$item['preprocessing'] = array_values($item['preprocessing']);
@@ -989,7 +982,6 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		self::extractHttpFields($upd_db_items);
 		self::addInternalFields($upd_db_items);
 
 		if ($upd_db_items) {
@@ -1010,11 +1002,9 @@ class CItemPrototype extends CItemGeneral {
 				];
 
 				$upd_item += array_intersect_key([
-					'headers' => [],
 					'tags' => [],
 					'preprocessing' => [],
-					'parameters' => [],
-					'query_fields' => []
+					'parameters' => []
 				], $db_item);
 
 				$upd_items[] = $upd_item;
@@ -1134,8 +1124,6 @@ class CItemPrototype extends CItemGeneral {
 			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
 		}
 
-		self::extractHttpFields($upd_db_items);
-
 		$upd_items = [];
 
 		foreach ($upd_db_items as $upd_db_item) {
@@ -1144,11 +1132,9 @@ class CItemPrototype extends CItemGeneral {
 			$upd_items[] = [
 				'itemid' => $upd_db_item['itemid'],
 				'type' => $item['type'],
-				'headers' => [],
 				'tags' => [],
 				'preprocessing' => [],
-				'parameters' => [],
-				'query_fields' => []
+				'parameters' => []
 			];
 		}
 
