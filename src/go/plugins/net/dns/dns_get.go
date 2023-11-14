@@ -274,85 +274,93 @@ var dnsClassesGet = map[uint16]string{
 	255:"ANY",
 }
 
-// func parseRespAnswer(respAnswer []dns.RR) {
+var dnsExtraQuestionTypesGet = map[uint16]string{
+	251:"IXFR",
+        252:"AXFR",
+        253:"MAILB",
+        254:"MAILA",
+        255:"ANY",
+}
 
-// 	resultG := make(map[string][]interface{})
+func parseRespAnswer(respAnswer []dns.RR) {
 
-// 	for _, ii := range respAnswer {
-// 		h := ii.Header() // RR_Header
-// 		log.Infof("AGS H: ->%s<-\n", h)
+	resultG := make(map[string][]interface{})
 
-// 		result := make(map[string]interface{})
+	for _, ii := range respAnswer {
+		h := ii.Header() // RR_Header
+		log.Infof("AGS H: ->%s<-\n", h)
 
-// 		value := reflect.ValueOf(ii)
-// 		typeOf := value.Type()
-// 		// *dns.A
+		result := make(map[string]interface{})
 
-// 		log.Infof("RECORD TYPE: %s", typeOf)
+		value := reflect.ValueOf(ii)
+		typeOf := value.Type()
+		// *dns.A
 
-// 		if value.Kind() == reflect.Ptr {
-// 			value = value.Elem()
-// 		}
+		log.Infof("RECORD TYPE: %s", typeOf)
 
-// 		resFieldAggregatedValues := make(map[string]interface{})
+		if value.Kind() == reflect.Ptr {
+			value = value.Elem()
+		}
 
-// 		for j := 0; j < value.NumField(); j++ {
+		resFieldAggregatedValues := make(map[string]interface{})
 
-// 			fieldValue := value.Field(j)
-// 			fieldType := value.Type().Field(j)
-// 			fieldName := fieldType.Name
+		for j := 0; j < value.NumField(); j++ {
 
-// 			log.Infof("FIELD_NAME Z: %s", fieldName)
-// 			if fieldName == "Hdr" {
+			fieldValue := value.Field(j)
+			fieldType := value.Type().Field(j)
+			fieldName := fieldType.Name
 
-// 				valueH := fieldValue
-// 				typeOfH := valueH.Type()
-// 				// *dns.A
-// 				log.Infof("RECORD TYPE: %s", typeOfH)
-// 				if valueH.Kind() == reflect.Ptr {
-// 					valueH = valueH.Elem()
-// 				}
+			log.Infof("FIELD_NAME Z: %s", fieldName)
+			if fieldName == "Hdr" {
 
-// 				for jH := 0; jH < valueH.NumField(); jH++ {
-// 					fieldValueH := valueH.Field(jH).Interface()
-// 					fieldTypeH := valueH.Type().Field(jH)
-// 					fieldNameH := fieldTypeH.Name
-// 					log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
-// 					log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
-// 					log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
-// 					n := strings.ToLower(fieldNameH)
+				valueH := fieldValue
+				typeOfH := valueH.Type()
+				// *dns.A
+				log.Infof("RECORD TYPE: %s", typeOfH)
+				if valueH.Kind() == reflect.Ptr {
+					valueH = valueH.Elem()
+				}
 
-// 					if (n == "rrtype") {
-// 						n = "type"
-// 						//log.Infof("SUBARU 1 in: %d", fieldValueH)
-// 						fieldValueH = dnsTypesGetReverse[fieldValueH]
-// 						//log.Infof("SUBARU 2 res: %s", fieldValueH)
-// 					} else if (n == "class") {
-// 						log.Infof("JEEP 1 in: %d", fieldValueH)
+				for jH := 0; jH < valueH.NumField(); jH++ {
+					fieldValueH := valueH.Field(jH).Interface()
+					fieldTypeH := valueH.Type().Field(jH)
+					fieldNameH := fieldTypeH.Name
+					log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
+					log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
+					log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
+					n := strings.ToLower(fieldNameH)
 
-// 						zeta, _ := fieldValueH.(uint16)
-// 						fieldValueH = dnsClassesGet[zeta]
+					if (n == "rrtype") {
+						n = "type"
+						//log.Infof("SUBARU 1 in: %d", fieldValueH)
+						fieldValueH = dnsTypesGetReverse[fieldValueH]
+						//log.Infof("SUBARU 2 res: %s", fieldValueH)
+					} else if (n == "class") {
+						log.Infof("JEEP 1 in: %d", fieldValueH)
 
-// 					}
-// 					result[n] = fieldValueH
-// 				}
-// 			} else {
-// 				resFieldValue := fieldValue.Interface()
-// 				//result[strings.ToLower(fieldName)] = resFieldValue
-// 				n := strings.ToLower(fieldName)
-// 				resFieldAggregatedValues[n] = resFieldValue
-// 			}
-// 		}
+						zeta, _ := fieldValueH.(uint16)
+						fieldValueH = dnsClassesGet[zeta]
 
-// 		result["rdata"] = resFieldAggregatedValues
+					}
+					result[n] = fieldValueH
+				}
+			} else {
+				resFieldValue := fieldValue.Interface()
+				//result[strings.ToLower(fieldName)] = resFieldValue
+				n := strings.ToLower(fieldName)
+				resFieldAggregatedValues[n] = resFieldValue
+			}
+		}
 
-// 		resultG["answer_section"] = append(resultG["answer_section"], result)
-// 	}
-// 	log.Infof("###################\n\n\n")
+		result["rdata"] = resFieldAggregatedValues
 
-// 	aG, _ := json.Marshal(resultG)
-// 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
-// }
+		resultG["answer_section"] = append(resultG["answer_section"], result)
+	}
+	log.Infof("###################\n\n\n")
+
+	aG, _ := json.Marshal(resultG)
+	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
+}
 
 func parseRespQuestion(respQuestion []dns.Question) {
 
@@ -368,8 +376,25 @@ func parseRespQuestion(respQuestion []dns.Question) {
 
 	q := respQuestion[0] //so there is 1 question
 	result["qname"] = q.Name
-	result["qtype"] = q.Qtype
-	result["qclass"] = q.Qclass
+	qTypeMapped, ok := dnsTypesGetReverse[q.Qtype]
+	if (!ok) {
+		qTypeMapped, ok = dnsExtraQuestionTypesGet[q.Qtype]
+		if (!ok) {
+			result["qtype"] = q.Qtype
+		} else {
+			result["qtype"] = qTypeMapped
+		}
+	} else {
+		result["qtype"] = qTypeMapped
+	}
+
+	qClassMapped, ok2 :=  dnsClassesGet[q.Qclass]
+	if (!ok2) {
+		result["qclass"] = q.Qclass
+	} else {
+		result["qclass"] = qClassMapped
+	}
+
 	resultG["question_section"] = append(resultG["question_section"], result)
 	aG, _ := json.Marshal(resultG)
 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
@@ -404,7 +429,7 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	//resp_answer, _ := json.Marshal(resp.Answer)
 	//log.Infof("AGS Answer: %s", resp_answer)
 	//resp_answer, _ := json.Marshal(resp.Answer)
-	//parseRespAnswer(resp.Answer)
+	parseRespAnswer(resp.Answer)
 	// ANSWER END
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
@@ -415,9 +440,11 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 
 	log.Infof("AGS RCODE: %d", resp.Rcode)
 
+	// QUESTION
 	//resp_q, _ := json.Marshal(resp.Question)
 	//log.Infof("AGS Q: %s", resp_q)
 	parseRespQuestion(resp.Question)
+	// QUESTION END
 
 
 	return resp.Answer, nil
