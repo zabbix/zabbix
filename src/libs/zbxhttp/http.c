@@ -401,8 +401,9 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 #ifdef CURLH_HEADER
 	struct curl_header	*type;
 	CURLHcode		h;
+
 	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
-			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)) || NULL == type)
+			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve Content-Type header:%u", h);
 	}
