@@ -513,12 +513,17 @@ static int	DBpatch_6000043(void)
 
 static int	DBpatch_6000044(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
-	int		ret = SUCCEED;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	char		*sql = NULL, *params = NULL, *item_filter = NULL, *time_period = NULL, *hist_func = NULL,
-			*aggr_func = NULL, *error = NULL;
+/* offsets in stack of tokens are relative to time period token */
+#define OFFSET_FILTER		(-1)
+#define OFFSET_HIST_FUNC	1
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = SUCCEED;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql = NULL, *params = NULL, *hist_func = NULL, *time_period = NULL;
+	zbx_vector_uint64_t	del_tokens;
+
+	zbx_vector_uint64_create(&del_tokens);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -527,7 +532,8 @@ static int	DBpatch_6000044(void)
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
-		int			seconds;
+		int			i;
+		char			*error = NULL;
 		zbx_eval_context_t	ctx;
 
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
@@ -538,71 +544,53 @@ static int	DBpatch_6000044(void)
 			continue;
 		}
 
-		/* only the formulas having 4 tokens need to be fixed */
-		if (4 != ctx.stack.values_num)
-			continue;
+		zbx_vector_uint64_clear(&del_tokens);
 
-		zbx_free(item_filter);
-		zbx_free(time_period);
-		zbx_free(hist_func);
-		zbx_free(aggr_func);
-
-		for (int i = 0; i < ctx.stack.values_num; i++)
+		for (i = 0; i < ctx.stack.values_num; i++)
 		{
-			zbx_eval_token_t	*token = &ctx.stack.values[i];
+			int			seconds;
+			zbx_strloc_t		*time_loc, *hist_loc;
 
-			switch(token->type)
-			{
-				case ZBX_EVAL_TOKEN_ARG_PERIOD:
-					time_period = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
-					break;
-				case ZBX_EVAL_TOKEN_ARG_QUERY:
-					item_filter = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
-					break;
-				case ZBX_EVAL_TOKEN_HIST_FUNCTION:
-					hist_func = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
-					break;
-				case ZBX_EVAL_TOKEN_FUNCTION:
-					aggr_func = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
-					break;
-			}
+			if (ZBX_EVAL_TOKEN_ARG_PERIOD != ctx.stack.values[i].type)
+				continue;
+
+			if (0 > i + OFFSET_FILTER || i + OFFSET_HIST_FUNC >= ctx.stack.values_num)
+				continue;
+
+			if (ZBX_EVAL_TOKEN_ARG_QUERY != ctx.stack.values[i + OFFSET_FILTER].type)
+				continue;
+
+			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i + OFFSET_HIST_FUNC].type)
+				continue;
+
+			hist_loc = &ctx.stack.values[i + OFFSET_HIST_FUNC].loc;
+			zbx_free(hist_func);
+			hist_func = zbx_substr(ctx.expression, hist_loc->l, hist_loc->r);
+
+			if (0 != strcmp("last_foreach", hist_func))
+				continue;
+
+			time_loc = &ctx.stack.values[i].loc;
+			zbx_free(time_period);
+			time_period = zbx_substr(ctx.expression, time_loc->l, time_loc->r);
+
+			if (FAIL == is_time_suffix(time_period, &seconds, ZBX_LENGTH_UNLIMITED) || 0 != seconds)
+				continue;
+
+			zbx_vector_uint64_append(&del_tokens, (zbx_uint32_t)i);
 		}
 
-		if (NULL == time_period || FAIL == is_time_suffix(time_period, &seconds, ZBX_LENGTH_UNLIMITED) ||
-				0 != seconds)
-		{
+		if (0 == del_tokens.values_num)
 			continue;
-		}
 
-		if (NULL == item_filter)
+		params = zbx_strdup(params, ctx.expression);
+
+		for (i = del_tokens.values_num - 1; i >= 0; i--)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s: cannot get item filter from formula '%s' for itemid %s",
-					__func__, row[1], row[0]);
-			continue;
-		}
+			zbx_strloc_t	*loc = &ctx.stack.values[(int)del_tokens.values[i]].loc;
 
-		if (NULL == hist_func)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s: cannot get history function from formula '%s' for itemid %s",
-					__func__, row[1], row[0]);
-			continue;
+			memmove(&params[loc->l - 1], &params[loc->r + 1], strlen(params) - loc->r + 1);
 		}
-
-		if (0 != strcmp("last_foreach", hist_func))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s: unexpected history function '%s' got from formula '%s' for"
-					" itemid %s, must be 'last_foreach'", __func__, hist_func, row[1], row[0]);
-			continue;
-		}
-
-		if (NULL == aggr_func)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s: cannot get aggregate function from formula '%s' for itemid"
-					" %s", __func__, row[1], row[0]);
-			continue;
-		}
-
-		params = zbx_dsprintf(params, "%s(last_foreach(%s))", aggr_func, item_filter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update items set params='%s' where itemid=%s;\n", params, row[0]);
@@ -620,16 +608,17 @@ static int	DBpatch_6000044(void)
 			ret = FAIL;
 	}
 
-	zbx_free(params);
+	zbx_vector_uint64_destroy(&del_tokens);
+
 	zbx_free(sql);
-	zbx_free(item_filter);
-	zbx_free(time_period);
+	zbx_free(params);
 	zbx_free(hist_func);
-	zbx_free(aggr_func);
+	zbx_free(time_period);
 
 	return ret;
+#undef OFFSET_FILTER
+#undef OFFSET_HIST_FUNC
 }
-
 #endif
 
 DBPATCH_START(6000)
