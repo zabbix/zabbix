@@ -285,7 +285,11 @@ var hintBox = {
 				e.preventDefault();
 			}
 
-			if ($target.data('hintbox-preload') && $target.data('hintbox-contents') === '') {
+			if ($target[0].dataset.hintboxPreload !== '' && $target[0].dataset.hintboxContents === '') {
+				if (e.type === 'mousemove') {
+					return;
+				}
+
 				clearTimeout(hintBox.preload_hint_timer);
 
 				// Manually trigger preloaderCloseHandler for the previous preloader.

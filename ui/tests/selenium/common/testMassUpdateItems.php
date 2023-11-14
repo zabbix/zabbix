@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -1369,8 +1370,9 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
-				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
+				$table = $this->query('xpath://form[@name='.
+						CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+						']/table')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
 				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 				$form = $overlay->asForm();
@@ -1794,8 +1796,9 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
-				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
+				$table = $this->query('xpath://form[@name='.
+						CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+						']/table')->asTable()->one();
 				// TODO: not stable test testPageMassUpdateItems_ChangePreprocessing#8 on Jenkins, failed to properly waitUntilReady for page
 				try {
 					$table->query('link', $name)->one()->waitUntilClickable()->click();
@@ -2239,8 +2242,9 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
-				$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
+				$table = $this->query('xpath://form[@name='.
+						CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+						']/table')->asTable()->one();
 				$table->query('link', $name)->one()->waitUntilClickable()->click();
 				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 				$form = $overlay->asForm();
@@ -2316,8 +2320,9 @@ class testMassUpdateItems extends CWebTest{
 		$this->page->login()->open($link);
 
 		// Get item table.
-		$table_name = ($prototypes) ? '@name="itemprototype"' : '@name="item_list"';
-		$table = $this->query('xpath://form['.$table_name.']/table[@class="list-table"]')->asTable()->one();
+		$table = $this->query('xpath://form[@name='.
+				CXPathHelper::escapeQuotes($prototypes ? 'itemprototype' : 'item_list').
+				']/table')->asTable()->one();
 		$table->findRows('Name', $data)->select();
 
 		// Open mass update form.

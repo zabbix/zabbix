@@ -213,6 +213,7 @@ zbx_execute_agent_check_WRAP_FUNCS = \
 	-Wl,--wrap=vfs_dir_size \
 	-Wl,--wrap=net_dns \
 	-Wl,--wrap=net_dns_record \
+	-Wl,--wrap=net_dns_perf \
 	-Wl,--wrap=net_tcp_port \
 	-Wl,--wrap=system_users_num
 

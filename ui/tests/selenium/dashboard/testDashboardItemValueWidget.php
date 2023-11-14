@@ -426,7 +426,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:show_1' => false, // Description.
 						'id:show_2' => false, // Value.
 						'id:show_3' => false, // Time.
-						'id:show_4' => false, // Change indicator.
+						'id:show_4' => false  // Change indicator.
 					],
 					'error' => ['Invalid parameter "Show": at least one option must be selected.']
 				]

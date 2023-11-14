@@ -118,12 +118,18 @@ zbx_status_section_t;
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		int config_timeout)
 {
-	char	*info = NULL;
+	char	*info = NULL, *ext = NULL;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		ext = "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\"" ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}";
+		info = zbx_strdup(info, "data collection is paused");
+		ret = FAIL;
+	}
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -138,7 +144,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zbx_process_command_results(jp);
 
-	zbx_send_response_same(sock, ret, info, config_timeout);
+	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
 	zbx_free(info);
 
@@ -160,7 +166,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 	if (SUCCEED != (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 	}
 	else if (!ZBX_IS_RUNNING())
 	{
@@ -1221,6 +1227,12 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			return FAIL;
 		}
 
+		if (SUCCEED == zbx_vps_monitor_capped())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot accept data: data collection has been paused.");
+			return FAIL;
+		}
+
 		memset(&av, 0, sizeof(zbx_agent_value_t));
 
 		if ('<' == *s)	/* XML protocol */
@@ -1336,8 +1348,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		int		snmp_reload = 0;
 #endif
 
-		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
-				get_process_type_string(process_type), process_num, sec);
+		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection%s]",
+				get_process_type_string(process_type), process_num, sec, zbx_vps_monitor_status());
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
