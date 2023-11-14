@@ -106,7 +106,8 @@ class testPageProblems extends CWebTest {
 		CDataHelper::addItemData($items['itemids'][0], [0, 20, 150]);
 		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
 		CDBHelper::setTriggerProblem('Trigger for Age problem 1 day', TRIGGER_VALUE_TRUE,
-				['clock' => $time - 86400]);
+				['clock' => $time - 86400]
+		);
 		CDBHelper::setTriggerProblem('Trigger for Age problem 1 month', TRIGGER_VALUE_TRUE,
 				['clock' => $time - 2.628e+6]
 		);
@@ -160,8 +161,8 @@ class testPageProblems extends CWebTest {
 
 		// Check complicated labels.
 		foreach (['By me', 'Tag name', 'Show timeline', 'Highlight whole row'] as $label) {
-			$this->assertTrue($filter_form->query('xpath://label[text()='.CXPathHelper::escapeQuotes($label)
-					.']')->one()->isVisible()
+			$this->assertTrue($filter_form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')
+					->one()->isVisible()
 			);
 		}
 
@@ -1264,8 +1265,7 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Hosts' => 'ЗАББИКС Сервер',
-						'Warning' => true,
-						'Show timeline' => true
+						'Warning' => true
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1274,7 +1274,8 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Third test trigger with tag priority'],
 						['Problem' => 'Second test trigger with tag priority'],
 						['Problem' => 'First test trigger with tag priority']
-					]
+					],
+					'table_timeline' => true
 				]
 			],
 			// #35 Age filter - 999.
@@ -1524,11 +1525,10 @@ class testPageProblems extends CWebTest {
 		}
 
 		// If Show timeline = true, it adds one more row to the result table.
-		$problem_count = (array_key_exists('fields', $data) && CTestArrayHelper::get($data['fields'], 'Show timeline'))
-			? count($data['result']) - 1
-			: count($data['result']);
-
-		$this->assertTableStats($problem_count);
+		$this->assertTableStats(CTestArrayHelper::get($data, 'table_timeline')
+				? count($data['result']) - 1
+				: count($data['result'])
+		);
 
 		$dialog_selector = 'xpath://div[@class="overlay-dialogue"]';
 		if (array_key_exists('check_trigger_description', $data)) {
