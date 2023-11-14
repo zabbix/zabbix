@@ -18,7 +18,7 @@ zabbix_export:
         - name: Subject
           value: '{ALERT.SUBJECT}'
         - name: To
-          value: '-4000308527'
+          value: 'channel'
         - name: Token
           value: 'Put token here'
       script: |
