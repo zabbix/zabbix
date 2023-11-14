@@ -192,7 +192,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		// Only non-empty fields need to be sent to server.
 		$data = $this->unsetEmptyValues($data);
 
-		$data = CItemHelper::encodeHttpFields($data);
+		CItemGeneral::prepareItemForDb($data);
 
 		if (array_key_exists('parameters', $data)) {
 			$data['parameters'] = $this->transformParametersFields($data['parameters']);

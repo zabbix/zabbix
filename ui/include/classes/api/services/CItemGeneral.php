@@ -269,7 +269,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if (array_key_exists('query_fields', $item)) {
-				if (strlen(CItemHelper::encodeQueryFields($item['query_fields']))
+				if (strlen(self::prepareQueryFieldsForDb($item['query_fields']))
 						> DB::getFieldLength('items', 'query_fields')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/query_fields', _('value is too long')
@@ -287,7 +287,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if (array_key_exists('headers', $item)) {
-				if (strlen(CItemHelper::encodeHeaders($item['headers'])) > DB::getFieldLength('items', 'headers')) {
+				if (strlen(self::prepareHeadersForDb($item['headers'])) > DB::getFieldLength('items', 'headers')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/headers', _('value is too long')
 					));
@@ -2013,8 +2013,6 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		self::extractHttpFields($result);
-
 		return $result;
 	}
 
@@ -2834,33 +2832,99 @@ abstract class CItemGeneral extends CApiService {
 		return array_merge($ns_regex, $ns_any, $other);
 	}
 
-	/**
-	 * @param array $items
-	 */
-	protected static function extractHttpFields(array &$items): void {
+	protected static function prepareItemsForApi(array &$items, array &$db_items = null): void {
 		foreach ($items as &$item) {
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = CItemHelper::extractHeaders($item['headers']);
-			}
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT
+					|| ($db_items !== null && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT)) {
+				self::prepareItemForApi($item);
 
-			if (array_key_exists('query_fields', $item)) {
-				$item['query_fields'] = CItemHelper::extractQueryFields($item['query_fields']);
+				if ($db_items !== null) {
+					self::prepareItemForApi($db_items[$item['itemid']]);
+				}
 			}
 		}
 		unset($item);
 	}
 
-	/**
-	 * @param array $items
-	 *
-	 * @return array
-	 */
-	protected static function encodeHttpFields(array &$items): array {
+	protected static function prepareItemForApi(array &$item): void {
+		if (array_key_exists('query_fields', $item)) {
+			$item['query_fields'] = self::prepareQueryFieldsForApi($item['query_fields']);
+		}
+
+		if (array_key_exists('headers', $item)) {
+			$item['headers'] = self::prepareHeadersForApi($item['headers']);
+		}
+	}
+
+	protected static function prepareQueryFieldsForApi(string $query_fields): array {
+		if ($query_fields === '') {
+			return [];
+		}
+
+		$_query_fields = json_decode($query_fields, true);
+		$query_fields = [];
+
+		if (json_last_error() == JSON_ERROR_NONE) {
+			foreach ($_query_fields as $i => $field) {
+				$query_fields[] = ['sortorder' => $i + 1, 'name' => key($field), 'value' => reset($field)];
+			}
+		}
+
+		return $query_fields;
+	}
+
+	protected static function prepareHeadersForApi(string $headers): array {
+		if ($headers === '') {
+			return [];
+		}
+
+		$_headers = explode("\r\n", $headers);
+		$headers = [];
+
+		foreach ($_headers as $i => $header) {
+			[$name, $value] = explode(': ', $header, 2) + [1 => ''];
+
+			$headers[] = ['sortorder' => $i + 1, 'name' => $name, 'value' => $value];
+		}
+
+		return $headers;
+	}
+
+	protected static function prepareItemsForDb(array &$items, array &$db_items = null): void {
 		foreach ($items as &$item) {
-			$item = CItemHelper::encodeHttpFields($item);
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT
+					|| ($db_items !== null && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT)) {
+				self::prepareItemForDb($item);
+			}
 		}
 		unset($item);
+	}
 
-		return $items;
+	public static function prepareItemForDb(array &$item): void {
+		if (array_key_exists('query_fields', $item)) {
+			$item['query_fields'] = self::prepareQueryFieldsForDb($item['query_fields']);
+		}
+
+		if (array_key_exists('headers', $item)) {
+			$item['headers'] = self::prepareHeadersForDb($item['headers']);
+		}
+	}
+
+	private static function prepareQueryFieldsForDb(array $query_fields): string {
+		foreach ($query_fields as &$query_field) {
+			$query_field = [$query_field['name'] => $query_field['value']];
+		}
+		unset($query_field);
+
+		return $query_fields ? json_encode($query_fields, JSON_UNESCAPED_UNICODE) : '';
+	}
+
+	private static function prepareHeadersForDb(array $headers): string {
+		foreach ($headers as &$header) {
+			$header = $header['name'].': '.$header['value'];
+		}
+		unset($header);
+
+		return $headers ? implode("\r\n", $headers) : '';
 	}
 }

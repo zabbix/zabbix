@@ -309,6 +309,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
+			self::prepareItemsForApi($result);
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 			$result = $this->unsetExtraFields($result, ['name_upper']);
@@ -985,7 +987,9 @@ class CDiscoveryRule extends CItemGeneral {
 	private static function createForce(array &$items): void {
 		self::addValueType($items);
 
-		$itemids = DB::insert('items', self::encodeHttpFields($items));
+		self::prepareItemsForDb($items);
+		$itemids = DB::insert('items', $items);
+		self::prepareItemsForApi($items);
 
 		$ins_items_rtdata = [];
 		$host_statuses = [];
@@ -1082,7 +1086,6 @@ class CDiscoveryRule extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		self::extractHttpFields($db_items);
 		self::addInternalFields($db_items);
 
 		foreach ($items as $i => &$item) {
@@ -1730,8 +1733,10 @@ class CDiscoveryRule extends CItemGeneral {
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['preprocessing', 'lld_macro_paths', 'filter', 'overrides', 'parameters']);
 
+		self::prepareItemsForDb($items, $db_items);
+
 		foreach ($items as $i => &$item) {
-			$upd_item = DB::getUpdatedValues('items', CItemHelper::encodeHttpFields($item), $db_items[$item['itemid']]);
+			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
 			if ($upd_item) {
 				$upd_items[] = [
@@ -1768,6 +1773,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
+
+		self::prepareItemsForApi($items, $db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_LLD_RULE, $items, $db_items);
 	}
@@ -2521,7 +2528,7 @@ class CDiscoveryRule extends CItemGeneral {
 			return;
 		}
 
-		self::extractHttpFields($db_items);
+		self::prepareItemsForApi($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];
@@ -2531,12 +2538,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
 				$item += ['parameters' => []];
-			}
-			elseif ($db_item['type'] == ITEM_TYPE_HTTPAGENT) {
-				$item += [
-					'headers' => [],
-					'query_fields' => []
-				];
 			}
 
 			$items[] = $item + [
@@ -2554,16 +2555,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = array_values($db_items);
 
 		foreach ($items as &$item) {
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = array_values($item['headers']);
-			}
-
 			if (array_key_exists('parameters', $item)) {
 				$item['parameters'] = array_values($item['parameters']);
-			}
-
-			if (array_key_exists('query_fields', $item)) {
-				$item['query_fields'] = array_values($item['query_fields']);
 			}
 
 			$item['preprocessing'] = array_values($item['preprocessing']);
@@ -2750,8 +2743,6 @@ class CDiscoveryRule extends CItemGeneral {
 			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
 		}
 
-		self::extractHttpFields($upd_db_items);
-
 		$upd_items = [];
 
 		foreach ($upd_db_items as $upd_db_item) {
@@ -2875,7 +2866,6 @@ class CDiscoveryRule extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		self::extractHttpFields($upd_db_items);
 		self::addInternalFields($upd_db_items);
 
 		if ($upd_db_items) {
@@ -2892,13 +2882,11 @@ class CDiscoveryRule extends CItemGeneral {
 				];
 
 				$upd_item += array_intersect_key([
-					'headers' => [],
 					'preprocessing' => [],
 					'lld_macro_paths' => [],
 					'filter' => [],
 					'overrides' => [],
-					'parameters' => [],
-					'query_fields' => []
+					'parameters' => []
 				], $db_item);
 
 				$upd_items[] = $upd_item;
@@ -3526,8 +3514,6 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!$src_items) {
 			return;
 		}
-
-		self::extractHttpFields($src_items);
 
 		$src_itemids = array_fill_keys(array_keys($src_items), true);
 		$src_valuemapids = [];

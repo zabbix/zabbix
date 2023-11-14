@@ -338,7 +338,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
 
-			$item_test_data = CItemHelper::encodeHttpFields($item_test_data);
+			CItemGeneral::prepareItemForDb($item_test_data);
 
 			/*
 			 * Server will turn off status code check if field value is empty. If field is not present, then server will
