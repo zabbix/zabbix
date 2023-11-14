@@ -397,23 +397,31 @@ clean:
 
 void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_t *allocated)
 {
+	char			*charset, *content_type = NULL;
+#ifdef CURLH_HEADER
 	struct curl_header	*type;
 	CURLHcode		h;
-	char			*charset, *content_type = NULL;
-
 	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
-			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
+			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)) || NULL == type)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve Content-Type header:%u", h);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "name '%s' value '%s' amount:%lu index: %lu"
+		zabbix_log(LOG_LEVEL_DEBUG, "name '%s' value '%s' amount:%lu index:%lu"
 				" origin:%u", type->name, type->value, type->amount,
 				type->index, type->origin);
 
 		content_type = type->value;
 	}
+#else
+	CURLcode	err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_TYPE, &content_type);
+
+	if (CURLE_OK != err || NULL == content_type)
+		zabbix_log(LOG_LEVEL_DEBUG,  "cannot get content type: %s", curl_easy_strerror(err));
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "content_type '%s'", content_type);
+#endif
 
 	charset = zbx_determine_charset(content_type, *body, *size);
 
