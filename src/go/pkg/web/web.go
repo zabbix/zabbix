@@ -41,7 +41,7 @@ import (
 func Get(url string, timeout time.Duration, dump bool) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", fmt.Errorf("Cannot create new request: %s", err)
+		return "", fmt.Errorf("Cannot create new request: %w", err)
 	}
 
 	req.Header = map[string][]string{
@@ -63,7 +63,7 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %s", err)
+		return "", fmt.Errorf("Cannot get content of web page: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -74,7 +74,7 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %s", err)
+		return "", fmt.Errorf("Cannot get content of web page: %w", err)
 	}
 
 	e, name, _ := charset.DetermineEncoding(b, resp.Header.Get("content-type"))
@@ -88,11 +88,11 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 
 	b, err = io.ReadAll(r)
 	if err != nil {
-		return "", fmt.Errorf("Cannot decode content of web page: %s", err)
+		return "", fmt.Errorf("Cannot decode content of web page: %w", err)
 	}
 	h, err := httputil.DumpResponse(resp, false)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get header of web page: %s", err)
+		return "", fmt.Errorf("Cannot get header of web page: %w", err)
 	}
 
 	return string(h) + string(b), nil
