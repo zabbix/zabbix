@@ -3133,7 +3133,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": an integer is expected.'
 			],
-			'Test script.create invalid "manualinput_validator_type" field type (array)' => [
+			'Test script.create invalid "manualinput_validator_type" field type (string)' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
