@@ -180,8 +180,9 @@ function createFontSelect(string $name): CSelect {
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 					], 'triggerListRow')
-					->addRow((new CLabel(_('New triggers'), 'elementNameTriggers_ms')),
-						(new CDiv([
+					->addRow(
+						(new CLabel(_('New triggers'), 'elementNameTriggers_ms')),
+						[
 							(new CMultiSelect([
 								'name' => 'elementNameTriggers',
 								'object_name' => 'triggers',
@@ -198,13 +199,11 @@ function createFontSelect(string $name): CSelect {
 									]
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-							new CDiv(
-								(new CButton(null, _('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
-									->setId('newSelementTriggers')
-						)]))
-							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+							(new CButton(null, _('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->setId('newSelementTriggers')
+								->addStyle('margin-top: 5px;')
+						],
 						'triggerSelectRow'
 					)
 					->addRow((new CLabel(_('Map'), 'elementNameMap_ms'))->setAsteriskMark(),

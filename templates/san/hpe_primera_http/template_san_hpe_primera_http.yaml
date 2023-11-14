@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T17:02:22Z'
+  date: '2023-11-01T21:00:02Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -3719,9 +3719,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'CPG [{#NAME}]: CPG space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -3735,9 +3732,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'CPG [{#NAME}]: Number of virtual volumes'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -3751,9 +3745,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'CPG [{#NAME}]: Raw space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -3767,9 +3758,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'CPG [{#NAME}]: Snapshot administration space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -3783,9 +3771,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'CPG [{#NAME}]: Snapshot data space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '25'
                   width: '24'
@@ -3799,9 +3784,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'CPG [{#NAME}]: User data space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Volumes
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -3816,9 +3798,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'Volume [{#NAME}]: Administrative space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -3832,9 +3811,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'Volume [{#NAME}]: Capacity efficiency: Ratio'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -3848,9 +3824,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'Volume [{#NAME}]: Capacity efficiency: Space saved'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -3864,9 +3837,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'Volume [{#NAME}]: Snapshot space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -3880,9 +3850,6 @@ zabbix_export:
                       value:
                         host: 'HPE Primera by HTTP'
                         name: 'Volume [{#NAME}]: User space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 79ba0611293541f29f8b43b34e64465d
           name: Boolean

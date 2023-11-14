@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:10:03Z'
+  date: '2023-11-01T20:43:51Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1652,9 +1652,6 @@ zabbix_export:
                   width: '12'
                   height: '9'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
@@ -1668,17 +1665,11 @@ zabbix_export:
                   width: '8'
                   height: '6'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: ITEM_PROTOTYPE
                       name: itemid
                       value:
                         host: 'Acronis Cyber Protect Cloud MSP by HTTP'
                         key: 'acronis.cpc.customer.status[{#NAME}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: INTEGER
                       name: source_type
                       value: '3'
@@ -1687,17 +1678,11 @@ zabbix_export:
                   width: '9'
                   height: '7'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: ITEM_PROTOTYPE
                       name: itemid
                       value:
                         host: 'Acronis Cyber Protect Cloud MSP by HTTP'
                         key: 'acronis.cpc.device.agent.enabled[{#NAME}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: INTEGER
                       name: source_type
                       value: '3'
@@ -1707,17 +1692,11 @@ zabbix_export:
                   width: '9'
                   height: '8'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: ITEM_PROTOTYPE
                       name: itemid
                       value:
                         host: 'Acronis Cyber Protect Cloud MSP by HTTP'
                         key: 'acronis.cpc.device.agent.online[{#NAME}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: INTEGER
                       name: source_type
                       value: '3'

@@ -1171,6 +1171,17 @@ reduce_max_vars:
 			goto next;
 		}
 
+		if (NULL == response->variables)
+		{
+			if (1 >= level && 1 < max_vars)
+				goto reduce_max_vars;
+
+			zbx_strlcpy(error, "No values received.", max_error_len);
+			ret = NOTSUPPORTED;
+			running = 0;
+			goto next;
+		}
+
 		/* process response */
 		for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 		{

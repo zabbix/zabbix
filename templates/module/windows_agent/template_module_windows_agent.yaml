@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:31:11Z'
+  date: '2023-11-01T20:50:20Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -385,9 +385,6 @@ zabbix_export:
                       value:
                         host: 'Windows filesystems by Zabbix agent'
                         name: '{#FSLABEL}({#FSNAME}): Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: 95c4026f8ade4fa7b72f8140fc152aea
       template: 'Windows generic by Zabbix agent'
       name: 'Windows generic by Zabbix agent'
@@ -1200,9 +1197,6 @@ zabbix_export:
                       value:
                         host: 'Windows network by Zabbix agent'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: dd37c51d4ded48ceb449fa633dd707e2
           name: 'Win32_NetworkAdapter::AdapterTypeId'
@@ -1514,9 +1508,6 @@ zabbix_export:
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk average queue length'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1530,9 +1521,6 @@ zabbix_export:
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk average waiting time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -1546,9 +1534,6 @@ zabbix_export:
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -1562,9 +1547,6 @@ zabbix_export:
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: dfd6f32510a840c29f9cb4b974977770
       template: 'Windows services by Zabbix agent'
       name: 'Windows services by Zabbix agent'

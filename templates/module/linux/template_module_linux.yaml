@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:30:05Z'
+  date: '2023-11-01T20:50:01Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -306,9 +306,6 @@ zabbix_export:
                       value:
                         host: 'Linux block devices by Zabbix agent'
                         name: '{#DEVNAME}: Disk average waiting time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -322,9 +319,6 @@ zabbix_export:
                       value:
                         host: 'Linux block devices by Zabbix agent'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -338,9 +332,6 @@ zabbix_export:
                       value:
                         host: 'Linux block devices by Zabbix agent'
                         name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: d4e080814aad467dbf6b95c46b862c28
       template: 'Linux CPU by Zabbix agent'
       name: 'Linux CPU by Zabbix agent'
@@ -834,9 +825,6 @@ zabbix_export:
                       value:
                         host: 'Linux filesystems by Zabbix agent'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: 38f973ee1556494fadeacb2f6b1ec987
       template: 'Linux generic by Zabbix agent'
       name: 'Linux generic by Zabbix agent'
@@ -1632,9 +1620,6 @@ zabbix_export:
                       value:
                         host: 'Linux network interfaces by Zabbix agent'
                         name: 'Interface {#IFNAME}: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 8513cf23b8d34952b92a31bbd82a31d3
           name: ifOperStatus
