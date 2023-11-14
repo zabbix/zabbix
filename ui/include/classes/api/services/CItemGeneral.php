@@ -2910,7 +2910,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 		unset($query_field);
 
-		return $query_fields ? json_encode($query_fields, JSON_UNESCAPED_UNICODE) : '';
+		return $query_fields ? json_encode(array_values($query_fields), JSON_UNESCAPED_UNICODE) : '';
 	}
 
 	private static function prepareHeadersForDb(array $headers): string {
