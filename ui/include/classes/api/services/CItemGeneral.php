@@ -2834,13 +2834,10 @@ abstract class CItemGeneral extends CApiService {
 
 	protected static function prepareItemsForApi(array &$items, array &$db_items = null): void {
 		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT
-					|| ($db_items !== null && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT)) {
-				self::prepareItemForApi($item);
+			self::prepareItemForApi($item);
 
-				if ($db_items !== null) {
-					self::prepareItemForApi($db_items[$item['itemid']]);
-				}
+			if ($db_items !== null) {
+				self::prepareItemForApi($db_items[$item['itemid']]);
 			}
 		}
 		unset($item);
@@ -2890,12 +2887,9 @@ abstract class CItemGeneral extends CApiService {
 		return $headers;
 	}
 
-	protected static function prepareItemsForDb(array &$items, array &$db_items = null): void {
+	protected static function prepareItemsForDb(array &$items): void {
 		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT
-					|| ($db_items !== null && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT)) {
-				self::prepareItemForDb($item);
-			}
+			self::prepareItemForDb($item);
 		}
 		unset($item);
 	}
