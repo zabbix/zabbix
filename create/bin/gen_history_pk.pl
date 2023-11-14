@@ -136,7 +136,7 @@ HEREDOC
 	num                      integer         DEFAULT '0'               NOT NULL,
 	value_min                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,
 	value_avg                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,
-	value_max                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,'
+	value_max                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,
 HEREDOC
 );
 
