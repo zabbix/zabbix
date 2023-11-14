@@ -70,7 +70,7 @@ Options:
 Example: zabbix_agent2 -c %[3]s
 
 Report bugs to: <https://support.zabbix.com>
-Zabbix home page: <http://www.zabbix.com>
+Zabbix home page: <https://www.zabbix.com>
 Documentation: <https://www.zabbix.com/documentation>
 `
 

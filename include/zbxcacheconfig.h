@@ -40,7 +40,8 @@
 #define	ZBX_POLLER_TYPE_HTTPAGENT	7
 #define	ZBX_POLLER_TYPE_AGENT		8
 #define	ZBX_POLLER_TYPE_SNMP		9
-#define	ZBX_POLLER_TYPE_COUNT		10	/* number of poller types */
+#define ZBX_POLLER_TYPE_INTERNAL	10
+#define	ZBX_POLLER_TYPE_COUNT		11	/* number of poller types */
 
 typedef enum
 {
@@ -191,7 +192,8 @@ typedef struct
 	char			password_orig[ZBX_ITEM_PASSWORD_LEN_MAX], *password;
 	char			snmpv3_contextname_orig[ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			jmx_endpoint_orig[ZBX_ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
-	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX], *timeout;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
 	char			url_orig[ZBX_ITEM_URL_LEN_MAX], *url;
 	char			query_fields_orig[ZBX_ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
 	char			*posts;
@@ -667,8 +669,7 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	char		*snmpv3_contextname;
 	unsigned char	allow_redirect;
-	int		timeout_sec;
-	char		*timeout_str;
+	int		timeout;
 }
 zbx_dc_dcheck_t;
 
@@ -1284,6 +1285,23 @@ zbx_maintenance_type_t;
 #define ZBX_RECALC_TIME_PERIOD_HISTORY	1
 #define ZBX_RECALC_TIME_PERIOD_TRENDS	2
 void	zbx_recalc_time_period(time_t *ts_from, int table_group);
+
+/* vps tracker */
+typedef struct
+{
+	zbx_uint64_t	overcommit_limit;
+	zbx_uint64_t	overcommit;
+	zbx_uint64_t	values_limit;
+	zbx_uint64_t	written_num;
+}
+zbx_vps_monitor_stats_t;
+
+void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit);
+void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num);
+void	zbx_vps_monitor_add_written(zbx_uint64_t values_num);
+int	zbx_vps_monitor_capped(void);
+void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats);
+const char	*zbx_vps_monitor_status(void);
 
 typedef struct
 {

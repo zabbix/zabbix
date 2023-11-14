@@ -310,7 +310,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_HTTPAGENT_POLLER	40
 #define ZBX_PROCESS_TYPE_AGENT_POLLER		41
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
-#define ZBX_PROCESS_TYPE_COUNT			43	/* number of process types */
+#define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
+#define ZBX_PROCESS_TYPE_COUNT			44	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -348,38 +349,6 @@ typedef enum
 	PERM_READ_WRITE
 }
 zbx_user_permission_t;
-
-typedef struct
-{
-	unsigned char	type;
-	unsigned char	execute_on;
-	char		*port;
-	unsigned char	authtype;
-	char		*username;
-	char		*password;
-	char		*publickey;
-	char		*privatekey;
-	char		*command;
-	char		*command_orig;
-	zbx_uint64_t	scriptid;
-	unsigned char	host_access;
-	int		timeout;
-}
-zbx_script_t;
-
-#define ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT	0
-#define ZBX_SCRIPT_TYPE_IPMI		1
-#define ZBX_SCRIPT_TYPE_SSH		2
-#define ZBX_SCRIPT_TYPE_TELNET		3
-#define ZBX_SCRIPT_TYPE_WEBHOOK		5
-
-#define ZBX_SCRIPT_SCOPE_ACTION	1
-#define ZBX_SCRIPT_SCOPE_HOST	2
-#define ZBX_SCRIPT_SCOPE_EVENT	4
-
-#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
-#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
-#define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	5
@@ -593,6 +562,10 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 /* could be moved into libzbxstr.a but it seems to be logically grouped with surrounding functions */
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
+
+#if defined(__hpux)
+int	zbx_hpux_vsnprintf_is_c99(void);
+#endif
 
 /* used by log */
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);

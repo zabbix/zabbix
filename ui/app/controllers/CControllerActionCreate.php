@@ -118,11 +118,11 @@ class CControllerActionCreate extends CController {
 					unset($condition['formulaid']);
 				}
 
-				if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_SUPPRESSED) {
 					unset($condition['value']);
 				}
 
-				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
+				if ($condition['conditiontype'] != ZBX_CONDITION_TYPE_EVENT_TAG_VALUE) {
 					unset($condition['value2']);
 				}
 			}

@@ -271,7 +271,8 @@
 	 *                                     - 'test' button to test single preprocessing step (step index).
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_element, step_obj_nr) {
-		var $row = jQuery(trigger_element).closest('.preprocessing-list-item, .preprocessing-list-foot, .tfoot-buttons'),
+		var $row = jQuery(trigger_element)
+					.closest('.preprocessing-list-item, .preprocessing-list-foot, .overlay-dialogue-footer'),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
 			cached_values = $row.data('test-data') || [];
 
@@ -290,6 +291,6 @@
 			show_final_result: show_final_result ? 1 : 0,
 			get_value: get_value ? 1 : 0,
 			data: cached_values
-		}), {dialogueid: 'item-test', trigger_element});
+		}), {dialogueid: 'item-test', dialogue_class: 'modal-popup-generic', trigger_element});
 	}
 </script>
