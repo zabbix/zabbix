@@ -274,84 +274,106 @@ var dnsClassesGet = map[uint16]string{
 	255:"ANY",
 }
 
-func parseRespAnswer(respAnswer []dns.RR) {
+// func parseRespAnswer(respAnswer []dns.RR) {
+
+// 	resultG := make(map[string][]interface{})
+
+// 	for _, ii := range respAnswer {
+// 		h := ii.Header() // RR_Header
+// 		log.Infof("AGS H: ->%s<-\n", h)
+
+// 		result := make(map[string]interface{})
+
+// 		value := reflect.ValueOf(ii)
+// 		typeOf := value.Type()
+// 		// *dns.A
+
+// 		log.Infof("RECORD TYPE: %s", typeOf)
+
+// 		if value.Kind() == reflect.Ptr {
+// 			value = value.Elem()
+// 		}
+
+// 		resFieldAggregatedValues := make(map[string]interface{})
+
+// 		for j := 0; j < value.NumField(); j++ {
+
+// 			fieldValue := value.Field(j)
+// 			fieldType := value.Type().Field(j)
+// 			fieldName := fieldType.Name
+
+// 			log.Infof("FIELD_NAME Z: %s", fieldName)
+// 			if fieldName == "Hdr" {
+
+// 				valueH := fieldValue
+// 				typeOfH := valueH.Type()
+// 				// *dns.A
+// 				log.Infof("RECORD TYPE: %s", typeOfH)
+// 				if valueH.Kind() == reflect.Ptr {
+// 					valueH = valueH.Elem()
+// 				}
+
+// 				for jH := 0; jH < valueH.NumField(); jH++ {
+// 					fieldValueH := valueH.Field(jH).Interface()
+// 					fieldTypeH := valueH.Type().Field(jH)
+// 					fieldNameH := fieldTypeH.Name
+// 					log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
+// 					log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
+// 					log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
+// 					n := strings.ToLower(fieldNameH)
+
+// 					if (n == "rrtype") {
+// 						n = "type"
+// 						//log.Infof("SUBARU 1 in: %d", fieldValueH)
+// 						fieldValueH = dnsTypesGetReverse[fieldValueH]
+// 						//log.Infof("SUBARU 2 res: %s", fieldValueH)
+// 					} else if (n == "class") {
+// 						log.Infof("JEEP 1 in: %d", fieldValueH)
+
+// 						zeta, _ := fieldValueH.(uint16)
+// 						fieldValueH = dnsClassesGet[zeta]
+
+// 					}
+// 					result[n] = fieldValueH
+// 				}
+// 			} else {
+// 				resFieldValue := fieldValue.Interface()
+// 				//result[strings.ToLower(fieldName)] = resFieldValue
+// 				n := strings.ToLower(fieldName)
+// 				resFieldAggregatedValues[n] = resFieldValue
+// 			}
+// 		}
+
+// 		result["rdata"] = resFieldAggregatedValues
+
+// 		resultG["answer_section"] = append(resultG["answer_section"], result)
+// 	}
+// 	log.Infof("###################\n\n\n")
+
+// 	aG, _ := json.Marshal(resultG)
+// 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
+// }
+
+func parseRespQuestion(respQuestion []dns.Question) {
 
 	resultG := make(map[string][]interface{})
+	result := make(map[string]interface{})
 
-	for _, ii := range respAnswer {
-		h := ii.Header() // RR_Header
-		log.Infof("AGS H: ->%s<-\n", h)
+	// From Library comments:
+	// Question holds a DNS question. Usually there is just one. While the
+	// original DNS RFCs allow multiple questions in the question section of a
+	// message, in practice it never works. Because most DNS servers see multiple
+	// questions as an error, it is recommended to only have one question per
+	// message.
 
-		result := make(map[string]interface{})
-
-		value := reflect.ValueOf(ii)
-		typeOf := value.Type()
-		// *dns.A
-
-		log.Infof("RECORD TYPE: %s", typeOf)
-
-		if value.Kind() == reflect.Ptr {
-			value = value.Elem()
-		}
-
-		resFieldAggregatedValues := make(map[string]interface{})
-
-		for j := 0; j < value.NumField(); j++ {
-
-			fieldValue := value.Field(j)
-			fieldType := value.Type().Field(j)
-			fieldName := fieldType.Name
-
-			log.Infof("FIELD_NAME Z: %s", fieldName)
-			if fieldName == "Hdr" {
-
-				valueH := fieldValue
-				typeOfH := valueH.Type()
-				// *dns.A
-				log.Infof("RECORD TYPE: %s", typeOfH)
-				if valueH.Kind() == reflect.Ptr {
-					valueH = valueH.Elem()
-				}
-
-				for jH := 0; jH < valueH.NumField(); jH++ {
-					fieldValueH := valueH.Field(jH).Interface()
-					fieldTypeH := valueH.Type().Field(jH)
-					fieldNameH := fieldTypeH.Name
-					log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
-					log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
-					log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
-					n := strings.ToLower(fieldNameH)
-
-					if (n == "rrtype") {
-						n = "type"
-						//log.Infof("SUBARU 1 in: %d", fieldValueH)
-						fieldValueH = dnsTypesGetReverse[fieldValueH]
-						//log.Infof("SUBARU 2 res: %s", fieldValueH)
-					} else if (n == "class") {
-						log.Infof("JEEP 1 in: %d", fieldValueH)
-
-						zeta, _ := fieldValueH.(uint16)
-						fieldValueH = dnsClassesGet[zeta]
-
-					}
-					result[n] = fieldValueH
-				}
-			} else {
-				resFieldValue := fieldValue.Interface()
-				//result[strings.ToLower(fieldName)] = resFieldValue
-				n := strings.ToLower(fieldName)
-				resFieldAggregatedValues[n] = resFieldValue
-			}
-		}
-
-		result["rdata"] = resFieldAggregatedValues
-
-		resultG["answer_section"] = append(resultG["answer_section"], result)
-	}
-	log.Infof("###################\n\n\n")
-
+	q := respQuestion[0] //so there is 1 question
+	result["qname"] = q.Name
+	result["qtype"] = q.Qtype
+	result["qclass"] = q.Qclass
+	resultG["question_section"] = append(resultG["question_section"], result)
 	aG, _ := json.Marshal(resultG)
 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
+
 }
 
 func getDNSAnswersGet(params []string) ([]dns.RR, error) {
@@ -377,20 +399,26 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
+
+	// ANSWER
+	//resp_answer, _ := json.Marshal(resp.Answer)
+	//log.Infof("AGS Answer: %s", resp_answer)
+	//resp_answer, _ := json.Marshal(resp.Answer)
+	//parseRespAnswer(resp.Answer)
+	// ANSWER END
+
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
 	log.Infof("AGS Question: %s", resp.Question)
 
-	resp_answer, _ := json.Marshal(resp.Answer)
-	log.Infof("AGS Answer: %s", resp_answer)
+	log.Infof("AGS Ns: %s", resp.Ns)
+	log.Infof("AGS Extra: %s", resp.Extra)
 
-	log.Infof("#######################################\n\n\n\n")
+	log.Infof("AGS RCODE: %d", resp.Rcode)
 
-	parseRespAnswer(resp.Answer)
+	//resp_q, _ := json.Marshal(resp.Question)
+	//log.Infof("AGS Q: %s", resp_q)
+	parseRespQuestion(resp.Question)
 
-	// log.Infof("AGS Ns: %s", resp.Ns)
-	// log.Infof("AGS Extra: %s", resp.Extra)
-
-	// log.Infof("AGS RCODE: %d", resp.Rcode)
 
 	return resp.Answer, nil
 }
