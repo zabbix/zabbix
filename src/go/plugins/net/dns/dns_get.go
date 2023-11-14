@@ -266,7 +266,7 @@ func reverseMap(m map[string]uint16) map[interface{}]string {
 
 var dnsTypesGetReverse = reverseMap(dnsTypesGet)
 
-var dnsClassesGet = map[interface{}]string{
+var dnsClassesGet = map[uint16]string{
 	1:"IN",
 	3:"CH",
 	4:"HS",
@@ -324,24 +324,15 @@ func parseRespAnswer(respAnswer []dns.RR) {
 
 					if (n == "rrtype") {
 						n = "type"
-						log.Infof("SUBARU 1 in: %d", fieldValueH)
+						//log.Infof("SUBARU 1 in: %d", fieldValueH)
 						fieldValueH = dnsTypesGetReverse[fieldValueH]
-						log.Infof("SUBARU 2 res: %s", fieldValueH)
+						//log.Infof("SUBARU 2 res: %s", fieldValueH)
 					} else if (n == "class") {
-						// if (fieldValueH==1) {
-						// 	fieldValueH = "IN"
-						// } else if (fieldValueH==3){
-						// 	fieldValueH = "CH"
-						// } else if (fieldValueH==4){
-						// 	fieldValueH = "HS"
-						// } else if (fieldValueH==254) {
-						// 	fieldValueH = "NONE"
-						// } else if (fieldValueH ==255){
-						// 	fieldValueH = "ANY"
-						// }
 						log.Infof("JEEP 1 in: %d", fieldValueH)
-						fieldValueH = dnsClassesGet[int(fieldValueH)]
-						log.Infof("JEEP 2 in: %s", fieldValueH)
+
+						zeta, _ := fieldValueH.(uint16)
+						fieldValueH = dnsClassesGet[zeta]
+
 					}
 					result[n] = fieldValueH
 				}
