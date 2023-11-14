@@ -273,6 +273,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			'hostids' => [$hostid]
 		]);
 
+		$db_item_passive_count = API::Item()->get([
+			'countOutput' => true,
+			'filter' => ['type' => ITEM_TYPE_ZABBIX],
+			'hostids' => [$hostid]
+		]);
+
 		if ($db_item_active_count > 0) {
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			$db_host['interfaces'][] = [
@@ -282,6 +288,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			];
 			unset($db_host['active_available']);
 		}
+
+		$db_host['passive_checks'] = $db_item_passive_count > 0;
 	}
 
 	// get lld-rules
@@ -358,7 +366,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces']));
+			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['passive_checks']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), (int) $db_host['hostDiscovery']['ts_delete'])];
