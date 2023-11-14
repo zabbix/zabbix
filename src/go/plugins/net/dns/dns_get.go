@@ -9,6 +9,8 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
+	"bytes"
+
 )
 
 type dnsGetOptions struct {
@@ -281,8 +283,20 @@ var dnsExtraQuestionTypesGet = map[uint16]string{
         254:"MAILA",
         255:"ANY",
 }
+func insertAtEveryNthPosition(s string,n int, r rune) string {
+	var buffer bytes.Buffer
+	var n_1 = n - 1
+	var l_1 = len(s) - 1
+	for i,rune := range s {
+		buffer.WriteRune(rune)
+		if i % n == n_1 && i != l_1  {
+			buffer.WriteRune(r)
+		}
+	}
+	return buffer.String()
+}
 
-func parseRespAnswer(respAnswer []dns.RR) {
+func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) {
 
 	resultG := make(map[string][]interface{})
 
@@ -295,6 +309,9 @@ func parseRespAnswer(respAnswer []dns.RR) {
 		value := reflect.ValueOf(ii)
 		typeOf := value.Type()
 		// *dns.A
+
+		// note, opt can exist only in additional section
+		_, isOPT := value.Interface().(*dns.OPT)
 
 		log.Infof("RECORD TYPE: %s", typeOf)
 
@@ -316,10 +333,12 @@ func parseRespAnswer(respAnswer []dns.RR) {
 				valueH := fieldValue
 				typeOfH := valueH.Type()
 				// *dns.A
-				log.Infof("RECORD TYPE: %s", typeOfH)
+				log.Infof("RECORD TYPE IN: %s", typeOfH)
+
 				if valueH.Kind() == reflect.Ptr {
 					valueH = valueH.Elem()
 				}
+
 
 				for jH := 0; jH < valueH.NumField(); jH++ {
 					fieldValueH := valueH.Field(jH).Interface()
@@ -336,27 +355,57 @@ func parseRespAnswer(respAnswer []dns.RR) {
 						fieldValueH = dnsTypesGetReverse[fieldValueH]
 						//log.Infof("SUBARU 2 res: %s", fieldValueH)
 					} else if (n == "class") {
-						log.Infof("JEEP 1 in: %d", fieldValueH)
+						if (!isOPT) {
+							log.Infof("JEEP 1 in: %d", fieldValueH)
+							zeta, _ := fieldValueH.(uint16)
+							fieldValueH = dnsClassesGet[zeta]
+						} else {
+							n = "udp_payload"
+						}
 
-						zeta, _ := fieldValueH.(uint16)
-						fieldValueH = dnsClassesGet[zeta]
-
+					} else if ("ttl" == n && isOPT) {
+						n = "extended_rcode"
 					}
 					result[n] = fieldValueH
 				}
 			} else {
 				resFieldValue := fieldValue.Interface()
+				tX := reflect.ValueOf(resFieldValue).Type()
 				//result[strings.ToLower(fieldName)] = resFieldValue
 				n := strings.ToLower(fieldName)
-				resFieldAggregatedValues[n] = resFieldValue
+				if (isOPT && n =="option") {
+					n = "options"
+					optionResults := make([]interface{},0)
+					log.Infof("GMLRS: -%s<-", tX)
+
+					ee, isee := resFieldValue.([]dns.EDNS0)
+					log.Infof("ISEEE: %t",isee)
+					if (isee) {
+						for _,oo := range ee {
+							optionResult := make(map[string]interface{})
+							n1, isn1 := oo.(*dns.EDNS0_NSID)
+							log.Infof("N1: %t", n1)
+							if (isn1) {
+								optionResult["code"] = n1.Code
+								nsidValue := n1.Nsid
+								nsidValue = insertAtEveryNthPosition(nsidValue, 2, ' ')
+								optionResult["nsid"] = nsidValue
+								optionResults = append(optionResults, optionResult)
+							}
+						}
+					}
+					resFieldAggregatedValues[n] = optionResults
+				} else {
+					resFieldAggregatedValues[n] = resFieldValue
+				}
 			}
 		}
 
 		result["rdata"] = resFieldAggregatedValues
 
-		resultG["answer_section"] = append(resultG["answer_section"], result)
+		//resultG["answer_section"] = append(resultG["answer_section"], result)
+		resultG[source] = append(resultG[source], result)
 	}
-	log.Infof("###################\n\n\n")
 
 	aG, _ := json.Marshal(resultG)
 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
@@ -416,7 +465,6 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 		if err != nil {
 			continue
 		}
-
 		break
 	}
 
@@ -424,21 +472,19 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-
+	log.Infof("AGS HEADER: %s", resp.MsgHdr)
+	log.Infof("AGS Question: %s", resp.Question)
+	log.Infof("AGS Ns: %s", resp.Ns)
+	log.Infof("AGS Extra: %s", resp.Extra)
+	log.Infof("AGS RCODE: %d", resp.Rcode)
+	
 	// ANSWER
 	//resp_answer, _ := json.Marshal(resp.Answer)
 	//log.Infof("AGS Answer: %s", resp_answer)
 	//resp_answer, _ := json.Marshal(resp.Answer)
-	parseRespAnswer(resp.Answer)
+	parseRespAnswerOrExtra(resp.Answer, "answer_section")
 	// ANSWER END
 
-	log.Infof("AGS HEADER: %s", resp.MsgHdr)
-	log.Infof("AGS Question: %s", resp.Question)
-
-	log.Infof("AGS Ns: %s", resp.Ns)
-	log.Infof("AGS Extra: %s", resp.Extra)
-
-	log.Infof("AGS RCODE: %d", resp.Rcode)
 
 	// QUESTION
 	//resp_q, _ := json.Marshal(resp.Question)
@@ -446,6 +492,14 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	parseRespQuestion(resp.Question)
 	// QUESTION END
 
+	// EXTRA
+	log.Infof("\n\nAGS EEEEEE")
+	resp_e, _ := json.Marshal(resp.Extra)
+	log.Infof("AGS Q: %s", resp_e)
+
+	parseRespAnswerOrExtra(resp.Extra, "additional_section")
+	log.Infof("AGS EEEEEEEE 2222222\n\n\n\n")
+	// EXTRA END
 
 	return resp.Answer, nil
 }
