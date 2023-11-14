@@ -26,6 +26,7 @@
 static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
 {
 	ZBX_RETURN_IF_NOT_EQUAL(loc->r - loc->l + 1, text_len);
+
 	return zbx_strncasecmp(src + loc->l, text, text_len);
 }
 

@@ -653,7 +653,7 @@ out:
   return: SUCCEED
 
 ---
-test case: utf16 BE noBOM with enconding
+test case: utf16 BE noBOM with encoding
 in:
   encoding: 'text/html; charset=UTF-16BE'
   buffer:
