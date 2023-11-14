@@ -353,7 +353,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_GROUP		0
 #define CONDITION_TYPE_HOST			1
 #define CONDITION_TYPE_TRIGGER			2
-#define CONDITION_TYPE_TRIGGER_NAME		3
+#define CONDITION_TYPE_EVENT_NAME		3
 #define CONDITION_TYPE_TRIGGER_SEVERITY		4
 /* #define CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define CONDITION_TYPE_TIME_PERIOD		6
@@ -1844,4 +1844,5 @@ typedef enum
 zbx_err_codes_t;
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+#define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #endif

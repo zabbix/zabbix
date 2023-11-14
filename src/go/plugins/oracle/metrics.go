@@ -29,14 +29,14 @@ import (
 )
 
 const (
-	keyArchive                = "oracle.archive.info"
-	keyArchiveDiscovery       = "oracle.archive.discovery"
 	keyASMDiskGroups          = "oracle.diskgroups.stats"
 	keyASMDiskGroupsDiscovery = "oracle.diskgroups.discovery"
+	keyArchive                = "oracle.archive.info"
+	keyArchiveDiscovery       = "oracle.archive.discovery"
 	keyCDB                    = "oracle.cdb.info"
 	keyCustomQuery            = "oracle.custom.query"
-	keyDatabasesDiscovery     = "oracle.db.discovery"
 	keyDataFiles              = "oracle.datafiles.stats"
+	keyDatabasesDiscovery     = "oracle.db.discovery"
 	keyFRA                    = "oracle.fra.stats"
 	keyInstance               = "oracle.instance.info"
 	keyPDB                    = "oracle.pdb.info"
@@ -45,13 +45,14 @@ const (
 	keyPing                   = "oracle.ping"
 	keyProc                   = "oracle.proc.stats"
 	keyRedoLog                = "oracle.redolog.info"
-	keySessions               = "oracle.sessions.stats"
 	keySGA                    = "oracle.sga.stats"
+	keySessions               = "oracle.sessions.stats"
 	keySysMetrics             = "oracle.sys.metrics"
 	keySysParams              = "oracle.sys.params"
 	keyTablespaces            = "oracle.ts.stats"
 	keyTablespacesDiscovery   = "oracle.ts.discovery"
 	keyUser                   = "oracle.user.info"
+	keyVersion                = "oracle.version"
 )
 
 var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "1521"}
@@ -169,8 +170,9 @@ var metrics = metric.MetricSet{
 }
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(ctx context.Context, conn OraClient,
-	params map[string]string, extraParams ...string) (res interface{}, err error)
+type handlerFunc func(
+	ctx context.Context, conn OraClient, params map[string]string, extraParams ...string,
+) (res interface{}, err error)
 
 func init() {
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
@@ -228,7 +230,8 @@ func getHandlerFunc(key string) handlerFunc {
 		return tablespacesDiscoveryHandler
 	case keyUser:
 		return userHandler
-
+	case keyVersion:
+		return versionHandler
 	default:
 		return nil
 	}
