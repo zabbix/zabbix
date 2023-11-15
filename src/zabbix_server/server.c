@@ -1762,7 +1762,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
+				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 		}
 	}
