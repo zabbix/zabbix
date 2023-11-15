@@ -496,6 +496,42 @@ func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
 	return result
 }
 
+var dnsRespCodesMappingGet = map[int]string{
+	0: "NOERROR",
+	1:"FORMERR",
+	2:"SERVFAIL",
+	3:"NXDOMAIN",
+	4:"NOTIMP",
+	5:"REFUSED",
+	6:"YXDOMAIN",
+	7:"YXRRSET",
+	8:"NXRRSET",
+	9:"NOTAUTH",
+	10:"NOTZONE",
+	16:"BADSIG/BADVERS",
+	17:"BADKEY",
+	18:"BADTIME",
+	19:"BADMODE",
+	20:"BADNAME",
+	21:"BADALG",
+	22:"BADTRUNC",
+	23:"BADCOOKIE",
+}
+
+func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
+	result := make(map[string]interface{})
+
+	rCodeMapped, ok := dnsRespCodesMappingGet[rh.Rcode]
+
+	if (ok) {
+		result["response_code"] = rCodeMapped
+	} else {
+		result["response_code"] = rh.Rcode
+	}
+
+	return result
+}
+
 func getDNSAnswersGet(params []string) (string,error) {
 	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
 
@@ -528,6 +564,8 @@ func getDNSAnswersGet(params []string) (string,error) {
 
 	parsedFlagsSection := parseRespFlags(resp.MsgHdr)
 
+	parsedResponseCode := parseRespCode(resp.MsgHdr)
+
 	log.Infof("AGS Question: %s", resp.Question)
 	log.Infof("AGS Ns: %s", resp.Ns)
 	log.Infof("AGS Extra: %s", resp.Extra)
@@ -559,6 +597,7 @@ func getDNSAnswersGet(params []string) (string,error) {
 
 	result := []interface{}{
 		parsedFlagsSection,
+		parsedResponseCode,
 		queryTimeSection,
 		parsedQuestionSection,
 		parsedAnswerSection,
