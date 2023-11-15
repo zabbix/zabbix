@@ -1007,7 +1007,7 @@ class testConnector extends CAPITest {
 				$this->assertSame($connector['url'], $db_connector['url']);
 
 				// Numeric fields.
-				foreach (['protocol', 'data_type', 'max_records', 'max_senders', 'max_attempts', 'authtype',
+				foreach (['protocol', 'data_type', 'authtype', 'max_records', 'max_senders', 'max_attempts',
 						'verify_peer', 'verify_host', 'status', 'tags_evaltype'] as $field) {
 					if (array_key_exists($field, $connector)) {
 						$this->assertEquals($connector[$field], $db_connector[$field]);
@@ -1172,7 +1172,7 @@ class testConnector extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "item_value_type", "max_records", "max_senders", "max_attempts", "attempt_interval", "timeout", "http_proxy", "authtype", "username", "password", "token", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "item_value_type", "authtype", "username", "password", "token", "max_records", "max_senders", "max_attempts", "attempt_interval", "timeout", "http_proxy", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
 			],
 
 			// Check "selectTags" option.
@@ -2248,7 +2248,7 @@ class testConnector extends CAPITest {
 				$this->assertNotEmpty($connector_upd['url']);
 
 				// Numeric fields.
-				foreach (['protocol', 'data_type', 'max_records', 'max_senders', 'max_attempts', 'authtype',
+				foreach (['protocol', 'data_type', 'authtype', 'max_records', 'max_senders', 'max_attempts',
 						'verify_peer', 'verify_host', 'status', 'tags_evaltype'] as $field) {
 					if (array_key_exists($field, $connector)) {
 						$this->assertEquals($connector[$field], $connector_upd[$field]);
@@ -2434,10 +2434,10 @@ class testConnector extends CAPITest {
 	 */
 	private function getConnectors(array $connectorids): array {
 		$response = $this->call('connector.get', [
-			'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type', 'max_records',
-				'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype', 'username',
-				'password', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'description', 'status', 'tags_evaltype'
+			'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type', 'authtype',
+				'username', 'password', 'token', 'max_records', 'max_senders', 'max_attempts', 'attempt_interval',
+				'timeout', 'http_proxy', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file',
+				'ssl_key_password', 'description', 'status', 'tags_evaltype'
 			],
 			'selectTags' => ['tag', 'operator', 'value'],
 			'connectorids' => $connectorids,
