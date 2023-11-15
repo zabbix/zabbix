@@ -114,40 +114,6 @@ var (
 	four         = flag.Bool("4", false, "use IPv4 only")
 )
 
-// func parseAnswersGet(answers []dns.RR) string {
-// 	var out string
-// 	answersNum := len(answers)
-
-// 	log.Infof("AGS 111\n")
-// 	//	fmt.Println("AGS answersNum: %d", answersNum)
-// 	//fmt.Println("AGS 222")
-
-// 	for i, a := range answers {
-// 		// fmt.Println("STRATA: i: %d", i)
-// 		// fmt.Println("STRATA: a: %s", a)
-// 		// fmt.Println("STRATA: T: %T", a)
-
-// 		out += fmt.Sprintf("%-20s", strings.TrimSuffix(a.Header().Name, "."))
-// 		out += fmt.Sprintf(" %-8s ", dns.Type(a.Header().Rrtype).String())
-
-// 		// switch rr := a.(type) {
-// 		// 	out +=
-// 		// }
-
-// 		// fmt.Println("OMEGA X222: %s",a.String())
-
-// 		s := fmt.Sprintf("OMEGA X999: %s", reflect.TypeOf(a))
-// 		log.Infof(s)
-
-// 		out += a.String()
-
-// 		if i != answersNum-1 {
-// 			out += "\n"
-// 		}
-// 	}
-
-// 	return out
-// }
 
 func exportDnsGet(params []string) (result interface{}, err error) {
 
@@ -162,7 +128,6 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	// 	return nil, zbxerr.New("Cannot perform DNS query.")
 	// }
 
-	//return parseAnswersGet(answer), nil
 	return answer, nil
 }
 
@@ -284,10 +249,10 @@ var dnsClassesGet = map[uint16]string{
 
 var dnsExtraQuestionTypesGet = map[uint16]string{
 	251:"IXFR",
-        252:"AXFR",
-        253:"MAILB",
-        254:"MAILA",
-        255:"ANY",
+	252:"AXFR",
+	253:"MAILB",
+	254:"MAILA",
+	255:"ANY",
 }
 func insertAtEveryNthPosition(s string,n int, r rune) string {
 	var buffer bytes.Buffer
@@ -300,6 +265,82 @@ func insertAtEveryNthPosition(s string,n int, r rune) string {
 		}
 	}
 	return buffer.String()
+}
+
+func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT bool) {
+
+	valueH := fieldValue
+	typeOfH := valueH.Type()
+
+	log.Infof("RECORD TYPE IN: %s", typeOfH)
+
+	if valueH.Kind() == reflect.Ptr {
+		valueH = valueH.Elem()
+	}
+
+
+	for jH := 0; jH < valueH.NumField(); jH++ {
+		fieldValueH := valueH.Field(jH).Interface()
+		fieldTypeH := valueH.Type().Field(jH)
+		fieldNameH := fieldTypeH.Name
+		log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
+		log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
+		log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
+		n := strings.ToLower(fieldNameH)
+
+		if (n == "rrtype") {
+			n = "type"
+			//log.Infof("SUBARU 1 in: %d", fieldValueH)
+			fieldValueH = dnsTypesGetReverse[fieldValueH]
+			//log.Infof("SUBARU 2 res: %s", fieldValueH)
+		} else if (n == "class") {
+			if (!isOPT) {
+				log.Infof("JEEP 1 in: %d", fieldValueH)
+				zeta, _ := fieldValueH.(uint16)
+				fieldValueH = dnsClassesGet[zeta]
+			} else {
+				n = "udp_payload"
+			}
+
+		} else if ("ttl" == n && isOPT) {
+			n = "extended_rcode"
+		}
+		result[n] = fieldValueH
+	}
+}
+
+func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, result map[string]interface{}, isOPT bool,
+	resFieldAggregatedValues map[string]interface{}) {
+
+	resFieldValue := fieldValue.Interface()
+
+	tX := reflect.ValueOf(resFieldValue).Type()
+	n := strings.ToLower(fieldType.Name)
+	if (isOPT && n =="option") {
+		n = "options"
+		optionResults := make([]interface{},0)
+		log.Infof("GMLRS: -%s<-", tX)
+
+		ee, isee := resFieldValue.([]dns.EDNS0)
+		log.Infof("ISEEE: %t",isee)
+		if (isee) {
+			for _,oo := range ee {
+				optionResult := make(map[string]interface{})
+				n1, isn1 := oo.(*dns.EDNS0_NSID)
+				log.Infof("N1: %t", n1)
+				if (isn1) {
+					optionResult["code"] = n1.Code
+					nsidValue := n1.Nsid
+					nsidValue = insertAtEveryNthPosition(nsidValue, 2, ' ')
+					optionResult["nsid"] = nsidValue
+					optionResults = append(optionResults, optionResult)
+				}
+			}
+		}
+		resFieldAggregatedValues[n] = optionResults
+	} else {
+		resFieldAggregatedValues[n] = resFieldValue
+	}
 }
 
 func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]interface{} {
@@ -331,85 +372,18 @@ func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]int
 
 			fieldValue := value.Field(j)
 			fieldType := value.Type().Field(j)
-			fieldName := fieldType.Name
+			//fieldName := fieldType.Name
 
-			log.Infof("FIELD_NAME Z: %s", fieldName)
-			if fieldName == "Hdr" {
-
-				valueH := fieldValue
-				typeOfH := valueH.Type()
-				// *dns.A
-				log.Infof("RECORD TYPE IN: %s", typeOfH)
-
-				if valueH.Kind() == reflect.Ptr {
-					valueH = valueH.Elem()
-				}
-
-
-				for jH := 0; jH < valueH.NumField(); jH++ {
-					fieldValueH := valueH.Field(jH).Interface()
-					fieldTypeH := valueH.Type().Field(jH)
-					fieldNameH := fieldTypeH.Name
-					log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
-					log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
-					log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
-					n := strings.ToLower(fieldNameH)
-
-					if (n == "rrtype") {
-						n = "type"
-						//log.Infof("SUBARU 1 in: %d", fieldValueH)
-						fieldValueH = dnsTypesGetReverse[fieldValueH]
-						//log.Infof("SUBARU 2 res: %s", fieldValueH)
-					} else if (n == "class") {
-						if (!isOPT) {
-							log.Infof("JEEP 1 in: %d", fieldValueH)
-							zeta, _ := fieldValueH.(uint16)
-							fieldValueH = dnsClassesGet[zeta]
-						} else {
-							n = "udp_payload"
-						}
-
-					} else if ("ttl" == n && isOPT) {
-						n = "extended_rcode"
-					}
-					result[n] = fieldValueH
-				}
+			log.Infof("FIELD_NAME Z: %s", fieldType.Name)
+			if fieldType.Name == "Hdr" {
+				parseHeader(fieldValue, result, isOPT)
 			} else {
-				resFieldValue := fieldValue.Interface()
-				tX := reflect.ValueOf(resFieldValue).Type()
-				//result[strings.ToLower(fieldName)] = resFieldValue
-				n := strings.ToLower(fieldName)
-				if (isOPT && n =="option") {
-					n = "options"
-					optionResults := make([]interface{},0)
-					log.Infof("GMLRS: -%s<-", tX)
-
-					ee, isee := resFieldValue.([]dns.EDNS0)
-					log.Infof("ISEEE: %t",isee)
-					if (isee) {
-						for _,oo := range ee {
-							optionResult := make(map[string]interface{})
-							n1, isn1 := oo.(*dns.EDNS0_NSID)
-							log.Infof("N1: %t", n1)
-							if (isn1) {
-								optionResult["code"] = n1.Code
-								nsidValue := n1.Nsid
-								nsidValue = insertAtEveryNthPosition(nsidValue, 2, ' ')
-								optionResult["nsid"] = nsidValue
-								optionResults = append(optionResults, optionResult)
-							}
-						}
-					}
-					resFieldAggregatedValues[n] = optionResults
-				} else {
-					resFieldAggregatedValues[n] = resFieldValue
-				}
+				parseRest(fieldValue, fieldType, result, isOPT, resFieldAggregatedValues)
 			}
 		}
 
 		result["rdata"] = resFieldAggregatedValues
 
-		//resultG["answer_section"] = append(resultG["answer_section"], result)
 		resultG[source] = append(resultG[source], result)
 	}
 
@@ -424,16 +398,14 @@ func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
 	resultG := make(map[string][]interface{})
 	result := make(map[string]interface{})
 
-	// From Library comments:
-	// Question holds a DNS question. Usually there is just one. While the
-	// original DNS RFCs allow multiple questions in the question section of a
-	// message, in practice it never works. Because most DNS servers see multiple
-	// questions as an error, it is recommended to only have one question per
-	// message.
-
-	q := respQuestion[0] //so there is 1 question
+	// RFC allows to have multiple questsions, however DNS library describes
+	// it almost never happens, so it says it will fail if there is more than 1,
+	// so safe to assumed  there will be exactly 1 question
+	q := respQuestion[0]
 	result["qname"] = q.Name
+
 	qTypeMapped, ok := dnsTypesGetReverse[q.Qtype]
+
 	if (!ok) {
 		qTypeMapped, ok = dnsExtraQuestionTypesGet[q.Qtype]
 		if (!ok) {
