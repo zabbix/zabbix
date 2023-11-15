@@ -30,6 +30,7 @@ class CSVGPie {
 	static ZBX_STYLE_TOTAL_VALUE_NO_DATA =	'svg-pie-chart-total-value-no-data';
 
 	static LINE_HEIGHT = 1.14;
+	static TEXT_BASELINE = 0.8;
 
 	static ANIMATE_DURATION_WHOLE = 1000;
 	static ANIMATE_DURATION_POP_OUT = 300;
@@ -39,7 +40,8 @@ class CSVGPie {
 	static DRAW_TYPE_DOUGHNUT = 1;
 
 	static TOTAL_VALUE_SIZE_DEFAULT = 10;
-	static TOTAL_VALUE_PADDING = 4;
+	static TOTAL_VALUE_HEIGHT_MIN = 12;
+	static TOTAL_VALUE_PADDING = 8;
 
 	/**
 	 * Widget configuration.
@@ -169,6 +171,41 @@ class CSVGPie {
 	#radius_inner;
 
 	/**
+	 * Scale of pie chart.
+	 *
+	 * @type {number}
+	 */
+	#scale = 1;
+
+	/**
+	 * Total value of pie chart combined from value and units.
+	 *
+	 * @type {string}
+	 */
+	#total_value;
+
+	/**
+	 * Font size of total value.
+	 *
+	 * @type {number}
+	 */
+	#total_value_font_size;
+
+	/**
+	 * Canvas context for text measuring.
+	 *
+	 * @type {object}
+	 */
+	#canvas_context = null;
+
+	/**
+	 * Font family of SVG.
+	 *
+	 * @type {string}
+	 */
+	#font_family = '';
+
+	/**
 	 * Arc generator function.
 	 *
 	 * @type {function}
@@ -209,6 +246,10 @@ class CSVGPie {
 
 		this.#svg = d3.create('svg:svg').attr('class', CSVGPie.ZBX_STYLE_CLASS);
 
+		this.#canvas_context = document.createElement('canvas').getContext('2d');
+
+		this.#font_family = this.#svg.style('font-family');
+
 		this.#createContainers();
 
 		this.#sector_observer = new MutationObserver((mutation_list) => {
@@ -237,13 +278,15 @@ class CSVGPie {
 
 		const box_size = this.#radius_outer * 2;
 
-		const scale = Math.min(this.#width / box_size, this.#height / box_size);
-		const offset = scale / 10;
+		this.#scale = Math.min(this.#width / box_size, this.#height / box_size);
+		this.#scale -= this.#scale / 10;
 
 		const x = this.#width / 2;
-		const y = (this.#height - box_size * scale) / 2 + this.#radius_outer * scale;
+		const y = (this.#height - box_size * this.#scale) / 2 + this.#radius_outer * this.#scale;
 
-		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${scale - offset})`);
+		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${this.#scale})`);
+
+		this.#positionValue();
 	}
 
 	/**
@@ -261,6 +304,12 @@ class CSVGPie {
 		this.#popped_out_sector = null;
 		this.#popped_out_placeholder = null;
 
+		this.#total_value = total_value.value;
+
+		if (this.#config.total_value.units_show && total_value.units !== '') {
+			this.#total_value += ` ${total_value.units}`;
+		}
+
 		if (sectors.length > 0) {
 			all_sectorids = this.#prepareAllSectorids(all_sectorids);
 			sectors = this.#sortByReference(sectors, all_sectorids);
@@ -268,69 +317,6 @@ class CSVGPie {
 			this.#arcs_container
 				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 				.style('display', 'none');
-
-			this.#no_data_container.style('display', 'none');
-
-			if (this.#config.total_value?.show) {
-				this.#total_value_container
-					.text(() => {
-						let text = total_value.value;
-
-						if (this.#config.total_value.units_show && total_value.units !== '') {
-							text += ` ${total_value.units}`;
-						}
-
-						return text;
-					});
-
-				if (this.#config.total_value.is_custom_size) {
-					this.#total_value_container
-						.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT - this.#config.total_value.size)
-						.style('font-size', `${this.#config.total_value.size * 10}px`);
-				}
-				else {
-					const text_width = this.#getMeasuredTextWidth(
-						this.#total_value_container.text(),
-						CSVGPie.TOTAL_VALUE_SIZE_DEFAULT,
-						this.#svg.style('font-family')) + CSVGPie.TOTAL_VALUE_PADDING;
-
-					const scale = this.#radius_inner * 2 / text_width;
-
-					this.#total_value_container.attr('transform', `scale(${scale})`);
-				}
-
-				this.#total_value_container.style('display', '');
-			}
-		}
-		else {
-			if (this.#config.total_value?.show) {
-				this.#total_value_container
-					.text('')
-					.style('display', 'none');
-
-				if (this.#config.total_value.is_custom_size) {
-					this.#no_data_container
-						.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT - this.#config.total_value.size)
-						.style('font-size', `${this.#config.total_value.size * 10}px`);
-				}
-				else {
-					const text_width = this.#getMeasuredTextWidth(
-						this.#no_data_container.text(),
-						CSVGPie.TOTAL_VALUE_SIZE_DEFAULT,
-						this.#svg.style('font-family')) + CSVGPie.TOTAL_VALUE_PADDING;
-
-					const scale = this.#radius_inner * 2 / text_width;
-
-					this.#no_data_container.attr('transform', `scale(${scale})`);
-				}
-
-				this.#no_data_container.style('display', '');
-			}
-			else {
-				this.#no_data_container
-					.attr('y', 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10 / 2 / CSVGPie.LINE_HEIGHT - 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT)
-					.style('font-size', `${2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10}px`);
-			}
 		}
 
 		this.#sectors_old = this.#sectors_new;
@@ -433,6 +419,8 @@ class CSVGPie {
 				}
 			})
 			.catch(() => {});
+
+		this.#positionValue();
 	}
 
 	/**
@@ -449,6 +437,78 @@ class CSVGPie {
 	 */
 	destroy() {
 		this.#svg.node().remove();
+	}
+
+	#positionValue() {
+		if (this.#sectors_new.length > 0) {
+			this.#no_data_container.style('display', 'none');
+
+			if (this.#config.total_value?.show) {
+				this.#total_value_container.style('display', '');
+
+				this.#total_value_container
+					.select('div')
+					.text(this.#total_value);
+
+				if (this.#config.total_value.is_custom_size) {
+					this.#total_value_font_size = this.#config.total_value.size * 10;
+				}
+				else {
+					this.#total_value_font_size = this.#getAutoFontSize(this.#total_value, CSVGPie.TOTAL_VALUE_SIZE_DEFAULT);
+				}
+
+				this.#total_value_container
+					.attr('y', -this.#total_value_font_size / 2)
+					.attr('height', `${this.#total_value_font_size}px`)
+					.style('font-size', `${this.#total_value_font_size}px`)
+					.style('line-height', `${this.#total_value_font_size / CSVGPie.TEXT_BASELINE}px`);
+			}
+		}
+		else {
+			if (this.#config.total_value?.show) {
+				this.#total_value_container.style('display', 'none');
+
+				this.#total_value_container
+					.select('div')
+					.text('');
+
+				if (this.#config.total_value.is_custom_size) {
+					this.#no_data_container
+						.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT - this.#config.total_value.size)
+						.style('font-size', `${this.#config.total_value.size * 10}px`);
+				}
+				else {
+					const text_width = this.#getMeasuredTextWidth(
+						this.#no_data_container.text(),
+						CSVGPie.TOTAL_VALUE_SIZE_DEFAULT) + CSVGPie.TOTAL_VALUE_PADDING;
+
+					const text_scale = this.#radius_inner * 2 / text_width;
+
+					this.#no_data_container.attr('transform', `scale(${text_scale})`);
+				}
+
+				this.#no_data_container.style('display', '');
+			}
+			else {
+				this.#no_data_container
+					.attr('y', 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10 / 2 / CSVGPie.LINE_HEIGHT - 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT)
+					.style('font-size', `${2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10}px`);
+			}
+		}
+	}
+
+	#getAutoFontSize(text, default_size) {
+		const text_width = this.#getMeasuredTextWidth(text, default_size);
+
+		const available_width = this.#radius_inner * 2 * this.#scale;
+
+		let coefficient = available_width / text_width;
+
+		const percent = default_size * coefficient;
+		const px1 = default_size * this.#scale;
+		const px2 = px1 * coefficient;
+
+		return CSVGPie.TOTAL_VALUE_HEIGHT_MIN * percent / px2;
 	}
 
 	/**
@@ -481,13 +541,15 @@ class CSVGPie {
 
 			if (this.#config.total_value?.show) {
 				this.#total_value_container = this.#g_scalable
-					.append('svg:text')
+					.append('svg:foreignObject')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
-					.attr('y', y_offset)
-					.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT}px`)
+					.attr('x', -this.#radius_inner)
+					.attr('width', `${this.#radius_inner * 2}px`)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
-					.style('fill', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
+					.style('color', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
 					.style('display', 'none');
+
+				this.#total_value_container.append('xhtml:div');
 			}
 		}
 
@@ -603,18 +665,14 @@ class CSVGPie {
 	 * Get text width using canvas measuring.
 	 *
 	 * @param {string} text
-	 * @param {number} size
-	 * @param {string} font_family
+	 * @param {number} font_size
 	 *
 	 * @returns {number}
 	 */
-	#getMeasuredTextWidth(text, size, font_family) {
-		const canvas = document.createElement('canvas');
-		const context = canvas.getContext('2d');
+	#getMeasuredTextWidth(text, font_size) {
+		this.#canvas_context.font = `${font_size}px ${this.#font_family}`;
 
-		context.font = `${size}px ${font_family}`;
-
-		return context.measureText(text).width;
+		return this.#canvas_context.measureText(text).width;
 	}
 
 	/**

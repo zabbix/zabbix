@@ -23,8 +23,11 @@
 		}
 	}
 
-	.svg-pie-chart-total-value {
-		text-anchor: middle;
+	.svg-pie-chart-total-value div {
+		text-align: center;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.svg-pie-chart-total-value-no-data {

@@ -3513,8 +3513,11 @@ section {
       fill: #383838; }
     .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-inner {
       fill: #2b2b2b; }
-  .svg-pie-chart .svg-pie-chart-total-value {
-    text-anchor: middle; }
+  .svg-pie-chart .svg-pie-chart-total-value div {
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .svg-pie-chart .svg-pie-chart-total-value-no-data {
     text-anchor: middle;
     fill: #737373; }
