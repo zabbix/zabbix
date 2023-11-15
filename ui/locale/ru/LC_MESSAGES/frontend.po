@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-10-19 11:28+0000\n"
+"PO-Revision-Date: 2023-11-03 14:01+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -679,12 +679,11 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "Класс действия %1$s должен расширять %2$s класс."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Действие удалено"
-msgstr[1] "Действие удалено"
-msgstr[2] "Действие удалено"
+msgstr[1] "Действия удалены"
+msgstr[2] "Действия удалены"
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -1633,7 +1632,7 @@ msgstr "Как минимум один параметр должен быть в
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Должен быть включкен как минимум один параметр."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -2571,12 +2570,11 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Невозможно удалить внутреннего пользователя Zabbix \"%1$s\", попробуйте отключить его."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "Не удалось удалить действие"
-msgstr[1] "Не удалось удалить действие"
-msgstr[2] "Не удалось удалить действие"
+msgstr[1] "Не удалось удалить действия"
+msgstr[2] "Не удалось удалить действия"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
@@ -2619,28 +2617,25 @@ msgstr[1] "Не удалось удалить корреляции событи�
 msgstr[2] "Не удалось удалить корреляции событий"
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "Не удалось удалить график"
-msgstr[1] "Не удалось удалить график"
-msgstr[2] "Не удалось удалить график"
+msgstr[1] "Не удалось удалить графики"
+msgstr[2] "Не удалось удалить графики"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
-msgstr[0] "Не удалось удалить прототип графика"
-msgstr[1] "Не удалось удалить прототип графика"
-msgstr[2] "Не удалось удалить прототип графика"
+msgstr[0] ""
+msgstr[1] "Не удалось удалить прототипы графиков"
+msgstr[2] "Не удалось удалить прототипы графиков"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Не удалось удалить узел сети"
-msgstr[1] "Не удалось удалить узел сети"
-msgstr[2] "Не удалось удалить узел сети"
+msgstr[1] "Не удалось удалить узелы сети"
+msgstr[2] "Не удалось удалить узелы сети"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2699,20 +2694,18 @@ msgid "Cannot delete inventory."
 msgstr "Не удалось удалить инвентарные данные."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
 msgstr[0] "Не удалось удалить элемент данных"
-msgstr[1] "Не удалось удалить элемент данных"
-msgstr[2] "Не удалось удалить элемент данных"
+msgstr[1] "Не удалось удалить элементы данных"
+msgstr[2] "Не удалось удалить элементы данных"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
 msgstr[0] "Не удалось удалить прототип элементов данных"
-msgstr[1] "Не удалось удалить прототип элементов данных"
-msgstr[2] "Не удалось удалить прототип элементов данных"
+msgstr[1] "Не удалось удалить прототипы элементов данных"
+msgstr[2] "Не удалось удалить прототипы элементов данных"
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2737,12 +2730,11 @@ msgstr[1] "Не удалось удалить модули: %1$s."
 msgstr[2] "Не удалось удалить модули: %1$s."
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
 msgstr[0] "Не удалось удалить карту сети"
-msgstr[1] "Не удалось удалить карту сети"
-msgstr[2] "Не удалось удалить карту сети"
+msgstr[1] "Не удалось удалить карты сети"
+msgstr[2] "Не удалось удалить карты сети"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
@@ -2800,12 +2792,11 @@ msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr "Не удалось удалить услугу \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "Не удалось удалить шаблон"
-msgstr[1] "Не удалось удалить шаблон"
-msgstr[2] "Не удалось удалить шаблон"
+msgstr[1] "Не удалось удалить шаблоны"
+msgstr[2] "Не удалось удалить шаблоны"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2838,20 +2829,18 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Невозможно удалить веб-сценарий \"%1$s\" унаследованный из шаблона."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Не удалось удалить триггер"
-msgstr[1] "Не удалось удалить триггер"
-msgstr[2] "Не удалось удалить триггер"
+msgstr[1] "Не удалось удалить триггеры"
+msgstr[2] "Не удалось удалить триггеры"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
 msgstr[0] "Не удалось удалить прототип триггеров"
-msgstr[1] "Не удалось удалить прототип триггеров"
-msgstr[2] "Не удалось удалить прототип триггеров"
+msgstr[1] "Не удалось удалить прототипы триггеров"
+msgstr[2] "Не удалось удалить прототипы триггеров"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
@@ -2880,12 +2869,11 @@ msgstr[1] "Не удалось удалить роли пользователе�
 msgstr[2] "Не удалось удалить ролей пользователей"
 
 #: httpconf.php:178 httpconf.php:418
-#, fuzzy
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
 msgstr[0] "Не удалось удалить веб-сценарий"
-msgstr[1] "Не удалось удалить веб-сценарий"
-msgstr[2] "Не удалось удалить веб-сценарий"
+msgstr[1] "Не удалось удалить веб-сценарии"
+msgstr[2] "Не удалось удалить веб-сценарии"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
@@ -3978,12 +3966,11 @@ msgstr "Не удалось обновить группы для обнаруж�
 #: app/controllers/CControllerHostUpdate.php:36
 #: app/controllers/CControllerHostUpdate.php:160
 #: app/controllers/CControllerPopupMassupdateHost.php:521
-#, fuzzy
 msgid "Cannot update host"
 msgid_plural "Cannot update hosts"
 msgstr[0] "Не удалось обновить узел сети"
-msgstr[1] "Не удалось обновить узел сети"
-msgstr[2] "Не удалось обновить узел сети"
+msgstr[1] "Не удалось обновить узлы сети"
+msgstr[2] "Не удалось обновить узлы сети"
 
 #: include/classes/api/services/CHost.php:982
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
@@ -4017,12 +4004,11 @@ msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Не удалось обновить интерфейс для обнаруженного узла сети \"%1$s\"."
 
 #: app/controllers/CControllerPopupMassupdateItem.php:279 items.php:670
-#, fuzzy
 msgid "Cannot update item"
 msgid_plural "Cannot update items"
 msgstr[0] "Не удалось обновить элемент данных"
-msgstr[1] "Не удалось обновить элемент данных"
-msgstr[2] "Не удалось обновить элемент данных"
+msgstr[1] "Не удалось обновить элементы данных"
+msgstr[2] "Не удалось обновить элементы данных"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:278
 #: disc_prototypes.php:457 disc_prototypes.php:484 disc_prototypes.php:523
@@ -4116,12 +4102,11 @@ msgstr "Не удалось обновить шаг унаследованног
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
-#, fuzzy
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
 msgstr[0] "Не удалось обновить шаблон"
-msgstr[1] "Не удалось обновить шаблон"
-msgstr[2] "Не удалось обновить шаблон"
+msgstr[1] "Не удалось обновить шаблоны"
+msgstr[2] "Не удалось обновить шаблоны"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
@@ -4131,12 +4116,11 @@ msgstr "Не удалось обновить группу шаблонов"
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "Не удалось обновить триггер"
-msgstr[1] "Не удалось обновить триггер"
-msgstr[2] "Не удалось обновить триггер"
+msgstr[1] "Не удалось обновить триггеры"
+msgstr[2] "Не удалось обновить триггеры"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
@@ -13794,6 +13778,14 @@ msgstr "Новый узел сети"
 msgid "New host group"
 msgstr "Новая группа узлов сети"
 
+#: app/views/item.edit.php:218
+msgid "New item"
+msgstr ""
+
+#: app/views/item.prototype.edit.php:191
+msgid "New item prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
@@ -15607,6 +15599,10 @@ msgstr "Линия процентиля (слева)"
 #: widgets/svggraph/includes/WidgetForm.php:264
 msgid "Percentile line (right)"
 msgstr "Линия процентиля (справа)"
+
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -23234,6 +23230,13 @@ msgstr "asin() - Арксинус значения в виде угла, в ра
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
 msgstr "необходимо выбрать по крайней мере один день недели"
+
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"

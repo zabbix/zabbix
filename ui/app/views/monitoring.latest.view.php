@@ -29,6 +29,8 @@ $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 $this->addJsFile('class.expandable.subfilter.js');
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.latest.view.js.php');
 

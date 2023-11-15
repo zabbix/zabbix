@@ -1025,7 +1025,7 @@ if (!empty($data['itemid'])) {
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			)
-			->onClick('view.checkNow(this);');
+			->addClass('js-execute-item');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
@@ -1076,7 +1076,8 @@ $html_page->show();
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
 		'counter' => $data['counter'],
-		'context' => $data['context']
+		'context' => $data['context'],
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

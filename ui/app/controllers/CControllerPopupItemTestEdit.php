@@ -188,7 +188,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps = sortPreprocessingSteps($this->getInput('steps', []));
+		$preprocessing_steps = CItemGeneralHelper::sortPreprocessingSteps((array) $this->getInput('steps', []));
 		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps);
 		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
@@ -280,19 +280,21 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					continue;
 				}
 
-				foreach (['name', 'value'] as $key) {
-					$texts_having_macros = array_filter($inputs[$field][$key], function($str) {
-						return (strstr($str, '{') !== false);
-					});
+				$texts_having_macros = array_merge(
+					array_column($inputs[$field], 'name'),
+					array_column($inputs[$field], 'value')
+				);
+				$texts_having_macros = array_filter($texts_having_macros, function($str) {
+					return (strstr($str, '{') !== false);
+				});
 
-					if ($texts_having_macros) {
-						$supported_macros = array_merge_recursive($supported_macros, $macros);
-						$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
-						$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+				if ($texts_having_macros) {
+					$supported_macros = array_merge_recursive($supported_macros, $macros);
+					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
 
-						if ($support_lldmacros) {
-							$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
-						}
+					if ($support_lldmacros) {
+						$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
 					}
 				}
 			}

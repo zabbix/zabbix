@@ -326,7 +326,7 @@ else {
 }
 
 $tabs = (new CTabView(['id' => 'template-tabs']))
-	->addTab('template-tab', _('Templates'), $template_tab)
+	->addTab('template-tab', _('Template'), $template_tab)
 	->addTab('template-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('template-macro-tab', _('Macros'),$macros_tab, TAB_INDICATOR_TEMPLATE_MACROS)
 	->addTab('template-valuemap-tab', _('Value mapping'), $valuemap_tab, TAB_INDICATOR_TEMPLATE_VALUEMAPS)
