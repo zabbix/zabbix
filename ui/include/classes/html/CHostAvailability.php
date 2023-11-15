@@ -41,7 +41,7 @@ class CHostAvailability extends CTag {
 
 	protected $type_interfaces = [];
 
-	protected $passive_checks = true;
+	protected $has_passive_checks = true;
 
 	public function __construct() {
 		parent::__construct('div', true);
@@ -105,14 +105,14 @@ class CHostAvailability extends CTag {
 	}
 
 	/**
-	 * Sets the value if the host passive checks exist
+	 * Sets the value if the host has passive checks
 	 *
-	 * @param bool $value has passive check items.
+	 * @param bool $value has items with passive checks.
 	 *
 	 * @return CHostAvailability
 	 */
 	public function setPassiveChecks(bool $value): CHostAvailability {
-		$this->passive_checks = $value;
+		$this->has_passive_checks = $value;
 
 		return $this;
 	}
@@ -122,7 +122,7 @@ class CHostAvailability extends CTag {
 			if ($type == INTERFACE_TYPE_AGENT && count($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]) > 0) {
 				$interfaces = array_merge($interfaces, $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
 
-				$status = $this->passive_checks
+				$status = $this->has_passive_checks
 					? getInterfaceAvailabilityStatus($interfaces)
 					: getInterfaceAvailabilityStatus($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
 			}
