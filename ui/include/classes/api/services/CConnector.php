@@ -36,7 +36,7 @@ class CConnector extends CApiService {
 	protected $sortColumns = ['connectorid', 'name', 'data_type', 'status'];
 
 	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'item_value_type',
-		'authtype',	'username', 'password', 'token', 'max_records', 'max_senders', 'max_attempts', 'attempt_interval',
+		'authtype', 'username', 'password', 'token', 'max_records', 'max_senders', 'max_attempts', 'attempt_interval',
 		'timeout', 'http_proxy', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 		'description', 'status', 'tags_evaltype'
 	];
@@ -365,8 +365,6 @@ class CConnector extends CApiService {
 										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR | ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG | ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 | ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT)],
 										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('connector', 'item_value_type')]
 			]],
-			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
-			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER])],
 			'username' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'username')],
@@ -387,6 +385,8 @@ class CConnector extends CApiService {
 										['if' => ['field' => 'max_attempts', 'in' =>'2:5'], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:10'],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'attempt_interval')]
 			]],
+			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
+			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')],
