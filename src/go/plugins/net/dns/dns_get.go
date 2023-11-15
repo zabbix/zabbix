@@ -114,54 +114,56 @@ var (
 	four         = flag.Bool("4", false, "use IPv4 only")
 )
 
-func parseAnswersGet(answers []dns.RR) string {
-	var out string
-	answersNum := len(answers)
+// func parseAnswersGet(answers []dns.RR) string {
+// 	var out string
+// 	answersNum := len(answers)
 
-	log.Infof("AGS 111\n")
-	//	fmt.Println("AGS answersNum: %d", answersNum)
-	//fmt.Println("AGS 222")
+// 	log.Infof("AGS 111\n")
+// 	//	fmt.Println("AGS answersNum: %d", answersNum)
+// 	//fmt.Println("AGS 222")
 
-	for i, a := range answers {
-		// fmt.Println("STRATA: i: %d", i)
-		// fmt.Println("STRATA: a: %s", a)
-		// fmt.Println("STRATA: T: %T", a)
+// 	for i, a := range answers {
+// 		// fmt.Println("STRATA: i: %d", i)
+// 		// fmt.Println("STRATA: a: %s", a)
+// 		// fmt.Println("STRATA: T: %T", a)
 
-		out += fmt.Sprintf("%-20s", strings.TrimSuffix(a.Header().Name, "."))
-		out += fmt.Sprintf(" %-8s ", dns.Type(a.Header().Rrtype).String())
+// 		out += fmt.Sprintf("%-20s", strings.TrimSuffix(a.Header().Name, "."))
+// 		out += fmt.Sprintf(" %-8s ", dns.Type(a.Header().Rrtype).String())
 
-		// switch rr := a.(type) {
-		// 	out +=
-		// }
+// 		// switch rr := a.(type) {
+// 		// 	out +=
+// 		// }
 
-		// fmt.Println("OMEGA X222: %s",a.String())
+// 		// fmt.Println("OMEGA X222: %s",a.String())
 
-		s := fmt.Sprintf("OMEGA X999: %s", reflect.TypeOf(a))
-		log.Infof(s)
+// 		s := fmt.Sprintf("OMEGA X999: %s", reflect.TypeOf(a))
+// 		log.Infof(s)
 
-		out += a.String()
+// 		out += a.String()
 
-		if i != answersNum-1 {
-			out += "\n"
-		}
-	}
+// 		if i != answersNum-1 {
+// 			out += "\n"
+// 		}
+// 	}
 
-	return out
-}
+// 	return out
+// }
 
 func exportDnsGet(params []string) (result interface{}, err error) {
 	answer, err := getDNSAnswersGet(params)
-	if err != nil {
-		return
-	}
 
+	if err != nil {
+		return nil, err
+	}
 	log.Infof("ANSWER PRIMARY: ", answer)
 
-	if len(answer) < 1 {
-		return nil, zbxerr.New("Cannot perform DNS query.")
-	}
 
-	return parseAnswersGet(answer), nil
+	// if len(answer) < 1 {
+	// 	return nil, zbxerr.New("Cannot perform DNS query.")
+	// }
+
+	//return parseAnswersGet(answer), nil
+	return answer, nil
 }
 
 func (o *dnsGetOptions) setFlags(flags string) error {
@@ -298,7 +300,7 @@ func insertAtEveryNthPosition(s string,n int, r rune) string {
 	return buffer.String()
 }
 
-func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) {
+func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]interface{} {
 
 	resultG := make(map[string][]interface{})
 
@@ -411,9 +413,11 @@ func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) {
 
 	aG, _ := json.Marshal(resultG)
 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
+
+	return resultG
 }
 
-func parseRespQuestion(respQuestion []dns.Question) {
+func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
 
 	resultG := make(map[string][]interface{})
 	result := make(map[string]interface{})
@@ -450,14 +454,15 @@ func parseRespQuestion(respQuestion []dns.Question) {
 	aG, _ := json.Marshal(resultG)
 	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
 
+	return resultG
 }
 
-func getDNSAnswersGet(params []string) ([]dns.RR, error) {
+func getDNSAnswersGet(params []string) (string,error) {
 	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
 
 	options, err := parseParamasGet(params)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	var resp *dns.Msg
@@ -471,7 +476,7 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	}
 
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return "", zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
@@ -482,30 +487,37 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 
 	// AUTHORITY
 	log.Infof("\n\nAGS AUTHORITY")
-	parseRespAnswerOrExtra(resp.Ns, "authority_section")
+	parsedAuthoritySection := parseRespAnswerOrExtra(resp.Ns, "authority_section")
 	log.Infof("AGS AUTHORITY END\n\n")
 	// AUTHORITY END
 
 	// ANSWER
 	log.Infof("\n\nAGS ANSWER")
-	parseRespAnswerOrExtra(resp.Answer, "answer_section")
+	parsedAnswerSection := parseRespAnswerOrExtra(resp.Answer, "answer_section")
 	log.Infof("AGS ANSWER END\n\n")
 	// ANSWER END
 
-
 	// QUESTION
 	log.Infof("\n\nAGS QUESTION")
-	parseRespQuestion(resp.Question)
+	parsedQuestionSection := parseRespQuestion(resp.Question)
 	log.Infof("\n\nAGS QUESTION END")
 	// QUESTION END
 
 	// EXTRA
 	log.Infof("\n\nAGS ADDITIONAL")
-	parseRespAnswerOrExtra(resp.Extra, "additional_section")
+	parsedAdditionalSection := parseRespAnswerOrExtra(resp.Extra, "additional_section")
 	log.Infof("\n\nAGS ADDITIONAL END")
 	// EXTRA END
 
-	return resp.Answer, nil
+	result := []interface{}{
+		parsedQuestionSection,
+		parsedAnswerSection,
+		parsedAuthoritySection,
+		parsedAdditionalSection}
+
+	resultJson, _ := json.Marshal(result)
+
+	return string(resultJson), nil
 }
 
 
