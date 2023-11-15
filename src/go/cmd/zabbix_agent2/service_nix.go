@@ -56,14 +56,14 @@ func validateExclusiveFlags(args *Arguments) error {
 	)
 
 	if args.verbose && !(args.test != "" || args.print) {
-		return errors.New("Verbose parameter can be specified only with test or print parameters")
+		return errors.New("verbose parameter can be specified only with test or print parameters")
 	}
 
 	for _, exclusiveFlagSet := range exclusiveFlagsSet {
 		if exclusiveFlagSet {
 			count++
 		}
-		if count >= 2 {
+		if count >= 2 { //nolint:gomnd
 			return errors.New("mutually exclusive options used, use help '-help'('-h'), for additional information")
 		}
 	}
