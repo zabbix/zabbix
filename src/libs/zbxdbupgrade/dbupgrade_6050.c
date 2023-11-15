@@ -89,6 +89,7 @@ static int	DBpatch_6050007(void)
 static int	DBpatch_6050008(void)
 {
 	const zbx_db_field_t	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int	ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -100,7 +101,13 @@ static int	DBpatch_6050008(void)
 	if (SUCCEED == DBcheck_field_type("history", &field))
 		return SUCCEED;
 #endif
-	return DBmodify_field_type("history", &field, &field);
+	if (SUCCEED != (ret = DBmodify_field_type("history", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of history table, please check upgrade"
+				" notes");
+	}
+
+	return ret;
 }
 
 static int	DBpatch_6050009(void)
@@ -123,6 +130,7 @@ static int	DBpatch_6050009(void)
 static int	DBpatch_6050010(void)
 {
 	const zbx_db_field_t	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int			ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -135,12 +143,19 @@ static int	DBpatch_6050010(void)
 		return SUCCEED;
 #endif
 
-	return DBmodify_field_type("trends", &field, &field);
+	if (SUCCEED != (ret = DBmodify_field_type("trends", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of trends table, please check upgrade"
+				" notes");
+	}
+
+	return ret;
 }
 
 static int	DBpatch_6050011(void)
 {
 	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int			ret;
 
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
@@ -153,7 +168,13 @@ static int	DBpatch_6050011(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBmodify_field_type("trends", &field, &field);
+	if (SUCCEED != (ret = DBmodify_field_type("trends", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of trends table, please check upgrade"
+				" notes");
+	}
+
+	return ret;
 }
 
 static int	DBpatch_6050012(void)
