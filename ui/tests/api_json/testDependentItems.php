@@ -83,7 +83,7 @@ class testDependentItems extends CAPITest {
 								['key_' => 'template.overflow.item.prototype[{#LLD}]']
 							]
 						]
-					],
+					]
 				],
 				[
 					'host' => 't.mixed.dependencies',
