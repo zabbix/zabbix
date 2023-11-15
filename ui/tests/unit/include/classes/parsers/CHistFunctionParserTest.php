@@ -1143,6 +1143,16 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '\\1h\\']
 			],
 			[
+				'nodata(/host/key, "\\\\1h\\\\")', 0, ['escape_backslashes' => false],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
 				'nodata(/host/key, "\\"")', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

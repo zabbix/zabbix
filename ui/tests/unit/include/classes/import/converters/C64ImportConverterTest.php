@@ -21,8 +21,9 @@
 
 class C64ImportConverterTest extends CImportConverterTest {
 
-	public function importConverterDataProvider(): array {
-		$item_types = [CXmlConstantName::CALCULATED, CXmlConstantName::DEPENDENT, CXmlConstantName::EXTERNAL,
+	public function importConverterDataProviderItemTimeout(): array {
+		$item_types = [
+			CXmlConstantName::CALCULATED, CXmlConstantName::DEPENDENT, CXmlConstantName::EXTERNAL,
 			CXmlConstantName::HTTP_AGENT, CXmlConstantName::INTERNAL, CXmlConstantName::IPMI, CXmlConstantName::JMX,
 			CXmlConstantName::ODBC, CXmlConstantName::SCRIPT, CXmlConstantName::SIMPLE, CXmlConstantName::SNMP_AGENT,
 			CXmlConstantName::SNMP_TRAP, CXmlConstantName::SSH, CXmlConstantName::TELNET,
@@ -104,8 +105,178 @@ class C64ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
+	public function importConverterDataProviderExpressionHistoryFunction(): array {
+		$source_expression = 'find(/host/key,10m,"regex","\.+\\\"[a-z]+")';
+		$expected_expression = 'find(/host/key,10m,"regex","\\\.+\\\\\"[a-z]+")';
+
+		$source_triggers = [
+			[
+				'expression' => $source_expression,
+				'recovery_expression' => $source_expression,
+				'name' => '{?'.$source_expression.'}',
+				'event_name' => '{?'.$source_expression.'}',
+				'description' => '{?'.$source_expression.'}'
+			]
+		];
+		$expected_triggers = [
+			[
+				'expression' => $expected_expression,
+				'recovery_expression' => $expected_expression,
+				'name' => '{?'.$expected_expression.'}',
+				'event_name' => '{?'.$expected_expression.'}',
+				'description' => '{?'.$expected_expression.'}'
+			]
+		];
+
+		$source_items = [
+			[
+				'type' => CXmlConstantName::CALCULATED,
+				'params' => $source_expression,
+				'triggers' => $source_triggers
+			]
+		];
+		$expected_items = [
+			[
+				'type' => CXmlConstantName::CALCULATED,
+				'params' => $expected_expression,
+				'triggers' => $expected_triggers
+			]
+		];
+
+		$source_lld_rules = [
+			[
+				'type' => CXmlConstantName::ZABBIX_PASSIVE,
+				'item_prototypes' => [
+					[
+						'type' => 'CALCULATED',
+						'params' => $source_expression,
+						'trigger_prototypes' => $source_triggers
+					]
+				]
+			]
+		];
+		$expected_lld_rules = [
+			[
+				'type' => CXmlConstantName::ZABBIX_PASSIVE,
+				'item_prototypes' => [
+					[
+						'type' => 'CALCULATED',
+						'params' => $expected_expression,
+						'trigger_prototypes' => $expected_triggers
+					]
+				]
+			]
+		];
+
+		$source_maps = [
+			[
+				'selements' => [
+					[
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'elements' => [
+							[
+								'description' => '{?'.$source_expression.'}',
+								'expression' => $source_expression,
+								'recovery_expression' => $source_expression
+							]
+						]
+					]
+				]
+			]
+		];
+		$expected_maps = [
+			[
+				'selements' => [
+					[
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'elements' => [
+							[
+								'description' => '{?'.$expected_expression.'}',
+								'expression' => $expected_expression,
+								'recovery_expression' => $expected_expression
+							]
+						]
+					]
+				]
+			]
+		];
+
+		$source_mediatypes = [
+			[
+				'type' => CXmlConstantName::WEBHOOK,
+				'parameters' => [
+					[
+						'value' => '{?'.$source_expression.'}'
+					]
+				],
+				'message_templates' => [
+					[
+						'subject' => '{?'.$source_expression.'}',
+						'message' => '{?'.$source_expression.'}'
+					]
+				]
+			]
+		];
+		$expected_mediatypes = [
+			[
+				'type' => CXmlConstantName::WEBHOOK,
+				'parameters' => [
+					[
+						'value' => '{?'.$expected_expression.'}'
+					]
+				],
+				'message_templates' => [
+					[
+						'subject' => '{?'.$expected_expression.'}',
+						'message' => '{?'.$expected_expression.'}'
+					]
+				]
+			]
+		];
+
+		return [
+			[
+				[
+					'templates' => [
+						[
+							'items' => $source_items,
+							'discovery_rules' => $source_lld_rules
+						]
+					],
+					'hosts' => [
+						[
+							'items' => $source_items,
+							'discovery_rules' => $source_lld_rules
+						]
+					],
+					'triggers' => $source_triggers,
+					'maps' => $source_maps,
+					'media_types' => $source_mediatypes
+				],
+				[
+					'templates' => [
+						[
+							'items' => $expected_items,
+							'discovery_rules' => $expected_lld_rules
+						]
+					],
+					'hosts' => [
+						[
+							'items' => $expected_items,
+							'discovery_rules' => $expected_lld_rules
+						]
+					],
+					'triggers' => $expected_triggers,
+					'maps' => $expected_maps,
+					'media_types' => $expected_mediatypes
+				]
+			]
+		];
+	}
+
 	/**
-	 * @dataProvider importConverterDataProvider
+	 * @dataProvider importConverterDataProviderItemTimeout
+	 * @dataProvider importConverterDataProviderExpressionHistoryFunction
 	 *
 	 * @param array $data
 	 * @param array $expected
