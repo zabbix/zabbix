@@ -1710,14 +1710,14 @@ static int	DBpatch_6050143(void)
 
 static int	DBpatch_6050144(void)
 {
-/* offsets in stack of tokens are relative to time period token */
-#define OFFSET_FILTER		(-1)
+/* offset in stack of tokens is relative to time period token */
 #define OFFSET_HIST_FUNC	1
+#define TOKEN_LEN(loc)		(loc->r - loc->l + 1)
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
 	int			ret = SUCCEED;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	char			*sql = NULL, *params = NULL, *hist_func = NULL;
+	char			*sql = NULL, *params = NULL;
 	zbx_vector_uint32_t	del_tokens;
 
 	zbx_vector_uint32_create(&del_tokens);
@@ -1745,25 +1745,17 @@ static int	DBpatch_6050144(void)
 
 		for (i = 0; i < ctx.stack.values_num; i++)
 		{
-			zbx_strloc_t		*hist_loc;
+			zbx_strloc_t	*loc;
 
 			if (ZBX_EVAL_TOKEN_ARG_PERIOD != ctx.stack.values[i].type)
 				continue;
 
-			if (0 > i + OFFSET_FILTER || i + OFFSET_HIST_FUNC >= ctx.stack.values_num)
+			if (i + OFFSET_HIST_FUNC >= ctx.stack.values_num)
 				continue;
 
-			if (ZBX_EVAL_TOKEN_ARG_QUERY != ctx.stack.values[i + OFFSET_FILTER].type)
-				continue;
+			loc = &ctx.stack.values[i + OFFSET_HIST_FUNC].loc;
 
-			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i + OFFSET_HIST_FUNC].type)
-				continue;
-
-			hist_loc = &ctx.stack.values[i + OFFSET_HIST_FUNC].loc;
-			zbx_free(hist_func);
-			hist_func = zbx_substr(ctx.expression, hist_loc->l, hist_loc->r);
-
-			if (0 != strcmp("last_foreach", hist_func))
+			if (0 != strncmp("last_foreach", &ctx.expression[loc->l], TOKEN_LEN(loc)))
 				continue;
 
 			zbx_vector_uint32_append(&del_tokens, (zbx_uint32_t)i);
@@ -1801,11 +1793,10 @@ static int	DBpatch_6050144(void)
 
 	zbx_free(sql);
 	zbx_free(params);
-	zbx_free(hist_func);
 
 	return ret;
-#undef OFFSET_FILTER
 #undef OFFSET_HIST_FUNC
+#undef TOKEN_LEN
 }
 #endif
 
