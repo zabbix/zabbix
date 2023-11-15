@@ -155,6 +155,8 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 		return
 	}
 
+	log.Infof("ANSWER PRIMARY: ", answer)
+
 	if len(answer) < 1 {
 		return nil, zbxerr.New("Cannot perform DNS query.")
 	}
@@ -477,28 +479,30 @@ func getDNSAnswersGet(params []string) ([]dns.RR, error) {
 	log.Infof("AGS Ns: %s", resp.Ns)
 	log.Infof("AGS Extra: %s", resp.Extra)
 	log.Infof("AGS RCODE: %d", resp.Rcode)
-	
+
+	// AUTHORITY
+	log.Infof("\n\nAGS AUTHORITY")
+	parseRespAnswerOrExtra(resp.Ns, "authority_section")
+	log.Infof("AGS AUTHORITY END\n\n")
+	// AUTHORITY END
+
 	// ANSWER
-	//resp_answer, _ := json.Marshal(resp.Answer)
-	//log.Infof("AGS Answer: %s", resp_answer)
-	//resp_answer, _ := json.Marshal(resp.Answer)
+	log.Infof("\n\nAGS ANSWER")
 	parseRespAnswerOrExtra(resp.Answer, "answer_section")
+	log.Infof("AGS ANSWER END\n\n")
 	// ANSWER END
 
 
 	// QUESTION
-	//resp_q, _ := json.Marshal(resp.Question)
-	//log.Infof("AGS Q: %s", resp_q)
+	log.Infof("\n\nAGS QUESTION")
 	parseRespQuestion(resp.Question)
+	log.Infof("\n\nAGS QUESTION END")
 	// QUESTION END
 
 	// EXTRA
-	log.Infof("\n\nAGS EEEEEE")
-	resp_e, _ := json.Marshal(resp.Extra)
-	log.Infof("AGS Q: %s", resp_e)
-
+	log.Infof("\n\nAGS ADDITIONAL")
 	parseRespAnswerOrExtra(resp.Extra, "additional_section")
-	log.Infof("AGS EEEEEEEE 2222222\n\n\n\n")
+	log.Infof("\n\nAGS ADDITIONAL END")
 	// EXTRA END
 
 	return resp.Answer, nil
