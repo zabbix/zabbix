@@ -1133,7 +1133,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Problem' => 'test trigger with tag priority',
 						'Show tags' => 3,
-						'Tag display priority' => 'Kappa',
+						'Tag display priority' => 'Kappa'
 					],
 					'result' => [
 						[
@@ -1161,7 +1161,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Problem' => 'test trigger with tag priority',
 						'Show tags' => 3,
-						'Tag display priority' => 'Kappa, Beta',
+						'Tag display priority' => 'Kappa, Beta'
 					],
 					'result' => [
 						[
@@ -1189,7 +1189,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Problem' => 'test trigger with tag priority',
 						'Show tags' => 3,
-						'Tag display priority' => 'Gamma, Kappa, Beta',
+						'Tag display priority' => 'Gamma, Kappa, Beta'
 					],
 					'result' => [
 						[
