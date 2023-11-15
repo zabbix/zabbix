@@ -340,6 +340,6 @@ class CDashboardElement extends CElement {
 	 * @return string
 	 */
 	public function getSelectedPageName() {
-		$this->query('xpath://div[@class="selected-tab"]/span')->one()->getText();
+		return $this->query('xpath://div[@class="selected-tab"]/span')->one()->getText();
 	}
 }
