@@ -357,9 +357,13 @@ class C64ImportConverter extends CConverter {
 		foreach ($triggers as &$trigger) {
 			$trigger['expression'] = self::convertExpression($trigger['expression']);
 
-			foreach (['description', 'recovery_expression', 'event_name'] as $field) {
+			if (array_key_exists('recovery_expression', $trigger)) {
+				$trigger['recovery_expression'] = self::convertExpression($trigger['recovery_expression']);
+			}
+
+			foreach (['name', 'event_name', 'description'] as $field) {
 				if (array_key_exists($field, $trigger)) {
-					$trigger[$field] = self::convertExpression($trigger[$field]);
+					$trigger[$field] = self::convertExpression($trigger[$field], true);
 				}
 			}
 		}
