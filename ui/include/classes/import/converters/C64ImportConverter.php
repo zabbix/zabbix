@@ -138,6 +138,15 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertMediaTypes(array $media_types): array {
 		foreach ($media_types as &$media_type) {
+			if ($media_type['type'] === CXmlConstantName::WEBHOOK && array_key_exists('parameters', $media_type)) {
+				foreach ($media_type['parameters'] as &$parameter) {
+					if (array_key_exists('value', $parameter)) {
+						$parameter['value'] = self::convertExpression($parameter['value'], true);
+					}
+				}
+				unset($parameter);
+			}
+
 			if (array_key_exists('message_templates', $media_type)) {
 				foreach ($media_type['message_templates'] as &$message_template) {
 					foreach (['subject', 'message'] as $field) {
