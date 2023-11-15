@@ -327,7 +327,7 @@ class CConnector extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['authtype', 'data_type',
+		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['data_type', 'authtype',
 			'max_attempts'
 		]);
 

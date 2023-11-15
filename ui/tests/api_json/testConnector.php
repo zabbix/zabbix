@@ -321,6 +321,110 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/item_value_type": an integer is expected.'
 			],
 
+			// Check "authtype".
+			'Test connector.create: invalid "authtype" (string)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test connector.create: invalid "authtype" (not in range)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
+					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+						ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER
+					]).'.'
+			],
+
+			// Check "username".
+			'Test connector.create: invalid "username" (must be empty)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'username' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
+			],
+			'Test connector.create: invalid "username" (boolean)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
+					'username' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/username": a character string is expected.'
+			],
+			'Test connector.create: invalid "username" (too long)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_NTLM,
+					'username' => str_repeat('a', DB::getFieldLength('connector', 'username') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
+			],
+
+			// Check "password".
+			'Test connector.create: invalid "password" (must be empty)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'password' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
+			],
+			'Test connector.create: invalid "password" (boolean)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
+					'password' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/password": a character string is expected.'
+			],
+			'Test connector.create: invalid "password" (too long)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_NTLM,
+					'password' => str_repeat('a', DB::getFieldLength('connector', 'password') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
+			],
+
+			// Check "token".
+			'Test connector.create: invalid "token" (boolean)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'token' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
+			],
+			'Test connector.create: invalid "token" (incompatible authtype)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'token' => '{$BEARER_TOKEN}'
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value must be empty.'
+			],
+			'Test connector.create: invalid "token" (too long)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BEARER,
+					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
+			],
+
 			// Check "max_records".
 			'Test connector.create: invalid "max_records" (string)' => [
 				'connector' => [
@@ -490,110 +594,6 @@ class testConnector extends CAPITest {
 					'http_proxy' => str_repeat('a', DB::getFieldLength('connector', 'http_proxy') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/http_proxy": value is too long.'
-			],
-
-			// Check "authtype".
-			'Test connector.create: invalid "authtype" (string)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'authtype' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
-			],
-			'Test connector.create: invalid "authtype" (not in range)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'authtype' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
-					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
-						ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER
-					]).'.'
-			],
-
-			// Check "username".
-			'Test connector.create: invalid "username" (must be empty)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'username' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
-			],
-			'Test connector.create: invalid "username" (boolean)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'authtype' => ZBX_HTTP_AUTH_BASIC,
-					'username' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/username": a character string is expected.'
-			],
-			'Test connector.create: invalid "username" (too long)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'authtype' => ZBX_HTTP_AUTH_NTLM,
-					'username' => str_repeat('a', DB::getFieldLength('connector', 'username') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
-			],
-
-			// Check "password".
-			'Test connector.create: invalid "password" (must be empty)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'password' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
-			],
-			'Test connector.create: invalid "password" (boolean)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'authtype' => ZBX_HTTP_AUTH_BASIC,
-					'password' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/password": a character string is expected.'
-			],
-			'Test connector.create: invalid "password" (too long)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'authtype' => ZBX_HTTP_AUTH_NTLM,
-					'password' => str_repeat('a', DB::getFieldLength('connector', 'password') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
-			],
-
-			// Check "token".
-			'Test connector.create: invalid "token" (boolean)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'token' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
-			],
-			'Test connector.create: invalid "token" (incompatible authtype)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'token' => '{$BEARER_TOKEN}'
-				],
-				'expected_error' => 'Invalid parameter "/1/token": value must be empty.'
-			],
-			'Test connector.create: invalid "token" (too long)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'authtype' => ZBX_HTTP_AUTH_BEARER,
-					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
 			],
 
 			// Check "verify_peer".
@@ -1680,6 +1680,95 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be 31.'
 			],
 
+			// Check "authtype".
+			'Test connector.update: invalid "authtype" (string)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'authtype' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test connector.update: invalid "authtype" (not in range)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'authtype' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
+					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+						ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER
+					]).'.'
+			],
+
+			// Check "username".
+			'Test connector.update: invalid "username" (must be empty)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'username' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
+			],
+			'Test connector.update: invalid "username" (boolean)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'username' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/username": a character string is expected.'
+			],
+			'Test connector.update: invalid "username" (too long)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'username' => str_repeat('a', DB::getFieldLength('connector', 'username') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
+			],
+
+			// Check "password".
+			'Test connector.update: invalid "password" (must be empty)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'password' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
+			],
+			'Test connector.update: invalid "password" (boolean)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'password' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/password": a character string is expected.'
+			],
+			'Test connector.update: invalid "password" (too long)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'password' => str_repeat('a', DB::getFieldLength('connector', 'password') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
+			],
+
+			// Check "token".
+			'Test connector.update: invalid "token" (boolean)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'token' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
+			],
+			'Test connector.update: invalid "token" (incompatible authtype)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'token' => '{$BEARER_TOKEN}'
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value must be empty.'
+			],
+			'Test connector.update: invalid "token" (too long)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'authtype' => ZBX_HTTP_AUTH_BEARER,
+					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
+			],
+
 			// Check "max_records".
 			'Test connector.update: invalid "max_records" (string)' => [
 				'connector' => [
@@ -1822,95 +1911,6 @@ class testConnector extends CAPITest {
 					'http_proxy' => str_repeat('a', DB::getFieldLength('connector', 'http_proxy') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/http_proxy": value is too long.'
-			],
-
-			// Check "authtype".
-			'Test connector.update: invalid "authtype" (string)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'authtype' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
-			],
-			'Test connector.update: invalid "authtype" (not in range)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'authtype' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
-					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
-						ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER
-					]).'.'
-			],
-
-			// Check "username".
-			'Test connector.update: invalid "username" (must be empty)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'username' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
-			],
-			'Test connector.update: invalid "username" (boolean)' => [
-				'connector' => [
-					'connectorid' => 'update_authtype_basic',
-					'username' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/username": a character string is expected.'
-			],
-			'Test connector.update: invalid "username" (too long)' => [
-				'connector' => [
-					'connectorid' => 'update_authtype_basic',
-					'username' => str_repeat('a', DB::getFieldLength('connector', 'username') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
-			],
-
-			// Check "password".
-			'Test connector.update: invalid "password" (must be empty)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'password' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
-			],
-			'Test connector.update: invalid "password" (boolean)' => [
-				'connector' => [
-					'connectorid' => 'update_authtype_basic',
-					'password' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/password": a character string is expected.'
-			],
-			'Test connector.update: invalid "password" (too long)' => [
-				'connector' => [
-					'connectorid' => 'update_authtype_basic',
-					'password' => str_repeat('a', DB::getFieldLength('connector', 'password') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
-			],
-
-			// Check "token".
-			'Test connector.update: invalid "token" (boolean)' => [
-				'connector' => [
-					'connectorid' => 'update_authtype_basic',
-					'token' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
-			],
-			'Test connector.update: invalid "token" (incompatible authtype)' => [
-				'connector' => [
-					'connectorid' => 'update_authtype_basic',
-					'token' => '{$BEARER_TOKEN}'
-				],
-				'expected_error' => 'Invalid parameter "/1/token": value must be empty.'
-			],
-			'Test connector.update: invalid "token" (too long)' => [
-				'connector' => [
-					'connectorid' => 'update_authtype_basic',
-					'authtype' => ZBX_HTTP_AUTH_BEARER,
-					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
 			],
 
 			// Check "verify_peer".
