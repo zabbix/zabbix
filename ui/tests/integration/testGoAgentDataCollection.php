@@ -62,6 +62,12 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
+			'key' => 'net.dns.perf[,zabbix.com]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'threshold' => 10000
+		],
+		[
 			'key' => 'net.if.discovery',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT

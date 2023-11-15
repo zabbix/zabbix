@@ -580,7 +580,7 @@
 
 				$('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
 					'$.extend(' + JSON.stringify(parameters) + ', view.getOnlyHostParam()),' +
-					'{dialogue_class: "modal-popup-generic", trigger_element: this});'
+					'{dialogue_class: "modal-popup-generic", trigger_element: this.parentNode});'
 				);
 			}
 		},

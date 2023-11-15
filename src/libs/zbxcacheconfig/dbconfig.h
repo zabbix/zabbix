@@ -22,7 +22,7 @@
 
 #include "zbxcacheconfig.h"
 #include "user_macro.h"
-
+#include "vps_monitor.h"
 #include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
@@ -1005,6 +1005,7 @@ typedef struct
 	zbx_um_cache_t		*um_cache;
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
+	zbx_vps_monitor_t	vps_monitor;
 }
 ZBX_DC_CONFIG;
 

@@ -41,6 +41,7 @@ int	__wrap_vfs_file_cksum(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_dir_size(const char *command, AGENT_RESULT *result);
 int	__wrap_net_dns(const char *command, AGENT_RESULT *result);
 int	__wrap_net_dns_record(const char *command, AGENT_RESULT *result);
+int	__wrap_net_dns_perf(const char *command, AGENT_RESULT *result);
 int	__wrap_net_tcp_port(const char *command, AGENT_RESULT *result);
 int	__wrap_system_users_num(const char *command, AGENT_RESULT *result);
 
@@ -202,6 +203,16 @@ int	__wrap_net_dns_record(const char *command, AGENT_RESULT *result)
 	ZBX_UNUSED(result);
 
 	called_key = "net.dns.record";
+
+	return SUCCEED;
+}
+
+int	__wrap_net_dns_perf(const char *command, AGENT_RESULT *result)
+{
+	ZBX_UNUSED(command);
+	ZBX_UNUSED(result);
+
+	called_key = "net.dns.perf";
 
 	return SUCCEED;
 }
