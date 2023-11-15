@@ -188,7 +188,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure Virtual Machines (VMs) by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -299,7 +299,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure MySQL flexible servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -384,7 +384,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure MySQL single servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -470,7 +470,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure PostgreSQL flexible servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -560,7 +560,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure PostgreSQL servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -645,7 +645,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft SQL serverless databases by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -736,7 +736,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft SQL databases by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -898,6 +898,121 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |Azure MongoDB: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.data.errors))>0`|Average||
 |Azure MongoDB: Cosmos DB for MongoDB account: Availability is low||`(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}`|Warning||
+
+# Azure Cost Management by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Cost Management by HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 6.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Microsoft Azure
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.BILLING.MONTH}|<p>Months to get historical data from Azure Cost Management API, no more than 11 (plus current month). The time period for pulling the data cannot exceed 1 year(s).</p>|`11`|
+|{$AZURE.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered service by name.</p>|`.*`|
+|{$AZURE.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered service by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.LLD.FILTER.RESOURCE.LOCATION.MATCHES}|<p>Filter of discoverable discovered location by name.</p>|`.*`|
+|{$AZURE.LLD.FILTER.RESOURCE.LOCATION.NOT_MATCHES}|<p>Filter to exclude discovered location by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.LLD.FILTER.RESOURCE.GROUP.MATCHES}|<p>Filter of discoverable discovered resource group by name.</p>|`.*`|
+|{$AZURE.LLD.FILTER.RESOURCE.GROUP.NOT_MATCHES}|<p>Filter to exclude discovered resource group by name.</p>|`CHANGE_IF_NEEDED`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Cost: Get monthly costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.monthly.costs|
+|Azure Cost: Get daily costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.daily.costs|
+
+### LLD rule Azure daily costs by services discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily costs by services discovery|<p>Discovery of daily costs by services.</p>|Dependent item|azure.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Item prototypes for Azure daily costs by services discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Cost: Service ["{#AZURE.SERVICE.NAME}"]: Meter ["{#AZURE.BILLING.METER}"]: Subcategory ["{#AZURE.BILLING.METER.SUBCATEGORY}"] daily cost|<p>The daily cost by service {#AZURE.SERVICE.NAME}, meter {#AZURE.BILLING.METER}, subcategory {#AZURE.BILLING.METER.SUBCATEGORY}.</p>|Dependent item|azure.daily.cost["{#AZURE.SERVICE.NAME}", "{#AZURE.BILLING.METER}", "{#AZURE.BILLING.METER.SUBCATEGORY}","{#AZURE.RESOURCE.GROUP}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### LLD rule Azure monthly costs by services discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure monthly costs by services discovery|<p>Discovery of monthly costs by services.</p>|Dependent item|azure.monthly.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serviceCost.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Item prototypes for Azure monthly costs by services discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Cost: Service ["{#AZURE.SERVICE.NAME}"]: Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost by service {#AZURE.SERVICE.NAME}.</p>|Dependent item|azure.monthly.service.cost["{#AZURE.SERVICE.NAME}", "{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### LLD rule Azure monthly costs by location discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure monthly costs by location discovery|<p>Discovery of monthly costs by location.</p>|Dependent item|azure.monthly.location.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resourceLocationCost.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Item prototypes for Azure monthly costs by location discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Cost: Location: ["{#AZURE.RESOURCE.LOCATION}"]: Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost by location {#AZURE.RESOURCE.LOCATION}.</p>|Dependent item|azure.monthly.location.cost["{#AZURE.RESOURCE.LOCATION}", "{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### LLD rule Azure monthly costs by resource group discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure monthly costs by resource group discovery|<p>Discovery of monthly costs by resource group.</p>|Dependent item|azure.monthly.resource.group.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resourceGroupCost.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Item prototypes for Azure monthly costs by resource group discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Cost: Resource group: ["{#AZURE.RESOURCE.GROUP}"]: Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost by resource group {#AZURE.RESOURCE.GROUP}.</p>|Dependent item|azure.monthly.resource.group.cost["{#AZURE.RESOURCE.GROUP}", "{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### LLD rule Azure monthly costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure monthly costs discovery|<p>Discovery of monthly costs.</p>|Dependent item|azure.monthly.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthCost.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Item prototypes for Azure monthly costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Cost: Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost.</p>|Dependent item|azure.monthly.cost["{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ## Feedback
 
