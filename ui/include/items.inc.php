@@ -2178,6 +2178,13 @@ function prepareLldOverrides(array $overrides, ?array $db_item): array {
 	return $overrides;
 }
 
+/**
+ * Format query fields received via form for API input.
+ *
+ * @param array $query_fields
+ *
+ * @return array
+ */
 function prepareItemQueryFields(array $query_fields): array {
 	foreach ($query_fields as $i => $query_field) {
 		unset($query_fields[$i]['sortorder']);
