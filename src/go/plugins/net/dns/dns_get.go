@@ -15,7 +15,6 @@ import (
 
 type dnsGetOptions struct {
 	options
-	//flags []f
 	flags map[string]bool
 }
 
@@ -280,19 +279,13 @@ func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT 
 		fieldValueH := valueH.Field(jH).Interface()
 		fieldTypeH := valueH.Type().Field(jH)
 		fieldNameH := fieldTypeH.Name
-		log.Infof("AGS fieldValueH: -%s<-", fieldValueH)
-		log.Infof("AGS fieldTypeH: -%s<-", fieldTypeH)
-		log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
 		n := strings.ToLower(fieldNameH)
 
 		if n == "rrtype" {
 			n = "type"
-			//log.Infof("SUBARU 1 in: %d", fieldValueH)
 			fieldValueH = dnsTypesGetReverse[fieldValueH]
-			//log.Infof("SUBARU 2 res: %s", fieldValueH)
 		} else if n == "class" {
 			if !isOPT {
-				log.Infof("JEEP 1 in: %d", fieldValueH)
 				zeta, _ := fieldValueH.(uint16)
 				fieldValueH = dnsClassesGet[zeta]
 			} else {
