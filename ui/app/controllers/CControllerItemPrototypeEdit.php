@@ -175,16 +175,19 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 				'output' => ['valuemapid', 'name', 'hostid'],
 				'valuemapids' => [$item['valuemapid']]
 			]);
-			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
+			$valuemap = $valuemap ? reset($valuemap) : [];
 
-			if ($item['valuemap'] && $this->getInput('templateid', 0)) {
-				$host_valuemap = API::ValueMap()->get([
-					'output' => ['valuemapid'],
-					'search' => ['name' => $item['valuemap']['name']],
+			if ($valuemap && $valuemap['hostid'] != $host['hostid']) {
+				$valuemap = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name', 'hostid'],
+					'search' => ['name' => $valuemap['name']],
 					'filter' => ['hostid' => $host['hostid']]
 				]);
-				$item['valuemap']['valuemapid'] = $host_valuemap ? $host_valuemap[0]['valuemapid'] : 0;
+				$valuemap = $valuemap ? reset($valuemap) : [];
 			}
+
+			$item['valuemap'] = $valuemap;
+			$item['valuemapid'] = $valuemap ? $valuemap['valuemapid'] : 0;
 		}
 
 		if ($item['master_itemid']) {

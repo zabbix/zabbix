@@ -295,7 +295,7 @@ class testDashboardClockWidget extends testWidgets {
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
 					'xpath:.//div[@class="fields-group fields-group-tzone"]' => ['id:tzone_size' => 20,
 							'id:tzone_bold' => false, 'id:tzone_color' => null,
-							'id:tzone_timezone' => 'Local default: (UTC+02:00) Europe/Riga',
+							'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
 							'id:tzone_format' => 'Short'
 					]
 				];

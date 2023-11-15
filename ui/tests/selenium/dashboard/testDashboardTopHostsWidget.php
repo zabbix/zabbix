@@ -2102,8 +2102,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->createTopHostsWidget($data, 'top_host_screenshots');
 
 		// Check widget added and assert screenshots.
-		$element = CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
-				->query('class:dashboard-grid-widget-container')->one();
+		$element = CDashboardElement::find()->one()->getWidget($data['main_fields']['Name']);
 		$this->assertScreenshot($element, $data['screen_name']);
 	}
 
