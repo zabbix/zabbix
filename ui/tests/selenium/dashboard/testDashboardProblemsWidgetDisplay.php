@@ -716,6 +716,53 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'result' => []
 				]
+			],
+			// #19 Unacknowledged.
+			[
+				[
+					'fields' => [
+						'Name' => 'Unacknowledged problems',
+						'Severity' => 'Warning',
+						'Acknowledgement status' => 'Unacknowledged'
+					],
+					'result' => [
+						['Problem • Severity' => 'Trigger for widget 2 log'],
+						['Problem • Severity' => 'Test trigger with tag'],
+						['Problem • Severity' => 'Fourth test trigger with tag priority'],
+						['Problem • Severity' => 'Third test trigger with tag priority'],
+						['Problem • Severity' => 'Second test trigger with tag priority'],
+						['Problem • Severity' => 'First test trigger with tag priority'],
+						['Problem • Severity' => '1_trigger_Warning']
+					]
+				]
+			],
+			// #20 Acknowledged.
+			[
+				[
+					'fields' => [
+						'Name' => 'Acknowledged problems',
+						'Acknowledgement status' => 'Acknowledged'
+					],
+					'result' => [
+						['Problem • Severity' => '4_trigger_Average'],
+						['Problem • Severity' => '3_trigger_Average'],
+						['Problem • Severity' => '2_trigger_Information']
+					]
+				]
+			],
+			// #21 Acknowledged by me.
+			[
+				[
+					'fields' => [
+						'Name' => 'Acknowledged by me problems',
+						'Acknowledgement status' => 'Acknowledged',
+						'id:acknowledged_by_me' => true
+					],
+					'result' => [
+						['Problem • Severity' => '3_trigger_Average'],
+						['Problem • Severity' => '2_trigger_Information']
+					]
+				]
 			]
 		];
 	}

@@ -141,10 +141,10 @@ static const char	*help_message[] = {
 	"                                  (alerter, alert manager, availability manager, configuration syncer,",
 	"                                  connector manager, connector worker, discovery manager,",
 	"                                  escalator, ha manager, history poller, history syncer,",
-	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
-	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
-	"                                  self-monitoring, service manager, snmp trapper,",
+	"                                  housekeeper, http poller, icmp pinger, internal poller,",
+	"                                  ipmi manager, ipmi poller, java poller, odbc poller, poller,",
+	"                                  agent poller, http agent poller, snmp poller, preprocessing manager,",
+	"                                  proxy poller, self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
 	"        pid                       Process identifier",
@@ -154,10 +154,10 @@ static const char	*help_message[] = {
 	"                                  (alerter, alert manager, availability manager, configuration syncer,",
 	"                                  connector manager, connector worker, discovery manager,",
 	"                                  escalator, ha manager, history poller, history syncer,",
-	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
-	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
-	"                                  self-monitoring, service manager, snmp trapper,",
+	"                                  housekeeper, http poller, icmp pinger, internal poller,",
+	"                                  ipmi manager, ipmi poller, java poller, odbc poller, poller,",
+	"                                  agent poller, http agent poller, snmp poller, preprocessing manager,",
+	"                                  proxy poller, self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
 	"        pid                       Process identifier",
@@ -254,7 +254,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
-	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -353,6 +354,9 @@ static int	config_tcp_max_backlog_size	= SOMAXCONN;
 static char	*zbx_config_webservice_url	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+
+static int	config_vps_limit		= 0;
+static int	config_vps_overcommit_limit	= 0;
 
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
@@ -568,6 +572,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
 	else
 		return FAIL;
@@ -1028,7 +1037,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{NULL}
+		{"VPSLimit",			&config_vps_limit,	TYPE_INT,
+			PARM_OPT,	0,			ZBX_MEBIBYTE},
+		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,	TYPE_INT,
+			PARM_OPT,	0,			ZBX_MEBIBYTE},
+	{NULL}
 	};
 
 	/* initialize multistrings */
@@ -1465,6 +1478,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
+	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
+
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
@@ -1743,6 +1758,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &zbx_threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
+				thread_args.args = &poller_args;
+				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}

@@ -614,8 +614,11 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 				do
 				{
-					if (FAIL == zbx_hc_check_proxy(proxy.proxyid))
+					if (FAIL == zbx_hc_check_proxy(proxy.proxyid) ||
+							SUCCEED == zbx_vps_monitor_capped())
+					{
 						break;
+					}
 
 					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout,
 							config_trapper_timeout, events_cbs, proxydata_frequency,
@@ -702,8 +705,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"
-					" exchanging data]", get_process_type_string(process_type), process_num,
-					old_processed, old_total_sec);
+					" exchanging data%s]", get_process_type_string(process_type), process_num,
+					old_processed, old_total_sec, zbx_vps_monitor_status());
 		}
 
 		processed += process_proxy(proxy_poller_args_in->config_vault, proxy_poller_args_in->config_timeout,
@@ -723,14 +726,14 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 			if (0 == sleeptime)
 			{
 				zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"
-						" exchanging data]", get_process_type_string(process_type), process_num,
-						processed, total_sec);
+						" exchanging data%s]", get_process_type_string(process_type),
+						process_num, processed, total_sec, zbx_vps_monitor_status());
 			}
 			else
 			{
 				zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"
-						" idle %d sec]", get_process_type_string(process_type), process_num,
-						processed, total_sec, sleeptime);
+						" idle %d sec%s]", get_process_type_string(process_type), process_num,
+						processed, total_sec, sleeptime, zbx_vps_monitor_status());
 				old_processed = processed;
 				old_total_sec = total_sec;
 			}

@@ -40,7 +40,8 @@
 #define	ZBX_POLLER_TYPE_HTTPAGENT	7
 #define	ZBX_POLLER_TYPE_AGENT		8
 #define	ZBX_POLLER_TYPE_SNMP		9
-#define	ZBX_POLLER_TYPE_COUNT		10	/* number of poller types */
+#define ZBX_POLLER_TYPE_INTERNAL	10
+#define	ZBX_POLLER_TYPE_COUNT		11	/* number of poller types */
 
 typedef enum
 {
@@ -1285,6 +1286,23 @@ zbx_maintenance_type_t;
 #define ZBX_RECALC_TIME_PERIOD_HISTORY	1
 #define ZBX_RECALC_TIME_PERIOD_TRENDS	2
 void	zbx_recalc_time_period(time_t *ts_from, int table_group);
+
+/* vps tracker */
+typedef struct
+{
+	zbx_uint64_t	overcommit_limit;
+	zbx_uint64_t	overcommit;
+	zbx_uint64_t	values_limit;
+	zbx_uint64_t	written_num;
+}
+zbx_vps_monitor_stats_t;
+
+void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit);
+void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num);
+void	zbx_vps_monitor_add_written(zbx_uint64_t values_num);
+int	zbx_vps_monitor_capped(void);
+void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats);
+const char	*zbx_vps_monitor_status(void);
 
 typedef struct
 {
