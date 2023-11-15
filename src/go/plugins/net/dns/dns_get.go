@@ -10,7 +10,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
 	"bytes"
-
+	"time"
 )
 
 type dnsGetOptions struct {
@@ -150,13 +150,13 @@ var (
 // }
 
 func exportDnsGet(params []string) (result interface{}, err error) {
+
 	answer, err := getDNSAnswersGet(params)
 
 	if err != nil {
 		return nil, err
 	}
 	log.Infof("ANSWER PRIMARY: ", answer)
-
 
 	// if len(answer) < 1 {
 	// 	return nil, zbxerr.New("Cannot perform DNS query.")
@@ -464,6 +464,7 @@ func getDNSAnswersGet(params []string) (string,error) {
 	if err != nil {
 		return "", err
 	}
+	timeBeforeQuery := time.Now()
 
 	var resp *dns.Msg
 	for i := 1; i <= options.count; i++ {
@@ -478,6 +479,11 @@ func getDNSAnswersGet(params []string) (string,error) {
 	if err != nil {
 		return "", zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
+	timeResponseReceived := time.Since(timeBeforeQuery).Seconds()
+	queryTimeSection := make(map[string]interface{})
+	tFormattedTwoDigitsPrecision := fmt.Sprintf("%.2f", timeResponseReceived)
+	queryTimeSection["query_time"] = tFormattedTwoDigitsPrecision
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
 	log.Infof("AGS Question: %s", resp.Question)
@@ -510,6 +516,7 @@ func getDNSAnswersGet(params []string) (string,error) {
 	// EXTRA END
 
 	result := []interface{}{
+		queryTimeSection,
 		parsedQuestionSection,
 		parsedAnswerSection,
 		parsedAuthoritySection,
