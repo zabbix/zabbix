@@ -48,15 +48,15 @@ class CExpressionParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false             Enable user macros usage in expression.
-	 *   'lldmacros' => false              Enable low-level discovery macros usage in expression.
-	 *   'collapsed_expression' => false   Short trigger expression.
-	 *                                        For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
-	 *   'calculated' => false             Parse calculated item formula instead of trigger expression.
-	 *   'host_macro' => false             Allow {HOST.HOST} macro as host name part in the query.
-	 *   'host_macro_n' => false           Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
-	 *   'empty_host' => false             Allow empty hostname in the query string.
-	 *   'no_backslash_escaping' => false  Enable backslash escaping in history function parameters.
+	 *   'usermacros' => false            Enable user macros usage in expression.
+	 *   'lldmacros' => false             Enable low-level discovery macros usage in expression.
+	 *   'collapsed_expression' => false  Short trigger expression.
+	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
+	 *   'calculated' => false            Parse calculated item formula instead of trigger expression.
+	 *   'host_macro' => false            Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false          Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false            Allow empty hostname in the query string.
+	 *   'escape_backslashes' => true     Disable backslash escaping in history function parameters prior to v7.0.
 	 *
 	 * @var array
 	 */
@@ -68,7 +68,7 @@ class CExpressionParser extends CParser {
 		'host_macro' => false,
 		'host_macro_n' => false,
 		'empty_host' => false,
-		'no_backslash_escaping' => false
+		'escape_backslashes' => true
 	];
 
 	/**
@@ -620,7 +620,7 @@ class CExpressionParser extends CParser {
 			'host_macro' => $options['host_macro'],
 			'host_macro_n' => $options['host_macro_n'],
 			'empty_host' => $options['empty_host'],
-			'no_backslash_escaping' => $options['no_backslash_escaping']
+			'escape_backslashes' => $options['escape_backslashes']
 		]);
 
 		if ($hist_function_parser->parse($source, $pos) == CParser::PARSE_FAIL) {

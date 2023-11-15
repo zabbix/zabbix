@@ -24,7 +24,8 @@
  */
 class C64ImportConverter extends CConverter {
 
-	private static CExpressionParser $parser;
+	private static CExpressionParser $expression_parser;
+	private static CExpressionMacroParser $expression_macro_parser;
 
 	/**
 	 * Convert import data from 6.4 to 7.0 version.
@@ -36,7 +37,8 @@ class C64ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '7.0';
 
-		self::$parser = new CExpressionParser(['usermacros' => true, 'no_backslash_escaping' => true]);
+		self::$expression_parser = new CExpressionParser(['escape_backslashes' => false]);
+		self::$expression_macro_parser = new CExpressionMacroParser(['escape_backslashes' => false]);
 
 		if (array_key_exists('templates', $data['zabbix_export'])) {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
@@ -140,7 +142,7 @@ class C64ImportConverter extends CConverter {
 				foreach ($media_type['message_templates'] as &$message_template) {
 					foreach (['subject', 'message'] as $field) {
 						if (array_key_exists($field, $message_template)) {
-							$message_template[$field] = self::convertExpression($message_template[$field]);
+							$message_template[$field] = self::convertExpression($message_template[$field], true);
 						}
 					}
 				}
@@ -361,15 +363,22 @@ class C64ImportConverter extends CConverter {
 	 * Convert expression.
 	 *
 	 * @param string $expression
+	 * @param bool   $is_expression_macro
 	 *
 	 * @return string
 	 */
-	private static function convertExpression(string $expression): string {
-		if (self::$parser->parse($expression) != CParser::PARSE_SUCCESS) {
+	private static function convertExpression(string $expression, bool $is_expression_macro = false): string {
+		$parser = $is_expression_macro ? self::$expression_macro_parser : self::$expression_parser;
+
+		if ($parser->parse($expression) != CParser::PARSE_SUCCESS) {
 			return $expression;
 		}
 
-		$tokens = self::$parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
+		if ($parser instanceof CExpressionMacroParser) {
+			$parser = $parser->getExpressionParser();
+		}
+
+		$tokens = $parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
 		$convert_parameters = [];
 
 		foreach ($tokens as $token) {
@@ -386,9 +395,12 @@ class C64ImportConverter extends CConverter {
 		}
 
 		foreach (array_reverse($convert_parameters) as $parameter) {
+			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'], false);
+			$parameter['match'] = CHistFunctionParser::quoteParam($parameter['match']);
+
 			$expression = substr_replace(
 				$expression,
-				strtr($parameter['match'], ['\\"' => '\\"', '\\' => '\\\\']),
+				$parameter['match'],
 				$parameter['pos'],
 				$parameter['length']
 			);

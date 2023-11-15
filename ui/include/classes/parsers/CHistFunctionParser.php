@@ -38,12 +38,12 @@ class CHistFunctionParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false             Enable user macros usage in function parameters.
-	 *   'lldmacros' => false              Enable low-level discovery macros usage in function parameters.
-	 *   'host_macro' => false             Allow {HOST.HOST} macro as host name part in the query.
-	 *   'host_macro_n' => false           Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
-	 *   'empty_host' => false             Allow empty hostname in the query string.
-	 *   'no_backslash_escaping' => false  Enable backslash escaping in history function parameters.
+	 *   'usermacros' => false         Enable user macros usage in function parameters.
+	 *   'lldmacros' => false          Enable low-level discovery macros usage in function parameters.
+	 *   'host_macro' => false         Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false       Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false         Allow empty hostname in the query string.
+	 *   'escape_backslashes' => true  Disable backslash escaping in history function parameters prior to v7.0.
 	 *
 	 * @var array
 	 */
@@ -54,7 +54,7 @@ class CHistFunctionParser extends CParser {
 		'host_macro' => false,
 		'host_macro_n' => false,
 		'empty_host' => false,
-		'no_backslash_escaping' => false
+		'escape_backslashes' => true
 	];
 
 	private $query_parser;
@@ -331,7 +331,7 @@ class CHistFunctionParser extends CParser {
 					$_parameters[$num]['match'] .= $source[$p];
 					$_parameters[$num]['length']++;
 
-					if ($this->options['no_backslash_escaping']) {
+					if (!$this->options['escape_backslashes']) {
 						if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 							$state = self::STATE_END;
 						}
@@ -393,30 +393,40 @@ class CHistFunctionParser extends CParser {
 		return $this->parameters;
 	}
 
-	/*
+	/**
 	 * Unquotes special symbols in the parameter.
 	 *
-	 * @param string  $param
+	 * @param string $param
+	 * @param bool   $unescape_backslashes
 	 *
 	 * @return string
 	 */
-	public static function unquoteParam(string $param): string {
-		return strtr(substr($param, 1, -1), ['\\"' => '"', '\\\\' => '\\']);
+	public static function unquoteParam(string $param, bool $unescape_backslashes = true): string {
+		$replace_pairs = $unescape_backslashes
+			? ['\\"' => '"', '\\\\' => '\\']
+			: ['\\"' => '"'];
+
+		return strtr(substr($param, 1, -1), $replace_pairs);
 	}
 
-	/*
-	 * @param string  $param
+	/**
+	 * @param string $param
+	 * @param bool   $escape_backslashes
 	 *
 	 * @return string
 	 */
-	public static function quoteParam(string $param): string {
-		return '"'.strtr($param, ['\\' => '\\\\', '"' => '\\"']).'"';
+	public static function quoteParam(string $param, bool $escape_backslashes = true): string {
+		$replace_pairs = $escape_backslashes
+			? ['\\' => '\\\\', '"' => '\\"']
+			: ['"' => '\\"'];
+
+		return '"'.strtr($param, $replace_pairs).'"';
 	}
 
 	/**
 	 * Returns an unquoted parameter.
 	 *
-	 * @param int $n  The number of the requested parameter.
+	 * @param int $num  The number of the requested parameter.
 	 *
 	 * @return string|null
 	 */
@@ -427,6 +437,8 @@ class CHistFunctionParser extends CParser {
 
 		$param = $this->parameters[$num];
 
-		return ($param['type'] == self::PARAM_TYPE_QUOTED) ? self::unquoteParam($param['match']) : $param['match'];
+		return $param['type'] == self::PARAM_TYPE_QUOTED
+			? self::unquoteParam($param['match'], $this->options['escape_backslashes'])
+			: $param['match'];
 	}
 }
