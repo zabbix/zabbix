@@ -1526,8 +1526,8 @@ class testPageProblems extends CWebTest {
 
 		// If Show timeline = true, it adds one more row to the result table.
 		$this->assertTableStats(CTestArrayHelper::get($data, 'table_timeline')
-				? count($data['result']) - 1
-				: count($data['result'])
+			? count($data['result']) - 1
+			: count($data['result'])
 		);
 
 		$dialog_selector = 'xpath://div[@class="overlay-dialogue"]';
