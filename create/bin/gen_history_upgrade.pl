@@ -7,7 +7,7 @@ my ($db, $table, $tsdb_compression) = @ARGV;
 
 my @dbs = ('mysql', 'oracle', 'postgresql', 'timescaledb');
 my @tables = ('history', 'history_uint', 'history_str', 'history_log', 'history_text');
-my @tables_compressed = ('history', 'history_uint', 'history_str', 'history_log', 'history_text', 'trends');
+my @tables_tsdb = ('history', 'history_uint', 'history_str', 'history_log', 'history_text', 'trends');
 
 my %mysql = (
 	'alter_table' => 'RENAME TABLE %TBL TO %TBL_old;',
@@ -297,7 +297,7 @@ else
 	}
 	elsif ($db eq 'timescaledb')
 	{
-		foreach my $tbl (@tables_compressed)
+		foreach my $tbl (@tables_tsdb)
 		{
 			output_table(\%postgresql, $tbl, 0);
 		}
