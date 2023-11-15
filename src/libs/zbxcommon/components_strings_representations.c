@@ -123,6 +123,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "agent poller";
 		case ZBX_PROCESS_TYPE_SNMP_POLLER:
 			return "snmp poller";
+		case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
+			return "internal poller";
 		case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
 			return "configuration syncer worker";
 	}

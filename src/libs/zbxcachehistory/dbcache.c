@@ -2572,6 +2572,8 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
 
+	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
+
 	zbx_vector_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -3930,7 +3932,21 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	{
 		zbx_log_t	log;
 
-		zbx_variant_convert(value, ZBX_VARIANT_STR);
+		if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_STR))
+		{
+			char	*error;
+
+			error = zbx_dsprintf(NULL, "Failed to add new variant value to the cache:"
+					" conversion of a variant (%s) to string has failed.",
+					zbx_variant_type_desc(value));
+
+			zabbix_log(LOG_LEVEL_CRIT, error);
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			dc_local_add_history_notsupported(itemid, &ts, error, lastlogsize, mtime, value_flags);
+
+			return;
+		}
 
 		log.logeventid = value_opt->logeventid;
 		log.severity = value_opt->severity;
@@ -3986,6 +4002,8 @@ void	zbx_dc_flush_history(void)
 	cache->history_num += item_values_num;
 
 	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
 	item_values_num = 0;
 	string_values_offset = 0;

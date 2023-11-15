@@ -21,6 +21,9 @@
 
 require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 
+/**
+ * Test for checking that multiselects' dialogs do not contain any errors before and after filling.
+ */
 class testMultiselectsProblems extends testMultiselectDialogs {
 
 	public static function getCheckDialogsData() {
