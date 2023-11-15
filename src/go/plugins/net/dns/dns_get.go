@@ -115,7 +115,6 @@ var (
 )
 
 func exportDnsGet(params []string) (result interface{}, err error) {
-
 	answer, err := getDNSAnswersGet(params)
 
 	if err != nil {
@@ -131,7 +130,6 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 }
 
 func (o *dnsGetOptions) setFlags(flags string) error {
-
 	flags = "," + flags
 
 	o.flags = map[string]bool{
@@ -145,7 +143,6 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 	}
 
 	for key, val := range o.flags {
-
 		noXflag := strings.Contains(flags, ",no"+key)
 		Xflag := strings.Contains(flags, ","+key)
 
@@ -233,6 +230,7 @@ func reverseMap(m map[string]uint16) map[interface{}]string {
 	for k, v := range m {
 		n[v] = k
 	}
+
 	return n
 }
 
@@ -264,11 +262,11 @@ func insertAtEveryNthPosition(s string, n int, r rune) string {
 			buffer.WriteRune(r)
 		}
 	}
+
 	return buffer.String()
 }
 
 func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT bool) {
-
 	valueH := fieldValue
 	typeOfH := valueH.Type()
 
@@ -300,7 +298,6 @@ func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT 
 			} else {
 				n = "udp_payload"
 			}
-
 		} else if "ttl" == n && isOPT {
 			n = "extended_rcode"
 		}
@@ -308,9 +305,8 @@ func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT 
 	}
 }
 
-func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, result map[string]interface{}, isOPT bool,
+func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, isOPT bool,
 	resFieldAggregatedValues map[string]interface{}) {
-
 	resFieldValue := fieldValue.Interface()
 
 	tX := reflect.ValueOf(resFieldValue).Type()
@@ -330,7 +326,8 @@ func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, result m
 				if isn1 {
 					optionResult["code"] = n1.Code
 					nsidValue := n1.Nsid
-					nsidValue = insertAtEveryNthPosition(nsidValue, 2, ' ')
+					const numOfDigitsTogetherInNSID = 2
+					nsidValue = insertAtEveryNthPosition(nsidValue, numOfDigitsTogetherInNSID, ' ')
 					optionResult["nsid"] = nsidValue
 					optionResults = append(optionResults, optionResult)
 				}
@@ -343,7 +340,6 @@ func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, result m
 }
 
 func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]interface{} {
-
 	resultG := make(map[string][]interface{})
 
 	for _, ii := range respAnswer {
@@ -368,7 +364,6 @@ func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]int
 		resFieldAggregatedValues := make(map[string]interface{})
 
 		for j := 0; j < value.NumField(); j++ {
-
 			fieldValue := value.Field(j)
 			fieldType := value.Type().Field(j)
 			//fieldName := fieldType.Name
@@ -377,7 +372,7 @@ func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]int
 			if fieldType.Name == "Hdr" {
 				parseHeader(fieldValue, result, isOPT)
 			} else {
-				parseRest(fieldValue, fieldType, result, isOPT, resFieldAggregatedValues)
+				parseRest(fieldValue, fieldType, isOPT, resFieldAggregatedValues)
 			}
 		}
 
@@ -386,14 +381,10 @@ func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]int
 		resultG[source] = append(resultG[source], result)
 	}
 
-	aG, _ := json.Marshal(resultG)
-	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
-
 	return resultG
 }
 
 func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
-
 	resultG := make(map[string][]interface{})
 	result := make(map[string]interface{})
 
@@ -424,14 +415,11 @@ func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
 	}
 
 	resultG["question_section"] = append(resultG["question_section"], result)
-	aG, _ := json.Marshal(resultG)
-	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
 
 	return resultG
 }
 
 func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
-
 	result := make(map[string]interface{})
 	answer_flags := make([]string, 0)
 
@@ -460,9 +448,6 @@ func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
 	}
 
 	result["flags"] = answer_flags
-
-	aG, _ := json.Marshal(result)
-	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
 
 	return result
 }
@@ -519,6 +504,7 @@ func getDNSAnswersGet(params []string) (string, error) {
 		if err != nil {
 			continue
 		}
+
 		break
 	}
 
@@ -575,9 +561,9 @@ func getDNSAnswersGet(params []string) (string, error) {
 		parsedAuthoritySection,
 		parsedAdditionalSection}
 
-	resultJson, _ := json.Marshal(result)
+	resultJson, err := json.Marshal(result)
 
-	return string(resultJson), nil
+	return string(resultJson), err
 }
 
 func (o *dnsGetOptions) setDNSTypeGet(dnsType string) error {
@@ -596,7 +582,6 @@ func (o *dnsGetOptions) setDNSTypeGet(dnsType string) error {
 }
 
 func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
-
 	resolver := o.ip
 	domain := o.name
 	net := o.protocol
