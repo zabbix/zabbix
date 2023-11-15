@@ -82,6 +82,7 @@
 			submit() {
 				view.tile_url.value = view.tile_url.value.trim();
 				view.attribution.value = view.attribution.value.trim();
+				view.max_zoom.value = view.max_zoom.value.trim();
 			}
 		}
 	};

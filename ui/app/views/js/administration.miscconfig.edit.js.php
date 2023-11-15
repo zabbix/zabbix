@@ -26,12 +26,20 @@
 		init({default_inventory_mode, iframe_sandboxing_enabled, iframe_sandboxing_exceptions, login_attempts,
 				login_block, snmptrap_logging, uri_valid_schemes, url, validate_uri_schemes, vault_provider,
 				x_frame_options}) {
+			const $form = jQuery('#miscconfig-form');
+
 			$('#validate_uri_schemes').change(function() {
 				$('#uri_valid_schemes').prop('disabled', !this.checked);
 			});
 
 			$('#iframe_sandboxing_enabled').change(function() {
 				$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
+			});
+
+			$form.on('submit', () => {
+				$form.trimValues(['#url', '#login_block', '#uri_valid_schemes', '#x_frame_options',
+					'#iframe_sandboxing_exceptions'
+				]);
 			});
 
 			$("#resetDefaults").click(function() {
