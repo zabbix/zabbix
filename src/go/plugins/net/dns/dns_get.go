@@ -1,15 +1,15 @@
 package dns
 
 import (
-	"reflect"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"strings"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
-	"bytes"
+	"reflect"
+	"strings"
 	"time"
 )
 
@@ -20,100 +20,99 @@ type dnsGetOptions struct {
 }
 
 var dnsTypesGet = map[string]uint16{
-	"None": dns.TypeNone,
-	"A": dns.TypeA,
-	"NS": dns.TypeNS,
-	"MD": dns.TypeMD,
-	"MF": dns.TypeMF,
-	"CNAME": dns.TypeCNAME,
-	"SOA": dns.TypeSOA,
-	"MB": dns.TypeMB,
-	"MG": dns.TypeMG,
-	"MR": dns.TypeMR,
-	"NULL": dns.TypeNULL,
-	"PTR": dns.TypePTR,
-	"HINFO": dns.TypeHINFO,
-	"MINFO": dns.TypeMINFO,
-	"MX": dns.TypeMX,
-	"TXT": dns.TypeTXT,
-	"RP": dns.TypeRP,
-	"AFSDB": dns.TypeAFSDB,
-	"X25": dns.TypeX25,
-	"ISDN": dns.TypeISDN,
-	"RT": dns.TypeRT,
-	"NSAPPTR": dns.TypeNSAPPTR,
-	"SIG": dns.TypeSIG,
-	"KEY": dns.TypeKEY,
-	"PX": dns.TypePX,
-	"GPOS": dns.TypeGPOS,
-	"AAAA": dns.TypeAAAA,
-	"LOC": dns.TypeLOC,
-	"NXT": dns.TypeNXT,
-	"EID": dns.TypeEID,
-	"NIMLOC": dns.TypeNIMLOC,
-	"SRV": dns.TypeSRV,
-	"ATMA": dns.TypeATMA,
-	"NAPTR": dns.TypeNAPTR,
-	"KX": dns.TypeKX,
-	"CERT": dns.TypeCERT,
-	"DNAME": dns.TypeDNAME,
-	"OPT": dns.TypeOPT,
-	"APL": dns.TypeAPL,
-	"DS": dns.TypeDS,
-	"SSHFP": dns.TypeSSHFP,
-	"RRSIG": dns.TypeRRSIG,
-	"NSEC": dns.TypeNSEC,
-	"DNSKEY": dns.TypeDNSKEY,
-	"DHCID": dns.TypeDHCID,
-	"NSEC3": dns.TypeNSEC3,
+	"None":       dns.TypeNone,
+	"A":          dns.TypeA,
+	"NS":         dns.TypeNS,
+	"MD":         dns.TypeMD,
+	"MF":         dns.TypeMF,
+	"CNAME":      dns.TypeCNAME,
+	"SOA":        dns.TypeSOA,
+	"MB":         dns.TypeMB,
+	"MG":         dns.TypeMG,
+	"MR":         dns.TypeMR,
+	"NULL":       dns.TypeNULL,
+	"PTR":        dns.TypePTR,
+	"HINFO":      dns.TypeHINFO,
+	"MINFO":      dns.TypeMINFO,
+	"MX":         dns.TypeMX,
+	"TXT":        dns.TypeTXT,
+	"RP":         dns.TypeRP,
+	"AFSDB":      dns.TypeAFSDB,
+	"X25":        dns.TypeX25,
+	"ISDN":       dns.TypeISDN,
+	"RT":         dns.TypeRT,
+	"NSAPPTR":    dns.TypeNSAPPTR,
+	"SIG":        dns.TypeSIG,
+	"KEY":        dns.TypeKEY,
+	"PX":         dns.TypePX,
+	"GPOS":       dns.TypeGPOS,
+	"AAAA":       dns.TypeAAAA,
+	"LOC":        dns.TypeLOC,
+	"NXT":        dns.TypeNXT,
+	"EID":        dns.TypeEID,
+	"NIMLOC":     dns.TypeNIMLOC,
+	"SRV":        dns.TypeSRV,
+	"ATMA":       dns.TypeATMA,
+	"NAPTR":      dns.TypeNAPTR,
+	"KX":         dns.TypeKX,
+	"CERT":       dns.TypeCERT,
+	"DNAME":      dns.TypeDNAME,
+	"OPT":        dns.TypeOPT,
+	"APL":        dns.TypeAPL,
+	"DS":         dns.TypeDS,
+	"SSHFP":      dns.TypeSSHFP,
+	"RRSIG":      dns.TypeRRSIG,
+	"NSEC":       dns.TypeNSEC,
+	"DNSKEY":     dns.TypeDNSKEY,
+	"DHCID":      dns.TypeDHCID,
+	"NSEC3":      dns.TypeNSEC3,
 	"NSEC3PARAM": dns.TypeNSEC3PARAM,
-	"TLSA": dns.TypeTLSA,
-	"SMIMEA": dns.TypeSMIMEA,
-	"HIP": dns.TypeHIP,
-	"NINFO": dns.TypeNINFO,
-	"RKEY": dns.TypeRKEY,
-	"TALINK": dns.TypeTALINK,
-	"CDS": dns.TypeCDS,
-	"CDNSKEY": dns.TypeCDNSKEY,
+	"TLSA":       dns.TypeTLSA,
+	"SMIMEA":     dns.TypeSMIMEA,
+	"HIP":        dns.TypeHIP,
+	"NINFO":      dns.TypeNINFO,
+	"RKEY":       dns.TypeRKEY,
+	"TALINK":     dns.TypeTALINK,
+	"CDS":        dns.TypeCDS,
+	"CDNSKEY":    dns.TypeCDNSKEY,
 	"OPENPGPKEY": dns.TypeOPENPGPKEY,
-	"CSYNC": dns.TypeCSYNC,
-	"ZONEMD": dns.TypeZONEMD,
-	"SVCB": dns.TypeSVCB,
-	"HTTPS": dns.TypeHTTPS,
-	"SPF": dns.TypeSPF,
-	"UINFO": dns.TypeUINFO,
-	"UID": dns.TypeUID,
-	"GID": dns.TypeGID,
-	"UNSPEC": dns.TypeUNSPEC,
-	"NID": dns.TypeNID,
-	"L32": dns.TypeL32,
-	"L64": dns.TypeL64,
-	"LP": dns.TypeLP,
-	"EUI48": dns.TypeEUI48,
-	"EUI64": dns.TypeEUI64,
-	"URI": dns.TypeURI,
-	"CAA": dns.TypeCAA,
-	"AVC": dns.TypeAVC,
+	"CSYNC":      dns.TypeCSYNC,
+	"ZONEMD":     dns.TypeZONEMD,
+	"SVCB":       dns.TypeSVCB,
+	"HTTPS":      dns.TypeHTTPS,
+	"SPF":        dns.TypeSPF,
+	"UINFO":      dns.TypeUINFO,
+	"UID":        dns.TypeUID,
+	"GID":        dns.TypeGID,
+	"UNSPEC":     dns.TypeUNSPEC,
+	"NID":        dns.TypeNID,
+	"L32":        dns.TypeL32,
+	"L64":        dns.TypeL64,
+	"LP":         dns.TypeLP,
+	"EUI48":      dns.TypeEUI48,
+	"EUI64":      dns.TypeEUI64,
+	"URI":        dns.TypeURI,
+	"CAA":        dns.TypeCAA,
+	"AVC":        dns.TypeAVC,
 
 	"TKEY": dns.TypeTKEY,
 	"TSIG": dns.TypeTSIG,
 	//
-	"IXFR": dns.TypeIXFR,
-	"AXFR": dns.TypeAXFR,
+	"IXFR":  dns.TypeIXFR,
+	"AXFR":  dns.TypeAXFR,
 	"MAILB": dns.TypeMAILB,
 	"MAILA": dns.TypeMAILA,
-	"ANY": dns.TypeANY,
+	"ANY":   dns.TypeANY,
 
-	"TA": dns.TypeTA,
-	"DLV": dns.TypeDLV,
+	"TA":       dns.TypeTA,
+	"DLV":      dns.TypeDLV,
 	"Reserved": dns.TypeReserved,
 }
 
 var (
-	six          = flag.Bool("6", false, "use IPv6 only")
-	four         = flag.Bool("4", false, "use IPv4 only")
+	six  = flag.Bool("6", false, "use IPv6 only")
+	four = flag.Bool("4", false, "use IPv4 only")
 )
-
 
 func exportDnsGet(params []string) (result interface{}, err error) {
 
@@ -135,29 +134,29 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 
 	flags = "," + flags
 
-	o.flags = map[string]bool {
+	o.flags = map[string]bool{
 		"cdflag": false,
-			"rdflag": true,
-			"dnssec": false,
-			"nsid": false,
-			"edns0": true,
-			"aaflag": false,
-			"adflag": false,
-		}
+		"rdflag": true,
+		"dnssec": false,
+		"nsid":   false,
+		"edns0":  true,
+		"aaflag": false,
+		"adflag": false,
+	}
 
 	for key, val := range o.flags {
 
-		noXflag := strings.Contains(flags, ",no" + key)
-		Xflag := strings.Contains(flags, "," + key)
+		noXflag := strings.Contains(flags, ",no"+key)
+		Xflag := strings.Contains(flags, ","+key)
 
-		if (noXflag && Xflag) {
+		if noXflag && Xflag {
 			return zbxerr.New("Invalid flags combination, cannot use no" + key + " and " + key +
-					" together")
+				" together")
 		}
 
-		if (noXflag) {
+		if noXflag {
 			o.flags[key] = false
-		} else if (Xflag) {
+		} else if Xflag {
 			o.flags[key] = true
 		} else {
 			o.flags[key] = val
@@ -240,27 +239,28 @@ func reverseMap(m map[string]uint16) map[interface{}]string {
 var dnsTypesGetReverse = reverseMap(dnsTypesGet)
 
 var dnsClassesGet = map[uint16]string{
-	1:"IN",
-	3:"CH",
-	4:"HS",
-	254:"NONE",
-	255:"ANY",
+	1:   "IN",
+	3:   "CH",
+	4:   "HS",
+	254: "NONE",
+	255: "ANY",
 }
 
 var dnsExtraQuestionTypesGet = map[uint16]string{
-	251:"IXFR",
-	252:"AXFR",
-	253:"MAILB",
-	254:"MAILA",
-	255:"ANY",
+	251: "IXFR",
+	252: "AXFR",
+	253: "MAILB",
+	254: "MAILA",
+	255: "ANY",
 }
-func insertAtEveryNthPosition(s string,n int, r rune) string {
+
+func insertAtEveryNthPosition(s string, n int, r rune) string {
 	var buffer bytes.Buffer
 	var n_1 = n - 1
 	var l_1 = len(s) - 1
-	for i,rune := range s {
+	for i, rune := range s {
 		buffer.WriteRune(rune)
-		if i % n == n_1 && i != l_1  {
+		if i%n == n_1 && i != l_1 {
 			buffer.WriteRune(r)
 		}
 	}
@@ -278,7 +278,6 @@ func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT 
 		valueH = valueH.Elem()
 	}
 
-
 	for jH := 0; jH < valueH.NumField(); jH++ {
 		fieldValueH := valueH.Field(jH).Interface()
 		fieldTypeH := valueH.Type().Field(jH)
@@ -288,13 +287,13 @@ func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT 
 		log.Infof("AGS fieldNameH: -%s<-", fieldNameH)
 		n := strings.ToLower(fieldNameH)
 
-		if (n == "rrtype") {
+		if n == "rrtype" {
 			n = "type"
 			//log.Infof("SUBARU 1 in: %d", fieldValueH)
 			fieldValueH = dnsTypesGetReverse[fieldValueH]
 			//log.Infof("SUBARU 2 res: %s", fieldValueH)
-		} else if (n == "class") {
-			if (!isOPT) {
+		} else if n == "class" {
+			if !isOPT {
 				log.Infof("JEEP 1 in: %d", fieldValueH)
 				zeta, _ := fieldValueH.(uint16)
 				fieldValueH = dnsClassesGet[zeta]
@@ -302,7 +301,7 @@ func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT 
 				n = "udp_payload"
 			}
 
-		} else if ("ttl" == n && isOPT) {
+		} else if "ttl" == n && isOPT {
 			n = "extended_rcode"
 		}
 		result[n] = fieldValueH
@@ -316,19 +315,19 @@ func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, result m
 
 	tX := reflect.ValueOf(resFieldValue).Type()
 	n := strings.ToLower(fieldType.Name)
-	if (isOPT && n =="option") {
+	if isOPT && n == "option" {
 		n = "options"
-		optionResults := make([]interface{},0)
+		optionResults := make([]interface{}, 0)
 		log.Infof("GMLRS: -%s<-", tX)
 
 		ee, isee := resFieldValue.([]dns.EDNS0)
-		log.Infof("ISEEE: %t",isee)
-		if (isee) {
-			for _,oo := range ee {
+		log.Infof("ISEEE: %t", isee)
+		if isee {
+			for _, oo := range ee {
 				optionResult := make(map[string]interface{})
 				n1, isn1 := oo.(*dns.EDNS0_NSID)
 				log.Infof("N1: %t", n1)
-				if (isn1) {
+				if isn1 {
 					optionResult["code"] = n1.Code
 					nsidValue := n1.Nsid
 					nsidValue = insertAtEveryNthPosition(nsidValue, 2, ' ')
@@ -406,9 +405,9 @@ func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
 
 	qTypeMapped, ok := dnsTypesGetReverse[q.Qtype]
 
-	if (!ok) {
+	if !ok {
 		qTypeMapped, ok = dnsExtraQuestionTypesGet[q.Qtype]
-		if (!ok) {
+		if !ok {
 			result["qtype"] = q.Qtype
 		} else {
 			result["qtype"] = qTypeMapped
@@ -417,8 +416,8 @@ func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
 		result["qtype"] = qTypeMapped
 	}
 
-	qClassMapped, ok2 :=  dnsClassesGet[q.Qclass]
-	if (!ok2) {
+	qClassMapped, ok2 := dnsClassesGet[q.Qclass]
+	if !ok2 {
 		result["qclass"] = q.Qclass
 	} else {
 		result["qclass"] = qClassMapped
@@ -436,27 +435,27 @@ func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
 	result := make(map[string]interface{})
 	answer_flags := make([]string, 0)
 
-	if (rh.Authoritative) {
+	if rh.Authoritative {
 		answer_flags = append(answer_flags, "AA")
 	}
 
-	if (rh.Truncated) {
+	if rh.Truncated {
 		answer_flags = append(answer_flags, "TC")
 	}
 
-	if (rh.RecursionDesired) {
+	if rh.RecursionDesired {
 		answer_flags = append(answer_flags, "RD")
 	}
 
-	if (rh.RecursionAvailable) {
+	if rh.RecursionAvailable {
 		answer_flags = append(answer_flags, "RA")
 	}
 
-	if (rh.AuthenticatedData) {
+	if rh.AuthenticatedData {
 		answer_flags = append(answer_flags, "AD")
 	}
 
-	if (rh.CheckingDisabled) {
+	if rh.CheckingDisabled {
 		answer_flags = append(answer_flags, "CD")
 	}
 
@@ -469,25 +468,25 @@ func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
 }
 
 var dnsRespCodesMappingGet = map[int]string{
-	0: "NOERROR",
-	1:"FORMERR",
-	2:"SERVFAIL",
-	3:"NXDOMAIN",
-	4:"NOTIMP",
-	5:"REFUSED",
-	6:"YXDOMAIN",
-	7:"YXRRSET",
-	8:"NXRRSET",
-	9:"NOTAUTH",
-	10:"NOTZONE",
-	16:"BADSIG/BADVERS",
-	17:"BADKEY",
-	18:"BADTIME",
-	19:"BADMODE",
-	20:"BADNAME",
-	21:"BADALG",
-	22:"BADTRUNC",
-	23:"BADCOOKIE",
+	0:  "NOERROR",
+	1:  "FORMERR",
+	2:  "SERVFAIL",
+	3:  "NXDOMAIN",
+	4:  "NOTIMP",
+	5:  "REFUSED",
+	6:  "YXDOMAIN",
+	7:  "YXRRSET",
+	8:  "NXRRSET",
+	9:  "NOTAUTH",
+	10: "NOTZONE",
+	16: "BADSIG/BADVERS",
+	17: "BADKEY",
+	18: "BADTIME",
+	19: "BADMODE",
+	20: "BADNAME",
+	21: "BADALG",
+	22: "BADTRUNC",
+	23: "BADCOOKIE",
 }
 
 func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
@@ -495,7 +494,7 @@ func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
 
 	rCodeMapped, ok := dnsRespCodesMappingGet[rh.Rcode]
 
-	if (ok) {
+	if ok {
 		result["response_code"] = rCodeMapped
 	} else {
 		result["response_code"] = rh.Rcode
@@ -504,8 +503,8 @@ func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
 	return result
 }
 
-func getDNSAnswersGet(params []string) (string,error) {
-	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
+func getDNSAnswersGet(params []string) (string, error) {
+	fmt.Printf("OMEGA PARAMTS: %s" + strings.Join(params, ", "))
 
 	options, err := parseParamasGet(params)
 	if err != nil {
@@ -581,7 +580,6 @@ func getDNSAnswersGet(params []string) (string,error) {
 	return string(resultJson), nil
 }
 
-
 func (o *dnsGetOptions) setDNSTypeGet(dnsType string) error {
 	if dnsType == "" {
 		return nil
@@ -634,7 +632,6 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 
 	m.Question[0] = dns.Question{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET}
 
-
 	///
 	if flags["dnssec"] || flags["nsid"] /*|| *client != ""*/ {
 		o := &dns.OPT{
@@ -658,7 +655,6 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 
 		m.Extra = append(m.Extra, o)
 	}
-
 
 	r, _, err := c.Exchange(m, resolver)
 
