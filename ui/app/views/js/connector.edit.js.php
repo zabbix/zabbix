@@ -79,7 +79,7 @@ window.connector_edit_popup = new class {
 		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
 		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
 
-		this.form.querySelector('#attempt_interval').disabled = this.form.querySelector('#max_attempts').value <= 1;
+		document.getElementById('attempt_interval').disabled = document.getElementById('max_attempts').value <= 1;
 	}
 
 	clone({title, buttons}) {
