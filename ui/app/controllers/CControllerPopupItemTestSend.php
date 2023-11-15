@@ -385,7 +385,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$output['value'] = $result['result'];
 					$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
 
-					if ($result['truncated']) {
+					if (array_key_exists('truncated', $result) && $result['truncated']) {
 						$output['warning'] = _s('First %1$s of %2$s shown.',
 							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
 							convertUnits(['value' => $result['original_size'], 'units' => 'B'])
@@ -476,7 +476,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							}
 						}
 						else {
-							if ($step['truncated']) {
+							if (array_key_exists('truncated', $step) && $step['truncated']) {
 								$step['warning'] = _s('First %1$s of %2$s shown.',
 									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
 									convertUnits(['value' => $step['original_size'], 'units' => 'B'])
@@ -506,7 +506,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'result' => $result['result']
 						];
 
-						if ($result['truncated']) {
+						if (array_key_exists('truncated', $result) && $result['truncated']) {
 							$output['final']['warning'] = _s('First %1$s of %2$s shown.',
 								convertUnits(['value' => strlen($result['result']), 'units' => 'B']),
 								convertUnits(['value' => $result['original_size'], 'units' => 'B'])
