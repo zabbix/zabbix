@@ -283,7 +283,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		];
 
 		// Merge all Advanced fields into one array.
-		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background color']);
+		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background colour']);
 
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);
@@ -928,7 +928,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '99',
 						'id:units_bold' => true,
-						'Background color' => 'FFAAAA',
+						'Background colour' => 'FFAAAA',
 						'xpath://button[@id="lbl_desc_color"]/..' => 'AABBCC',
 						'xpath://button[@id="lbl_value_color"]/..' => 'CC11CC',
 						'xpath://button[@id="lbl_units_color"]/..' => 'BBCC55',
