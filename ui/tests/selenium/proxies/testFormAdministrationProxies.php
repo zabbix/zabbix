@@ -1134,6 +1134,20 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'proxy' => self::CHANGE_PASSIVE_PROXY
 				]
+			],
+			[
+				[
+					'proxy' => 'Active proxy to delete',
+					'encryption_fields' => [
+						'id:tls_accept_none' => true,
+						'id:tls_accept_psk' => true,
+						'id:tls_accept_certificate' => true,
+						'PSK identity' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//",
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
+					]
+				]
 			]
 		];
 	}
@@ -1207,7 +1221,19 @@ class testFormAdministrationProxies extends CWebTest {
 		}
 
 		$this->assertEquals($original_fields, $cloned_fields);
-		$dialog->close();
+
+		//$dialog->invalidate();
+
+		// Check "Encryption" tabs functionality.
+		if (CTestArrayHelper::get($data, 'encryption_fields')) {
+			$form->selectTab('Encryption');
+			$form->fill($data['encryption_fields']);
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Proxy updated');
+		}
+		else {
+			$dialog->close();
+		}
 	}
 
 	/**
