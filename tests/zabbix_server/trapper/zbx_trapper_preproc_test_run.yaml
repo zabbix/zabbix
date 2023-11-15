@@ -267,16 +267,24 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 4"
+            "result": "data: 4",
+            "truncated": false,
+            "original_size": 7
           },
           {
-            "result": "4"
+            "result": "4",
+            "truncated": false,
+            "original_size": 1
           },
           {
-            "result": "8"
+            "result": "8",
+            "truncated": false,
+            "original_size": 1
           }
         ],
-        "result": "8"
+        "result": "8",
+        "truncated": false,
+        "original_size": 1
       }
     }
 ---
@@ -365,7 +373,9 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 4"
+            "result": "data: 4",
+            "truncated": false,
+            "original_size": 7
           },
           {
             "error": "/.*"
@@ -414,10 +424,14 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: x"
+            "result": "data: x",
+            "truncated": false,
+            "original_size": 7
           },
           {
-            "result": "x"
+            "result": "x",
+            "truncated": false,
+            "original_size": 1
           },
           {
             "error": "/.*"
@@ -466,7 +480,9 @@ out:
       "data": {
         "steps": [
           {
-            "result": "4"
+            "result": "4",
+            "truncated": false,
+            "original_size": 1
           },
           {
             "result": null,
@@ -517,18 +533,26 @@ out:
       "data": {
         "steps": [
           {
-            "result": "4"
+            "result": "4",
+            "truncated": false,
+            "original_size": 1
           },
           {
             "result": "5",
+            "truncated": false,
+            "original_size": 1,
             "action": 2,
             "error": "/.*"
           },
           {
-            "result": "10"
+            "result": "10",
+            "truncated": false,
+            "original_size": 2
           }
         ],
-        "result": "10"
+        "result": "10",
+        "truncated": false,
+        "original_size": 2
       }
     }
 ---
@@ -571,7 +595,9 @@ out:
       "data": {
         "steps": [
           {
-            "result": "4"
+            "result": "4",
+            "truncated": false,
+            "original_size": 1
           },
           {
             "failed": "Validation error",
@@ -616,10 +642,14 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: x"
+            "result": "data: x",
+            "truncated": false,
+            "original_size": 7
           },
           {
-            "result": "x"
+            "result": "x",
+            "truncated": false,
+            "original_size": 1
           }
         ],
         "error": "/.*"
@@ -654,10 +684,14 @@ out:
       "data": {
         "steps": [
           {
-            "result": "x"
+            "result": "x",
+            "truncated": false,
+            "original_size": 1
           }
         ],
-        "result": "x"
+        "result": "x",
+        "truncated": false,
+        "original_size": 1
       }
     }
 ---
@@ -692,10 +726,14 @@ out:
       "data": {
         "steps": [
           {
-            "result": "600"
+            "result": "600",
+            "truncated": false,
+            "original_size": 3
           }
         ],
-        "result": "600"
+        "result": "600",
+        "truncated": false,
+        "original_size": 3
       }
     }
 ---
@@ -730,10 +768,14 @@ out:
       "data": {
         "steps": [
           {
-            "result": "10"
+            "result": "10",
+            "truncated": false,
+            "original_size": 2
           }
         ],
-        "result": "10"
+        "result": "10",
+        "truncated": false,
+        "original_size": 2
       }
     }
 ---
@@ -832,7 +874,9 @@ out:
         "previous": true,
         "steps": [
           {
-            "result": "data: 4"
+            "result": "data: 4",
+            "truncated": false,
+            "original_size": 7
           },
           {
             "error": "/.*"
@@ -886,10 +930,14 @@ out:
       "previous": true,
         "steps": [
           {
-            "result": "data: x"
+            "result": "data: x",
+            "truncated": false,
+            "original_size": 7
           },
           {
-            "result": "x"
+            "result": "x",
+            "truncated": false,
+            "original_size": 1
           },
           {
             "error": "/.*"
@@ -942,16 +990,24 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 3"
+            "result": "data: 3",
+            "truncated": false,
+            "original_size": 7
           },
           {
-            "result": "3"
+            "result": "3",
+            "truncated": false,
+            "original_size": 1
           },
           {
-            "result": "6"
+            "result": "6",
+            "truncated": false,
+            "original_size": 1
           }
         ],
-        "result": "6"
+        "result": "6",
+        "truncated": false,
+        "original_size": 1
       }
     }
 ---
@@ -998,16 +1054,24 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 3"
+            "result": "data: 3",
+            "truncated": false,
+            "original_size": 7
           },
           {
-            "result": "3"
+            "result": "3",
+            "truncated": false,
+            "original_size": 1
           },
           {
-            "result": "6"
+            "result": "6",
+            "truncated": false,
+            "original_size": 1
           }
         ],
-        "result": "6"
+        "result": "6",
+        "truncated": false,
+        "original_size": 1
       }
     }
 ---
@@ -1055,7 +1119,9 @@ out:
         "previous": true,
         "steps": [
           {
-            "result": "4"
+            "result": "4",
+            "truncated": false,
+            "original_size": 1
           },
           {
             "failed": "Validation error",
@@ -1105,10 +1171,14 @@ out:
         "previous": true,
         "steps": [
           {
-            "result": "data: x"
+            "result": "data: x",
+            "truncated": false,
+            "original_size": 7
           },
           {
-            "result": "x"
+            "result": "x",
+            "truncated": false,
+            "original_size": 1
           }
         ],
         "error": "/.*"
@@ -1147,10 +1217,14 @@ out:
       "data": {
         "steps": [
           {
-            "result": "x"
+            "result": "x",
+            "truncated": false,
+            "original_size": 1
           }
         ],
-        "result": "x"
+        "result": "x",
+        "truncated": false,
+        "original_size": 1
       }
     }
 ---
@@ -1191,13 +1265,19 @@ out:
       "data": {
         "steps": [
           {
-            "result": "10"
+            "result": "10",
+            "truncated": false,
+            "original_size": 2
           },
           {
-            "result": "1"
+            "result": "1",
+            "truncated": false,
+            "original_size": 1
           }
         ],
-        "result": "1"
+        "result": "1",
+        "truncated": false,
+        "original_size": 1
       }
     }
 ---
@@ -1238,13 +1318,19 @@ out:
       "data": {
         "steps": [
           {
-            "result": "10"
+            "result": "10",
+            "truncated": false,
+            "original_size": 2
           },
           {
-            "result": "10"
+            "result": "10",
+            "truncated": false,
+            "original_size": 2
           }
         ],
-        "result": "10"
+        "result": "10",
+        "truncated": false,
+        "original_size": 2
       }
     }
 ---
@@ -1276,10 +1362,14 @@ out:
       "data": {
         "steps": [
           {
-             "result": "value 123"
+             "result": "value 123",
+             "truncated": false,
+             "original_size": 9
           }
         ],
-        "result": "value 123"
+        "result": "value 123",
+        "truncated": false,
+        "original_size": 9
       }
     }
 ---
@@ -1397,17 +1487,25 @@ out:
       "data": {
         "steps": [
           {
-             "result": "value 123"
+             "result": "value 123",
+             "truncated": false,
+             "original_size": 9
           },
           {
-             "result": "value 123"
+             "result": "value 123",
+             "truncated": false,
+             "original_size": 9
           },
           {
-             "result": "value 123"
+             "result": "value 123",
+             "truncated": false,
+             "original_size": 9
           }
 
          ],
-        "result": "value 123"
+        "result": "value 123",
+        "truncated": false,
+        "original_size": 9
       }
     }
 ---
@@ -1463,10 +1561,14 @@ out:
           {
              "action": 2,
              "error":"333",
-             "result":"444"
+             "result":"444",
+             "truncated": false,
+             "original_size": 3
           }
          ],
-        "result": "444"
+        "result": "444",
+        "truncated": false,
+        "original_size": 3
       }
     }
 ...
