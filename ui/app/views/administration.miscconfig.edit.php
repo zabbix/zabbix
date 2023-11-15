@@ -200,8 +200,8 @@ $from_list = (new CFormList())
 	);
 
 $form = (new CForm())
-	->setName('otherForm')
 	->setId('other_form')
+	->setName('otherForm')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.update')
 		->getUrl()
