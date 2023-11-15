@@ -148,6 +148,7 @@ $gui_view = (new CTabView())
 	));
 
 $form = (new CForm())
+	->setId('gui-form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'gui.update')
