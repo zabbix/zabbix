@@ -190,10 +190,12 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 					" together")
 		}
 
-		if (!val) {
-			o.flags[key] = Xflag
+		if (noXflag) {
+			o.flags[key] = false
+		} else if (Xflag) {
+			o.flags[key] = true
 		} else {
-			o.flags[key] = noXflag
+			o.flags[key] = val
 		}
 	}
 
@@ -457,6 +459,43 @@ func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
 	return resultG
 }
 
+func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
+
+	result := make(map[string]interface{})
+	answer_flags := make([]string, 0)
+
+	if (rh.Authoritative) {
+		answer_flags = append(answer_flags, "AA")
+	}
+
+	if (rh.Truncated) {
+		answer_flags = append(answer_flags, "TC")
+	}
+
+	if (rh.RecursionDesired) {
+		answer_flags = append(answer_flags, "RD")
+	}
+
+	if (rh.RecursionAvailable) {
+		answer_flags = append(answer_flags, "RA")
+	}
+
+	if (rh.AuthenticatedData) {
+		answer_flags = append(answer_flags, "AD")
+	}
+
+	if (rh.CheckingDisabled) {
+		answer_flags = append(answer_flags, "CD")
+	}
+
+	result["flags"] = answer_flags
+
+	aG, _ := json.Marshal(result)
+	log.Infof("MARSHALL RES aG: ->%s<-", string(aG))
+
+	return result
+}
+
 func getDNSAnswersGet(params []string) (string,error) {
 	fmt.Printf("OMEGA PARAMTS: %s"+strings.Join(params, ", "))
 
@@ -486,6 +525,9 @@ func getDNSAnswersGet(params []string) (string,error) {
 	queryTimeSection["query_time"] = tFormattedTwoDigitsPrecision
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
+
+	parsedFlagsSection := parseRespFlags(resp.MsgHdr)
+
 	log.Infof("AGS Question: %s", resp.Question)
 	log.Infof("AGS Ns: %s", resp.Ns)
 	log.Infof("AGS Extra: %s", resp.Extra)
@@ -516,6 +558,7 @@ func getDNSAnswersGet(params []string) (string,error) {
 	// EXTRA END
 
 	result := []interface{}{
+		parsedFlagsSection,
 		queryTimeSection,
 		parsedQuestionSection,
 		parsedAnswerSection,
@@ -568,12 +611,12 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
-			Authoritative:      flags["aaflag"],
+			Authoritative:     flags["aaflag"],
 			AuthenticatedData: flags["adflag"],
 			CheckingDisabled:  false,
 			RecursionDesired:  flags["rdflag"],
-			Opcode:           dns.OpcodeQuery,
-			Rcode:            dns.RcodeSuccess,
+			Opcode:            dns.OpcodeQuery,
+			Rcode:             dns.RcodeSuccess,
 		},
 		Question: make([]dns.Question, 1),
 	}
