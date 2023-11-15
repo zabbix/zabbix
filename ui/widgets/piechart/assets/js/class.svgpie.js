@@ -71,7 +71,7 @@ class CSVGPie {
 	 * @type {SVGGElement}
 	 * @member {Selection}
 	 */
-	#g_scalable;
+	#container;
 
 	/**
 	 * SVG group element that contains all the sectors and empty circles.
@@ -284,7 +284,7 @@ class CSVGPie {
 		const x = this.#width / 2;
 		const y = (this.#height - box_size * this.#scale) / 2 + this.#radius_outer * this.#scale;
 
-		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${this.#scale})`);
+		this.#container.attr('transform', `translate(${x} ${y}) scale(${this.#scale})`);
 
 		this.#positionValue();
 	}
@@ -522,9 +522,9 @@ class CSVGPie {
 			.append('svg:g')
 			.attr('transform', `translate(${this.#padding.horizontal} ${this.#padding.vertical})`);
 
-		this.#g_scalable = main.append('svg:g');
+		this.#container = main.append('svg:g');
 
-		this.#arcs_container = this.#g_scalable
+		this.#arcs_container = this.#container
 			.append('svg:g')
 			.attr('class', CSVGPie.ZBX_STYLE_ARCS);
 
@@ -540,7 +540,7 @@ class CSVGPie {
 				.attr('r', this.#radius_inner);
 
 			if (this.#config.total_value?.show) {
-				this.#total_value_container = this.#g_scalable
+				this.#total_value_container = this.#container
 					.append('svg:foreignObject')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
 					.attr('x', -this.#radius_inner)
@@ -553,7 +553,7 @@ class CSVGPie {
 			}
 		}
 
-		this.#no_data_container = this.#g_scalable
+		this.#no_data_container = this.#container
 			.append('svg:text')
 			.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE_NO_DATA)
 			.attr('y', y_offset)
