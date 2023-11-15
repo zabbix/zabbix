@@ -392,16 +392,16 @@ class CDataHelper extends CAPIHelper {
 		$suffix = static::getItemDataTableSuffix($itemid);
 
 		foreach (array_values($values) as $key => $value) {
+			$clock = is_array($time) ? $time[$key] : $time;
+
 			// If value is an array, it means that we are dealing with trend data, which is inserted in differently.
 			if (is_array($value)) {
-				$clock = is_array($time) ? $time[$key] : $time;
 				DBexecute('INSERT INTO trends'.$suffix.' (itemid, clock, num, value_min, value_avg,'.
 						' value_max) VALUES ('.zbx_dbstr($itemid).', '.zbx_dbstr($clock).', '.zbx_dbstr($value['num']).
 						', '.zbx_dbstr($value['min']).', '.zbx_dbstr($value['avg']).', '.zbx_dbstr($value['max']).')'
 				);
 			}
 			else {
-				$clock = is_array($time) ? $time[$key] : $time;
 				DBexecute('INSERT INTO history'.$suffix.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).
 						', '.zbx_dbstr($clock).', '.zbx_dbstr($value).')'
 				);

@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
+require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -29,9 +29,23 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
 class testDataDisplayInGraphs extends CWebTest {
 
 	protected static $hostid;
-	protected static $timestamps;
 	protected static $itemids;
 	protected static $dashboardid;
+
+	const TIMESTAMPS = [
+			'history' => [
+				'from' => '2023-10-07 12:58:00',
+				'to' => '2023-10-07 13:20:00'
+			],
+			'trends' => [
+				'from' => '2023-10-03 00:00:00',
+				'to' => '2023-10-07 12:00:00'
+			],
+			'pie' => [
+				'from' => 'now-1h',
+				'to' => 'now'
+			]
+		];
 
 	public static function prepareGraphData() {
 		$host_responce = CDataHelper::createHosts([
@@ -106,7 +120,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			'Item for trends data display 1' => $host_responce['itemids']['Host for data display on graphs:item_key_3'],
 			'Item for trends data display 2' => $host_responce['itemids']['Host for data display on graphs:item_key_4'],
 			'Item for pie chart 1' => $host_responce['itemids']['Host for data display on graphs:item_key_5'],
-			'Item for pie chart 2' => $host_responce['itemids']['Host for data display on graphs:item_key_6'],
+			'Item for pie chart 2' => $host_responce['itemids']['Host for data display on graphs:item_key_6']
 		];
 
 		$graph_responce = CDataHelper::call('graph.create', [
@@ -502,7 +516,7 @@ class testDataDisplayInGraphs extends CWebTest {
 					$timestamp.' + 15 minute',
 					$timestamp.' + 16 minute',
 					$timestamp.' + 17 minute',
-					$timestamp.' + 18 minute',
+					$timestamp.' + 18 minute'
 				],
 				'values' => [10.5, 8.33, 12.69, 4.025, 3.1, 7, 6.66, -1.5, 0.31, 6.47, 2.11, 8.98, 10.01]
 			],
@@ -621,7 +635,7 @@ class testDataDisplayInGraphs extends CWebTest {
 					$timestamp.' + 13 minute',
 					$timestamp.' + 16 minute',
 					$timestamp.' + 17 minute',
-					$timestamp.' + 18 minute',
+					$timestamp.' + 18 minute'
 				],
 				'values' => [4.31, -0.5, 7.53, 2.37, 5.55, 7.77, 9.11, 10.34, 2.23, 5.98, -3.21, 2.45, 5.1]
 			]
@@ -639,21 +653,6 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		CDataHelper::addItemData(self::$itemids['Item for pie chart 1'], 0.66);
 		CDataHelper::addItemData(self::$itemids['Item for pie chart 2'], 0.34);
-
-		self::$timestamps = [
-			'history' => [
-				'from' => '2023-10-07 12:58:00',
-				'to' => '2023-10-07 13:20:00',
-			],
-			'trends' => [
-				'from' => '2023-10-03 00:00:00',
-				'to' => '2023-10-07 12:00:00',
-			],
-			'pie' => [
-				'from' => 'now-1h',
-				'to' => 'now'
-			]
-		];
 
 		// Create dashboard with SVG graphs and classic graph widgets.
 		$dashboard_responce = CDataHelper::call('dashboard.create', [
@@ -988,12 +987,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['history']['from']
+										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1054,12 +1053,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['history']['from']
+										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1120,12 +1119,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['history']['from']
+										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1186,12 +1185,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['history']['from']
+										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1247,12 +1246,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['trends']['to']
+										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1318,12 +1317,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['trends']['to']
+										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1389,12 +1388,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['trends']['to']
+										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1460,12 +1459,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['trends']['to']
+										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1531,12 +1530,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['history']['from']
+										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1597,12 +1596,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['history']['from']
+										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 0,
@@ -1668,12 +1667,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['trends']['to']
+										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1739,12 +1738,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['trends']['to']
+										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -1810,7 +1809,7 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 1,
@@ -1906,7 +1905,7 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
@@ -1997,12 +1996,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['history']['from']
+										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['history']['to']
+										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
 										'type' => 0,
@@ -2083,12 +2082,12 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'time_from',
-										'value' => self::$timestamps['trends']['from']
+										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
 										'type' => 1,
 										'name' => 'time_to',
-										'value' => self::$timestamps['trends']['to']
+										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
 										'type' => 0,
@@ -2152,16 +2151,15 @@ class testDataDisplayInGraphs extends CWebTest {
 				->waitUntilReady();
 
 		// Open the time selector tab if it's not opened yet.
-		$time_tab = $this->query('xpath://a[contains(@class, "btn-time")]')->one();
 		$timeselector_tab = $this->query('id:tab_1')->one();
 
 		if ($timeselector_tab->isDisplayed(false)) {
-			$time_tab->click();
+			$this->query('xpath://a[contains(@class, "btn-time")]')->one()->click();
 			$timeselector_tab->waitUntilVisible();
 		}
 
 		// Set time selector to display the time period, required for the corresponding data type.
-		$this->setTimeSelector(self::$timestamps[$data['type']]);
+		$this->setTimeSelector(self::TIMESTAMPS[$data['type']]);
 
 		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');
@@ -2232,14 +2230,15 @@ class testDataDisplayInGraphs extends CWebTest {
 	public function testDataDisplayInGraphs_LatestData($data) {
 		$this->page->login()->open('history.php?action=showgraph&itemids%5B%5D='.self::$itemids[$data['item']])
 				->waitUntilReady();
+
 		// In Latest data the image loads longer, so need to wait for image source to change before checking the screenshot.
 		$image = $this->query('id:historyGraph')->one();
 		$old_source = $image->getAttribute('src');
 
 		// Set time selector to display the time period, required for the corresponding data type.
-		$this->setTimeSelector(self::$timestamps[$data['type']]);
+		$this->setTimeSelector(self::TIMESTAMPS[$data['type']]);
 
-		// Wait for the image source to chenge and check graph screenshot.
+		// Wait for the image source to change and check graph screenshot.
 		$image->waitUntilAttributesNotPresent(['src' => $old_source]);
 		$screenshot_id = 'latest_data_'.$data['type'];
 		$this->assertScreenshot($this->query('class:center')->one(), $screenshot_id);
@@ -2300,7 +2299,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// It's required to set time selector only for pages with classic graph widgets, SVG graphs have period set in config.
 		if (CTestArrayHelper::get($data, 'type')) {
-			$this->setTimeSelector(self::$timestamps[$data['type']]);
+			$this->setTimeSelector(self::TIMESTAMPS[$data['type']]);
 		}
 
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
