@@ -171,7 +171,7 @@ static int	check_persistent_directory_exists(const char *pathname, char **error)
 {
 	zbx_stat_t	status;
 
-	if (0 != lstat(pathname, &status))
+	if (0 != zbx_stat(pathname, &status))
 	{
 		*error = zbx_dsprintf(*error, "cannot obtain directory information: %s", zbx_strerror(errno));
 		return FAIL;
