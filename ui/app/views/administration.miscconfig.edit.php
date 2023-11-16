@@ -114,18 +114,18 @@ $from_list = (new CFormList())
 			makeHelpIcon([
 				_('X-Frame-Options HTTP header supported values:'),
 				(new CList([
-					new CListItem(_s('%1$s (default) or %2$s (must be single-quoted) - the page can only be displayed in a frame on the same origin as the page itself%3$s',
-						'SAMEORIGIN', '\'self\'', ';'
-					)),
-					new CListItem(_s('%1$s (default) or %2$s (must be single-quoted) - the page cannot be displayed in a frame, regardless of the site attempting to do so%3$s',
-						'DENY', '\'none\'', ';'
-					)),
-					new CListItem(_s('a string of space-separated hostnames; adding %1$s (must be single-quoted) to the list will allow the page to be displayed in a frame on the same origin as the page itself%2$s',
-						'\'self\'', '.'
-					))
+					_s('%1$s (default) or %2$s (must be single-quoted) - the page can only be displayed in a frame on the same origin as the page itself',
+						'SAMEORIGIN', "'self'"
+					),
+					_s('%1$s (default) or %2$s (must be single-quoted) - the page cannot be displayed in a frame, regardless of the site attempting to do so',
+						'DENY', "'none'"
+					),
+					_s('a string of space-separated hostnames; adding %1$s (must be single-quoted) to the list will allow the page to be displayed in a frame on the same origin as the page itself',
+						"'self\'"
+					)
 				]))->addClass(ZBX_STYLE_LIST_DASHED),
-				_s('Note, that using %1$s or %2$s without single quotes will result in them being regarded as hostnames%3$s',
-					'\'self\'', '\'none\'', '.'
+				_s('Note that using %1$s or %2$s without single quotes will result in them being regarded as hostnames',
+					"'self\'", "'none'"
 				)
 			])
 		], 'x_frame_header_enabled'))->setAsteriskMark(),
@@ -200,7 +200,7 @@ $from_list = (new CFormList())
 	);
 
 $form = (new CForm())
-	->setId('other_form')
+	->setId('other-form')
 	->setName('otherForm')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.update')
