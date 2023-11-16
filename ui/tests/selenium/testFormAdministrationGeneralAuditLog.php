@@ -31,7 +31,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	public $default_values = [
 		'Enable audit logging' => true,
 		'Enable internal housekeeping' => true,
-		'Data storage period' => '365d'
+		'Data storage period' => '31d'
 	];
 
 	public $custom_values = [
@@ -43,7 +43,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	public $db_default_values = [
 		'auditlog_enabled' => 1,
 		'hk_audit_mode' => 1,
-		'hk_audit' => '365d'
+		'hk_audit' => '31d'
 	];
 
 	/**
@@ -104,6 +104,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 
 	public static function getUpdateValueData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -114,10 +115,11 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '0',
-						'hk_audit' => '365d'
+						'hk_audit' => '31d'
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -128,10 +130,11 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '0',
-						'hk_audit' => '365d'
+						'hk_audit' => '31d'
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -147,6 +150,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -162,6 +166,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -177,6 +182,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -192,6 +198,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -207,6 +214,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -222,6 +230,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -237,6 +246,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -252,6 +262,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -267,6 +278,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -282,6 +294,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -297,6 +310,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -312,6 +326,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -327,6 +342,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -342,6 +358,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -357,6 +374,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -372,6 +390,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -383,6 +402,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -394,6 +414,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -405,6 +426,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -416,6 +438,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -427,6 +450,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -438,6 +462,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -449,6 +474,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -460,6 +486,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -471,6 +498,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -482,6 +510,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -493,6 +522,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -504,6 +534,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #30.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -515,6 +546,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #31.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -526,6 +558,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #32.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -537,6 +570,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #33.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -548,6 +582,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #34.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -559,6 +594,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #35.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -570,6 +606,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #36.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -581,6 +618,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #37.
 			[
 				[
 					'expected' => TEST_BAD,

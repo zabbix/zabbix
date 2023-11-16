@@ -540,7 +540,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 		if (ZBX_IS_RUNNING())
 		{
-			async_initiate_queued_checks(&poller_config);
+			if (FAIL == zbx_vps_monitor_capped())
+				async_initiate_queued_checks(&poller_config);
+
 			zbx_async_manager_requeue_flush(poller_config.manager);
 			zbx_async_manager_interfaces_flush(poller_config.manager, &poller_config.interfaces);
 		}
@@ -552,9 +554,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		{
 			zbx_update_env(get_process_type_string(process_type), zbx_time());
 
-			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec]",
+			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec%s]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
-				poller_config.queued);
+				poller_config.queued, zbx_vps_monitor_status());
 
 			poller_config.processed = 0;
 			poller_config.queued = 0;
