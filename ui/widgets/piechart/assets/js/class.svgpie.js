@@ -482,11 +482,11 @@ class CSVGPie {
 	 * Adjust position of total value and no data text inside pie chart.
 	 */
 	#positionValue() {
-		const getAutoFontSize = (text, default_size) => {
+		const getAutoFontSize = (text, default_size, font_weight) => {
 			let available_width = this.#radius_inner * 2 * this.#scale;
 			available_width -= available_width / CSVGPie.TOTAL_VALUE_PADDING;
 
-			const text_width = this.#getMeasuredTextWidth(text, default_size);
+			const text_width = this.#getMeasuredTextWidth(text, default_size, font_weight);
 
 			const coefficient = available_width / text_width;
 
@@ -515,8 +515,10 @@ class CSVGPie {
 					this.#total_value_font_size = this.#config.total_value.size * 10;
 				}
 				else {
+					const font_weight = this.#config.total_value.is_bold ? 'bold' : '';
+
 					this.#total_value_font_size = getAutoFontSize(
-						this.#total_value_text, CSVGPie.TOTAL_VALUE_HEIGHT_MIN
+						this.#total_value_text, CSVGPie.TOTAL_VALUE_HEIGHT_MIN, font_weight
 					);
 				}
 
@@ -542,8 +544,10 @@ class CSVGPie {
 						.style('font-size', `${this.#config.total_value.size * 10}px`);
 				}
 				else {
+					const font_weight = this.#config.total_value.is_bold ? 'bold' : '';
+
 					const text_width = this.#getMeasuredTextWidth(
-						this.#no_data_container.text(), CSVGPie.TOTAL_VALUE_SIZE_DEFAULT
+						this.#no_data_container.text(), CSVGPie.TOTAL_VALUE_SIZE_DEFAULT, font_weight
 					);
 
 					let text_scale = this.#radius_inner * 2 / text_width;
@@ -667,11 +671,12 @@ class CSVGPie {
 	 *
 	 * @param {string} text
 	 * @param {number} font_size
+	 * @param {number|string} font_weight
 	 *
 	 * @returns {number}
 	 */
-	#getMeasuredTextWidth(text, font_size) {
-		this.#canvas_context.font = `${font_size}px ${this.#svg.style('font-family')}`;
+	#getMeasuredTextWidth(text, font_size, font_weight = '') {
+		this.#canvas_context.font = `${font_weight} ${font_size}px ${this.#svg.style('font-family')}`;
 
 		return this.#canvas_context.measureText(text).width;
 	}
