@@ -216,7 +216,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 		}
 	}
 
-	if (NULL != str_cutoff)
+	if (NULL != full_len)
 		*full_len = len;
 
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type) {
