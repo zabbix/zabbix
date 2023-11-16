@@ -561,9 +561,17 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 		parsedResponseCode,
 		queryTimeSection,
 		parsedQuestionSection,
-		parsedAnswerSection,
-		parsedAuthoritySection,
-		parsedAdditionalSection}
+	}
+
+	if len(parsedAnswerSection) != 0 {
+		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAnswerSection)
+	}
+	if len(parsedAuthoritySection) != 0 {
+		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAuthoritySection)
+	}
+	if len(parsedAdditionalSection) != 0 {
+		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAdditionalSection)
+	}
 
 	// Check if the result can be marshaled first and if not:
 	// 1) return appropriate error encoded in json

@@ -509,10 +509,10 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 	c.ReadTimeout = timeout
 	c.WriteTimeout = timeout
 
-	if (record == dns.TypePTR) {
+	if record == dns.TypePTR {
 		rdomain, revAddrErr := dns.ReverseAddr(domain)
 
-		if (revAddrErr != nil) {
+		if revAddrErr != nil {
 			return nil, revAddrErr
 		}
 
