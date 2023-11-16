@@ -637,6 +637,16 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 	c.ReadTimeout = timeout
 	c.WriteTimeout = timeout
 
+	if record == dns.TypePTR {
+		rdomain, revAddrErr := dns.ReverseAddr(domain)
+
+		if revAddrErr != nil {
+			return nil, revAddrErr
+		}
+
+		domain = rdomain
+	}
+
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
 			Authoritative:     flags["aaflag"],
