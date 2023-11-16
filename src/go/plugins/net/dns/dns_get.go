@@ -265,60 +265,55 @@ func insertAtEveryNthPosition(s string, n int, r rune) string {
 	return buffer.String()
 }
 
-func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT bool) {
-	valueH := fieldValue
-	typeOfH := valueH.Type()
+func parseHeader(header reflect.Value, result map[string]interface{}, isOPT bool) {
+	for i := 0; i < header.NumField(); i++ {
+		fieldValue := header.Field(i).Interface()
+		fieldName := strings.ToLower(header.Type().Field(i).Name)
 
-	log.Infof("RECORD TYPE IN: %s", typeOfH)
-
-	if valueH.Kind() == reflect.Ptr {
-		valueH = valueH.Elem()
-	}
-
-	for jH := 0; jH < valueH.NumField(); jH++ {
-		fieldValueH := valueH.Field(jH).Interface()
-		fieldTypeH := valueH.Type().Field(jH)
-		fieldNameH := fieldTypeH.Name
-		n := strings.ToLower(fieldNameH)
-
-		if n == "rrtype" {
-			n = "type"
-			fieldValueH = dnsTypesGetReverse[fieldValueH]
-		} else if n == "class" {
-			if !isOPT {
-				zeta, _ := fieldValueH.(uint16)
-				fieldValueH = dnsClassesGet[zeta]
-			} else {
-				n = "udp_payload"
+		if fieldName == "rrtype" {
+			fieldName = "type"
+			mappedFieldValue, ok := dnsTypesGetReverse[fieldValue]
+			if (ok) {
+				fieldValue = mappedFieldValue
 			}
-		} else if "ttl" == n && isOPT {
-			n = "extended_rcode"
+		} else if fieldName == "class" {
+			if !isOPT {
+				classValue, ok := fieldValue.(uint16)
+				if (ok) {
+					mappedClass, ok2 := dnsClassesGet[classValue]
+
+					if (ok2) {
+						fieldValue = mappedClass
+					}
+				}
+			} else {
+				fieldName = "udp_payload"
+			}
+		} else if "ttl" == fieldName && isOPT {
+			fieldName = "extended_rcode"
 		}
-		result[n] = fieldValueH
+		result[fieldName] = fieldValue
 	}
 }
 
-func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, isOPT bool,
+func parseRest(RRFieldButNotHeader reflect.Value, fieldType reflect.StructField, isOPT bool,
 	result map[string]interface{}) {
-	resFieldValue := fieldValue.Interface()
+	fieldInterface := RRFieldButNotHeader.Interface()
+	fieldName := strings.ToLower(fieldType.Name)
 
-	tX := reflect.ValueOf(resFieldValue).Type()
-	n := strings.ToLower(fieldType.Name)
-	if isOPT && n == "option" {
-		n = "options"
+	if isOPT && fieldName == "option" {
+		fieldName = "options"
 		optionResults := make([]interface{}, 0)
-		log.Infof("GMLRS: -%s<-", tX)
+		EDNS0Field, isEDNS0Field := fieldInterface.([]dns.EDNS0)
 
-		ee, isee := resFieldValue.([]dns.EDNS0)
-		log.Infof("ISEEE: %t", isee)
-		if isee {
-			for _, oo := range ee {
+		if isEDNS0Field {
+			for _, edns0FieldNextPart := range EDNS0Field {
 				optionResult := make(map[string]interface{})
-				n1, isn1 := oo.(*dns.EDNS0_NSID)
-				log.Infof("N1: %t", n1)
-				if isn1 {
-					optionResult["code"] = n1.Code
-					nsidValue := n1.Nsid
+				edns0_NSIDField, isEDNS0_NSIDField := edns0FieldNextPart.(*dns.EDNS0_NSID)
+
+				if isEDNS0_NSIDField {
+					optionResult["code"] = edns0_NSIDField.Code
+					nsidValue := edns0_NSIDField.Nsid
 					const numOfDigitsTogetherInNSID = 2
 					nsidValue = insertAtEveryNthPosition(nsidValue, numOfDigitsTogetherInNSID, ' ')
 					optionResult["nsid"] = nsidValue
@@ -326,9 +321,9 @@ func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, isOPT bo
 				}
 			}
 		}
-		result[n] = optionResults
+		result[fieldName] = optionResults
 	} else {
-		result[n] = resFieldValue
+		result[fieldName] = fieldInterface
 	}
 }
 
@@ -599,8 +594,7 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 
 	m.Question[0] = dns.Question{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET}
 
-	///
-	if flags["dnssec"] || flags["nsid"] /*|| *client != ""*/ {
+	if flags["dnssec"] || flags["nsid"] {
 		o := &dns.OPT{
 			Hdr: dns.RR_Header{
 				Name:   ".",
