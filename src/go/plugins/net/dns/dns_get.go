@@ -3,7 +3,6 @@ package dns
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
@@ -108,11 +107,6 @@ var dnsTypesGet = map[string]uint16{
 	"Reserved": dns.TypeReserved,
 }
 
-var (
-	six  = flag.Bool("6", false, "use IPv6 only")
-	four = flag.Bool("4", false, "use IPv4 only")
-)
-
 func exportDnsGet(params []string) (result interface{}, err error) {
 	answer, err := getDNSAnswersGet(params)
 
@@ -141,18 +135,22 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 		"adflag": false,
 	}
 
-	for key, val := range o.flags {
-		noXflag := strings.Contains(flags, ",no"+key)
-		Xflag := strings.Contains(flags, ","+key)
+	if (strings.Contains(flags, ",nsid") && strings.Contains(flags, "noedns0")) {
+		return zbxerr.New("Invalid flags combination, cannot use noedns0 and nsid together")
+	}
 
-		if noXflag && Xflag {
-			return zbxerr.New("Invalid flags combination, cannot use no" + key + " and " + key +
-				" together")
+	for key, val := range o.flags {
+		flagIsNotPresent := strings.Contains(flags, ",no" + key)
+		flagIsPresent := strings.Contains(flags, "," + key)
+
+		if flagIsNotPresent && flagIsPresent {
+			return zbxerr.New("Invalid flags combination, cannot use no" +
+				key + " and " + key + " together")
 		}
 
-		if noXflag {
+		if flagIsNotPresent {
 			o.flags[key] = false
-		} else if Xflag {
+		} else if flagIsPresent {
 			o.flags[key] = true
 		} else {
 			o.flags[key] = val
@@ -162,7 +160,7 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 	return nil
 }
 
-func parseParamasGet(params []string) (o dnsGetOptions, err error) {
+func parseParamsGet(params []string) (o dnsGetOptions, err error) {
 	switch len(params) {
 	case seventhParam:
 		err = o.setFlags(params[seventhParam-1])
@@ -472,9 +470,9 @@ func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
 }
 
 func getDNSAnswersGet(params []string) (string, error) {
-	fmt.Printf("OMEGA PARAMTS: %s" + strings.Join(params, ", "))
+	fmt.Printf("\nOMEGA PARAMTS: %s" + strings.Join(params, ", ")+"\n\n")
 
-	options, err := parseParamasGet(params)
+	options, err := parseParamsGet(params)
 	if err != nil {
 		return "", err
 	}
@@ -574,14 +572,6 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 	c.DialTimeout = timeout
 	c.ReadTimeout = timeout
 	c.WriteTimeout = timeout
-
-	if *four {
-		c.Net = "udp4"
-	}
-
-	if *six {
-		c.Net = "udp6"
-	}
 
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
