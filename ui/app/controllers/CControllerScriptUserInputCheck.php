@@ -101,7 +101,7 @@ class CControllerScriptUserInputCheck extends CController {
 				));
 			}
 			elseif (!preg_match($regular_expression, trim($manualinput))) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_default_value',
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
 					_s('input does not match the provided pattern: %1$s', $manualinput_validator)
 				));
 			}
