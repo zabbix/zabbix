@@ -40,7 +40,7 @@ import (
 const usageMessageFormat = //
 `Usage of Zabbix web service:
   %[1]s [-c config-file]
-  %[1]s -T
+  %[1]s [-c config-file] -T
   %[1]s -h
   %[1]s -V
 
