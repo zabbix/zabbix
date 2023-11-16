@@ -124,9 +124,9 @@ $from_list = (new CFormList())
 						"'self'"
 					).'.'
 				]))->addClass(ZBX_STYLE_LIST_DASHED),
-				_s('Note that using %1$s or %2$s without single quotes will result in them being regarded as hostnames',
+				_s('Note that using %1$s or %2$s without single quotes will result in them being regarded as hostnames.',
 					"'self'", "'none'"
-				).'.'
+				)
 			])
 		], 'x_frame_header_enabled'))->setAsteriskMark(),
 		[
