@@ -121,11 +121,11 @@ $from_list = (new CFormList())
 						'DENY', "'none'"
 					),
 					_s('a string of space-separated hostnames; adding %1$s (must be single-quoted) to the list will allow the page to be displayed in a frame on the same origin as the page itself',
-						"'self\'"
+						"'self'"
 					)
 				]))->addClass(ZBX_STYLE_LIST_DASHED),
-				_s('Note that using %1$s or %2$s without single quotes will result in them being regarded as hostnames',
-					"'self\'", "'none'"
+				_s('Note that using %1$s or %2$s without single quotes will result in them being regarded as hostnames.',
+					"'self'", "'none'"
 				)
 			])
 		], 'x_frame_header_enabled'))->setAsteriskMark(),
