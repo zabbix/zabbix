@@ -96,14 +96,15 @@ class testTimeoutsDisplay extends CWebTest {
 	];
 
 	/**
-	 * Change global timeouts values and check them.
+	 * Change global or proxy timeouts values and check them.
 	 *
-	 * @param string $timeout_values  	Reset default, macros values or custom values.
-	 * @param string $link    			Link to table with items, items prototype, discovery rules.
-	 * @param string $button_name		Button name to check not linked items.
-	 * @param string $proxy				Fill proxy timeouts.
+	 * @param array $timeout_values  		Reset default, macros values or custom values.
+	 * @param string $link    				Link to table with items, items prototype, LLD.
+	 * @param string $activity				Button name or table selector.
+	 * @param boolean $proxy				Fill proxy or global timeouts.
+	 * @param boolean $linked				Timeouts from linked template should be checked.
 	 */
-	public function checkGlobal($timeout_values, $link, $button_name, $proxy = false, $linked = false) {
+	public function checkGlobal($timeout_values, $link, $activity, $proxy = false, $linked = false) {
 		// Global Zabbix agent timeout used in active and passive agents. Add this value to array.
 		switch ($timeout_values) {
 			case 'proxy_macros':
@@ -148,16 +149,16 @@ class testTimeoutsDisplay extends CWebTest {
 
 		if ($linked) {
 			// Check linked item, item prototypes, discovery.
-			$this->checkLinked($values, $link, $button_name);
+			$this->checkLinked($values, $link, $activity);
 		}
 		else {
 			// Check not linked items, item prototypes, discovery.
-			$this->checkSimple($values, $link, $button_name);
+			$this->checkSimple($values, $link, $activity);
 		}
 	}
 
 	/**
-	 * Fill timeouts.
+	 * Change global timeouts.
 	 *
 	 * @param array $values		Timeouts values to fill.
 	 */
@@ -190,6 +191,11 @@ class testTimeoutsDisplay extends CWebTest {
 		$form->checkValue($values);
 	}
 
+	/**
+	 * Change proxy timeouts.
+	 *
+	 * @param array $values		Timeouts values to fill.
+	 */
 	protected function fillProxyTimeouts($values) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->query('name:proxy_list')->asTable()->one()->query('link:Proxy assigned to host')->one()->click();
@@ -220,6 +226,13 @@ class testTimeoutsDisplay extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check timeouts in items/item prototypes/LLD after timeout changes.
+	 *
+	 * @param array $values				Values to check.
+	 * @param string $link				Link to page where to check timeouts.
+	 * @param string $button_name		Button name to add new item, item prototype, LLD.
+	 */
 	protected function checkSimple($values, $link, $button_name) {
 		// Check timeout value in items one by one, after changes in Administration->Timeouts or Proxy->timeouts.
 		foreach ($values as $item_type => $timeout) {
@@ -255,7 +268,21 @@ class testTimeoutsDisplay extends CWebTest {
 		}
 	}
 
-	protected function checkLinked($values, $link, $table_selector, $discovery = false) {
+	/**
+	 * Check timeouts in templated items/item prototypes/LLD after timeout changes.
+	 *
+	 * @param array $values					Values to check.
+	 * @param string $link					Link to page where to check timeouts.
+	 * @param string $table_selector		Table selector for items, item prototypes and LLD.
+	 */
+	protected function checkLinked($values, $link, $table_selector) {
+		// If we need to check linked item prototype timeouts, we should first navigate through discovery rule.
+		if ($table_selector === 'name:itemprototype') {
+			$this->query('name:discovery')->asTable()->one()->findRow('Name', 'Template for linking: Zabbix agent')
+					->getColumn('Items')->query('link:Item prototypes')->one()->click();
+			$this->page->waitUntilReady();
+		}
+
 		// Check timeout value in items one by one, after changes in Administration->Timeouts.
 		foreach ($values as $item_name => $timeout) {
 			$this->query($table_selector)->asTable()->one()->query('link', $item_name)->one()->click();
