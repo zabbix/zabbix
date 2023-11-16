@@ -250,4 +250,6 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 #define ZBX_CONDITION_OPERATOR_EXIST		12
 #define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
 
+int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
+
 #endif /* ZABBIX_EXPR_H */

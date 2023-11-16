@@ -218,6 +218,38 @@ out:
 		freeaddrinfo(ai);
 }
 
+int	zbx_inet_pton(int af, const char *src, void *dst)
+{
+	if (AF_INET == af)
+	{
+		memset(dst, 0, sizeof(struct in_addr *));
+
+		if (0 >= inet_pton(AF_INET, src, (struct in_addr *)dst))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv4 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+	else if (AF_INET6 == af)
+	{
+		memset(dst, 0, sizeof(struct in6_addr));
+
+		if (0 >= inet_pton(AF_INET6, src, (struct in6_addr *)dst))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv6 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Fail to parse IP: '%s'", src);
+
+	return FAIL;
+}
+
 int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
 {
 	if (AF_INET == ai->ai_addr->sa_family)

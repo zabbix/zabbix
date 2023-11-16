@@ -564,7 +564,7 @@ class testPageHostDashboards extends CWebTest {
 				['name' => '🙂🙃'],
 				['name' => '<script>alert("hi!");</script>'],
 				['name' => 'test тест 测试 テスト ทดสอบ'],
-				['name' => '&nbsp; &amp;☺♥²©™"\''],
+				['name' => '&nbsp; &amp;☺♥²©™"\'']
 			]
 		];
 		$api_dashboards = $this->createHostWithDashboards($data);
