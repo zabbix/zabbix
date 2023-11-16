@@ -1044,7 +1044,7 @@ class CScreenProblem extends CScreenBase {
 			);
 
 			$this->data['filter']['compact_view']
-				? $header_clock->addStyle('width: 115px;')
+				? $header_clock->addStyle('width: 140px;')
 				: $header_clock->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			if ($show_timeline) {
@@ -1096,7 +1096,7 @@ class CScreenProblem extends CScreenBase {
 					$tags_header
 				]))
 					->addClass(ZBX_STYLE_COMPACT_VIEW)
-					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					->addClass(ZBX_STYLE_LIST_TABLE_FIXED);
 			}
 			else {
 				$table->setHeader(array_merge($header, [
@@ -1660,16 +1660,28 @@ class CScreenProblem extends CScreenBase {
 					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 				: new CSpan(_('Update'));
 
+			$severty_cell = CSeverityHelper::makeSeverityCell((int) $problem['severity'], null,
+				$value == TRIGGER_VALUE_FALSE
+			);
+
+			if ($data['filter']['compact_view']){
+				$severty_cell->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+			}
+
 			$row->addItem([
-				CSeverityHelper::makeSeverityCell((int) $problem['severity'], null, $value == TRIGGER_VALUE_FALSE),
+				$severty_cell,
 				$data['show_recovery_data'] ? $cell_r_clock : null,
 				$data['show_recovery_data'] ? $cell_status : null,
 				$cell_info,
 				$data['filter']['compact_view']
-					? (new CDiv($data['triggers_hosts'][$trigger['triggerid']]))->addClass(ZBX_STYLE_ACTION_CONTAINER)
+					? (new CDiv($data['triggers_hosts'][$trigger['triggerid']]))
+						->addClass(ZBX_STYLE_ACTION_CONTAINER)
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 					: $data['triggers_hosts'][$trigger['triggerid']],
 				$data['filter']['compact_view']
-					? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)
+					? (new CDiv($description))
+						->addClass(ZBX_STYLE_ACTION_CONTAINER)
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 					: $description,
 				($data['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
 					? $opdata->addClass(ZBX_STYLE_WORDBREAK)
