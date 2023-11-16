@@ -56,7 +56,7 @@ window.widget_pie_chart_form = new class {
 		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
-				use_default: !['ds', 'merge_color'].includes(colorpicker.name)
+				use_default: colorpicker.name === 'value_color'
 			});
 		}
 
