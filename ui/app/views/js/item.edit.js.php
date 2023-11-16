@@ -420,12 +420,6 @@ window.item_edit_form = new class {
 						(a, b) => parseFloat(a.sortorder) - parseFloat(b.sortorder)
 					);
 
-					for (const [i, param] of Object.entries(fields[key])) {
-						fields[key][i] = {name: param.name.trim(), value: param.value.trim()}
-					}
-
-					break;
-
 				case 'parameters':
 					for (const [i, param] of Object.entries(fields[key])) {
 						fields[key][i] = {name: param.name.trim(), value: param.value.trim()}

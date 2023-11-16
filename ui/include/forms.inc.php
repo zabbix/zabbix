@@ -123,6 +123,7 @@ function getItemFormData(array $item = []) {
 	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
 		$data['headers'] = prepareItemHeaders($data['headers']);
 		$data['query_fields'] = prepareItemQueryFields($data['query_fields']);
+		$data['parameters'] = [];
 	}
 	elseif ($data['type'] == ITEM_TYPE_SCRIPT) {
 		$values = [];
