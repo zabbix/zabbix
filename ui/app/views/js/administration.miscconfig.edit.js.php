@@ -28,6 +28,8 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		const $form = jQuery('#miscconfig-form');
+
 		$('#validate_uri_schemes').change(function() {
 			$('#uri_valid_schemes').prop('disabled', !this.checked);
 		});
@@ -40,8 +42,8 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 			$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
 		});
 
-		$('#other-form').submit(function() {
-			$('#x_frame_options').val($.trim($('#x_frame_options').val()));
+		$form.on('submit', () => {
+			$form.trimValues(['#x_frame_options']);
 		});
 
 		$("#resetDefaults").click(function() {
