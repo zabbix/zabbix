@@ -194,7 +194,7 @@ func validateExclusiveFlags(args *Arguments) error {
 	)
 
 	if args.verbose && !(args.test != "" || args.print) {
-		return errors.New("verbose parameter can be specified only with test or print parameters")
+		return errors.New("option -v, --verbose can only be specified with -t or -p")
 	}
 
 	for _, exclusiveFlagSet := range exclusiveFlagsSet {
@@ -202,13 +202,13 @@ func validateExclusiveFlags(args *Arguments) error {
 			count++
 		}
 		if count >= 2 { //nolint:gomnd
-			return errors.New("mutually exclusive options used, use help '-help'('-h'), for additional information")
+			return errors.New("mutually exclusive options used, see -h, --help for more information")
 		}
 	}
 
 	if !validateMultipleAgentFlag() {
 		return errors.New(
-			"multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information",
+			"option -m, --multiple-agents can only be used with one of the service options, see -h, --help for more information")
 		)
 	}
 
