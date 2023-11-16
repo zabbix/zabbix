@@ -257,12 +257,27 @@ func insertAtEveryNthPosition(s string, n int, r rune) string {
 	var l1 = len(s) - 1
 	for i, rune := range s {
 		buffer.WriteRune(rune)
-		if i % n == n1 && i != l1 {
+		if i%n == n1 && i != l1 {
 			buffer.WriteRune(r)
 		}
 	}
 
 	return buffer.String()
+}
+
+func parseClassInHeader(isOPT bool, fieldValue *any, fieldName *string) {
+	if !isOPT {
+		classValue, ok := (*fieldValue).(uint16)
+		if ok {
+			mappedClass, ok2 := dnsClassesGet[classValue]
+
+			if ok2 {
+				*fieldValue = mappedClass
+			}
+		}
+	} else {
+		*fieldName = "udp_payload"
+	}
 }
 
 func parseHeader(header reflect.Value, result map[string]interface{}, isOPT bool) {
@@ -273,22 +288,11 @@ func parseHeader(header reflect.Value, result map[string]interface{}, isOPT bool
 		if fieldName == "rrtype" {
 			fieldName = "type"
 			mappedFieldValue, ok := dnsTypesGetReverse[fieldValue]
-			if (ok) {
+			if ok {
 				fieldValue = mappedFieldValue
 			}
 		} else if fieldName == "class" {
-			if !isOPT {
-				classValue, ok := fieldValue.(uint16)
-				if (ok) {
-					mappedClass, ok2 := dnsClassesGet[classValue]
-
-					if (ok2) {
-						fieldValue = mappedClass
-					}
-				}
-			} else {
-				fieldName = "udp_payload"
-			}
+			parseClassInHeader(isOPT, &fieldValue, &fieldName)
 		} else if "ttl" == fieldName && isOPT {
 			fieldName = "extended_rcode"
 		}
@@ -495,15 +499,14 @@ func getDNSAnswersGet(params []string) (string, error) {
 	queryTimeSection := make(map[string]interface{})
 	queryTimeSection["query_time"] = fmt.Sprintf("%.2f", timeDNSResponseReceived)
 
-
 	// We have this from the DNS library:
 	//    type Msg struct {
-        //    MsgHdr
-        //    Compress bool       `json:"-"`
-        //    Question []Question // Holds the RR(s) of the question section.
-        //    Answer   []RR       // Holds the RR(s) of the answer section.
-        //    Ns       []RR       // Holds the RR(s) of the authority section.
-        //    Extra    []RR       // Holds the RR(s) of the additional section.
+	//    MsgHdr
+	//    Compress bool       `json:"-"`
+	//    Question []Question // Holds the RR(s) of the question section.
+	//    Answer   []RR       // Holds the RR(s) of the answer section.
+	//    Ns       []RR       // Holds the RR(s) of the authority section.
+	//    Extra    []RR       // Holds the RR(s) of the additional section.
 	//    }
 	//
 	// This is parsed, with some new data attached and large JSON response consisting
