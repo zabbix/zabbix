@@ -24,7 +24,7 @@ class AllItemValueTypes {
 	const HOST = 'Host for all item value types';
 
 	public static function load() {
-		CDataHelper::call('host.create', [
+		$hosts = CDataHelper::call('host.create', [
 			'host' => self::HOST,
 			'groups' => [['groupid' => 4]],
 			'inventory_mode' => 0,
@@ -32,12 +32,12 @@ class AllItemValueTypes {
 				'alias' => 'Item_Types_Alias'
 			]
 		]);
-		$hostids = CDataHelper::getIds('host');
+		$hostid = $hosts['hostids'][0];
 
 		CDataHelper::call('discoveryrule.create', [
 			'name' => 'LLD rule for item types',
 			'key_' => 'lld_rule',
-			'hostid' => $hostids['Host for all item value types'],
+			'hostid' => $hostid,
 			'type' => ITEM_TYPE_TRAPPER
 		]);
 		$lldid = CDataHelper::getIds('name');
@@ -59,7 +59,7 @@ class AllItemValueTypes {
 
 		foreach ($value_types as $name => $type) {
 			$item_prototype_data[] = [
-				'hostid' => $hostids[self::HOST],
+				'hostid' => $hostid,
 				'ruleid' => $lldid['LLD rule for item types'],
 				'name' => $name.' item prototype',
 				'key_' => $name.'_item_prototype_[{#KEY}]',
@@ -75,7 +75,7 @@ class AllItemValueTypes {
 
 		foreach ($dependent_items as $name => $type) {
 			$dependent_item_prototype_data[] = [
-				'hostid' => $hostids[self::HOST],
+				'hostid' => $hostid,
 				'ruleid' => $lldid['LLD rule for item types'],
 				'name' => $name.' item prototype',
 				'key_' => $name.'_item_prototype_[{#KEY}]',
@@ -91,7 +91,7 @@ class AllItemValueTypes {
 
 		foreach ($value_types as $name => $type) {
 			$items_data[] = [
-				'hostid' => $hostids[self::HOST],
+				'hostid' => $hostid,
 				'name' => $name.' item',
 				'key_' => $name,
 				'type' => ITEM_TYPE_TRAPPER,
@@ -111,7 +111,7 @@ class AllItemValueTypes {
 
 		foreach ($dependent_items as $name => $type) {
 			$dependent_items_data[] = [
-				'hostid' => $hostids[self::HOST],
+				'hostid' => $hostid,
 				'name' => $name.' item',
 				'key_' => $name,
 				'type' => ITEM_TYPE_DEPENDENT,
@@ -137,7 +137,7 @@ class AllItemValueTypes {
 		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids, $additional_itemids);
 
 		return [
-			'hostid' => $hostids,
+			'hostid' => $hostid,
 			'itemids' => $itemids
 		];
 	}
