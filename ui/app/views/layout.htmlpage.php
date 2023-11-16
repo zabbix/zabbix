@@ -28,13 +28,13 @@ function local_showHeader(array $data): void {
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
 
-	if (strcasecmp($data['config']['x_frame_options'], 'null') !== 0) {
-		$x_frame_options = trim($data['config']['x_frame_options']);
+	if (strcasecmp($data['config']['x_frame_options'], 'null') != 0) {
+		$x_frame_options = $data['config']['x_frame_options'];
 
-		if (strcasecmp($x_frame_options, 'SAMEORIGIN') === 0) {
+		if (strcasecmp($x_frame_options, 'SAMEORIGIN') == 0) {
 			header('X-Frame-Options: SAMEORIGIN');
 		}
-		elseif (strcasecmp($x_frame_options, 'DENY') === 0) {
+		elseif (strcasecmp($x_frame_options, 'DENY') == 0) {
 			header('X-Frame-Options: DENY');
 		}
 		else {
