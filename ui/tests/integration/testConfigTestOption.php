@@ -35,7 +35,7 @@ class testConfigTestOption extends CIntegrationTest {
 	protected function startComponent($component, $waitLogLineOverride = '', $skip_pid = false) {}
 
 	/**
-	 * [TODO]
+	 * This function will perform the actual test of specified component.
 	 *
 	 * @return array
 	 */
@@ -61,7 +61,7 @@ class testConfigTestOption extends CIntegrationTest {
 	}
 
 	/**
-	 * Configuration provider. [TODO]
+	 * Configuration provider, return valid configuration for each comonent.
 	 *
 	 * @return array
 	 */
@@ -74,7 +74,7 @@ class testConfigTestOption extends CIntegrationTest {
 	}
 
 	/**
-	 * Configuration provider. [TODO]
+	 * Configuration provider, return invalid configuration for each comonent.
 	 *
 	 * @return array
 	 */
@@ -87,7 +87,7 @@ class testConfigTestOption extends CIntegrationTest {
 	}
 
 	/**
-	 * Test [TODO]
+	 * Test each component with valid configuration. Must exit with 0 exit code.
 	 */
 	public function testConfigTestOption_checkingValidServerConfig() {
 		foreach (self::$components as $component) {
@@ -100,7 +100,7 @@ class testConfigTestOption extends CIntegrationTest {
 	}
 
 	/**
-	 * Test [TODO]
+	 * Test each component with invalid configuration. Must exit with non-zero exit code.
 	 */
 	public function testConfigTestOption_checkingInvalidServerConfig() {
 		foreach (self::$components as $component) {
@@ -113,7 +113,7 @@ class testConfigTestOption extends CIntegrationTest {
 	}
 
 	/**
-	 * Test [TODO]
+	 * Test each component with invalid command-line parameters. Must exit with non-zero exit code.
 	 */
 	public function testConfigTestOption_checkingInvalidOptions() {
 		foreach (self::$components as $component) {
