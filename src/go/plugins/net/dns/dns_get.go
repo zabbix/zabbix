@@ -107,21 +107,6 @@ var dnsTypesGet = map[string]uint16{
 	"Reserved": dns.TypeReserved,
 }
 
-func exportDnsGet(params []string) (result interface{}, err error) {
-	answer, err := getDNSAnswersGet(params)
-
-	if err != nil {
-		return nil, err
-	}
-	log.Infof("ANSWER PRIMARY: ", answer)
-
-	// if len(answer) < 1 {
-	// 	return nil, zbxerr.New("Cannot perform DNS query.")
-	// }
-
-	return answer, nil
-}
-
 func (o *dnsGetOptions) setFlags(flags string) error {
 	o.flags = map[string]bool{
 		"cdflag": false,
@@ -493,9 +478,13 @@ func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
 	return result
 }
 
-func getDNSAnswersGet(params []string) (string, error) {
-	fmt.Printf("\nOMEGA PARAMTS: %s" + strings.Join(params, ", ") + "\n\n")
+const (
+	noErrorResponseCodeFinalJsonResult    = 0
+	communicationErrorCodeFinalJsonResult = -1
+	jsonParsingErrorCodeFinalJsonResult   = -2
+)
 
+func exportDnsGet(params []string) (result interface{}, err error) {
 	options, err := parseParamsGet(params)
 	if err != nil {
 		return "", err
@@ -514,7 +503,19 @@ func getDNSAnswersGet(params []string) (string, error) {
 	}
 
 	if err != nil {
-		return "", zbxerr.ErrorCannotFetchData.Wrap(err)
+		networkErrorMessageBlock := make(map[string]interface{})
+
+		networkErrorMessageBlock["zbx_error_code"] = communicationErrorCodeFinalJsonResult
+		networkErrorMessageBlock["zbx_error_msg"] = "Communication error: " + err.Error()
+
+		resultJson, err := json.Marshal(networkErrorMessageBlock)
+		if err != nil {
+			// There is communication error, however we failed to parse it
+			// return the original communivation error as regular error.
+			return nil, err
+		}
+
+		return string(resultJson), nil
 	}
 
 	timeDNSResponseReceived := time.Since(timeBeforeQuery).Seconds()
@@ -531,13 +532,13 @@ func getDNSAnswersGet(params []string) (string, error) {
 	//    Extra    []RR       // Holds the RR(s) of the additional section.
 	//    }
 	//
-	// This is parsed, with some new data attached and large JSON response consisting
+	// This gets parsed, with some new data attached and large JSON response consisting
 	// of several sections is returned:
 	// 1) Meta-data: zbx_error_code and query_time - internally generated,
 	//               not coming from the DNS library
 	// 2) MsgHdr data: response_code and flags
 	// 3) Question, Answer section, Ns and Extra sections data, mostly untouched,
-	//    but formatted to make it more consistent with other Zabbix JSON returning items
+	//    but formatted to make it more consistent with other Zabbix JSON returning items.
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
 
@@ -554,7 +555,8 @@ func getDNSAnswersGet(params []string) (string, error) {
 	parsedAuthoritySection := parseRRs(resp.Ns, "authority_section")
 	parsedAdditionalSection := parseRRs(resp.Extra, "additional_section")
 
-	result := []interface{}{
+	// not marshaled yet and without zbx_error_code (and possibly zbx_error_msg)
+	almostCompleteResultBlock := []interface{}{
 		parsedFlagsSection,
 		parsedResponseCode,
 		queryTimeSection,
@@ -563,9 +565,39 @@ func getDNSAnswersGet(params []string) (string, error) {
 		parsedAuthoritySection,
 		parsedAdditionalSection}
 
-	resultJson, err := json.Marshal(result)
+	// Check if the result can be marshaled first and if not:
+	// 1) return appropriate error encoded in json
+	// 2) if it also fails, return regular error.
+	//
+	// If original marshal succeed - need to attach the success
+	// response to the original result. If this results into error
+	// in subsequent marshall - then return regular error.
 
-	return string(resultJson), err
+	_, errResultParse := json.Marshal(almostCompleteResultBlock)
+
+	if errResultParse != nil {
+		resultFailParse := make(map[string]interface{})
+		resultFailParse["zbx_error_code"] = jsonParsingErrorCodeFinalJsonResult
+		resultFailParse["zbx_error_msg"] = errResultParse.Error()
+		resultJsonFailParse, errFailParse := json.Marshal(resultFailParse)
+
+		if errFailParse != nil {
+			return nil, errFailParse
+		}
+
+		return string(resultJsonFailParse), nil
+	}
+
+	resultOkParse := make(map[string]interface{})
+	resultOkParse["zbx_error_code"] = noErrorResponseCodeFinalJsonResult
+	almostCompleteResultBlock = append(almostCompleteResultBlock, resultOkParse)
+
+	finalResultJson, errFinalResultParse := json.Marshal(almostCompleteResultBlock)
+	if errFinalResultParse != nil {
+		return nil, errFinalResultParse
+	}
+
+	return string(finalResultJson), nil
 }
 
 func (o *dnsGetOptions) setDNSTypeGet(dnsType string) error {
