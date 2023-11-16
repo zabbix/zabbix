@@ -658,7 +658,7 @@ class CScript extends CApiService {
 	 *     'manualinput_default_value' =>  (string)  Script manualinput default value.
 	 * ]
 	 */
-	protected function prepareManualInputValues(&$script,$db_script) {
+	protected function prepareManualInputValues(array &$script, array $db_script): void {
 		if ($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
 			if ($db_script) {
 				if (!array_key_exists('manualinput', $script)) {
@@ -710,7 +710,7 @@ class CScript extends CApiService {
 
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateManualInput(array &$script, int $index, ?array $db_script = null): void {
+	private function validateManualInput(array &$script, int $index, ?array $db_script = null): void {
 		if ($db_script) {
 			$this->prepareManualInputValues($script, $db_script);
 		}
@@ -740,13 +740,13 @@ class CScript extends CApiService {
 					}
 				}
 				else {
-					unset ($validation_fields['manualinput_validator']);
+					unset($validation_fields['manualinput_validator']);
 				}
 			}
 
 			foreach ($script as $key => $value) {
 				if (in_array($key, ['manualinput', 'manualinput_prompt', 'manualinput_validator_type',
-					'manualinput_validator', 'manualinput_default_value'])) {
+						'manualinput_validator', 'manualinput_default_value'])) {
 					$script_manualinput_fields[$key] = $value;
 				}
 			}

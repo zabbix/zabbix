@@ -570,6 +570,10 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 			fetch(curl.getUrl())
 				.then((response) => response.json())
 				.then((response) => {
+					if (this.overlay) {
+						this.overlay.unsetLoading()
+					}
+
 					for (const element of form.parentNode.children) {
 						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 							element.parentNode.removeChild(element);
@@ -597,8 +601,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 				})
 				.catch((exception) => {
 					console.log('Could not retrieve macro values:', exception);
-				})
-				.finally(() => this.overlay.unsetLoading());
+				});
 		});
 	}
 	else if (confirmation.length > 0) {

@@ -29,7 +29,7 @@ class CControllerScriptUserInputCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'manualinput' =>				'required|string',
-			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST, ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]),
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]),
 			'manualinput_validator' =>		'db scripts.manualinput_validator|required|string',
 			'test' =>						'in 1'
 		];
@@ -68,7 +68,7 @@ class CControllerScriptUserInputCheck extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
 	}
 
-	protected function validateManualinputFields(): bool {
+	private function validateManualinputFields(): bool {
 		$manualinput = $this->getInput('manualinput');
 		$manualinput_validator = $this->getInput('manualinput_validator');
 
@@ -81,6 +81,8 @@ class CControllerScriptUserInputCheck extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
 					_s('value must be one of %1$s', $manualinput_validator)
 				));
+
+				return false;
 			}
 		}
 		else {
@@ -94,19 +96,25 @@ class CControllerScriptUserInputCheck extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.','manualinput_validator',
 					$regex_validator->getError()
 				));
+
+				return false;
 			}
-			elseif ($manualinput_validator === '') {
+			if ($manualinput_validator === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator',
 					_('Expression cannot be empty')
 				));
+
+				return false;
 			}
-			elseif (!preg_match($regular_expression, trim($manualinput))) {
+			if (!preg_match($regular_expression, trim($manualinput))) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
 					_s('input does not match the provided pattern: %1$s', $manualinput_validator)
 				));
+
+				return false;
 			}
 		}
 
-		return !hasErrorMessages();
+		return true;
 	}
 }

@@ -2879,7 +2879,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$manualinput_value[$eventid] = $script['manualinput_value'];
 			}
 
-			unset ($script['manualinput_value']);
+			unset($script['manualinput_value']);
 
 			$event = $events[$eventid];
 			$triggerid = $event['objectid'];

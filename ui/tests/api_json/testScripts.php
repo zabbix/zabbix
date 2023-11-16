@@ -13312,9 +13312,9 @@ class testScripts extends CAPITest {
 	 */
 	private static function resolveIds(array $request): array {
 		/**
-		 * For script.get, script.update, script.execute and getScriptsByHosts/Events methods.
+		 * For script.get, script.update, script.execute, script.getScriptsByHosts, script.getScriptsByEvents methods.
 		 * Same fields are checked in "filter" as well.
-		*/
+		 */
 		$request_ = array_key_exists('filter', $request) ? $request['filter'] : $request;
 
 		foreach (['scriptid', 'hostid', 'eventid', 'usrgrpid', 'groupid'] as $field) {

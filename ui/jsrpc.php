@@ -864,7 +864,6 @@ switch ($data['method']) {
 				$result = $scripts[$data['hostid']][$data['scriptid']];
 			}
 		}
-
 		break;
 
 	case 'get_scripts_by_events':
@@ -885,11 +884,10 @@ switch ($data['method']) {
 				];
 			}
 
-			elseif ($scripts) {
+			if ($scripts) {
 				$result = $scripts[$data['eventid']][0];
 			}
 		}
-
 		break;
 
 	default:

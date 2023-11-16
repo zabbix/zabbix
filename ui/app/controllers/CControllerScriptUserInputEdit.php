@@ -29,7 +29,7 @@ class CControllerScriptUserInputEdit extends CController {
 		$fields = [
 			'manualinput_prompt' =>			'db scripts.manualinput_prompt|required|not_empty',
 			'manualinput_default_value' =>	'db scripts.manualinput_default_value|string',
-			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_LIST, ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]),
+			'manualinput_validator_type' =>	'db scripts.manualinput_validator_type|in '.implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]),
 			'manualinput_validator' =>		'db scripts.manualinput_validator',
 			'test' =>						'in 1',
 			'confirmation' =>				'db scripts.confirmation'
