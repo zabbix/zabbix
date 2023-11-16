@@ -216,40 +216,34 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 		}
 	}
 
-	if (full_len)
+	if (NULL != str_cutoff)
 		*full_len = len;
 
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type) {
 		len += 2;
 
-		if (str_cutoff)
+		if (NULL != str_cutoff)
 			len_cutoff += 2;
 	}
 
-	if (str_cutoff)	/* cut utf8 sequence if exists at the end */
+	if (NULL != str_cutoff)	/* cut utf8 sequence if exists at the end */
 	{
 		size_t to_cut = 0;
 
-		*cutoff = (str_cutoff - string) - 1;
+		if (NULL != cutoff)
+			*cutoff = (str_cutoff - string) - 1;
 
 		for (size_t i = MIN(4, *cutoff); 0x80 == (0xc0 & *(--str_cutoff)) && 0 < i; i--, to_cut++);
 
-		if (0xf0 <= (unsigned char)*str_cutoff && 3 > to_cut)	/* cut in 4 byte sequence */
+		if ((0xf0 <= (unsigned char)*str_cutoff && 3 > to_cut) ||		/* cut in 4 byte sequence */
+				(0xe0 <= (unsigned char)*str_cutoff && 2 > to_cut) ||	/* cut in 3 byte sequence */
+				(0xc0 <= (unsigned char)*str_cutoff && 1 > to_cut))	/* cut in 2 byte sequence */
 		{
-			len_cutoff -= to_cut + 1;
-			*cutoff -= to_cut + 1;
-		}
-		else if (0xe0 <= (unsigned char)*str_cutoff && 2 > to_cut)	/* cut in 3 byte sequence */
-		{
-			len_cutoff -= to_cut + 1;
-			*cutoff -= to_cut + 1;
-		}
-		else if (0xc0 <= (unsigned char)*str_cutoff && 1 > to_cut)	/* cut in 2 byte sequence */
-		{
-			len_cutoff--;
-			(*cutoff)--;
-		}
+			len_cutoff -= ++to_cut;
 
+			if (NULL != cutoff)
+				*cutoff -= to_cut;
+		}
 	}
 
 	return str_cutoff ? len_cutoff : len;
