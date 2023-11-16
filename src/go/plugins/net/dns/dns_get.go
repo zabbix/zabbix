@@ -257,7 +257,7 @@ func insertAtEveryNthPosition(s string, n int, r rune) string {
 	var l1 = len(s) - 1
 	for i, rune := range s {
 		buffer.WriteRune(rune)
-		if i%n == n1 && i != l1 {
+		if i % n == n1 && i != l1 {
 			buffer.WriteRune(r)
 		}
 	}
@@ -299,7 +299,7 @@ func parseHeader(fieldValue reflect.Value, result map[string]interface{}, isOPT 
 }
 
 func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, isOPT bool,
-	resFieldAggregatedValues map[string]interface{}) {
+	result map[string]interface{}) {
 	resFieldValue := fieldValue.Interface()
 
 	tX := reflect.ValueOf(resFieldValue).Type()
@@ -326,90 +326,81 @@ func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, isOPT bo
 				}
 			}
 		}
-		resFieldAggregatedValues[n] = optionResults
+		result[n] = optionResults
 	} else {
-		resFieldAggregatedValues[n] = resFieldValue
+		result[n] = resFieldValue
 	}
 }
 
-func parseRRs(respAnswer []dns.RR, source string) map[string][]interface{} {
-	resultG := make(map[string][]interface{})
+func parseRRs(in []dns.RR, source string) map[string][]interface{} {
+	result := make(map[string][]interface{})
 
-	for _, ii := range respAnswer {
-		h := ii.Header() // RR_Header
-		log.Infof("AGS H: ->%s<-\n", h)
+	for _, rrNext := range in {
+		resultPart := make(map[string]interface{})
 
-		result := make(map[string]interface{})
-
-		value := reflect.ValueOf(ii)
-		typeOf := value.Type()
-		// *dns.A
+		rrNextValue := reflect.ValueOf(rrNext)
 
 		// note, opt can exist only in additional section
-		_, isOPT := value.Interface().(*dns.OPT)
+		_, isOPT := rrNextValue.Interface().(*dns.OPT)
 
-		log.Infof("RECORD TYPE: %s", typeOf)
-
-		if value.Kind() == reflect.Ptr {
-			value = value.Elem()
+		// if it is a pointer - dereference it
+		if rrNextValue.Kind() == reflect.Ptr {
+			rrNextValue = rrNextValue.Elem()
 		}
 
 		resFieldAggregatedValues := make(map[string]interface{})
 
-		for j := 0; j < value.NumField(); j++ {
-			fieldValue := value.Field(j)
-			fieldType := value.Type().Field(j)
-			//fieldName := fieldType.Name
+		for i := 0; i < rrNextValue.NumField(); i++ {
+			fieldTypeOfrrNextValue := rrNextValue.Type().Field(i)
 
-			log.Infof("FIELD_NAME Z: %s", fieldType.Name)
-			if fieldType.Name == "Hdr" {
-				parseHeader(fieldValue, result, isOPT)
+			if fieldTypeOfrrNextValue.Name == "Hdr" {
+				parseHeader(rrNextValue.Field(i), resultPart, isOPT)
 			} else {
-				parseRest(fieldValue, fieldType, isOPT, resFieldAggregatedValues)
+				parseRest(rrNextValue.Field(i), fieldTypeOfrrNextValue, isOPT,
+					resFieldAggregatedValues)
 			}
 		}
 
-		result["rdata"] = resFieldAggregatedValues
-
-		resultG[source] = append(resultG[source], result)
+		resultPart["rdata"] = resFieldAggregatedValues
+		result[source] = append(result[source], resultPart)
 	}
 
-	return resultG
+	return result
 }
 
 func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
-	resultG := make(map[string][]interface{})
-	result := make(map[string]interface{})
+	result := make(map[string][]interface{})
+	resultPart := make(map[string]interface{})
 
-	// RFC allows to have multiple questsions, however DNS library describes
+	// RFC allows to have multiple questions, however DNS library describes
 	// it almost never happens, so it says it will fail if there is more than 1,
 	// so safe to assumed  there will be exactly 1 question
 	q := respQuestion[0]
-	result["qname"] = q.Name
+	resultPart["qname"] = q.Name
 
 	qTypeMapped, ok := dnsTypesGetReverse[q.Qtype]
 
 	if !ok {
 		qTypeMapped, ok = dnsExtraQuestionTypesGet[q.Qtype]
 		if !ok {
-			result["qtype"] = q.Qtype
+			resultPart["qtype"] = q.Qtype
 		} else {
-			result["qtype"] = qTypeMapped
+			resultPart["qtype"] = qTypeMapped
 		}
 	} else {
-		result["qtype"] = qTypeMapped
+		resultPart["qtype"] = qTypeMapped
 	}
 
 	qClassMapped, ok2 := dnsClassesGet[q.Qclass]
 	if !ok2 {
-		result["qclass"] = q.Qclass
+		resultPart["qclass"] = q.Qclass
 	} else {
-		result["qclass"] = qClassMapped
+		resultPart["qclass"] = qClassMapped
 	}
 
-	resultG["question_section"] = append(resultG["question_section"], result)
+	result["question_section"] = append(result["question_section"], resultPart)
 
-	return resultG
+	return result
 }
 
 func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
