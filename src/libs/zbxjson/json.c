@@ -212,7 +212,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 			case '\n': /* newline */
 			case '\r': /* carriage return */
 			case '\t': /* horizontal tab */
-				if (!str_cutoff && (max_size && 2 + len > max_size))
+				if (NULL == str_cutoff && (max_size && 2 + len > max_size))
 				{
 					str_cutoff = sptr + 1;
 					len_cutoff = len;
@@ -224,7 +224,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 				/* RFC 8259 requires escaping control characters U+0000 - U+001F */
 				if (0x1f >= (unsigned char)*sptr)
 				{
-					if (!str_cutoff && (max_size && 6 + len > max_size))
+					if (NULL == str_cutoff && (max_size && 6 + len > max_size))
 					{
 						str_cutoff = sptr + 1;
 						len_cutoff = len;
@@ -234,7 +234,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 				}
 				else
 				{
-					if (!str_cutoff && (max_size && 1 + len > max_size))
+					if (NULL == str_cutoff && (max_size && 1 + len > max_size))
 					{
 						str_cutoff = sptr + 1;
 						len_cutoff = len;
@@ -264,18 +264,18 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 
 		for (size_t i = MIN(4, *cutoff); 0x80 == (0xc0 & *(--str_cutoff)) && 0 < i; i--, to_cut++);
 
-		if ((0xf0 <= (unsigned char)*str_cutoff && 3 > to_cut) ||		/* cut in 4 byte sequence */
-				(0xe0 <= (unsigned char)*str_cutoff && 2 > to_cut) ||	/* cut in 3 byte sequence */
-				(0xc0 <= (unsigned char)*str_cutoff && 1 > to_cut))	/* cut in 2 byte sequence */
+		if ((0xf0 <= (unsigned char)*str_cutoff && 3 >= to_cut) ||		/* cut in 4 byte sequence */
+				(0xe0 <= (unsigned char)*str_cutoff && 2 >= to_cut) ||	/* cut in 3 byte sequence */
+				(0xc0 <= (unsigned char)*str_cutoff && 1 >= to_cut))	/* cut in 2 byte sequence */
 		{
-			len_cutoff -= ++to_cut;
+			len_cutoff -= to_cut;
 
 			if (NULL != cutoff)
 				*cutoff -= to_cut;
 		}
 	}
 
-	return str_cutoff ? len_cutoff : len;
+	return (NULL != str_cutoff) ? len_cutoff : len;
 }
 
 static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
@@ -440,8 +440,8 @@ void	zbx_json_addarray(struct zbx_json *j, const char *name)
 	__zbx_json_addobject(j, name, 0);
 }
 
-size_t	zbx_json_addstring_limit(
-		struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type, size_t max_size)
+size_t	zbx_json_addstring_limit( struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type,
+		size_t max_size)
 {
 	size_t	len = 0, str_len = 0, orig_len;
 	char	*p, *psrc, *pdst;
