@@ -3155,9 +3155,10 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => ''
+					'manualinput_validator' => '',
+					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.'
 			],
 			'Test script.create "manualinput_validator" field empty when "manualinput_validator_type" is list' => [
 				'script' => [
@@ -3168,9 +3169,10 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => ''
+					'manualinput_validator' => '',
+					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.'
 			],
 			'Test script.create invalid "manualinput_validator" field type (integer)' => [
 				'script' => [
@@ -3181,7 +3183,8 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => 55555
+					'manualinput_validator' => 55555,
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
 			],
@@ -3194,7 +3197,8 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => []
+					'manualinput_validator' => [],
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
 			],
@@ -3207,7 +3211,8 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => '[[[[['
+					'manualinput_validator' => '[[[[[',
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[[": "Compilation failed: missing terminating ] for character class at offset 5".'
 			],
@@ -3220,7 +3225,8 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_prompt' => 'prompt text',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => 'asd('
+					'manualinput_validator' => 'asd(',
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "asd(": "Compilation failed: missing closing parenthesis at offset 4".'
 			],
@@ -6345,7 +6351,8 @@ class testScripts extends CAPITest {
 				'script' => [
 					'scriptid' => 'update_manualinput_params',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => '[[[['
+					'manualinput_validator' => '[[[[',
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[": "Compilation failed: missing terminating ] for character class at offset 4".'
 			],
@@ -6353,7 +6360,8 @@ class testScripts extends CAPITest {
 				'script' => [
 					'scriptid' => 'update_manualinput_params',
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => 'ab('
+					'manualinput_validator' => 'ab(',
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "ab(": "Compilation failed: missing closing parenthesis at offset 3".'
 			],
@@ -6372,7 +6380,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '\d'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: \d.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_default_value" is missing.'
 			],
 			'Test script.update invalid scope change with "manualinput" parameters' => [
 				'script' => [
