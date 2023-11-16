@@ -93,7 +93,6 @@ function getItemFormData(array $item = []) {
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'tags' => getRequest('tags', []),
-		'parameters' => [],
 		'backurl' => getRequest('backurl')
 	];
 

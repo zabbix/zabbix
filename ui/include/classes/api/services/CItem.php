@@ -811,7 +811,7 @@ class CItem extends CItemGeneral {
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
 
-		self::prepareItemsForDb($items, $db_items);
+		self::prepareItemsForDb($items);
 
 		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);

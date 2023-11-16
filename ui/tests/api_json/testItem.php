@@ -524,8 +524,8 @@ class testItem extends CAPITest {
 						'Reject headers without value' => [
 							'request_data' => $params + [
 								'hostid' => '50009',
-								'key_' => 'httpagent.accept.headers.no.value',
-								'name' => 'httpagent.accept.headers.no.value',
+								'key_' => 'httpagent.reject.headers.no.value',
+								'name' => 'httpagent.reject.headers.no.value',
 								'type' => $type,
 								'value_type' => ITEM_VALUE_TYPE_TEXT,
 								'headers' => [

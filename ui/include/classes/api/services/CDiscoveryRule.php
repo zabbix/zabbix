@@ -1733,7 +1733,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['preprocessing', 'lld_macro_paths', 'filter', 'overrides', 'parameters']);
 
-		self::prepareItemsForDb($items, $db_items);
+		self::prepareItemsForDb($items);
 
 		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);

@@ -1319,4 +1319,27 @@ abstract class CControllerPopupItemTest extends CController {
 
 		return true;
 	}
+
+	/**
+	 * @param array $data
+	 */
+	protected static function transformHttpFields(array &$data): void {
+		if (array_key_exists('query_fields', $data)) {
+			foreach ($data['query_fields'] as &$query_field) {
+				$query_field = [$query_field['name'] => $query_field['value']];
+			}
+			unset($query_field);
+
+			$data['query_fields'] = json_encode(array_values($data['query_fields']), JSON_UNESCAPED_UNICODE);
+		}
+
+		if (array_key_exists('headers', $data)) {
+			foreach ($data['headers'] as &$header) {
+				$header = $header['name'].': '.$header['value'];
+			}
+			unset($header);
+
+			$data['headers'] = implode("\r\n", $data['headers']);
+		}
+	}
 }

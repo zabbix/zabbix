@@ -2730,17 +2730,15 @@ class testDiscoveryRule extends CAPITest {
 			 */
 
 			$lld_ruleids = [];
-			$all_ruleids = [];
 
 			// Get all discovery rule fields.
 			$src_items = CDBHelper::getAll(
-				'SELECT i.itemid,i.type,i.snmp_oid,i.hostid,i.name,i.key_,i.delay,i.history,i.trends,'.
-					'i.status,i.value_type,i.trapper_hosts,i.units,i.logtimefmt,i.valuemapid,'.
-					'i.params,i.ipmi_sensor,i.authtype,i.username,i.password,i.publickey,i.privatekey,'.
-					'i.flags,i.description,i.inventory_link,i.lifetime,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
-					'i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,'.
-					'i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
-					'i.verify_host,i.allow_traps'.
+				'SELECT i.itemid,i.type,i.snmp_oid,i.hostid,i.name,i.key_,i.delay,i.status,i.value_type,'.
+					'i.trapper_hosts,i.units,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.authtype,i.username,'.
+					'i.password,i.publickey,i.privatekey,i.flags,i.description,i.inventory_link,i.lifetime,'.
+					'i.jmx_endpoint,i.url,i.query_fields,i.timeout,i.posts,i.status_codes,i.follow_redirects,'.
+					'i.post_type,i.http_proxy,i.headers,i.retrieve_mode,i.request_method,i.ssl_cert_file,'.
+					'i.ssl_key_file,i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps'.
 				' FROM items i'.
 				' WHERE '.dbConditionId('i.itemid', $params['discoveryids'])
 			);
@@ -2748,18 +2746,16 @@ class testDiscoveryRule extends CAPITest {
 
 			foreach ($src_items as $src_item) {
 				$lld_ruleids[$src_item['hostid']][$src_item['key_']] = $src_item['itemid'];
-				$all_ruleids[] = $src_item['itemid'];
 			}
 
 			$dest_items = CDBHelper::getAll(
-				'SELECT dest.itemid,dest.type,dest.snmp_oid,dest.hostid,dest.name,dest.key_,'.
-					'dest.delay,dest.history,dest.trends,dest.status,dest.value_type,dest.trapper_hosts,dest.units,'.
-					'dest.logtimefmt,dest.valuemapid,dest.params,dest.ipmi_sensor,dest.authtype,dest.username,'.
-					'dest.password,dest.publickey,dest.privatekey,dest.flags,dest.description,dest.inventory_link,'.
-					'dest.lifetime,dest.jmx_endpoint,dest.url,dest.query_fields,dest.timeout,dest.posts,'.
-					'dest.status_codes,dest.follow_redirects,dest.post_type,dest.http_proxy,dest.headers,'.
-					'dest.retrieve_mode,dest.request_method,dest.ssl_cert_file,dest.ssl_key_file,'.
-					'dest.ssl_key_password,dest.verify_peer,dest.verify_host,dest.allow_traps'.
+				'SELECT dest.itemid,dest.type,dest.snmp_oid,dest.hostid,dest.name,dest.key_,dest.delay,dest.status,'.
+					'dest.value_type,dest.trapper_hosts,dest.units,dest.logtimefmt,dest.valuemapid,dest.params,'.
+					'dest.ipmi_sensor,dest.authtype,dest.username,dest.password,dest.publickey,dest.privatekey,'.
+					'dest.flags,dest.description,dest.inventory_link,dest.lifetime,dest.jmx_endpoint,dest.url,'.
+					'dest.query_fields,dest.timeout,dest.posts,dest.status_codes,dest.follow_redirects,dest.post_type,'.
+					'dest.http_proxy,dest.headers,dest.retrieve_mode,dest.request_method,dest.ssl_cert_file,'.
+					'dest.ssl_key_file,dest.ssl_key_password,dest.verify_peer,dest.verify_host,dest.allow_traps'.
 				' FROM items dest,items src'.
 				' WHERE '.dbConditionId('src.itemid', $params['discoveryids']).
 					' AND dest.key_=src.key_'.
@@ -2769,7 +2765,6 @@ class testDiscoveryRule extends CAPITest {
 
 			foreach ($dest_items as $dest_item) {
 				$lld_ruleids[$dest_item['hostid']][$dest_item['key_']] = $dest_item['itemid'];
-				$all_ruleids[] = $dest_item['itemid'];
 			}
 
 			foreach ($params['discoveryids'] as $src_itemid) {

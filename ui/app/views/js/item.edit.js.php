@@ -145,7 +145,6 @@ window.item_edit_form = new class {
 			rows: this.form_data.parameters,
 			allow_empty: true
 		});
-
 		jQuery('#query-fields-table').dynamicRows({
 			sortable: true,
 			sortableOptions: {update: updateSortOrder},
@@ -160,7 +159,6 @@ window.item_edit_form = new class {
 			rows: this.form_data.headers,
 			allow_empty: true
 		}).sortable({disabled: this.form_readonly});
-
 		jQuery('#delay-flex-table').dynamicRows({
 			template: '#delay-flex-row-tmpl',
 			rows: this.form_data.delay_flex,
@@ -418,13 +416,9 @@ window.item_edit_form = new class {
 
 				case 'query_fields':
 				case 'headers':
-					const entries = [];
-
-					for (const param of Object.values(fields[key])) {
-						entries[param.sortorder] = {name: param.name.trim(), value: param.value.trim()};
-					};
-
-					fields[key] = Object.values(entries);
+					fields[key] = Object.values(fields[key]).sort(
+						(a, b) => parseFloat(a.sortorder) - parseFloat(b.sortorder)
+					);
 
 					break;
 
