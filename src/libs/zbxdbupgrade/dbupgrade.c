@@ -606,6 +606,35 @@ static int	DBdrop_serial_trigger(const char *table_name)
 
 #endif
 
+
+#if defined(HAVE_POSTGRESQL)
+int	DBcheck_field_type(const char *table_name, const zbx_db_field_t *field)
+{
+	zbx_db_result_t	result;
+	int		ret;
+	char		*sql = NULL;
+	size_t		sql_alloc, sql_offset;
+
+	DBfield_type_string(&sql, &sql_alloc, &sql_offset, field);
+
+	result = zbx_db_select(
+			"select 1"
+			" from information_schema.columns"
+			" where table_name='%s'"
+				" and column_name='%s'"
+				" and data_type='%s'"
+				" and table_schema='%s'",
+			table_name, field->name, sql, zbx_db_get_schema_esc());
+
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+	zbx_db_free_result(result);
+
+	zbx_free(sql);
+
+	return ret;
+}
+#endif
+
 int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, const zbx_db_field_t *old_field)
 {
 	char	*sql = NULL;
