@@ -48,7 +48,7 @@ class CControllerMiscConfigUpdate extends CController {
 
 		if ($ret) {
 			if ($this->getInput('x_frame_header_enabled') == 1) {
-				$fields['x_frame_options'] = 'not_empty';
+				$fields['x_frame_options'] = 'required|not_empty';
 			}
 
 			$ret = $this->validateInput($fields);
