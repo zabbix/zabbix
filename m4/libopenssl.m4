@@ -93,7 +93,13 @@ AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
       else
         want_openssl="yes"
         _libopenssl_dir=$withval
-        _libopenssl_dir_lib="$withval/lib"
+        if test -d $withval/lib64; then
+          _libopenssl_dir_lib=$withval/lib64
+        elif test -d $withval/lib/64; then
+          _libopenssl_dir_lib=$withval/lib/64
+        else
+          _libopenssl_dir_lib=$withval/lib
+        fi
       fi
       accept_openssl_version="no"
       mt_required=$2
@@ -107,8 +113,6 @@ AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
         AC_REQUIRE([PKG_PROG_PKG_CONFIG])
         m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
         test -z "$PKG_CONFIG" -a -z "$_libopenssl_dir_lib" && AC_MSG_ERROR([Not found pkg-config library])
-        _libopenssl_dir_lib_64="$_libopenssl_dir_lib/64"
-        test -d "$_libopenssl_dir_lib_64" && _libopenssl_dir_lib="$_libopenssl_dir_lib_64"
         m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
     fi
 
@@ -133,15 +137,7 @@ AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
      else						# search in the specified OpenSSL directory
        if test -f $_libopenssl_dir/include/openssl/ssl.h -a -f $_libopenssl_dir/include/openssl/crypto.h; then
          OPENSSL_CFLAGS=-I$_libopenssl_dir/include
-
-         if test -d $_libopenssl_dir/lib64; then
-           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib64
-         elif test -d $_libopenssl_dir/lib/64; then
-           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib/64
-         else
-           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
-         fi
-
+         OPENSSL_LDFLAGS=-L$_libopenssl_dir_lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
          LIBOPENSSL_ACCEPT_VERSION([$_libopenssl_dir/include/openssl/opensslv.h], [$mt_required])
