@@ -2832,28 +2832,24 @@ abstract class CItemGeneral extends CApiService {
 		return array_merge($ns_regex, $ns_any, $other);
 	}
 
-	protected static function prepareItemsForApi(array &$items, array &$db_items = null): void {
+	protected static function prepareItemsForApi(array &$items, bool $sortorder = true): void {
 		foreach ($items as &$item) {
-			self::prepareItemForApi($item);
-
-			if ($db_items !== null) {
-				self::prepareItemForApi($db_items[$item['itemid']]);
-			}
+			self::prepareItemForApi($item, $sortorder);
 		}
 		unset($item);
 	}
 
-	protected static function prepareItemForApi(array &$item): void {
+	protected static function prepareItemForApi(array &$item, bool $sortorder = true): void {
 		if (array_key_exists('query_fields', $item)) {
-			$item['query_fields'] = self::prepareQueryFieldsForApi($item['query_fields']);
+			$item['query_fields'] = self::prepareQueryFieldsForApi($item['query_fields'], $sortorder);
 		}
 
 		if (array_key_exists('headers', $item)) {
-			$item['headers'] = self::prepareHeadersForApi($item['headers']);
+			$item['headers'] = self::prepareHeadersForApi($item['headers'], $sortorder);
 		}
 	}
 
-	protected static function prepareQueryFieldsForApi(string $query_fields): array {
+	private static function prepareQueryFieldsForApi(string $query_fields, bool $sortorder): array {
 		if ($query_fields === '') {
 			return [];
 		}
@@ -2863,14 +2859,16 @@ abstract class CItemGeneral extends CApiService {
 
 		if (json_last_error() == JSON_ERROR_NONE) {
 			foreach ($_query_fields as $i => $field) {
-				$query_fields[] = ['sortorder' => $i + 1, 'name' => key($field), 'value' => reset($field)];
+				$query_fields[] = $sortorder
+					? ['sortorder' => $i + 1, 'name' => key($field), 'value' => reset($field)]
+					: ['name' => key($field), 'value' => reset($field)];
 			}
 		}
 
 		return $query_fields;
 	}
 
-	protected static function prepareHeadersForApi(string $headers): array {
+	private static function prepareHeadersForApi(string $headers, bool $sortorder): array {
 		if ($headers === '') {
 			return [];
 		}
@@ -2881,7 +2879,9 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($_headers as $i => $header) {
 			[$name, $value] = explode(': ', $header, 2) + [1 => ''];
 
-			$headers[] = ['sortorder' => $i + 1, 'name' => $name, 'value' => $value];
+			$headers[] = $sortorder
+				? ['sortorder' => $i + 1, 'name' => $name, 'value' => $value]
+				: ['name' => $name, 'value' => $value];
 		}
 
 		return $headers;

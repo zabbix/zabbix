@@ -309,7 +309,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
-			self::prepareItemsForApi($result);
+			self::prepareItemsForApi($result, false);
 
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
@@ -1774,7 +1774,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
 
-		self::prepareItemsForApi($items, $db_items);
+		self::prepareItemsForApi($items);
+		self::prepareItemsForApi($db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_LLD_RULE, $items, $db_items);
 	}

@@ -293,7 +293,7 @@ class CItemPrototype extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
-			self::prepareItemsForApi($result);
+			self::prepareItemsForApi($result, false);
 
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
@@ -702,7 +702,8 @@ class CItemPrototype extends CItemGeneral {
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
 
-		self::prepareItemsForApi($items, $db_items);
+		self::prepareItemsForApi($items);
+		self::prepareItemsForApi($db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
