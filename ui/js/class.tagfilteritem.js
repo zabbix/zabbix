@@ -48,9 +48,11 @@ class CTagFilterItem extends CBaseComponent {
 			changeOperation: (ev) => {
 				if (ev.target.value == TAG_OPERATOR_EXISTS || ev.target.value == TAG_OPERATOR_NOT_EXISTS) {
 					this._value.addClass('display-none');
+					this._value._target.closest('td').style.paddingRight = 0;
 				}
 				else {
 					this._value.removeClass('display-none');
+					this._value._target.closest('td').style.paddingRight = null;
 				}
 			}
 		}

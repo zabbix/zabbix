@@ -563,9 +563,19 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				{
 					continue;
 				}
+
 				if (ZBX_VARIANT_NONE != token->value.type)
 				{
-					zbx_variant_convert(&token->value, ZBX_VARIANT_STR);
+					if (FAIL == zbx_variant_convert(&token->value, ZBX_VARIANT_STR))
+					{
+						*error = zbx_dsprintf(*error, "failed to convert token to string from %s",
+								zbx_variant_type_desc(&token->value));
+						zabbix_log(LOG_LEVEL_CRIT, *error);
+						THIS_SHOULD_NEVER_HAPPEN;
+						ret = FAIL;
+						break;
+					}
+
 					value = token->value.data.str;
 					zbx_variant_set_none(&token->value);
 				}
