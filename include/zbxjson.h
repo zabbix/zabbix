@@ -280,8 +280,8 @@ void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
 void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
-size_t	zbx_json_addstring_limit(
-		struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type, size_t max_size);
+size_t	zbx_json_addstring_limit( struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type,
+		size_t max_size);
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value);
 void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);
 void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data);
