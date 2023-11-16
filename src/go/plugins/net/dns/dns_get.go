@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
 	"reflect"
@@ -540,16 +539,8 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	// 3) Question, Answer section, Ns and Extra sections data, mostly untouched,
 	//    but formatted to make it more consistent with other Zabbix JSON returning items.
 
-	log.Infof("AGS HEADER: %s", resp.MsgHdr)
-
 	parsedFlagsSection := parseRespFlags(resp.MsgHdr)
 	parsedResponseCode := parseRespCode(resp.MsgHdr)
-
-	log.Infof("AGS Question: %s", resp.Question)
-	log.Infof("AGS Ns: %s", resp.Ns)
-	log.Infof("AGS Extra: %s", resp.Extra)
-	log.Infof("AGS RCODE: %d", resp.Rcode)
-
 	parsedQuestionSection := parseRespQuestion(resp.Question)
 	parsedAnswerSection := parseRRs(resp.Answer, "answer_section")
 	parsedAuthoritySection := parseRRs(resp.Ns, "authority_section")
