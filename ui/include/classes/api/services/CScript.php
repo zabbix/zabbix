@@ -1400,7 +1400,8 @@ class CScript extends CApiService {
 			foreach ($host_scripts as $hostid => $scripts) {
 				foreach ($scripts as $scriptid => $script) {
 					unset($script['hosts']);
-					$scripts_by_host[$hostid][$scriptid] = $script;
+					$size = count($scripts_by_host[$hostid]);
+					$scripts_by_host[$hostid][$size] = $script;
 
 					// Set confirmation, URL and manualinput prompt with resolved macros.
 					if (array_key_exists($hostid, $macros_data)
@@ -1409,21 +1410,20 @@ class CScript extends CApiService {
 
 						if (array_key_exists($hostid, $macros_data)) {
 							if (strpos($script['confirmation'], '{') !== false) {
-								$scripts_by_host[$hostid][$scriptid]['confirmation'] = $macro_values['confirmation'];
+								$scripts_by_host[$hostid][$size]['confirmation'] = $macro_values['confirmation'];
 							}
 
 							if (strpos($script['url'], '{') !== false) {
-								$scripts_by_host[$hostid][$scriptid]['url'] = $macro_values['url'];
+								$scripts_by_host[$hostid][$size]['url'] = $macro_values['url'];
 							}
 
 							if (array_key_exists('manualinput_prompt', $script)
 									&& strpos($script['manualinput_prompt'], '{') !== false) {
-								$scripts_by_host[$hostid][$scriptid]['manualinput_prompt'] =
+								$scripts_by_host[$hostid][$size]['manualinput_prompt'] =
 									$macro_values['manualinput_prompt'];
 							}
 						}
 					}
-
 				}
 			}
 		}

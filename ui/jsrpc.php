@@ -844,8 +844,7 @@ switch ($data['method']) {
 	case 'get_scripts_by_hosts':
 		$result = '';
 
-		if (array_key_exists('hostid', $data) && is_scalar($data['hostid'])
-				&& array_key_exists('scriptid', $data) && is_scalar($data['scriptid'])) {
+		if (array_key_exists('hostid', $data) && is_scalar($data['hostid'])) {
 			$scripts = API::Script()->getScriptsByHosts([
 				'hostid' => $data['hostid'],
 				'scriptid' => $data['scriptid'],
@@ -861,7 +860,7 @@ switch ($data['method']) {
 			}
 
 			if ($scripts) {
-				$result = $scripts[$data['hostid']][$data['scriptid']];
+				$result = $scripts[$data['hostid']][0];
 			}
 		}
 		break;
