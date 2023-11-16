@@ -1,0 +1,1 @@
+....I..... [ZBX-23146] fixed automatic database upgrade and manual upgrade scripts failing on TimescaleDB with compression (vso)
