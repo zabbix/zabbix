@@ -123,7 +123,7 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 		return zbxerr.New(fmt.Sprintf("Too many flags supplied: %d", len(o.flags)))
 	}
 
-	// for checking duplicates, struct is redundant, this is go's version of set
+	// For checking the duplicates. struct{} is redundant, this is go's version of set.
 	foundFlags := map[string]struct{}{}
 
 	for _, i := range flagsSplit {
@@ -345,7 +345,7 @@ func parseRRs(in []dns.RR, source string) map[string][]interface{} {
 
 		rrNextValue := reflect.ValueOf(rrNext)
 
-		// note, opt can exist only in additional section
+		// OPT can exist only in additional section
 		_, isOPT := rrNextValue.Interface().(*dns.OPT)
 
 		// if it is a pointer - dereference it
@@ -379,7 +379,7 @@ func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
 
 	// RFC allows to have multiple questions, however DNS library describes
 	// it almost never happens, so it says it will fail if there is more than 1,
-	// so safe to assumed  there will be exactly 1 question
+	// so safe to assumed  there will be exactly 1 question.
 	q := respQuestion[0]
 	resultPart["qname"] = q.Name
 
@@ -521,7 +521,7 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	queryTimeSection := make(map[string]interface{})
 	queryTimeSection["query_time"] = fmt.Sprintf("%.2f", timeDNSResponseReceived)
 
-	// We have this from the DNS library:
+	// Now, resp from the DNS library is ready to be processed:
 	//    type Msg struct {
 	//    MsgHdr
 	//    Compress bool       `json:"-"`
@@ -531,8 +531,8 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	//    Extra    []RR       // Holds the RR(s) of the additional section.
 	//    }
 	//
-	// This gets parsed, with some new data attached and large JSON response consisting
-	// of several sections is returned:
+	// This gets parsed, with some new data attached. At the end, large JSON response,
+	// consisting of several sections is returned:
 	// 1) Meta-data: zbx_error_code and query_time - internally generated,
 	//               not coming from the DNS library
 	// 2) MsgHdr data: response_code and flags
@@ -546,7 +546,8 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	parsedAuthoritySection := parseRRs(resp.Ns, "authority_section")
 	parsedAdditionalSection := parseRRs(resp.Extra, "additional_section")
 
-	// not marshaled yet and without zbx_error_code (and possibly zbx_error_msg)
+	// Almost complete since it is not marshaled yet and without
+	// zbx_error_code (and possibly zbx_error_msg).
 	almostCompleteResultBlock := []interface{}{
 		parsedFlagsSection,
 		parsedResponseCode,
@@ -568,7 +569,7 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	// 1) return appropriate error encoded in json
 	// 2) if it also fails, return regular error.
 	//
-	// If original marshal succeed - need to attach the success
+	// If original marshal succeeds - need to attach the success
 	// response to the original result. If this results into error
 	// in subsequent marshall - then return regular error.
 
