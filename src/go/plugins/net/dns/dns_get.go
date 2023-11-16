@@ -123,8 +123,6 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 }
 
 func (o *dnsGetOptions) setFlags(flags string) error {
-	flags = "," + flags
-
 	o.flags = map[string]bool{
 		"cdflag": false,
 		"rdflag": true,
@@ -135,13 +133,39 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 		"adflag": false,
 	}
 
-	if (strings.Contains(flags, ",nsid") && strings.Contains(flags, "noedns0")) {
+	flagsSplit := strings.Split(flags, ",")
+
+	if len(flagsSplit) > len(o.flags) {
+		return zbxerr.New(fmt.Sprintf("Too many flags supplied: %d", len(o.flags)))
+	}
+
+	// for checking duplicates, struct is redundant, this is go's version of set
+	foundFlags := map[string]struct{}{}
+
+	for _, i := range flagsSplit {
+		_, ok := o.flags[i]
+		if !ok {
+			return zbxerr.New("Invalid flag supplied: " + i)
+		}
+
+		_, flagAlreadyParsed := foundFlags[i]
+
+		if flagAlreadyParsed {
+			return zbxerr.New("Duplicate flag supplied: " + i)
+		} else {
+			foundFlags[i] = struct{}{}
+		}
+	}
+
+	flags = "," + flags
+
+	if strings.Contains(flags, ",nsid") && strings.Contains(flags, "noedns0") {
 		return zbxerr.New("Invalid flags combination, cannot use noedns0 and nsid together")
 	}
 
 	for key, val := range o.flags {
-		flagIsNotPresent := strings.Contains(flags, ",no" + key)
-		flagIsPresent := strings.Contains(flags, "," + key)
+		flagIsNotPresent := strings.Contains(flags, ",no"+key)
+		flagIsPresent := strings.Contains(flags, ","+key)
 
 		if flagIsNotPresent && flagIsPresent {
 			return zbxerr.New("Invalid flags combination, cannot use no" +
@@ -470,7 +494,7 @@ func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
 }
 
 func getDNSAnswersGet(params []string) (string, error) {
-	fmt.Printf("\nOMEGA PARAMTS: %s" + strings.Join(params, ", ")+"\n\n")
+	fmt.Printf("\nOMEGA PARAMTS: %s" + strings.Join(params, ", ") + "\n\n")
 
 	options, err := parseParamsGet(params)
 	if err != nil {
