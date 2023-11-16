@@ -530,6 +530,6 @@ func init() {
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.perf", "Measures DNS query time in seconds.",
 		"net.dns.record", "Performs a DNS query.",
-		"net.dns.get", "Performs a DNS query. (Returns verbose response in JSON)",
+		"net.dns.get", "Performs a DNS query. (Returns verbose response in JSON).",
 	)
 }

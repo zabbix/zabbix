@@ -253,11 +253,11 @@ var dnsExtraQuestionTypesGet = map[uint16]string{
 
 func insertAtEveryNthPosition(s string, n int, r rune) string {
 	var buffer bytes.Buffer
-	var n_1 = n - 1
-	var l_1 = len(s) - 1
+	var n1 = n - 1
+	var l1 = len(s) - 1
 	for i, rune := range s {
 		buffer.WriteRune(rune)
-		if i%n == n_1 && i != l_1 {
+		if i%n == n1 && i != l1 {
 			buffer.WriteRune(r)
 		}
 	}
@@ -332,7 +332,7 @@ func parseRest(fieldValue reflect.Value, fieldType reflect.StructField, isOPT bo
 	}
 }
 
-func parseRespAnswerOrExtra(respAnswer []dns.RR, source string) map[string][]interface{} {
+func parseRRs(respAnswer []dns.RR, source string) map[string][]interface{} {
 	resultG := make(map[string][]interface{})
 
 	for _, ii := range respAnswer {
@@ -505,15 +505,32 @@ func getDNSAnswersGet(params []string) (string, error) {
 		return "", zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	timeResponseReceived := time.Since(timeBeforeQuery).Seconds()
+	timeDNSResponseReceived := time.Since(timeBeforeQuery).Seconds()
 	queryTimeSection := make(map[string]interface{})
-	tFormattedTwoDigitsPrecision := fmt.Sprintf("%.2f", timeResponseReceived)
-	queryTimeSection["query_time"] = tFormattedTwoDigitsPrecision
+	queryTimeSection["query_time"] = fmt.Sprintf("%.2f", timeDNSResponseReceived)
+
+
+	// We have this from the DNS library:
+	//    type Msg struct {
+        //    MsgHdr
+        //    Compress bool       `json:"-"`
+        //    Question []Question // Holds the RR(s) of the question section.
+        //    Answer   []RR       // Holds the RR(s) of the answer section.
+        //    Ns       []RR       // Holds the RR(s) of the authority section.
+        //    Extra    []RR       // Holds the RR(s) of the additional section.
+	//    }
+	//
+	// This is parsed, with some new data attached and large JSON response consisting
+	// of several sections is returned:
+	// 1) Meta-data: zbx_error_code and query_time - internally generated,
+	//               not coming from the DNS library
+	// 2) MsgHdr data: response_code and flags
+	// 3) Question, Answer section, Ns and Extra sections data, mostly untouched,
+	//    but formatted to make it more consistent with other Zabbix JSON returning items
 
 	log.Infof("AGS HEADER: %s", resp.MsgHdr)
 
 	parsedFlagsSection := parseRespFlags(resp.MsgHdr)
-
 	parsedResponseCode := parseRespCode(resp.MsgHdr)
 
 	log.Infof("AGS Question: %s", resp.Question)
@@ -521,29 +538,10 @@ func getDNSAnswersGet(params []string) (string, error) {
 	log.Infof("AGS Extra: %s", resp.Extra)
 	log.Infof("AGS RCODE: %d", resp.Rcode)
 
-	// AUTHORITY
-	log.Infof("\n\nAGS AUTHORITY")
-	parsedAuthoritySection := parseRespAnswerOrExtra(resp.Ns, "authority_section")
-	log.Infof("AGS AUTHORITY END\n\n")
-	// AUTHORITY END
-
-	// ANSWER
-	log.Infof("\n\nAGS ANSWER")
-	parsedAnswerSection := parseRespAnswerOrExtra(resp.Answer, "answer_section")
-	log.Infof("AGS ANSWER END\n\n")
-	// ANSWER END
-
-	// QUESTION
-	log.Infof("\n\nAGS QUESTION")
 	parsedQuestionSection := parseRespQuestion(resp.Question)
-	log.Infof("\n\nAGS QUESTION END")
-	// QUESTION END
-
-	// EXTRA
-	log.Infof("\n\nAGS ADDITIONAL")
-	parsedAdditionalSection := parseRespAnswerOrExtra(resp.Extra, "additional_section")
-	log.Infof("\n\nAGS ADDITIONAL END")
-	// EXTRA END
+	parsedAnswerSection := parseRRs(resp.Answer, "answer_section")
+	parsedAuthoritySection := parseRRs(resp.Ns, "authority_section")
+	parsedAdditionalSection := parseRRs(resp.Extra, "additional_section")
 
 	result := []interface{}{
 		parsedFlagsSection,
