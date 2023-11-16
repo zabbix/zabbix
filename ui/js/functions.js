@@ -584,6 +584,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 						const message_box = makeMessageBox('bad', response.result.error, '', true, true)[0];
 
 						form.parentNode.insertBefore(message_box, form);
+						document.removeEventListener('keydown', window.submitHandler);
 					}
 					else {
 						confirmation = response.result.confirmation;
@@ -596,11 +597,13 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 							showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid,
 								csrf_token, e.detail.data.manualinput, overlay.dialogueid
 							);
+							document.removeEventListener('keydown', window.submitHandler);
 						}
 					}
 				})
 				.catch((exception) => {
 					console.log('Could not retrieve macro values:', exception);
+					document.removeEventListener('keydown', window.submitHandler);
 				});
 		});
 	}

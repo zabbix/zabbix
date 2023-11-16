@@ -1633,6 +1633,7 @@ function openManualinputDialogue(item, data) {
 			.then((response) => {
 				this.overlay.unsetLoading();
 				document.querySelector('[name="manualinput"]').focus();
+				document.removeEventListener('keydown', window.submitHandler);
 
 				for (const element of form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {

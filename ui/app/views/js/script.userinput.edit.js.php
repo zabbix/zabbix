@@ -74,6 +74,15 @@ window.script_userinput_popup = new class {
 		curl.setArgument('action', 'script.userinput.check');
 
 		this.overlay.setLoading();
+
+		window.submitHandler = (event) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+			}
+		};
+
+		document.addEventListener('keydown', window.submitHandler);
+
 		this.#post(curl.getUrl(), fields);
 	}
 

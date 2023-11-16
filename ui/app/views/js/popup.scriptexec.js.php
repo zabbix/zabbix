@@ -25,6 +25,8 @@
 ?>
 
 $(document).ready(function() {
+	document.removeEventListener('keydown', window.submitHandler);
+
 	$('#script_execution_log').on('click', function() {
 		if ($(this).hasClass('<?= ZBX_STYLE_DISABLED ?>')) {
 			return;
