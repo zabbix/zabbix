@@ -597,7 +597,6 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 							showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid,
 								csrf_token, e.detail.data.manualinput, overlay.dialogueid
 							);
-							document.removeEventListener('keydown', window.submitHandler);
 						}
 					}
 				})
@@ -662,8 +661,11 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
  */
 function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
 		manualinput = null, overlay_dialogue_id = null) {
+	document.removeEventListener('keydown', window.submitHandler);
+
 	overlayDialogue({
 		'title': t('Execution confirmation'),
+		'dialogueid': 'script-execution-confirmation',
 		'content': jQuery('<span>')
 			.addClass('confirmation-msg')
 			.text(confirmation),
@@ -673,13 +675,22 @@ function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element
 				'title': t('Cancel'),
 				'class': 'btn-alt',
 				'focused': (hostid === null && eventid === null),
-				'action': () => {}
+				'action': () => {
+					if (overlay_dialogue_id) {
+						this.overlay = overlays_stack.getById(overlay_dialogue_id);
+						this.overlay.unsetLoading();
+						document.querySelector('[name="manualinput"]').focus();
+					}
+				}
 			},
 			{
 				'title': t('Execute'),
 				'enabled': (hostid !== null || eventid !== null),
 				'focused': (hostid !== null || eventid !== null),
+				'keepOpen': true,
 				'action': () => {
+					document.addEventListener('keydown', window.submitHandler);
+
 					execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element);
 
 					if (overlay_dialogue_id) {

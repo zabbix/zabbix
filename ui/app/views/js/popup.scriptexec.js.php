@@ -25,7 +25,17 @@
 ?>
 
 $(document).ready(function() {
-	document.removeEventListener('keydown', window.submitHandler);
+	if (document.getElementById('execution-output')) {
+		overlayDialogueDestroy('script-execution-confirmation');
+		document.getElementById('execution-output').focus();
+		document.removeEventListener('keydown', window.submitHandler);
+	}
+
+	if (document.querySelector('.msg-bad')) {
+		overlayDialogueDestroy('script-execution-confirmation');
+		document.querySelector('.msg-bad').firstElementChild.focus();
+		document.removeEventListener('keydown', window.submitHandler);
+	}
 
 	$('#script_execution_log').on('click', function() {
 		if ($(this).hasClass('<?= ZBX_STYLE_DISABLED ?>')) {
