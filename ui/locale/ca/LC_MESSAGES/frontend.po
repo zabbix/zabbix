@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-10-21 07:29+0000\n"
+"PO-Revision-Date: 2023-11-04 08:07+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2543,6 +2543,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "No es pot pas desactivar el tipus de suport"
 msgstr[1] "No es poden pas desactivar els tipus de suport"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] "No es pot desactivar el mòdul"
+msgstr[1] "No es poden desactivar els mòduls"
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2626,6 +2632,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "No es pot pas activar el tipus de suport"
 msgstr[1] "No es poden pas activar els tipus de suport"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] "No es pot activar el mòdul"
+msgstr[1] "No es poden activar els mòduls"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3365,6 +3377,10 @@ msgstr "No es pot pas actualitzar el manteniment"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "No es pot pas actualitzar el tipus de suport"
+
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr "No es pot actualitzar el mòdul"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -11958,6 +11974,12 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Mòdul esborrat: %1$s."
 msgstr[1] "Mòduls esborrats: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] "Mòdul desactivat"
+msgstr[1] "Mòduls desactivats"
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11965,12 +11987,22 @@ msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Mòdul desactivat: %1$s."
 msgstr[1] "Mòduls desactivats: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] "Mòdul activat"
+msgstr[1] "Mòduls activats"
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Mòdul activat: %1$s."
 msgstr[1] "Mòduls activats: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr "Mòdul actualitzat"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format

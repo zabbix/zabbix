@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:41:04Z'
+  date: '2023-11-01T20:53:30Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1695,9 +1695,6 @@ zabbix_export:
                       value:
                         host: 'MikroTik CRS106-1C-5S by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: ce35f7985cc545bb821b0d0603ddcdd5
           name: 'IF-MIB::ifOperStatus'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:53:46Z'
+  date: '2023-11-01T20:57:21Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -955,9 +955,6 @@ zabbix_export:
                       value:
                         host: 'TP-LINK by SNMP'
                         name: 'Interface {#IFDESCR}: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: ca6bcc5f345b46ffaa445d38a90ddcae
           name: 'IF-MIB::ifOperStatus'

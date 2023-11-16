@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:46:14Z'
+  date: '2023-11-01T20:55:04Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1694,9 +1694,6 @@ zabbix_export:
                       value:
                         host: 'MikroTik PowerBox Pro by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: f3c5ab8576b34585a21cc5c12ea2f030
           name: 'IF-MIB::ifOperStatus'

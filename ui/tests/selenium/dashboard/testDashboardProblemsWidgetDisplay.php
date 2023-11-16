@@ -43,8 +43,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		];
 	}
 
-	private static $dashboardid;
-	private static $time;
+	protected static $dashboardid;
+	protected static $time;
 	protected static $acktime;
 
 	public function prepareDashboardData() {
@@ -105,80 +105,68 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 				'description' => 'Trigger for widget 1 float',
 				'expression' => 'last(/Host for Problems Widgets/float)=0',
 				'opdata' => 'Item value: {ITEM.LASTVALUE}',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => 'Trigger for widget 1 char',
 				'expression' => 'last(/Host for Problems Widgets/char)=0',
-				'priority' => 1,
+				'priority' => TRIGGER_SEVERITY_INFORMATION,
 				'manual_close' => 1
 			],
 			[
 				'description' => 'Trigger for widget 2 log',
 				'expression' => 'last(/Host for Problems Widgets/log)=0',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Trigger for widget 2 unsigned',
 				'expression' => 'last(/Host for Problems Widgets/unsigned)=0',
 				'opdata' => 'Item value: {ITEM.LASTVALUE}',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => 'Trigger for widget text',
 				'expression' => 'last(/Host for Problems Widgets/text)=0',
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
-		$triggerids = CDataHelper::getIds('description');
-
-		// Create events and problems.
-		self::$time = time();
 
 		foreach (array_values($itemids) as $itemid) {
 			CDataHelper::addItemData($itemid, 0);
 		}
 
-		$i = 0;
-		foreach ($triggerids as $name => $id) {
-			// Create events.
-			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
-			);
-
-			// Create problems.
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
-			);
-			$i++;
+		// Create events and problems.
+		self::$time = time();
+		foreach (CDataHelper::getIds('description') as $name => $id) {
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 		}
 
-		// Change triggers' state to Problem.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget 1 float').', '.
-				zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
-				zbx_dbstr('Trigger for widget text').')'
-		);
-
 		// Manual close is true for the problem: Trigger for widget 1 char.
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
+		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.
 				zbx_dbstr('Trigger for widget 1 char')
 		);
 
+		// Get event ids.
+		$eventids = [];
+		foreach (['Trigger for widget text', 'Trigger for widget 2 unsigned'] as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
+		}
+
 		// Suppress the problem: 'Trigger for widget text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until)'.
-				'VALUES (100990, 1009954, NULL, 0)'
+				'VALUES (100990, '.$eventids['Trigger for widget text'].', NULL, 0)'
 		);
 
 		// Acknowledge the problem: 'Trigger for widget 2 unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
-			'eventids' => 1009953,
+			'eventids' => $eventids['Trigger for widget 2 unsigned'],
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
 
 		$event = CDataHelper::call('event.get', [
-			'eventids' => 1009953,
+			'eventids' => $eventids['Trigger for widget 2 unsigned'],
 			'select_acknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');

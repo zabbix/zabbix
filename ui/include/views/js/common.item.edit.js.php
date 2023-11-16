@@ -51,12 +51,11 @@
 </script>
 <script>
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
-				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
-			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
-		}
-		else {
-			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
+		if (document.getElementById('type').value == <?= ITEM_TYPE_SSH ?>) {
+			document.getElementById('js-item-password-label').innerText =
+					document.getElementById('authtype').value == <?= ITEM_AUTHTYPE_PUBLICKEY ?>
+				? <?= json_encode(_('Key passphrase')) ?>
+				: <?= json_encode(_('Password')) ?>;
 		}
 	}
 

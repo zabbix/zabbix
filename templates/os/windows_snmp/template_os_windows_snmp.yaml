@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:59:02Z'
+  date: '2023-11-01T20:58:59Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1085,9 +1085,6 @@ zabbix_export:
                       value:
                         host: 'Windows by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: 3b28bdbfdb6d4cf1a69c7466a4f059f3
           name: 'System performance'
           pages:
@@ -1114,9 +1111,6 @@ zabbix_export:
                       value:
                         host: 'Windows by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '12'
@@ -1130,9 +1124,6 @@ zabbix_export:
                       value:
                         host: 'Windows by SNMP'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 2357d81186e34d5b91db98c2350e0bdf
           name: 'IF-MIB::ifOperStatus'

@@ -22,14 +22,12 @@
 /**
  * @var CPartial $this
  */
-$table = (new CTableInfo())
-	->makeVerticalRotation()
-	->setHeadingColumn(0);
+$table = (new CTableInfo())->setHeadingColumn(0);
 
 $headings[] = _('Items');
 foreach ($data['hosts'] as $host) {
-	$headings[] = (new CColHeader($host['name']))
-		->addClass('vertical_rotation')
+	$headings[] = (new CSpan($host['name']))
+		->addClass(ZBX_STYLE_TEXT_VERTICAL)
 		->setTitle($host['name']);
 }
 

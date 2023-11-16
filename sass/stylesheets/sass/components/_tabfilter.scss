@@ -47,7 +47,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		display: flex;
 		flex: 1;
 		justify-content: space-between;
-		background-color: $body-bg-color;
 		// Sortable container have padding-top 3px for focused state be visible, therefore filter content shift compensated with negative margin of same size.
 		margin-top: -3px;
 	}
@@ -128,6 +127,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			background-color: $tab-label-expanded-bg-color;
 			border: 1px solid $tab-label-expanded-border-color;
 			border-bottom: 0;
+			border-bottom-right-radius: 0;
+			border-bottom-left-radius: 0;
 			padding-bottom: 7px;
 			vertical-align: baseline;
 
@@ -142,6 +143,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		&.selected {
 			background-color: $tab-label-expanded-bg-color;
+			border-color: $tab-label-expanded-border-color;
 
 			.tabfilter-item-link[data-counter]::after {
 				display: none;

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T17:02:03Z'
+  date: '2023-11-01T20:59:56Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -4048,9 +4048,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Cache: Write utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -4064,9 +4061,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Cache usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -4080,9 +4074,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Controller CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -4096,9 +4087,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Data transfer rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -4112,9 +4100,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Controller [{#CONTROLLER.ID}]: Disk operations rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Disk groups'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -4129,9 +4114,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Average response time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -4145,9 +4127,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Data transfer rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -4161,9 +4140,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Disk operations rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -4177,9 +4153,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Disk group [{#NAME}]: Space utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Fans
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -4194,9 +4167,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Fan [{#DURABLE.ID}]: Speed'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Pools
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -4211,9 +4181,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Pool [{#NAME}]: Space utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Volumes
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -4228,9 +4195,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Cache usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -4244,9 +4208,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Data transfer rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -4260,9 +4221,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Disk operations rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -4276,9 +4234,6 @@ zabbix_export:
                       value:
                         host: 'HPE MSA 2060 Storage by HTTP'
                         name: 'Volume [{#NAME}]: Space utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: f7af1259f3c54a5faa040c743d386d1d
           name: 'Controller status'

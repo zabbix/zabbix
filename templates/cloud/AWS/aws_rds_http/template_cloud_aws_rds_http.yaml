@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:21:31Z'
+  date: '2023-11-07T10:09:27Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1345,7 +1345,7 @@ zabbix_export:
                       'WriteLatency:Seconds',
                       'WriteThroughput:Bytes/Second',
                       'BurstBalance:Percent',
-                      'FreeStorageSpace:Percent',
+                      'FreeStorageSpace:Bytes',
                       'OldestReplicationSlotLag:Bytes',
                       'ReplicaLag:Seconds',
                       'TransactionLogsGeneration:Bytes/Second'
@@ -1430,7 +1430,7 @@ zabbix_export:
                     request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                    
+            
                     Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
             
                     response = request.post(url,request_data);

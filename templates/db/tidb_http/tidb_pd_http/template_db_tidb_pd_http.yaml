@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:28:39Z'
+  date: '2023-11-01T20:49:35Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1040,9 +1040,6 @@ zabbix_export:
                       value:
                         host: 'TiDB PD by HTTP'
                         name: 'TiDB cluster: Storage Usage[{#SINGLETON}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: ITEM
                   name: Uptime
                   x: '4'
@@ -1086,9 +1083,6 @@ zabbix_export:
                       value:
                         host: 'TiDB PD by HTTP'
                         name: 'TiDB cluster: Stores number by states[{#SINGLETON}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: bce54cbdf2b8487985f9c7847a4c4918
           name: 'Service state'
