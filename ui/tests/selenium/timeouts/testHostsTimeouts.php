@@ -32,14 +32,12 @@ class testHostsTimeouts extends testTimeoutsDisplay {
 	protected static $hostid_druleids;
 
 	public static function prepareTimeoutsData() {
-		CDataHelper::call('proxy.create',
+		CDataHelper::call('proxy.create', [
 			[
-				[
-					'name' => 'Proxy assigned to host',
-					'operating_mode' => 0
-				]
+				'name' => 'Proxy assigned to host',
+				'operating_mode' => 0
 			]
-		);
+		]);
 		$proxyid = CDataHelper::getIds('name');
 
 		$host_result = CDataHelper::createHosts([
@@ -123,14 +121,12 @@ class testHostsTimeouts extends testTimeoutsDisplay {
 		self::$hostid = $host_result['hostids'];
 		self::$hostid_druleids = $host_result['discoveryruleids'];
 
-		CDataHelper::call('host.update',
+		CDataHelper::call('host.update', [
 			[
-				[
-					'hostid' => self::$hostid['Host for timeouts check with proxy'],
-					'proxyid' => $proxyid['Proxy assigned to host']
-				]
+				'hostid' => self::$hostid['Host for timeouts check with proxy'],
+				'proxyid' => $proxyid['Proxy assigned to host']
 			]
-		);
+		]);
 	}
 
 	public function testHostsTimeouts_checkItemsMacros() {

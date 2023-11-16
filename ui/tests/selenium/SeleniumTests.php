@@ -276,6 +276,8 @@ require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
 require_once dirname(__FILE__).'/timeouts/testHostsTimeouts.php';
+require_once dirname(__FILE__).'/timeouts/testLinkedTimeouts.php';
+require_once dirname(__FILE__).'/timeouts/testTemplatesTimeouts.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
@@ -571,6 +573,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
 */
 		$suite->addTestSuite('testHostsTimeouts');
+		$suite->addTestSuite('testLinkedTimeouts');
+		$suite->addTestSuite('testTemplatesTimeouts');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');

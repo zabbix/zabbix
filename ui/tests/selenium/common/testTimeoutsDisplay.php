@@ -98,12 +98,12 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Change global timeouts values and check them.
 	 *
-	 * @param string $timeout_values  	Reset default, macros values or seconds.
+	 * @param string $timeout_values  	Reset default, macros values or custom values.
 	 * @param string $link    			Link to table with items, items prototype, discovery rules.
-	 * @param string $button_name		Table selector for items, discovery rules, items prototype.
+	 * @param string $button_name		Button name to check not linked items.
 	 * @param string $proxy				Fill proxy timeouts.
 	 */
-	public function checkGlobal($timeout_values, $link, $button_name, $proxy = false) {
+	public function checkGlobal($timeout_values, $link, $button_name, $proxy = false, $linked = false) {
 		// Global Zabbix agent timeout used in active and passive agents. Add this value to array.
 		switch ($timeout_values) {
 			case 'proxy_macros':
@@ -146,37 +146,13 @@ class testTimeoutsDisplay extends CWebTest {
 		// Navigate to page for timeouts checking.
 		$this->page->open($link)->waitUntilReady();
 
-		// Check timeout value in items one by one, after changes in Administration->Timeouts or Proxy->timeouts.
-		foreach ($values as $item_type => $timeout) {
-			$this->query('button', $button_name)->one()->click();
-
-			// Discovery rule doesn't have overlay.
-			if ($button_name === 'Create discovery rule') {
-				$this->page->waitUntilReady();
-			}
-			else {
-				COverlayDialogElement::find()->waitUntilReady()->one();
-			}
-
-			$form = $this->query('name:itemForm')->asForm()->one();
-
-			// Timeout field for SNMP agent appears after adding walk[1] to SNMP OID field.
-			$fill_form_values = ($item_type === 'SNMP agent')
-					? ['Type' => $item_type, 'SNMP OID' => 'walk[1]']
-					: ['Type' => $item_type];
-
-			$form->fill($fill_form_values);
-			$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
-			$this->assertEquals('Global', $radio->getText());
-			$this->assertTrue($radio->isEnabled());
-			$form->checkValue(['Timeout' => $timeout]);
-
-			if ($button_name === 'Create discovery rule') {
-				$this->page->open($link)->waitUntilReady();
-			}
-			else {
-				COverlayDialogElement::find()->one()->close();
-			}
+		if ($linked) {
+			// Check linked item, item prototypes, discovery.
+			$this->checkLinked($values, $link, $button_name);
+		}
+		else {
+			// Check not linked items, item prototypes, discovery.
+			$this->checkSimple($values, $link, $button_name);
 		}
 	}
 
@@ -241,6 +217,69 @@ class testTimeoutsDisplay extends CWebTest {
 			$form->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$this->page->waitUntilReady();
+		}
+	}
+
+	protected function checkSimple($values, $link, $button_name) {
+		// Check timeout value in items one by one, after changes in Administration->Timeouts or Proxy->timeouts.
+		foreach ($values as $item_type => $timeout) {
+			$this->query('button', $button_name)->one()->click();
+
+			// Discovery rule doesn't have overlay.
+			if ($button_name === 'Create discovery rule') {
+				$this->page->waitUntilReady();
+			}
+			else {
+				COverlayDialogElement::find()->waitUntilReady()->one();
+			}
+
+			$form = $this->query('name:itemForm')->asForm()->one();
+
+			// Timeout field for SNMP agent appears after adding walk[1] to SNMP OID field.
+			$fill_form_values = ($item_type === 'SNMP agent')
+				? ['Type' => $item_type, 'SNMP OID' => 'walk[1]']
+				: ['Type' => $item_type];
+
+			$form->fill($fill_form_values);
+			$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
+			$this->assertEquals('Global', $radio->getText());
+			$this->assertTrue($radio->isEnabled());
+			$form->checkValue(['Timeout' => $timeout]);
+
+			if ($button_name === 'Create discovery rule') {
+				$this->page->open($link)->waitUntilReady();
+			}
+			else {
+				COverlayDialogElement::find()->one()->close();
+			}
+		}
+	}
+
+	protected function checkLinked($values, $link, $table_selector, $discovery = false) {
+		// Check timeout value in items one by one, after changes in Administration->Timeouts.
+		foreach ($values as $item_name => $timeout) {
+			$this->query($table_selector)->asTable()->one()->query('link', $item_name)->one()->click();
+
+			// Discovery rule doesn't have overlay.
+			if ($table_selector === 'name:discovery') {
+				$this->page->waitUntilReady();
+			}
+			else {
+				COverlayDialogElement::find()->waitUntilReady()->one();
+			}
+
+			$form = $this->query('name:itemForm')->asForm()->one();
+			$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
+			$this->assertEquals('Global', $radio->getText());
+			$this->assertFalse($radio->isEnabled());
+			$form->checkValue(['Timeout' => $timeout]);
+
+			if ($table_selector === 'name:discovery') {
+				$this->page->open($link)->waitUntilReady();
+			}
+			else {
+				COverlayDialogElement::find()->one()->close();
+			}
 		}
 	}
 }
