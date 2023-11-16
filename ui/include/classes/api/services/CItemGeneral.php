@@ -2894,7 +2894,7 @@ abstract class CItemGeneral extends CApiService {
 		unset($item);
 	}
 
-	public static function prepareItemForDb(array &$item): void {
+	private static function prepareItemForDb(array &$item): void {
 		if (array_key_exists('query_fields', $item)) {
 			$item['query_fields'] = self::prepareQueryFieldsForDb($item['query_fields']);
 		}
