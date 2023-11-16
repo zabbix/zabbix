@@ -2686,15 +2686,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = [];
 		$macros = ['host' => [], 'interface' => [], 'user_data' => [], 'inventory' => []];
 		$usermacros = [];
-
 		$manualinput_value = [];
 
-		foreach ($data as $hostid => $script) {
-			foreach ($script as $parameters) {
-				if (array_key_exists('manualinput_value', $parameters)) {
-					$manualinput_value[$hostid] = $parameters['manualinput_value'];
-				}
+		foreach ($data as $hostid => &$script) {
+			if (array_key_exists('manualinput_value', $script)) {
+				$manualinput_value[$hostid] = $script['manualinput_value'];
 			}
+
+			unset($script['manualinput_value']);
 
 			// Reset matched macros for each host.
 			$matched_macros = [
@@ -2703,6 +2702,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				],
 				'usermacros' => []
 			];
+
 
 			foreach ($script as $fields) {
 				$exctracted_macros = self::extractMacros($fields, $types);
@@ -2760,6 +2760,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
+		unset($script);
 
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
@@ -2775,7 +2776,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($data as $hostid => &$scripts) {
 			if ($macro_values) {
 				foreach ($macro_values[$hostid] as $type => &$macro_value) {
-					if ($manualinput_value && $type === '{MANUALINPUT}') {
+					if ($manualinput_value && $type === '{MANUALINPUT}'
+							&& array_key_exists($hostid, $manualinput_value)) {
 						$macro_value = $manualinput_value[$hostid];
 					}
 				}
@@ -2872,12 +2874,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 		$manualinput_value = [];
 
-		foreach ($data as $eventid => $script) {
-			foreach ($script as $parameters) {
-				if (array_key_exists('manualinput_value', $parameters)) {
-					$manualinput_value[$eventid] = $parameters['manualinput_value'];
-				}
+		foreach ($data as $eventid => &$script) {
+			if (array_key_exists('manualinput_value', $script)) {
+				$manualinput_value[$eventid] = $script['manualinput_value'];
 			}
+
+			unset ($script['manualinput_value']);
 
 			$event = $events[$eventid];
 			$triggerid = $event['objectid'];
@@ -3047,6 +3049,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				];
 			}
 		}
+		unset($script);
 
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);

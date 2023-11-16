@@ -860,7 +860,7 @@ switch ($data['method']) {
 			}
 
 			if ($scripts) {
-				$result = $scripts[$data['hostid']][0];
+				$result = $scripts[$data['hostid']];
 			}
 		}
 

@@ -8584,7 +8584,7 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/2": value (1234) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (hostid)=(1234) already exists.'
 			]
 		];
 	}
@@ -8685,10 +8685,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -8715,10 +8715,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						// Webhook does not return parameters. Mostly frontend needs only  script ID anyway.
@@ -8745,10 +8745,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -8775,10 +8775,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -9220,10 +9220,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -9250,10 +9250,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -9280,10 +9280,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -9694,10 +9694,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -9723,10 +9723,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -9753,10 +9753,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -10264,10 +10264,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						]
 					],
@@ -10379,10 +10379,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						]
 					],
@@ -10605,7 +10605,7 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/2": value (20) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (eventid)=(20) already exists.'
 			],
 			'Test script.getScriptsByEvents for same event with different scriptids' => [
 				'request' => [
@@ -10619,7 +10619,7 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/2": value (20) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (eventid)=(20) already exists.'
 			]
 		];
 	}
@@ -10743,10 +10743,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -10774,10 +10774,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -10803,10 +10803,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -10833,10 +10833,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -10863,10 +10863,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -11477,10 +11477,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -11508,10 +11508,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -11538,10 +11538,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -11568,10 +11568,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -12104,10 +12104,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -12133,10 +12133,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -12163,10 +12163,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -12193,10 +12193,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
 						[
@@ -12996,10 +12996,10 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES,
-							'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+							'manualinput' => (string) ZBX_SCRIPT_MANUALINPUT_DISABLED,
 							'manualinput_prompt' => '',
 							'manualinput_validator' => '',
-							'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						]
 					],
