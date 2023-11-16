@@ -84,19 +84,19 @@ AC_DEFUN([LIBOPENSSL_CHECK_CONFIG],
 If you want to use encryption provided by OpenSSL library:
 AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@:>@, DIR is the libssl and libcrypto install directory.])],
     [
-	if test "$withval" = "no"; then
-	    want_openssl="no"
-	    _libopenssl_dir="no"
-	elif test "$withval" = "yes"; then
-	    want_openssl="yes"
-	    _libopenssl_dir="no"
-	else
-	    want_openssl="yes"
-	    _libopenssl_dir=$withval
-	    _libopenssl_dir_lib="$withval/lib"
-	fi
-	accept_openssl_version="no"
-	mt_required=$2
+      if test "$withval" = "no"; then
+        want_openssl="no"
+        _libopenssl_dir="no"
+      elif test "$withval" = "yes"; then
+        want_openssl="yes"
+        _libopenssl_dir="no"
+      else
+        want_openssl="yes"
+        _libopenssl_dir=$withval
+        _libopenssl_dir_lib="$withval/lib"
+      fi
+      accept_openssl_version="no"
+      mt_required=$2
     ],[want_openssl=ifelse([$1],,[no],[$1])]
   )
 
