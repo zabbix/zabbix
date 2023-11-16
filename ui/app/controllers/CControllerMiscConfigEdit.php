@@ -36,6 +36,7 @@ class CControllerMiscConfigEdit extends CController {
 			'login_block' =>					'db config.login_block',
 			'validate_uri_schemes' =>			'db config.validate_uri_schemes',
 			'uri_valid_schemes' =>				'db config.uri_valid_schemes',
+			'x_frame_header_enabled' =>         'in 0,1',
 			'x_frame_options' =>				'db config.x_frame_options',
 			'iframe_sandboxing_enabled' =>		'db config.iframe_sandboxing_enabled',
 			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
