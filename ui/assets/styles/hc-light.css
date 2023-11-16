@@ -3463,7 +3463,8 @@ section {
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; }
+    text-overflow: ellipsis;
+    margin: auto; }
   .svg-pie-chart .svg-pie-chart-total-value-no-data {
     text-anchor: middle;
     fill: #333333; }
