@@ -566,7 +566,9 @@ static int	DBpatch_6000044(void)
 
 			if (FAIL == is_time_suffix(&ctx.expression[loc->l], &seconds, TOKEN_LEN(loc)) ||
 					0 != seconds)
+			{
 				continue;
+			}
 
 			zbx_vector_uint64_append(&del_tokens, (zbx_uint32_t)i);
 		}
