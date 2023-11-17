@@ -740,8 +740,8 @@ class CScript extends CApiService {
 				]],
 				'manualinput_validator' => ['type' => API_MULTIPLE, 'rules' => [
 					['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
-						['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
+						['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
+						['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
 					]],
 					['else' => true, 'type' => API_UNEXPECTED]
 				]],
