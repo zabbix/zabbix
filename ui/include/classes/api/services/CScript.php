@@ -739,7 +739,10 @@ class CScript extends CApiService {
 					['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'manualinput_validator' => ['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
+					['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
+						['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
+					]],
 					['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'manualinput_default_value' => ['type' => API_MULTIPLE, 'rules' => [
@@ -757,13 +760,13 @@ class CScript extends CApiService {
 		}
 
 		if (array_key_exists('manualinput', $script) && $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-			$regex_validator = new CRegexValidator([
-				'messageInvalid' => _('Regular expression must be a string'),
-				'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
-			]);
-
 			if (array_key_exists('manualinput_validator_type', $script) &&
 					$script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
+				$regex_validator = new CRegexValidator([
+					'messageInvalid' => _('Regular expression must be a string'),
+					'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+				]);
+
 				$default_input = array_key_exists('manualinput_default_value', $script)
 					? $script['manualinput_default_value']
 					: '';

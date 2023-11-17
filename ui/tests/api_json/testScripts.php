@@ -3158,7 +3158,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '',
 					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.'
+				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.'
 			],
 			'Test script.create "manualinput_validator" field empty when "manualinput_validator_type" is list' => [
 				'script' => [
@@ -3168,7 +3168,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 					'manualinput_prompt' => 'prompt text',
-					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '',
 					'manualinput_default_value' => ''
 				],
