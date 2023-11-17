@@ -828,6 +828,41 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '{$PERIOD}:{$OFFSET}']
 			],
 			[
+				'last(/host/key, {{$PERIOD}.regsub("^([0-9]+)", \1)}:{{$OFFSET}.regsub("^([0-9]+)", \1)})', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/host/key, {{$PERIOD}.regsub("^([0-9]+)", \1)}:{{$OFFSET}.regsub("^([0-9]+)", \1)})',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '{{$PERIOD}.regsub("^([0-9]+)", \1)}:{{$OFFSET}.regsub("^([0-9]+)", \1)}',
+							'length' => 71,
+							'data' => [
+								'sec_num' => '{{$PERIOD}.regsub("^([0-9]+)", \1)}',
+								'time_shift' => '{{$OFFSET}.regsub("^([0-9]+)", \1)}'
+							]
+						]
+					]
+				],
+				['/host/key', '{{$PERIOD}.regsub("^([0-9]+)", \1)}:{{$OFFSET}.regsub("^([0-9]+)", \1)}']
+			],
+			[
 				'last(/host/key, {$PERIOD}:now-{$ONE_HOUR} )', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

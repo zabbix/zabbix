@@ -1135,6 +1135,24 @@ void	zbx_strupper(char *str)
 		*str = toupper(*str);
 }
 
+const char	*zbx_get_bom_econding(char *in, size_t in_size)
+{
+	if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
+	{
+		return "UTF-8";
+	}
+	else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
+	{
+		return "UTF-16LE";
+	}
+	else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
+	{
+		return "UTF-16BE";
+	}
+
+	return "";
+}
+
 #if defined(_WINDOWS) || defined(__MINGW32__)
 char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **error)
 {
@@ -1284,20 +1302,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 
 	/* try to guess encoding using BOM if it exists */
 	if ('\0' == *encoding)
-	{
-		if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
-		{
-			encoding = "UTF-8";
-		}
-		else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
-		{
-			encoding = "UTF-16LE";
-		}
-		else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
-		{
-			encoding = "UTF-16BE";
-		}
-	}
+		encoding = zbx_get_bom_econding(in, in_size);
 
 	if ('\0' == *encoding )
 	{

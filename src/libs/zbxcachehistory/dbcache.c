@@ -3936,14 +3936,15 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 		{
 			char	*error;
 
-			error = zbx_dsprintf(NULL, "Failed to add new variant value to the cache:"
-					" conversion of a variant (%s) to string has failed.",
-					zbx_variant_type_desc(value));
-
-			zabbix_log(LOG_LEVEL_CRIT, error);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot convert value from %s to %s",
+					zbx_variant_type_desc(value), zbx_get_variant_type_desc(ZBX_VARIANT_STR));
 			THIS_SHOULD_NEVER_HAPPEN;
 
-			dc_local_add_history_notsupported(itemid, &ts, error, lastlogsize, mtime, value_flags);
+			error = zbx_dsprintf(NULL, "Cannot convert value from %s to %s.",
+					zbx_variant_type_desc(value), zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+			dc_local_add_history_notsupported(itemid, &ts, error, lastlogsize, mtime,
+					value_flags);
+			zbx_free(error);
 
 			return;
 		}
