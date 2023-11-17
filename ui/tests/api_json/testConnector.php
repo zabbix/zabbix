@@ -514,7 +514,7 @@ class testConnector extends CAPITest {
 					'max_attempts' => 2,
 					'attempt_interval' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
 			],
 			'Test connector.create: invalid "attempt_interval" (boolean) where "max_attempts" equals 1' => [
 				'connector' => [
@@ -1840,7 +1840,7 @@ class testConnector extends CAPITest {
 					'max_attempts' => 2,
 					'attempt_interval' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 1-10.'
+				'expected_error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
 			],
 			'Test connector.update: invalid "attempt_interval" (boolean) where "max_attempts" equals 1' => [
 				'connector' => [
