@@ -1441,8 +1441,7 @@ class testFormAlertsScripts extends CWebTest {
 	 * @param int		$id       id of the script in case of updating
 	 */
 	private function checkScripts($data, $update, $id = null) {
-		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		if ($expected === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 			$old_hash = CDBHelper::getHash($sql);
 		}
@@ -1472,7 +1471,7 @@ class testFormAlertsScripts extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		if ($expected === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$title = ($update) ? 'Cannot update script' : 'Cannot add script';
 			$this->assertMessage(TEST_BAD, $title, $data['details']);
 
@@ -1654,10 +1653,25 @@ class testFormAlertsScripts extends CWebTest {
 		$this->assertEquals(['Name', 'Value', 'Action'], $form->query('id:parameters-table')->asTable()->one()->getHeadersText());
 
 		// Check fields' lengths.
-		$field_maxlength = ['Name' => 255, 'Timeout' => 32, 'Description' => 65535, 'Menu path' => 255,
-			'Confirmation text' => 255, 'Commands' => 65535, 'URL' => 2048, 'Username' => 64, 'Password' => 64,
-			'Port' => 64, 'Public key file' => 64, 'Private key file' => 64, 'Key passphrase' => 64, 'Command' => 65535,
-			'Input prompt' => 255, 'Default input string' => 255, 'Input validation rule' => 2048, 'Dropdown options' => 2048
+		$field_maxlength = [
+			'Name' => 255,
+			'Timeout' => 32,
+			'Description' => 65535,
+			'Menu path' => 255,
+			'Confirmation text' => 255,
+			'Commands' => 65535,
+			'URL' => 2048,
+			'Username' => 64,
+			'Password' => 64,
+			'Port' => 64,
+			'Public key file' => 64,
+			'Private key file' => 64,
+			'Key passphrase' => 64,
+			'Command' => 65535,
+			'Input prompt' => 255,
+			'Default input string' => 255,
+			'Input validation rule' => 2048,
+			'Dropdown options' => 2048
 		];
 		foreach ($field_maxlength as $input => $value) {
 			$this->assertEquals($value, $form->getField($input)->getAttribute('maxlength'));
@@ -1863,7 +1877,6 @@ class testFormAlertsScripts extends CWebTest {
 					// Check advanced configuration default value.
 					$form->checkValue(['Advanced configuration' => false]);
 
-
 					// Check that the 'Advanced configuration' additional fields are hidden.
 					foreach ($common_manual_scope['advanced_fields'] as $label) {
 						$this->assertFalse($form->getLabel($label)->isDisplayed());
@@ -1881,7 +1894,7 @@ class testFormAlertsScripts extends CWebTest {
 				$form->checkValue(array_merge($scope_default, $type_fields['default']));
 
 				if ($scope === 'Manual host action' || $scope === 'Manual event action') {
-						$form->fill(['Enable user input' => true, 'Enable confirmation' => true]);
+					$form->fill(['Enable user input' => true, 'Enable confirmation' => true]);
 				}
 
 				$this->assertEqualsCanonicalizing(array_merge($scope_required, $type_fields['required']),
@@ -1931,9 +1944,12 @@ class testFormAlertsScripts extends CWebTest {
 					}
 
 					// Change advanced configuration to default state.
-					$form->fill(['Input type' => 'String', 'Enable user input' => false, 'Enable confirmation' => false,
-							'Advanced configuration' => false]
-					);
+					$form->fill([
+						'Input type' => 'String',
+						'Enable user input' => false,
+						'Enable confirmation' => false,
+						'Advanced configuration' => false
+					]);
 				}
 			}
 		}
