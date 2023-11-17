@@ -574,9 +574,11 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 						this.overlay.unsetLoading()
 					}
 
-					for (const element of form.parentNode.children) {
-						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-							element.parentNode.removeChild(element);
+					if (form) {
+						for (const element of form.parentNode.children) {
+							if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+								element.parentNode.removeChild(element);
+							}
 						}
 					}
 
