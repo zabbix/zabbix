@@ -2860,8 +2860,8 @@ abstract class CItemGeneral extends CApiService {
 		if (json_last_error() == JSON_ERROR_NONE) {
 			foreach ($_query_fields as $i => $field) {
 				$query_fields[] = $sortorder
-					? ['sortorder' => $i + 1, 'name' => key($field), 'value' => reset($field)]
-					: ['name' => key($field), 'value' => reset($field)];
+					? ['sortorder' => $i + 1, 'name' => (string) key($field), 'value' => reset($field)]
+					: ['name' => (string) key($field), 'value' => reset($field)];
 			}
 		}
 
