@@ -416,6 +416,11 @@ static int	eval_has_usermacro(const char *str, size_t len)
 		{
 			if ('$' == *ptr)
 				return SUCCEED;
+
+			if ('{' == *ptr++)
+				if ('$' == *ptr)
+					return SUCCEED;
+
 			ptr++;
 		}
 	}
@@ -553,6 +558,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 
 		switch (token->type)
 		{
+			case ZBX_EVAL_TOKEN_VAR_MACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
@@ -568,10 +574,19 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				{
 					if (FAIL == zbx_variant_convert(&token->value, ZBX_VARIANT_STR))
 					{
-						*error = zbx_dsprintf(*error, "failed to convert token to string from %s",
-								zbx_variant_type_desc(&token->value));
-						zabbix_log(LOG_LEVEL_CRIT, *error);
+						zabbix_log(LOG_LEVEL_CRIT, "cannot convert value from %s to %s",
+								zbx_variant_type_desc(&token->value),
+								zbx_get_variant_type_desc(ZBX_VARIANT_STR));
 						THIS_SHOULD_NEVER_HAPPEN;
+
+						if (NULL != error)
+						{
+							*error = zbx_dsprintf(*error,
+									"cannot convert value from %s to %s",
+									zbx_variant_type_desc(&token->value),
+									zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+						}
+
 						ret = FAIL;
 						break;
 					}

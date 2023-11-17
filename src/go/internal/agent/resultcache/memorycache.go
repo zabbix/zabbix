@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -42,7 +41,6 @@ type MemoryCache struct {
 	totalValueNum   int32
 	persistValueNum int32
 	historyUpload   bool
-	mu              sync.Mutex
 }
 
 func (c *MemoryCache) upload(u Uploader) (err error) {
