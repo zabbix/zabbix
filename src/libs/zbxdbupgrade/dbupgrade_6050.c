@@ -2092,11 +2092,6 @@ static int	DBpatch_6050152(void)
 	return fix_expression_macro_escaping("triggers", "triggerid", "event_name", "event name of the trigger");
 }
 
-static int	DBpatch_6050153(void)
-{
-	return fix_expression_macro_escaping("triggers", "triggerid", "description", "name of the trigger");
-}
-
 #endif
 
 DBPATCH_START(6050)
@@ -2254,6 +2249,5 @@ DBPATCH_ADD(6050149, 0, 1)
 DBPATCH_ADD(6050150, 0, 1)
 DBPATCH_ADD(6050151, 0, 1)
 DBPATCH_ADD(6050152, 0, 1)
-DBPATCH_ADD(6050153, 0, 1)
 
 DBPATCH_END()
