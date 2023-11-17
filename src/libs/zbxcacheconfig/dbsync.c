@@ -1608,10 +1608,10 @@ static char	**dbsync_interface_preproc_row(char **row)
 
 	/* expand user macros */
 	if (NULL != strstr(row[5], "{$"))
-		row[5] = dc_expand_user_macros_dyn(row[5], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		row[5] = dc_expand_user_and_func_macros_dyn(row[5], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 
 	if (NULL != strstr(row[6], "{$"))
-		row[6] = dc_expand_user_macros_dyn(row[6], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		row[6] = dc_expand_user_and_func_macros_dyn(row[6], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 
 	return row;
 }
