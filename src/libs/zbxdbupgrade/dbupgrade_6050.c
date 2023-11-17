@@ -1738,6 +1738,20 @@ static int	DBpatch_6050143(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050144(void)
+{
+	const zbx_db_field_t	field = {"hk_audit", "31d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_6050145(void)
+{
+	const zbx_db_field_t	field = {"hk_history", "31d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBset_default("config", &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1886,5 +1900,7 @@ DBPATCH_ADD(6050140, 0, 1)
 DBPATCH_ADD(6050141, 0, 1)
 DBPATCH_ADD(6050142, 0, 1)
 DBPATCH_ADD(6050143, 0, 1)
+DBPATCH_ADD(6050144, 0, 1)
+DBPATCH_ADD(6050145, 0, 1)
 
 DBPATCH_END()
