@@ -227,7 +227,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 			len_cutoff += 2;
 	}
 
-	if (NULL != str_cutoff)	/* cut cut in multi-byte utf-8 sequence */
+	if (NULL != str_cutoff)	/* cut in multi-byte utf-8 sequence */
 	{
 		while (0x80 == (0xc0 & (unsigned char)*(str_cutoff - 1)))
 		{
