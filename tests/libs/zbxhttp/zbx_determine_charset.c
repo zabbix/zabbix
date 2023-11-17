@@ -30,7 +30,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	int		expected_result;
 	size_t		in_buffer_length = 0, expected_result_buffer_length = 0;
-	char		*in_buffer, *result_buffer, *expected_result_buffer, *encoding;
+	char		*in_buffer, *result_buffer, *expected_result_buffer, *encoding, *error = NULL;
 
 	ZBX_UNUSED(state);
 
@@ -49,7 +49,7 @@ void	zbx_mock_test_entry(void **state)
 	encoding = zbx_determine_charset(zbx_mock_get_parameter_string("in.encoding"), in_buffer, in_buffer_length);
 	zbx_mock_assert_str_eq("", zbx_mock_get_parameter_string("out.encoding"), encoding);
 
-	result_buffer = zbx_convert_to_utf8(in_buffer, in_buffer_length, encoding);
+	result_buffer = zbx_convert_to_utf8(in_buffer, in_buffer_length, encoding, &error);
 
 	if (expected_result_buffer_length  != strlen(result_buffer) ||
 			0 != memcmp(result_buffer, expected_result_buffer, expected_result_buffer_length))
