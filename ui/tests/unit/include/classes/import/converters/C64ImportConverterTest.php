@@ -144,7 +144,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::ZABBIX_PASSIVE,
 				'item_prototypes' => [
 					[
-						'type' => 'CALCULATED',
+						'type' => CXmlConstantName::CALCULATED,
 						'params' => $source_expression,
 						'trigger_prototypes' => $source_triggers
 					]
@@ -156,7 +156,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::ZABBIX_PASSIVE,
 				'item_prototypes' => [
 					[
-						'type' => 'CALCULATED',
+						'type' => CXmlConstantName::CALCULATED,
 						'params' => $expected_expression,
 						'trigger_prototypes' => $expected_triggers
 					]
