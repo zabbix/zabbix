@@ -959,13 +959,12 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 
 		zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
 
-		
 		if (NULL == (converted = zbx_convert_to_utf8(*body, *size, charset, &error)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert from charset '%s': %s", charset, error);
 			zbx_free(error);
 		}
-		else 
+		else
 		{
 			zbx_free(*body);
 
