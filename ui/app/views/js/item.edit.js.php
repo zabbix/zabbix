@@ -419,6 +419,7 @@ window.item_edit_form = new class {
 					fields[key] = Object.values(fields[key]).sort(
 						(a, b) => parseFloat(a.sortorder) - parseFloat(b.sortorder)
 					);
+					// falls through
 
 				case 'parameters':
 					for (const [i, param] of Object.entries(fields[key])) {
