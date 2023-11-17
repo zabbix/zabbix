@@ -113,18 +113,14 @@ class C64ImportConverterTest extends CImportConverterTest {
 			[
 				'expression' => $source_expression,
 				'recovery_expression' => $source_expression,
-				'name' => '{?'.$source_expression.'}',
-				'event_name' => '{?'.$source_expression.'}',
-				'description' => '{?'.$source_expression.'}'
+				'event_name' => '{?'.$source_expression.'}'
 			]
 		];
 		$expected_triggers = [
 			[
 				'expression' => $expected_expression,
 				'recovery_expression' => $expected_expression,
-				'name' => '{?'.$expected_expression.'}',
-				'event_name' => '{?'.$expected_expression.'}',
-				'description' => '{?'.$expected_expression.'}'
+				'event_name' => '{?'.$expected_expression.'}'
 			]
 		];
 
@@ -175,7 +171,6 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'elements' => [
 							[
-								'description' => '{?'.$source_expression.'}',
 								'expression' => $source_expression,
 								'recovery_expression' => $source_expression
 							]
@@ -191,7 +186,6 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'elements' => [
 							[
-								'description' => '{?'.$expected_expression.'}',
 								'expression' => $expected_expression,
 								'recovery_expression' => $expected_expression
 							]
