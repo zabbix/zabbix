@@ -36,6 +36,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \

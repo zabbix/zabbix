@@ -252,4 +252,6 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 #define ZBX_CONDITION_OPERATOR_EXIST		12
 #define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
 
+int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
+
 #endif /* ZABBIX_EXPR_H */

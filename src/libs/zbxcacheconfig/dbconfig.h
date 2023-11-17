@@ -22,7 +22,7 @@
 
 #include "zbxcacheconfig.h"
 #include "user_macro.h"
-
+#include "vps_monitor.h"
 #include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
@@ -1005,6 +1005,7 @@ typedef struct
 	zbx_um_cache_t		*um_cache;
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
+	zbx_vps_monitor_t	vps_monitor;
 }
 ZBX_DC_CONFIG;
 
@@ -1061,10 +1062,10 @@ size_t	zbx_maintenance_update_flags_num(void);
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
+char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env);
 
-char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
+void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *src_interface);
 
-void		DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *src_interface);
 ZBX_DC_HOST	*DCfind_host(const char *host);
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key);
 void		DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src_function);

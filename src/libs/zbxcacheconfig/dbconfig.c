@@ -209,6 +209,12 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 				arg1 = get_rparam(&request, 0);
 				arg2 = get_rparam(&request, 1);
 
+				if (0 == strcmp(arg1, "vps"))
+				{
+					ret = SUCCEED;
+					goto clean;
+				}
+
 				if (2 == request.nparam)
 				{
 					if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery"))
@@ -275,11 +281,13 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_SCRIPT:
-		case ITEM_TYPE_INTERNAL:
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		case ITEM_TYPE_INTERNAL:
+
+			return ZBX_POLLER_TYPE_INTERNAL;
 		case ITEM_TYPE_DB_MONITOR:
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_ODBCPOLLER))
 				break;
@@ -431,8 +439,7 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *
  *          with resolved macros                                              *
  *                                                                            *
  ******************************************************************************/
-static char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num,
-		int env)
+char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0;
@@ -2036,45 +2043,118 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: trying to resolve the macros in host interface                    *
+ * Purpose: expand host macros in string                                      *
+ *                                                                            *
+ * Return value: text with resolved macros or NULL if there were no macros    *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
+static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_host)
 {
-	int		macros;
-	char		*addr;
-	zbx_dc_host_t	host;
+#define IF_MACRO_HOST		"{HOST."
+#define IF_MACRO_HOST_HOST	IF_MACRO_HOST "HOST}"
+#define IF_MACRO_HOST_NAME	IF_MACRO_HOST "NAME}"
+#define IF_MACRO_HOST_IP	IF_MACRO_HOST "IP}"
+#define IF_MACRO_HOST_DNS	IF_MACRO_HOST "DNS}"
+#define IF_MACRO_HOST_CONN	IF_MACRO_HOST "CONN}"
+/* deprecated macros */
+#define IF_MACRO_HOSTNAME	"{HOSTNAME}"
+#define IF_MACRO_IPADDRESS	"{IPADDRESS}"
 
-#define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
+#define IF_MACRO_HOST_HOST_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_HOST)
+#define IF_MACRO_HOST_NAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_NAME)
+#define IF_MACRO_HOST_IP_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_IP)
+#define IF_MACRO_HOST_DNS_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_DNS)
+#define IF_MACRO_HOST_CONN_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_CONN)
+#define IF_MACRO_HOSTNAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOSTNAME)
+#define IF_MACRO_IPADDRESS_LEN	ZBX_CONST_STRLEN(IF_MACRO_IPADDRESS)
 
-	macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
-	macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
+	zbx_token_t		token;
+	int			pos = 0, last_pos = 0;
+	char			*str = NULL;
+	size_t			str_alloc = 0, str_offset = 0;
+	zbx_dc_interface_t	interface;
 
-	if (0 != macros)
+	if ('\0' == *text)
+		return NULL;
+
+	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
-		zbx_dc_get_host_by_hostid(&host, interface->hostid);
+		const char	*value = NULL;
 
-		if (0 != (macros & 0x01))
+		if (ZBX_TOKEN_MACRO != token.type)
+			continue;
+
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
+
+		if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_HOST, IF_MACRO_HOST_HOST_LEN) ||
+				SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOSTNAME, IF_MACRO_HOSTNAME_LEN))
 		{
-			addr = zbx_strdup(NULL, interface->ip);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
-				dc_strpool_replace(1, &interface->ip, addr);
-			zbx_free(addr);
+			value = dc_host->host;
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_NAME, IF_MACRO_HOST_NAME_LEN))
+		{
+			value = dc_host->name;
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN) ||
+				SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_IPADDRESS, IF_MACRO_IPADDRESS_LEN))
+		{
+			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+					INTERFACE_TYPE_AGENT))
+			{
+				value = interface.ip_orig;
+			}
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_DNS, IF_MACRO_HOST_DNS_LEN))
+		{
+			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+					INTERFACE_TYPE_AGENT))
+			{
+				value = interface.dns_orig;
+			}
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_CONN, IF_MACRO_HOST_CONN_LEN))
+		{
+			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+					INTERFACE_TYPE_AGENT))
+			{
+				value = interface.addr;
+			}
 		}
 
-		if (0 != (macros & 0x02))
+		if (NULL != value)
 		{
-			addr = zbx_strdup(NULL, interface->dns);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
-				dc_strpool_replace(1, &interface->dns, addr);
-			zbx_free(addr);
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
 		}
+		else
+		{
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
+
+		pos = (int)token.loc.r;
+		last_pos = pos + 1;
 	}
-#undef STR_CONTAINS_MACROS
+
+	/* if no macros were found then str will be NULL, which should be returned */
+	if (NULL != str)
+		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+
+	return str;
+
+#undef IF_MACRO_HOSTNAME_LEN
+#undef IF_MACRO_HOST_CONN_LEN
+#undef IF_MACRO_HOST_DNS_LEN
+#undef IF_MACRO_HOST_IP_LEN
+#undef IF_MACRO_HOST_NAME_LEN
+#undef IF_MACRO_HOST_HOST_LEN
+#undef IF_MACRO_IPADDRESS
+#undef IF_MACRO_HOSTNAME
+#undef IF_MACRO_HOST_CONN
+#undef IF_MACRO_HOST_DNS
+#undef IF_MACRO_HOST_IP
+#undef IF_MACRO_HOST_NAME
+#undef IF_MACRO_HOST_HOST
+#undef IF_MACRO_HOST
 }
 
 /******************************************************************************
@@ -2116,47 +2196,85 @@ static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
 	}
 }
 
+static void	dc_interface_snmpaddrs_update(ZBX_DC_INTERFACE *interface)
+{
+	ZBX_DC_INTERFACE_ADDR	*ifaddr, ifaddr_local;
+
+	ifaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
+
+	if ('\0' != *ifaddr_local.addr)
+	{
+		if (NULL == (ifaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_search(&config->interface_snmpaddrs,
+				&ifaddr_local)))
+		{
+			dc_strpool_acquire(ifaddr_local.addr);
+
+			ifaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_insert(
+					&config->interface_snmpaddrs, &ifaddr_local,
+					sizeof(ZBX_DC_INTERFACE_ADDR));
+			zbx_vector_uint64_create_ext(&ifaddr->interfaceids,
+					__config_shmem_malloc_func,
+					__config_shmem_realloc_func,
+					__config_shmem_free_func);
+		}
+
+		zbx_vector_uint64_append(&ifaddr->interfaceids, interface->interfaceid);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: setup SNMP attributes for interface with interfaceid index        *
  *                                                                            *
  * Parameters: interfaceid  - [IN]                                            *
  *             row          - [IN] the row data from DB                       *
- *             bulk_changed - [IN]                                            *
+ *             modified     - [OUT] 1 if SNMP data were modified, untouched   *
+ *                                  otherwise                                 *
  *                                                                            *
  ******************************************************************************/
-static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, const char **row,
-		unsigned char *bulk_changed)
+static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, const char **row, int *modified)
 {
 	int			found;
 	ZBX_DC_SNMPINTERFACE	*snmp;
-	unsigned char		bulk;
+	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol, max_repetitions;
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)DCfind_id(&config->interfaces_snmp, interfaceid, sizeof(ZBX_DC_SNMPINTERFACE),
 			&found);
 
 	ZBX_STR2UCHAR(bulk, row[13]);
+	ZBX_STR2UCHAR(version, row[12]);
+	ZBX_STR2UCHAR(securitylevel, row[16]);
+	ZBX_STR2UCHAR(authprotocol, row[19]);
+	ZBX_STR2UCHAR(privprotocol, row[20]);
+	ZBX_STR2UCHAR(max_repetitions, row[22]);
 
-	if (0 == found)
-		*bulk_changed = 1;
-	else if (snmp->bulk != bulk)
-		*bulk_changed = 1;
-	else
-		*bulk_changed = 0;
+	if (0 != found)
+	{
+		if (snmp->bulk != bulk || version != snmp->version || securitylevel != snmp->securitylevel ||
+				authprotocol != snmp->authprotocol || privprotocol != snmp->privprotocol ||
+				max_repetitions != snmp->max_repetitions)
+		{
+			*modified = 1;
+		}
+	}
 
-	if (0 != *bulk_changed)
-		snmp->bulk = bulk;
+	snmp->bulk = bulk;
+	snmp->version = version;
+	snmp->securitylevel = securitylevel;
+	snmp->authprotocol = authprotocol;
+	snmp->privprotocol = privprotocol;
+	snmp->max_repetitions = max_repetitions;
 
-	ZBX_STR2UCHAR(snmp->version, row[12]);
-	dc_strpool_replace(found, &snmp->community, row[14]);
-	dc_strpool_replace(found, &snmp->securityname, row[15]);
-	ZBX_STR2UCHAR(snmp->securitylevel, row[16]);
-	dc_strpool_replace(found, &snmp->authpassphrase, row[17]);
-	dc_strpool_replace(found, &snmp->privpassphrase, row[18]);
-	ZBX_STR2UCHAR(snmp->authprotocol, row[19]);
-	ZBX_STR2UCHAR(snmp->privprotocol, row[20]);
-	dc_strpool_replace(found, &snmp->contextname, row[21]);
-	ZBX_STR2UCHAR(snmp->max_repetitions, row[22]);
+	if (SUCCEED == dc_strpool_replace(found, &snmp->community, row[14]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->securityname, row[15]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->authpassphrase, row[17]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->privpassphrase, row[18]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->contextname, row[21]))
+		*modified = 1;
 
 	return snmp;
 }
@@ -2186,6 +2304,59 @@ static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
 	return;
 }
 
+typedef struct
+{
+	ZBX_DC_INTERFACE	*interface;
+	ZBX_DC_SNMPINTERFACE	*snmp;
+	ZBX_DC_HOST		*host;
+	char			*ip;
+	char			*dns;
+	int			modified;
+}
+zbx_dc_if_update_t;
+
+ZBX_PTR_VECTOR_DECL(dc_if_update_ptr, zbx_dc_if_update_t *)
+ZBX_PTR_VECTOR_IMPL(dc_if_update_ptr, zbx_dc_if_update_t *)
+
+static void	dc_if_update_free(zbx_dc_if_update_t *update)
+{
+	zbx_free(update->ip);
+	zbx_free(update->dns);
+	zbx_free(update);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve host macros in host interface update                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, const ZBX_DC_HOST *host)
+{
+	char	*addr;
+
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->ip, host)))
+	{
+		if (SUCCEED == zbx_is_ip(addr))
+		{
+			zbx_free(update->ip);
+			update->ip = addr;
+		}
+		else
+			zbx_free(addr);
+	}
+
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->dns, host)))
+	{
+		if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+		{
+			zbx_free(update->dns);
+			update->dns = addr;
+		}
+		else
+			zbx_free(addr);
+	}
+}
+
 static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char			**row;
@@ -2194,21 +2365,22 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
-	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
 	ZBX_DC_HOST		*host;
 
 	int			found, update_index, ret, i;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_, useip;
-	unsigned char		reset_snmp_stats;
-	zbx_vector_ptr_t	interfaces;
+
+	zbx_vector_dc_if_update_ptr_t	updates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&interfaces);
+	zbx_vector_dc_if_update_ptr_create(&updates);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
+		zbx_dc_if_update_t	*update;
+
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
@@ -2226,9 +2398,14 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		interface = (ZBX_DC_INTERFACE *)DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE),
 				&found);
-		zbx_vector_ptr_append(&interfaces, interface);
 
-		/* remove old address->interfaceid index */
+		update = (zbx_dc_if_update_t *)zbx_malloc(NULL, sizeof(zbx_dc_if_update_t));
+		memset(update, 0, sizeof(zbx_dc_if_update_t));
+
+		update->interface = interface;
+		update->host = host;
+
+				/* remove old address->interfaceid index */
 		if (0 != found && INTERFACE_TYPE_SNMP == interface->type)
 			dc_interface_snmpaddrs_remove(interface);
 
@@ -2264,21 +2441,21 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				else
 					update_index = 1;
 			}
+
+			update->modified = 1;
 		}
-
-		/* store new information in interface structure */
-
-		reset_snmp_stats = (0 == found || interface->hostid != hostid || interface->type != type ||
-				interface->useip != useip);
+		else if (interface->useip != useip)
+			update->modified = 1;
 
 		interface->hostid = hostid;
 		interface->type = type;
 		interface->main = main_;
 		interface->useip = useip;
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->ip, row[5]));
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->dns, row[6]));
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]));
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->error, row[10]));
+
+		update->ip = zbx_strdup(NULL, row[5]);
+		update->dns = zbx_strdup(NULL, row[6]);
+		if (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]))
+			update->modified = 1;
 
 		if (0 == found)
 		{
@@ -2288,6 +2465,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			interface->availability_ts = time(NULL);
 			interface->reset_availability = 0;
 			interface->items_num = 0;
+			dc_strpool_replace(found, &interface->error, row[10]);
 		}
 
 		/* update interfaces_ht index using new data, if not done already */
@@ -2300,42 +2478,13 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			zbx_hashset_insert(&config->interfaces_ht, &interface_ht_local, sizeof(ZBX_DC_INTERFACE_HT));
 		}
 
-		/* update interface_snmpaddrs for SNMP traps or reset bulk request statistics */
-
+		/* update SNMP data  */
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
-			ZBX_DC_SNMPINTERFACE	*snmp;
-			unsigned char		bulk_changed;
-
-			interface_snmpaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
-
-			if ('\0' != *interface_snmpaddr_local.addr)
-			{
-				if (NULL == (interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_search(
-						&config->interface_snmpaddrs, &interface_snmpaddr_local)))
-				{
-					dc_strpool_acquire(interface_snmpaddr_local.addr);
-					zbx_vector_uint64_create_ext(&(interface_snmpaddr_local.interfaceids),
-							__config_shmem_malloc_func,
-							__config_shmem_realloc_func,
-							__config_shmem_free_func);
-					interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_insert(
-							&config->interface_snmpaddrs, &interface_snmpaddr_local,
-							sizeof(ZBX_DC_INTERFACE_ADDR));
-				}
-
-				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
-			}
-
 			if (FAIL == zbx_db_is_null(row[12]))
 			{
-				snmp = dc_interface_snmp_set(interfaceid, (const char **)row, &bulk_changed);
-
-				if (1 == reset_snmp_stats || 0 != bulk_changed)
-				{
-					snmp->max_succeed = 0;
-					snmp->min_fail = ZBX_MAX_SNMP_ITEMS + 1;
-				}
+				update->snmp = dc_interface_snmp_set(interfaceid, (const char **)row,
+						&update->modified);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -2345,7 +2494,17 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		/* because other interfaces might reference main interfaces ip and dns */
 		/* with {HOST.IP} and {HOST.DNS} macros                                */
 		if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
-			substitute_host_interface_macros(interface);
+		{
+			dc_if_update_substitute_host_macros(update, host);
+
+			if (SUCCEED == dc_strpool_replace(found, &interface->ip, update->ip))
+				update->modified = 1;
+
+			if (SUCCEED == dc_strpool_replace(found, &interface->dns, update->dns))
+				update->modified = 1;
+		}
+
+		zbx_vector_dc_if_update_ptr_append(&updates, update);
 
 		if (0 == found)
 		{
@@ -2369,18 +2528,36 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
-
-		dc_host_update_revision(host, revision);
 	}
 
-	/* resolve macros in other interfaces */
-
-	for (i = 0; i < interfaces.values_num; i++)
+	/* resolve macros in other interfaces and handle interface modify status */
+	for (i = 0; i < updates.values_num; i++)
 	{
-		interface = (ZBX_DC_INTERFACE *)interfaces.values[i];
+		zbx_dc_if_update_t	*update = updates.values[i];
 
-		if (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type)
-			substitute_host_interface_macros(interface);
+		if (1 != update->interface->main || INTERFACE_TYPE_AGENT != update->interface->type)
+		{
+			dc_if_update_substitute_host_macros(update, update->host);
+
+			if (SUCCEED == dc_strpool_replace(found, &update->interface->ip, update->ip))
+				update->modified = 1;
+
+			if (SUCCEED == dc_strpool_replace(found, &update->interface->dns, update->dns))
+				update->modified = 1;
+		}
+
+		if (0 != update->modified)
+		{
+			dc_host_update_revision(update->host, revision);
+
+			if (NULL != update->snmp)
+			{
+				update->snmp->max_succeed = 0;
+				update->snmp->min_fail = ZBX_MAX_SNMP_ITEMS + 1;
+
+				dc_interface_snmpaddrs_update(update->interface);
+			}
+		}
 	}
 
 	/* remove deleted interfaces from buffer */
@@ -2434,7 +2611,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_hashset_remove_direct(&config->interfaces, interface);
 	}
 
-	zbx_vector_ptr_destroy(&interfaces);
+	zbx_vector_dc_if_update_ptr_clear_ext(&updates, dc_if_update_free);
+	zbx_vector_dc_if_update_ptr_destroy(&updates);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -8381,6 +8559,9 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
 
+	if (SUCCEED != vps_monitor_create(&config->vps_monitor, error))
+		goto out;
+
 #define CREATE_HASHSET(hashset, hashset_size)									\
 														\
 	CREATE_HASHSET_EXT(hashset, hashset_size, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
@@ -8599,6 +8780,8 @@ void	zbx_free_configuration_cache(void)
 	config = NULL;
 
 	UNLOCK_CACHE;
+
+	vps_monitor_destroy();
 
 	zbx_shmem_destroy(config_mem);
 	config_mem = NULL;
