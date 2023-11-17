@@ -193,7 +193,6 @@ void	zbx_mock_test_entry(void **state)
 	int			returned_ret, expected_ret;
 	zbx_mock_handle_t	handle;
 	zbx_uint64_t		random_gen_length = 0, expected_data_len = 0;
-	char			*alert_message = NULL;
 	size_t			tmp_alloc = 0, tmp_offset = 0;
 	ZBX_UNUSED(state);
 
