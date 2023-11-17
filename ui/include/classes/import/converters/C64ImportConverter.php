@@ -120,9 +120,7 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertMaps(array $maps): array {
 		foreach ($maps as &$map) {
-			if (array_key_exists('selements', $map)) {
-				$map['selements'] = self::convertSelements($map['selements']);
-			}
+			$map['selements'] = self::convertSelements($map['selements']);
 		}
 		unset($map);
 
