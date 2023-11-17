@@ -713,7 +713,6 @@ class CScript extends CApiService {
 			$this->prepareManualInputValues($script, $db_script);
 		}
 
-		$validation_rules = ['type' => API_OBJECT, 'fields' => []];
 		$script_manualinput_fields = [];
 		$path = '/'.($index + 1);
 
@@ -723,6 +722,10 @@ class CScript extends CApiService {
 						'manualinput_validator', 'manualinput_default_value'])) {
 					$script_manualinput_fields[$key] = $value;
 				}
+			}
+
+			if (!array_key_exists('manualinput', $script_manualinput_fields)) {
+				$script_manualinput_fields['manualinput'] = ZBX_SCRIPT_MANUALINPUT_DISABLED;
 			}
 
 			$validation_rules = ['type' => API_OBJECT, 'fields' => [
