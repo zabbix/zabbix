@@ -306,7 +306,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 
 static void	process_tcpsvc_result(void *data)
 {
-	zbx_tcpsvc_context		*tcpsvc_context = (zbx_tcpsvc_context *)data;
+	zbx_tcpsvc_context_t		*tcpsvc_context = (zbx_tcpsvc_context_t *)data;
 	discovery_async_result_t	*async_result = (discovery_async_result_t *)tcpsvc_context->arg;
 	zbx_dc_item_context_t		*item = &tcpsvc_context->item;
 

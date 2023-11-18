@@ -31,7 +31,7 @@ typedef enum
 }
 zbx_zabbix_tcpsvc_step_t;
 
-typedef struct
+typedef struct zbx_tcpsvc_context
 {
 	zbx_dc_item_context_t		item;
 	void				*arg;
@@ -44,17 +44,18 @@ typedef struct
 	const char			*config_source_ip;
 	int				config_timeout;
 	unsigned char			svc_type;
-	int				(*validate_func)(const unsigned char, const char *);
+	int				(*validate_func)(const unsigned char, const char *, struct zbx_tcpsvc_context *);
 	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
 	zbx_async_rdns_step_t		rdns_step;
 	char				*reverse_dns;
+	char				*send_data;
 }
-zbx_tcpsvc_context;
+zbx_tcpsvc_context_t;
 
 int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RESULT *result,
 		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
 		struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
-void	zbx_async_check_tcpsvc_clean(zbx_tcpsvc_context *agent_context);
+void	zbx_async_check_tcpsvc_clean(zbx_tcpsvc_context_t *agent_context);
 
 #endif /* ZABBIX_ASYNC_TCPSVC_H_ */

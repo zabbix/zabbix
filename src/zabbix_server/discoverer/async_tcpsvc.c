@@ -46,7 +46,7 @@ static const char	*get_tcpsvc_step_string(zbx_zabbix_tcpsvc_step_t step)
 static int	tcpsvc_send_context_init(const unsigned char svc_type, unsigned char flags,
 		zbx_tcp_send_context_t *context, AGENT_RESULT *result)
 {
-	const char	*data;
+	memset(context, 0, sizeof(zbx_tcp_send_context_t));
 
 	switch (svc_type)
 	{
@@ -54,104 +54,47 @@ static int	tcpsvc_send_context_init(const unsigned char svc_type, unsigned char 
 	case SVC_FTP:
 	case SVC_POP:
 	case SVC_NNTP:
-		data = "QUIT\r\n";
+		context->data = "QUIT\r\n";
 		break;
 	case SVC_IMAP:
-		data = "a1 LOGOUT\r\n";
+		context->data = "a1 LOGOUT\r\n";
 		break;
+	case SVC_SSH:
 	case SVC_HTTP:
 	case SVC_TCP:
-		data = "";
 		break;
 	default:
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Error of unknown service:%u", svc_type));
 		return FAIL;
 	}
 
-	context->compressed_data = NULL;
-	context->written = 0;
-	context->written_header = 0;
-	context->header_len = 0;
-	*context->header_buf = '\0';
-
-	context->data = data;
-	context->send_len = strlen(context->data);
+	if (NULL != context->data)
+		context->send_len = strlen(context->data);
 
 	if (0 == (flags & ZBX_TCP_PROTOCOL))
-		return SUCCEED;
-
-	context->header_len = 0;
+		return FAIL;
 
 	return SUCCEED;
 }
 
-static ssize_t	tcpsvc_recv_context_raw(zbx_socket_t *s, zbx_tcp_recv_context_t *context, short *events)
-{
-	ssize_t	nbytes;
-	size_t	allocated = 8 * ZBX_STAT_BUF_LEN;
-
-	if (NULL != events)
-		*events = 0;
-
-	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + context->buf_stat_bytes,
-			sizeof(s->buf_stat) - context->buf_stat_bytes, events)))
-	{
-		if (ZBX_PROTO_ERROR == nbytes)
-		{
-			if (ZBX_ASYNC_TASK_STOP == zbx_async_poller_get_task_state_for_event(*events))
-				return FAIL;
-			else
-				break;
-		}
-
-		if (ZBX_BUF_TYPE_STAT == s->buf_type)
-			context->buf_stat_bytes += (size_t)nbytes;
-		else
-		{
-			if (context->buf_dyn_bytes + (size_t)nbytes >= allocated)
-			{
-				while (context->buf_dyn_bytes + (size_t)nbytes >= allocated)
-					allocated *= 2;
-				s->buffer = (char *)zbx_realloc(s->buffer, allocated);
-			}
-
-			memcpy(s->buffer + context->buf_dyn_bytes, s->buf_stat, (size_t)nbytes);
-			context->buf_dyn_bytes += (size_t)nbytes;
-		}
-
-		if (context->buf_stat_bytes + context->buf_dyn_bytes >= context->expected_len)
-			break;
-
-		if (sizeof(s->buf_stat) == context->buf_stat_bytes)
-		{
-			s->buf_type = ZBX_BUF_TYPE_DYN;
-			s->buffer = (char *)zbx_malloc(NULL, allocated);
-			context->buf_dyn_bytes = sizeof(s->buf_stat);
-			context->buf_stat_bytes = 0;
-			memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
-		}
-	}
-
-	if (ZBX_BUF_TYPE_DYN == s->buf_type)
-	{
-		s->read_bytes = context->buf_stat_bytes + context->buf_dyn_bytes;
-		s->buffer[s->read_bytes] = '\0';
-	}
-	else
-		s->buf_stat[context->buf_stat_bytes] = '\0';
-
-	return (ssize_t)(context->buf_stat_bytes + context->buf_dyn_bytes);
-}
-
 static int	tcpsvc_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
 {
-	zbx_tcpsvc_context	*tcpsvc_context = (zbx_tcpsvc_context *)data;
+#	define	SET_RESULT_SUCCEED					\
+		SET_UI64_RESULT(&tcpsvc_context->item.result, 1);	\
+		tcpsvc_context->item.ret = SUCCEED
+
+#	define	SET_RESULT_FAIL						\
+		SET_UI64_RESULT(&tcpsvc_context->item.result, 0);	\
+		tcpsvc_context->item.ret = SUCCEED
+
+
+	zbx_tcpsvc_context_t	*tcpsvc_context = (zbx_tcpsvc_context_t *)data;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)tcpsvc_context->arg_action;
 	int			errnum = 0;
-	ssize_t			received_len;
 	socklen_t		optlen = sizeof(int);
 	short			event_new;
 	zbx_async_task_state_t	state;
+	const char		*buf;
 
 
 	ZBX_UNUSED(fd);
@@ -199,8 +142,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 	if (0 != (event & EV_TIMEOUT))
 	{
-		SET_UI64_RESULT(&tcpsvc_context->item.result, 0);
-		tcpsvc_context->item.ret = SUCCEED;
+		SET_RESULT_FAIL;
 		goto stop;
 	}
 
@@ -210,15 +152,13 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 			if (0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)
 			{
-				SET_UI64_RESULT(&tcpsvc_context->item.result, 0);
-				tcpsvc_context->item.ret = SUCCEED;
+				SET_RESULT_FAIL;
 				break;
 			}
 
-			if (0 == tcpsvc_context->tcp_send_context.send_len)
+			if (NULL == tcpsvc_context->validate_func)
 			{
-				SET_UI64_RESULT(&tcpsvc_context->item.result, 1);
-				tcpsvc_context->item.ret = SUCCEED;
+				SET_RESULT_SUCCEED;
 
 				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == tcpsvc_context->resolve_reverse_dns)
 				{
@@ -253,37 +193,37 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 				break;
 			}
 
-			if (FAIL == (received_len = tcpsvc_recv_context_raw(&tcpsvc_context->s,
+			while (NULL != (buf = zbx_tcp_recv_context_line(&tcpsvc_context->s,
 					&tcpsvc_context->tcp_recv_context, &event_new)))
 			{
-				if (ZBX_ASYNC_TASK_STOP != (
-						state = zbx_async_poller_get_task_state_for_event(event_new)))
+				int	val;
+
+				val = tcpsvc_context->validate_func(tcpsvc_context->svc_type, buf, tcpsvc_context);
+
+				if (SUCCEED == val)
 				{
-					return state;
+					tcpsvc_context->step = ZABBIX_TCPSVC_STEP_SEND;
+
+					SET_RESULT_SUCCEED;
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d key:%s", __func__,
+							get_tcpsvc_step_string(tcpsvc_context->step), event,
+							tcpsvc_context->item.key);
+
+					return ZBX_ASYNC_TASK_WRITE;
 				}
 
-				SET_UI64_RESULT(&tcpsvc_context->item.result, 0);
-				tcpsvc_context->item.ret = SUCCEED;
-				break;
+				if (FAIL == val)
+					break;
 			}
 
-			if (0 == received_len || SUCCEED != tcpsvc_context->validate_func(
-					tcpsvc_context->svc_type, tcpsvc_context->s.buffer))
+			if (NULL == buf && ZBX_ASYNC_TASK_STOP != (
+					state = zbx_async_poller_get_task_state_for_event(event_new)))
 			{
-				SET_UI64_RESULT(&tcpsvc_context->item.result, 0);
-				tcpsvc_context->item.ret = SUCCEED;
-				break;
+				return state;
 			}
 
-			tcpsvc_context->item.ret = SUCCEED;
-			SET_UI64_RESULT(&tcpsvc_context->item.result, 1);
-
-			tcpsvc_context->step = ZABBIX_TCPSVC_STEP_SEND;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d key:%s", __func__,
-					get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.key);
-
-			return ZBX_ASYNC_TASK_WRITE;
+			SET_RESULT_FAIL;
+			break;
 		case ZABBIX_TCPSVC_STEP_SEND:
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() sending data for key:%s len:%d", __func__,
 					tcpsvc_context->item.key, (int)tcpsvc_context->tcp_send_context.send_len);
@@ -297,8 +237,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 					return state;
 				}
 
-				SET_UI64_RESULT(&tcpsvc_context->item.result, 0);
-				tcpsvc_context->item.ret = SUCCEED;
+				SET_RESULT_FAIL;
 				break;
 			}
 
@@ -314,14 +253,42 @@ stop:
 	zbx_tcp_close(&tcpsvc_context->s);
 
 	return ZBX_ASYNC_TASK_STOP;
+
+#	undef SET_RESULT_SUCCEED
+#	undef SET_RESULT_FAIL
 }
 
-void	zbx_async_check_tcpsvc_clean(zbx_tcpsvc_context *tcpsvc_context)
+void	zbx_async_check_tcpsvc_clean(zbx_tcpsvc_context_t *tcpsvc_context)
 {
 	zbx_free(tcpsvc_context->item.key_orig);
 	zbx_free(tcpsvc_context->item.key);
 	zbx_free(tcpsvc_context->reverse_dns);
+	zbx_free(tcpsvc_context->send_data);
 	zbx_free_agent_result(&tcpsvc_context->item.result);
+}
+
+static int	async_check_ssh_validate(const char *data, zbx_tcpsvc_context_t *context)
+{
+	int	major, minor, ret = FAIL;
+
+	if (2 == sscanf(data, "SSH-%d.%d-%*s", &major, &minor))
+	{
+		context->send_data = zbx_dsprintf(context->send_data, "SSH-%d.%d-zabbix_agent\r\n", major, minor);
+		context->tcp_send_context.data = context->send_data;
+		context->tcp_send_context.send_len = strlen(context->send_data);
+		ret = SUCCEED;
+	}
+
+	return ret;
+}
+
+static int	async_check_service_validate(const unsigned char svc_type, const char *data,
+		zbx_tcpsvc_context_t *context)
+{
+	if (SVC_SSH == svc_type)
+		return NULL == data ? FAIL : async_check_ssh_validate(data, context);
+
+	return zbx_check_service_validate(svc_type, data);
 }
 
 int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RESULT *result,
@@ -330,7 +297,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	int			ret;
-	zbx_tcpsvc_context	*tcpsvc_context = zbx_malloc(NULL, sizeof(zbx_tcpsvc_context));
+	zbx_tcpsvc_context_t	*tcpsvc_context = zbx_malloc(NULL, sizeof(zbx_tcpsvc_context_t));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key,
 			item->host.host, item->interface.addr);
@@ -344,7 +311,6 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	tcpsvc_context->item.value_type = item->value_type;
 	tcpsvc_context->item.flags = item->flags;
 	tcpsvc_context->svc_type = svc_type;
-	tcpsvc_context->validate_func = zbx_check_service_validate;
 	zbx_strlcpy(tcpsvc_context->item.host, item->host.host, sizeof(tcpsvc_context->item.host));
 	tcpsvc_context->item.interface = item->interface;
 	tcpsvc_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
@@ -363,6 +329,9 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	tcpsvc_context->rdns_step = ZABBIX_ASYNC_STEP_DEFAULT;
 	tcpsvc_context->reverse_dns = NULL;
 
+	if (NOTSUPPORTED != async_check_service_validate(svc_type, NULL, NULL))
+		tcpsvc_context->validate_func = async_check_service_validate;
+
 	tcpsvc_context->config_source_ip = config_source_ip;
 	tcpsvc_context->config_timeout = item->timeout;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -371,6 +340,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	else
 		tcpsvc_context->server_name = NULL;
 #endif
+	tcpsvc_context->send_data = NULL;
 	zbx_init_agent_result(&tcpsvc_context->item.result);
 	zbx_socket_clean(&tcpsvc_context->s);
 

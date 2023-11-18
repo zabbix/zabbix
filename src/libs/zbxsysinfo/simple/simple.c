@@ -310,25 +310,48 @@ int	zbx_check_service_validate(const unsigned char svc_type, const char *data)
 	switch (svc_type)
 	{
 	case SVC_SMTP:
+		if (NULL == data)
+			return FAIL;
+
 		ret = validate_smtp(data);
 		break;
 	case SVC_FTP:
+		if (NULL == data)
+			return FAIL;
+
 		ret = validate_ftp(data);
 		break;
 	case SVC_POP:
+		if (NULL == data)
+			return FAIL;
+
 		ret = validate_pop(data);
 		break;
 	case SVC_NNTP:
+		if (NULL == data)
+			return FAIL;
+
 		ret = validate_nntp(data);
 		break;
 	case SVC_IMAP:
+		if (NULL == data)
+			return FAIL;
+
 		ret = validate_imap(data);
 		break;
 	default:
-		ret = ZBX_TCP_EXPECT_FAIL;
+		return NOTSUPPORTED;
 	}
 
-	return ZBX_TCP_EXPECT_OK == ret ? SUCCEED : FAIL;
+	switch(ret)
+	{
+	case ZBX_TCP_EXPECT_OK:
+		return SUCCEED;
+	case ZBX_TCP_EXPECT_FAIL:
+		return FAIL;
+	default:
+		return ret;
+	}
 }
 
 int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
