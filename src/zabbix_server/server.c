@@ -1449,11 +1449,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_unreachable_period, config_unreachable_delay};
 #endif
 	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip, config_ssl_ca_location,
-			config_ssl_cert_location, config_ssl_key_location};
+									config_ssl_cert_location,
+									config_ssl_key_location};
 	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
-			zbx_config_dbhigh, zbx_config_source_ip};
+								zbx_config_dbhigh, zbx_config_source_ip};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};

@@ -269,7 +269,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 				errcodes[i] = zbx_async_check_httpagent(&items[i], &results[i],
 						poller_config->config_source_ip, poller_config->config_ssl_ca_location,
 						poller_config->config_ssl_cert_location,
-						poller_config->config_ssl_key_location,  poller_config->curl_handle);
+						poller_config->config_ssl_key_location, poller_config->curl_handle);
 	#else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for HTTP agent was not compiled in:"

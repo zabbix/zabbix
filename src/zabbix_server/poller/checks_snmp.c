@@ -3062,7 +3062,7 @@ int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poll
 }
 
 /* Actually this could be called by discoverer, without poller being initialized, */
-/* , so cannot call poller_get_progname(), need progname to be passed directly. */
+/* so cannot call poller_get_progname(), need progname to be passed directly. */
 static void	zbx_init_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;
@@ -3083,7 +3083,7 @@ static void	zbx_init_snmp(const char *progname)
 }
 
 /* Actually this could be called by discoverer, without poller being initialized, */
-/* , so cannot call poller_get_progname(), need progname to be passed directly. */
+/* so cannot call poller_get_progname(), need progname to be passed directly. */
 static void	zbx_shutdown_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;

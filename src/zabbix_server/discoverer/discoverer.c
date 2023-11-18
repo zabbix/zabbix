@@ -1624,6 +1624,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	for (i = 0; i < workers_num; i++)
 	{
 		manager->workers[i].worker_id = i + 1;
+
 		if (SUCCEED != discoverer_worker_init(&manager->workers[i], &manager->queue, manager->timekeeper,
 				discoverer_worker_entry, error))
 		{

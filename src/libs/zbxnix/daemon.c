@@ -85,7 +85,8 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	s.sival_ptr = NULL;
 	s.ZBX_SIVAL_INT = flags;
 
-	for (i = 0; i < get_threads_num_func_cb(); i++)
+	int	threads_num = get_threads_num_func_cb();
+	for (i = 0; i < threads_num; i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
 			break;
@@ -147,17 +148,19 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	s.sival_ptr = NULL;
 	s.ZBX_SIVAL_INT = flags;
 
-	for (i = 0; i < get_threads_num_func_cb(); i++)
+	int	threads_num = get_threads_num_func_cb();
+	for (i = 0; i < threads_num; i++)
 	{
-		if ((0 != pid && (get_threads_func_cb())[i] != pid) || 0 == (get_threads_func_cb())[i])
+		int	thread_pid = get_threads_func_cb()[i];
+
+		if ((0 != pid && thread_pid != pid) || 0 == thread_pid)
 			continue;
 
 		found = 1;
 
-		if (-1 != sigqueue((get_threads_func_cb())[i], SIGUSR1, s))
+		if (-1 != sigqueue(thread_pid, SIGUSR1, s))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",
-					(get_threads_func_cb())[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d", thread_pid);
 		}
 		else
 		{
@@ -204,7 +207,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		return;
 	}
 
-	if (NULL == (get_threads_func_cb()))
+	if (NULL == get_threads_func_cb())
 		return;
 
 	if (signal_redirect_handler != NULL)

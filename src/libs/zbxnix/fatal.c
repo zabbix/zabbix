@@ -362,7 +362,8 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 #ifdef	ZBX_GET_PC
 	zabbix_log(LOG_LEVEL_CRIT, "================================");
 	zabbix_log(LOG_LEVEL_CRIT, "Please consider attaching a disassembly listing to your bug report.");
-	zabbix_log(LOG_LEVEL_CRIT, "This listing can be produced with, e.g., objdump -DSswx %s.", nix_get_progname_cb()());
+	zabbix_log(LOG_LEVEL_CRIT, "This listing can be produced with, e.g., objdump -DSswx %s.",
+			nix_get_progname_cb()());
 #endif
 
 	zabbix_log(LOG_LEVEL_CRIT, "================================");
