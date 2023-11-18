@@ -40,6 +40,7 @@
 int	zbx_http_punycode_encode_url(char **url);
 void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
+char	*zbx_determine_charset(const char *content_type, char *body, size_t size);
 
 #ifdef HAVE_LIBCURL
 
@@ -108,7 +109,7 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURLcode err, long *response_code,
 		char **out, char **error);
 int	zbx_handle_response_code(char *status_codes, long response_code, const char *out, char **error);
-
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated);
 #endif
 
 #endif

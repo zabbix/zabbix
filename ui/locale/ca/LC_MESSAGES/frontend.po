@@ -16963,6 +16963,10 @@ msgstr "Retorna el nombre de canvis d'estat des del mode disc/memòria des de l'
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Retorna el percentatge de paquets de ping ICMP perduts."
 
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
 msgid "Revert"
@@ -23737,6 +23741,11 @@ msgstr "in() - Comprova si un valor és igual a un dels valors llistats (1 - és
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "incloent subgrups"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

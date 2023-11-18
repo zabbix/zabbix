@@ -18,6 +18,9 @@
 **/
 
 #include "zbxhttp.h"
+#include "zbxtypes.h"
+#include <stddef.h>
+#include "zbxalgo.h"
 
 #include "zbxstr.h"
 #include "zbxdbhigh.h"
@@ -638,11 +641,14 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 	switch (context->retrieve_mode)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
-			if (NULL != context->body.data && FAIL == zbx_is_utf8(context->body.data))
+			if (NULL == context->body.data)
 			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				*error = zbx_strdup(NULL, "Server returned empty content");
 				return FAIL;
 			}
+
+			zbx_http_convert_to_utf8(easyhandle, &context->body.data, &context->body.offset,
+					&context->body.allocated);
 
 			if (HTTP_STORE_JSON == context->output_format)
 			{
@@ -660,11 +666,7 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_HEADERS:
-			if (FAIL == zbx_is_utf8(context->header.data))
-			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
-				return FAIL;
-			}
+			zbx_replace_invalid_utf8(context->header.data);
 
 			if (HTTP_STORE_JSON == context->output_format)
 			{
@@ -688,12 +690,16 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_BOTH:
-			if (FAIL == zbx_is_utf8(context->header.data) || (NULL != context->body.data &&
-					FAIL == zbx_is_utf8(context->body.data)))
+			if (NULL == context->body.data)
 			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				*error = zbx_dsprintf(NULL, "Server returned empty content");
 				return FAIL;
 			}
+
+			zbx_replace_invalid_utf8(context->header.data);
+
+			zbx_http_convert_to_utf8(easyhandle, &context->body.data, &context->body.offset,
+					&context->body.allocated);
 
 			if (HTTP_STORE_JSON == context->output_format)
 			{
@@ -916,6 +922,63 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_t *allocated)
+{
+	char			*charset, *content_type = NULL;
+#ifdef CURLH_HEADER
+	struct curl_header	*type;
+	CURLHcode		h;
+
+	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
+			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve Content-Type header:%u", h);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "name '%s' value '%s' amount:%lu index:%lu"
+				" origin:%u", type->name, type->value, type->amount,
+				type->index, type->origin);
+
+		content_type = type->value;
+	}
+#else
+	CURLcode	err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_TYPE, &content_type);
+
+	if (CURLE_OK != err || NULL == content_type)
+		zabbix_log(LOG_LEVEL_DEBUG,  "cannot get content type: %s", curl_easy_strerror(err));
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "content_type '%s'", content_type);
+#endif
+
+	charset = zbx_determine_charset(content_type, *body, *size);
+
+	if (0 != strcmp(charset, "UTF-8"))
+	{
+		char	*converted, *error = NULL;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
+
+		if (NULL == (converted = zbx_convert_to_utf8(*body, *size, charset, &error)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert from charset '%s': %s", charset, error);
+			zbx_free(error);
+		}
+		else
+		{
+			zbx_free(*body);
+
+			*body = converted;
+			*size = strlen(converted);
+			*allocated = *size;
+		}
+	}
+
+	zbx_free(charset);
+
+	zbx_replace_invalid_utf8(*body);
 }
 
 #endif

@@ -92,7 +92,7 @@ zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML
 	-Wl,--wrap=zbx_user_free \
 	-Wl,--wrap=zbx_init_agent_result \
 	-Wl,--wrap=zbx_free_agent_result \
-	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
+	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
 
 zbx_trapper_preproc_test_run_CFLAGS = \
 	-I@top_srcdir@/tests -I@top_srcdir@/src  @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
