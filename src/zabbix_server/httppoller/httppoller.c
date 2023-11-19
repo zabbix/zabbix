@@ -75,7 +75,8 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 		if ((int)sec >= nextcheck)
 		{
 			httptests_count += process_httptests((int)sec, httppoller_args_in->config_source_ip,
-			httppoller_args_in->config_ssl_ca_location, httppoller_args_in->config_ssl_cert_location,
+					httppoller_args_in->config_ssl_ca_location,
+					httppoller_args_in->config_ssl_cert_location,
 					httppoller_args_in->config_ssl_key_location, &nextcheck);
 			total_sec += zbx_time() - sec;
 
