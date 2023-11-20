@@ -79,13 +79,20 @@ static int	tcpsvc_send_context_init(const unsigned char svc_type, unsigned char 
 
 static int	tcpsvc_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
 {
-#	define	SET_RESULT_SUCCEED					\
-		SET_UI64_RESULT(&tcpsvc_context->item.result, 1);	\
-		tcpsvc_context->item.ret = SUCCEED
+#	define	SET_RESULT_SUCCEED								\
+		SET_UI64_RESULT(&tcpsvc_context->item.result, 1);				\
+		tcpsvc_context->item.ret = SUCCEED;						\
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() SUCCEED step '%s' event:%d key:%s", __func__,	\
+				get_tcpsvc_step_string(tcpsvc_context->step), event,		\
+				tcpsvc_context->item.key);
 
-#	define	SET_RESULT_FAIL						\
-		SET_UI64_RESULT(&tcpsvc_context->item.result, 0);	\
-		tcpsvc_context->item.ret = SUCCEED
+
+#	define	SET_RESULT_FAIL(info)								\
+		SET_UI64_RESULT(&tcpsvc_context->item.result, 0);				\
+		tcpsvc_context->item.ret = SUCCEED;						\
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() FAIL:%s step '%s' event:%d key:%s", __func__,	\
+			info, get_tcpsvc_step_string(tcpsvc_context->step), event,		\
+			tcpsvc_context->item.key);
 
 
 	zbx_tcpsvc_context_t	*tcpsvc_context = (zbx_tcpsvc_context_t *)data;
@@ -142,7 +149,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 	if (0 != (event & EV_TIMEOUT))
 	{
-		SET_RESULT_FAIL;
+		SET_RESULT_FAIL("timeout");
 		goto stop;
 	}
 
@@ -152,7 +159,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 			if (0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)
 			{
-				SET_RESULT_FAIL;
+				SET_RESULT_FAIL("connect");
 				break;
 			}
 
@@ -203,26 +210,28 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 				if (SUCCEED == val)
 				{
 					tcpsvc_context->step = ZABBIX_TCPSVC_STEP_SEND;
-
 					SET_RESULT_SUCCEED;
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d key:%s", __func__,
-							get_tcpsvc_step_string(tcpsvc_context->step), event,
-							tcpsvc_context->item.key);
-
 					return ZBX_ASYNC_TASK_WRITE;
 				}
 
 				if (FAIL == val)
+				{
+					SET_RESULT_FAIL("line_check");
 					break;
+				}
 			}
 
-			if (NULL == buf && ZBX_ASYNC_TASK_STOP != (
-					state = zbx_async_poller_get_task_state_for_event(event_new)))
+			if (SUCCEED != tcpsvc_context->item.ret)
 			{
-				return state;
+				if (ZBX_ASYNC_TASK_STOP != (
+						state = zbx_async_poller_get_task_state_for_event(event_new)))
+				{
+					return state;
+				}
+
+				SET_RESULT_FAIL("unknown");
 			}
 
-			SET_RESULT_FAIL;
 			break;
 		case ZABBIX_TCPSVC_STEP_SEND:
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() sending data for key:%s len:%d", __func__,
@@ -237,7 +246,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 					return state;
 				}
 
-				SET_RESULT_FAIL;
+				SET_RESULT_FAIL("send");
 				break;
 			}
 
@@ -258,13 +267,14 @@ stop:
 #	undef SET_RESULT_FAIL
 }
 
-void	zbx_async_check_tcpsvc_clean(zbx_tcpsvc_context_t *tcpsvc_context)
+void	zbx_async_check_tcpsvc_free(zbx_tcpsvc_context_t *tcpsvc_context)
 {
 	zbx_free(tcpsvc_context->item.key_orig);
 	zbx_free(tcpsvc_context->item.key);
 	zbx_free(tcpsvc_context->reverse_dns);
 	zbx_free(tcpsvc_context->send_data);
 	zbx_free_agent_result(&tcpsvc_context->item.result);
+	zbx_free(tcpsvc_context);
 }
 
 static int	async_check_ssh_validate(const char *data, zbx_tcpsvc_context_t *context)
@@ -353,7 +363,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 				item->timeout + 1, tcpsvc_task_process, clear_cb);
 	}
 	else
-		zbx_async_check_tcpsvc_clean(tcpsvc_context);
+		zbx_async_check_tcpsvc_free(tcpsvc_context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

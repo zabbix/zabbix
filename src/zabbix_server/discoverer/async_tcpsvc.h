@@ -56,6 +56,6 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
 		struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
-void	zbx_async_check_tcpsvc_clean(zbx_tcpsvc_context_t *agent_context);
+void	zbx_async_check_tcpsvc_free(zbx_tcpsvc_context_t *agent_context);
 
 #endif /* ZABBIX_ASYNC_TCPSVC_H_ */
