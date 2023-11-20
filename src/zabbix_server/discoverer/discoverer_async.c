@@ -333,7 +333,8 @@ static void	process_tcpsvc_result(void *data)
 	}
 
 	zbx_free(async_result);
-	zbx_async_check_tcpsvc_free(tcpsvc_context);
+	zbx_async_check_tcpsvc_clean(tcpsvc_context);
+	zbx_free(tcpsvc_context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
 }

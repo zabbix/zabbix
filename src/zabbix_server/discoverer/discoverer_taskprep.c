@@ -114,7 +114,6 @@ static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 	case SVC_IMAP:
 	case SVC_HTTP:
 	case SVC_SSH:
-	case SVC_TELNET:
 		return SUCCEED;
 	default:
 		return FAIL;

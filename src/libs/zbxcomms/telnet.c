@@ -334,14 +334,6 @@ static void	telnet_rm_prompt(const char *buf, size_t *offset)
 	}
 }
 
-int	zbx_telnet_bufcheck(const char *buf, size_t size)
-{
-	if (':' == telnet_lastchar(buf, size))
-		return SUCCEED;
-
-	return FAIL;
-}
-
 int	zbx_telnet_test_login(zbx_socket_t *s)
 {
 	char	buf[MAX_BUFFER_LEN];
@@ -354,7 +346,7 @@ int	zbx_telnet_test_login(zbx_socket_t *s)
 	offset = 0;
 	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
-		if (SUCCEED == zbx_telnet_bufcheck(buf, offset))
+		if (':' == telnet_lastchar(buf, offset))
 			break;
 	}
 
