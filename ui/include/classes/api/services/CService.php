@@ -1709,7 +1709,7 @@ class CService extends CApiService {
 					];
 				}
 			}
-			elseif (array_key_exists($db_link['serviceupid'], $db_services)) {
+			if (array_key_exists($db_link['serviceupid'], $db_services)) {
 				$db_services[$db_link['serviceupid']]['children'][$db_link['linkid']] = [
 					'linkid' => $db_link['linkid'],
 					'serviceid' => $db_link['servicedownid']
