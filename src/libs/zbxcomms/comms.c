@@ -2220,7 +2220,7 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 	if (0 != timeout)
 		zbx_socket_set_deadline(s, 0);
 
-	return (ZBX_PROTO_ERROR == nbytes ? FAIL : nbytes);
+	return nbytes;
 }
 
 /******************************************************************************
@@ -2295,7 +2295,7 @@ ssize_t	zbx_tcp_recv_context_raw(zbx_socket_t *s, zbx_tcp_recv_context_t *contex
 	s->read_bytes = context->buf_stat_bytes + context->buf_dyn_bytes;
 	s->buffer[s->read_bytes] = '\0';
 out:
-	return (ZBX_PROTO_ERROR == nbytes ? ZBX_PROTO_ERROR : (ssize_t)(s->read_bytes));
+	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes));
 }
 
 /******************************************************************************
@@ -2338,7 +2338,7 @@ const char	*zbx_tcp_recv_context_line(zbx_socket_t *s, zbx_tcp_recv_context_t *c
 	{
 		ssize_t		nbytes;
 
-		if (ZBX_PROTO_ERROR == (nbytes = zbx_tcp_recv_context_raw(s, context, events, 1)))
+		if (FAIL == (nbytes = zbx_tcp_recv_context_raw(s, context, events, 1)))
 			goto out;
 
 		if (0 == nbytes)

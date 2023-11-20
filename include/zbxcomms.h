@@ -361,6 +361,8 @@ int	zbx_socket_start(char **error);
 int	zbx_telnet_test_login(zbx_socket_t *s);
 int	zbx_telnet_login(zbx_socket_t *s, const char *username, const char *password, AGENT_RESULT *result);
 int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *result, const char *encoding);
+int	zbx_telnet_bufcheck(const char *buf, size_t size);
+
 
 /* TLS BLOCK */
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
