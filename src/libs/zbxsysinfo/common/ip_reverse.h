@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,37 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_SYSINFO_COMMON_IP_REVERSE_H
+#define ZABBIX_SYSINFO_COMMON_IP_REVERSE_H
 
-/**
- * A parser for reference macros like \0-\9.
- */
-class CReplacementParser extends CParser {
+#include "zbxcommon.h"
 
-	/**
-	 * @param string    $source
-	 * @param int       $pos
-	 *
-	 * @return int
-	 */
-	public function parse($source, $pos = 0) {
-		$this->length = 0;
-		$this->match = '';
+int	zbx_ip_reverse(const char *src_ip, char **dst_ip, char **error);
 
-		$p = $pos;
-
-		if (!isset($source[$p]) || $source[$p] !== '\\') {
-			return CParser::PARSE_FAIL;
-		}
-		$p++;
-
-		if (!isset($source[$p]) || !ctype_digit($source[$p])) {
-			return CParser::PARSE_FAIL;
-		}
-		$p++;
-
-		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
-
-		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
-	}
-}
+#endif	/* ZABBIX_SYSINFO_COMMON_IP_REVERSE_H */

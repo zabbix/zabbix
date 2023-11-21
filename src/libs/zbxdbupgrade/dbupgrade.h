@@ -73,6 +73,10 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 int	DBadd_foreign_key(const char *table_name, int id, const zbx_db_field_t *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
 
+#if defined(HAVE_POSTGRESQL)
+int	DBcheck_field_type(const char *table_name, const zbx_db_field_t *field);
+#endif
+
 #	ifdef HAVE_ORACLE
 int	DBcreate_serial_sequence(const char *table_name);
 int	DBcreate_serial_trigger(const char *table_name, const char *field_name);

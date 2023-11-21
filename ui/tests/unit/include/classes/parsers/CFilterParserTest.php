@@ -313,6 +313,33 @@ class CFilterParserTest extends TestCase {
 				]
 			],
 			[
+				'?[{{$MACRO}.regsub("^([0-9]+)", \1)} <> {#MACRO}]', 0, ['usermacros' => true, 'lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '?[{{$MACRO}.regsub("^([0-9]+)", \1)} <> {#MACRO}]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_USER_MACRO,
+							'pos' => 2,
+							'match' => '{{$MACRO}.regsub("^([0-9]+)", \1)}',
+							'length' => 34
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 37,
+							'match' => '<>',
+							'length' => 2
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_LLD_MACRO,
+							'pos' => 40,
+							'match' => '{#MACRO}',
+							'length' => 8
+						]
+					]
+				]
+			],
+			[
 				'?[{$MACRO} = {#MACRO}]', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,

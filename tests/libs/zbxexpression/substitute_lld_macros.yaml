@@ -90,4 +90,37 @@ in:
 out:
   expression: 'Expression:{?last(/host/key) = "xyz" }.'
   return: SUCCEED
+---
+test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.regsub("2","\0")}]}}=' with {#A}=123
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"123"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{last(/{HOST.KEY}/key[{{#A}.regsub("2","\0")}]}}='
+out:
+  expression: '={?{last(/{HOST.KEY}/key[2]}}='
+  return: SUCCEED
+---
+test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.iregsub("a","\0")}]}}=' with {#A}=ABC
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"ABC"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{last(/{HOST.KEY}/key[{{#A}.iregsub("a","\0")}]}}='
+out:
+  expression: '={?{last(/{HOST.KEY}/key[A]}}='
+  return: SUCCEED
+---
+test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.fmtnum(1)}]}}=' with {#A}=ABC
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"123.456"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{last(/{HOST.KEY}/key[{{#A}.fmtnum(1)}]}}='
+out:
+  expression: '={?{last(/{HOST.KEY}/key[123.5]}}='
+  return: SUCCEED
 ...

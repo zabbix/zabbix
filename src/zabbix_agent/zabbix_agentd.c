@@ -126,6 +126,7 @@ const char	*usage_message[] = {
 	"[-c config-file]", NULL,
 	"[-c config-file]", "-p", NULL,
 	"[-c config-file]", "-t item-key", NULL,
+	"[-c config-file]", "-T", NULL,
 #ifdef _WINDOWS
 	"[-c config-file]", "-i", "[-m]", NULL,
 	"[-c config-file]", "-d", "[-m]", NULL,
@@ -154,6 +155,7 @@ const char	*help_message[] = {
 	"  -f --foreground                Run Zabbix agent in foreground",
 	"  -p --print                     Print known items and exit",
 	"  -t --test item-key             Test specified item and exit",
+	"  -T --test-config               Validate configuration file and exit",
 #ifdef _WINDOWS
 	"  -m --multiple-agents           For -i -d -s -x functions service name will",
 	"                                 include Hostname parameter specified in",
@@ -209,6 +211,7 @@ static struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{"print",		0,	NULL,	'p'},
 	{"test",		1,	NULL,	't'},
+	{"test-config",		0,	NULL,	'T'},
 #ifndef _WINDOWS
 	{"runtime-control",	1,	NULL,	'R'},
 #else
@@ -224,7 +227,7 @@ static struct zbx_option	longopts[] =
 };
 
 static char	shortopts[] =
-	"c:hVpt:f"
+	"c:hVpt:Tf"
 #ifndef _WINDOWS
 	"R:"
 #else
@@ -389,7 +392,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #else
 				goto out;
 #endif
-
 			case 'V':
 				t->task = ZBX_TASK_SHOW_VERSION;
 				goto out;
@@ -403,6 +405,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					t->task = ZBX_TASK_TEST_METRIC;
 					TEST_METRIC = strdup(zbx_optarg);
 				}
+				break;
+			case 'T':
+				t->task = ZBX_TASK_TEST_CONFIG;
 				break;
 			case 'f':
 				t->flags |= ZBX_TASK_FLAG_FOREGROUND;
@@ -483,21 +488,24 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* check for mutually exclusive options */
 	/* Allowed option combinations.		*/
 	/* Option 'c' is always optional.	*/
-	/*   p  t  i  d  s  x  m    opt_mask	*/
-	/* ---------------------    --------	*/
-	/*   -  -  -  -  -  -  -	0x00	*/
-	/*   p  -  -  -  -  -  -	0x40	*/
-	/*   -  t  -  -  -  -  -	0x20	*/
-	/*   -  -  i  -  -  -  -	0x10	*/
-	/*   -  -  -  d  -  -  -	0x08	*/
-	/*   -  -  -  -  s  -  -	0x04	*/
-	/*   -  -  -  -  -  x  -	0x02	*/
-	/*   -  -  i  -  -  -  m	0x11	*/
-	/*   -  -  -  d  -  -  m	0x09	*/
-	/*   -  -  -  -  s  -  m	0x05	*/
-	/*   -  -  -  -  -  x  m	0x03	*/
-	/*   -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
+	/* T  p  t  i  d  s  x  m    opt_mask	*/
+	/* ----------------------    --------	*/
+	/* -  -  -  -  -  -  -  -	0x00	*/
+	/* T  -  -  -  -  -  -  -	0x80	*/
+	/* -  p  -  -  -  -  -  -	0x40	*/
+	/* -  -  t  -  -  -  -  -	0x20	*/
+	/* -  -  -  i  -  -  -  -	0x10	*/
+	/* -  -  -  -  d  -  -  -	0x08	*/
+	/* -  -  -  -  -  s  -  -	0x04	*/
+	/* -  -  -  -  -  -  x  -	0x02	*/
+	/* -  -  -  i  -  -  -  m	0x11	*/
+	/* -  -  -  -  d  -  -  m	0x09	*/
+	/* -  -  -  -  -  s  -  m	0x05	*/
+	/* -  -  -  -  -  -  x  m	0x03	*/
+	/* -  -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
 
+	if (0 < opt_count['T'])
+		opt_mask |= 0x80;
 	if (0 < opt_count['p'])
 		opt_mask |= 0x40;
 	if (0 < opt_count['t'])
@@ -527,6 +535,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case 0x11:
 		case 0x20:
 		case 0x40:
+		case 0x80:
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
@@ -536,10 +545,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 #else
 	/* check for mutually exclusive options */
-	if (1 < opt_count['p'] + opt_count['t'] + opt_count['R'])
+	if (1 < opt_count['p'] + opt_count['t'] + opt_count['T'] + opt_count['R'])
 	{
 		zbx_error("only one of options \"-p\" or \"--print\", \"-t\" or \"--test\","
-				" \"-R\" or \"--runtime-control\" can be used");
+				"\"-T\" or \"--test-config\", \"-R\" or \"--runtime-control\" can be used");
 		ret = FAIL;
 		goto out;
 	}
@@ -1491,7 +1500,6 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
-
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
 	/* into windows event log while zabbix_log is not ready */
@@ -1509,14 +1517,13 @@ int	main(int argc, char **argv)
 
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
-			SUCCEED != zbx_socket_start(&error))
+			ZBX_TASK_TEST_CONFIG != t.task && SUCCEED != zbx_socket_start(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 #endif
-
 	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
@@ -1567,6 +1574,25 @@ int	main(int argc, char **argv)
 			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #endif
+		case ZBX_TASK_TEST_CONFIG:
+			printf("Validating configuration file \"%s\"\n", config_file);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
+			load_aliases(CONFIG_ALIASES);
+			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+
+			if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
+				zbx_free(error);
+				exit(EXIT_FAILURE);
+			}
+
+			zbx_free_metrics();
+			zbx_alias_list_free();
+			zbx_free_config();
+			printf("Validation successful\n");
+
+			exit(EXIT_SUCCESS);
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);

@@ -16809,6 +16809,10 @@ msgstr ""
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "ICMP pingパケットのロスト率を返す。"
 
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
 msgid "Revert"
@@ -23554,6 +23558,11 @@ msgstr "in() - 値がリストアップされた値と同じかチェック (1 -
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "サブグループを含む"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

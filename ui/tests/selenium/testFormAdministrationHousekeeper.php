@@ -44,7 +44,7 @@ class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
 		// History.
 		'id:hk_history_mode' => true,
 		'id:hk_history_global' => false,
-		'id:hk_history' => '90d',
+		'id:hk_history' => '31d',
 		// Trends.
 		'id:hk_trends_mode' => true,
 		'id:hk_trends_global' => false,
@@ -63,7 +63,7 @@ class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
 		'hk_sessions' => '365d',
 		'hk_history_mode' => 1,
 		'hk_history_global' => 0,
-		'hk_history' => '90d',
+		'hk_history' => '31d',
 		'hk_trends_mode' => 1,
 		'hk_trends_global' => 0,
 		'hk_trends' => '365d'
@@ -85,7 +85,7 @@ class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
 		// History.
 		'id:hk_history_mode' => false,
 		'id:hk_history_global' => true,
-		'id:hk_history' => '90d',   // This should be changed to another custom value after DEV-1673 is fixed.
+		'id:hk_history' => '31d',   // This should be changed to another custom value after DEV-1673 is fixed.
 		// Trends.
 		'id:hk_trends_mode' => false,
 		'id:hk_trends_global' => true,
