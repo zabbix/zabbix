@@ -3448,29 +3448,27 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column: 1; }
 
-.svg-pie-chart {
+.svg-pie-chart path {
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke: #000000; }
+.svg-pie-chart .svg-pie-chart-arc-placeholder {
+  stroke-width: 0;
+  fill: transparent; }
+.svg-pie-chart .svg-pie-chart-arc-no-data-outer {
+  fill: #111111; }
+.svg-pie-chart .svg-pie-chart-arc-no-data-inner {
+  fill: #000000; }
+.svg-pie-chart .svg-pie-chart-total-value div {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: auto;
   fill: #ffffff; }
-  .svg-pie-chart .svg-pie-chart-arcs {
-    stroke-linejoin: round; }
-    .svg-pie-chart .svg-pie-chart-arcs path {
-      vector-effect: non-scaling-stroke;
-      stroke: #000000; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-placeholder {
-      stroke-width: 0;
-      fill: transparent; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-outer {
-      fill: #111111; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-inner {
-      fill: #000000; }
-  .svg-pie-chart .svg-pie-chart-total-value div {
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: auto; }
-  .svg-pie-chart .svg-pie-chart-total-value-no-data {
-    text-anchor: middle;
-    fill: #cacaca; }
+.svg-pie-chart .svg-pie-chart-total-value-no-data {
+  text-anchor: middle;
+  fill: #cacaca; }
 
 .svg-pie-chart-legend {
   box-sizing: border-box;

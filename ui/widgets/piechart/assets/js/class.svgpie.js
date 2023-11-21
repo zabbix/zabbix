@@ -22,6 +22,7 @@ class CSVGPie {
 
 	static ZBX_STYLE_CLASS =				'svg-pie-chart';
 	static ZBX_STYLE_ARCS =					'svg-pie-chart-arcs';
+	static ZBX_STYLE_ARCS_PLACEHOLDERS =	'svg-pie-chart-arcs-placeholders';
 	static ZBX_STYLE_ARC =					'svg-pie-chart-arc';
 	static ZBX_STYLE_ARC_PLACEHOLDER =		'svg-pie-chart-arc-placeholder';
 	static ZBX_STYLE_ARC_NO_DATA_OUTER =	'svg-pie-chart-arc-no-data-outer';
@@ -73,12 +74,20 @@ class CSVGPie {
 	#container;
 
 	/**
-	 * SVG group element that contains all the sectors and empty circles.
+	 * SVG group element that contains all the sectors.
 	 *
 	 * @type {SVGGElement}
 	 * @member {Selection}
 	 */
 	#arcs_container;
+
+	/**
+	 * SVG group element that contains placeholders of all the sectors.
+	 *
+	 * @type {SVGGElement}
+	 * @member {Selection}
+	 */
+	#arcs_placeholders_container;
 
 	/**
 	 * SVG foreignObject element that contains total value and units.
@@ -306,7 +315,7 @@ class CSVGPie {
 			all_sectorids = this.#prepareAllSectorids(all_sectorids);
 			sectors = this.#sortByReference(sectors, all_sectorids);
 
-			this.#arcs_container
+			this.#container
 				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 				.style('display', 'none');
 		}
@@ -319,7 +328,7 @@ class CSVGPie {
 
 		const key = d => d.data.id;
 
-		this.#arcs_container
+		this.#arcs_placeholders_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
 			.data(this.#pieGenerator(this.#sectors_new), key)
 			.join('svg:path')
@@ -329,8 +338,7 @@ class CSVGPie {
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
 			.data(this.#pieGenerator(was), key)
-			.enter()
-			.insert('svg:path')
+			.join('svg:path')
 			.attr('class', CSVGPie.ZBX_STYLE_ARC)
 			.attr('data-hintbox', 1)
 			.attr('data-hintbox-static', 1)
@@ -363,6 +371,10 @@ class CSVGPie {
 					.attr('transform', 'translate(0, 0)')
 					.attr('data-hintbox-contents', this.#setHint(d))
 					.style('fill', d => d.data.color)
+					.style('transition', this.#sectors_old.length > 0
+						? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
+						: ''
+					)
 					.on('mouseleave', null);
 			})
 			.end()
@@ -403,7 +415,7 @@ class CSVGPie {
 				const sectors = this.#arcs_container.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`).nodes();
 
 				if (sectors.length === 0) {
-					this.#arcs_container
+					this.#container
 						.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 						.style('display', '');
 
@@ -442,17 +454,21 @@ class CSVGPie {
 
 		this.#container = main.append('svg:g');
 
+		this.#arcs_placeholders_container = this.#container
+			.append('svg:g')
+			.attr('class', CSVGPie.ZBX_STYLE_ARCS_PLACEHOLDERS);
+
 		this.#arcs_container = this.#container
 			.append('svg:g')
 			.attr('class', CSVGPie.ZBX_STYLE_ARCS);
 
-		this.#arcs_container
+		this.#container
 			.append('svg:circle')
 			.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER)
 			.attr('r', this.#radius_outer);
 
 		if (this.#config.draw_type === CSVGPie.DRAW_TYPE_DOUGHNUT) {
-			this.#arcs_container
+			this.#container
 				.append('svg:circle')
 				.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER)
 				.attr('r', this.#radius_inner);
