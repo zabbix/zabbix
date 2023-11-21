@@ -263,7 +263,7 @@ FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|master_itemid	|t_id		|	|NULL		|ZBX_PROXY		|5|items	|itemid		|RESTRICT
 FIELD		|timeout	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
-FIELD		|query_fields	|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|query_fields	|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|posts		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|status_codes	|t_varchar(255)	|'200'	|NOT NULL	|ZBX_PROXY
 FIELD		|follow_redirects|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
@@ -2190,4 +2190,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050145	|6050145
+ROW		|1		|6050146	|6050146
