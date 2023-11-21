@@ -19,6 +19,7 @@
 
 #include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
+#include "zbxalgo.h"
 
 void	*zbx_discovery_open(void)
 {

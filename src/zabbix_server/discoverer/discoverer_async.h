@@ -21,6 +21,7 @@
 #define ZABBIX_DISCOVERER_ASYNC_H
 
 #include "discoverer_int.h"
+#include "discoverer_job.h"
 
 int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		zbx_discoverer_manager_t *dmanager, int worker_id, char **error);

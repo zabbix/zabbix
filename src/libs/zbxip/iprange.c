@@ -341,7 +341,7 @@ check_fill:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: concert IP address (v4 or v6) into IP string                      *
+ * Purpose: convert IP address (v4 or v6) into IP string                      *
  *                                                                            *
  * Parameters: type    - [IN] type of IP                                      *
  *             address - [IN] IP address as number array                      *

@@ -21,6 +21,9 @@
 
 #include "zbxexpression.h"
 #include "zbx_discoverer_constants.h"
+#include "discoverer_int.h"
+#include "zbxdbhigh.h"
+#include "zbxip.h"
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
@@ -175,10 +178,10 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	if (1 == *need_resolve)
 		*need_resolve = 0;
 
-	return checks_count;
+	return (zbx_uint64_t)checks_count;
 }
 
-static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck, const char *ip,
+static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck, char *ip,
 		unsigned char *need_resolve, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
 {
 	int			port = 0;
@@ -193,7 +196,7 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *
 		zbx_discoverer_task_t	task_local, *task;
 
 		task_local.addr_type = DISCOVERY_ADDR_IP;
-		task_local.addr.ip = (char *)ip;
+		task_local.addr.ip = ip;
 		task_local.port = (unsigned short)port;
 
 		if (NULL == (task = zbx_hashset_search(tasks, &task_local)))
@@ -360,7 +363,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashs
 
 	for (i = 0; '\0' != start[i]; start[i] == ',' ? i++ : *start++);
 
-	zbx_vector_iprange_reserve(ipranges, i);
+	zbx_vector_iprange_reserve(ipranges, (size_t)i);
 
 	for (start = drule->iprange; '\0' != *start;)
 	{

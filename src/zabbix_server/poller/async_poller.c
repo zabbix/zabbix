@@ -41,6 +41,7 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxasyncpoller.h"
 
 #include <event2/dns.h>
 

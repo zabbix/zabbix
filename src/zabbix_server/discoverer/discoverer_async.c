@@ -19,13 +19,18 @@
 
 #include "discoverer_job.h"
 #include "discoverer_async.h"
-#include "zbxlog.h"
 #include "../poller/checks_snmp.h"
 #include "../poller/async_agent.h"
 #include "async_tcpsvc.h"
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
 #include <event2/dns.h>
+#include "zbxasyncpoller.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
+#include "zbxdbhigh.h"
+#include "zbxip.h"
+#include "zbxstr.h"
 
 static ZBX_THREAD_LOCAL int log_worker_id;
 
@@ -133,7 +138,7 @@ static void	process_snmp_result(void *data)
 }
 
 static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
-		char *ip, const int port, zbx_discoverer_results_t *dresult, char **error)
+		char *ip, const unsigned short port, zbx_discoverer_results_t *dresult, char **error)
 {
 	int				ret;
 	zbx_dc_item_t			item;
@@ -255,7 +260,7 @@ static void	process_agent_result(void *data)
 }
 
 static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
-		char *ip, const int port, zbx_discoverer_results_t *dresult, char **error)
+		char *ip, const unsigned short port, zbx_discoverer_results_t *dresult, char **error)
 {
 	int				ret;
 	zbx_dc_item_t			item;
@@ -339,7 +344,7 @@ static void	process_tcpsvc_result(void *data)
 }
 
 static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
-		char *ip, const int port, zbx_discoverer_results_t *dresult, char **error)
+		char *ip, const unsigned short port, zbx_discoverer_results_t *dresult, char **error)
 {
 	int				ret;
 	const char			*service = NULL;
@@ -397,7 +402,7 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 	async_result->dcheckid = dcheck->dcheckid;
 
 	memset(&item, 0, sizeof(zbx_dc_item_t));
-	zbx_snprintf(item.key_orig, sizeof(item.key_orig), "net.tcp.service[%s,%s,%d]", service, ip, port);
+	zbx_snprintf(item.key_orig, sizeof(item.key_orig), "net.tcp.service[%s,%s,%d]", service, ip, (int)port);
 	item.key = item.key_orig;
 
 	item.interface.useip = 1;
@@ -525,16 +530,16 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 				case SVC_SNMPv2c:
 				case SVC_SNMPv3:
 #ifdef HAVE_NETSNMP
-					ret = discovery_snmp(&poller_config, dcheck, ip, task->addr.range->state.port,
-							result, error);
+					ret = discovery_snmp(&poller_config, dcheck, ip,
+							(unsigned short)task->addr.range->state.port, result, error);
 #else
 					ret = FAIL;
 					*error = zbx_strdup(*error, "Support for SNMP checks was not compiled in.");
 #endif
 					break;
 				case SVC_AGENT:
-					ret = discovery_agent(&poller_config, dcheck, ip, task->addr.range->state.port,
-							result, error);
+					ret = discovery_agent(&poller_config, dcheck, ip,
+							(unsigned short)task->addr.range->state.port, result, error);
 					break;
 				case SVC_SSH:
 				case SVC_LDAP:
@@ -547,8 +552,8 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 				case SVC_TCP:
 				case SVC_HTTPS:
 				case SVC_TELNET:
-					ret = discovery_tcpsvc(&poller_config, dcheck, ip, task->addr.range->state.port,
-							result, error);
+					ret = discovery_tcpsvc(&poller_config, dcheck, ip,
+							(unsigned short)task->addr.range->state.port, result, error);
 					break;
 				default:
 					ret = FAIL;

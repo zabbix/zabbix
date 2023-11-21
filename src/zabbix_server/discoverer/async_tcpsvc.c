@@ -25,7 +25,6 @@
 #include "zbxself.h"
 #include "zbxsysinfo.h"
 #include "../poller/async_poller.h"
-#include "zbxpoller.h"
 #include "zbx_discoverer_constants.h"
 
 static const char	*get_tcpsvc_step_string(zbx_zabbix_tcpsvc_step_t step)
@@ -86,14 +85,12 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 				get_tcpsvc_step_string(tcpsvc_context->step), event,		\
 				tcpsvc_context->item.key);
 
-
 #	define	SET_RESULT_FAIL(info)								\
 		SET_UI64_RESULT(&tcpsvc_context->item.result, 0);				\
 		tcpsvc_context->item.ret = SUCCEED;						\
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() FAIL:%s step '%s' event:%d key:%s", __func__,	\
 			info, get_tcpsvc_step_string(tcpsvc_context->step), event,		\
 			tcpsvc_context->item.key);
-
 
 	zbx_tcpsvc_context_t	*tcpsvc_context = (zbx_tcpsvc_context_t *)data;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)tcpsvc_context->arg_action;
@@ -102,7 +99,6 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 	short			event_new;
 	zbx_async_task_state_t	state;
 	const char		*buf;
-
 
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(dnserr);
@@ -145,7 +141,6 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
 				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid);
 	}
-
 
 	if (0 != (event & EV_TIMEOUT))
 	{

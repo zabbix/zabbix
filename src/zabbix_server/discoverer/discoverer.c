@@ -39,7 +39,8 @@
 #include "zbxproxybuffer.h"
 #include "zbx_discoverer_constants.h"
 #include "discoverer_taskprep.h"
-#include "zbxpoller.h"
+#include "discoverer_int.h"
+#include "zbxtimekeeper.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
