@@ -453,13 +453,6 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	defer r.wg.Done()
 
 	for name := range r.names {
-		// err := clearString(name)
-		// if err != nil {
-		// 	r.err <- zbxerr.ErrorCannotFetchData.Wrap(err)
-		//
-		// 	return
-		// }
-
 		devices, err := r.plugin.ctl.Execute("-a", name, "-j")
 		if err != nil {
 			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
@@ -514,32 +507,19 @@ runner:
 		}
 
 		for {
-			// var name string
-
 			args := []string{
 				"-a", raid.name,
-				"-d", fmt.Sprintf("%s,%s", raid.name, raid.rType),
+				"-d", fmt.Sprintf("%s,%d", raid.rType, i),
 				"-j",
 			}
-			// name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
 
 			if raid.rType == satType {
-				// name = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
-				args = []string{"-a", raid.name, "-d", raid.rType, "-j"}
+				args = []string{
+					"-a", raid.name,
+					"-d", raid.rType,
+					"-j",
+				}
 			}
-			// else {
-			// 	name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
-			// }
-
-			// err := clearString(name)
-			// if err != nil {
-			// 	r.plugin.Tracef(
-			// 		"stopped looking for RAID devices of %s type, err: %s",
-			// 		raid.rType, fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
-			// 	)
-			//
-			// 	continue runner
-			// }
 
 			device, err := r.plugin.ctl.Execute(args...)
 			if err != nil {
@@ -609,17 +589,6 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 		if !ok {
 			return
 		}
-
-		// err := clearString(name)
-		// if err != nil {
-		// 	r.plugin.Tracef(
-		// 		"stopped looking for RAID devices of %s type, err: %s", raid.rType,
-		// 		fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
-		// 	)
-		//
-		// 	continue
-		// }
-		// name := fmt.Sprintf("%s -d %s", raid.name, raid.rType)
 
 		device, err := r.plugin.ctl.Execute(
 			"-a", raid.name, "-d", raid.rType, "-j",

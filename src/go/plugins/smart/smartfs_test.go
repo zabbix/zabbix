@@ -20,6 +20,7 @@
 package smart
 
 import (
+	"encoding/json"
 	"errors"
 	stdlog "log"
 	"os"
@@ -312,12 +313,31 @@ func Test_runner_executeRaids(t *testing.T) {
 		wantDevices     map[string]deviceParser
 	}{
 		{
-			"+valid",
+			"+env1",
 			[]expectation{
 				{
-					args: []string{"-a", "/dev/sda", "-d", "/dev/sda,3ware", "-j"},
-					err:  nil,
-					out:  mock.OutputAllDiscInfoSDA,
+					args: []string{
+						"-a", "/dev/sda", "-d", "3ware,0", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSda3Ware0,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "areca,1", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSdaAreca1,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "cciss,0", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSdaCciss0,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "sat", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSdaSat,
 				},
 			},
 			fields{
@@ -335,8 +355,103 @@ func Test_runner_executeRaids(t *testing.T) {
 				false,
 			},
 			map[string]jsonDevice{},
+			map[string]deviceParser{
+				"/dev/sda sat": {
+					ModelName:    "INTEL SSDSC2BB120G6",
+					SerialNumber: "PHWA619301M9120CGN",
+					Info: deviceInfo{
+						Name:     "/dev/sda sat",
+						InfoName: "/dev/sda [SAT]",
+						DevType:  "sat",
+						name:     "/dev/sda",
+						raidType: "sat",
+					},
+					Smartctl:    smartctlField{Version: []int{7, 3}},
+					SmartStatus: &smartStatus{SerialNumber: true},
+					SmartAttributes: smartAttributes{
+						Table: []table{
+							{Attrname: "Reallocated_Sector_Ct", ID: 5},
+							{Attrname: "Power_On_Hours", ID: 9},
+							{Attrname: "Power_Cycle_Count", ID: 12},
+							{Attrname: "Available_Reservd_Space", ID: 170, Thresh: 10},
+							{Attrname: "Program_Fail_Count", ID: 171},
+							{Attrname: "Erase_Fail_Count", ID: 172},
+							{Attrname: "Unsafe_Shutdown_Count", ID: 174},
+							{Attrname: "Power_Loss_Cap_Test", ID: 175, Thresh: 10},
+							{Attrname: "SATA_Downshift_Count", ID: 183},
+							{Attrname: "End-to-End_Error", ID: 184, Thresh: 90},
+							{Attrname: "Reported_Uncorrect", ID: 187},
+							{Attrname: "Temperature_Case", ID: 190},
+							{Attrname: "Unsafe_Shutdown_Count", ID: 192},
+							{Attrname: "Temperature_Internal", ID: 194},
+							{Attrname: "Current_Pending_Sector", ID: 197},
+							{Attrname: "CRC_Error_Count", ID: 199},
+							{Attrname: "Host_Writes_32MiB", ID: 225},
+							{Attrname: "Workld_Media_Wear_Indic", ID: 226},
+							{Attrname: "Workld_Host_Reads_Perc", ID: 227},
+							{Attrname: "Workload_Minutes", ID: 228},
+							{Attrname: "Available_Reservd_Space", ID: 232, Thresh: 10},
+							{Attrname: "Media_Wearout_Indicator", ID: 233},
+							{Attrname: "Thermal_Throttle", ID: 234},
+							{Attrname: "Host_Writes_32MiB", ID: 241},
+							{Attrname: "Host_Reads_32MiB", ID: 242},
+							{Attrname: "NAND_Writes_32MiB", ID: 243},
+						},
+					},
+				},
+			},
+		},
+		{
+			"+env1JSON",
+			[]expectation{
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "3ware,0", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSda3Ware0,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "areca,1", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSdaAreca1,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "cciss,0", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSdaCciss0,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "sat", "-j",
+					},
+					out: mock.OutputEnv1GetRaidSdaSat,
+				},
+			},
+			fields{
+				jsonDevices: map[string]jsonDevice{},
+				devices:     map[string]deviceParser{},
+			},
+			args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda [SAT]",
+						DevType:  "sat",
+					},
+				},
+				true,
+			},
+			map[string]jsonDevice{
+				"/dev/sda sat": {
+					serialNumber: "PHWA619301M9120CGN",
+					jsonData:     string(mock.OutputEnv1GetRaidSdaSat),
+				},
+			},
 			map[string]deviceParser{},
 		},
+
 		{
 			"-noDevices",
 			[]expectation{},
@@ -635,7 +750,10 @@ func Test_cutPrefix(t *testing.T) {
 }
 
 func Test_deviceParser_checkErr(t *testing.T) {
-	type fields struct{ Smartctl smartctlField }
+	type fields struct {
+		Smartctl smartctlField
+		rawResp  []byte
+	}
 
 	tests := []struct {
 		name    string
@@ -645,20 +763,41 @@ func Test_deviceParser_checkErr(t *testing.T) {
 	}{
 		{
 			"+no_err",
-			fields{smartctlField{Messages: nil, ExitStatus: 0}},
+			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 0}},
+			false,
+			"",
+		},
+		{
+			"+rawRespErr",
+			fields{rawResp: mock.OutputEnv1GetRaidSda3Ware0},
+			true,
+			"/dev/sda: Unknown device type '3ware,0', =======> VALID " +
+				"ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], " +
+				"sat[,auto][,N][+TYPE], usbcypress[,X], " +
+				"usbjmicron[,p][,x][,N], usbprolific, usbsunplus, " +
+				"sntasmedia, sntjmicron[,NSID], sntrealtek, " +
+				"intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], " +
+				"jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], " +
+				"auto, test <=======",
+		},
+		{
+			"+rawRespNoErr",
+			fields{rawResp: mock.OutputEnv1GetRaidSdaSat},
 			false,
 			"",
 		},
 		{
 			"+no_err",
-			fields{smartctlField{Messages: nil, ExitStatus: 4}},
+			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 4}},
 			false,
 			"",
 		},
 		{
 			"+warning",
 			fields{
-				smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 3},
+				Smartctl: smartctlField{
+					Messages: []message{{"barfoo"}}, ExitStatus: 3,
+				},
 			},
 			true,
 			"barfoo",
@@ -666,7 +805,9 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		{
 			"-error_status_one",
 			fields{
-				smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 1},
+				Smartctl: smartctlField{
+					Messages: []message{{"barfoo"}}, ExitStatus: 1,
+				},
 			},
 			true,
 			"barfoo",
@@ -674,7 +815,9 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		{
 			"-error_status_two",
 			fields{
-				smartctlField{Messages: []message{{"foobar"}}, ExitStatus: 2},
+				Smartctl: smartctlField{
+					Messages: []message{{"foobar"}}, ExitStatus: 2,
+				},
 			},
 			true,
 			"foobar",
@@ -682,9 +825,8 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		{
 			"-two_err",
 			fields{
-				smartctlField{
-					Messages:   []message{{"foobar"}, {"barfoo"}},
-					ExitStatus: 2,
+				Smartctl: smartctlField{
+					Messages: []message{{"foobar"}, {"barfoo"}}, ExitStatus: 2,
 				},
 			},
 			true,
@@ -692,7 +834,11 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		},
 		{
 			"-unknown_err/no message",
-			fields{smartctlField{Messages: []message{}, ExitStatus: 2}},
+			fields{
+				Smartctl: smartctlField{
+					Messages: []message{}, ExitStatus: 2,
+				},
+			},
 			true,
 			"unknown error from smartctl",
 		},
@@ -701,21 +847,33 @@ func Test_deviceParser_checkErr(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dp := deviceParser{Smartctl: tt.fields.Smartctl}
+
+			if tt.fields.rawResp != nil {
+				dpFromRaw := deviceParser{}
+				err := json.Unmarshal(tt.fields.rawResp, &dpFromRaw)
+				if err != nil {
+					t.Fatalf("deviceParser.checkErr() error = %v", err)
+				}
+
+				dp = dpFromRaw
+			}
+
 			err := dp.checkErr()
 			if (err != nil) != tt.wantErr {
-				t.Errorf(
+				t.Fatalf(
 					"deviceParser.checkErr() error = %v, wantErr %v",
 					err,
 					tt.wantErr,
 				)
 			}
 
-			if (err != nil) && err.Error() != tt.wantMsg {
-				t.Errorf(
-					"deviceParser.checkErr() error message = %v, want %v",
-					err,
-					tt.wantErr,
-				)
+			if err != nil {
+				if diff := cmp.Diff(tt.wantMsg, err.Error()); diff != "" {
+					t.Fatalf(
+						"deviceParser.checkErr() error message mismatch (-want +got):\n%s",
+						diff,
+					)
+				}
 			}
 		})
 	}
@@ -832,7 +990,7 @@ func TestPlugin_getDevices(t *testing.T) {
 		// TODO: need to get smartctl --scann -d sat -j  outputs of megaraid
 		// devices.
 		{
-			"+valid",
+			"+env1",
 			expect{true},
 			fields{
 				basicScanOut: mock.OutputEnv1ScanBasic,
