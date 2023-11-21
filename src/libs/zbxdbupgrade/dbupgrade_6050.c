@@ -1766,6 +1766,133 @@ static int	DBpatch_6050148(void)
 	return DBadd_field("connector", &field);
 }
 
+static int	DBpatch_6050149(void)
+{
+	const zbx_db_table_t	table = {"proxy_group", "proxy_groupid", 0,
+			{
+				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"failover_delay", "1m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"min_online", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050150(void)
+{
+	return DBcreate_changelog_insert_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050151(void)
+{
+	return DBcreate_changelog_update_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050152(void)
+{
+	return DBcreate_changelog_delete_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050153(void)
+{
+	const zbx_db_table_t	table = {"host_proxy", "hostid", 0,
+			{
+				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"revision", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050154(void)
+{
+	return DBcreate_index("host_proxy", "host_proxy_1", "proxyid", 0);
+}
+
+static int	DBpatch_6050155(void)
+{
+	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_proxy", 1, &field);
+}
+
+static int	DBpatch_6050156(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_proxy", 2, &field);
+}
+
+static int	DBpatch_6050157(void)
+{
+	return DBcreate_changelog_insert_trigger("host_proxy", "hostid");
+}
+
+static int	DBpatch_6050158(void)
+{
+	return DBcreate_changelog_update_trigger("host_proxy", "hostid");
+}
+
+static int	DBpatch_6050159(void)
+{
+	return DBcreate_changelog_delete_trigger("host_proxy", "hostid");
+}
+
+static int	DBpatch_6050160(void)
+{
+	const zbx_db_field_t	field = {"local_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050161(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050162(void)
+{
+	return DBcreate_index("proxy", "proxy_2", "proxy_groupid", 0);
+}
+
+static int	DBpatch_6050163(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("proxy", 1, &field);
+}
+
+static int	DBpatch_6050164(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6050165(void)
+{
+	return DBcreate_index("hosts", "hosts_8", "proxy_groupid", 0);
+}
+
+static int	DBpatch_6050166(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("hosts", 4, &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1919,5 +2046,23 @@ DBPATCH_ADD(6050145, 0, 1)
 DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
 DBPATCH_ADD(6050148, 0, 1)
+DBPATCH_ADD(6050149, 0, 1)
+DBPATCH_ADD(6050150, 0, 1)
+DBPATCH_ADD(6050151, 0, 1)
+DBPATCH_ADD(6050152, 0, 1)
+DBPATCH_ADD(6050153, 0, 1)
+DBPATCH_ADD(6050154, 0, 1)
+DBPATCH_ADD(6050155, 0, 1)
+DBPATCH_ADD(6050156, 0, 1)
+DBPATCH_ADD(6050157, 0, 1)
+DBPATCH_ADD(6050158, 0, 1)
+DBPATCH_ADD(6050159, 0, 1)
+DBPATCH_ADD(6050160, 0, 1)
+DBPATCH_ADD(6050161, 0, 1)
+DBPATCH_ADD(6050162, 0, 1)
+DBPATCH_ADD(6050163, 0, 1)
+DBPATCH_ADD(6050164, 0, 1)
+DBPATCH_ADD(6050165, 0, 1)
+DBPATCH_ADD(6050166, 0, 1)
 
 DBPATCH_END()

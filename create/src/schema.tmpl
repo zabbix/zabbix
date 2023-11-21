@@ -93,6 +93,7 @@ FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|name_upper	|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|vendor_name	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|vendor_version	|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|proxy_groupid	|t_id		|	|NULL		|0			|4|proxy_group|	|RESTRICT
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxyid
@@ -100,6 +101,7 @@ INDEX		|4		|name
 INDEX		|5		|maintenanceid
 INDEX		|6		|name_upper
 INDEX		|7		|templateid
+INDEX		|8		|proxy_groupid
 CHANGELOG	|1
 UPD_TRIG_FUNC	|name		|name_upper	|hostid	|upper
 
@@ -2179,7 +2181,10 @@ FIELD		|timeout_http_agent	|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|timeout_ssh_agent	|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|timeout_telnet_agent	|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|timeout_script		|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|local_address		|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|proxy_groupid		|t_id		|		|NULL		|0	|1|proxy_group|	|RESTRICT
 UNIQUE		|1		|name
+INDEX		|2		|proxy_groupid
 CHANGELOG	|19
 
 TABLE|proxy_rtdata|proxyid|0
@@ -2188,8 +2193,24 @@ FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|version	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compatibility	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 
+TABLE|proxy_group|proxy_groupid|0
+FIELD		|proxy_groupid	|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|failover_delay	|t_varchar(32)	|'1m'	|NOT NULL	|0
+FIELD		|min_online	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+CHANGELOG	|20
+
+TABLE|host_proxy|hostid|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|0|1|hosts	|	|RESTRICT
+FIELD		|proxyid	|t_id		|	|NOT NULL	|0|2|proxy	|	|RESTRICT
+FIELD		|revision	|t_bigint	|'0'	|NOT NULL	|0
+INDEX		|1		|proxyid
+CHANGELOG	|21
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050148	|6050148
+ROW		|1		|6050166	|6050166
