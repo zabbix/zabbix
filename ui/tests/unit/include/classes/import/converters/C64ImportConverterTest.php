@@ -211,9 +211,24 @@ class C64ImportConverterTest extends CImportConverterTest {
 
 		$source_mediatypes = [
 			[
+				'type' => CXmlConstantName::SCRIPT,
+				'parameters' => [
+					[
+						'value' => '{?'.$source_expression.'}'
+					]
+				],
+				'message_templates' => [
+					[
+						'subject' => '{?'.$source_expression.'}',
+						'message' => '{?'.$source_expression.'}'
+					]
+				]
+			],
+			[
 				'type' => CXmlConstantName::WEBHOOK,
 				'parameters' => [
 					[
+						'name' => '{?'.$source_expression.'}',
 						'value' => '{?'.$source_expression.'}'
 					]
 				],
@@ -227,9 +242,24 @@ class C64ImportConverterTest extends CImportConverterTest {
 		];
 		$expected_mediatypes = [
 			[
+				'type' => CXmlConstantName::SCRIPT,
+				'parameters' => [
+					[
+						'value' => '{?'.$expected_expression.'}'
+					]
+				],
+				'message_templates' => [
+					[
+						'subject' => '{?'.$expected_expression.'}',
+						'message' => '{?'.$expected_expression.'}'
+					]
+				]
+			],
+			[
 				'type' => CXmlConstantName::WEBHOOK,
 				'parameters' => [
 					[
+						'name' => '{?'.$expected_expression.'}',
 						'value' => '{?'.$expected_expression.'}'
 					]
 				],
