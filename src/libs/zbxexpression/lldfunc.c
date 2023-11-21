@@ -552,7 +552,7 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 
 		if (0 != (token.type & flags))
 		{
-			char	m_ptr;
+			char	*m_ptr;
 
 			switch (token.type)
 			{
