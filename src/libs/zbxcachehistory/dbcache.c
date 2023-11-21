@@ -1263,6 +1263,14 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
+static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
+{
+	if (0 != (mask & (1 << item->value_type)))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: export history                                                    *
@@ -1321,7 +1329,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
-				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
+				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].item_value_type,
+						item) && SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
 						&connector_filters->values[k].connector_tags, &item_info->item_tags))
 				{
 					zbx_vector_uint64_append(&connector_object.ids,
@@ -1335,7 +1344,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 		zbx_json_clean(&json);
 
-		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);

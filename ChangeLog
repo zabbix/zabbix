@@ -1,6 +1,9 @@
 Changes for 7.0.0alpha8
 
 New features:
+....I..... [ZBXNEXT-8765] changed default values for Audit log data storage period and for Housekeeping History storage period to 31 days (dpetra)
+A.F....PS. [ZBXNEXT-5120] extended support of macro functions on built-in and user macros (akozlovs, Sasha)
+...G...... [ZBXNEXT-3826] added automatic IP address reversal for reverse DNS lookups (arimdjonoks)
 ..F....... [ZBXNEXT-8486] moved items and item prototypes to mvc model and refactored edit forms to modal forms (gcalenko)
 ...G.....T [ZBXNEXT-8705] implemented new tablespace item to retrieve percentage about current tablespace usage from max for both Oracle templates (knaglis)
 ...G...... [ZBXNEXT-5401] implemented net.dns.perf key; thanks to Robert Young (arimdjonoks)
@@ -12,6 +15,10 @@ New features:
 .........T [ZBXCTR-20] added scheme for metrics endpoints (ebbex)
 
 Bug fixes:
+...G...PS. [ZBX-23490] improved HTTP agent, web scenario, web checks and JavaScript to convert to UTF-8 from charset specified in HTTP header or HTTP meta tag (vso)
+.......P.. [ZBX-22493] fixed foreign key support with sqlite3 database (wiper)
+....I..... [ZBX-23146] fixed automatic database upgrade and manual upgrade scripts failing on TimescaleDB with compression (vso)
+.......PS. [ZBX-23602] fixed false positive host revision update in configuration cache when syncing interfaces (wiper)
 ..F....... [ZBX-23269] fixed sizes of loading modals (apoga)
 .......PS. [ZBX-23621] fixed snmp discovery looping forever with empty trend response (wiper)
 .......PS. [ZBX-23668] added overflow check when converting string variant to ui64 (dgoloscapov)
@@ -393,6 +400,9 @@ New features:
 .........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
 
 Bug fixes:
+...G...PS. [ZBX-23490] improved HTTP agent, web scenario, web checks and JavaScript to convert to UTF-8 from charset specified in HTTP header or HTTP meta tag (vso)
+.......P.. [ZBX-22493] fixed foreign key support with sqlite3 database (wiper)
+.......PS. [ZBX-23602] fixed false positive host revision update in configuration cache when syncing interfaces (wiper)
 .......PS. [ZBX-23621] fixed snmp discovery looping forever with empty trend response (wiper)
 ...G...... [ZBX-23644] fixed Zabbix agent compilation on AIX (Andris)
 ..F....... [ZBX-23525] fixed template tab name in template configuration form (agriscenko)
@@ -1905,6 +1915,8 @@ New features:
 .........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
 
 Bug fixes:
+.......P.. [ZBX-22493] fixed foreign key support with sqlite3 database (wiper)
+...G...PS. [ZBX-23490] improved HTTP agent, web scenario, web checks and JavaScript to convert to UTF-8 from charset specified in HTTP header or HTTP meta tag (vso)
 .......PS. [ZBX-23621] fixed snmp discovery looping forever with empty trend response (wiper)
 ...G...... [ZBX-23644] fixed Zabbix agent compilation on AIX (Andris)
 ..F....... [ZBX-23525] fixed template tab name in template configuration form (agriscenko)
@@ -4715,6 +4727,7 @@ Changes for 5.0.40rc1
 New features:
 
 Bug fixes:
+.......P.. [ZBX-22493] fixed foreign key support with sqlite3 database (wiper)
 .........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 

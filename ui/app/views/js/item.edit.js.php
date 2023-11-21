@@ -416,19 +416,14 @@ window.item_edit_form = new class {
 
 				case 'query_fields':
 				case 'headers':
-					for (const [i, param] of Object.entries(fields[key])) {
-						fields[key][i] = {
-							name: param.name.trim(),
-							value: param.value.trim(),
-							sortorder: param.sortorder
-						}
-					}
-
-					break;
+					fields[key] = Object.values(fields[key]).sort(
+						(a, b) => parseFloat(a.sortorder) - parseFloat(b.sortorder)
+					);
+					// falls through
 
 				case 'parameters':
-					for (const [i, param] of Object.entries(fields.parameters)) {
-						fields.parameters[i] = {name: param.name.trim(), value: param.value.trim()}
+					for (const [i, param] of Object.entries(fields[key])) {
+						fields[key][i] = {name: param.name.trim(), value: param.value.trim()}
 					}
 
 					break;
