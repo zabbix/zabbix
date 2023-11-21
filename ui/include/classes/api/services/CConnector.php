@@ -248,6 +248,37 @@ class CConnector extends CApiService {
 	}
 
 	/**
+	 * Add default values for fields that became unnecessary as the result of the change of the type fields.
+	 *
+	 * @param array $connectors
+	 */
+	private static function addFieldDefaultsByType(array &$connectors): void {
+		$db_defaults = DB::getDefaults('connector');
+
+		foreach ($connectors as &$connector) {
+			if ($connector['data_type'] != ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
+				$connector += ['item_value_type' => $db_defaults['item_value_type']];
+			}
+
+			if ($connector['authtype'] == ZBX_HTTP_AUTH_NONE || $connector['authtype'] == ZBX_HTTP_AUTH_BEARER) {
+				$connector += [
+					'username' => $db_defaults['username'],
+					'password' => $db_defaults['password']
+				];
+			}
+
+			if ($connector['authtype'] != ZBX_HTTP_AUTH_BEARER) {
+				$connector += ['token' => $db_defaults['token']];
+			}
+
+			if ($connector['max_attempts'] <= 1) {
+				$connector += ['attempt_interval' => $db_defaults['attempt_interval']];
+			}
+		}
+		unset($connector);
+	}
+
+	/**
 	 * @param array $connectors
 	 *
 	 * @return array
@@ -260,6 +291,7 @@ class CConnector extends CApiService {
 		}
 
 		$this->validateUpdate($connectors, $db_connectors);
+		self::addFieldDefaultsByType($connectors);
 
 		$connectorids = array_column($connectors, 'connectorid');
 
@@ -330,30 +362,6 @@ class CConnector extends CApiService {
 		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['data_type', 'authtype',
 			'max_attempts'
 		]);
-
-		$db_defaults = DB::getDefaults('connector');
-
-		foreach ($connectors as &$connector) {
-			if ($connector['data_type'] != ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
-				$connector += ['item_value_type' => $db_defaults['item_value_type']];
-			}
-
-			if ($connector['authtype'] == ZBX_HTTP_AUTH_NONE || $connector['authtype'] == ZBX_HTTP_AUTH_BEARER) {
-				$connector += [
-					'username' => $db_defaults['username'],
-					'password' => $db_defaults['password']
-				];
-			}
-
-			if ($connector['authtype'] != ZBX_HTTP_AUTH_BEARER) {
-				$connector += ['token' => $db_defaults['token']];
-			}
-
-			if ($connector['max_attempts'] <= 1) {
-				$connector += ['attempt_interval' => $db_defaults['attempt_interval']];
-			}
-		}
-		unset($connector);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['connectorid'], ['name']], 'fields' => [
 			'connectorid' =>		['type' => API_ID],
