@@ -2141,6 +2141,8 @@ FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|tags_evaltype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|item_value_type|t_integer	|'31'	|NOT NULL	|0
+FIELD		|attempt_interval|t_varchar(32)	|'5s'	|NOT NULL	|0
 UNIQUE		|1		|name
 CHANGELOG	|17
 
@@ -2190,4 +2192,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050146	|6050146
+ROW		|1		|6050148	|6050148

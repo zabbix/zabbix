@@ -578,9 +578,12 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 	zbx_json_free(&json);
 }
 
-CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context)
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
+		int check_response_code)
 {
 	CURLcode	err;
+	char	status_codes[] = "200,400,401,403,404,405,415,422";
+	long	response_code;
 
 	/* try to retrieve page several times depending on number of retries */
 	do
@@ -589,6 +592,22 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 
 		if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 		{
+			if (1 == check_response_code)
+			{
+				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+						&response_code)))
+				{
+					zabbix_log(LOG_LEVEL_INFORMATION, "cannot get the response code: %s",
+							curl_easy_strerror(err));
+
+					goto next_attempt;
+				}
+				else if (FAIL == zbx_int_in_list(status_codes, (int)response_code))
+					goto next_attempt;
+
+				return err;
+			}
+
 			return err;
 		}
 		else
@@ -600,8 +619,12 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 			}
 		}
 
+next_attempt:
 		context->header.offset = 0;
 		context->body.offset = 0;
+
+		if (0 != attempt_interval && 1 < context->max_attempts)
+			sleep((unsigned int)attempt_interval);
 	}
 	while (0 < --context->max_attempts);
 

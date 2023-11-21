@@ -100,11 +100,16 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
 		char **error);
 
-CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context);
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
+		int check_response_code);
 int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURLcode err, long *response_code,
 		char **out, char **error);
 int	zbx_handle_response_code(char *status_codes, long response_code, const char *out, char **error);
 void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated);
+
+#define ZBX_HTTP_IGNORE_RESPONSE_CODE	0
+#define ZBX_HTTP_CHECK_RESPONSE_CODE	1
+
 #endif
 
 #endif
