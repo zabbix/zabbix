@@ -82,12 +82,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$show = array_flip($this->fields_values['show']);
 
-		if ($this->getInput('name', '') === '' && !$this->isTemplateDashboard()) {
-			if ($this->fields_values['override_hostid'] && $tmp_items) {
+		if ($this->getInput('name', '') === '') {
+			if (!$this->isTemplateDashboard() || ($this->fields_values['override_hostid'] && $tmp_items)) {
 				$options['output'][] = 'name_resolved';
 			}
 
-			$options['selectHosts'] = ['name'];
+			if (!$this->isTemplateDashboard()) {
+				$options['selectHosts'] = ['name'];
+			}
 		}
 
 		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
@@ -212,13 +214,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 
-			if ($this->getInput('name', '') === '' && !$this->isTemplateDashboard()) {
-				if ($this->fields_values['override_hostid']) {
+			if ($this->getInput('name', '') === '') {
+				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 					// Resolve original item name when user is in normal dashboards or template dashboards view mode.
 					$name = $item['name_resolved'];
 				}
 
-				$name = $item['hosts'][0]['name'].NAME_DELIMITER.$name;
+				if (!$this->isTemplateDashboard()) {
+					$name = $item['hosts'][0]['name'].NAME_DELIMITER.$name;
+				}
 			}
 
 			/*
