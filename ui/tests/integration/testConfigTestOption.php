@@ -28,7 +28,7 @@ class testConfigTestOption extends CIntegrationTest {
 		self::COMPONENT_SERVER,
 		self::COMPONENT_PROXY,
 		self::COMPONENT_AGENT,
-		self::COMPONENT_AGENT2,
+		self::COMPONENT_AGENT2
 	];
 
 	// override CIntegrationTest::startComponent(), we want to prepare the configuration but not start the component
