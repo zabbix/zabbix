@@ -602,7 +602,7 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 
 					goto next_attempt;
 				}
-				else if (FAIL == zbx_int_in_list(status_codes, response_code))
+				else if (FAIL == zbx_int_in_list(status_codes, (int)response_code))
 					goto next_attempt;
 
 				return err;
