@@ -45,7 +45,7 @@ function makeStepResult(step) {
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
 		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
-			{result: step.result, result_hint: jQuery.escapeHtml(step.result)}
+			{result: step.result, result_hint: escapeHtml(step.result)}
 		));
 	}
 	else {
@@ -381,13 +381,13 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
-					]) ?>, {failed: step.result, failed_hint: jQuery.escapeHtml(step.result)})));
+					]) ?>, {failed: step.result, failed_hint: escapeHtml(step.result)})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set error to')
-					]) ?>, {failed: step.failed, failed_hint: jQuery.escapeHtml(step.result)})));
+					]) ?>, {failed: step.failed, failed_hint: escapeHtml(step.result)})));
 					break;
 			}
 		}
