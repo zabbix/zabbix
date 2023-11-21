@@ -93,7 +93,7 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 			ZBX_STR2UINT64(hostid, row[1]);
 			name = zbx_strdup(NULL, row[2]);
 
-			(void)zbx_dc_expand_user_macros(um_handle, &name, &hostid, 1, NULL);
+			(void)zbx_dc_expand_user_and_func_macros(um_handle, &name, &hostid, 1, NULL);
 
 			if (0 != strcmp(row[3], name))
 			{
