@@ -190,6 +190,18 @@ class C64ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
+				],
+				'links' => [
+					[
+						'linktriggers' => [
+							[
+								'trigger' => [
+									'expression' => $source_expression,
+									'recovery_expression' => $source_expression
+								]
+							]
+						]
+					]
 				]
 			]
 		];
@@ -202,6 +214,18 @@ class C64ImportConverterTest extends CImportConverterTest {
 							[
 								'expression' => $expected_expression,
 								'recovery_expression' => $expected_expression
+							]
+						]
+					]
+				],
+				'links' => [
+					[
+						'linktriggers' => [
+							[
+								'trigger' => [
+									'expression' => $expected_expression,
+									'recovery_expression' => $expected_expression
+								]
 							]
 						]
 					]
