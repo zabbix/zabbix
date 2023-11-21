@@ -89,6 +89,7 @@ static int	DBpatch_6050007(void)
 static int	DBpatch_6050008(void)
 {
 	const zbx_db_field_t	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int	ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -96,9 +97,17 @@ static int	DBpatch_6050008(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("history", "value", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("history", &field))
+		return SUCCEED;
+#endif
+	if (SUCCEED != (ret = DBmodify_field_type("history", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of history table, please check upgrade"
+				" notes");
+	}
 
-	return DBmodify_field_type("history", &field, &field);
+	return ret;
 }
 
 static int	DBpatch_6050009(void)
@@ -111,14 +120,17 @@ static int	DBpatch_6050009(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_min", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
-
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
+		return SUCCEED;
+#endif
 	return DBmodify_field_type("trends", &field, &field);
 }
 
 static int	DBpatch_6050010(void)
 {
 	const zbx_db_field_t	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int			ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -126,24 +138,43 @@ static int	DBpatch_6050010(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_avg", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
+		return SUCCEED;
+#endif
 
-	return DBmodify_field_type("trends", &field, &field);
+	if (SUCCEED != (ret = DBmodify_field_type("trends", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of trends table, please check upgrade"
+				" notes");
+	}
+
+	return ret;
 }
 
 static int	DBpatch_6050011(void)
 {
 	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int			ret;
 
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
+		return SUCCEED;
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
 #endif /* defined(HAVE_ORACLE) */
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBmodify_field_type("trends", &field, &field);
+	if (SUCCEED != (ret = DBmodify_field_type("trends", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of trends table, please check upgrade"
+				" notes");
+	}
+
+	return ret;
 }
 
 static int	DBpatch_6050012(void)
@@ -191,29 +222,28 @@ static int	DBpatch_6050014(void)
 
 static int	DBpatch_6050015(void)
 {
-	const zbx_db_field_t	field = {"http_user", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"http_user", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("httptest", &field, NULL);
 }
 
 static int	DBpatch_6050016(void)
 {
-	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("httptest", &field, NULL);
 }
 
 static int	DBpatch_6050017(void)
 {
-	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, NULL);
 }
 
 static int	DBpatch_6050018(void)
 {
-	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, NULL);
 }
@@ -1040,24 +1070,21 @@ static int	DBpatch_6050100(void)
 
 static int	DBpatch_6050101(void)
 {
-	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050102(void)
 {
-	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050103(void)
 {
-	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -1065,47 +1092,42 @@ static int	DBpatch_6050103(void)
 static int	DBpatch_6050104(void)
 {
 	const zbx_db_field_t	field = {"timeout_external_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+			ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050105(void)
 {
-	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050106(void)
 {
-	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050107(void)
 {
-	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050108(void)
 {
-	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050109(void)
 {
-	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -1147,7 +1169,7 @@ static int	DBpatch_6050111(void)
 
 static int	DBpatch_6050112(void)
 {
-	const zbx_db_field_t	field = {"timeout", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
 }
@@ -1709,6 +1731,20 @@ static int	DBpatch_6050143(void)
 
 static int	DBpatch_6050144(void)
 {
+	const zbx_db_field_t	field = {"hk_audit", "31d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_6050145(void)
+{
+	const zbx_db_field_t	field = {"hk_history", "31d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_6050146(void)
+{
 	const zbx_db_field_t	old_field = {"query_fields", "", NULL, NULL, 2048, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
 	const zbx_db_field_t	field = {"query_fields", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -1865,5 +1901,7 @@ DBPATCH_ADD(6050141, 0, 1)
 DBPATCH_ADD(6050142, 0, 1)
 DBPATCH_ADD(6050143, 0, 1)
 DBPATCH_ADD(6050144, 0, 1)
+DBPATCH_ADD(6050145, 0, 1)
+DBPATCH_ADD(6050146, 0, 1)
 
 DBPATCH_END()
