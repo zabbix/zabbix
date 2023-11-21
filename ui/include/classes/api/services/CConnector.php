@@ -271,7 +271,7 @@ class CConnector extends CApiService {
 				$connector += ['token' => $db_defaults['token']];
 			}
 
-			if ($connector['max_attempts'] <= 1) {
+			if ($connector['max_attempts'] == 1) {
 				$connector += ['attempt_interval' => $db_defaults['attempt_interval']];
 			}
 		}
