@@ -113,14 +113,26 @@ class C64ImportConverterTest extends CImportConverterTest {
 			[
 				'expression' => $source_expression,
 				'recovery_expression' => $source_expression,
-				'event_name' => '{?'.$source_expression.'}'
+				'event_name' => '{?'.$source_expression.'}',
+				'dependencies' => [
+					[
+						'expression' => $source_expression,
+						'recovery_expression' => $source_expression
+					]
+				]
 			]
 		];
 		$expected_triggers = [
 			[
 				'expression' => $expected_expression,
 				'recovery_expression' => $expected_expression,
-				'event_name' => '{?'.$expected_expression.'}'
+				'event_name' => '{?'.$expected_expression.'}',
+				'dependencies' => [
+					[
+						'expression' => $expected_expression,
+						'recovery_expression' => $expected_expression
+					]
+				]
 			]
 		];
 
@@ -148,7 +160,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'params' => $source_expression,
 						'trigger_prototypes' => $source_triggers
 					]
-				]
+				],
+				'trigger_prototypes' => $source_triggers
 			]
 		];
 		$expected_lld_rules = [
@@ -160,7 +173,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'params' => $expected_expression,
 						'trigger_prototypes' => $expected_triggers
 					]
-				]
+				],
+				'trigger_prototypes' => $expected_triggers
 			]
 		];
 

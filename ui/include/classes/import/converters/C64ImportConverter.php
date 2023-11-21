@@ -210,6 +210,10 @@ class C64ImportConverter extends CConverter {
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
 				$discovery_rule['item_prototypes'] = self::convertItemPrototypes($discovery_rule['item_prototypes']);
 			}
+
+			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
+				$discovery_rule['trigger_prototypes'] = self::convertTriggers($discovery_rule['trigger_prototypes']);
+			}
 		}
 		unset($discovery_rule);
 
@@ -361,6 +365,17 @@ class C64ImportConverter extends CConverter {
 
 			if (array_key_exists('event_name', $trigger)) {
 				$trigger['event_name'] = self::convertExpression($trigger['event_name'], true);
+			}
+
+			if (array_key_exists('dependencies', $trigger)) {
+				foreach ($trigger['dependencies'] as &$dependency) {
+					$dependency['expression'] = self::convertExpression($dependency['expression']);
+
+					if (array_key_exists('recovery_expression', $dependency)) {
+						$dependency['recovery_expression'] = self::convertExpression($dependency['recovery_expression']);
+					}
+				}
+				unset($dependency);
 			}
 		}
 		unset($trigger);
