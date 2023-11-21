@@ -98,7 +98,7 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Change global or proxy timeouts values and check them.
 	 *
-	 * @param array $timeout_values  		Reset default, macros values or custom values.
+	 * @param string $timeout_values  		Reset default, macros values or custom values with/without proxy.
 	 * @param string $link    				Link to table with items, items prototype, LLD.
 	 * @param string $activity				Button name or table selector.
 	 * @param boolean $proxy				Fill proxy or global timeouts.
