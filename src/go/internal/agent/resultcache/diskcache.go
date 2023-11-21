@@ -58,7 +58,6 @@ type DiskCache struct {
 	database      *sql.DB
 	persistFlag   uint32
 	historyUpload bool
-	mu            sync.Mutex
 }
 
 func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, err error) {
