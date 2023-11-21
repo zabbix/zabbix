@@ -1141,8 +1141,7 @@ return [
 			],
 			'query_fields' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'posts' => [

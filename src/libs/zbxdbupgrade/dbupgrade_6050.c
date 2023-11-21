@@ -1745,12 +1745,21 @@ static int	DBpatch_6050145(void)
 
 static int	DBpatch_6050146(void)
 {
+	const zbx_db_field_t	old_field = {"query_fields", "", NULL, NULL, 2048, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"query_fields", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_6050147(void)
+{
 	const zbx_db_field_t	field = {"item_value_type", "31", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("connector", &field);
 }
 
-static int	DBpatch_6050147(void)
+static int	DBpatch_6050148(void)
 {
 	const zbx_db_field_t	field = {"attempt_interval", "5s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -1909,5 +1918,6 @@ DBPATCH_ADD(6050144, 0, 1)
 DBPATCH_ADD(6050145, 0, 1)
 DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
+DBPATCH_ADD(6050148, 0, 1)
 
 DBPATCH_END()
