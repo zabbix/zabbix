@@ -119,11 +119,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 					],
 					'webitems' => true
 				]);
+				$item = reset($items);
 
-				$item = CArrayHelper::renameKeys(reset($items), ['name_resolved' => 'name']);
-				$resourceid = $items ? $item['itemid'] : null;
-
-				if ($resourceid === null) {
+				if ($item) {
+					$resourceid = $item['itemid'];
+					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+				}
+				else {
+					$resourceid = null;
 					$is_resource_available = false;
 				}
 			}
