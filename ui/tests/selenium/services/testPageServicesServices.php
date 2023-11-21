@@ -24,8 +24,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource EntitiesTags
- * @dataSource Services
+ * @dataSource EntitiesTags, Services, Actions
  *
  * @backup services
  */
@@ -45,7 +44,7 @@ class testPageServicesServices extends CWebTest {
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 19;
+	const SERVICE_COUNT = 20;
 
 	const LAYOUT_PARENT = 'Parent for 2 levels of child services';
 	const LAYOUT_CHILD = 'Child service with child service';
