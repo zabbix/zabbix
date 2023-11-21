@@ -937,8 +937,9 @@ class CMacrosResolverGeneral {
 		unset($db_item);
 
 		$item_macros = ['ITEM.DESCRIPTION' => 'description_expanded', 'ITEM.DESCRIPTION.ORIG' => 'description',
-			'ITEM.ID' => 'itemid', 'ITEM.KEY' => 'key_expanded', 'ITEM.KEY.ORIG' => 'key_', 'ITEM.NAME' => 'name',
-			'ITEM.NAME.ORIG' => 'name', 'ITEM.STATE' => 'state', 'ITEM.VALUETYPE' => 'value_type'
+			'ITEM.ID' => 'itemid', 'ITEM.KEY' => 'key_expanded', 'ITEM.KEY.ORIG' => 'key_',
+			'ITEM.NAME' => 'name_resolved', 'ITEM.NAME.ORIG' => 'name', 'ITEM.STATE' => 'state',
+			'ITEM.VALUETYPE' => 'value_type'
 		];
 
 		foreach ($db_items as $itemid => $db_item) {
