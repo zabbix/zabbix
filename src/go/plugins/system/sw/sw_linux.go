@@ -239,15 +239,16 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 		// the stanza. The query for such packages would return an empty value,
 		// which strconv obviously fails to parse into an Uint.
 		//
-		// When that is the case, we simply set the size to 0.
+		// When that is the case, we simply report the size as 0.
 		//
 		// [1]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#binary-package-control-files-debian-control
 		// [2]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-installed-size
 
-		if split[4] == "" {
-			size = 0
-		} else if size, err = strconv.ParseUint(split[4], 10, 64); nil != err {
-			return
+		if split[4] != "" {
+			size, err = strconv.ParseUint(split[4], 10, 64);
+			if err != nil {
+				return "", err
+			}
 		}
 
 		// the reported size is in kB, we want bytes
