@@ -37,29 +37,6 @@ static int	connector_object_compare_func(const void *d1, const void *d2)
 			&((const zbx_connector_data_point_t *)d2)->ts);
 }
 
-#ifdef HAVE_LIBCURL
-static int	parse_attempt_interval(const char *value, int *interval_out)
-{
-#define ATTEMPT_DELAY_MAX	10
-	if (FAIL == zbx_is_time_suffix(value, interval_out, (int)strlen(value)))
-	{
-		if (0 == strcmp(value, "0"))
-		{
-			*interval_out = 0;
-			return SUCCEED;
-		}
-
-		return FAIL;
-	}
-
-	if (ATTEMPT_DELAY_MAX < *interval_out)
-		return FAIL;
-
-	return SUCCEED;
-#undef ATTEMPT_DELAY_MAX
-}
-#endif
-
 static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_source_ip,
 		zbx_ipc_message_t *message, zbx_vector_connector_data_point_t *connector_data_points,
 		zbx_uint64_t *processed_num)
@@ -83,6 +60,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
+#define ATTEMPT_DELAY_MAX	10
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200";
 	zbx_http_context_t	context;
 	int			ret, timeout_seconds, attempt_interval_sec;
@@ -96,9 +74,10 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		goto skip;
 	}
 
-	if (FAIL == parse_attempt_interval(connector.attempt_interval, &attempt_interval_sec))
+	if (FAIL == zbx_is_time_suffix(connector.attempt_interval, &attempt_interval_sec,
+			(int)strlen(connector.attempt_interval)) || ATTEMPT_DELAY_MAX < attempt_interval_sec)
 	{
-		error = zbx_dsprintf(NULL, "Invalid attempt interval: %s", connector.attempt_interval);
+		error = zbx_dsprintf(NULL, "Invalid attempt delay: %s", connector.attempt_interval);
 		ret = FAIL;
 		goto skip;
 	}
@@ -165,6 +144,7 @@ skip:
 	}
 
 	zbx_http_context_destroy(&context);
+#undef ATTEMPT_DELAY_MAX
 #else
 	ZBX_UNUSED(config_source_ip);
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");
