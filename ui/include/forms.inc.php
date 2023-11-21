@@ -120,12 +120,12 @@ function getItemFormData(array $item = []) {
 			);
 	}
 
-	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
-		$data['headers'] = prepareItemHeaders($data['headers']);
-		$data['query_fields'] = prepareItemQueryFields($data['query_fields']);
-		$data['parameters'] = [];
+	if ($data['type'] != ITEM_TYPE_HTTPAGENT) {
+		$data['headers'] = [];
+		$data['query_fields'] = [];
 	}
-	elseif ($data['type'] == ITEM_TYPE_SCRIPT) {
+
+	if ($data['type'] == ITEM_TYPE_SCRIPT) {
 		$values = [];
 
 		if (is_array($data['parameters']) && array_key_exists('name', $data['parameters'])
@@ -141,6 +141,9 @@ function getItemFormData(array $item = []) {
 		}
 
 		$data['parameters'] = $values;
+	}
+	else {
+		$data['parameters'] = [];
 	}
 
 	// Dependent item initialization by master_itemid.
