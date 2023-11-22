@@ -214,7 +214,7 @@ function itemGetValueTest(overlay) {
 			jQuery('#value', $form).multilineInput('value', ret.value);
 			jQuery('#value_warning', $form)
 				.toggle('warning' in ret)
-				.addClass('js-retrieved')
+				.toggleClass('js-retrieved', 'warning' in ret)
 				.attr('data-hintbox-contents', ret.warning);
 
 			if (typeof ret.eol !== 'undefined') {
@@ -317,7 +317,7 @@ function itemCompleteTest(overlay) {
 			jQuery('#value', $form).multilineInput('value', ret.value);
 			jQuery('#value_warning', $form)
 				.toggle('warning' in ret)
-				.addClass('js-retrieved')
+				.toggleClass('js-retrieved', 'warning' in ret)
 				.attr('data-hintbox-contents', ret.warning);
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
