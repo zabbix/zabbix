@@ -501,17 +501,8 @@ class CElementQuery implements IWaitable {
 
 		return function () use ($target, $attributes) {
 			$element = $target->one(false);
-			if (!$element->isValid()) {
+			if (!$element->isValid() || !$element->isAttributePresent($attributes)) {
 				return false;
-			}
-
-			foreach ($attributes as $key => $value) {
-				if (is_numeric($key) && $element->getAttribute($value) === null) {
-					return false;
-				}
-				elseif ($element->getAttribute($key) !== $value) {
-					return false;
-				}
 			}
 
 			return true;
