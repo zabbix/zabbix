@@ -1825,7 +1825,6 @@ static int	DBpatch_6050149(void)
 
 		for (i = 0; i < ctx.stack.values_num; i++)
 		{
-			int		sec;
 			zbx_strloc_t	*loc;
 
 			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i].type)
