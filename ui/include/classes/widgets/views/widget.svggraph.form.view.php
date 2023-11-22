@@ -281,7 +281,7 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_item_problems']),
 		CWidgetHelper::getCheckBox($fields['graph_item_problems'])
 	)
-	->addRow(CWidgetHelper::getLabel($fields['problemhosts']),
+	->addRow((new CLabel(_('Problem hosts'), 'problemhosts__ms')),
 		CWidgetHelper::getHostPatternSelect($fields['problemhosts'], $form_name)
 	)
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
