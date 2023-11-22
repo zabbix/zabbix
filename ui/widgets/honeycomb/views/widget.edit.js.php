@@ -58,8 +58,8 @@ window.widget_honeycomb_form = new class {
 	}
 
 	#updateForm() {
-		const primary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY ?>}`);
-		const secondary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY ?>}`);
+		const primary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY_LABEL ?>}`);
+		const secondary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY_LABEL ?>}`);
 
 		this.#updateLabelFields('primary', primary_show);
 		this.#updateLabelFields('secondary', secondary_show)
@@ -83,7 +83,7 @@ window.widget_honeycomb_form = new class {
 
 	#updateLabelFields(type, show) {
 		const is_label_size_custom = this.#form
-			.querySelector(`[name="${type}_label_size_type"]:checked`).value == <?= WidgetForm::SIZE_CUSTOM ?>;
+			.querySelector(`[name="${type}_label_size_type"]:checked`).value == <?= WidgetForm::LABEL_SIZE_CUSTOM ?>;
 		const is_label_type_value = this.#form
 			.querySelector(`[name="${type}_label_type"]:checked`).value == <?= WidgetForm::LABEL_TYPE_VALUE ?>;
 		const units_show = document.getElementById(`${type}_label_units_show`);

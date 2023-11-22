@@ -46,31 +46,17 @@ use CWidgetsData;
  */
 class WidgetForm extends CWidgetForm {
 
-	public const SHOW_PRIMARY = 1;
-	public const SHOW_SECONDARY = 2;
+	public const SHOW_PRIMARY_LABEL = 1;
+	public const SHOW_SECONDARY_LABEL = 2;
 
+	public const LABEL_TYPE_TEXT = 0;
 	public const LABEL_TYPE_VALUE = 1;
-	private const LABEL_TYPE_TEXT = 0;
 
-	public const BOLD_ON = 1;
-	public const UNITS_ON = 1;
-	public const INTERPOLATION_ON = 1;
-
-	public const SIZE_CUSTOM = 1;
-	private const SIZE_AUTO = 0;
-
-	private const SIZE_PERCENT_MIN = 1;
-	private const SIZE_PERCENT_MAX = 100;
-
-	private const PRIMARY_SIZE_DEFAULT = 20;
-	private const SECONDARY_SIZE_DEFAULT = 30;
-
-	private const VALUE_DECIMALS_DEFAULT = 2;
-	private const VALUE_DECIMALS_MAX = 6;
-	private const VALUE_DECIMALS_MIN = 0;
+	public const LABEL_SIZE_AUTO = 0;
+	public const LABEL_SIZE_CUSTOM = 1;
 
 	public const UNITS_POSITION_BEFORE = 0;
-	private const UNITS_POSITION_AFTER = 1;
+	public const UNITS_POSITION_AFTER = 1;
 
 	public function addFields(): self {
 		return $this
@@ -86,7 +72,7 @@ class WidgetForm extends CWidgetForm {
 								CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_HOST_IDS
 							)
 						]
-						: CWidgetFieldMultiSelectHost::DEFAULT_VALUE
+						: []
 					)
 			)
 			->addField($this->isTemplateDashboard()
@@ -114,17 +100,16 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldTags('item_tags')
 			)
 			->addField(
-				(new CWidgetFieldCheckBox(
-					'maintenance',
+				new CWidgetFieldCheckBox('maintenance',
 					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
-				))->setDefault(0)
+				)
 			)
 			->addField(
 				(new CWidgetFieldCheckBoxList('show', _('Show'), [
-					self::SHOW_PRIMARY => _('Primary label'),
-					self::SHOW_SECONDARY => _('Secondary label')
+					self::SHOW_PRIMARY_LABEL => _('Primary label'),
+					self::SHOW_SECONDARY_LABEL => _('Secondary label')
 				]))
-					->setDefault([self::SHOW_PRIMARY, self::SHOW_SECONDARY])
+					->setDefault([self::SHOW_PRIMARY_LABEL, self::SHOW_SECONDARY_LABEL])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
@@ -134,10 +119,8 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::LABEL_TYPE_TEXT)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('primary_label_decimal_places', _('Decimal places'),
-					self::VALUE_DECIMALS_MIN, self::VALUE_DECIMALS_MAX)
-				)
-					->setDefault(self::VALUE_DECIMALS_DEFAULT)
+				(new CWidgetFieldIntegerBox('primary_label_decimal_places', _('Decimal places'), 0, 6))
+					->setDefault(2)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
@@ -147,14 +130,12 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('primary_label_size_type', null, [
-					self::SIZE_AUTO => _('Auto'),
-					self::SIZE_CUSTOM => _('Custom')
-				]))->setDefault(self::SIZE_AUTO)
+					self::LABEL_SIZE_AUTO => _('Auto'),
+					self::LABEL_SIZE_CUSTOM => _('Custom')
+				]))->setDefault(self::LABEL_SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('primary_label_size', _('Size'), self::SIZE_PERCENT_MIN,
-					self::SIZE_PERCENT_MAX)
-				)->setDefault(self::PRIMARY_SIZE_DEFAULT)
+				(new CWidgetFieldIntegerBox('primary_label_size', _('Size'), 1, 100))->setDefault(20)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('primary_label_bold', _('Bold'))
@@ -163,7 +144,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('primary_label_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('primary_label_units_show'))->setDefault(self::UNITS_ON)
+				(new CWidgetFieldCheckBox('primary_label_units_show'))->setDefault(1)
 			)
 			->addField(
 				new CWidgetFieldTextBox('primary_label_units', _('Units'))
@@ -181,10 +162,8 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::LABEL_TYPE_VALUE)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('secondary_label_decimal_places', _('Decimal places'),
-					self::VALUE_DECIMALS_MIN, self::VALUE_DECIMALS_MAX)
-				)
-					->setDefault(self::VALUE_DECIMALS_DEFAULT)
+				(new CWidgetFieldIntegerBox('secondary_label_decimal_places', _('Decimal places'), 0, 6))
+					->setDefault(2)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
@@ -194,23 +173,21 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('secondary_label_size_type', null, [
-					self::SIZE_AUTO => _('Auto'),
-					self::SIZE_CUSTOM => _('Custom')
-				]))->setDefault(self::SIZE_AUTO)
+					self::LABEL_SIZE_AUTO => _('Auto'),
+					self::LABEL_SIZE_CUSTOM => _('Custom')
+				]))->setDefault(self::LABEL_SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('secondary_label_size', _('Size'), self::SIZE_PERCENT_MIN,
-					self::SIZE_PERCENT_MAX)
-				)->setDefault(self::SECONDARY_SIZE_DEFAULT)
+				(new CWidgetFieldIntegerBox('secondary_label_size', _('Size'), 1, 100))->setDefault(30)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('secondary_label_bold', _('Bold')))->setDefault(self::BOLD_ON)
+				(new CWidgetFieldCheckBox('secondary_label_bold', _('Bold')))->setDefault(1)
 			)
 			->addField(
 				new CWidgetFieldColor('secondary_label_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('secondary_label_units_show'))->setDefault(self::UNITS_ON)
+				(new CWidgetFieldCheckBox('secondary_label_units_show'))->setDefault(1)
 			)
 			->addField(
 				(new CWidgetFieldTextBox('secondary_label_units', _('Units')))
@@ -225,8 +202,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))
-					->setDefault(self::INTERPOLATION_ON)
+				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))->setDefault(1)
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
@@ -253,5 +229,15 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		return $errors;
+	}
+
+	protected function normalizeValues(array $values): array {
+		// Restore the default checked state of the disabled interpolation checkbox.
+		if (!array_key_exists('thresholds', $values) || !is_array($values['thresholds'])
+				|| count($values['thresholds']) < 2) {
+			$values['interpolation'] = 1;
+		}
+
+		return parent::normalizeValues($values);
 	}
 }

@@ -143,9 +143,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$primary_label = '';
 				$secondary_label = '';
 
-				if (array_key_exists(WidgetForm::SHOW_PRIMARY, $show)) {
+				if (array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)) {
 					if ($this->fields_values['primary_label_type'] == WidgetForm::LABEL_TYPE_VALUE) {
-						if ($this->fields_values['primary_label_units_show'] == WidgetForm::UNITS_ON) {
+						if ($this->fields_values['primary_label_units_show'] == 1) {
 							if ($this->fields_values['primary_label_units'] !== '') {
 								$item['units'] = $this->fields_values['primary_label_units'];
 							}
@@ -163,7 +163,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 						$item['units'] = $original_units;
 
-						if ($this->fields_values['primary_label_units_show'] == WidgetForm::UNITS_ON) {
+						if ($this->fields_values['primary_label_units_show'] == 1) {
 							$primary_label =
 								$this->fields_values['primary_label_units_pos'] == WidgetForm::UNITS_POSITION_BEFORE
 									? $formatted_primary_value['units'].' '.$formatted_primary_value['value']
@@ -185,9 +185,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 				}
 
-				if (array_key_exists(WidgetForm::SHOW_SECONDARY, $show)) {
+				if (array_key_exists(WidgetForm::SHOW_SECONDARY_LABEL, $show)) {
 					if ($this->fields_values['secondary_label_type'] == WidgetForm::LABEL_TYPE_VALUE) {
-						if ($this->fields_values['secondary_label_units_show'] == WidgetForm::UNITS_ON) {
+						if ($this->fields_values['secondary_label_units_show'] == 1) {
 							if ($this->fields_values['secondary_label_units'] !== '') {
 								$item['units'] = $this->fields_values['secondary_label_units'];
 							}
@@ -205,7 +205,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 						$item['units'] = $original_units;
 
-						if ($this->fields_values['secondary_label_units_show'] == WidgetForm::UNITS_ON) {
+						if ($this->fields_values['secondary_label_units_show'] == 1) {
 							$secondary_label =
 								$this->fields_values['secondary_label_units_pos'] == WidgetForm::UNITS_POSITION_BEFORE
 									? $formatted_secondary_value['units'].' '.$formatted_secondary_value['value']
@@ -250,15 +250,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$show = array_flip($this->fields_values['show']);
 
-		if (array_key_exists(WidgetForm::SHOW_PRIMARY, $show)) {
+		if (array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)) {
 			$config['primary_label'] = [
 				'show' => true,
-				'is_custom_size' => $this->fields_values['primary_label_size_type'] == WidgetForm::SIZE_CUSTOM,
-				'is_bold' => $this->fields_values['primary_label_bold'] == WidgetForm::BOLD_ON,
+				'is_custom_size' => $this->fields_values['primary_label_size_type'] == WidgetForm::LABEL_SIZE_CUSTOM,
+				'is_bold' => $this->fields_values['primary_label_bold'] == 1,
 				'color' => $this->fields_values['primary_label_color']
 			];
 
-			if ($this->fields_values['primary_label_size_type'] == WidgetForm::SIZE_CUSTOM) {
+			if ($this->fields_values['primary_label_size_type'] == WidgetForm::LABEL_SIZE_CUSTOM) {
 				$config['primary_label']['size'] = $this->fields_values['primary_label_size'];
 			}
 		}
@@ -266,15 +266,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$config['primary_label']['show'] = false;
 		}
 
-		if (array_key_exists(WidgetForm::SHOW_SECONDARY, $show)) {
+		if (array_key_exists(WidgetForm::SHOW_SECONDARY_LABEL, $show)) {
 			$config['secondary_label'] = [
 				'show' => true,
-				'is_custom_size' => $this->fields_values['secondary_label_size_type'] == WidgetForm::SIZE_CUSTOM,
-				'is_bold' => $this->fields_values['secondary_label_bold'] == WidgetForm::BOLD_ON,
+				'is_custom_size' => $this->fields_values['secondary_label_size_type'] == WidgetForm::LABEL_SIZE_CUSTOM,
+				'is_bold' => $this->fields_values['secondary_label_bold'] == 1,
 				'color' => $this->fields_values['secondary_label_color']
 			];
 
-			if ($this->fields_values['secondary_label_size_type'] == WidgetForm::SIZE_CUSTOM) {
+			if ($this->fields_values['secondary_label_size_type'] == WidgetForm::LABEL_SIZE_CUSTOM) {
 				$config['secondary_label']['size'] = $this->fields_values['secondary_label_size'];
 			}
 		}
@@ -282,7 +282,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$config['secondary_label']['show'] = false;
 		}
 
-		$config['apply_interpolation'] = $this->fields_values['interpolation'] == WidgetForm::INTERPOLATION_ON;
+		$config['apply_interpolation'] = $this->fields_values['interpolation'] == 1;
 		$config['thresholds'] = $this->fields_values['thresholds'];
 
 		$number_parser = new CNumberParser([
