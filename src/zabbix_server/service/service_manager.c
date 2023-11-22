@@ -2770,6 +2770,10 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 					continue;
 				}
 
+				/* exclude problems with negative duration from downtime */
+				if (event->clock < (*ptr)->clock)
+					event->clock = (*ptr)->clock;
+
 				recover_services_problem(service_manager, event);
 
 				event_free(event);
