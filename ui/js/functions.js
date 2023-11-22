@@ -67,11 +67,13 @@ function testUserSound(idx) {
 	}
 }
 
-/**
- * Converts all HTML symbols into HTML entities.
- */
-jQuery.escapeHtml = function(html) {
-	return jQuery('<div>').text(html).html();
+function escapeHtml(string) {
+	return string
+		.replace(/&/g,'&amp;')
+		.replace(/</g,'&lt;')
+		.replace(/>/g,'&gt;')
+		.replace(/\"/g,'&quot;')
+		.replace(/\'/g,'&apos;');
 }
 
 function validateNumericBox(obj, allowempty, allownegative) {

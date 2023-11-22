@@ -58,6 +58,11 @@ zabbix_agentd \- Zabbix agent daemon
 .B \-R
 .I runtime\-option
 .br
+.B zabbix_agentd
+.RB [ \-c
+.IR config\-file ]
+.B \-T
+.br
 .B zabbix_agentd \-h
 .br
 .B zabbix_agentd \-V
@@ -149,6 +154,8 @@ Unsigned integer.
 .IP "\fB\-t\fR, \fB\-\-test\fR \fIitem\-key\fR"
 Test single item and exit.
 See \fB\-\-print\fR for output description.
+.IP "\fB\-T\fR, \fB\-\-test-config\fR"
+Validate configuration file and exit.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"
