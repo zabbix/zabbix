@@ -831,7 +831,10 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 			connector_filter.item_value_type = dc_connector->item_value_type;
 		}
 		else
+		{
 			connector_filter_dest = connector_filters_events;
+			connector_filter.item_value_type = 0;
+		}
 
 		connector_filter.connectorid = dc_connector->connectorid;
 		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
