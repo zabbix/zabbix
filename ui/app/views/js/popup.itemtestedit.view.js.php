@@ -34,7 +34,7 @@
 function makeStepResult(step) {
 	if (typeof step.error !== 'undefined') {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
+			{error: escapeHtml(step.error) || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
 		));
 	}
 	else if (typeof step.result === 'undefined' || step.result === null) {
@@ -387,7 +387,7 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set error to')
-					]) ?>, {failed: step.failed, failed_hint: escapeHtml(step.result)})));
+					]) ?>, {failed: step.failed, failed_hint: escapeHtml(step.failed)})));
 					break;
 			}
 		}
