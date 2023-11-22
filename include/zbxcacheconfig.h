@@ -630,7 +630,7 @@ typedef struct
 	char			*password_orig, *password;
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
-	char			*ssl_cert_file_orig,*ssl_cert_file;
+	char			*ssl_cert_file_orig, *ssl_cert_file;
 	char			*ssl_key_file_orig, *ssl_key_file;
 	char			*ssl_key_password_orig, *ssl_key_password;
 
@@ -638,6 +638,9 @@ typedef struct
 	zbx_list_t		data_point_link_queue;
 	int			time_flush;
 	int			senders;
+
+	int			item_value_type;
+	char			*attempt_interval;
 }
 zbx_connector_t;
 
