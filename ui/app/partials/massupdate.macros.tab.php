@@ -117,7 +117,7 @@ $checkbox_remove_all = (new CDiv(
 
 $form_list = (new CFormList('macros-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[macros]', 'macros-div', _('Original')))
+		(new CVisibilityBox('visible[macros]', 'macros-field', _('Original')))
 			->setLabel(_('Macros'))
 			->setChecked(array_key_exists('macros', $data['visible'])),
 		(new CDiv([
@@ -133,7 +133,7 @@ $form_list = (new CFormList('macros-form-list'))
 			$checkbox_update,
 			$checkbox_remove,
 			$checkbox_remove_all
-		]))->setId('macros-div')
+		]))->setId('macros-field')
 	);
 
 $form_list->show();

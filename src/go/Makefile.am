@@ -56,9 +56,21 @@ zabbix.com/cmd/zabbix_web_service:
 
 build: ${TARGETS}
 
-clean:
-	go clean ./...
-	rm -f bin/zabbix_agent2 bin/mock_server
+clean: clean-go-build clean-sbom
+
+clean-go-build:
+	-go clean ./...
+	-rm -f bin/mock_server
+	-rm -f bin/zabbix_agent2
+	-rm -f bin/zabbix_web_service
+
+clean-sbom:
+	-rm -f sbom-mod.json
+	-rm -f sbom-mod.xml
+	-rm -f sbom-za2.json
+	-rm -f sbom-za2.xml
+	-rm -f sbom-zws.json
+	-rm -f sbom-zws.xml
 
 install-zabbix.com/cmd/zabbix_agent2:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
@@ -75,19 +87,68 @@ install-zabbix.com/cmd/zabbix_web_service:
 
 install-exec-local: ${INSTALL_TARGETS}
 
-sbom.json:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" cyclonedx-gomod mod \
-		   -output-version 1.4 \
-		   -licenses -assert-licenses -json -output "$@"
+sbom-za2.json:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_agent2 \
+		-licenses -assert-licenses \
+		-json \
+		-output-version 1.4 \
+		-output "$@"
 
-# cyclonedx-gomod mod defaults to xml as the output format if the -json flag is not given
+# cyclonedx-gomod defaults to xml as the output format if the -json flag is not given
 # there is no way to specify this explicitly
-sbom.xml:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" cyclonedx-gomod mod \
-		   -output-version 1.4 \
-		   -licenses -assert-licenses -output "$@"
+sbom-za2.xml:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_agent2 \
+		-licenses -assert-licenses \
+		-output-version 1.4 \
+		-output "$@"
 
-sbom: sbom.json
+sbom-za2: sbom-za2.json
+
+sbom-zws.json:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_web_service \
+		-licenses -assert-licenses \
+		-json \
+		-output-version 1.4 \
+		-output "$@"
+
+# cyclonedx-gomod defaults to xml as the output format if the -json flag is not given
+# there is no way to specify this explicitly
+sbom-zws.xml:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod app \
+		-main cmd/zabbix_web_service \
+		-licenses -assert-licenses \
+		-output-version 1.4 \
+		-output "$@"
+
+sbom-zws: sbom-zws.json
+
+sbom-apps: sbom-za2 sbom-zws
+
+sbom-mod.json:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod mod \
+		-licenses -assert-licenses \
+		-json \
+		-output-version 1.4 \
+		-output "$@"
+
+sbom-mod.xml:
+	GOARCH="${GOARC}" GOOS="${GOOS}" CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		cyclonedx-gomod mod \
+		-licenses -assert-licenses \
+		-output-version 1.4 \
+		-output "$@"
+
+sbom-mod: sbom-mod.json
+
+sbom: sbom-apps sbom-mod
 
 check:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
@@ -95,3 +156,5 @@ style:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" golangci-lint run --new-from-rev=$(NEW_FROM_REV)  ./...
 format:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go fmt ./... 
+
+.PHONY: all build check clean clean-go-build clean-sbom format sbom sbom-apps sbom-mod sbom-za2 sbom-zws style

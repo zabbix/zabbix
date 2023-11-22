@@ -67,6 +67,12 @@
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DATA_SOURCES_DIR}" value="${basedir}/ui/tests/selenium/data/sources/"/>
 	</target>
 
+	<target name="show-browser-info">
+		<exec executable="php" failonerror="on">
+			<arg line="ui/tests/browser.php"/>
+		</exec>
+	</target>
+
 	<target name="create-saml-configs">
 		<property name="phpunit_simplesaml_baseurl" value="${PHPUNIT_SIMPLESAML_BASEURL}"/>
 		<property name="phpunit_sp_entity_id" value="${PHPUNIT_SP_ENTITY_ID}"/>
@@ -489,8 +495,8 @@
 	</target>
 
 	<target name="build-phpunit" depends="test-phpunit"/>
-	<target name="build-mysql" depends="init-frontend-mysql,test-frontend"/>
-	<target name="build-postgresql" depends="init-frontend-postgresql,test-frontend"/>
+	<target name="build-mysql" depends="init-frontend-mysql,show-browser-info,test-frontend"/>
+	<target name="build-postgresql" depends="init-frontend-postgresql,show-browser-info,test-frontend"/>
 	<target name="build-api-mysql" depends="init-api-mysql,test-api"/>
 	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>

@@ -21,8 +21,8 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup sla, profiles
@@ -31,17 +31,16 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
  */
 class testPageServicesSla extends CWebTest {
 
-	use TableTrait;
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			CTagBehavior::class
 		];
 	}
 

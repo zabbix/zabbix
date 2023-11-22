@@ -42,10 +42,9 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-              "cloudwatch:Describe*",
-              "cloudwatch:Get*",
-              "cloudwatch:List*",
-              "rds:Describe*"
+                "cloudwatch:DescribeAlarms",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances"
           ],
           "Effect":"Allow",
           "Resource":"*"
@@ -54,7 +53,35 @@ Add the following required permissions to your Zabbix IAM policy in order to col
   }
   ```
 
-Set macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.RDS.INSTANCE.ID}"
+If you are using role-based authorization, set the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+Set macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.RDS.INSTANCE.ID}"
+
+If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -74,6 +101,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`role_base`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|

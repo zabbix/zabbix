@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-05 06:11+0000\n"
-"Last-Translator: Satoshi Fujioka <s.fujioka.exeo@gmail.com>\n"
+"PO-Revision-Date: 2023-10-08 12:33+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1580,7 +1580,7 @@ msgstr "軽度の障害"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "収集間隔内の仮想ディスクへの未処理の読み込みリクエスト数の平均、\"url\" - VMwareサービスURL、\"uuid\" - VMware仮想マシンのグローバルな一意識別子、\"instance\" - ディスクデ>バイスのインスタンス"
 
 #: include/classes/data/CItemData.php:1529
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1588,7 +1588,7 @@ msgstr "収集間隔内の仮想ディスクへの未処理の読み込みリク
 
 #: include/classes/data/CItemData.php:1562
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリクエスト数の平均、\"url\" - VMwareサービスURL、\"uuid\" - VMware仮想マシンのグローバルな一意識別子、\"instance\" - ディスクデバイスのインスタンス"
 
 #: include/classes/data/CItemData.php:1549
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -2078,6 +2078,10 @@ msgstr "自身の役割のユーザーの種類を変更できません。"
 msgid "Cannot clear history"
 msgstr "ヒストリを削除できません"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr "ヒストリとトレンドを削除できません"
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "グラフのプロトタイプを複製できません。"
@@ -2486,6 +2490,11 @@ msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "メディアタイプを無効にできません"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2557,6 +2566,11 @@ msgstr[0] "アイテムを有効にできません"
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "メディアタイプを有効にできません"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3287,6 +3301,10 @@ msgstr "メンテナンスを更新できません"
 msgid "Cannot update media type"
 msgstr "メディアタイプを更新できません"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
@@ -3654,6 +3672,14 @@ msgstr "ヒストリを削除"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "ヒストリとトレンドを削除"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6664,6 +6690,10 @@ msgstr "イベントログの監視。ログ値を返す。"
 msgid "Event name"
 msgstr "イベント名"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "イベントタグのペア"
@@ -7875,6 +7905,10 @@ msgstr "行を強調表示"
 #: jsLoader.php:372
 msgid "History"
 msgstr "ヒストリ"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -11828,17 +11862,31 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] "モジュールを削除しました: %1$s。"
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] "モジュールを無効にしました: %1$s。"
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] ""
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "モジュールを有効にしました: %1$s。"
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
