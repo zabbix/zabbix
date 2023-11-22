@@ -1787,7 +1787,6 @@ static int	DBpatch_6050149(void)
 /* Offset in stack of tokens is relative to last_foreach() history function token, */
 /* assuming that time is present in formula. */
 #define OFFSET_TIME	(-1)
-#define OFFSET_FILTER	(-2)
 #define TOKEN_LEN(loc)	(loc->r - loc->l + 1)
 #define LAST_FOREACH	"last_foreach"
 	zbx_db_row_t		row;
@@ -1886,7 +1885,6 @@ static int	DBpatch_6050149(void)
 
 	return ret;
 #undef OFFSET_TIME
-#undef OFFSET_FILTER
 #undef TOKEN_LEN
 #undef LAST_FOREACH
 }
