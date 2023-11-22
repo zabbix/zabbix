@@ -222,8 +222,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 	protected function createSource(array $data = []): array {
 		return [
 			'zabbix_export' => array_merge([
-				'version' => '6.4',
-				'date' => '2023-09-04T18:00:00:00Z'
+				'version' => '6.4'
 			], $data)
 		];
 	}
@@ -231,8 +230,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 	protected function createExpectedResult(array $data = []): array {
 		return [
 			'zabbix_export' => array_merge([
-				'version' => '7.0',
-				'date' => '2023-09-04T18:00:00:00Z'
+				'version' => '7.0'
 			], $data)
 		];
 	}

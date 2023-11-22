@@ -175,7 +175,7 @@ class C64ImportConverter extends CConverter {
 	/**
 	 * Removes useless 2nd parameter from last_foreach() functions.
 	 *
-	 * @param string $expression
+	 * @param string $formula
 	 * @param bool   $prototype
 	 *
 	 * @return string
