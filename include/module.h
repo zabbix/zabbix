@@ -88,7 +88,9 @@ zbx_log_t;
 #define AR_META		0x40
 #define AR_BIN		0x80
 
-/* agent return structure */
+/* Agent return structure.                                       */
+/* Need to preserve the compatibility with previous versions,    */
+/* so new fields must be added at the end of the struct.         */
 typedef struct
 {
 	zbx_uint64_t	lastlogsize;	/* meta information */
@@ -98,9 +100,9 @@ typedef struct
 	char		*text;
 	char		*msg;		/* possible error message */
 	zbx_log_t	*log;
-	char		*bin;
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
+	char		*bin;
 }
 AGENT_RESULT;
 
@@ -349,15 +351,26 @@ typedef struct
 	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
 	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
 	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
-	void	(*history_bin_cb)(const ZBX_HISTORY_BIN *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
+
+typedef struct
+{
+	void	(*history_float_cb)(const ZBX_HISTORY_FLOAT *history, int history_num);
+	void	(*history_integer_cb)(const ZBX_HISTORY_INTEGER *history, int history_num);
+	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
+	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
+	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
+	void	(*history_bin_cb)(const ZBX_HISTORY_BIN *history, int history_num);
+}
+ZBX_HISTORY_WRITE_CBS_V2;
 
 int	zbx_module_api_version(void);
 int	zbx_module_init(void);
 int	zbx_module_uninit(void);
 void	zbx_module_item_timeout(int timeout);
 ZBX_METRIC	*zbx_module_item_list(void);
-ZBX_HISTORY_WRITE_CBS	zbx_module_history_write_cbs(void);
+ZBX_HISTORY_WRITE_CBS		zbx_module_history_write_cbs(void);
+ZBX_HISTORY_WRITE_CBS_V2	zbx_module_history_write_cbs_v2(void);
 
 #endif
