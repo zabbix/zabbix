@@ -71,7 +71,7 @@ var AddValueMap = class {
 			this.row.querySelector(`input[value="${this.data.name}"] ~ a`).focus();
 		}
 		else {
-			document.querySelector('#valuemap-table tbody').append(this.row);
+			document.querySelector(`#${'<?= $data['table_id'] ?>'} tbody`).append(this.row);
 		}
 	}
 

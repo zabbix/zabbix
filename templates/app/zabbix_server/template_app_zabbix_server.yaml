@@ -1130,6 +1130,20 @@ zabbix_export:
                   value: capacity
                 - tag: scope
                   value: performance
+        - uuid: 0f61de4dcc1b469a94dd024e1b932936
+          name: 'Zabbix server: Number of values synchronized with the database per second.'
+          type: INTERNAL
+          key: 'zabbix[vps,written]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Average quantity of values written to the database, recalculated once per minute.'
+          preprocessing:
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            - tag: component
+              value: system
         - uuid: 1ae8253bb4da434da3ea6bcb0352115d
           name: 'Zabbix server: History write cache, % used'
           type: INTERNAL

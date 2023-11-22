@@ -1,0 +1,490 @@
+[
+    {
+        "value": "1696954626",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S"]
+        },
+        "result": "2023-10-10 19:17:06"
+    },
+    {
+        "value": "02:00:00",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%H:%M:%S"]
+        },
+        "result": "02:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S"]
+        },
+        "result": "2020-01-01 02:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1h"]
+        },
+        "result": "2020-01-01 05:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1h"]
+        },
+        "result": "2020-01-01 03:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1d"]
+        },
+        "result": "2020-01-02 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1d"]
+        },
+        "result": "2019-12-31 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1w"]
+        },
+        "result": "2020-01-08 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1w"]
+        },
+        "result": "2019-12-25 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1M"]
+        },
+        "result": "2020-02-01 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M"]
+        },
+        "result": "2019-12-01 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1y"]
+        },
+        "result": "2021-01-01 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y"]
+        },
+        "result": "2019-01-01 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1d-1h"]
+        },
+        "result": "2019-12-31 03:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1w-1h"]
+        },
+        "result": "2019-12-25 03:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1w-1d"]
+        },
+        "result": "2019-12-24 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M-1h"]
+        },
+        "result": "2019-12-01 03:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M-1d"]
+        },
+        "result": "2019-11-30 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M-1w"]
+        },
+        "result": "2019-11-24 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y-1h"]
+        },
+        "result": "2019-01-01 03:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y-1d"]
+        },
+        "result": "2018-12-31 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y-1w"]
+        },
+        "result": "2018-12-25 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y-1M"]
+        },
+        "result": "2018-12-01 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1h-1h"]
+        },
+        "result": "2020-01-01 02:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1d+1h"]
+        },
+        "result": "2019-12-31 05:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1w+1h"]
+        },
+        "result": "2019-12-25 05:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1w+1d"]
+        },
+        "result": "2019-12-26 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M+1h"]
+        },
+        "result": "2019-12-01 05:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M+1d"]
+        },
+        "result": "2019-12-02 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M+1w"]
+        },
+        "result": "2019-12-08 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y+1h"]
+        },
+        "result": "2019-01-01 05:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y+1d"]
+        },
+        "result": "2019-01-02 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y+1w"]
+        },
+        "result": "2019-01-08 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y+1M"]
+        },
+        "result": "2019-02-01 04:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1M/M-1d"]
+        },
+        "result": "2020-01-31 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1M/M-1h"]
+        },
+        "result": "2020-01-31 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1d/d-1h"]
+        },
+        "result": "2020-01-01 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1w/w-1h"]
+        },
+        "result": "2020-01-05 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1w/w-1d"]
+        },
+        "result": "2020-01-05 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1M/M-1w"]
+        },
+        "result": "2020-01-25 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1y/y-1h"]
+        },
+        "result": "2020-12-31 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1y/y-1d"]
+        },
+        "result": "2020-12-31 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1y/y-1w"]
+        },
+        "result": "2020-12-25 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1y/y-1M"]
+        },
+        "result": "2020-12-01 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M/M-1d"]
+        },
+        "result": "2019-11-30 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M/M-1h"]
+        },
+        "result": "2019-11-30 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1d/d-1h"]
+        },
+        "result": "2019-12-30 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1w/w-1h"]
+        },
+        "result": "2019-12-22 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1w/w-1d"]
+        },
+        "result": "2019-12-22 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1M/M-1w"]
+        },
+        "result": "2019-11-24 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y/y-1h"]
+        },
+        "result": "2018-12-31 23:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y/y-1d"]
+        },
+        "result": "2018-12-31 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y/y-1w"]
+        },
+        "result": "2018-12-25 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "-1y/y-1M"]
+        },
+        "result": "2018-12-01 00:00:00"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "*1h"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1q"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+xh"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "x"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1y.y-1h"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1y/X-1h"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "2020-01-01T02:00:00Z",
+        "macrofunc": {
+            "function": "fmttime",
+            "parameters": ["%Y-%m-%d %H:%M:%S", "+1M/-1d"]
+        },
+        "result": "*UNKNOWN*"
+    }
+]

@@ -310,7 +310,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_HTTPAGENT_POLLER	40
 #define ZBX_PROCESS_TYPE_AGENT_POLLER		41
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
-#define ZBX_PROCESS_TYPE_COUNT			43	/* number of process types */
+#define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
+#define ZBX_PROCESS_TYPE_COUNT			44	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -456,10 +457,11 @@ typedef enum
 	ZBX_TASK_INSTALL_SERVICE,
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
-	ZBX_TASK_STOP_SERVICE
+	ZBX_TASK_STOP_SERVICE,
 #else
-	ZBX_TASK_RUNTIME_CONTROL
+	ZBX_TASK_RUNTIME_CONTROL,
 #endif
+	ZBX_TASK_TEST_CONFIG
 }
 zbx_task_t;
 

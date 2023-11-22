@@ -85,6 +85,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 #endif	/* HAVE_ICONV */
 
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
+const char	*zbx_get_bom_econding(char *in, size_t in_size);
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
 char	*zbx_strshift_utf8(char *text, size_t num);

@@ -568,7 +568,7 @@ class CIntegrationTest extends CAPITest {
 			: PHPUNIT_BINARY_DIR.'zabbix_'.$component;
 
 		self::executeCommand($bin_path, ['-c', $config], $background);
-		self::waitForStartup($component, $waitLogLineOverride, $skip_pid );
+		self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
 	}
 
 	/**

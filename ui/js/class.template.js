@@ -133,14 +133,6 @@ class Template {
 
 		data = data === undefined || data === null ? '' : `${data}`;
 
-		return before + (escape
-			? data
-				.replace(/&/g,'&amp;')
-				.replace(/</g,'&lt;')
-				.replace(/>/g,'&gt;')
-				.replace(/\"/g,'&quot;')
-				.replace(/\'/g,'&apos;')
-			: data
-		);
+		return before + (escape ? escapeHtml(data) : data);
 	}
 }
