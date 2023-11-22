@@ -586,6 +586,8 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 						confirmation = response.result.confirmation;
 
 						if (confirmation === '') {
+							overlayDialogueDestroy(overlay.dialogueid);
+
 							execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
 						}
 						else {
