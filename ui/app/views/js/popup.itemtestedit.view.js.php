@@ -208,8 +208,9 @@ function itemGetValueTest(overlay) {
 				jQuery('#value', $form).multilineInput('value', ret.value);
 				jQuery('#value_warning', $form)
 					.toggle('warning' in ret)
-					.addClass('js-retrieved')
-					.attr('data-hintbox-contents', ret.warning);
+					.toggleClass('js-retrieved', 'warning' in ret)
+					.next('.hint-box')
+						.html(ret.warning);
 
 				if (typeof ret.eol !== 'undefined') {
 					jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -302,8 +303,9 @@ function itemCompleteTest(overlay) {
 			jQuery('#value', $form).multilineInput('value', ret.value);
 			jQuery('#value_warning', $form)
 				.toggle('warning' in ret)
-				.addClass('js-retrieved')
-				.attr('data-hintbox-contents', ret.warning);
+				.toggleClass('js-retrieved', 'warning' in ret)
+				.next('.hint-box')
+					.html(ret.warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");

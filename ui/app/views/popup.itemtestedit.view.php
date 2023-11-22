@@ -262,6 +262,7 @@ if ($data['is_item_testable']) {
 $form_grid->addItem([
 	new CLabel([
 		_('Value'),
+		' ',
 		makeWarningIcon('#{warning}')
 			->setId('value_warning')
 			->addStyle('display: none;')
@@ -413,6 +414,7 @@ $templates = [
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 					->setHint('#{result}', 'hintbox-wrap'),
 				makeWarningIcon('#{warning}')
+					->addStyle('margin: 0;')
 			]))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; display: inline-flex;')
 		),
