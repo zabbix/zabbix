@@ -164,6 +164,14 @@ class CSVGPie {
 	#popped_out_placeholder = null;
 
 	/**
+	 * SVG path element that represents the last clicked element (sector or placeholder).
+	 *
+	 * @type {SVGPathElement}
+	 * @member {Selection}
+	 */
+	#clicked_element = null;
+
+	/**
 	 * Outer radius of pie chart.
 	 * It is large number because SVG works more precise that way (later it will be scaled according to widget size).
 	 *
@@ -253,9 +261,50 @@ class CSVGPie {
 
 		this.#sector_observer = new MutationObserver((mutation_list) => {
 			for (const mutation of mutation_list) {
-				if (mutation.type === 'attributes' && mutation.oldValue === 'true'
-						&& !mutation.target.matches(':hover')) {
-					this.#popIn(mutation.target);
+				if (mutation.type === 'attributes') {
+					const target = d3.select(mutation.target);
+
+					if (target.classed(CSVGPie.ZBX_STYLE_ARC) && this.#clicked_element.classed(CSVGPie.ZBX_STYLE_ARC)) {
+						const placeholder = this.#arcs_placeholders_container
+							.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
+							.filter((d) => d.data.id === target.datum().data.id);
+
+						if (mutation.oldValue === null) {
+							placeholder.node().hintboxid = mutation.target.hintboxid;
+							placeholder.node().hintBoxItem = mutation.target.hintBoxItem;
+							placeholder.node().isStatic = mutation.target.isStatic;
+						}
+						else {
+							hintBox.deleteHint(mutation.target);
+
+							if (!mutation.target.matches(':hover')) {
+								hintBox.deleteHint(placeholder.node());
+								placeholder.attr('data-hintbox', '1');
+								this.#popIn(mutation.target);
+							}
+						}
+					}
+					else if (target.classed(CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)
+						&& this.#clicked_element.classed(CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)) {
+						const sector = this.#arcs_container
+							.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
+							.filter((d) => d.data.id === target.datum().data.id);
+
+						if (mutation.oldValue === null) {
+							sector.node().hintboxid = mutation.target.hintboxid;
+							sector.node().hintBoxItem = mutation.target.hintBoxItem;
+							sector.node().isStatic = mutation.target.isStatic;
+						}
+						else {
+							hintBox.deleteHint(mutation.target);
+
+							if (!mutation.target.matches(':hover')) {
+								hintBox.deleteHint(sector.node());
+								sector.attr('data-hintbox', '1');
+								this.#popIn(sector.node());
+							}
+						}
+					}
 				}
 			}
 		});
@@ -333,7 +382,12 @@ class CSVGPie {
 			.data(this.#pieGenerator(this.#sectors_new), key)
 			.join('svg:path')
 			.attr('class', CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)
-			.attr('d', (d) => this.#arcGenerator(d));
+			.attr('d', (d) => this.#arcGenerator(d))
+			.attr('data-hintbox', 1)
+			.attr('data-hintbox-static', 1)
+			.attr('data-hintbox-track-mouse', 1)
+			.attr('data-hintbox-delay', 0)
+			.attr('data-hintbox-contents', (d) => this.#setHint(d));
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
@@ -380,10 +434,17 @@ class CSVGPie {
 			.end()
 			.then(() => {
 				const sectors = this.#arcs_container.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`).nodes();
+				const placeholders = this.#arcs_placeholders_container
+					.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`).nodes();
 
 				if (sectors.length > 1) {
 					for (let i = 0; i < sectors.length; i++) {
 						this.#sector_observer.observe(sectors[i], {
+							attributeFilter: ['data-expanded'],
+							attributeOldValue: true
+						});
+
+						this.#sector_observer.observe(placeholders[i], {
 							attributeFilter: ['data-expanded'],
 							attributeOldValue: true
 						});
@@ -395,6 +456,9 @@ class CSVGPie {
 						}
 
 						d3.select(sectors[i]).on('mouseleave', (e) => this.#onMouseLeave(e));
+						d3.select(placeholders[i]).on('mouseleave', (e) => this.#onMouseLeave(e));
+						d3.select(sectors[i]).on('click', (e) => this.#onMouseClick(e));
+						d3.select(placeholders[i]).on('click', (e) => this.#onMouseClick(e));
 					}
 
 					this.#svg.on('mousemove', (e) => this.#onMouseMove(e));
@@ -734,8 +798,57 @@ class CSVGPie {
 	 * @param {Event} e  Mouse leave event.
 	 */
 	#onMouseLeave(e) {
-		if (e.toElement === null || !e.toElement.classList.contains(CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)) {
-			this.#popIn(this.#popped_out_sector);
+		if ((e.toElement === null || !e.toElement.classList.contains(CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER))
+				&& !e.fromElement.dataset.expanded) {
+			const sector = this.#arcs_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
+				.filter((d) => d.data.id === d3.select(e.fromElement).datum().data.id);
+
+			this.#popIn(sector.node());
+		}
+	}
+
+	/**
+	 * Process mouse click events for hintboxes.
+	 *
+	 * @param {Event} e  Mouse click event.
+	 */
+	#onMouseClick(e) {
+		const target = d3.select(e.target);
+
+		target.attr('data-hintbox', '1');
+
+		this.#clicked_element = target;
+
+		if (target.classed(CSVGPie.ZBX_STYLE_ARC)) {
+			const placeholder = this.#arcs_placeholders_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
+				.filter((d) => d.data.id === target.datum().data.id);
+
+			if (e.target.dataset.expanded) {
+				placeholder.attr('data-expanded', null);
+				placeholder.attr('data-hintbox', '1');
+				hintBox.deleteHint(placeholder.node());
+			}
+			else {
+				placeholder.attr('data-expanded', 'true');
+				placeholder.attr('data-hintbox', '0');
+			}
+		}
+		else if (target.classed(CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)) {
+			const sector = this.#arcs_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
+				.filter((d) => d.data.id === target.datum().data.id);
+
+			if (e.target.dataset.expanded) {
+				sector.attr('data-expanded', null);
+				sector.attr('data-hintbox', '1');
+				hintBox.deleteHint(sector.node());
+			}
+			else {
+				sector.attr('data-expanded', 'true');
+				sector.attr('data-hintbox', '0');
+			}
 		}
 	}
 
