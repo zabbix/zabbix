@@ -513,20 +513,37 @@ static int	DBpatch_6000043(void)
 
 static int	DBpatch_6000044(void)
 {
-/* offset in stack of tokens is relative to time period token */
-#define OFFSET_HIST_FUNC	1
-#define TOKEN_LEN(loc)		(loc->r - loc->l + 1)
-#define LAST_FOREACH		"last_foreach"
+/* -------------------------------------------------------*/
+/* Formula:                                               */
+/* aggregate_function(last_foreach(filter))               */
+/* aggregate_function(last_foreach(filter,time))          */
+/*--------------------------------------------------------*/
+/* Relative positioning of tokens on a stack              */
+/*----------------------------+---------------------------*/
+/* Time is present in formula | Time is absent in formula */
+/*----------------------------+---------------------------*/
+/* [i-2] filter               |                           */
+/* [i-1] time                 | [i-1] filter              */
+/*   [i] last_foreach         |   [i] last_foreach        */
+/* [i+2] aggregate function   | [i+2]                     */
+/*----------------------------+---------------------------*/
+
+/* Offset in stack of tokens is relative to last_foreach() history function token, */
+/* assuming that time is present in formula. */
+#define OFFSET_TIME	(-1)
+#define OFFSET_FILTER	(-2)
+#define TOKEN_LEN(loc)	(loc->r - loc->l + 1)
+#define LAST_FOREACH	"last_foreach"
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			ret = SUCCEED;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	char			*sql = NULL, *params = NULL;
 	zbx_eval_context_t	ctx;
-	zbx_vector_uint64_t	del_tokens;
+	zbx_vector_uint64_t	del_idx;
 
 	zbx_eval_init(&ctx);
-	zbx_vector_uint64_create(&del_tokens);
+	zbx_vector_uint64_create(&del_idx);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -535,8 +552,8 @@ static int	DBpatch_6000044(void)
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
-		int			i;
-		char			*error = NULL;
+		int	i;
+		char	*esc, *error = NULL;
 
 		zbx_eval_clear(&ctx);
 
@@ -548,49 +565,58 @@ static int	DBpatch_6000044(void)
 			continue;
 		}
 
-		zbx_vector_uint64_clear(&del_tokens);
+		zbx_vector_uint64_clear(&del_idx);
 
 		for (i = 0; i < ctx.stack.values_num; i++)
 		{
-			int		seconds;
+			int		sec;
 			zbx_strloc_t	*loc;
 
-			if (ZBX_EVAL_TOKEN_ARG_PERIOD != ctx.stack.values[i].type)
-				continue;
-
-			if (i + OFFSET_HIST_FUNC >= ctx.stack.values_num)
-				continue;
-
-			loc = &ctx.stack.values[i + OFFSET_HIST_FUNC].loc;
-
-			if (0 != strncmp(LAST_FOREACH, &ctx.expression[loc->l], TOKEN_LEN(loc)))
+			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i].type)
 				continue;
 
 			loc = &ctx.stack.values[i].loc;
 
-			if (FAIL == is_time_suffix(&ctx.expression[loc->l], &seconds, TOKEN_LEN(loc)) ||
-					0 != seconds)
+			if (0 != strncmp(LAST_FOREACH, &ctx.expression[loc->l], TOKEN_LEN(loc)))
+				continue;
+
+			/* if time is absent in formula */
+			if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			if (ZBX_EVAL_TOKEN_ARG_NULL == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			loc = &ctx.stack.values[i + OFFSET_TIME].loc;
+
+			if (FAIL == is_time_suffix(&ctx.expression[loc->l], &sec, (int)TOKEN_LEN(loc)) || 0 != sec)
 			{
 				continue;
 			}
 
-			zbx_vector_uint64_append(&del_tokens, (zbx_uint32_t)i);
+			zbx_vector_uint64_append(&del_idx, (zbx_uint32_t)(i + OFFSET_TIME));
 		}
 
-		if (0 == del_tokens.values_num)
+		if (0 == del_idx.values_num)
 			continue;
 
 		params = zbx_strdup(params, ctx.expression);
 
-		for (i = del_tokens.values_num - 1; i >= 0; i--)
+		for (i = del_idx.values_num - 1; i >= 0; i--)
 		{
-			zbx_strloc_t	*loc = &ctx.stack.values[(int)del_tokens.values[i]].loc;
+			size_t		l, r;
+			zbx_strloc_t	*loc = &ctx.stack.values[(int)del_idx.values[i]].loc;
 
-			memmove(&params[loc->l - 1], &params[loc->r + 1], strlen(params) - loc->r + 1);
+			for (l = loc->l - 1; ',' != params[l]; l--) {}
+			for (r = loc->r + 1; ')' != params[r]; r++) {}
+
+			memmove(&params[l], &params[r], strlen(params) - r + 1);
 		}
 
+		esc = DBdyn_escape_string(params);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update items set params='%s' where itemid=%s;\n", params, row[0]);
+				"update items set params='%s' where itemid=%s;\n", esc, row[0]);
+		zbx_free(esc);
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
@@ -606,13 +632,14 @@ static int	DBpatch_6000044(void)
 	}
 
 	zbx_eval_clear(&ctx);
-	zbx_vector_uint64_destroy(&del_tokens);
+	zbx_vector_uint64_destroy(&del_idx);
 
 	zbx_free(sql);
 	zbx_free(params);
 
 	return ret;
-#undef OFFSET_HIST_FUNC
+#undef OFFSET_TIME
+#undef OFFSET_FILTER
 #undef TOKEN_LEN
 #undef LAST_FOREACH
 }
