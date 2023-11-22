@@ -31,7 +31,6 @@
 #define ZBX_MODULE_FUNC_ITEM_TIMEOUT		"zbx_module_item_timeout"
 #define ZBX_MODULE_FUNC_UNINIT			"zbx_module_uninit"
 #define ZBX_MODULE_FUNC_HISTORY_WRITE_CBS	"zbx_module_history_write_cbs"
-#define ZBX_MODULE_FUNC_HISTORY_WRITE_CBS_V2	"zbx_module_history_write_cbs_v2"
 
 static zbx_vector_ptr_t	modules;
 
@@ -87,126 +86,122 @@ static zbx_module_t	*zbx_register_module(void *lib, char *name)
 
 	return module;
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: registers callback functions for history export                   *
  *                                                                            *
- * Parameters: module              - module pointer for later reference       *
- *             history_write_cbs_v - callbacks                                *
+ * Parameters: module            - module pointer for later reference         *
+ *             history_write_cbs - callbacks                                  *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_REGISTER(history_write_cbs_v, history_write_cbs_v_type)						\
-static void	zbx_register_##history_write_cbs_v(zbx_module_t *module,					\
-		history_write_cbs_v_type history_write_cbs_v)							\
-{														\
-	if (NULL != history_write_cbs_v.history_float_cb)							\
-	{													\
-		size_t	j = 0;											\
-														\
-		if (NULL == history_float_cbs)									\
-		{												\
-			history_float_cbs = (zbx_history_float_cb_t *)zbx_malloc(history_float_cbs,		\
-					sizeof(zbx_history_float_cb_t));					\
-			history_float_cbs[0].module = NULL;							\
-		}												\
-														\
-		while (NULL != history_float_cbs[j].module)							\
-			j++;											\
-														\
-		history_float_cbs = (zbx_history_float_cb_t *)zbx_realloc(history_float_cbs, (j + 2) *		\
-				sizeof(zbx_history_float_cb_t));						\
-		history_float_cbs[j].module = module;								\
-		history_float_cbs[j].history_float_cb = history_write_cbs_v.history_float_cb;			\
-		history_float_cbs[j + 1].module = NULL;								\
-	}													\
-														\
-	if (NULL != history_write_cbs_v.history_integer_cb)							\
-	{													\
-		size_t	j = 0;											\
-														\
-		if (NULL == history_integer_cbs)								\
-		{												\
-			history_integer_cbs = (zbx_history_integer_cb_t *)zbx_malloc(history_integer_cbs,	\
-					sizeof(zbx_history_integer_cb_t));					\
-			history_integer_cbs[0].module = NULL;							\
-		}												\
-														\
-		while (NULL != history_integer_cbs[j].module)							\
-			j++;											\
-														\
-		history_integer_cbs = (zbx_history_integer_cb_t *)zbx_realloc(history_integer_cbs, (j + 2) *	\
-				sizeof(zbx_history_integer_cb_t));						\
-		history_integer_cbs[j].module = module;								\
-		history_integer_cbs[j].history_integer_cb = history_write_cbs_v.history_integer_cb;		\
-		history_integer_cbs[j + 1].module = NULL;							\
-	}													\
-														\
-	if (NULL != history_write_cbs_v.history_string_cb)							\
-	{													\
-		size_t	j = 0;											\
-														\
-		if (NULL == history_string_cbs)									\
-		{												\
-			history_string_cbs = (zbx_history_string_cb_t *)zbx_malloc(history_string_cbs,		\
-					sizeof(zbx_history_string_cb_t));					\
-			history_string_cbs[0].module = NULL;							\
-		}												\
-														\
-		while (NULL != history_string_cbs[j].module)							\
-			j++;											\
-														\
-		history_string_cbs = (zbx_history_string_cb_t *)zbx_realloc(history_string_cbs, (j + 2) *	\
-				sizeof(zbx_history_string_cb_t));						\
-		history_string_cbs[j].module = module;								\
-		history_string_cbs[j].history_string_cb = history_write_cbs_v.history_string_cb;		\
-		history_string_cbs[j + 1].module = NULL;							\
-	}													\
-														\
-	if (NULL != history_write_cbs_v.history_text_cb)							\
-	{													\
-		size_t	j = 0;											\
-														\
-		if (NULL == history_text_cbs)									\
-		{												\
-			history_text_cbs = (zbx_history_text_cb_t *)zbx_malloc(history_text_cbs,		\
-					sizeof(zbx_history_text_cb_t));						\
-			history_text_cbs[0].module = NULL;							\
-		}												\
-														\
-		while (NULL != history_text_cbs[j].module)							\
-			j++;											\
-														\
-		history_text_cbs = (zbx_history_text_cb_t *)zbx_realloc(history_text_cbs, (j + 2) *		\
-				sizeof(zbx_history_text_cb_t));							\
-		history_text_cbs[j].module = module;								\
-		history_text_cbs[j].history_text_cb = history_write_cbs_v.history_text_cb;			\
-		history_text_cbs[j + 1].module = NULL;								\
-	}													\
-														\
-	if (NULL != history_write_cbs_v.history_log_cb)								\
-	{													\
-		size_t	j = 0;											\
-														\
-		if (NULL == history_log_cbs)									\
-		{												\
-			history_log_cbs = (zbx_history_log_cb_t *)zbx_malloc(history_log_cbs,			\
-					sizeof(zbx_history_log_cb_t));						\
-			history_log_cbs[0].module = NULL;							\
-		}												\
-														\
-		while (NULL != history_log_cbs[j].module)							\
-			j++;											\
-														\
-		history_log_cbs = (zbx_history_log_cb_t *)zbx_realloc(history_log_cbs, (j + 2) *		\
-				sizeof(zbx_history_log_cb_t));							\
-		history_log_cbs[j].module = module;								\
-		history_log_cbs[j].history_log_cb = history_write_cbs_v.history_log_cb;				\
-		history_log_cbs[j + 1].module = NULL;								\
-	}													\
-}														\
+static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRITE_CBS history_write_cbs)
+{
+	if (NULL != history_write_cbs.history_float_cb)
+	{
+		int	j = 0;
 
-ZBX_REGISTER(history_write_cbs, ZBX_HISTORY_WRITE_CBS)
-ZBX_REGISTER(history_write_cbs_v2, ZBX_HISTORY_WRITE_CBS_V2)
+		if (NULL == history_float_cbs)
+		{
+			history_float_cbs = (zbx_history_float_cb_t *)zbx_malloc(history_float_cbs,
+					sizeof(zbx_history_float_cb_t));
+			history_float_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_float_cbs[j].module)
+			j++;
+
+		history_float_cbs = (zbx_history_float_cb_t *)zbx_realloc(history_float_cbs, (j + 2) *
+				sizeof(zbx_history_float_cb_t));
+		history_float_cbs[j].module = module;
+		history_float_cbs[j].history_float_cb = history_write_cbs.history_float_cb;
+		history_float_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_integer_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_integer_cbs)
+		{
+			history_integer_cbs = (zbx_history_integer_cb_t *)zbx_malloc(history_integer_cbs,
+					sizeof(zbx_history_integer_cb_t));
+			history_integer_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_integer_cbs[j].module)
+			j++;
+
+		history_integer_cbs = (zbx_history_integer_cb_t *)zbx_realloc(history_integer_cbs, (j + 2) *
+				sizeof(zbx_history_integer_cb_t));
+		history_integer_cbs[j].module = module;
+		history_integer_cbs[j].history_integer_cb = history_write_cbs.history_integer_cb;
+		history_integer_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_string_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_string_cbs)
+		{
+			history_string_cbs = (zbx_history_string_cb_t *)zbx_malloc(history_string_cbs,
+					sizeof(zbx_history_string_cb_t));
+			history_string_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_string_cbs[j].module)
+			j++;
+
+		history_string_cbs = (zbx_history_string_cb_t *)zbx_realloc(history_string_cbs, (j + 2) *
+				sizeof(zbx_history_string_cb_t));
+		history_string_cbs[j].module = module;
+		history_string_cbs[j].history_string_cb = history_write_cbs.history_string_cb;
+		history_string_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_text_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_text_cbs)
+		{
+			history_text_cbs = (zbx_history_text_cb_t *)zbx_malloc(history_text_cbs,
+					sizeof(zbx_history_text_cb_t));
+			history_text_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_text_cbs[j].module)
+			j++;
+
+		history_text_cbs = (zbx_history_text_cb_t *)zbx_realloc(history_text_cbs, (j + 2) *
+				sizeof(zbx_history_text_cb_t));
+		history_text_cbs[j].module = module;
+		history_text_cbs[j].history_text_cb = history_write_cbs.history_text_cb;
+		history_text_cbs[j + 1].module = NULL;
+	}
+
+	if (NULL != history_write_cbs.history_log_cb)
+	{
+		int	j = 0;
+
+		if (NULL == history_log_cbs)
+		{
+			history_log_cbs = (zbx_history_log_cb_t *)zbx_malloc(history_log_cbs,
+					sizeof(zbx_history_log_cb_t));
+			history_log_cbs[0].module = NULL;
+		}
+
+		while (NULL != history_log_cbs[j].module)
+			j++;
+
+		history_log_cbs = (zbx_history_log_cb_t *)zbx_realloc(history_log_cbs, (j + 2) *
+				sizeof(zbx_history_log_cb_t));
+		history_log_cbs[j].module = module;
+		history_log_cbs[j].history_log_cb = history_write_cbs.history_log_cb;
+		history_log_cbs[j + 1].module = NULL;
+	}
+}
 
 static int	zbx_module_compare_func(const void *d1, const void *d2)
 {
@@ -257,7 +252,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	module_tmp.lib = lib;
 	if (FAIL != zbx_vector_ptr_search(&modules, &module_tmp, zbx_module_compare_func))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "module \"%s\" has already been loaded", name);
+		zabbix_log(LOG_LEVEL_DEBUG, "module \"%s\" has already beed loaded", name);
 		return SUCCEED;
 	}
 

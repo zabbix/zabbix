@@ -281,24 +281,3 @@ ZBX_HISTORY_WRITE_CBS	zbx_module_history_write_cbs(void)
 
 	return dummy_callbacks;
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: v2 has capability to register bin callback, but this is not       *
- *          is not implemented yet, so it is identical to v1 for now.         *
- *          Separate v2 structure is needed for module compatibility.         *
- *                                                                            *
- ******************************************************************************/
-ZBX_HISTORY_WRITE_CBS_V2	zbx_module_history_write_cbs_v2(void)
-{
-	static ZBX_HISTORY_WRITE_CBS_V2	dummy_callbacks =
-	{
-		dummy_history_float_cb,
-		dummy_history_integer_cb,
-		dummy_history_string_cb,
-		dummy_history_text_cb,
-		dummy_history_log_cb,
-	};
-
-	return dummy_callbacks;
-}
