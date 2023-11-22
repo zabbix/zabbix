@@ -620,7 +620,7 @@ function addValues(frame, values, submit_parent) {
 		}
 
 		if (jQuery(frm_storage).is('span')) {
-			jQuery(frm_storage).html(values[key]);
+			jQuery(frm_storage).text(values[key]);
 		}
 		else {
 			jQuery(frm_storage).val(values[key]).change();
