@@ -70,8 +70,8 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.append(this.$dialogue.$footer);
 
 	this.$dialogue.$body.on('submit', 'form', function(e) {
-		if (this.$btn_submit) {
-			e.preventDefault();
+		e.preventDefault();
+		if (this.$btn_submit && this.$btn_submit.prop('disabled') === false) {
 			this.$btn_submit.trigger('click');
 		}
 	}.bind(this));
@@ -199,6 +199,10 @@ Overlay.prototype.containFocus = function() {
 				}
 			});
 	}
+};
+
+Overlay.prototype.hasLoading = function() {
+	return this.$dialogue.$body.hasClass('is-loading');
 };
 
 /**

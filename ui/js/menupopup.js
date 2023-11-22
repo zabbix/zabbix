@@ -1568,7 +1568,7 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 				item.rel = data.params.rel;
 
 				if (data.params.manualinput === '1') {
-					item.clickCallback = () => openManualinputDialogue(item, data);
+					item.clickCallback = () => openManualinputDialogue(item, data, trigger_elm);
 				}
 				else if (data.params.manualinput === '0' && data.params.confirmation !== '') {
 					item.url = data.params.url;
@@ -1595,7 +1595,7 @@ function getMenuPopupURLItems(tree, trigger_elm) {
  * @param {object} item  Item object.
  * @param {object} data  Data object.
  */
-function openManualinputDialogue(item, data) {
+function openManualinputDialogue(item, data, trigger_element) {
 	const parameters = {
 		manualinput_prompt: data.params.manualinput_prompt,
 		manualinput_default_value: data.params.manualinput_default_value,
@@ -1606,7 +1606,8 @@ function openManualinputDialogue(item, data) {
 
 	const overlay = PopUp('script.userinput.edit', parameters, {
 		dialogueid: 'script-userinput-form',
-		dialogue_class: 'modal-popup-small position-middle'
+		dialogue_class: 'modal-popup-small position-middle',
+		trigger_element: trigger_element
 	});
 
 	overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
@@ -1632,8 +1633,6 @@ function openManualinputDialogue(item, data) {
 			.then((response) => response.json())
 			.then((response) => {
 				this.overlay.unsetLoading();
-				document.querySelector('[name="manualinput"]').focus();
-				document.removeEventListener('keydown', window.submitHandler);
 
 				for (const element of form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -1660,6 +1659,10 @@ function openManualinputDialogue(item, data) {
 							if (confirm(response.result.confirmation)) {
 								window.open(item.url, '_blank');
 								overlayDialogueDestroy(overlay.dialogueid);
+							}
+							else {
+								overlay.recoverFocus();
+								overlay.containFocus();
 							}
 						}
 					}

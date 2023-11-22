@@ -545,10 +545,12 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 
 		const overlay = PopUp('script.userinput.edit', parameters, {
 			dialogueid: 'script-userinput-form',
-			dialogue_class: 'modal-popup-small position-middle'
+			dialogue_class: 'modal-popup-small position-middle',
+			trigger_element: trigger_element
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const form = document.getElementById('script-userinput-form');
 			const curl = new Curl('jsrpc.php');
 
 			curl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
@@ -564,16 +566,9 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 				curl.setArgument('eventid', eventid);
 			}
 
-			const form = document.getElementById('script-userinput-form');
-			this.overlay = overlays_stack.getById('script-userinput-form');
-
 			fetch(curl.getUrl())
 				.then((response) => response.json())
 				.then((response) => {
-					if (this.overlay) {
-						this.overlay.unsetLoading()
-					}
-
 					if (form) {
 						for (const element of form.parentNode.children) {
 							if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -586,25 +581,22 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 						const message_box = makeMessageBox('bad', response.result.error, '', true, true)[0];
 
 						form.parentNode.insertBefore(message_box, form);
-						document.removeEventListener('keydown', window.submitHandler);
 					}
 					else {
 						confirmation = response.result.confirmation;
 
 						if (confirmation === '') {
 							execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
-							overlayDialogueDestroy(overlay.dialogueid);
 						}
 						else {
 							showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid,
-								csrf_token, e.detail.data.manualinput, overlay.dialogueid
+								csrf_token, e.detail.data.manualinput, overlay.dialogueid, e.target
 							);
 						}
 					}
 				})
 				.catch((exception) => {
 					console.log('Could not retrieve macro values:', exception);
-					document.removeEventListener('keydown', window.submitHandler);
 				});
 		});
 	}
@@ -626,7 +618,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
  * @param {string}      csrf_token       CSRF token.
  * @param {Node}        trigger_element  UI element that was clicked to open overlay dialogue.
  */
-function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element) {
+function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element, dialogueid = null) {
 	const popup_options = {scriptid: scriptid};
 
 	if (hostid !== null) {
@@ -645,7 +637,9 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
 			|| (manualinput !== null && Object.keys(popup_options).length === 3)) {
 		popup_options._csrf_token = csrf_token;
 
-		PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
+		PopUp('popup.scriptexec', popup_options, {
+			dialogue_class: 'modal-popup-medium', trigger_element
+		});
 	}
 }
 
@@ -663,11 +657,9 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
  */
 function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
 		manualinput = null, overlay_dialogue_id = null) {
-	document.removeEventListener('keydown', window.submitHandler);
 
 	overlayDialogue({
 		'title': t('Execution confirmation'),
-		'dialogueid': 'script-execution-confirmation',
 		'content': jQuery('<span>')
 			.addClass('confirmation-msg')
 			.text(confirmation),
@@ -677,11 +669,17 @@ function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element
 				'title': t('Cancel'),
 				'class': 'btn-alt',
 				'focused': (hostid === null && eventid === null),
+				'cancel': true,
 				'action': () => {
-					if (overlay_dialogue_id) {
-						this.overlay = overlays_stack.getById(overlay_dialogue_id);
-						this.overlay.unsetLoading();
-						document.querySelector('[name="manualinput"]').focus();
+					const overlay = overlays_stack.getById(overlay_dialogue_id);
+
+					if (overlay) {
+						overlay.unsetLoading();
+						overlay.recoverFocus();
+						overlay.containFocus();
+					}
+					else {
+						trigger_element.focus();
 					}
 				}
 			},
@@ -689,19 +687,16 @@ function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element
 				'title': t('Execute'),
 				'enabled': (hostid !== null || eventid !== null),
 				'focused': (hostid !== null || eventid !== null),
-				'keepOpen': true,
 				'action': () => {
-					document.addEventListener('keydown', window.submitHandler);
-
-					execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element);
-
 					if (overlay_dialogue_id) {
 						overlayDialogueDestroy(overlay_dialogue_id);
 					}
+
+					execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element, overlay_dialogue_id);
 				}
 			}
 		]
-	}, trigger_element);
+	});
 
 	return false;
 }
