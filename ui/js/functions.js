@@ -590,7 +590,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 						}
 						else {
 							showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid,
-								csrf_token, e.detail.data.manualinput, overlay.dialogueid, e.target
+								csrf_token, e.detail.data.manualinput, overlay.dialogueid
 							);
 						}
 					}
@@ -618,7 +618,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
  * @param {string}      csrf_token       CSRF token.
  * @param {Node}        trigger_element  UI element that was clicked to open overlay dialogue.
  */
-function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element, dialogueid = null) {
+function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element) {
 	const popup_options = {scriptid: scriptid};
 
 	if (hostid !== null) {
