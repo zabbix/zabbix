@@ -620,7 +620,6 @@ static int	DBpatch_6000044(void)
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-
 	DBfree_result(result);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
