@@ -1567,10 +1567,11 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 				item.target = data.params.target;
 				item.rel = data.params.rel;
 
-				if (data.params.manualinput === '1') {
+				if (data.params.manualinput == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 					item.clickCallback = () => openManualinputDialogue(item, data, trigger_elm);
 				}
-				else if (data.params.manualinput === '0' && data.params.confirmation !== '') {
+				else if (data.params.manualinput == ZBX_SCRIPT_MANUALINPUT_DISABLED
+						&& data.params.confirmation !== '') {
 					item.url = data.params.url;
 
 					item.clickCallback = function() {

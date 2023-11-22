@@ -536,7 +536,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 		manualinput = null, manualinput_prompt, manualinput_validator_type, manualinput_validator,
 		manualinput_default_value) {
 
-	if (manualinput === '1') {
+	if (manualinput == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 		const parameters = {
 			manualinput_prompt: manualinput_prompt,
 			manualinput_default_value: manualinput_default_value,
