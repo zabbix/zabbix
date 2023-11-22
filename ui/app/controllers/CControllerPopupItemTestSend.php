@@ -327,14 +327,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'item_type' => 'type'
 			]);
 
-			if (array_key_exists('headers', $item_test_data)) {
-				$item_test_data['headers'] = $this->transformHeaderFields($item_test_data['headers']);
-			}
-
-			if (array_key_exists('query_fields', $item_test_data)) {
-				$item_test_data['query_fields'] = $this->transformQueryFields($item_test_data['query_fields']);
-			}
-
 			if (array_key_exists('parameters', $item_test_data)) {
 				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
 			}
@@ -345,6 +337,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
+
+			self::transformHttpFields($item_test_data);
 
 			/*
 			 * Server will turn off status code check if field value is empty. If field is not present, then server will

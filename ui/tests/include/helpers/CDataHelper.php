@@ -381,7 +381,16 @@ class CDataHelper extends CAPIHelper {
 		}
 
 		if ($time === null) {
-			$time = time();
+			if (is_array($values)) {
+				$offset = time();
+				$time = [];
+				for ($i = count($values); $i > 0; $i--) {
+					$time[] = $offset - $i;
+				}
+			}
+			else {
+				$time = time();
+			}
 		}
 		elseif (is_array($time)) {
 			if (count($time) !== count($values)) {

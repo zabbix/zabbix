@@ -189,20 +189,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'item_type' => 'type'
 		]);
 
-		if (array_key_exists('headers', $data)) {
-			$data['headers'] = $this->transformHeaderFields($data['headers']);
-		}
+		// Only non-empty fields need to be sent to server.
+		$data = $this->unsetEmptyValues($data);
 
-		if (array_key_exists('query_fields', $data)) {
-			$data['query_fields'] = $this->transformQueryFields($data['query_fields']);
-		}
+		self::transformHttpFields($data);
 
 		if (array_key_exists('parameters', $data)) {
 			$data['parameters'] = $this->transformParametersFields($data['parameters']);
 		}
-
-		// Only non-empty fields need to be sent to server.
-		$data = $this->unsetEmptyValues($data);
 
 		/*
 		 * Server will turn off status code check if field value is empty. If field is not present, then server will

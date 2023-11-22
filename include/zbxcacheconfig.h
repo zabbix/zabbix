@@ -630,7 +630,7 @@ typedef struct
 	char			*password_orig, *password;
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
-	char			*ssl_cert_file_orig,*ssl_cert_file;
+	char			*ssl_cert_file_orig, *ssl_cert_file;
 	char			*ssl_key_file_orig, *ssl_key_file;
 	char			*ssl_key_password_orig, *ssl_key_password;
 
@@ -638,6 +638,9 @@ typedef struct
 	zbx_list_t		data_point_link_queue;
 	int			time_flush;
 	int			senders;
+
+	int			item_value_type;
+	char			*attempt_interval;
 }
 zbx_connector_t;
 
@@ -1161,10 +1164,10 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle);
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
 
-int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error);
-int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, unsigned char env, char **error);
+int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, char **error);
+int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 
