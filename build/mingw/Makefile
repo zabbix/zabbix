@@ -31,6 +31,7 @@ OBJS = \
 	$(OUTPUTDIR)\token.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
+	$(OUTPUTDIR)\ip.o \
 	$(OUTPUTDIR)\iprange.o \
 	$(OUTPUTDIR)\zbxhash.o \
 	$(OUTPUTDIR)\md5.o \
@@ -50,6 +51,7 @@ OBJS = \
 	$(OUTPUTDIR)\variant.o \
 	$(OUTPUTDIR)\sysinfo_system.o \
 	$(OUTPUTDIR)\sysinfo_dns.o \
+	$(OUTPUTDIR)\sysinfo_ip_reverse.o \
 	$(OUTPUTDIR)\sysinfo_vfs_file.o \
 	$(OUTPUTDIR)\sysinfo_dir.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
@@ -119,6 +121,9 @@ GOLDFLAGS += -X main.applicationName=zabbix_agent2
 all: $(TARGETBIN)
 
 $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\ip.o: $(TOPDIR)\src\libs\zbxip\ip.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\iprange.o: $(TOPDIR)\src\libs\zbxip\iprange.c
@@ -215,6 +220,9 @@ $(OUTPUTDIR)\sysinfo.o: $(TOPDIR)\src\libs\zbxsysinfo\sysinfo.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
 $(OUTPUTDIR)\sysinfo_system.o: $(TOPDIR)\src\libs\zbxsysinfo\common\system.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\sysinfo_ip_reverse.o: $(TOPDIR)\src\libs\zbxsysinfo\common\ip_reverse.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\sysinfo_dns.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dns.c

@@ -262,15 +262,14 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
-			switch ($data['constructor']) {
-				case 'open':
-					$this->zbxTestClickButtonText('Expression constructor');
-					break;
-				case 'open_close':
-					$this->zbxTestClickButtonText('Expression constructor');
-					$this->zbxTestClickButtonText('Close expression constructor');
-					$this->page->waitUntilReady();
-					break;
+			$this->zbxTestClickButtonText('Expression constructor');
+			// Wait for expression constructor to open, textarea is disabled and its id has changed to 'expr_temp'.
+			$dialog->query('id:expr_temp')->waitUntilVisible();
+
+			if ($data['constructor'] === 'open_close') {
+				$this->zbxTestClickButtonText('Close expression constructor');
+				// Wait until expression constructor closes, textarea is enabled and its id has changed to 'expression'.
+				$dialog->query('id:expression')->waitUntilVisible();
 			}
 		}
 
@@ -422,22 +421,22 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
 			$this->assertEquals(4, $dialog_footer->query('button',['Update', 'Clone', 'Delete', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 		elseif (isset($data['templatedHost'])) {
 			$this->assertEquals(3, $dialog_footer->query('button',['Update', 'Clone', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 			$this->assertEquals(1, $dialog_footer->query('button:Delete')->all()
-				->filter(new CElementFilter(CElementFilter::NOT_CLICKABLE))->count()
+					->filter(CElementFilter::NOT_CLICKABLE)->count()
 			);
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		}
 		else {
 			$this->assertEquals(2, $dialog_footer->query('button',['Add', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 

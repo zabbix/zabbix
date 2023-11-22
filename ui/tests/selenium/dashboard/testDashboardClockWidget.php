@@ -21,8 +21,8 @@
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup widget, profiles
@@ -32,7 +32,17 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 class testDashboardClockWidget extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Id of the dashboard with widgets.
@@ -40,15 +50,6 @@ class testDashboardClockWidget extends CWebTest {
 	 * @var integer
 	 */
 	protected static $dashboardid;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -288,8 +289,9 @@ class testDashboardClockWidget extends CWebTest {
 							'id:time_sec' => true, 'id:time_format' => '24-hour'
 					],
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
-					'xpath:.//div[@class="fields-group fields-group-tzone"]' => ['id:tzone_size' => 20, 'id:tzone_bold' => false,
-							'id:tzone_color' => null, 'id:tzone_timezone' => 'Local default: (UTC+03:00) Europe/Riga',
+					'xpath:.//div[@class="fields-group fields-group-tzone"]' => ['id:tzone_size' => 20,
+							'id:tzone_bold' => false, 'id:tzone_color' => null,
+							'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
 							'id:tzone_format' => 'Short'
 					]
 				];
@@ -337,6 +339,8 @@ class testDashboardClockWidget extends CWebTest {
 				}
 			}
 		}
+
+		$this->assertEquals(['Item', 'Show'], $form->getRequiredLabels());
 	}
 
 	/**
@@ -926,6 +930,23 @@ class testDashboardClockWidget extends CWebTest {
 					'Error message' => [
 						'Invalid parameter "Item": cannot be empty.'
 					]
+				],
+				// #29.
+				[
+					[
+						'expected' => TEST_BAD,
+						'second_page' => true,
+						'fields' => [
+							'Clock type' => 'Digital',
+							'id:show_1' => false,
+							'id:show_2' => false,
+							'id:show_3' => false,
+							'id:show_4' => false
+						],
+						'Error message' => [
+							'Invalid parameter "Show": at least one option must be selected.'
+						]
+					]
 				]
 			]
 		];
@@ -936,8 +957,6 @@ class testDashboardClockWidget extends CWebTest {
 	 *
 	 * @param array      $data      data provider
 	 * @param boolean    $update    true if update scenario, false if create
-	 *
-	 * @dataProvider getClockWidgetCommonData
 	 */
 	public function checkFormClockWidget($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {

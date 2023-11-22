@@ -342,7 +342,7 @@ class testProxy extends CAPITest {
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_PROXY,
+						'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$data['proxyids']['delete_used_in_action']
 					]
@@ -562,7 +562,7 @@ class testProxy extends CAPITest {
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'allowed_addresses' => '192.168.0-255.0/30'
 				],
-				'expected_error' => 'Invalid parameter "/1/allowed_addresses": invalid address range "192.168.0-255.0/30".'
+				'expected_error' => 'Invalid parameter "/1/allowed_addresses": incorrect address starting from "/30".'
 			],
 			'Test proxy.create: invalid "allowed_addresses" (IPv6 address range)' => [
 				'proxy' => [
@@ -570,7 +570,7 @@ class testProxy extends CAPITest {
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'allowed_addresses' => '::ff-0ffff'
 				],
-				'expected_error' => 'Invalid parameter "/1/allowed_addresses": invalid address range "::ff-0ffff".'
+				'expected_error' => 'Invalid parameter "/1/allowed_addresses": incorrect address starting from "::ff-0ffff".'
 			],
 			'Test proxy.create: invalid "allowed_addresses" (user macro)' => [
 				'proxy' => [
@@ -578,7 +578,7 @@ class testProxy extends CAPITest {
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'allowed_addresses' => '{$MACRO}'
 				],
-				'expected_error' => 'Invalid parameter "/1/allowed_addresses": invalid address range "{$MACRO}".'
+				'expected_error' => 'Invalid parameter "/1/allowed_addresses": incorrect address starting from "{$MACRO}".'
 			],
 			'Test proxy.create: invalid "allowed_addresses" (too long)' => [
 				'proxy' => [
@@ -3086,21 +3086,21 @@ class testProxy extends CAPITest {
 					'proxyid' => 'update_active_defaults',
 					'allowed_addresses' => '192.168.0-255.0/30'
 				],
-				'expected_error' => 'Invalid parameter "/1/allowed_addresses": invalid address range "192.168.0-255.0/30".'
+				'expected_error' => 'Invalid parameter "/1/allowed_addresses": incorrect address starting from "/30".'
 			],
 			'Test proxy.update: invalid "allowed_addresses" (IPv6 address range)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'allowed_addresses' => '::ff-0ffff'
 				],
-				'expected_error' => 'Invalid parameter "/1/allowed_addresses": invalid address range "::ff-0ffff".'
+				'expected_error' => 'Invalid parameter "/1/allowed_addresses": incorrect address starting from "::ff-0ffff".'
 			],
 			'Test proxy.update: invalid "allowed_addresses" (user macro)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'allowed_addresses' => '{$MACRO}'
 				],
-				'expected_error' => 'Invalid parameter "/1/allowed_addresses": invalid address range "{$MACRO}".'
+				'expected_error' => 'Invalid parameter "/1/allowed_addresses": incorrect address starting from "{$MACRO}".'
 			],
 			'Test proxy.update: invalid "allowed_addresses" (too long)' => [
 				'proxy' => [

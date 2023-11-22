@@ -566,7 +566,7 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (NULL != func_macro_in_list(*data, &token.data.func_macro, NULL))
+					if (NULL != func_get_macro_from_func(*data, &token.data.func_macro, NULL))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, lld_macro_paths,
 								error, max_error_len);
@@ -635,7 +635,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		size_t	param_pos, param_len, rel_len = len - (p - e);
 		int	quoted;
 
-		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+		zbx_lld_trigger_function_param_parse(p, &param_pos, &param_len, &sep_pos);
 
 		/* copy what was before the parameter */
 		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);

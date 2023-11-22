@@ -104,8 +104,8 @@ class testFormHostFromStandalone extends testFormHost {
 	public function testFormHostFromStandalone_DiscoveredHostLinkedTemplates() {
 		$filtered_results = [
 			[
-				'type' => 'items.php?',
-				'form' => 'items',
+				'type' => 'zabbix.php?action=item.list&',
+				'form' => 'item_list',
 				'objects' => [
 					'before_unlink' => [
 						'Test of discovered host 1 template for unlink: Template1 item1',

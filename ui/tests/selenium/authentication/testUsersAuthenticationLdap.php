@@ -19,7 +19,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
@@ -30,7 +31,17 @@ require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
  */
 class testUsersAuthenticationLdap extends testFormAuthentication {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	public function testUsersAuthenticationLdap_Layout() {
 		$ldap_form = $this->openFormAndCheckBasics('LDAP');

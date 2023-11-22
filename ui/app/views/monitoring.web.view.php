@@ -27,6 +27,8 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.web.view.js.php');
 

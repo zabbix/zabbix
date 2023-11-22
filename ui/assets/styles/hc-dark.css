@@ -795,8 +795,10 @@ header {
     white-space: nowrap; }
     header .header-controls label {
       line-height: 24px; }
-    header .header-controls .radio-list-control label {
-      line-height: 1.2; }
+    header .header-controls .radio-list-control {
+      vertical-align: top; }
+      header .header-controls .radio-list-control label {
+        line-height: 1.2; }
     header .header-controls .zi-star,
     header .header-controls .zi-star-filled {
       padding: 0;
@@ -2151,6 +2153,12 @@ button {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+@page {
+  margin: 10px; }
+@media print {
+  .dashboard-page {
+    margin: 10px;
+    break-after: page; } }
 .diff {
   padding: 4px;
   background: #111111; }
@@ -2280,6 +2288,8 @@ button {
   background-color: #000000;
   border-collapse: separate;
   border: 1px solid #444444; }
+  .list-table.fixed {
+    table-layout: fixed; }
   .list-table thead th {
     height: 100%;
     overflow: hidden;
@@ -2288,8 +2298,12 @@ button {
     color: #cacaca;
     white-space: nowrap;
     vertical-align: bottom; }
-    .list-table thead th .vertical {
+    .list-table thead th .text-vertical {
+      max-height: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       writing-mode: vertical-lr;
+      line-height: 22px;
       transform: rotate(180deg); }
     .list-table thead th .arrow-up {
       margin-left: 3px;
@@ -2369,9 +2383,6 @@ button {
     .list-table .action-container .separator {
       flex-shrink: 0;
       margin-right: 4px; }
-  .list-table .vertical_rotation_inner {
-    transform: rotate(270deg);
-    white-space: nowrap; }
   .list-table .nothing-to-show td {
     color: #cacaca;
     text-align: center; }
@@ -3513,7 +3524,6 @@ section {
     display: flex;
     flex: 1;
     justify-content: space-between;
-    background-color: #111111;
     margin-top: -3px; }
   .filter-container.tabfilter-container nav > ul > li {
     padding-top: 3px; }
@@ -3574,7 +3584,8 @@ section {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover {
         background: #414141; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: #000000; }
+      background-color: #000000;
+      border-color: #444444; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.focused {
@@ -3901,27 +3912,27 @@ div.dashboard-widget-clock .clock-digital {
     color: #cacaca;
     font-weight: bold; }
 
-form.dashboard-widget-gauge .fields-group.fields-group-colors, form.dashboard-widget-gauge .fields-group.fields-group-description, form.dashboard-widget-gauge .fields-group.fields-group-value, form.dashboard-widget-gauge .fields-group.fields-group-needle, form.dashboard-widget-gauge .fields-group.fields-group-scale, form.dashboard-widget-gauge .fields-group.fields-group-thresholds {
+form.dashboard-widget-gauge .fields-group.fields-group-colors, form.dashboard-widget-gauge .fields-group.fields-group-description, form.dashboard-widget-gauge .fields-group.fields-group-value, form.dashboard-widget-gauge .fields-group.fields-group-value-arc, form.dashboard-widget-gauge .fields-group.fields-group-needle, form.dashboard-widget-gauge .fields-group.fields-group-scale, form.dashboard-widget-gauge .fields-group.fields-group-thresholds {
   display: grid;
   grid-template-columns: minmax(100px, max-content) 1fr max-content minmax(95px, max-content);
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-gauge .fields-group.fields-group-colors label, form.dashboard-widget-gauge .fields-group.fields-group-description label, form.dashboard-widget-gauge .fields-group.fields-group-value label, form.dashboard-widget-gauge .fields-group.fields-group-needle label, form.dashboard-widget-gauge .fields-group.fields-group-scale label, form.dashboard-widget-gauge .fields-group.fields-group-thresholds label {
+  form.dashboard-widget-gauge .fields-group.fields-group-colors label, form.dashboard-widget-gauge .fields-group.fields-group-description label, form.dashboard-widget-gauge .fields-group.fields-group-value label, form.dashboard-widget-gauge .fields-group.fields-group-value-arc label, form.dashboard-widget-gauge .fields-group.fields-group-needle label, form.dashboard-widget-gauge .fields-group.fields-group-scale label, form.dashboard-widget-gauge .fields-group.fields-group-thresholds label {
     text-align: right; }
-  form.dashboard-widget-gauge .fields-group.fields-group-colors hr, form.dashboard-widget-gauge .fields-group.fields-group-description hr, form.dashboard-widget-gauge .fields-group.fields-group-value hr, form.dashboard-widget-gauge .fields-group.fields-group-needle hr, form.dashboard-widget-gauge .fields-group.fields-group-scale hr, form.dashboard-widget-gauge .fields-group.fields-group-thresholds hr {
+  form.dashboard-widget-gauge .fields-group.fields-group-colors hr, form.dashboard-widget-gauge .fields-group.fields-group-description hr, form.dashboard-widget-gauge .fields-group.fields-group-value hr, form.dashboard-widget-gauge .fields-group.fields-group-value-arc hr, form.dashboard-widget-gauge .fields-group.fields-group-needle hr, form.dashboard-widget-gauge .fields-group.fields-group-scale hr, form.dashboard-widget-gauge .fields-group.fields-group-thresholds hr {
     grid-column: 1 / -1;
     margin: 0;
     width: 100%;
     border: solid #333333;
     border-width: 1px 0 0 0; }
-  form.dashboard-widget-gauge .fields-group.fields-group-colors .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-description .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-value .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-scale .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-fluid {
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-description .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-value .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-value-arc .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-scale .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-fluid {
     grid-column: 2 / -1; }
-  form.dashboard-widget-gauge .fields-group.fields-group-colors .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-description .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-value .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-needle .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-scale .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .offset-3 {
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-description .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-value .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-value-arc .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-needle .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-scale .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .offset-3 {
     grid-column-start: 3; }
-  form.dashboard-widget-gauge .fields-group.fields-group-colors .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-description .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-value .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-scale .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-size input {
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-description .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-value .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-value-arc .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-scale .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-size input {
     margin-right: 5px; }
-  form.dashboard-widget-gauge .fields-group.fields-group-colors .form-field, form.dashboard-widget-gauge .fields-group.fields-group-description .form-field, form.dashboard-widget-gauge .fields-group.fields-group-value .form-field, form.dashboard-widget-gauge .fields-group.fields-group-needle .form-field, form.dashboard-widget-gauge .fields-group.fields-group-scale .form-field, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field {
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .form-field, form.dashboard-widget-gauge .fields-group.fields-group-description .form-field, form.dashboard-widget-gauge .fields-group.fields-group-value .form-field, form.dashboard-widget-gauge .fields-group.fields-group-value-arc .form-field, form.dashboard-widget-gauge .fields-group.fields-group-needle .form-field, form.dashboard-widget-gauge .fields-group.fields-group-scale .form-field, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field {
     line-height: 24px; }
 form.dashboard-widget-gauge .fields-group.fields-group-colors {
   grid-template-columns: repeat(3, minmax(100px, max-content) 1fr); }
@@ -3930,10 +3941,6 @@ form.dashboard-widget-gauge .fields-group.fields-group-description .form-field:n
 form.dashboard-widget-gauge .fields-group.fields-group-value .units-show {
   display: flex; }
   form.dashboard-widget-gauge .fields-group.fields-group-value .units-show label[for='units'] {
-    width: 100%; }
-form.dashboard-widget-gauge .fields-group.fields-group-needle .needle-show {
-  display: flex; }
-  form.dashboard-widget-gauge .fields-group.fields-group-needle .needle-show label[for='lbl_needle_color'] {
     width: 100%; }
 form.dashboard-widget-gauge .fields-group.fields-group-scale .scale-show {
   display: flex; }
@@ -3954,24 +3961,50 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
-div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
+div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
+  padding-top: 5px;
+  border-top: 1px solid #333333; }
+div.dashboard-widget-hostavail .host-avail-table th {
+  width: 15%;
+  min-width: 100px;
+  color: #cacaca; }
+div.dashboard-widget-hostavail .host-avail-table td {
+  min-width: 95px;
   border-left: 1px dotted #333333; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-true {
-  background: #86cc89; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-false {
-  background: #e45959; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown {
-  background: #97aab3; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
-  background: transparent; }
+div.dashboard-widget-hostavail .host-avail-table th:last-child,
+div.dashboard-widget-hostavail .host-avail-table td:last-child {
+  padding-right: 5px; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-true {
+  color: #ffffff;
+  background-color: #34af67; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-false {
+  color: #ffffff;
+  background-color: #d64e4e; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed {
+  color: #ffffff;
+  background-color: #f1a50b; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
+  color: #ffffff;
+  background-color: #acbbc2; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
+  color: #ffffff;
+  background-color: transparent; }
 
-div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
+div.dashboard-widget-hostavail .host-avail-table thead th {
+  color: #ffffff; }
+div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
+  padding-top: 6px;
+  border-top: none; }
+div.dashboard-widget-hostavail .host-avail-table th {
+  color: #ffffff; }
+div.dashboard-widget-hostavail .host-avail-table td {
   border-left: 1px solid #444444; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-true,
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-false,
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown,
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
-  background: transparent; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-true,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-false,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
+  background-color: transparent; }
 
 .dashboard-widget-inaccessible {
   display: grid;
@@ -4446,10 +4479,6 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
     display: flex;
     flex-direction: column;
     justify-content: center; }
-
-div.dashboard-widget-slareport .date-vertical {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg); }
 
 form.dashboard-widget-svggraph .svg-graph-preview,
 form.dashboard-widget-svggraph .graph-widget-config-tabs {
@@ -4947,10 +4976,6 @@ form.is-loading {
   white-space: pre-wrap;
   word-break: break-word; }
 
-.overflow-table {
-  overflow-x: auto;
-  position: relative; }
-
 .filter-btn-container {
   position: relative;
   text-align: right; }
@@ -4987,6 +5012,8 @@ form.is-loading {
       border-right: 0; }
     .filter-forms .cell button {
       margin: 0; }
+    .filter-forms .cell table {
+      width: auto; }
   .filter-forms button {
     margin: 10px 5px 0; }
   .filter-forms select {
@@ -5040,6 +5067,7 @@ form.is-loading {
   .table-forms td {
     position: relative; }
   .table-forms .table-forms-td-left {
+    position: relative;
     display: table-cell;
     padding: 5px 0;
     text-align: right;
@@ -5053,6 +5081,10 @@ form.is-loading {
       .table-forms .table-forms-td-left label .btn-icon,
       .table-forms .table-forms-td-left label .icon {
         margin-left: 5px; }
+    .table-forms .table-forms-td-left .checkbox-radio {
+      right: 0;
+      margin-right: 0;
+      margin-left: 0; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
@@ -5078,6 +5110,9 @@ form.is-loading {
         padding-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
+  .table-forms .table-subforms {
+    margin-top: -5px;
+    margin-bottom: -5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -6384,31 +6419,29 @@ span.is-loading {
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .z-select .focusable,
 z-select .focusable, .z-select .list,
 z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
-.overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
+.overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, .z-select .focusable::-webkit-scrollbar,
   z-select .focusable::-webkit-scrollbar, .z-select .list::-webkit-scrollbar,
   z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
-  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
+  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
-    width: 9px; }
+    width: 9px;
+    height: 9px; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, .z-select .focusable::-webkit-scrollbar-track,
   z-select .focusable::-webkit-scrollbar-track, .z-select .list::-webkit-scrollbar-track,
   z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
-  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
+  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #1f1f1f; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, .z-select .focusable::-webkit-scrollbar-thumb,
   z-select .focusable::-webkit-scrollbar-thumb, .z-select .list::-webkit-scrollbar-thumb,
   z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
-  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
+  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: #999999;
     border: 1px solid #4d4d4d; }
-
-.overflow-table::-webkit-scrollbar {
-  height: 9px; }
 
 .drag-icon, .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
@@ -6676,6 +6709,7 @@ svg {
 .ui-sortable .td-drag-icon {
   width: 12px; }
 .ui-sortable.ui-sortable-disabled .drag-icon {
+  cursor: default;
   color: #555555; }
 
 #expressions_list .ui-sortable-helper {
@@ -7131,6 +7165,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .leaflet-control.disabled {
   background-color: #000000 !important;
   opacity: 1; }
+  .leaflet-control.disabled .geomap-filter-button {
+    cursor: default;
+    opacity: .4; }
 
 .leaflet-container {
   height: 100%;

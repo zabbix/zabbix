@@ -40,6 +40,7 @@
 int	zbx_http_punycode_encode_url(char **url);
 void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
+char	*zbx_determine_charset(const char *content_type, char *body, size_t size);
 
 #ifdef HAVE_LIBCURL
 
@@ -93,16 +94,21 @@ void	zbx_http_context_create(zbx_http_context_t *context);
 void	zbx_http_context_destroy(zbx_http_context_t *context);
 int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
-		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
+		int timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
 		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
 		char **error);
 
-CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context);
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
+		int check_response_code);
 int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURLcode err, long *response_code,
 		char **out, char **error);
 int	zbx_handle_response_code(char *status_codes, long response_code, const char *out, char **error);
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated);
+
+#define ZBX_HTTP_IGNORE_RESPONSE_CODE	0
+#define ZBX_HTTP_CHECK_RESPONSE_CODE	1
 
 #endif
 

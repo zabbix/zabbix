@@ -20,22 +20,31 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource EntitiesTags
- * @dataSource Services
+ * @dataSource EntitiesTags, Services, Actions
  *
  * @backup services
  */
 class testPageServicesServices extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 19;
+	const SERVICE_COUNT = 20;
 
 	const LAYOUT_PARENT = 'Parent for 2 levels of child services';
 	const LAYOUT_CHILD = 'Child service with child service';
@@ -48,16 +57,6 @@ class testPageServicesServices extends CWebTest {
 
 	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
 	const TABLE_SELECTOR = 'id:service-list';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
-
 
 	/**
 	 * Set parent and child services to Problem status and link the child services to the corresponding problem events.

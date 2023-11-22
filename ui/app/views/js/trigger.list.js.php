@@ -136,15 +136,15 @@
 			const dialogue = overlay.$dialogue[0];
 
 			dialogue.addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
+				postMessageOk(e.detail.success.title);
 
 				const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 				uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
 				chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
 				chkbxRange.update(this.checkbox_object);
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+				if ('messages' in e.detail.success) {
+					postMessageDetails('success', e.detail.success.messages);
 				}
 
 				location.href = location.href;
@@ -254,6 +254,18 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this, this.context),
+				{once: true}
+			);
 		}
 
 		editHost(e, hostid) {

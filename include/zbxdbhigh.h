@@ -596,6 +596,7 @@ typedef struct
 	zbx_uint64_t		connectorid;
 	int			tags_evaltype;
 	zbx_vector_match_tags_t	connector_tags;
+	int			item_value_type;
 }
 zbx_connector_filter_t;
 
@@ -900,7 +901,7 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_HOST_GROUP			0
 #define ZBX_CONDITION_TYPE_HOST				1
 #define ZBX_CONDITION_TYPE_TRIGGER			2
-#define ZBX_CONDITION_TYPE_TRIGGER_NAME			3
+#define ZBX_CONDITION_TYPE_EVENT_NAME			3
 #define ZBX_CONDITION_TYPE_TRIGGER_SEVERITY		4
 /* #define ZBX_CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define ZBX_CONDITION_TYPE_TIME_PERIOD			6

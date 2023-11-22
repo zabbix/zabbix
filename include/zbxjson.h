@@ -173,7 +173,7 @@
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
 #define ZBX_PROTO_TAG_ITEM_TAGS			"item_tags"
-#define ZBX_PROTO_TAG_PROXY_UPLOAD		"upload"
+#define ZBX_PROTO_TAG_HISTORY_UPLOAD		"upload"
 #define ZBX_PROTO_TAG_DASHBOARDID		"dashboardid"
 #define ZBX_PROTO_TAG_USERID			"userid"
 #define ZBX_PROTO_TAG_PERIOD			"period"
@@ -241,8 +241,8 @@
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
 
-#define ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED	"enabled"
-#define ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED	"disabled"
+#define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
+#define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"
 
 #define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
 
@@ -295,6 +295,7 @@ const char	*zbx_json_strerror(void);
 
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
+void	zbx_json_init_with(struct zbx_json *j, const char *src);
 void	zbx_json_clean(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);

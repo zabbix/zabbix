@@ -22,7 +22,15 @@
 
 package main
 
-func loadOSDependentFlags() {}
+import (
+	"errors"
+
+	"git.zabbix.com/ap/plugin-support/zbxflag"
+)
+
+const usageMessageExampleConfPath = `/etc/zabbix/zabbix_agent2.conf`
+
+func osDependentFlags() zbxflag.Flags { return zbxflag.Flags{} }
 
 func setServiceRun(fourground bool) {}
 
@@ -36,7 +44,32 @@ func eventLogErr(err error) error { return nil }
 
 func confirmService() {}
 
-func validateExclusiveFlags() error { return nil }
+func validateExclusiveFlags(args *Arguments) error {
+	var (
+		exclusiveFlagsSet = []bool{
+			args.print,
+			args.test != "",
+			args.runtimeCommand != "",
+			args.testConfig,
+		}
+		count int
+	)
+
+	if args.verbose && !(args.test != "" || args.print) {
+		return errors.New("option -v, --verbose can only be specified with -t or -p")
+	}
+
+	for _, exclusiveFlagSet := range exclusiveFlagsSet {
+		if exclusiveFlagSet {
+			count++
+		}
+		if count >= 2 { //nolint:gomnd
+			return errors.New("mutually exclusive options used, see -h, --help for more information")
+		}
+	}
+
+	return nil
+}
 
 func handleWindowsService(conf string) error { return nil }
 

@@ -21,11 +21,6 @@
 
 class CControllerTriggerPrototypeUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $db_trigger_prototype;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -73,16 +68,12 @@ class CControllerTriggerPrototypeUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name', 'itemid', 'hostid'],
-			'itemids' => $this->getInput('parent_discoveryid'),
-			'editable' => true
-		]);
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	}
 
-		if (!$discovery_rule) {
-			return false;
-		}
-
+	protected function doAction(): void {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'templateid',
 				'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
@@ -94,23 +85,19 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'editable' => true
 		]);
 
-		if (!$db_trigger_prototypes) {
-			return false;
+		if ($db_trigger_prototypes) {
+			$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+			$db_trigger_prototype = reset($db_trigger_prototypes);
+		}
+		else {
+			$db_trigger_prototype = null;
 		}
 
-		$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		$this->db_trigger_prototype = reset($db_trigger_prototypes);
-
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-	}
-
-	protected function doAction(): void {
 		$trigger_prototype = [];
 
-		if ($this->db_trigger_prototype['templateid'] == 0) {
+		if ($db_trigger_prototype && $db_trigger_prototype['templateid'] == 0) {
 			$trigger_prototype += [
 				'description' => $this->getInput('name'),
 				'event_name' => $this->getInput('event_name', ''),
@@ -149,8 +136,6 @@ class CControllerTriggerPrototypeUpdate extends CController {
 				unset($tags[$key]['type']);
 			}
 		}
-
-		CArrayHelper::sort($tags, ['tag', 'value']);
 
 		$trigger_prototype += [
 			'type' => $this->getInput('type', 0),

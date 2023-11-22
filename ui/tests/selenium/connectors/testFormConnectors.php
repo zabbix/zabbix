@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup connector, profiles
@@ -30,21 +30,22 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormConnectors extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	private static $connector_sql = 'SELECT * FROM connector ORDER BY connectorid';
 	private static $default_connector = 'Default connector';
 	private static $update_connector = 'Update connector';
 	private static $delete_connector = 'Delete connector';
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public static function prepareConnectorsData() {
 		CDataHelper::call('connector.create', [
@@ -68,14 +69,16 @@ class testFormConnectors extends CWebTest {
 	 */
 	public function testFormConnectors_Layout() {
 		$default_labels = [
-			'fields' => ['Name', 'Protocol', 'Data type', 'URL', 'Tag filter', 'HTTP authentication', 'Advanced configuration',
-				'Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout', 'HTTP proxy', 'SSL verify peer',
-				'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password', 'Description', 'Enabled'
+			'fields' => ['Name', 'Protocol', 'Data type', 'URL', 'Tag filter', 'Type of information', 'HTTP authentication',
+				'Advanced configuration', 'Max records per message', 'Concurrent sessions', 'Attempts', 'Attempt interval',
+				'Timeout', 'HTTP proxy', 'SSL verify peer',	'SSL verify host', 'SSL certificate file', 'SSL key file',
+				'SSL key password', 'Description', 'Enabled'
 			],
 			'advanced_fields' => ['Max records per message', 'Concurrent sessions', 'Attempts','Timeout', 'HTTP proxy',
 				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password'
 			],
-			'required' => ['Name', 'URL', 'Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout'],
+			'required' => ['Name', 'URL', 'Type of information', 'Max records per message', 'Concurrent sessions',
+				'Attempts', 'Attempt interval', 'Timeout'],
 			'default' => [
 				'Data type' => 'Item values',
 				'Tag filter' => 'And/Or',
@@ -83,6 +86,7 @@ class testFormConnectors extends CWebTest {
 				'Max records per message' => 'Unlimited',
 				'Concurrent sessions' => '1',
 				'Attempts' => '1',
+				'Attempt interval' => '5s',
 				'Timeout' => '5s',
 				'SSL verify peer' => true,
 				'SSL verify host' => true,
