@@ -357,6 +357,9 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))
 		return SUCCEED;
 
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "25006"))
+		return SUCCEED;
+
 	return FAIL;
 }
 #endif
