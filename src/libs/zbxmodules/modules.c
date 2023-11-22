@@ -56,7 +56,7 @@ static int	zbx_register_module_items(zbx_metric_t *metrics, char *error, size_t 
 {
 	int	i;
 
-	for (int i = 0; NULL != metrics[i].key; i++)
+	for (i = 0; NULL != metrics[i].key; i++)
 	{
 		/* accept only CF_HAVEPARAMS flag from module items */
 		metrics[i].flags &= CF_HAVEPARAMS;
