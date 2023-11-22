@@ -1868,7 +1868,6 @@ static int	DBpatch_6050149(void)
 
 		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-
 	zbx_db_free_result(result);
 
 	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
