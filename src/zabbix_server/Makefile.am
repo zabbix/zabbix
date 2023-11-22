@@ -23,7 +23,8 @@ SUBDIRS = \
 	service \
 	rtc \
 	ha \
-	proxyconfigread
+	proxyconfigread \
+	pgmanager
 
 sbin_PROGRAMS = zabbix_server
 
@@ -85,6 +86,7 @@ zabbix_server_LDADD = \
 	libzbxserver.a \
 	stats/libzbxserver_server.a \
 	ha/libzbxha.a \
+	pgmanager/libzbxpgmanager.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \

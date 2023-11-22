@@ -903,6 +903,17 @@ zbx_dc_connector_t;
 
 typedef struct
 {
+	zbx_uint64_t	proxy_groupid;
+	int		failover_delay;
+	int		min_online;
+
+	zbx_uint64_t	revision;
+	zbx_uint64_t	host_mapping_revision;
+}
+zbx_dc_proxy_group_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -995,6 +1006,7 @@ typedef struct
 	zbx_hashset_t		httpstep_fields;
 	zbx_hashset_t		connectors;
 	zbx_hashset_t		connector_tags;
+	zbx_hashset_t		proxy_groups;
 	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;

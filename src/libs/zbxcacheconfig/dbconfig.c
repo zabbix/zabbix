@@ -19,6 +19,7 @@
 
 #include "dbconfig.h"
 
+#include "proxy_group.h"
 #include "zbxtasks.h"
 #include "zbxexpression.h"
 #include "zbxshmem.h"
@@ -97,6 +98,7 @@ ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
 ZBX_VECTOR_IMPL(host_key, zbx_host_key_t)
+ZBX_VECTOR_IMPL(objmove, zbx_objmove_t)
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
@@ -7209,7 +7211,8 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
 			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec, drules_sec, drules_sec2, httptest_sec,
-			httptest_sec2, connector_sec, connector_sec2, proxy_sec, proxy_sec2;
+			httptest_sec2, connector_sec, connector_sec2, proxy_sec, proxy_sec2, proxy_group_sec,
+			proxy_group_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -7218,7 +7221,8 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
 			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
-			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync;
+			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
+			proxy_group_sync;
 
 	double		autoreg_csec, autoreg_csec2, autoreg_host_csec, autoreg_host_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -7253,6 +7257,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 
 	zbx_dbsync_init(&autoreg_config_sync, mode);
 	zbx_dbsync_init(&autoreg_host_sync, mode);
+	zbx_dbsync_init(&proxy_group_sync, mode);
 	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
@@ -7328,6 +7333,11 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 		goto out;
 	autoreg_host_csec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_prepare_proxy_group(&proxy_group_sync))
+		goto out;
+	proxy_group_sec = zbx_time() - sec;
+
 	/* sync global configuration settings */
 	START_SYNC;
 	sec = zbx_time();
@@ -7342,6 +7352,11 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	sec = zbx_time();
 	DCsync_autoreg_host(&autoreg_host_sync);
 	autoreg_host_csec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	dc_sync_proxy_group(&proxy_group_sync, new_revision);
+	proxy_group_sec2 = zbx_time() - sec;
+
 	FINISH_SYNC;
 
 	/* sync macro related data, to support macro resolving during configuration sync */
@@ -7765,12 +7780,12 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				dsec + fsec + expr_sec + action_sec + action_op_sec + action_condition_sec +
 				trigger_tag_sec + correlation_sec + corr_condition_sec + corr_operation_sec +
 				hgroups_sec + itempp_sec + maintenance_sec + item_tag_sec + drules_sec + httptest_sec +
-				connector_sec + proxy_sec;
+				connector_sec + proxy_sec + proxy_group_sec;
 		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
-				drules_sec2 + httptest_sec2 + connector_sec2 + proxy_sec2;
+				drules_sec2 + httptest_sec2 + connector_sec2 + proxy_sec2 + proxy_group_sec2;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
@@ -7933,6 +7948,10 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, proxy_sec, proxy_sec2, proxy_sync.add_num,
 				proxy_sync.update_num, proxy_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy_group: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, proxy_group_sec, proxy_group_sec2, proxy_group_sync.add_num,
+				proxy_group_sync.update_num, proxy_group_sync.remove_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
@@ -8061,6 +8080,8 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				config->connectors.num_data, config->connectors.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector tags : %d (%d slots)", __func__,
 				config->connector_tags.num_data, config->connector_tags.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy groups : %d (%d slots)", __func__,
+				config->proxy_groups.num_data, config->proxy_groups.num_slots);
 
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
@@ -8650,6 +8671,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 
 	CREATE_HASHSET(config->connectors, 0);
 	CREATE_HASHSET(config->connector_tags, 0);
+
+	CREATE_HASHSET(config->proxy_groups, 0);
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{

@@ -164,4 +164,6 @@ int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
 
+int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync);
+
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

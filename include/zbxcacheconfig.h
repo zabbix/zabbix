@@ -1035,6 +1035,7 @@ typedef struct
 	zbx_uint64_t	upstream;	/* configuration revision received from server */
 	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
 	zbx_uint64_t	connector;
+	zbx_uint64_t	proxy_group;	/* summary revision of all proxy groups */
 }
 zbx_dc_revision_t;
 
@@ -1339,5 +1340,59 @@ zbx_dc_item_type_timeouts_t;
 
 void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts);
 char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
+
+typedef struct
+{
+	zbx_uint64_t	objid;
+	zbx_uint64_t	srcid;
+	zbx_uint64_t	dstid;
+}
+zbx_objmove_t;
+
+ZBX_VECTOR_DECL(objmove, zbx_objmove_t)
+
+/* proxy group manager local cache support */
+
+typedef struct zbx_pgm_group zbx_pgm_group_t;
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	revision;
+}
+zbx_pgm_host_t;
+
+ZBX_VECTOR_DECL(pgm_host, zbx_pgm_host_t)
+
+typedef struct
+{
+	zbx_uint64_t		proxyid;
+	int			status;
+	int			firstaccess;
+	struct zbx_pgm_group_t	*group;
+	zbx_vector_pgm_host_t	hosts;
+}
+zbx_pgm_proxy_t;
+
+ZBX_PTR_VECTOR_DECL(pgm_proxy_ptr, zbx_pgm_proxy_t *)
+
+struct zbx_pgm_group
+{
+	zbx_uint64_t			proxy_groupid;
+	zbx_uint64_t			revision;
+	zbx_uint64_t			mapping_revision;
+	zbx_uint64_t			sync_revision;
+	int				failover_delay;
+	int				min_online;
+	int				status;
+	zbx_uint32_t			flag;
+	zbx_vector_pgm_proxy_ptr_t	proxies;
+	zbx_vector_uint64_t		hostids;
+};
+
+ZBX_PTR_VECTOR_DECL(pgm_group_ptr, zbx_pgm_group_t *)
+
+
+int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
 
 #endif

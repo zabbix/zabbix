@@ -2112,6 +2112,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/lld/Makefile
+	src/zabbix_server/pgmanager/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile

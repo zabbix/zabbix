@@ -1563,6 +1563,25 @@ static void	DCdump_connectors(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static void	DCdump_proxy_groups(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_proxy_group_t	*pg;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
+	while (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "proxy_groupid:" ZBX_FS_UI64 " failover_delay:%d min_online:%d"
+				" revision:" ZBX_FS_UI64 " host_mapping_revision:" ZBX_FS_UI64,
+				pg->proxy_groupid, pg->failover_delay, pg->min_online, pg->revision,
+				pg->host_mapping_revision);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
@@ -1601,6 +1620,7 @@ void	DCdump_configuration(void)
 	DCdump_httpstep_fields();
 	DCdump_autoreg_hosts();
 	DCdump_connectors();
+	DCdump_proxy_groups();
 #ifdef HAVE_TESTS
 	DCdump_strpool();
 #endif

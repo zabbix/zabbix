@@ -125,6 +125,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "snmp poller";
 		case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
 			return "internal poller";
+		case ZBX_PROCESS_TYPE_PG_MANAGER:
+			return "proxy group manager";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
