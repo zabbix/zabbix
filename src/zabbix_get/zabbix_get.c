@@ -355,7 +355,7 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message);
+				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);
@@ -433,7 +433,7 @@ int	main(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_print_usage(usage_message);
+				zbx_print_usage(usage_message, zbx_progname);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -449,7 +449,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == host || NULL == key)
 	{
-		zbx_print_usage(usage_message);
+		zbx_print_usage(usage_message, zbx_progname);
 		ret = FAIL;
 	}
 

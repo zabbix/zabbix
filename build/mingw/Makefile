@@ -19,7 +19,6 @@ OBJS = \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\common_str.o \
 	$(OUTPUTDIR)\common_log.o \
-	$(OUTPUTDIR)\common_internal.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\libc_wrappers.o \
 	$(OUTPUTDIR)\param.o \
@@ -140,9 +139,6 @@ $(OUTPUTDIR)\common_str.o: $(TOPDIR)\src\libs\zbxcommon\common_str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\common_log.o: $(TOPDIR)\src\libs\zbxcommon\common_log.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\common_internal.o: $(TOPDIR)\src\libs\zbxcommon\common_internal.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxfile\file.c

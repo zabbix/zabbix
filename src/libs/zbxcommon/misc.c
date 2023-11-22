@@ -19,8 +19,6 @@
 
 #include "zbxcommon.h"
 
-#include "common_internal.h"
-
 #include "zbxstr.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
@@ -236,9 +234,10 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  *          80-column terminal                                                *
  *                                                                            *
  * Parameters:  usage_message - [IN]                                          *
+ *              progname      - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_print_usage(const char **usage_message)
+void	zbx_print_usage(const char **usage_message, const char *progname)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -252,8 +251,8 @@ void	zbx_print_usage(const char **usage_message)
 	{
 		size_t	pos;
 
-		printf("%s%s", ZBX_SPACE1, common_get_progname()());
-		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(common_get_progname()());
+		printf("%s%s", ZBX_SPACE1, progname);
+		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(progname);
 
 		while (NULL != *p)
 		{
@@ -302,13 +301,14 @@ static const char	help_message_footer[] =
  * Parameters: param         - [IN] pointer to modification parameter         *
  *             help_message  - [IN]                                           *
  *             usage_message - [IN]                                           *
+ *             progname      - [IN]                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_print_help(const char *param, const char **help_message, const char **usage_message)
+void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname)
 {
 	const char	**p = help_message;
 
-	zbx_print_usage(usage_message);
+	zbx_print_usage(usage_message, progname);
 	printf("\n");
 
 	while (NULL != *p)
@@ -548,27 +548,6 @@ unsigned int	zbx_alarm_off(void)
 int	zbx_alarm_timed_out(void)
 {
 	return (0 == zbx_timed_out ? FAIL : SUCCEED);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Print error text to the stderr                                    *
- *                                                                            *
- * Parameters: fmt - format of message                                        *
- *                                                                            *
- ******************************************************************************/
-void	zbx_error(const char *fmt, ...)
-{
-	va_list	args;
-
-	va_start(args, fmt);
-
-	fprintf(stderr, "%s [%li]: ", common_get_progname()(), zbx_get_thread_id());
-	vfprintf(stderr, fmt, args);
-	fprintf(stderr, "\n");
-	fflush(stderr);
-
-	va_end(args);
 }
 
 zbx_uint64_t	suffix2factor(char c)

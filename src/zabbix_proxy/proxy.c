@@ -1198,7 +1198,7 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_TEST_CONFIG;
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message);
+				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -1214,7 +1214,7 @@ int	main(int argc, char **argv)
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				zbx_print_usage(usage_message);
+				zbx_print_usage(usage_message, zbx_progname);
 				exit(EXIT_FAILURE);
 				break;
 		}
