@@ -191,7 +191,7 @@ class C54ImportConverter extends CConverter {
 	}
 
 	/**
-	 * @param array  $items
+	 * @param array  $item_prototypes
 	 *
 	 * @return array
 	 */
