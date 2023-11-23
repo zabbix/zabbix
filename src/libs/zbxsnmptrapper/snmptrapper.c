@@ -618,13 +618,18 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (ZBX_IS_RUNNING() && SUCCEED == get_latest_data(snmptrapper_args_in->config_snmptrap_file))
+		while (ZBX_IS_RUNNING() && FAIL == zbx_vps_monitor_capped())
+		{
+			if (SUCCEED != get_latest_data(snmptrapper_args_in->config_snmptrap_file))
+				break;
+
 			read_traps(snmptrapper_args_in->config_snmptrap_file);
+		}
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",
-				get_process_type_string(process_type), sec);
+		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec%s]",
+				get_process_type_string(process_type), sec, zbx_vps_monitor_status());
 
 		zbx_sleep_loop(info, 1);
 	}

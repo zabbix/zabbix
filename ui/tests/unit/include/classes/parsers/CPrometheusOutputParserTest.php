@@ -51,6 +51,20 @@ class CPrometheusOutputParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M}.regsub("([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("([0-9]+)", \1)}'
+				]
+			],
+			[
+				'{{$M: "context"}.regsub("([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M: "context"}.regsub("([0-9]+)", \1)}'
+				]
+			],
+			[
 				'{$FS_MAX: "/home"}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

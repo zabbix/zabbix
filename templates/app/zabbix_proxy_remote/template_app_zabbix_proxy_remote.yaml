@@ -852,6 +852,87 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
+        - uuid: 0e27243e5c844357a57a1c32869863a4
+          name: 'Remote Zabbix proxy: Proxy memory buffer, % used'
+          type: DEPENDENT
+          key: proxy_buffer.buffer.pused
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            Statistics and availability of Zabbix proxy memory buffer usage statistics. Percentage of used proxy memory buffer.
+            Proxy memory buffer is used to store the new historical data and upload from it without accessing database.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.wcache.[''proxy buffer''].memory.pused'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Proxy memory buffer is disabled.'
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: system
+          triggers:
+            - uuid: 4c04e5a21a91485e9562ef951877a5f3
+              expression: 'max(/Remote Zabbix proxy health/proxy_buffer.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}'
+              name: 'Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the proxy memory buffer'
+              priority: AVERAGE
+              description: 'Consider increasing ProxyMemoryBufferSize in the zabbix_proxy.conf configuration file.'
+              tags:
+                - tag: scope
+                  value: capacity
+                - tag: scope
+                  value: performance
+        - uuid: 4bfed9e5c4b449c490a26ea67f1106cd
+          name: 'Remote Zabbix proxy: Proxy buffer, state changes'
+          type: DEPENDENT
+          key: proxy_buffer.state.changes
+          delay: '0'
+          history: 7d
+          description: 'The number of state changes between disk/memory buffer modes since proxy start.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.wcache.[''proxy buffer''].[''state change'']'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: system
+        - uuid: ddca62888fab477a84b215812c7bf57d
+          name: 'Remote Zabbix proxy: Proxy buffer, state'
+          type: DEPENDENT
+          key: proxy_buffer.state.current
+          delay: '0'
+          history: 7d
+          description: |
+            The current working state of proxy buffer where the new data is being stored. Possible values:
+            
+            0 - disk (also returned when memory buffer is disabled);
+            1 - memory.
+          valuemap:
+            name: 'Proxy buffer mode'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.wcache.[''proxy buffer''].state'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: system
         - uuid: 72dd891d7ced4cefb7de988dadf81f3b
           name: 'Remote Zabbix proxy: Configuration cache, % used'
           type: DEPENDENT
@@ -1338,6 +1419,14 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAD
+      valuemaps:
+        - uuid: 70f06f62852c428b94f1f2447d58a6c8
+          name: 'Proxy buffer mode'
+          mappings:
+            - value: '0'
+              newvalue: Disk
+            - value: '1'
+              newvalue: Memory
   graphs:
     - uuid: 4cc55dd64cab48cc92fbde98135d7f7f
       name: 'Remote Zabbix proxy: Zabbix cache usage, % used'
@@ -1363,6 +1452,11 @@ zabbix_export:
           item:
             host: 'Remote Zabbix proxy health'
             key: vmware.buffer.pused
+        - sortorder: '4'
+          color: '274482'
+          item:
+            host: 'Remote Zabbix proxy health'
+            key: proxy_buffer.buffer.pused
     - uuid: 1daa58364c74486ba4038e56cecf1a41
       name: 'Remote Zabbix proxy: Zabbix data gathering process busy %'
       ymin_type_1: FIXED

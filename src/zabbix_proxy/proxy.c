@@ -45,7 +45,7 @@
 #include "../zabbix_server/trapper/trapper_request.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
-#include "taskmanager/taskmanager.h"
+#include "taskmanager/taskmanager_proxy.h"
 #include "../zabbix_server/vmware/vmware.h"
 #include "zbxcomms.h"
 #include "zbxvault.h"
@@ -60,7 +60,6 @@
 #include "zbx_rtc_constants.h"
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
-#include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
@@ -68,8 +67,7 @@
 #include "zbxsnmptrapper.h"
 
 #ifdef HAVE_OPENIPMI
-#include "../zabbix_server/ipmi/ipmi_manager.h"
-#include "../zabbix_server/ipmi/ipmi_poller.h"
+#include "zbxipmi.h"
 #endif
 
 const char	*progname = NULL;
@@ -78,6 +76,7 @@ const char	syslog_app_name[] = "zabbix_proxy";
 const char	*usage_message[] = {
 	"[-c config-file]", NULL,
 	"[-c config-file]", "-R runtime-option", NULL,
+	"[-c config-file]", "-T", NULL,
 	"-h", NULL,
 	"-V", NULL,
 	NULL	/* end of text */
@@ -134,6 +133,7 @@ const char	*help_message[] = {
 	"                                 (rwlock, mutex, processing) can be used with process-type",
 	"                                 (e.g., history syncer,1,processing)",
 	"",
+	"  -T --test-config               Validate configuration file and exit",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
 	"",
@@ -155,13 +155,14 @@ static struct zbx_option	longopts[] =
 	{"config",		1,	NULL,	'c'},
 	{"foreground",		0,	NULL,	'f'},
 	{"runtime-control",	1,	NULL,	'R'},
+	{"test-config",		0,	NULL,	'T'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
 	{NULL}
 };
 
 /* short options */
-static char	shortopts[] = "c:hVR:f";
+static char	shortopts[] = "c:hVR:Tf";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -227,7 +228,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
-	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1 /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -469,6 +471,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
 	else
 		return FAIL;
@@ -1157,7 +1164,7 @@ int	main(int argc, char **argv)
 
 	ZBX_TASK_EX			t = {ZBX_TASK_START};
 	char				ch;
-	int				opt_c = 0, opt_r = 0;
+	int				opt_c = 0, opt_r = 0, opt_t = 0, opt_f = 0;
 
 	/* see description of 'optarg' in 'man 3 getopt' */
 	char				*zbx_optarg = NULL;
@@ -1187,6 +1194,10 @@ int	main(int argc, char **argv)
 				t.opts = zbx_strdup(t.opts, zbx_optarg);
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
+			case 'T':
+				opt_t++;
+				t.task = ZBX_TASK_TEST_CONFIG;
+				break;
 			case 'h':
 				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
@@ -1200,6 +1211,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
+				opt_f++;
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
@@ -1210,13 +1222,23 @@ int	main(int argc, char **argv)
 	}
 
 	/* every option may be specified only once */
-	if (1 < opt_c || 1 < opt_r)
+	if (1 < opt_c || 1 < opt_r || 1 < opt_t || 1 < opt_f)
 	{
 		if (1 < opt_c)
 			zbx_error("option \"-c\" or \"--config\" specified multiple times");
 		if (1 < opt_r)
 			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
+		if (1 < opt_t)
+			zbx_error("option \"-T\" or \"--test-config\" specified multiple times");
+		if (1 < opt_f)
+			zbx_error("option \"-f\" or \"--foreground\" specified multiple times");
 
+		exit(EXIT_FAILURE);
+	}
+
+	if (0 != opt_t && 0 != opt_r)
+	{
+		zbx_error("option \"-T\" or \"--test-config\" cannot be specified with \"-R\"");
 		exit(EXIT_FAILURE);
 	}
 
@@ -1239,7 +1261,16 @@ int	main(int argc, char **argv)
 	zbx_init_metrics();
 	zbx_init_library_cfg(program_type, config_file);
 
+	if (ZBX_TASK_TEST_CONFIG == t.task)
+		printf("Validating configuration file \"%s\"\n", config_file);
+
 	zbx_load_config(&t);
+
+	if (ZBX_TASK_TEST_CONFIG == t.task)
+	{
+		printf("Validation successful\n");
+		exit(EXIT_SUCCESS);
+	}
 
 	zbx_init_library_dbupgrade(get_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(NULL, zbx_preprocess_item_value, zbx_preprocessor_flush);
@@ -1380,14 +1411,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_hostname, config_proxydata_frequency};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
-								zbx_config_log_remote_commands, config_hostname};
+								zbx_config_log_remote_commands, config_hostname,
+								get_config_forks};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
 								zbx_config_source_ip, &events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&events_cbs, &listen_sock, config_startup_time,
-								config_proxydata_frequency};
+								config_proxydata_frequency, get_config_forks};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
@@ -1723,10 +1755,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
 				thread_args.args = &ipmimanager_args;
-				zbx_thread_start(ipmi_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_ipmi_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				zbx_thread_start(ipmi_poller_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_ipmi_poller_thread, &thread_args, &threads[i]);
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
@@ -1762,6 +1794,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;
+			case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
+				thread_args.args = &poller_args;
+				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 		}
 	}
 

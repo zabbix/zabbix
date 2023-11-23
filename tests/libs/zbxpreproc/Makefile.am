@@ -36,6 +36,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -53,7 +54,7 @@ zbx_item_preproc_LDADD = $(JSON_LIBS)
 
 zbx_item_preproc_LDADD += @SERVER_LIBS@
 zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
-	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
+	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
 
 zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
@@ -67,7 +68,7 @@ item_preproc_xpath_LDADD = $(JSON_LIBS)
 
 item_preproc_xpath_LDADD += @SERVER_LIBS@
 item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLD_LDFLAGS) \
-	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
+	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
 
 item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
@@ -81,7 +82,7 @@ item_preproc_csv_to_json_LDADD = $(JSON_LIBS)
 
 item_preproc_csv_to_json_LDADD += @SERVER_LIBS@
 item_preproc_csv_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
-	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
+	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
 
 item_preproc_csv_to_json_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS) $(TLS_CFLAGS)

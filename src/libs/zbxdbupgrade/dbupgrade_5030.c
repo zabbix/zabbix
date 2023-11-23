@@ -31,6 +31,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbx_trigger_constants.h"
+#include "zbx_scripts_constants.h"
 
 /*
  * 5.4 development database patches
@@ -5435,7 +5436,7 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 
 	zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
 
-	if (4 == request->nparam)
+	if (4 == request->nparam && 0 != strcmp("last", request->params[2]))
 	{
 		zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
 

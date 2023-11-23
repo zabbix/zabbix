@@ -13,12 +13,12 @@ zabbix_export:
         1. On the FortiGate GUI, select System > Admin Profiles > Create New.
         2. Enter a profile name (ex. zabbix_ro) and enable all the Read permissions. Please note the profile name, it will be used a bit later.
         3. Go to System > Administrators > Create New > REST API Admin.
-        4. Enter the API-user's name and select the profile name you created from the step 2.
+        4. Enter the API-user's name and select the profile name you created in step 2.
         5. The trusted host can be specified to ensure that only Zabbix server can reach the FortiGate.
         6. Click OK and an API token will be generated. Make a note of the API token as it's only shown once and cannot be retrieved.
         7. Put the API token into {$FGATE.API.TOKEN} macro.
         8. Set your FortiGate GUI IP/FQDN as {$FGATE.API.FQDN} macro value.
-        9. If FortiGate GUI uses "https", put "https" value into {$FGATE.SCHEME} macro and "443" into {$FGATE.API.PORT} macro.
+        9. If FortiGate GUI uses HTTPS, put "https" value into {$FGATE.SCHEME} macro and "443" into {$FGATE.API.PORT} macro.
         10. If FortiGate GUI port differs from the standard one, specify it in {$FGATE.API.PORT} macro.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
@@ -184,7 +184,7 @@ zabbix_export:
           triggers:
             - uuid: da4a8352ffb94c15a62523a0b97460c4
               expression: '{$FIRMWARE.UPDATES.CONTROL}=1 and last(/FortiGate by HTTP/fgate.device.firmwares_avail)>0'
-              name: 'FortiGate: New available firmwares found'
+              name: 'FortiGate: New available firmware found'
               priority: INFO
               description: |
                 New available firmware versions found to download.
@@ -1466,7 +1466,7 @@ zabbix_export:
                 value: '{$FWP.FWTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          description: 'Discovery for FortiGate firewall policies'
+          description: 'Discovery for FortiGate firewall policies.'
           item_prototypes:
             - uuid: 19b27ab621a1417f86ddbd52d93f6c55
               name: 'FW Policy [{#FWNAME}]: Action'
@@ -1787,7 +1787,7 @@ zabbix_export:
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: J
-          description: 'Discovery for FortiGate network interfaces'
+          description: 'Discovery for FortiGate network interfaces.'
           item_prototypes:
             - uuid: afb2dec9321a4eb1821b366c5219ce60
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Get data'
@@ -2261,7 +2261,7 @@ zabbix_export:
                 value: '{$SDWAN.HEALTH.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: H
-          description: 'Discovery for FortiGate SD-WAN health-checks'
+          description: 'Discovery for FortiGate SD-WAN health-checks.'
           item_prototypes:
             - uuid: 292228d1456f41b094b36edc2e22d24e
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Get data'
@@ -2577,7 +2577,7 @@ zabbix_export:
                 value: '{$SDWAN.MEMBER.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: H
-          description: 'Discovery for FortiGate SD-WAN members'
+          description: 'Discovery for FortiGate SD-WAN members.'
           item_prototypes:
             - uuid: 376cf1ce322a4de5af3f86323f411b46
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Get data'
@@ -2773,7 +2773,7 @@ zabbix_export:
               trends: 90d
               value_type: FLOAT
               units: Bps
-              description: 'Transmiting bandwidth of the {#NAME} interface in the {#ZONE} zone.'
+              description: 'Transmitting bandwidth of the {#NAME} interface in the {#ZONE} zone.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2920,7 +2920,7 @@ zabbix_export:
                 value: '{$SERVICE.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          description: 'Discovery for FortiGate services'
+          description: 'Discovery for FortiGate services.'
           item_prototypes:
             - uuid: c759d226d28143da977879550e913d5e
               name: 'Service [{#NAME}]: Expiration date'
@@ -3268,10 +3268,10 @@ zabbix_export:
           description: 'Threshold of CPU utilization for warning trigger in %.'
         - macro: '{$DISK.FREE.CRIT}'
           value: '10'
-          description: 'Threshold of disk free space for critical trigger in %'
+          description: 'Threshold of disk free space for critical trigger in %.'
         - macro: '{$DISK.FREE.WARN}'
           value: '20'
-          description: 'Threshold of disk free space for warning trigger in %'
+          description: 'Threshold of disk free space for warning trigger in %.'
         - macro: '{$FGATE.API.FQDN}'
           description: 'FortiGate API FQDN/IP (ex. ngfw.example.com).'
         - macro: '{$FGATE.API.PORT}'
@@ -3290,7 +3290,7 @@ zabbix_export:
           description: 'Request scheme which may be http or https.'
         - macro: '{$FIRMWARE.UPDATES.CONTROL}'
           value: '1'
-          description: 'This macro is used in "New available firmwares found" trigger.'
+          description: 'This macro is used in "New available firmware found" trigger.'
         - macro: '{$FWP.FWACTION.MATCHES}'
           value: '.*'
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
@@ -3311,46 +3311,46 @@ zabbix_export:
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'Threshold of memory utilization for critical trigger in %'
+          description: 'Threshold of memory utilization for critical trigger in %.'
         - macro: '{$MEMORY.UTIL.WARN}'
           value: '80'
-          description: 'Threshold of memory utilization for warning trigger in %'
+          description: 'Threshold of memory utilization for warning trigger in %.'
         - macro: '{$NET.IF.CONTROL}'
           value: '1'
-          description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
+          description: 'Macro for operational state of the interface for "Link down" trigger. Can be used with interface name as context.'
         - macro: '{$NET.IF.ERRORS.WARN}'
           value: '2'
           description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFSTATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFSTATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.UTIL.MAX}'
           value: '95'
           description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.'
@@ -3362,7 +3362,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SDWAN.HEALTH.IF.CONTROL}'
           value: '1'
-          description: 'Macro for the interface state for link down trigger. Can be used with interface name as context.'
+          description: 'Macro for the interface state for "Link down" trigger. Can be used with interface name as context.'
         - macro: '{$SDWAN.HEALTH.IF.LOSS.WARN}'
           value: '20'
           description: 'Threshold of packets loss for warning trigger in %. Can be used with interface name as context.'
@@ -3392,7 +3392,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SDWAN.MEMBER.IF.CONTROL}'
           value: '1'
-          description: 'Macro for the interface state for link down trigger. Can be used with interface name as context.'
+          description: 'Macro for the interface state for "Link down" trigger. Can be used with interface name as context.'
         - macro: '{$SDWAN.MEMBER.NAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3442,58 +3442,79 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: item
-                  name: 'API availability'
-                  x: '4'
+                  name: 'Port availability'
                   width: '4'
                   hide_header: 'YES'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '1'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: value_size
-                      value: '35'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_bold
-                      value: '1'
                     - type: STRING
                       name: bg_color
                       value: FFCA28
                     - type: STRING
-                      name: value_color
-                      value: FFFFFF
-                    - type: STRING
                       name: description
-                      value: API
-                    - type: STRING
-                      name: thresholds.color.0
-                      value: FF465C
-                    - type: STRING
-                      name: thresholds.threshold.0
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.color.1
-                      value: 0EC9AC
-                    - type: STRING
-                      name: thresholds.threshold.1
+                      value: Port
+                    - type: INTEGER
+                      name: desc_bold
                       value: '1'
                     - type: STRING
                       name: desc_color
                       value: FFFFFF
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'FortiGate by HTTP'
-                        key: fgate.api.status
+                        key: 'net.tcp.service["{$FGATE.SCHEME}","{$FGATE.API.FQDN}","{$FGATE.API.PORT}"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '35'
+                - type: item
+                  name: 'Number of CPUs'
+                  'y': '2'
+                  width: '4'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.cpu.num
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: value_color
+                      value: 1E88E5
+                    - type: INTEGER
+                      name: value_size
+                      value: '50'
                 - type: gauge
                   name: 'CPU utilization'
                   'y': '4'
@@ -3501,134 +3522,246 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: INTEGER
-                      name: desc_size
-                      value: '8'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
+                    - type: STRING
+                      name: description
+                      value: '{ITEM.DESCRIPTION}'
                     - type: INTEGER
-                      name: value_size
-                      value: '15'
-                    - type: INTEGER
-                      name: units_size
-                      value: '15'
-                    - type: INTEGER
-                      name: th_show_labels
-                      value: '1'
+                      name: desc_size
+                      value: '8'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.cpu.util
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
                     - type: INTEGER
                       name: th_show_arc
                       value: '1'
                     - type: INTEGER
-                      name: th_arc_size
-                      value: '5'
-                    - type: STRING
-                      name: description
-                      value: '{ITEM.DESCRIPTION}'
-                    - type: STRING
-                      name: min
-                      value: '0'
-                    - type: STRING
-                      name: max
-                      value: '100'
+                      name: th_show_labels
+                      value: '1'
                     - type: STRING
                       name: units
                       value: '%'
-                    - type: STRING
-                      name: thresholds.color.0
-                      value: 0EC9AC
-                    - type: STRING
-                      name: thresholds.threshold.0
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.color.1
-                      value: FFD54F
-                    - type: STRING
-                      name: thresholds.threshold.1
-                      value: '80'
-                    - type: STRING
-                      name: thresholds.color.2
-                      value: FF465C
-                    - type: STRING
-                      name: thresholds.threshold.2
-                      value: '90'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.cpu.util
+                    - type: INTEGER
+                      name: units_size
+                      value: '15'
+                    - type: INTEGER
+                      name: value_size
+                      value: '15'
                 - type: svggraph
                   name: 'Disk usage'
                   'y': '8'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: ds.width.0
-                      value: '2'
-                    - type: INTEGER
-                      name: ds.missingdatafunc.0
-                      value: '1'
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
-                    - type: INTEGER
-                      name: working_time
-                      value: '1'
-                    - type: INTEGER
-                      name: graph_time
-                      value: '1'
-                    - type: INTEGER
-                      name: legend_statistic
-                      value: '1'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '2'
                     - type: STRING
-                      name: ds.items.0.0
-                      value: 'FortiGate: Total disk space'
-                    - type: STRING
-                      name: ds.color.0
+                      name: ds.0.color
                       value: 1976D2
                     - type: STRING
-                      name: ds.items.1.0
-                      value: 'FortiGate: Free disk space'
+                      name: ds.0.items.0
+                      value: fgate.item.fs_total
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
                     - type: STRING
-                      name: ds.color.1
+                      name: ds.1.color
                       value: 4CAF50
                     - type: STRING
-                      name: time_from
-                      value: now-1d
+                      name: ds.1.items.0
+                      value: fgate.item.fs_free
                     - type: STRING
                       name: lefty_min
                       value: '0'
-                - type: item
-                  name: Firmware
-                  x: '18'
-                  width: '6'
-                  fields:
                     - type: INTEGER
-                      name: show
+                      name: legend_lines
                       value: '2'
                     - type: INTEGER
-                      name: adv_conf
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: time_period.from
+                      value: now-1d
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: item
+                  name: 'API availability'
+                  x: '4'
+                  width: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: FFCA28
+                    - type: STRING
+                      name: description
+                      value: API
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.api.status
+                    - type: INTEGER
+                      name: show.0
                       value: '1'
                     - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
                       name: value_size
-                      value: '40'
+                      value: '35'
+                - type: item
+                  name: 'Total memory'
+                  x: '4'
+                  'y': '2'
+                  width: '4'
+                  fields:
                     - type: INTEGER
                       name: decimal_size
-                      value: '20'
+                      value: '40'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.memory.total
                     - type: INTEGER
-                      name: units_show
-                      value: '0'
+                      name: show.0
+                      value: '2'
+                    - type: STRING
+                      name: units
+                      value: B
                     - type: INTEGER
                       name: units_bold
                       value: '0'
+                    - type: STRING
+                      name: units_color
+                      value: 1E88E5
+                    - type: STRING
+                      name: value_color
+                      value: 1E88E5
+                    - type: INTEGER
+                      name: value_size
+                      value: '50'
+                - type: item
+                  name: Uptime
+                  x: '8'
+                  width: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 1E88E5
+                    - type: STRING
+                      name: description
+                      value: Uptime
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'FortiGate by HTTP'
-                        key: fgate.device.firmware
+                        key: fgate.uptime
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '35'
+                - type: item
+                  name: 'Total disk space'
+                  x: '8'
+                  'y': '2'
+                  width: '4'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '40'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.fs.total
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: STRING
+                      name: units
+                      value: B
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: STRING
+                      name: units_color
+                      value: 1E88E5
+                    - type: STRING
+                      name: value_color
+                      value: 1E88E5
+                    - type: INTEGER
+                      name: value_size
+                      value: '50'
                 - type: gauge
                   name: 'Memory utilization'
                   x: '8'
@@ -3637,90 +3770,74 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: INTEGER
-                      name: th_show_labels
-                      value: '1'
+                      name: decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: description
+                      value: '{ITEM.DESCRIPTION}'
                     - type: INTEGER
                       name: desc_size
                       value: '8'
-                    - type: INTEGER
-                      name: decimal_places
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.memory.util
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.0.threshold
                       value: '0'
-                    - type: INTEGER
-                      name: value_size
-                      value: '15'
-                    - type: INTEGER
-                      name: units_size
-                      value: '15'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '70'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
                     - type: INTEGER
                       name: th_show_arc
                       value: '1'
                     - type: INTEGER
-                      name: th_arc_size
-                      value: '5'
-                    - type: STRING
-                      name: min
-                      value: '0'
-                    - type: STRING
-                      name: max
-                      value: '100'
+                      name: th_show_labels
+                      value: '1'
                     - type: STRING
                       name: units
                       value: '%'
-                    - type: STRING
-                      name: thresholds.color.0
-                      value: 0EC9AC
-                    - type: STRING
-                      name: thresholds.threshold.0
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.color.1
-                      value: FFD54F
-                    - type: STRING
-                      name: thresholds.threshold.1
-                      value: '70'
-                    - type: STRING
-                      name: thresholds.color.2
-                      value: FF465C
-                    - type: STRING
-                      name: thresholds.threshold.2
-                      value: '90'
-                    - type: STRING
-                      name: description
-                      value: '{ITEM.DESCRIPTION}'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.memory.util
+                    - type: INTEGER
+                      name: units_size
+                      value: '15'
+                    - type: INTEGER
+                      name: value_size
+                      value: '15'
                 - type: item
-                  name: Model
-                  x: '18'
-                  'y': '2'
+                  name: 'Serial Number'
+                  x: '12'
                   width: '6'
                   fields:
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: value_size
-                      value: '40'
-                    - type: INTEGER
                       name: decimal_size
                       value: '20'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.device.serialnumber
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
                     - type: INTEGER
                       name: units_show
                       value: '0'
                     - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.device.model
+                      name: value_size
+                      value: '40'
                 - type: item
                   name: Name
                   x: '12'
@@ -3728,256 +3845,43 @@ zabbix_export:
                   width: '6'
                   fields:
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: value_size
-                      value: '40'
-                    - type: INTEGER
                       name: decimal_size
                       value: '20'
-                    - type: INTEGER
-                      name: units_show
-                      value: '0'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'FortiGate by HTTP'
                         key: fgate.name
-                - type: item
-                  name: 'Number of CPUs'
-                  'y': '2'
-                  width: '4'
-                  fields:
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: value_size
-                      value: '50'
-                    - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
                     - type: INTEGER
                       name: units_show
                       value: '0'
-                    - type: STRING
-                      name: value_color
-                      value: 1E88E5
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.cpu.num
-                - type: item
-                  name: 'Port availability'
-                  width: '4'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '1'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: value_size
-                      value: '35'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_bold
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.color.0
-                      value: FF465C
-                    - type: STRING
-                      name: thresholds.threshold.0
-                      value: '0'
-                    - type: STRING
-                      name: bg_color
-                      value: FFCA28
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
-                    - type: STRING
-                      name: description
-                      value: Port
-                    - type: STRING
-                      name: thresholds.color.1
-                      value: 0EC9AC
-                    - type: STRING
-                      name: thresholds.threshold.1
-                      value: '1'
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: 'net.tcp.service["{$FGATE.SCHEME}","{$FGATE.API.FQDN}","{$FGATE.API.PORT}"]'
-                - type: item
-                  name: 'Serial Number'
+                      value: '40'
+                - type: problems
                   x: '12'
-                  width: '6'
+                  'y': '8'
+                  width: '12'
+                  height: '5'
                   fields:
                     - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
+                      name: acknowledgement_status
                       value: '1'
-                    - type: INTEGER
-                      name: value_size
-                      value: '40'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '20'
-                    - type: INTEGER
-                      name: units_show
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.device.serialnumber
-                - type: item
-                  name: 'Total disk space'
-                  x: '8'
-                  'y': '2'
-                  width: '4'
-                  fields:
                     - type: INTEGER
                       name: show
+                      value: '3'
+                    - type: INTEGER
+                      name: show_opdata
                       value: '2'
                     - type: INTEGER
-                      name: adv_conf
+                      name: show_tags
                       value: '1'
-                    - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: INTEGER
-                      name: value_size
-                      value: '50'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '40'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '2'
                     - type: STRING
-                      name: value_color
-                      value: 1E88E5
-                    - type: STRING
-                      name: units
-                      value: B
-                    - type: STRING
-                      name: units_color
-                      value: 1E88E5
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.fs.total
-                - type: item
-                  name: 'Total memory'
-                  x: '4'
-                  'y': '2'
-                  width: '4'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: INTEGER
-                      name: value_size
-                      value: '50'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '40'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '2'
-                    - type: STRING
-                      name: value_color
-                      value: 1E88E5
-                    - type: STRING
-                      name: units
-                      value: B
-                    - type: STRING
-                      name: units_color
-                      value: 1E88E5
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.memory.total
-                - type: item
-                  name: Uptime
-                  x: '8'
-                  width: '4'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '1'
-                    - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: value_size
-                      value: '35'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_bold
-                      value: '1'
-                    - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: STRING
-                      name: bg_color
-                      value: 1E88E5
-                    - type: STRING
-                      name: value_color
-                      value: FFFFFF
-                    - type: STRING
-                      name: description
-                      value: Uptime
-                    - type: STRING
-                      name: desc_color
-                      value: FFFFFF
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.uptime
+                      name: tag_priority
+                      value: scope
                 - type: gauge
                   name: 'Disk utilization'
                   x: '16'
@@ -3986,82 +3890,97 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: INTEGER
-                      name: desc_size
-                      value: '8'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
+                    - type: STRING
+                      name: description
+                      value: '{ITEM.DESCRIPTION}'
                     - type: INTEGER
-                      name: value_size
-                      value: '15'
-                    - type: INTEGER
-                      name: units_size
-                      value: '15'
-                    - type: INTEGER
-                      name: th_show_labels
-                      value: '1'
+                      name: desc_size
+                      value: '8'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.fs.util
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 0EC9AC
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '60'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FF465C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '80'
                     - type: INTEGER
                       name: th_show_arc
                       value: '1'
                     - type: INTEGER
-                      name: th_arc_size
-                      value: '5'
-                    - type: STRING
-                      name: min
-                      value: '0'
-                    - type: STRING
-                      name: max
-                      value: '100'
+                      name: th_show_labels
+                      value: '1'
                     - type: STRING
                       name: units
                       value: '%'
-                    - type: STRING
-                      name: thresholds.color.0
-                      value: 0EC9AC
-                    - type: STRING
-                      name: thresholds.threshold.0
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.color.1
-                      value: FFD54F
-                    - type: STRING
-                      name: thresholds.threshold.1
-                      value: '60'
-                    - type: STRING
-                      name: thresholds.color.2
-                      value: FF465C
-                    - type: STRING
-                      name: description
-                      value: '{ITEM.DESCRIPTION}'
-                    - type: STRING
-                      name: thresholds.threshold.2
-                      value: '80'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        key: fgate.fs.util
-                - type: problems
-                  x: '12'
-                  'y': '8'
-                  width: '12'
-                  height: '5'
+                    - type: INTEGER
+                      name: units_size
+                      value: '15'
+                    - type: INTEGER
+                      name: value_size
+                      value: '15'
+                - type: item
+                  name: Firmware
+                  x: '18'
+                  width: '6'
                   fields:
                     - type: INTEGER
-                      name: show
-                      value: '3'
+                      name: decimal_size
+                      value: '20'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.device.firmware
                     - type: INTEGER
-                      name: show_tags
-                      value: '1'
-                    - type: INTEGER
-                      name: show_opdata
+                      name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: acknowledgement_status
-                      value: '1'
-                    - type: STRING
-                      name: tag_priority
-                      value: scope
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
+                      name: value_size
+                      value: '40'
+                - type: item
+                  name: Model
+                  x: '18'
+                  'y': '2'
+                  width: '6'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '20'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        key: fgate.device.model
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
+                      name: value_size
+                      value: '40'
         - uuid: a1c7206d9312486b9d09dc9ef34ed98e
           name: 'FortiGate: Statistics'
           pages:
@@ -4072,30 +3991,39 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'FortiGate: CPU utilization'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        name: 'FortiGate: Memory utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'FortiGate: Disk usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        name: 'FortiGate: Memory utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -4103,10 +4031,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'FortiGate: Disk utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
             - name: 'Network interfaces'
               widgets:
                 - type: graphprototype
@@ -4116,14 +4047,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
             - name: 'SD-WAN statistics'
               widgets:
                 - type: graphprototype
@@ -4133,30 +4064,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Network traffic'
-                - type: graphprototype
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Bandwidth'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
                 - type: graphprototype
                   'y': '5'
                   width: '12'
@@ -4165,14 +4080,30 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Packets statistics'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
+                - type: graphprototype
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Bandwidth'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
                 - type: graphprototype
                   x: '12'
                   'y': '5'
@@ -4182,14 +4113,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Performance'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
             - name: 'Firewall statistics'
               widgets:
                 - type: graphprototype
@@ -4199,30 +4130,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'FW Policy [{#FWNAME}]: Active sessions'
-                - type: graphprototype
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'FortiGate by HTTP'
-                        name: 'FW Policy [{#FWNAME}]: Hits into the policy'
+                    - type: STRING
+                      name: reference
+                      value: AAAAJ
                 - type: graphprototype
                   'y': '5'
                   width: '12'
@@ -4231,14 +4146,30 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'FortiGate by HTTP'
                         name: 'FW Policy [{#FWNAME}]: Policy processing'
+                    - type: STRING
+                      name: reference
+                      value: AAAAL
+                - type: graphprototype
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'FortiGate by HTTP'
+                        name: 'FW Policy [{#FWNAME}]: Hits into the policy'
+                    - type: STRING
+                      name: reference
+                      value: AAAAK
       valuemaps:
         - uuid: 8b0c51b152b04ba690cd13e43a2c90d9
           name: 'Firewall policy action'

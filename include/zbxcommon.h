@@ -178,8 +178,6 @@ extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 #define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
 #define ZBX_FLAG_DISCOVERY_CREATED	0x04
 
-#define ZBX_GROUP_TYPE_HOST		0
-
 #define ZBX_HOST_PROT_INTERFACES_INHERIT	0
 #define ZBX_HOST_PROT_INTERFACES_CUSTOM		1
 
@@ -312,7 +310,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_HTTPAGENT_POLLER	40
 #define ZBX_PROCESS_TYPE_AGENT_POLLER		41
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
-#define ZBX_PROCESS_TYPE_COUNT			43	/* number of process types */
+#define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
+#define ZBX_PROCESS_TYPE_COUNT			44	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -350,38 +349,6 @@ typedef enum
 	PERM_READ_WRITE
 }
 zbx_user_permission_t;
-
-typedef struct
-{
-	unsigned char	type;
-	unsigned char	execute_on;
-	char		*port;
-	unsigned char	authtype;
-	char		*username;
-	char		*password;
-	char		*publickey;
-	char		*privatekey;
-	char		*command;
-	char		*command_orig;
-	zbx_uint64_t	scriptid;
-	unsigned char	host_access;
-	int		timeout;
-}
-zbx_script_t;
-
-#define ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT	0
-#define ZBX_SCRIPT_TYPE_IPMI		1
-#define ZBX_SCRIPT_TYPE_SSH		2
-#define ZBX_SCRIPT_TYPE_TELNET		3
-#define ZBX_SCRIPT_TYPE_WEBHOOK		5
-
-#define ZBX_SCRIPT_SCOPE_ACTION	1
-#define ZBX_SCRIPT_SCOPE_HOST	2
-#define ZBX_SCRIPT_SCOPE_EVENT	4
-
-#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
-#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
-#define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	5
@@ -490,10 +457,11 @@ typedef enum
 	ZBX_TASK_INSTALL_SERVICE,
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
-	ZBX_TASK_STOP_SERVICE
+	ZBX_TASK_STOP_SERVICE,
 #else
-	ZBX_TASK_RUNTIME_CONTROL
+	ZBX_TASK_RUNTIME_CONTROL,
 #endif
+	ZBX_TASK_TEST_CONFIG
 }
 zbx_task_t;
 

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -437,7 +438,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -454,7 +455,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -470,7 +471,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -487,7 +488,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -504,24 +505,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item without second header value',
-						'Key' => 'item-without-second-header-value',
-						'URL' => 'zabbix.com'
-					],
-					'headers' => [
-						['name' => 'user', 'value' => 'admin'],
-						['name' => 'password']
-					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -537,7 +521,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -679,7 +663,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -690,18 +674,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
-					]
-				]
-			],
-			// Check header fields.
-			[
-				[
-					'headers' => [
-						['name' => 'user update', 'value' => '', 'action' => 'update']
-					],
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -711,7 +684,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin update', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -722,18 +695,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
-					]
-				]
-			],
-			[
-				[
-					'headers' => [
-						['name' => 'user update', 'value' => 'admin update', 'action' => 'update'],
-						['name' => 'user']
-					],
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -990,6 +952,13 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->processPairFields($data['headers'], 'headers');
 		}
 
+		// Take a screenshot to test draggable object position of query and headers fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($this->query('id:headers-table')->one(), 'Headers fields');
+		}
+
 		if (array_key_exists('request_type', $data)) {
 			$form->getField('id:post_type')->asSegmentedRadio()->select($data['request_type']);
 		}
@@ -1016,13 +985,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// 4 is retrieve mode count.
 		for ($i = 0; $i < 4; $i++) {
 			$this->$check("//input[@id='retrieve_mode_".$i."'][@disabled]");
-		}
-
-		// Take a screenshot to test draggable object position of query and headers fields.
-		if (array_key_exists('screenshot', $data)) {
-			$this->page->removeFocus();
-			$this->assertScreenshot($dialog->query('id:query-fields-table')->one(), 'Query fields');
-			$this->assertScreenshot($dialog->query('id:headers-table')->one(), 'Headers fields');
 		}
 
 		// Check query fields after url parse.
@@ -1395,6 +1357,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				case 'delete':
 					$dialog->getFooter()->query('button:Delete')->one()->click();
 					$this->page->dismissAlert();
+					$dialog->close();
 					break;
 			}
 
