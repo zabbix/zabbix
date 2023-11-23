@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PG_MANAGER_H
 #define ZABBIX_PG_MANAGER_H
 
-#include "zbxnix.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(pg_manager_thread, args);
 

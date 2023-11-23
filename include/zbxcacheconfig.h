@@ -1353,30 +1353,30 @@ ZBX_VECTOR_DECL(objmove, zbx_objmove_t)
 
 /* proxy group manager local cache support */
 
-typedef struct zbx_pgm_group zbx_pgm_group_t;
+typedef struct zbx_pg_group zbx_pg_group_t;
 
 typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	revision;
 }
-zbx_pgm_host_t;
+zbx_pg_host_t;
 
-ZBX_VECTOR_DECL(pgm_host, zbx_pgm_host_t)
+ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
 
 typedef struct
 {
 	zbx_uint64_t		proxyid;
 	int			status;
 	int			firstaccess;
-	struct zbx_pgm_group_t	*group;
-	zbx_vector_pgm_host_t	hosts;
+	struct zbx_pg_group_t	*group;
+	zbx_vector_pg_host_t	hosts;
 }
-zbx_pgm_proxy_t;
+zbx_pg_proxy_t;
 
-ZBX_PTR_VECTOR_DECL(pgm_proxy_ptr, zbx_pgm_proxy_t *)
+ZBX_PTR_VECTOR_DECL(pg_proxy_ptr, zbx_pg_proxy_t *)
 
-struct zbx_pgm_group
+struct zbx_pg_group
 {
 	zbx_uint64_t			proxy_groupid;
 	zbx_uint64_t			revision;
@@ -1386,12 +1386,11 @@ struct zbx_pgm_group
 	int				min_online;
 	int				status;
 	zbx_uint32_t			flag;
-	zbx_vector_pgm_proxy_ptr_t	proxies;
+	zbx_vector_pg_proxy_ptr_t	proxies;
 	zbx_vector_uint64_t		hostids;
 };
 
-ZBX_PTR_VECTOR_DECL(pgm_group_ptr, zbx_pgm_group_t *)
-
+ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
 
 int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
 

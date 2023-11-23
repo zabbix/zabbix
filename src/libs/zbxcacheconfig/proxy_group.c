@@ -21,9 +21,9 @@
 #include "dbconfig.h"
 #include "dbsync.h"
 
-ZBX_VECTOR_IMPL(pgm_host, zbx_pgm_host_t)
-ZBX_PTR_VECTOR_IMPL(pgm_proxy_ptr, zbx_pgm_proxy_t *)
-ZBX_PTR_VECTOR_IMPL(pgm_group_ptr, zbx_pgm_group_t *)
+ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
+ZBX_PTR_VECTOR_IMPL(pg_proxy_ptr, zbx_pg_proxy_t *)
+ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
 
 void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
@@ -101,10 +101,10 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 
 	zbx_hashset_iter_t	iter;
 	zbx_dc_proxy_group_t	*dc_group;
-	zbx_pgm_group_t		*group;
+	zbx_pg_group_t		*group;
 
 	zbx_hashset_iter_reset(groups, &iter);
-	while (NULL != (group = (zbx_pgm_group_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 		group->sync_revision = 0;
 
 	RDLOCK_CACHE;
@@ -114,12 +114,12 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
 	while (NULL != (dc_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == (group = (zbx_pgm_group_t *)zbx_hashset_search(groups, &dc_group->proxy_groupid)))
+		if (NULL == (group = (zbx_pg_group_t *)zbx_hashset_search(groups, &dc_group->proxy_groupid)))
 		{
-			zbx_pgm_group_t	group_local = {.proxy_groupid = dc_group->proxy_groupid};
+			zbx_pg_group_t	group_local = {.proxy_groupid = dc_group->proxy_groupid};
 
-			group = (zbx_pgm_group_t *)zbx_hashset_insert(groups, &group_local, sizeof(group_local));
-			zbx_vector_pgm_proxy_ptr_create(&group->proxies);
+			group = (zbx_pg_group_t *)zbx_hashset_insert(groups, &group_local, sizeof(group_local));
+			zbx_vector_pg_proxy_ptr_create(&group->proxies);
 			zbx_vector_uint64_create(&group->hostids);
 		}
 

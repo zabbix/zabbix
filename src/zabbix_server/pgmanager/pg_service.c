@@ -18,7 +18,61 @@
 **/
 
 #include "pg_service.h"
+#include "pg_cache.h"
+#include "zbxpgservice.h"
 #include "zbxnix.h"
+#include "zbxserialize.h"
+#include "zbxthreads.h"
+
+static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
+{
+	unsigned char	*ptr = message->data;
+	zbx_uint64_t	hostid, srcid, dstid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	pthread_mutex_lock(&pgs->cache->lock);
+
+	while (ptr - message->data < message->size)
+	{
+		zbx_pg_group_t	*group;
+		int		i;
+
+		ptr += zbx_deserialize_value(ptr, &hostid);
+		ptr += zbx_deserialize_value(ptr, &srcid);
+		ptr += zbx_deserialize_value(ptr, &dstid);
+
+		if (0 != srcid)
+		{
+			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &srcid)))
+			{
+				if (FAIL != (i = zbx_vector_uint64_search(&group->hostids, hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+				{
+					zbx_vector_uint64_remove_noorder(&group->hostids, i);
+					pg_cache_queue_update(pgs->cache, group);
+				}
+			}
+		}
+
+		if (0 != dstid)
+		{
+			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &dstid)))
+			{
+				if (FAIL == (i = zbx_vector_uint64_search(&group->hostids, hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+				{
+					zbx_vector_uint64_append(&group->hostids, hostid);
+					pg_cache_queue_update(pgs->cache, group);
+				}
+			}
+		}
+	}
+
+	pthread_mutex_unlock(&pgs->cache->lock);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
 
 static void	*pg_service_entry(void *data)
 {
@@ -37,6 +91,9 @@ static void	*pg_service_entry(void *data)
 		{
 			switch (message->code)
 			{
+				case ZBX_IPC_PGM_HOST_PGROUP_UPDATE:
+					pg_update_host_pgroup(pgs, message);
+					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;
 			}
@@ -53,7 +110,7 @@ out:
 	return NULL;
 }
 
-int	pg_service_init(zbx_pg_service_t *pgs, char **error)
+int	pg_service_init(zbx_pg_service_t *pgs, zbx_pg_cache_t *cache, char **error)
 {
 	int	ret = FAIL;
 
@@ -71,6 +128,8 @@ int	pg_service_init(zbx_pg_service_t *pgs, char **error)
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;
 	}
+
+	pgs->cache = cache;
 
 	ret = SUCCEED;
 out:

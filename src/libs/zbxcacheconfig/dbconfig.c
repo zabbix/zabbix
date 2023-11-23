@@ -52,6 +52,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxkvs.h"
+#include "zbxpgservice.h"
 
 int	sync_in_progress = 0;
 
@@ -1592,8 +1593,27 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_
 	proxy->revision = revision;
 }
 
+static void	dc_host_set_proxy_group(ZBX_DC_HOST *host, zbx_uint64_t proxy_groupid, zbx_vector_objmove_t *pg_reloc)
+{
+	if (proxy_groupid != host->proxy_groupid)
+	{
+		if (NULL != pg_reloc)
+		{
+			zbx_objmove_t	move = {
+					.objid = host->hostid,
+					.srcid = host->proxy_groupid,
+					.dstid = proxy_groupid
+			};
+
+			zbx_vector_objmove_append_ptr(pg_reloc, &move);
+		}
+
+		host->proxy_groupid = proxy_groupid;
+	}
+}
+
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
-		zbx_hashset_t *activated_hosts, zbx_hashset_t *psk_owners)
+		zbx_hashset_t *activated_hosts, zbx_hashset_t *psk_owners, zbx_vector_objmove_t *pg_reloc)
 {
 	char				**row;
 	zbx_uint64_t			rowid;
@@ -1606,7 +1626,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 	int				i, found;
 	int				update_index_h, ret;
-	zbx_uint64_t			hostid, proxyid;
+	zbx_uint64_t			hostid, proxyid, proxy_groupid;
 	unsigned char			status;
 	time_t				now;
 	signed char			ipmi_authtype;
@@ -1627,6 +1647,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		ZBX_DBROW2UINT64(proxyid, row[1]);
+		ZBX_DBROW2UINT64(proxy_groupid, row[19]);
 		ZBX_STR2UCHAR(status, row[10]);
 
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
@@ -1647,6 +1668,19 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 				{
 					dc_strpool_release(host_h->host);
 					zbx_hashset_remove_direct(&config->hosts_h, host_h);
+				}
+
+				if (0 != host->proxy_groupid)
+				{
+					/* force host-mapping upload to proxy through proxy group revision change */
+					zbx_dc_proxy_group_t	*pg;
+
+					if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(
+							&config->proxy_groups, &host->proxy_groupid)))
+					{
+						pg->revision = revision;
+					}
+					config->revision.proxy_group = revision;
 				}
 			}
 
@@ -1682,6 +1716,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
 			host->data_expected_from = now;
+			host->proxy_groupid = 0;
 
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -1790,6 +1825,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		}
 
 		host->status = status;
+
+		dc_host_set_proxy_group(host, proxy_groupid, pg_reloc);
 	}
 
 	for (i = 0; i < proxy_hosts.values_num; i++)
@@ -1814,6 +1851,9 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		}
 
 		/* hosts */
+
+		/* clear proxy group and update tracking info */
+		dc_host_set_proxy_group(host, 0, pg_reloc);
 
 		if (HOST_STATUS_MONITORED == host->status || HOST_STATUS_NOT_MONITORED == host->status)
 		{
@@ -7192,6 +7232,45 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	dc_notify_proxy_group_manager(zbx_uint32_t code, zbx_vector_objmove_t *updates)
+{
+	static zbx_ipc_socket_t	sock;
+
+	if (0 == updates->values_num)
+		return;
+
+	if (0 == sock.fd)
+	{
+		char	*error = NULL;
+
+		if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PG_MANAGER, 0, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to proxy group manager service: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	unsigned char	*data, *ptr;
+
+	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)(sizeof(zbx_uint64_t) * 3 * updates->values_num));
+
+	for (int i = 0; i < updates->values_num; i++)
+	{
+		ptr += zbx_serialize_value(ptr, updates->values[i].objid);
+		ptr += zbx_serialize_value(ptr, updates->values[i].srcid);
+		ptr += zbx_serialize_value(ptr, updates->values[i].dstid);
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&sock, code, data, (zbx_uint32_t)(ptr - data)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot send data to proxy group manager service");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free(data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
@@ -7235,6 +7314,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	zbx_uint64_t		new_revision = config->revision.config + 1;
 	int			connectors_num = 0;
 	zbx_hashset_t		psk_owners;
+	zbx_vector_objmove_t	pg_reloc, *pg_reloc_ref;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -7252,12 +7332,21 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	else if (ZBX_DBSYNC_STATUS_INITIALIZED != sync_status)
 		changelog_sync_mode = ZBX_DBSYNC_INIT;
 
+	if (ZBX_DBSYNC_INIT != changelog_sync_mode)
+	{
+		/* track host - proxy group relocations only during incremental sync */
+		zbx_vector_objmove_create(&pg_reloc);
+		pg_reloc_ref = &pg_reloc;
+	}
+	else
+		pg_reloc_ref = NULL;
+
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
 
 	zbx_dbsync_init(&autoreg_config_sync, mode);
 	zbx_dbsync_init(&autoreg_host_sync, mode);
-	zbx_dbsync_init(&proxy_group_sync, mode);
+	zbx_dbsync_init(&proxy_group_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
@@ -7472,7 +7561,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
-	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, &psk_owners);
+	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, &psk_owners, pg_reloc_ref);
 	zbx_dbsync_clear_user_macros();
 	hsec2 = zbx_time() - sec;
 
@@ -8204,11 +8293,18 @@ clean:
 	zbx_dbsync_clear(&connector_sync);
 	zbx_dbsync_clear(&connector_tag_sync);
 	zbx_dbsync_clear(&proxy_sync);
+	zbx_dbsync_clear(&proxy_group_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_env_clear();
+
+	if (ZBX_DBSYNC_INIT != changelog_sync_mode)
+	{
+		dc_notify_proxy_group_manager(ZBX_IPC_PGM_HOST_PGROUP_UPDATE, &pg_reloc);
+		zbx_vector_objmove_destroy(&pg_reloc);
+	}
 
 	zbx_hashset_destroy(&activated_hosts);
 

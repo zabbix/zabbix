@@ -20,27 +20,18 @@
 #ifndef ZABBIX_PG_SERVICE_H
 #define ZABBIX_PG_SERVICE_H
 
-#include "zbxrtc.h"
-#include "zbx_rtc_constants.h"
+#include "pg_cache.h"
 #include "zbxipcservice.h"
-
-#define ZBX_IPC_SERVICE_PG_MANAGER		"pgmanager"
-
-#define ZBX_IPC_PGM_PGROUP_UPDATE		1
-#define ZBX_IPC_PGM_PGROUP_REMOVE		2
-#define ZBX_IPC_PGM_HOST_PGROUP_UPDATE		3
-#define ZBX_IPC_PGM_PROXY_UPDATE		4
-#define ZBX_IPC_PGM_RELOAD_CONF			5
-#define ZBX_IPC_PGM_STOP			100
 
 typedef struct
 {
+	zbx_pg_cache_t		*cache;
 	zbx_ipc_service_t	service;
 	pthread_t		thread;
 }
 zbx_pg_service_t;
 
-int	pg_service_init(zbx_pg_service_t *service, char **error);
+int	pg_service_init(zbx_pg_service_t *service, zbx_pg_cache_t *cache, char **error);
 void	pg_service_destroy(zbx_pg_service_t *service);
 
 #endif
