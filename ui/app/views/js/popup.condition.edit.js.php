@@ -142,7 +142,9 @@ window.condition_popup = new class {
 	}
 
 	selectServices() {
-		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
+		const overlay = PopUp('popup.services', {title: t('Services')},
+			{dialogueid: 'services', dialogue_class: 'modal-popup-generic'}
+		);
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
 			for (const service of e.detail) {

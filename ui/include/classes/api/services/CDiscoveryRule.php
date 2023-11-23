@@ -309,6 +309,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
+			self::prepareItemsForApi($result, false);
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 			$result = $this->unsetExtraFields($result, ['name_upper']);
@@ -336,17 +338,7 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($rule);
 		}
 
-		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
 		foreach ($result as &$item) {
-			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
-				$item['query_fields'] = json_last_error() ? [] : $query_fields;
-			}
-
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = $this->headersStringToArray($item['headers']);
-			}
-
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -995,7 +987,9 @@ class CDiscoveryRule extends CItemGeneral {
 	private static function createForce(array &$items): void {
 		self::addValueType($items);
 
+		self::prepareItemsForDb($items);
 		$itemids = DB::insert('items', $items);
+		self::prepareItemsForApi($items);
 
 		$ins_items_rtdata = [];
 		$host_statuses = [];
@@ -1084,10 +1078,6 @@ class CDiscoveryRule extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		/*
-		 * The fields "headers" and "query_fields" in API are arrays, but it is necessary to get the values of these
-		 * fields as stored in database.
-		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
 				array_diff(CItemType::FIELD_NAMES, ['parameters'])
@@ -1743,6 +1733,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['preprocessing', 'lld_macro_paths', 'filter', 'overrides', 'parameters']);
 
+		self::prepareItemsForDb($items);
+
 		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
@@ -1781,6 +1773,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
+
+		self::prepareItemsForApi($items);
+		self::prepareItemsForApi($db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_LLD_RULE, $items, $db_items);
 	}
@@ -2534,6 +2529,7 @@ class CDiscoveryRule extends CItemGeneral {
 			return;
 		}
 
+		self::prepareItemsForApi($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];

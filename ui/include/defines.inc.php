@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0alpha8');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050143);
+define('ZABBIX_DB_VERSION',		6050149);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -582,6 +582,12 @@ define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
 define('ITEM_VALUE_TYPE_BINARY',	5);
+
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT',	0x01);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR',		0x02);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG',		0x04);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64',	0x08);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT',	0x10);
 
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
@@ -1411,17 +1417,11 @@ define('GEOMAP_LNG_MIN', -180);
 define('GEOMAP_LNG_MAX', 180);
 
 // Regular expressions.
-define('ZBX_PREG_PRINT', '^\x00-\x1F');
-define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
-define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
 define('ZBX_PREG_INT', '(?<int>-?\d+)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
-define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-define('ZBX_PREG_EXPRESSION_LLD_MACROS', '(\{\#'.ZBX_PREG_MACRO_NAME_LLD.'\})');
 
 define('TRIGGER_QUERY_PLACEHOLDER', '$'); // !!! Don't forget sync code with C !!!
 
