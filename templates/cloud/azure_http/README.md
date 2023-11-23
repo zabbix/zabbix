@@ -188,7 +188,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure Virtual Machines (VMs) by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -299,7 +299,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure MySQL flexible servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -384,7 +384,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure MySQL single servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -470,7 +470,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure PostgreSQL flexible servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -560,7 +560,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft Azure PostgreSQL servers by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -645,7 +645,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft SQL serverless databases by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
@@ -736,7 +736,7 @@ This template has been tested on:
 ## Overview
 
 This template is designed to monitor Microsoft SQL databases by HTTP.
-It works without any external scripts and uses the script item.    
+It works without any external scripts and uses the script item.
 
 ## Requirements
 
