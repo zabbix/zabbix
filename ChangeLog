@@ -400,6 +400,7 @@ New features:
 .........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
 
 Bug fixes:
+A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item formula when item key has "last" function and additional four parameter (Ivo, mprihodko)
 ...G...PS. [ZBX-23490] improved HTTP agent, web scenarios, web checks and JavaScript to convert to UTF-8 from charset specified in HTTP header or HTTP meta tag (vso)
 .......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
 .......PS. [ZBX-23602] fixed false positive host revision update in configuration cache when syncing interfaces (wiper)
