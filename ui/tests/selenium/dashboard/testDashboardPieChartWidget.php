@@ -897,7 +897,7 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Checks the hintboxes in the Create/Edit form for both Data set forms.
 	 *
-	 * @param $form    Data set form
+	 * @param CFormElement $form  Data set form
 	 */
 	protected function validateDataSetHintboxes($form) {
 		$hints = [
@@ -918,10 +918,10 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Asserts that a range/slider input is displayed as expected.
 	 *
-	 * @param $label              label of the range input
-	 * @param $input_id           id for the input field right next to the slider
-	 * @param $form               parent form
-	 * @param $expected_values    the attribute values expected
+	 * @param string       $label            label of the range input
+	 * @param string       $input_id         id for the input field right next to the slider
+	 * @param CFormElement $form             parent form
+	 * @param array        $expected_values  the attribute values expected
 	 */
 	protected function assertRangeLayout($label, $input_id, $form, $expected_values) {
 		$range = $form->getField($label)->query('xpath:.//input[@type="range"]')->one();
@@ -938,8 +938,8 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Checks that a given label exists in a form.
 	 *
-	 * @param string $label           label to assert
-	 * @param CFormElement $form      form that this label should exist in.
+	 * @param string       $label  label to assert
+	 * @param CFormElement $form   form that this label should exist in.
 	 */
 	protected function assertNonUniformLabel($label, $form) {
 		try {
@@ -954,7 +954,7 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Resets the dashboard and creates a single Pie chart widget.
 	 *
-	 * @param string $widget_name    name of the widget to be created
+	 * @param string $widget_name  name of the widget to be created
 	 */
 	protected function createCleanWidget($widget_name){
 		CDataHelper::call('dashboard.update',
@@ -982,8 +982,8 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Calculates if the expected test result is TEST_GOOD.
 	 *
-	 * @param $data    data from data provider
-	 * @return bool    TRUE if TEST_GOOD expected, else FALSE
+	 * @param array $data  data from data provider
+	 * @return bool        TRUE if TEST_GOOD expected, else FALSE
 	 */
 	protected function isTestGood($data) {
 		return CTestArrayHelper::get($data, 'result', TEST_GOOD) === TEST_GOOD;
@@ -1004,7 +1004,7 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Asserts that the data is saved and displayed as expected in the Edit form.
 	 *
-	 * @param $data    data from data provider
+	 * @param array $data  data from data provider
 	 */
 	protected function assertEditFormAfterSave($data) {
 		$dashboard = CDashboardElement::find()->one();
@@ -1073,7 +1073,7 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Fill Pie chart widget edit form with provided data.
 	 *
-	 * @param array $fields         field data to fill
+	 * @param array        $fields  field data to fill
 	 * @param CFormElement $form    form to be filled
 	 */
 	protected function fillForm($fields, $form) {
@@ -1113,8 +1113,8 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Fill "Data sets" tab with field data.
 	 *
-	 * @param array $data_sets      array of data sets to be filled
-	 * @param CFormElement $form    CFormElement to be filled
+	 * @param array        $data_sets  array of data sets to be filled
+	 * @param CFormElement $form       CFormElement to be filled
 	 */
 	protected function fillDatasets($data_sets, $form) {
 		// Count of data sets that already exist (needed for updating).
@@ -1169,8 +1169,8 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Adds a new Data set of the correct type.
 	 *
-	 * @param $type    type of the data set
-	 * @param $form    widget edit form element
+	 * @param string       $type  type of the data set
+	 * @param CFormElement $form  widget edit form element
 	 */
 	protected function addNewDataSet($type, $form) {
 		if ($type === self::TYPE_ITEM_PATTERN) {
@@ -1186,9 +1186,9 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Exchanges generic field names for the actual field selectors in a Data set form.
 	 *
-	 * @param $data_set    Data set data
-	 * @param $number      the position of this data set in UI
-	 * @return array       remapped Data set
+	 * @param array $data_set  Data set data
+	 * @param int   $number    the position of this data set in UI
+	 * @return array           remapped Data set
 	 */
 	protected function remapDataSet($data_set, $number) {
 		// Key - selector mapping.
@@ -1235,8 +1235,8 @@ class testDashboardPieChartWidget extends CWebTest
 	/**
 	 * Takes field data from a data provider and sets the defaults for Data sets.
 	 *
-	 * @param $fields    field data from data provider
-	 * @returns array    normalised
+	 * @param array $fields  field data from data provider
+	 * @returns array        field data with default values set
 	 */
 	protected function extractDataSets($fields) {
 		$data_sets = array_key_exists('Data set', $fields)
