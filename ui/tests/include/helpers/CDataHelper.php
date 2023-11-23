@@ -427,7 +427,7 @@ class CDataHelper extends CAPIHelper {
 	 * @param string $itemid		item id
 	 */
 	public static function removeItemData($itemid) {
-		DBexecute('DELETE FROM '.self::getItemDataTableSuffix($itemid).' WHERE itemid='.zbx_dbstr($itemid));
+		DBexecute('DELETE FROM history'.self::getItemDataTableSuffix($itemid).' WHERE itemid='.zbx_dbstr($itemid));
 	}
 
 	/**
