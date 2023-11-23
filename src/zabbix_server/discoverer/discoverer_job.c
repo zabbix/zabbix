@@ -25,8 +25,8 @@ typedef union {
 	struct {
 		zbx_uint32_t	port;
 		zbx_uint32_t	dcheck_type;
-	}			key;
-	zbx_uint64_t		buf;
+	}		key;
+	zbx_uint64_t	buf;
 }
 dtask_hash_t;
 
@@ -53,7 +53,6 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 	const zbx_discoverer_task_t	*task1 = (const zbx_discoverer_task_t *)d1;
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
 	dtask_hash_t			state1, state2;
-	int				ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(task1->addr_type, task2->addr_type);
 
@@ -61,9 +60,7 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 	state2.key.port = task2->port;
 	state1.key.dcheck_type = DISCOVERY_ADDR_IP == task1->addr_type ? 0 : task1->dchecks.values[0]->type;
 	state2.key.dcheck_type = DISCOVERY_ADDR_IP == task2->addr_type ? 0 : task2->dchecks.values[0]->type;
-
-	if (0 != (ret = memcmp(&state1, &state2, sizeof(dtask_hash_t))))
-		return ret;
+	ZBX_RETURN_IF_NOT_EQUAL(state1.buf, state2.buf);
 
 	if (DISCOVERY_ADDR_IP == task1->addr_type)
 		return strcmp(task1->addr.ip, task2->addr.ip);
