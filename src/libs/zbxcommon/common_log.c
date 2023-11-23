@@ -227,7 +227,7 @@ void	zbx_error(const char *fmt, ...)
 
 	va_start(args, fmt);
 
-	fprintf(stderr, "%s [%li]: ", get_progname_cb(), zbx_get_thread_id());
+	fprintf(stderr, "%s [%li]: ", (NULL != get_progname_cb) ? get_progname_cb() : "", zbx_get_thread_id());
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 	fflush(stderr);

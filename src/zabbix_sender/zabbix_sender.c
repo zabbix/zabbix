@@ -131,7 +131,7 @@ static const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-unsigned char	zbx_program_type = ZBX_PROGRAM_TYPE_SENDER;
+static unsigned char	zbx_program_type = ZBX_PROGRAM_TYPE_SENDER;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static unsigned char	get_zbx_program_type(void)
 {
