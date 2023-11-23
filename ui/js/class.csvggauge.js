@@ -367,21 +367,19 @@ class CSVGGauge {
 			container.style.color = `#${this.#config.description.color}`;
 		}
 
-		const lines_data = [];
-
 		for (const text of this.#config.description.text.split('\r\n')) {
 			let line = null;
 
-			if (text !== '') {
+			if (text.replace(/ /g, '') !== '') {
 				line = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
+
+				line.innerText = text;
 
 				container.appendChild(line);
 			}
-
-			lines_data.push({line, text});
 		}
 
-		this.#elements.description = {container, lines_data};
+		this.#elements.description = {container};
 	}
 
 	/**
@@ -880,7 +878,7 @@ class CSVGGauge {
 	 * Position description according to the size of widget and truncate the text matching the available width.
 	 */
 	#drawDescription() {
-		const {container, lines_data} = this.#elements.description;
+		const {container} = this.#elements.description;
 
 		const line_height = this.#height * this.#config.description.size / 100;
 		const font_size = line_height * CSVGGauge.TEXT_BASELINE;
@@ -888,21 +886,12 @@ class CSVGGauge {
 		container.style.lineHeight = `${line_height}px`;
 		container.style.fontSize = `${font_size}px`;
 
-		let lines_count = 0;
-
-		for (const {line, text} of lines_data) {
-			if (text.replace(/ /g,'') !== '') {
-				line.innerText = text;
-				lines_count++;
-			}
-		}
-
 		container.setAttribute('width', this.#width);
-		container.setAttribute('height', line_height * lines_count);
+		container.setAttribute('height', line_height * container.childElementCount);
 		container.setAttribute('x', 0);
 		container.setAttribute('y', this.#config.description.position === CSVGGauge.DESC_V_POSITION_TOP
 			? 0
-			: this.#height - line_height * lines_count
+			: this.#height - line_height * container.childElementCount
 		);
 	}
 
