@@ -19,123 +19,48 @@
 **/
 
 
-class C64ImportConverterTest extends CImportConverterTest {
-
-	public function importConverterDataProvider(): array {
-		$item_types = [CXmlConstantName::CALCULATED, CXmlConstantName::DEPENDENT, CXmlConstantName::EXTERNAL,
-			CXmlConstantName::HTTP_AGENT, CXmlConstantName::INTERNAL, CXmlConstantName::IPMI, CXmlConstantName::JMX,
-			CXmlConstantName::ODBC, CXmlConstantName::SCRIPT, CXmlConstantName::SIMPLE, CXmlConstantName::SNMP_AGENT,
-			CXmlConstantName::SNMP_TRAP, CXmlConstantName::SSH, CXmlConstantName::TELNET,
-			CXmlConstantName::ZABBIX_ACTIVE, CXmlConstantName::TRAP, CXmlConstantName::ZABBIX_PASSIVE
-		];
-
-		$source_items = [];
-		$source_lld_rules = [];
-		$expected_items = [];
-		$expected_lld_rules = [];
-
-		foreach ($item_types as $type) {
-			$source_item = [
-				'type' => $type,
-				'timeout' => '3s'
-			];
-			$expected_item = [
-				'type' => $type
-			];
-
-			if ($type === CXmlConstantName::HTTP_AGENT || $type === CXmlConstantName::SCRIPT) {
-				$expected_item['timeout'] = '3s';
-			}
-
-			if ($type !== CXmlConstantName::CALCULATED && $type !== CXmlConstantName::SNMP_TRAP) {
-				$source_lld_rules[] = $source_item;
-				$expected_lld_rules[] = $expected_item;
-			}
-
-			$source_items[] = $source_item;
-			$expected_items[] = $expected_item;
-		}
-
-		foreach ($source_lld_rules as &$lld_rule) {
-			$lld_rule['item_prototypes'] = $source_items;
-		}
-		unset($lld_rule);
-
-		foreach ($expected_lld_rules as &$lld_rule) {
-			$lld_rule['item_prototypes'] = $expected_items;
-		}
-		unset($lld_rule);
-
-		return [
-			[
-				[],
-				[]
-			],
-			[
-				[
-					'templates' => [
-						[
-							'items' => $source_items,
-							'discovery_rules' => $source_lld_rules
-						]
-					],
-					'hosts' => [
-						[
-							'items' => $source_items,
-							'discovery_rules' => $source_lld_rules
-						]
-					]
-				],
-				[
-					'templates' => [
-						[
-							'items' => $expected_items,
-							'discovery_rules' => $expected_lld_rules
-						]
-					],
-					'hosts' => [
-						[
-							'items' => $expected_items,
-							'discovery_rules' => $expected_lld_rules
-						]
-					]
-				]
-			]
-		];
-	}
+class C62ImportConverterTest extends CImportConverterTest {
 
 	public function importConverterDataProviderCalcItemFormula(): array {
 		$formulas = [
 			[
-				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],0s))',
-				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],0s))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 0m))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 0h ))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 0d ))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"],  0w ))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))',
 				'prototype' => false
 			],
 			[
 				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], 15s))',
-				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], 15s))',
 				'prototype' => false
 			],
 			[
 				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], {$MACRO}))',
-				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], {$MACRO}))',
 				'prototype' => false
 			],
 			[
 				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], "{$MACRO: context}"))'.
 					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 1h ))',
-				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
-					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], "{$MACRO: context}"))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 1h ))',
 				'prototype' => false
 			],
 			[
 				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],{#LLD}))',
-				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],{#LLD}))',
 				'prototype' => true
 			],
 			[
 				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],  {#LLD}))',
-				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],  {#LLD}))',
 				'prototype' => true
 			]
 		];
@@ -209,7 +134,6 @@ class C64ImportConverterTest extends CImportConverterTest {
 	}
 
 	/**
-	 * @dataProvider importConverterDataProvider
 	 * @dataProvider importConverterDataProviderCalcItemFormula
 	 *
 	 * @param array $data
@@ -222,7 +146,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 	protected function createSource(array $data = []): array {
 		return [
 			'zabbix_export' => array_merge([
-				'version' => '6.4'
+				'version' => '6.2',
+				'date' => '2023-09-04T18:00:00:00Z'
 			], $data)
 		];
 	}
@@ -230,7 +155,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 	protected function createExpectedResult(array $data = []): array {
 		return [
 			'zabbix_export' => array_merge([
-				'version' => '7.0'
+				'version' => '6.4'
 			], $data)
 		];
 	}
@@ -240,7 +165,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 		$this->assertEquals($expected, $result);
 	}
 
-	protected function createConverter(): C64ImportConverter {
-		return new C64ImportConverter();
+	protected function createConverter(): C62ImportConverter {
+		return new C62ImportConverter();
 	}
 }
