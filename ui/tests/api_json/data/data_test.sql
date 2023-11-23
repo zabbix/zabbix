@@ -255,27 +255,12 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99004,10084,1,2,1,'127.0.0.1','','161');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004, 2, 1, '{$SNMP_COMMUNITY}');
 
--- discovery action
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99000, 'API active proxy for discovery action', 0, '');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (90, 90, 7);
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (90,90,20,0,99000,'');
-
 -- autoregistration action
 INSERT INTO usrgrp (usrgrpid, name) VALUES (47, 'User group for action delete');
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '$2a$10$gFL5ORa/Ml0VBDGraHI3tuE1WuiKOX8ef497bAfzNiSXUx4Vrrn.y', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '$2a$10$P8CZ/rs94pLp177hh27KheWKAKa6GXZLFhOE8ymd/QlEKT2FDngZe', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (87, 47, 53);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (88, 47, 54);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (91, 'API Autoregistration action', 2, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (91, 91, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (91, 0, 'Autoregistration: {HOST.HOST}', 'Host name: {HOST.HOST}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (91, 91, 47);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (92, 91, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (92, 0, 'Problem: {EVENT.NAME}', 'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (92, 92, 47);
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (93, 'API Action for deleting 2', 0, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (93, 91, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (93, 0, 'Problem: {EVENT.NAME}', 'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}', NULL);

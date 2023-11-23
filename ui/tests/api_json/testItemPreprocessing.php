@@ -571,7 +571,17 @@ class testItemPreprocessing extends CAPITest {
 	 * @dataProvider lldPreprocessingStepsDataProvider
 	 */
 	public function testItemPreprocessing_TypeNotSupported(string $method, array $params, ?string $error = null) {
-		CTestDataHelper::processReferences($method, $params);
+		if ($method === 'item.create') {
+			CTestDataHelper::convertItemReferences($params);
+		}
+
+		if ($method === 'itemprototype.create') {
+			CTestDataHelper::convertItemPrototypeReferences($params);
+		}
+
+		if ($method === 'discoveryrule.create') {
+			CTestDataHelper::convertLldRuleReferences($params);
+		}
 
 		return $this->call($method, $params, $error);
 	}
