@@ -9,6 +9,7 @@ DIST_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
+	zbxdbconfigworker \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -86,6 +87,7 @@ SERVER_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
+	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
 	zbxcacheconfig \

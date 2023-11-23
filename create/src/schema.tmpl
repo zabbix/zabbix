@@ -281,7 +281,6 @@ FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
-FIELD		|name_upper	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|hostid,key_(764)
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -289,9 +288,7 @@ INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 INDEX		|8		|key_(768)
-INDEX		|9		|hostid,name_upper
 CHANGELOG	|3
-UPD_TRIG_FUNC	|name		|name_upper	|itemid	|upper
 
 TABLE|httpstepitem|httpstepitemid|ZBX_TEMPLATE
 FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0
@@ -1405,6 +1402,11 @@ FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 
+TABLE|item_rtname|itemid|ZBX_TEMPLATE
+FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
+FIELD		|name_resolved	|t_varchar(2048)	|''	|NOT NULL	|0
+FIELD		|name_resolved_upper|t_varchar(2048)	|''	|NOT NULL	|ZBX_UPPER
+
 TABLE|opinventory|operationid|ZBX_DATA
 FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
 FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
@@ -2192,4 +2194,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050148	|6050148
+ROW		|1		|6050158	|6050158
