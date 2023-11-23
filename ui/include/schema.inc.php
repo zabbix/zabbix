@@ -1141,8 +1141,7 @@ return [
 			],
 			'query_fields' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'posts' => [
@@ -9683,6 +9682,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'item_value_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '31'
+			],
+			'attempt_interval' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '5s'
 			]
 		]
 	],

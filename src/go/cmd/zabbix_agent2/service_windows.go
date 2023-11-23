@@ -209,7 +209,6 @@ func validateExclusiveFlags(args *Arguments) error {
 	if !validateMultipleAgentFlag() {
 		return errors.New(
 			"option -m, --multiple-agents can only be used with one of the service options, see -h, --help for more information")
-		)
 	}
 
 	return nil
