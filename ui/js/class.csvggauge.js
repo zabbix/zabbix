@@ -364,7 +364,7 @@ class CSVGGauge {
 		}
 
 		if (this.#config.description.color !== '') {
-			container.style.fill = `#${this.#config.description.color}`;
+			container.style.color = `#${this.#config.description.color}`;
 		}
 
 		const lines_data = [];
