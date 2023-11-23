@@ -2578,8 +2578,8 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		if (0 == strcmp(hv->props[ZBX_VMWARE_HVPROP_MAINTENANCE], "true"))
 			continue;
 
-		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
-				counterid, datastore->uuid, 1, unit, result)))
+		if (SYSINFO_RET_OK != vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
+				counterid, datastore->uuid, 1, unit, result))
 		{
 			char	*err, *msg = *GET_MSG_RESULT(result);
 
@@ -2616,6 +2616,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		latency = latency / count;
 
 	SET_UI64_RESULT(result, latency);
+	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
