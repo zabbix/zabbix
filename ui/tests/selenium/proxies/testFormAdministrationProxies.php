@@ -527,11 +527,11 @@ class testFormAdministrationProxies extends CWebTest {
 				$form->selectTab('Timeouts');
 
 				// Check Timeouts for item types radio buttons.
-				$this->assertEquals(['Global', 'Override'], $form->getField('Timeouts for item types')->
-						asSegmentedRadio()->getLabels()->asText()
+				$this->assertEquals(['Global', 'Override'],
+						$form->getField('Timeouts for item types')->asSegmentedRadio()->getLabels()->asText()
 				);
 
-				// Global timeouts button is clickable.
+				// Global timeouts link is clickable.
 				$this->assertTrue($form->query('link:Global timeouts')->one()->isClickable());
 
 				// Default value for proxy should be Global.
@@ -539,26 +539,21 @@ class testFormAdministrationProxies extends CWebTest {
 
 				// Available timeouts list.
 				$timeouts = ['Zabbix agent', 'Simple check', 'SNMP agent', 'External check', 'Database monitor',
-						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script'];
+						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script'
+				];
 
 				// Every timeout has mandatory status.
 				$this->assertEquals($timeouts, $form->getRequiredLabels());
 
 				// Check timeouts fields values and status after switching between Global and Override.
-				foreach (['Global', 'Override'] as $parameter) {
-					if ($parameter === 'Override') {
-						$form->fill(['Timeouts for item types' => $parameter]);
-					}
+				foreach (['Override' => true, 'Global' => false] as $timeout => $enabled) {
+					$form->fill(['Timeouts for item types' => $timeout]);
 
 					foreach ($timeouts as $timeout) {
 						$field = $form->getField($timeout);
 						$this->assertEquals('3s', $field->getValue());
 						$this->assertEquals(255, $field->getAttribute('maxlength'));
-
-						($parameter === 'Global')
-							? $this->assertFalse($field->isClickable())
-							: $this->assertTrue($field->isClickable()
-						);
+						$this->assertEquals($enabled, $field->isClickable());
 					}
 				}
 
@@ -609,10 +604,10 @@ class testFormAdministrationProxies extends CWebTest {
 		$condition = ($data['operating_mode'] === 'Active')
 			? ($data['Connections to proxy'] !== 'No encryption')
 			: ($data['Connections from proxy'] !== [
-				'id:tls_accept_none' => true,
-				'id:tls_accept_psk' => false,
-				'id:tls_accept_certificate' => false
-			]);
+					'id:tls_accept_none' => true,
+					'id:tls_accept_psk' => false,
+					'id:tls_accept_certificate' => false
+				]);
 
 		$checked_proxy = ($data['operating_mode'] === 'Active') ? 'Active' : 'Passive';
 		$opposite_proxy = ($data['operating_mode'] === 'Active') ? 'Passive' : 'Active';
@@ -1447,6 +1442,82 @@ class testFormAdministrationProxies extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "/1/timeout_script": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - global macros',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'TELNET agent' => '{PROXY.NAME}'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - LLD macros',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '{#MACROS}'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - XSS',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SSH agent' => '<script>alert("hi!");</script>'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - unicode',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SNMP agent' => '☺♥²©™"\''
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - error order',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'External check' => 'test',
+						'TELNET agent' => '800'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
 					]
 				]
 			],
