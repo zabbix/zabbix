@@ -368,10 +368,8 @@ class CSVGGauge {
 		}
 
 		for (const text of this.#config.description.text.split('\r\n')) {
-			let line = null;
-
 			if (text.replace(/ /g, '') !== '') {
-				line = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
+				const line = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
 
 				line.innerText = text;
 
