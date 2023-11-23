@@ -72,7 +72,8 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_hashset_remove_direct(&config->proxy_groups, pg);
 	}
 
-	config->revision.proxy_group = revision;
+	if (0 != sync->add_num + sync->update_num + sync->remove_num)
+		config->revision.proxy_group = revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -90,10 +91,13 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
  ******************************************************************************/
 int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 {
-	if (*revision >= config->revision.proxy_group)
-		return FAIL;
+	int		ret = FAIL;
+	zbx_uint64_t	old_revision = *revision;
 
-	RDLOCK_CACHE;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (*revision >= config->revision.proxy_group)
+		goto out;
 
 	zbx_hashset_iter_t	iter;
 	zbx_dc_proxy_group_t	*dc_group;
@@ -103,6 +107,9 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 	while (NULL != (group = (zbx_pgm_group_t *)zbx_hashset_iter_next(&iter)))
 		group->sync_revision = 0;
 
+	RDLOCK_CACHE;
+
+	*revision = config->revision.proxy_group;
 
 	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
 	while (NULL != (dc_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
@@ -116,19 +123,21 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 			zbx_vector_uint64_create(&group->hostids);
 		}
 
-		group->sync_revision = config->revision.proxy_group;
+		group->sync_revision = *revision;
 
 		if (dc_group->revision > group->revision)
 		{
 			group->revision = dc_group->revision;
 			group->failover_delay = dc_group->failover_delay;
 			group->min_online = dc_group->min_online;
-
-			*revision = group->sync_revision;
 		}
 	}
 
 	UNLOCK_CACHE;
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s revision:" ZBX_FS_UI64 "->" ZBX_FS_UI64, __func__,
+			zbx_result_string(ret), old_revision, *revision);
+	return ret;
 }
