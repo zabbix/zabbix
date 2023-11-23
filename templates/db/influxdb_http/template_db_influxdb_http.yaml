@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-30T11:36:18Z'
+  date: '2023-11-01T20:48:32Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -690,11 +690,11 @@ zabbix_export:
                         host: 'InfluxDB by HTTP'
                         key: influx.healthcheck
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: GRAPH_CLASSIC
                   name: 'InfluxDB: Tasks runs'
                   'y': '2'
@@ -717,11 +717,11 @@ zabbix_export:
                         host: 'InfluxDB by HTTP'
                         key: influxdb.uptime
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: ITEM
                   name: Version
                   x: '8'
@@ -733,7 +733,7 @@ zabbix_export:
                         host: 'InfluxDB by HTTP'
                         key: influxdb.version
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'Workers busy, pct'
@@ -746,11 +746,11 @@ zabbix_export:
                         host: 'InfluxDB by HTTP'
                         key: influxdb.task_executor_workers_busy.pct
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: ITEM
                   name: 'Workers currently running'
                   x: '16'
@@ -762,11 +762,11 @@ zabbix_export:
                         host: 'InfluxDB by HTTP'
                         key: influxdb.task_executor_runs_active.total
                     - type: INTEGER
-                      name: show.0
-                      value: '4'
-                    - type: INTEGER
-                      name: show.1
+                      name: show
                       value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
                 - type: ITEM
                   name: 'Users, total'
                   x: '20'
@@ -778,7 +778,7 @@ zabbix_export:
                         host: 'InfluxDB by HTTP'
                         key: influxdb.users.total
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
             - name: Organizations
               widgets:

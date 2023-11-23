@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-30T11:33:27Z'
+  date: '2023-11-01T20:47:30Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1949,7 +1949,7 @@ zabbix_export:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.service_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: GRAPH_CLASSIC
                   'y': '5'
@@ -1999,7 +1999,7 @@ zabbix_export:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.task_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
                 - type: ITEM
                   name: 'Container instance count'
@@ -2019,7 +2019,7 @@ zabbix_export:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.container_instance_count
                     - type: INTEGER
-                      name: show.0
+                      name: show
                       value: '2'
             - name: Services
               widgets:
