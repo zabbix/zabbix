@@ -20,7 +20,6 @@
 #include "dbconfig.h"
 
 #include "zbxtasks.h"
-#include "zbxexpression.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
