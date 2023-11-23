@@ -1,9 +1,9 @@
 Changes for 7.0.0alpha8
 
 New features:
-A.F....PS. [ZBXNEXT-8735] added attempt interval and item type based filtering to connectors (dfofanovs, dgoloscapov)
-...G...PS. [ZBXNEXT-1400] added support for validation of configuration files (asestakovs, dimir)
-A.F.I..... [ZBXNEXT-7578] modified the structure of headers and query_fields parameters for item, item prototype and LLD rule API objects (akozlovs, jfreibergs, vmaksimovs)
+A.F....PS. [ZBXNEXT-8735] added attempt interval and item data type-based filtering to connectors (dfofanovs, dgoloscapov)
+...G...PS. [ZBXNEXT-1400] added support for configuration file validation (asestakovs, dimir)
+A.F.I..... [ZBXNEXT-7578] modified 'headers' and 'query_fields' parameter structure for item, item prototype, and LLD rule API objects (akozlovs, jfreibergs, vmaksimovs)
 ....I..... [ZBXNEXT-8765] changed default values of data storage period for audit log/history housekeeping to 31 days (dpetra)
 A.F....PS. [ZBXNEXT-5120] extended support of macro functions to all built-in and user macros (akozlovs, Sasha)
 ...G...... [ZBXNEXT-3826] added automatic IP address reversal for reverse DNS lookups (arimdjonoks)
@@ -18,7 +18,7 @@ A.F....PS. [ZBXNEXT-5120] extended support of macro functions to all built-in an
 .........T [ZBXCTR-20] added scheme for metrics endpoints (ebbex)
 
 Bug fixes:
-A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item formula when item key has "last" function and additional four parameter (Ivo, mprihodko)
+A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item formula when item key includes 'last' function and a fourth parameter (Ivo, mprihodko)
 ...G...PS. [ZBX-23490] improved HTTP agent, web scenarios, web checks and JavaScript to convert to UTF-8 from charset specified in HTTP header or HTTP meta tag (vso)
 .......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
 ....I..... [ZBX-23146] fixed automatic database upgrade and manual upgrade scripts failing on TimescaleDB with compression (vso)
@@ -4733,7 +4733,7 @@ Changes for 5.0.40rc1
 New features:
 
 Bug fixes:
-.......P.. [ZBX-22493] fixed foreign key support with sqlite3 database (wiper)
+.......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
 .........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 
