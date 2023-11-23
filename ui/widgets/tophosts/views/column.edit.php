@@ -45,12 +45,13 @@ if (array_key_exists('edit', $data)) {
 
 // Name.
 $form_grid->addItem([
-	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+	(new CLabel(_('Name'), 'column_name'))->setAsteriskMark(),
 	new CFormField(
 		(new CTextBox('name', $data['name'], false))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()
+			->setId('column_name')
 	)
 ]);
 
@@ -117,7 +118,7 @@ $item_select = (new CPatternSelect([
 $scripts[] = $item_select->getPostJS();
 
 $form_grid->addItem([
-	(new CLabel(_('Item'), 'item'))->setAsteriskMark(),
+	(new CLabel(_('Item'), 'item_ms'))->setAsteriskMark(),
 	new CFormField($item_select)
 ]);
 
