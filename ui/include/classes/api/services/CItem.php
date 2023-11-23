@@ -154,20 +154,20 @@ class CItem extends CItemGeneral {
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] === null) {
+				return [];
+			}
+			else {
+				$sqlParts['from'][] = 'host_hgset hh';
+				$sqlParts['from'][] = 'permission p';
+				$sqlParts['where'][] = 'i.hostid=hh.hostid';
+				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE i.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.zbx_dbstr($permission).
-					')';
+				if ($options['editable']) {
+					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
+			}
 		}
 
 		// itemids

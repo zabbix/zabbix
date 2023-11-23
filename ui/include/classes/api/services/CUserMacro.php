@@ -112,25 +112,18 @@ class CUserMacro extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if ($options['editable'] && !is_null($options['globalmacro'])) {
+			if (($options['editable'] && !is_null($options['globalmacro'])) || self::$userData['ugsetid'] === null) {
 				return [];
 			}
 			else {
-				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+				$sqlParts['from'][] = 'host_hgset hh';
+				$sqlParts['from'][] = 'permission p';
+				$sql_parts['where'][] = 'hm.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
 
-				$userGroups = getUserGroupsByUserId($userid);
-
-				$sqlParts['where'][] = 'EXISTS ('.
-						'SELECT NULL'.
-						' FROM hosts_groups hgg'.
-							' JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $userGroups).
-						' WHERE hm.hostid=hgg.hostid'.
-						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.zbx_dbstr($permission).
-						')';
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
 			}
 		}
 

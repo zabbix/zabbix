@@ -68,21 +68,22 @@ class CGraphItem extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] === null) {
+				return [];
+			}
+			else {
+				$sqlParts['from'][] = 'items i';
+				$sqlParts['from'][] = 'host_hgset hh';
+				$sqlParts['from'][] = 'permission p';
+				$sqlParts['where'][] = 'gi.itemid=i.itemid';
+				$sqlParts['where'][] = 'i.hostid=hh.hostid';
+				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE gi.itemid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY i.itemid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.zbx_dbstr($permission).
-					')';
+				if ($options['editable']) {
+					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
+			}
 		}
 
 		// graphids

@@ -1393,7 +1393,7 @@ class CUser extends CApiService {
 
 		$options = [
 			'output' => ['userid', 'ugsetid'],
-			'filter' => ['userid' => $userids]
+			'userids' => $userids
 		];
 		$result = DBselect(DB::makeSql('user_ugset', $options));
 
@@ -2668,6 +2668,22 @@ class CUser extends CApiService {
 		return DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type')[0];
 	}
 
+	private static function getUgSetId(array $db_user): ?string {
+		if ($db_user['roleid'] != 0 && $db_user['type'] != USER_TYPE_SUPER_ADMIN) {
+			$options = [
+				'output' => ['ugsetid'],
+				'userids' => $db_user['userid']
+			];
+			$row = DBfetch(DBselect(DB::makeSql('user_ugset', $options)));
+
+			if ($row) {
+				return $row['ugsetid'];
+			}
+		}
+
+		return null;
+	}
+
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -2898,6 +2914,7 @@ class CUser extends CApiService {
 	 */
 	private function addExtraFields(array $db_user, array $group_attrs): array {
 		$db_user['type'] = $this->getUserType($db_user['roleid']);
+		$db_user['ugsetid'] = $this->getUgSetId($db_user);
 		$db_user['userip'] = CWebUser::getIp();
 		$db_user['debug_mode'] = $group_attrs['debug_mode'];
 		$db_user['gui_access'] = $group_attrs['gui_access'];

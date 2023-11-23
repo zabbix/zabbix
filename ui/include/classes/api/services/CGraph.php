@@ -103,24 +103,24 @@ class CGraph extends CGraphGeneral {
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] === null) {
+				return [];
+			}
+			else {
+				$sqlParts['from']['graphs_items'] = 'graphs_items gi';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from'][] = 'host_hgset hh';
+				$sqlParts['from'][] = 'permission p';
+				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
+				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
+				$sqlParts['where'][] = 'i.hostid=hh.hostid';
+				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-			// check permissions by graph items
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM graphs_items gi,items i,hosts_groups hgg'.
-					' LEFT JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE g.graphid=gi.graphid'.
-					' AND gi.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.zbx_dbstr($permission).
-					' OR MIN(permission) IS NULL'.
-					' OR MIN(permission)='.PERM_DENY.
-				')';
+				if ($options['editable']) {
+					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
+			}
 		}
 
 		// groupids
