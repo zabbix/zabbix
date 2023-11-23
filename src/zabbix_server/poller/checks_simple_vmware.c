@@ -2573,6 +2573,8 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			goto unlock;
 		}
 
+		ds_count++;
+
 		if (0 == strcmp(hv->props[ZBX_VMWARE_HVPROP_MAINTENANCE], "true"))
 			continue;
 
@@ -2589,8 +2591,6 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			SET_MSG_RESULT(result, err);
 			goto unlock;
 		}
-
-		ds_count++;
 
 		if (0 == ISSET_VALUE(result))
 			continue;
