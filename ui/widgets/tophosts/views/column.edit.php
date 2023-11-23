@@ -57,7 +57,7 @@ $form_grid->addItem([
 
 // Data.
 $form_grid->addItem([
-	new CLabel(_('Data'), 'data'),
+	new CLabel(_('Data'), 'label_data'),
 	new CFormField(
 		(new CSelect('data'))
 			->setValue($data['data'])
@@ -66,6 +66,7 @@ $form_grid->addItem([
 				CWidgetFieldColumnsList::DATA_HOST_NAME => _('Host name'),
 				CWidgetFieldColumnsList::DATA_TEXT => _('Text')
 			]))
+			->setFocusableElementId('label_data')
 	)
 ]);
 
@@ -143,7 +144,7 @@ $form_grid->addItem([
 			_('Aggregation function'),
 			$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
 		],
-		'aggregate_function'
+		'label_aggregate_function'
 	),
 	new CFormField(
 		(new CSelect('aggregate_function'))
@@ -158,6 +159,7 @@ $form_grid->addItem([
 				AGGREGATE_FIRST => _('first'),
 				AGGREGATE_LAST => _('last')
 			]))
+			->setFocusableElementId('label_aggregate_function')
 	)
 ]);
 

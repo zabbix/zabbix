@@ -126,14 +126,14 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 		array_push($view_collection,
 			[
-				'label' => (new CLabel($this->field->getFromLabel(), 'time_period_from'))
+				'label' => (new CLabel($this->field->getFromLabel(), $field_name.'_from'))
 					->addClass('js-'.$field_name.'-from')
 					->setAsteriskMark($this->isRequired()),
 				'view' => $date_selector_from,
 				'class' => $style_class.'js-'.$field_name.'-from'
 			],
 			[
-				'label' => (new CLabel($this->field->getToLabel(), 'time_period_to'))
+				'label' => (new CLabel($this->field->getToLabel(), $field_name.'_to'))
 					->addClass('js-'.$field_name.'-to')
 					->setAsteriskMark($this->isRequired()),
 				'view' => $date_selector_to,
