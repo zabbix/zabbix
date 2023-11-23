@@ -4730,8 +4730,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.40rc1
 
-New features:
-
 Bug fixes:
 .......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
 .........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
