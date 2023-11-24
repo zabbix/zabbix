@@ -240,6 +240,7 @@
 		this.curl.setArgument('height', this.dimensions.graphHeight);
 		this.curl.setArgument('width', Math.max(1000, width));
 		this.curl.setArgument('profileIdx', 'web.charts.filter');
+		this.curl.setArgument('resolve_macros', 1);
 		this.curl.setArgument('_', (+new Date).toString(34));
 
 		const unsetLoading = this.setLoading(delay_loading);

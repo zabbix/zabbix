@@ -215,20 +215,33 @@ switch ($data['method']) {
 			case 'items':
 			case 'item_prototypes':
 				$options = [
-					'output' => ['itemid', 'name'],
+					'output' => ['itemid'],
 					'selectHosts' => ['name'],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
-					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'limit' => $limit
 				];
 
 				if ($data['object_name'] === 'item_prototypes') {
+					$options['output'][] = 'name';
+					$options['search'] = array_key_exists('search', $data) ? ['name' => $data['search']] : null;
+
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
-					$records = API::Item()->get($options + ['webitems' => true]);
+					$resolve_macros = array_key_exists('resolve_macros', $data) && $data['resolve_macros'];
+					$name_field = $resolve_macros ? 'name_resolved' : 'name';
+
+					$options['output'][] = $name_field;
+					$options['search'] = array_key_exists('search', $data) ? [$name_field => $data['search']] : null;
+					$options['webitems'] = true;
+
+					$records = API::Item()->get($options);
+
+					if ($resolve_macros) {
+						$records = CArrayHelper::renameObjectsKeys($records, ['name_resolved' => 'name']);
+					}
 				}
 
 				if ($records) {
@@ -771,9 +784,12 @@ switch ($data['method']) {
 					$hostids = $data['hostid'];
 				}
 
+				$resolve_macros = array_key_exists('resolve_macros', $data) && $data['resolve_macros'];
+				$name_field = $resolve_macros ? 'name_resolved' : 'name';
+
 				$options = [
-					'output' => ['name'],
-					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'output' => ['itemid', $name_field],
+					'search' => [$name_field => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
@@ -784,6 +800,10 @@ switch ($data['method']) {
 				];
 
 				$db_result = API::Item()->get($options);
+
+				if ($resolve_macros) {
+					$db_result = CArrayHelper::renameObjectsKeys($db_result, ['name_resolved' => 'name']);
+				}
 				break;
 
 			case 'graphs':

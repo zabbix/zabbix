@@ -325,7 +325,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'key_', 'name', 'flags', 'type', 'value_type', 'history', 'trends'],
+			'output' => ['hostid', 'key_', 'name_resolved', 'flags', 'type', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['host'],
 			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid'],
@@ -358,7 +358,7 @@ class CControllerMenuPopup extends CController {
 				'type' => 'item',
 				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
-				'name' => $db_item['name'],
+				'name' => $db_item['name_resolved'],
 				'key' => $db_item['key_'],
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
@@ -599,7 +599,7 @@ class CControllerMenuPopup extends CController {
 						$db_triggers = API::Trigger()->get([
 							'output' => ['triggerid', 'description'],
 							'selectHosts' => ['hostid', 'name', 'status'],
-							'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+							'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 							'triggerids' => array_column($selement['elements'], 'triggerid'),
 							'preservekeys' => true
 						]);
@@ -618,7 +618,7 @@ class CControllerMenuPopup extends CController {
 							}
 							unset($item);
 
-							CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+							CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 							$with_hostname = count($hosts) > 1;
 
@@ -629,8 +629,8 @@ class CControllerMenuPopup extends CController {
 
 								$items[] = [
 									'name' => $with_hostname
-										? $item['hostname'].NAME_DELIMITER.$item['name']
-										: $item['name'],
+										? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+										: $item['name_resolved'],
 									'params' => [
 										'itemid' => $item['itemid'],
 										'action' => in_array(
@@ -714,7 +714,7 @@ class CControllerMenuPopup extends CController {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url_name', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+			'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 			'triggerids' => $data['triggerid'],
 			'preservekeys' => true
 		]);
@@ -750,7 +750,7 @@ class CControllerMenuPopup extends CController {
 			}
 			unset($item);
 
-			CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+			CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 			$with_hostname = count($hosts) > 1;
 			$items = [];
@@ -758,8 +758,8 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $item['hostname'].NAME_DELIMITER.$item['name']
-						: $item['name'],
+						? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+						: $item['name_resolved'],
 					'params' => [
 						'itemid' => $item['itemid'],
 						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
