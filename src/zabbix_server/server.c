@@ -52,6 +52,7 @@
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
 #include "zbxconnector.h"
+#include "zbxdbconfigworker.h"
 #include "service/service_manager.h"
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
@@ -95,6 +96,7 @@ const char	syslog_app_name[] = "zabbix_server";
 const char	*usage_message[] = {
 	"[-c config-file]", NULL,
 	"[-c config-file]", "-R runtime-option", NULL,
+	"[-c config-file]", "-T", NULL,
 	"-h", NULL,
 	"-V", NULL,
 	NULL	/* end of text */
@@ -138,9 +140,9 @@ const char	*help_message[] = {
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
 	"                                  (alerter, alert manager, availability manager, configuration syncer,",
-	"                                  connector manager, connector worker, discovery manager,",
-	"                                  escalator, ha manager, history poller, history syncer,",
-	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
+	"                                  configuration syncer worker, connector manager, connector worker,",
+	"                                  discovery manager, escalator, ha manager, history poller, history syncer,",
+	"                                  housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
 	"                                  self-monitoring, service manager, snmp trapper,",
@@ -151,9 +153,9 @@ const char	*help_message[] = {
 	"      Profiling control targets:",
 	"        process-type              All processes of specified type",
 	"                                  (alerter, alert manager, availability manager, configuration syncer,",
-	"                                  connector manager, connector worker, discovery manager,",
-	"                                  escalator, ha manager, history poller, history syncer,",
-	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
+	"                                  configuration syncer worker, connector manager, connector worker,",
+	"                                  discovery manager, escalator, ha manager, history poller, history syncer,",
+	"                                  housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
 	"                                  self-monitoring, service manager, snmp trapper,",
@@ -164,6 +166,7 @@ const char	*help_message[] = {
 	"                                  (rwlock, mutex, processing) can be used with process-type",
 	"                                  (e.g., history syncer,1,processing)",
 	"",
+	"  -T --test-config                Validate configuration file and exit",
 	"  -h --help                       Display this help message",
 	"  -V --version                    Display version number",
 	"",
@@ -186,13 +189,14 @@ static struct zbx_option	longopts[] =
 	{"config",		1,	NULL,	'c'},
 	{"foreground",		0,	NULL,	'f'},
 	{"runtime-control",	1,	NULL,	'R'},
+	{"test-config",		0,	NULL,	'T'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
 	{NULL}
 };
 
 /* short options */
-static char	shortopts[] = "c:hVR:f";
+static char	shortopts[] = "c:hVR:Tf";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -257,7 +261,9 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
-	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
+	1 /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -356,6 +362,9 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 static char	*zbx_config_webservice_url	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+
+static int	config_vps_limit		= 0;
+static int	config_vps_overcommit_limit	= 0;
 
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
@@ -571,6 +580,16 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DBCONFIGWORKER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_DBCONFIGWORKER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DBCONFIGWORKER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
 	else
 		return FAIL;
@@ -1031,7 +1050,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{NULL}
+		{"VPSLimit",			&config_vps_limit,	TYPE_INT,
+			PARM_OPT,	0,			ZBX_MEBIBYTE},
+		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,	TYPE_INT,
+			PARM_OPT,	0,			ZBX_MEBIBYTE},
+	{NULL}
 	};
 
 	/* initialize multistrings */
@@ -1162,7 +1185,7 @@ int	main(int argc, char **argv)
 
 	ZBX_TASK_EX			t = {ZBX_TASK_START};
 	char				ch;
-	int				opt_c = 0, opt_r = 0;
+	int				opt_c = 0, opt_r = 0, opt_t = 0, opt_f = 0;
 
 	/* see description of 'optarg' in 'man 3 getopt' */
 	char				*zbx_optarg = NULL;
@@ -1192,6 +1215,10 @@ int	main(int argc, char **argv)
 				t.opts = zbx_strdup(t.opts, zbx_optarg);
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
+			case 'T':
+				opt_t++;
+				t.task = ZBX_TASK_TEST_CONFIG;
+				break;
 			case 'h':
 				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
@@ -1205,6 +1232,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
+				opt_f++;
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
@@ -1215,13 +1243,23 @@ int	main(int argc, char **argv)
 	}
 
 	/* every option may be specified only once */
-	if (1 < opt_c || 1 < opt_r)
+	if (1 < opt_c || 1 < opt_r || 1 < opt_t || 1 < opt_f)
 	{
 		if (1 < opt_c)
 			zbx_error("option \"-c\" or \"--config\" specified multiple times");
 		if (1 < opt_r)
 			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
+		if (1 < opt_t)
+			zbx_error("option \"-T\" or \"--test-config\" specified multiple times");
+		if (1 < opt_f)
+			zbx_error("option \"-f\" or \"--foreground\" specified multiple times");
 
+		exit(EXIT_FAILURE);
+	}
+
+	if (0 != opt_t && 0 != opt_r)
+	{
+		zbx_error("option \"-T\" or \"--test-config\" cannot be specified with \"-R\"");
 		exit(EXIT_FAILURE);
 	}
 
@@ -1244,7 +1282,16 @@ int	main(int argc, char **argv)
 	zbx_init_metrics();
 	zbx_init_library_cfg(program_type, config_file);
 
+	if (ZBX_TASK_TEST_CONFIG == t.task)
+		printf("Validating configuration file \"%s\"\n", config_file);
+
 	zbx_load_config(&t);
+
+	if (ZBX_TASK_TEST_CONFIG == t.task)
+	{
+		printf("Validation successful\n");
+		exit(EXIT_SUCCESS);
+	}
 
 	zbx_init_library_dbupgrade(get_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
@@ -1456,6 +1503,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		zbx_free(error);
 		return FAIL;
 	}
+
+	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
 
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
@@ -1704,6 +1753,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				thread_args.args = &connector_worker_args;
 				zbx_thread_start(connector_worker_thread, &thread_args, &threads[i]);
 				break;
+			case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				zbx_thread_start(dbconfig_worker_thread, &thread_args, &threads[i]);
+				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
 				thread_args.args = &report_manager_args;
 				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);
@@ -1735,6 +1788,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
+				thread_args.args = &poller_args;
+				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}

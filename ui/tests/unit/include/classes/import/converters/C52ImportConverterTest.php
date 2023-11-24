@@ -205,7 +205,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 								'item' => [
 									'key' => 'grpmin["host group","item",last,5m]',
 									'type' => 'CALCULATED',
-									'params' => 'min(last_foreach(/*/item?[group="host group"],5m))'
+									'params' => 'min(last_foreach(/*/item?[group="host group"]))'
 								]
 							]
 						]
@@ -249,7 +249,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 								'item' => [
 									'key' => 'grpmin["host group","item",last,5m]',
 									'type' => 'CALCULATED',
-									'params' => 'min(last_foreach(/*/item?[group="host group"],5m))'
+									'params' => 'min(last_foreach(/*/item?[group="host group"]))'
 								]
 							]
 						]
