@@ -374,31 +374,31 @@ func parseRRs(in []dns.RR, source string) map[string][]interface{} {
 }
 
 func parseRespQuestion(respQuestion []dns.Question) map[string][]any {
-    var (
-        // RFC allows to have multiple questions, however DNS library describes
-        // it almost never happens, so it says it will fail if there is more than 1,
-        // so safe to assume there will be exactly 1 question.
-        q          = respQuestion[0]
-        resultPart = map[string]any{"qname": q.Name}
-        ok         bool
-    )
+	var (
+		// RFC allows to have multiple questions, however DNS library describes
+		// it almost never happens, so it says it will fail if there is more than 1,
+		// so safe to assume there will be exactly 1 question.
+		q          = respQuestion[0]
+		resultPart = map[string]any{"qname": q.Name}
+		ok         bool
+	)
 
-    resultPart["qtype"], ok = dnsTypesGetReverse[q.Qtype]
-    if !ok {
-        resultPart["qtype"], ok = dnsExtraQuestionTypesGet[q.Qtype]
-        if !ok {
-            resultPart["qtype"] = q.Qtype
-        }
-    }
+	resultPart["qtype"], ok = dnsTypesGetReverse[q.Qtype]
+	if !ok {
+		resultPart["qtype"], ok = dnsExtraQuestionTypesGet[q.Qtype]
+		if !ok {
+			resultPart["qtype"] = q.Qtype
+		}
+	}
 
-    resultPart["qclass"], ok = dnsClassesGet[q.Qclass]
-    if !ok {
-        resultPart["qclass"] = q.Qclass
-    }
+	resultPart["qclass"], ok = dnsClassesGet[q.Qclass]
+	if !ok {
+		resultPart["qclass"] = q.Qclass
+	}
 
-    return map[string][]any{
-        "question_section": {resultPart},
-    }
+	return map[string][]any{
+		"question_section": {resultPart},
+	}
 }
 
 func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
