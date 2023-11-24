@@ -26,7 +26,7 @@
 #include "zbxnix.h"
 #include "zbxcacheconfig.h"
 
-static void	pgm_sync_config(zbx_pg_cache_t *cache)
+static void	pgm_dc_get_groups(zbx_pg_cache_t *cache)
 {
 	zbx_uint64_t	old_revision = cache->group_revision;
 
@@ -53,6 +53,32 @@ static void	pgm_sync_config(zbx_pg_cache_t *cache)
 		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] update proxy group " ZBX_FS_UI64, group->proxy_groupid);
 		pg_cache_queue_update(cache, group);
 	}
+}
+
+static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+
+	result = zbx_db_select("select hostid,proxy_groupid from hosts where proxy_groupid is not null");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	hostid, proxy_groupid;
+		zbx_pg_group_t	*group;
+
+		ZBX_DBROW2UINT64(hostid, row[0]);
+		ZBX_DBROW2UINT64(proxy_groupid, row[1]);
+
+		if (NULL == (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &proxy_groupid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_vector_uint64_append(&group->hostids, hostid);
+	}
+	zbx_db_free_result(result);
 }
 
 /*
@@ -85,7 +111,8 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	pgm_sync_config(&cache);
+	pgm_dc_get_groups(&cache);
+	pgm_db_get_hosts(&cache);
 
 	time_update = zbx_time();
 
@@ -99,7 +126,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 		if (PGM_UPDATE_DELAY >= time_update - time_now)
 		{
-			pgm_sync_config(&cache);
+			pgm_dc_get_groups(&cache);
 			time_update = time_now;
 		}
 
