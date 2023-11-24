@@ -45,27 +45,50 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 		if (0 != srcid)
 		{
 			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &srcid)))
-			{
-				if (FAIL != (i = zbx_vector_uint64_search(&group->hostids, hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-				{
-					zbx_vector_uint64_remove_noorder(&group->hostids, i);
-					pg_cache_queue_update(pgs->cache, group);
-				}
-			}
+				pg_cache_group_remove_host(pgs->cache, group, hostid);
 		}
 
 		if (0 != dstid)
 		{
 			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &dstid)))
-			{
-				if (FAIL == (i = zbx_vector_uint64_search(&group->hostids, hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-				{
-					zbx_vector_uint64_append(&group->hostids, hostid);
-					pg_cache_queue_update(pgs->cache, group);
-				}
-			}
+				pg_cache_group_add_host(pgs->cache, group, hostid);
+		}
+	}
+
+	pthread_mutex_unlock(&pgs->cache->lock);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
+{
+	unsigned char	*ptr = message->data;
+	zbx_uint64_t	proxyid, srcid, dstid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	pthread_mutex_lock(&pgs->cache->lock);
+
+	while (ptr - message->data < message->size)
+	{
+		zbx_pg_group_t	*group;
+
+		ptr += zbx_deserialize_value(ptr, &proxyid);
+		ptr += zbx_deserialize_value(ptr, &srcid);
+		ptr += zbx_deserialize_value(ptr, &dstid);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] %lu->%lu", srcid, dstid);
+
+		if (0 != srcid)
+		{
+			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &srcid)))
+				pg_cache_group_remove_proxy(pgs->cache, group, proxyid);
+		}
+
+		if (0 != dstid)
+		{
+			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &dstid)))
+				pg_cache_group_add_proxy(pgs->cache, group, proxyid, 0);
 		}
 	}
 
@@ -93,6 +116,9 @@ static void	*pg_service_entry(void *data)
 			{
 				case ZBX_IPC_PGM_HOST_PGROUP_UPDATE:
 					pg_update_host_pgroup(pgs, message);
+					break;
+				case ZBX_IPC_PGM_PROXY_PGROUP_UPDATE:
+					pg_update_proxy_pgroup(pgs, message);
 					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;

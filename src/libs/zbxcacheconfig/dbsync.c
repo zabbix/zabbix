@@ -4097,12 +4097,13 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 				"p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,pr.lastaccess,"
 				"p.timeout_zabbix_agent,p.timeout_simple_check,p.timeout_snmp_agent,"
 				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,"
-				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts"
+				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts,"
+				"p.proxy_groupid"
 			" from proxy p"
 			" join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");
 
-	dbsync_prepare(sync, 23, NULL);
+	dbsync_prepare(sync, 24, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

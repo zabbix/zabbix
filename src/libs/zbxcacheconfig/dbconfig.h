@@ -449,6 +449,7 @@ ZBX_VECTOR_DECL(host_rev, zbx_host_rev_t)
 typedef struct
 {
 	zbx_uint64_t			proxyid;
+	zbx_uint64_t			proxy_groupid;
 	const char			*name;
 	unsigned char			mode;
 	zbx_uint64_t			hosts_monitored;	/* number of enabled hosts assigned to proxy */

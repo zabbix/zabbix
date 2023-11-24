@@ -1357,20 +1357,11 @@ typedef struct zbx_pg_group zbx_pg_group_t;
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	zbx_uint64_t	revision;
-}
-zbx_pg_host_t;
-
-ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
-
-typedef struct
-{
 	zbx_uint64_t		proxyid;
 	int			status;
 	int			firstaccess;
-	struct zbx_pg_group_t	*group;
-	zbx_vector_pg_host_t	hosts;
+	struct zbx_pg_group	*group;
+	zbx_vector_uint64_t	hostids;
 }
 zbx_pg_proxy_t;
 
@@ -1386,8 +1377,9 @@ struct zbx_pg_group
 	int				min_online;
 	int				status;
 	zbx_uint32_t			flag;
-	zbx_vector_pg_proxy_ptr_t	proxies;
-	zbx_vector_uint64_t		hostids;
+	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
+	zbx_vector_uint64_t		hostids;		/* hostids assigned to proxy group */
+	zbx_vector_uint64_t		new_hostids;		/* hostids to be assigned to proxies */
 };
 
 ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)

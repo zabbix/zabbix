@@ -41,7 +41,6 @@ static void	pgm_dc_get_groups(zbx_pg_cache_t *cache)
 	{
 		if (0 == group->sync_revision)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "[WDN] remove proxy group " ZBX_FS_UI64, group->proxy_groupid);
 			pg_group_clear(group);
 			zbx_hashset_iter_remove(&iter);
 			continue;
@@ -50,7 +49,6 @@ static void	pgm_dc_get_groups(zbx_pg_cache_t *cache)
 		if (old_revision >= group->revision)
 			continue;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] update proxy group " ZBX_FS_UI64, group->proxy_groupid);
 		pg_cache_queue_update(cache, group);
 	}
 }
@@ -80,6 +78,104 @@ static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
 	}
 	zbx_db_free_result(result);
 }
+
+static void	pgm_db_get_proxies(zbx_pg_cache_t *cache)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	int		clock = 0;
+	zbx_pg_proxy_t *proxy;
+
+	result = zbx_db_select("select p.proxyid,p.proxy_groupid,rt.lastaccess"
+				" from proxy p,proxy_rtdata rt"
+				" where proxy_groupid is not null"
+					" and p.proxyid=rt.proxyid");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	proxyid, proxy_groupid;
+		zbx_pg_group_t	*group;
+
+		ZBX_DBROW2UINT64(proxyid, row[0]);
+		ZBX_DBROW2UINT64(proxy_groupid, row[1]);
+
+		if (NULL == (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &proxy_groupid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		/* the proxy lastacess is temporary stored in it's firstaccess */
+		proxy = pg_cache_group_add_proxy(cache, group, proxyid, atoi(row[2]));
+
+		if (proxy->firstaccess < clock)
+			proxy->firstaccess = clock;
+	}
+	zbx_db_free_result(result);
+
+	/* calculate proxy status by finding the highest proxy lastaccess time */
+	/* and using it as current timestamp                                   */
+
+	zbx_hashset_iter_t	iter;
+	zbx_hashset_iter_reset(&cache->proxies, &iter);
+
+	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (clock - proxy->firstaccess >= proxy->group->failover_delay)
+			proxy->status = ZBX_PG_PROXY_STATE_OFFLINE;
+		else
+			proxy->status = ZBX_PG_PROXY_STATE_ONLINE;
+
+		proxy->firstaccess = 0;
+	}
+}
+
+static void	pgm_db_get_map(zbx_pg_cache_t *cache)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+
+	result = zbx_db_select("select hostid,proxyid,revision from host_proxy");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	hostid, proxyid, revision;
+		zbx_pg_proxy_t	*proxy;
+
+		ZBX_DBROW2UINT64(hostid, row[0]);
+		ZBX_DBROW2UINT64(proxyid, row[1]);
+		ZBX_STR2UINT64(revision, row[2]);
+
+		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_vector_uint64_append(&proxy->hostids, hostid);
+
+		zbx_pg_host_t	host_local = {.hostid = hostid, .proxyid = proxyid, .revision = revision};
+
+		zbx_hashset_insert(&cache->map, &host_local, sizeof(host_local));
+	}
+	zbx_db_free_result(result);
+
+	/* queue unmapped hosts for proxy assignment */
+
+	zbx_hashset_iter_t	iter;
+	zbx_pg_group_t		*group;
+
+	zbx_hashset_iter_reset(&cache->groups, &iter);
+	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
+	{
+		for (int i = 0; i < group->hostids.values_num; i++)
+		{
+			if (NULL == zbx_hashset_search(&cache->map, &group->hostids.values[i]))
+				zbx_vector_uint64_append(&group->new_hostids, group->hostids.values[i]);
+		}
+	}
+}
+
 
 /*
  * main process loop
@@ -113,6 +209,11 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	pgm_dc_get_groups(&cache);
 	pgm_db_get_hosts(&cache);
+	pgm_db_get_proxies(&cache);
+	pgm_db_get_map(&cache);
+
+	/* WDN: debug */
+	pg_cache_dump(&cache);
 
 	time_update = zbx_time();
 
@@ -134,7 +235,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		zbx_sleep_loop(info, 1);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-		if (0 != cache.updates.values_num)
+		if (0 != cache.group_updates.values_num)
 			pg_cache_process_updates(&cache);
 	}
 

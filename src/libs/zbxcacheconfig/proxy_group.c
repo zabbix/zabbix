@@ -21,7 +21,6 @@
 #include "dbconfig.h"
 #include "dbsync.h"
 
-ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
 ZBX_PTR_VECTOR_IMPL(pg_proxy_ptr, zbx_pg_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
 
@@ -121,6 +120,7 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 			group = (zbx_pg_group_t *)zbx_hashset_insert(groups, &group_local, sizeof(group_local));
 			zbx_vector_pg_proxy_ptr_create(&group->proxies);
 			zbx_vector_uint64_create(&group->hostids);
+			zbx_vector_uint64_create(&group->new_hostids);
 		}
 
 		group->sync_revision = *revision;

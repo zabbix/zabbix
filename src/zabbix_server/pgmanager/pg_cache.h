@@ -24,11 +24,25 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 
+#define ZBX_PG_PROXY_STATE_OFFLINE	0
+#define ZBX_PG_PROXY_STATE_ONLINE	1
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	proxyid;
+	zbx_uint64_t	revision;
+}
+zbx_pg_host_t;
+
 typedef struct
 {
 	zbx_hashset_t			groups;
+	zbx_hashset_t			map;
+	zbx_hashset_t			map_updates;
+	zbx_hashset_t			proxies;
 	zbx_uint64_t			group_revision;
-	zbx_vector_pg_group_ptr_t	updates;
+	zbx_vector_pg_group_ptr_t	group_updates;
 	pthread_mutex_t			lock;
 }
 zbx_pg_cache_t;
@@ -40,8 +54,16 @@ void	pg_cache_destroy(zbx_pg_cache_t *cache);
 
 void	pg_cache_queue_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
 void	pg_cache_process_updates(zbx_pg_cache_t *cache);
+zbx_pg_proxy_t	*pg_cache_group_add_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid, int clock);
+void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid);
+
+void	pg_cache_group_remove_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t hostid);
+void	pg_cache_group_add_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t hostid);
+
+
 
 /* WDN: debug */
 void	pg_cache_dump_group(zbx_pg_group_t *group);
+void	pg_cache_dump(zbx_pg_cache_t *cache);
 
 #endif
