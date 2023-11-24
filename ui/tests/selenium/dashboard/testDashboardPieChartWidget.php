@@ -587,23 +587,7 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardPieChartWidget_Create($data){
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-
-		$dashboard = CDashboardElement::find()->one();
-		$old_widget_count = $dashboard->getWidgets()->count();
-		$form = $dashboard->edit()->addWidget()->asForm();
-
-		// Fill data and submit.
-		$this->fillForm($data['fields'], $form);
-		$form->submit();
-
-		$this->assertEditFormAfterSave($data);
-
-		// Check total Widget count.
-		$this->assertEquals(
-			$old_widget_count + (int) $this->isTestGood($data),
-			$dashboard->getWidgets()->count()
-		);
+		$this->createUpdatePieChart($data);
 	}
 
 	/**
@@ -612,25 +596,7 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardPieChartWidget_Update($data){
-		// Create a Pie chart widget for editing.
-		$widget_name = 'Edit widget';
-		$this->createCleanWidget($widget_name);
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-
-		$dashboard = CDashboardElement::find()->one();
-		$old_widget_count = $dashboard->getWidgets()->count();
-		$form = $dashboard->edit()->getWidget($widget_name)->edit();
-
-		// Fill data and submit.
-		$this->fillForm($data['fields'], $form);
-		$form->submit();
-
-		// Assert result.
-		$this->assertEditFormAfterSave($data);
-
-		// Check total Widget count.
-		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		$this->createUpdatePieChart($data, 'Edit widget');
 	}
 
 	public function getPieChartDisplayData() {
@@ -903,6 +869,42 @@ class testDashboardPieChartWidget extends CWebTest
 		// Screenshot the widget.
 		$this->page->removeFocus();
 		$this->assertScreenshot($widget, 'piechart_display_'.$data['screenshot_id']);
+	}
+
+	/**
+	 * Creates or updates a widget according to data from data provider.
+	 *
+	 * @param array $data               data from data provider
+	 * @param string $edit_widget_name  if this is set, then a widget named like this is updated
+	 */
+	protected function createUpdatePieChart($data, $edit_widget_name = null) {
+		if ($edit_widget_name) {
+			$this->createCleanWidget($edit_widget_name);
+		}
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		if ($edit_widget_name) {
+			$form = $dashboard->edit()->getWidget($edit_widget_name)->edit();
+		}
+		else {
+			$form = $dashboard->edit()->addWidget()->asForm();
+		}
+
+		// Fill data and assert.
+		$this->fillForm($data['fields'], $form);
+		$form->submit();
+		$this->assertEditFormAfterSave($data);
+
+		// Check total Widget count.
+		if ($edit_widget_name) {
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		}
+		else {
+			$this->assertEquals($old_widget_count + (int) $this->isTestGood($data),	$dashboard->getWidgets()->count());
+		}
 	}
 
 	/**
