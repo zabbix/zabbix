@@ -401,37 +401,34 @@ func parseRespQuestion(respQuestion []dns.Question) map[string][]any {
 	}
 }
 
-func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
-	result := make(map[string]interface{})
-	answer_flags := make([]string, 0)
+func parseRespFlags(rh dns.MsgHdr) map[string][]string {
+	var answerFlags []string
 
 	if rh.Authoritative {
-		answer_flags = append(answer_flags, "AA")
+		answerFlags = append(answerFlags, "AA")
 	}
 
 	if rh.Truncated {
-		answer_flags = append(answer_flags, "TC")
+		answerFlags = append(answerFlags, "TC")
 	}
 
 	if rh.RecursionDesired {
-		answer_flags = append(answer_flags, "RD")
+		answerFlags = append(answerFlags, "RD")
 	}
 
 	if rh.RecursionAvailable {
-		answer_flags = append(answer_flags, "RA")
+		answerFlags = append(answerFlags, "RA")
 	}
 
 	if rh.AuthenticatedData {
-		answer_flags = append(answer_flags, "AD")
+		answerFlags = append(answerFlags, "AD")
 	}
 
 	if rh.CheckingDisabled {
-		answer_flags = append(answer_flags, "CD")
+		answerFlags = append(answerFlags, "CD")
 	}
 
-	result["flags"] = answer_flags
-
-	return result
+	return map[string][]string{"flags": answerFlags}
 }
 
 var dnsRespCodesMappingGet = map[int]string{
