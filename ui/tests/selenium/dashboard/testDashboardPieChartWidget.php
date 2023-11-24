@@ -31,10 +31,10 @@ class testDashboardPieChartWidget extends CWebTest
 {
 	protected static $dashboardid;
 	protected static $item_ids;
-	protected const TYPE_ITEM_PATTERN = 'Item pattern';
-	protected const TYPE_ITEM_LIST = 'Item list';
-	protected const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
-	protected const HOST_NAME_SCREENSHOTS = 'Host for Pie chart screenshots';
+	const TYPE_ITEM_PATTERN = 'Item pattern';
+	const TYPE_ITEM_LIST = 'Item list';
+	const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
+	const HOST_NAME_SCREENSHOTS = 'Host for Pie chart screenshots';
 
 
 	/**
@@ -237,12 +237,12 @@ class testDashboardPieChartWidget extends CWebTest
 			$this->assertTrue($form->getLabel($label)->isVisible());
 		}
 
-		$radios = ['id:source' => ['Auto', 'History', 'Trends'], 'id:draw_type' => ['Pie', 'Doughnut']];
+		$radios = ['History data selection' => ['Auto', 'History', 'Trends'], 'Draw' => ['Pie', 'Doughnut']];
 
-		foreach ($radios as $selector => $labels) {
-			$radio_draw = $form->query($selector)->asSegmentedRadio()->one();
-			$radio_draw->isEnabled();
-			$this->assertEquals($labels, $radio_draw->getLabels()->asText());
+		foreach ($radios as $radio => $labels) {
+			$radio_element = $form->getField($radio)->asSegmentedRadio();
+			$radio_element->isEnabled();
+			$this->assertEquals($labels, $radio_element->getLabels()->asText());
 		}
 
 		$this->assertRangeLayout('Space between sectors', 'space', $form, ['min' => '0', 'max' => '10', 'step' => '1', 'value' => '1']);
@@ -282,9 +282,9 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
-		$radio2 = $form->query('id:time_period_data_source')->asSegmentedRadio()->one();
-		$this->assertTrue($radio2->isEnabled());
-		$this->assertEquals(['Dashboard', 'Widget', 'Custom'], $radio2->getLabels()->asText());
+		$time_period = $form->getField('Time period')->asSegmentedRadio();
+		$this->assertTrue($time_period->isEnabled());
+		$this->assertEquals(['Dashboard', 'Widget', 'Custom'], $time_period->getLabels()->asText());
 
 		// Legend tab.
 		$form->selectTab('Legend');
@@ -404,50 +404,6 @@ class testDashboardPieChartWidget extends CWebTest
 					]
 				]
 			],
-			// Missing Data set.
-			[
-				[
-					'fields' => [
-						'delete_data_set' => true
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Data set": cannot be empty.'
-				]
-			],
-			// Missing Host pattern.
-			[
-				[
-					'fields' => [
-						'remake_data_set' => true,
-						'Data set' => ['item' => '*']
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Data set/1/hosts": cannot be empty.'
-				]
-			],
-			// Missing Item pattern.
-			[
-				[
-					'fields' => [
-						'remake_data_set' => true,
-						'Data set' => ['host' => '*']
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Data set/1/items": cannot be empty.'
-				]
-			],
-			// Missing Item list.
-			[
-				[
-					'fields' => [
-						'Data set' => [
-							'type' => self::TYPE_ITEM_LIST
-							]
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Data set/1/itemids": cannot be empty.'
-				]
-			],
 			// Unicode values.
 			[
 				[
@@ -469,92 +425,6 @@ class testDashboardPieChartWidget extends CWebTest
 					]
 				]
 			],
-			// Merge sector % value too small.
-			[
-				[
-					'fields' => [
-						'Displaying options' => [
-							'id:merge' => true,
-							'id:merge_percent' => '0'
-						]
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "merge_percent": value must be one of 1-10.'
-				]
-			],
-			// Merge sector % value too big.
-			[
-				[
-					'fields' => [
-						'Displaying options' => [
-							'id:merge' => true,
-							'id:merge_percent' => '11'
-						]
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "merge_percent": value must be one of 1-10.'
-				]
-			],
-			// Decimal places value too big.
-			[
-				[
-					'fields' => [
-						'Displaying options' => [
-							'Draw' => 'Doughnut',
-							'Show total value' => true,
-							'Decimal places' => '7'
-						]
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Decimal places": value must be one of 0-6.'
-				]
-			],
-			// Empty Time period (Widget).
-			[
-				[
-					'fields' => [
-						'Time period' => [
-							'Time period' => 'Widget'
-						]
-					],
-					'result' => TEST_BAD,
-					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
-				]
-			],
-			// Empty Time period (Custom).
-			[
-				[
-					'fields' => [
-						'Time period' => [
-							'Time period' => 'Custom',
-							'From' => '',
-							'To' => ''
-						]
-					],
-					'result' => TEST_BAD,
-					'error' => [
-						'Invalid parameter "Time period/From": cannot be empty.',
-						'Invalid parameter "Time period/To": cannot be empty.'
-					]
-				]
-			],
-			// Invalid Time period (Custom).
-			[
-				[
-					'fields' => [
-						'Time period' => [
-							'Time period' => 'Custom',
-							'From' => '0',
-							'To' => '2020-13-32'
-						]
-					],
-					'result' => TEST_BAD,
-					'error' => [
-						'Invalid parameter "Time period/From": a time is expected.',
-						'Invalid parameter "Time period/To": a time is expected.'
-					]
-				]
-			],
 			// Different Time period formats.
 			[
 				[
@@ -564,6 +434,147 @@ class testDashboardPieChartWidget extends CWebTest
 							'From' => '2020',
 							'To' => '2020-10-10 00:00:00'
 						]
+					]
+				]
+			],
+			// Missing Data set.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'delete_data_set' => true
+					],
+					'error' => 'Invalid parameter "Data set": cannot be empty.'
+				]
+			],
+			// Missing Host pattern.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'remake_data_set' => true,
+						'Data set' => ['item' => '*']
+					],
+					'error' => 'Invalid parameter "Data set/1/hosts": cannot be empty.'
+				]
+			],
+			// Missing Item pattern.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'remake_data_set' => true,
+						'Data set' => ['host' => '*']
+					],
+					'error' => 'Invalid parameter "Data set/1/items": cannot be empty.'
+				]
+			],
+			// Missing Host AND Item pattern.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'remake_data_set' => true,
+						'Data set' => ['item' => '', 'host' => '']
+					],
+					'error' => 'Invalid parameter "Data set/1/hosts": cannot be empty.'
+				]
+			],
+			// Missing Item list.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Data set' => [
+							'type' => self::TYPE_ITEM_LIST
+						]
+					],
+					'error' => 'Invalid parameter "Data set/1/itemids": cannot be empty.'
+				]
+			],
+			// Merge sector % value too small.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Displaying options' => [
+							'id:merge' => true,
+							'id:merge_percent' => '0'
+						]
+					],
+					'error' => 'Invalid parameter "merge_percent": value must be one of 1-10.'
+				]
+			],
+			// Merge sector % value too big.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Displaying options' => [
+							'id:merge' => true,
+							'id:merge_percent' => '11'
+						]
+					],
+					'error' => 'Invalid parameter "merge_percent": value must be one of 1-10.'
+				]
+			],
+			// Decimal places value too big.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Displaying options' => [
+							'Draw' => 'Doughnut',
+							'Show total value' => true,
+							'Decimal places' => '7'
+						]
+					],
+					'error' => 'Invalid parameter "Decimal places": value must be one of 0-6.'
+				]
+			],
+			// Empty Time period (Widget).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Time period' => [
+							'Time period' => 'Widget'
+						]
+					],
+					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
+				]
+			],
+			// Empty Time period (Custom).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Time period' => [
+							'Time period' => 'Custom',
+							'From' => '',
+							'To' => ''
+						]
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
+					]
+				]
+			],
+			// Invalid Time period (Custom).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Time period' => [
+							'Time period' => 'Custom',
+							'From' => '0',
+							'To' => '2020-13-32'
+						]
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": a time is expected.',
+						'Invalid parameter "Time period/To": a time is expected.'
 					]
 				]
 			]
@@ -986,7 +997,7 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @return bool        TRUE if TEST_GOOD expected, else FALSE
 	 */
 	protected function isTestGood($data) {
-		return CTestArrayHelper::get($data, 'result', TEST_GOOD) === TEST_GOOD;
+		return CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD;
 	}
 
 	/**
@@ -1202,13 +1213,11 @@ class testDashboardPieChartWidget extends CWebTest
 
 		// Exchange the keys for the actual selectors and clear the old key.
 		foreach ($data_set as $data_set_key => $data_set_value) {
-			if (!array_key_exists($data_set_key, $mapping)) {
-				// Only change mapped keys.
-				continue;
+			// Only change mapped keys.
+			if (array_key_exists($data_set_key, $mapping)) {
+				$data_set += [$mapping[$data_set_key] => $data_set_value];
+				unset($data_set[$data_set_key]);
 			}
-
-			$data_set += [$mapping[$data_set_key] => $data_set_value];
-			unset($data_set[$data_set_key]);
 		}
 
 		// Also map item fields for Item list.
