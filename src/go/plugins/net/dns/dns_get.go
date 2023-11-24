@@ -373,39 +373,32 @@ func parseRRs(in []dns.RR, source string) map[string][]interface{} {
 	return result
 }
 
-func parseRespQuestion(respQuestion []dns.Question) map[string][]interface{} {
-	result := make(map[string][]interface{})
-	resultPart := make(map[string]interface{})
+func parseRespQuestion(respQuestion []dns.Question) map[string][]any {
+    var (
+        // RFC allows to have multiple questions, however DNS library describes
+        // it almost never happens, so it says it will fail if there is more than 1,
+        // so safe to assume there will be exactly 1 question.
+        q          = respQuestion[0]
+        resultPart = map[string]any{"qname": q.Name}
+        ok         bool
+    )
 
-	// RFC allows to have multiple questions, however DNS library describes
-	// it almost never happens, so it says it will fail if there is more than 1,
-	// so safe to assumed  there will be exactly 1 question.
-	q := respQuestion[0]
-	resultPart["qname"] = q.Name
+    resultPart["qtype"], ok = dnsTypesGetReverse[q.Qtype]
+    if !ok {
+        resultPart["qtype"], ok = dnsExtraQuestionTypesGet[q.Qtype]
+        if !ok {
+            resultPart["qtype"] = q.Qtype
+        }
+    }
 
-	qTypeMapped, ok := dnsTypesGetReverse[q.Qtype]
+    resultPart["qclass"], ok = dnsClassesGet[q.Qclass]
+    if !ok {
+        resultPart["qclass"] = q.Qclass
+    }
 
-	if !ok {
-		qTypeMapped, ok = dnsExtraQuestionTypesGet[q.Qtype]
-		if !ok {
-			resultPart["qtype"] = q.Qtype
-		} else {
-			resultPart["qtype"] = qTypeMapped
-		}
-	} else {
-		resultPart["qtype"] = qTypeMapped
-	}
-
-	qClassMapped, ok2 := dnsClassesGet[q.Qclass]
-	if !ok2 {
-		resultPart["qclass"] = q.Qclass
-	} else {
-		resultPart["qclass"] = qClassMapped
-	}
-
-	result["question_section"] = append(result["question_section"], resultPart)
-
-	return result
+    return map[string][]any{
+        "question_section": {resultPart},
+    }
 }
 
 func parseRespFlags(rh dns.MsgHdr) map[string]interface{} {
