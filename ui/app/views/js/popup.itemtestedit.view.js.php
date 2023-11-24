@@ -210,7 +210,7 @@ function itemGetValueTest(overlay) {
 					.toggle('warning' in ret)
 					.toggleClass('js-retrieved', 'warning' in ret)
 					.next('.hint-box')
-						.html(ret.warning);
+						.text(ret.warning);
 
 				if (typeof ret.eol !== 'undefined') {
 					jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -305,7 +305,7 @@ function itemCompleteTest(overlay) {
 				.toggle('warning' in ret)
 				.toggleClass('js-retrieved', 'warning' in ret)
 				.next('.hint-box')
-					.html(ret.warning);
+					.text(ret.warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
