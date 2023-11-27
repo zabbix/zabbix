@@ -89,6 +89,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
 		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testScriptManualInput');
 
 		return $suite;
 	}
