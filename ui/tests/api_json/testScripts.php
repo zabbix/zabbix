@@ -943,8 +943,8 @@ class testScripts extends CAPITest {
 			],
 
 			// script.update to test type, scope, name, menu_path, params and manualinput changes.
-			'update_ipmi' => [
-				'name' => 'API test script.update - IPMI',
+			'update_ipmi_action' => [
+				'name' => 'API test script.update - IPMI (action)',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server'
@@ -972,10 +972,10 @@ class testScripts extends CAPITest {
 				'publickey' => 'pub-k',
 				'privatekey' => 'priv-k'
 			],
-			'update_telnet' => [
+			'update_telnet_host' => [
 				'name' => 'API test script.update - Telnet',
 				'type' => ZBX_SCRIPT_TYPE_TELNET,
-				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'reboot server',
 				'username' => 'Jill'
 			],
@@ -1628,6 +1628,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_SSH,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server',
+					'username' => 'username',
 					'url' => 'http://localhost/'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "url".'
@@ -1638,6 +1639,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_TELNET,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server',
+					'username' => 'username',
 					'url' => 'http://localhost/'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "url".'
@@ -1869,8 +1871,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'host_access' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
 			],
 			'Test script.create unexpected "host_access" field for action scope' => [
 				'script' => [
@@ -1954,8 +1955,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'usrgrpid' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
 			],
 			'Test script.create unexpected "usrgrpid" field for action scope' => [
 				'script' => [
@@ -2096,8 +2096,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
 			],
 			'Test script.create unexpected "execute_on" field for IPMI type script' => [
 				'script' => [
@@ -2263,8 +2262,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'authtype' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
 			],
 			'Test script.create unexpected "authtype" field for custom type script' => [
 				'script' => [
@@ -2688,6 +2686,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_SSH,
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'command' => 'reboot server',
+					'username' => 'username',
 					'timeout' => '30s'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
@@ -2698,6 +2697,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_TELNET,
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'command' => 'reboot server',
+					'username' => 'username',
 					'timeout' => '30s'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
@@ -2805,8 +2805,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'parameters' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
 			],
 			'Test script.create unexpected parameters for custom type script' => [
 				'script' => [
@@ -2840,6 +2839,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_SSH,
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'command' => 'reboot server',
+					'username' => 'username',
 					'parameters' => [[
 						'name' => 'param1',
 						'value' => 'value1'
@@ -2853,6 +2853,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_TELNET,
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'command' => 'reboot server',
+					'username' => 'username',
 					'parameters' => [[
 						'name' => 'param1',
 						'value' => 'value1'
@@ -5228,7 +5229,7 @@ class testScripts extends CAPITest {
 			// Check script name.
 			'Test script.update empty name' => [
 				'script' => [[
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'name' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
@@ -5314,11 +5315,11 @@ class testScripts extends CAPITest {
 			'Test script.update duplicate name with default menu_path in input' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'Script with same name'
 					],
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'Script with same name'
 					]
 				],
@@ -5327,12 +5328,12 @@ class testScripts extends CAPITest {
 			'Test script.update duplicate name with custom identical menu_path in input' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_host',
 						'menu_path' => 'folder1/folder2',
 						'name' => 'Script with same name'
 					],
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'menu_path' => 'folder1/folder2',
 						'name' => 'Script with same name'
 					]
@@ -5342,12 +5343,12 @@ class testScripts extends CAPITest {
 			'Test script.update duplicate name with custom same menu_path in input with leading slash' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_host',
 						'menu_path' => 'folder1/folder2',
 						'name' => 'Script with same name'
 					],
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'menu_path' => '/folder1/folder2',
 						'name' => 'Script with same name'
 					]
@@ -5357,12 +5358,12 @@ class testScripts extends CAPITest {
 			'Test script.update duplicate name with custom same menu_path in input with trailing slash' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_host',
 						'menu_path' => 'folder1/folder2',
 						'name' => 'Script with same name'
 					],
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'menu_path' => 'folder1/folder2/',
 						'name' => 'Script with same name'
 					]
@@ -5372,12 +5373,12 @@ class testScripts extends CAPITest {
 			'Test script.update duplicate name with custom same menu_path in input with both leading and trailing slashes' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_host',
 						'menu_path' => 'folder1/folder2',
 						'name' => 'Script with same name'
 					],
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'menu_path' => '/folder1/folder2/',
 						'name' => 'Script with same name'
 					]
@@ -5388,7 +5389,7 @@ class testScripts extends CAPITest {
 			// Check script command.
 			'Test script.update empty command' => [
 				'script' => [[
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'command' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
@@ -5397,21 +5398,21 @@ class testScripts extends CAPITest {
 			// Check script type.
 			'Test script.update invalid type (empty string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'type' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			'Test script.update invalid type (string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'type' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			'Test script.update invalid type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'type' => 999999
 				],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
@@ -5421,7 +5422,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update invalid type for wrong scope' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'type' => ZBX_SCRIPT_TYPE_URL
 				],
 				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
@@ -5431,21 +5432,21 @@ class testScripts extends CAPITest {
 			// Check script scope.
 			'Test script.update invalid scope (empty string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'scope' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/scope": an integer is expected.'
 			],
 			'Test script.update invalid scope (string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'scope' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/scope": an integer is expected.'
 			],
 			'Test script.update invalid scope' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'scope' => 999999
 				],
 				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
@@ -5456,8 +5457,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_url',
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION
 				],
-				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
 			],
 			'Test script.update scope change assigned to action' => [
 				'script' => [
@@ -5468,6 +5468,13 @@ class testScripts extends CAPITest {
 			],
 
 			// Check script menu path.
+			'Test script.update unexpected "menu_path" field' => [
+				'script' => [
+					'scriptid' => 'update_ipmi_action',
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
 			'Test script.update invalid "menu_path" field' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_host',
@@ -5487,11 +5494,10 @@ class testScripts extends CAPITest {
 			// Check script host access.
 			'Test script.update unexpected "host_access" field for action scope (empty string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'host_access' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
 			],
 			'Test script.update invalid "host_access" field (empty string)' => [
 				'script' => [
@@ -5519,15 +5525,14 @@ class testScripts extends CAPITest {
 			// Check script user group.
 			'Test script.update unexpected "usrgrpid" field for action scope (empty string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'usrgrpid' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
 			],
 			'Test script.update unexpected "usrgrpid" field for action scope (int)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'usrgrpid' => 0
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
@@ -5550,7 +5555,7 @@ class testScripts extends CAPITest {
 			// Check script confirmation.
 			'Test script.update unexpected "confirmation" for action scope' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'confirmation' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
@@ -5559,14 +5564,14 @@ class testScripts extends CAPITest {
 			// Check script host group.
 			'Test script.update invalid host group (empty string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'groupid' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
 			],
 			'Test script.update invalid host group' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'groupid' => 999999
 				],
 				'expected_error' => 'Host group with ID "999999" is not available.'
@@ -5575,7 +5580,7 @@ class testScripts extends CAPITest {
 			// Check unexpected fields in script.
 			'Test script.update unexpected field' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'unexpected_field' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "unexpected_field".'
@@ -5608,15 +5613,14 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected "execute_on" field for IPMI type (empty string)' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'execute_on' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
 			],
 			'Test script.update unexpected "execute_on" field for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
@@ -5630,7 +5634,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected "execute_on" field for Telnet type' => [
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
@@ -5689,7 +5693,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected port field for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'port' => 0
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
@@ -5737,8 +5741,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_custom',
 					'authtype' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
 			],
 			'Test script.update unexpected "authtype" field for custom script type' => [
 				'script' => [
@@ -5749,14 +5752,14 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected "authtype" field for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'authtype' => ITEM_AUTHTYPE_PASSWORD
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
 			],
 			'Test script.update unexpected "authtype" field for Telnet type' => [
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'authtype' => ITEM_AUTHTYPE_PASSWORD
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
@@ -5786,7 +5789,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update empty username for Telnet type' => [
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'username' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
@@ -5807,7 +5810,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected username for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'username' => 'John'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
@@ -5844,7 +5847,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected password for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'password' => 'psswd'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
@@ -5895,14 +5898,14 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected "publickey" field for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'publickey' => 'secretpubkey'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
 			],
 			'Test script.update unexpected "publickey" field for Telnet type' => [
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'publickey' => 'secretpubkey'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
@@ -5953,14 +5956,14 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected "privatekey" field for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'privatekey' => 'secretprivkey'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
 			],
 			'Test script.update unexpected "privatekey" field for Telnet type' => [
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'privatekey' => 'secretprivkey'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
@@ -6011,7 +6014,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected timeout field for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'timeout' => '30s'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
@@ -6025,7 +6028,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected timeout field for Telnet type' => [
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'timeout' => '30s'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
@@ -6090,8 +6093,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_custom',
 					'parameters' => ''
 				],
-				// Must be changed in future if CApiInputValidator is improved.
-				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
 			],
 			'Test script.update unexpected parameters for custom script type' => [
 				'script' => [
@@ -6105,7 +6107,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected parameters for IPMI type' => [
 				'script' => [
-					'scriptid' => 'update_ipmi',
+					'scriptid' => 'update_ipmi_action',
 					'parameters' => [[
 						'name' => 'param1',
 						'value' => 'value1'
@@ -6125,7 +6127,7 @@ class testScripts extends CAPITest {
 			],
 			'Test script.update unexpected parameters for Telnet type' => [
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'parameters' => [[
 						'name' => 'param1',
 						'value' => 'value1'
@@ -6508,7 +6510,7 @@ class testScripts extends CAPITest {
 						'command' => 'reboot server 1'
 					],
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'API test script.update - IPMI updated',
 						'command' => 'reboot server 2'
 					]
@@ -6538,7 +6540,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful IPMI update' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'scope' => ZBX_SCRIPT_SCOPE_HOST,
 						'name' => 'API test script.update - IPMI updated',
 						'command' => 'shutdown -r',
@@ -6622,7 +6624,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful Telnet update' => [
 				'script' => [
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'API test script.update - Telnet updated',
 						'command' => 'shutdown -r',
 						'scope' => ZBX_SCRIPT_SCOPE_HOST,
@@ -6818,7 +6820,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful IPMI type change to custom script' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'API test script.update - IPMI changed to custom script (with execute on agent)',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -6830,7 +6832,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful IPMI type change to SSH with password' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'API test script.update - IPMI changed to SSH with password',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_SSH,
@@ -6844,7 +6846,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful IPMI type change to SSH with public key' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'API test script.update - IPMI changed to SSH with public key',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_SSH,
@@ -6861,7 +6863,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful IPMI type change to Telnet' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'API test script.update - IPMI changed to Telnet',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_TELNET,
@@ -6875,7 +6877,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful IPMI type change to Webhook' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'API test script.update - IPMI changed to Webhook',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
@@ -6897,7 +6899,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful IPMI type change to URL' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'name' => 'API test script.update - IPMI changed to URL',
 						'type' => ZBX_SCRIPT_TYPE_URL,
 						'scope' => ZBX_SCRIPT_SCOPE_HOST,
@@ -7057,7 +7059,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful Telnet type change to custom script' => [
 				'script' => [
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'API test script.update - Telnet changed to custom script (with execute on agent)',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -7069,7 +7071,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful Telnet type change to SSH with password' => [
 				'script' => [
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'API test script.update - Telnet changed to SSH with password',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_SSH,
@@ -7083,7 +7085,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful Telnet type change to SSH with public key' => [
 				'script' => [
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'API test script.update - Telnet changed to SSH with public key',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_SSH,
@@ -7100,7 +7102,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful Telnet type change to IPMI' => [
 				'script' => [
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'API test script.update - Telnet changed to IPMI',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_IPMI
@@ -7111,7 +7113,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful Telnet type change to Webhook' => [
 				'script' => [
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'API test script.update - Telnet changed to Webhook',
 						'command' => 'reboot',
 						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
@@ -7133,7 +7135,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful Telnet type change to URL' => [
 				'script' => [
 					[
-						'scriptid' => 'update_telnet',
+						'scriptid' => 'update_telnet_host',
 						'name' => 'API test script.update - Telnet changed to URL',
 						'type' => ZBX_SCRIPT_TYPE_URL,
 						'scope' => ZBX_SCRIPT_SCOPE_HOST,
@@ -7332,7 +7334,7 @@ class testScripts extends CAPITest {
 			'Test script.update successful parameter update when scope is changed to host' => [
 				'script' => [
 					[
-						'scriptid' => 'update_ipmi',
+						'scriptid' => 'update_ipmi_action',
 						'scope' => ZBX_SCRIPT_SCOPE_HOST,
 						'menu_path' => '/new_folder1/new_folder2/',
 						'usrgrpid' => 'admin',
@@ -8460,7 +8462,7 @@ class testScripts extends CAPITest {
 				'method' => 'script.update',
 				'login' => ['user' => 'api_test_admin', 'password' => '4P1T3$tEr'],
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'name' => 'API script update as zabbix admin'
 				],
 				'expected_error' => 'No permissions to call "script.update".'
@@ -8486,7 +8488,7 @@ class testScripts extends CAPITest {
 				'method' => 'script.update',
 				'login' => ['user' => 'api_test_user', 'password' => '4P1T3$tEr'],
 				'script' => [
-					'scriptid' => 'update_telnet',
+					'scriptid' => 'update_telnet_host',
 					'name' => 'API script update as zabbix user'
 				],
 				'expected_error' => 'No permissions to call "script.update".'
@@ -8608,33 +8610,15 @@ class testScripts extends CAPITest {
 		return [
 			'Test script.getScriptsByHosts with superadmin' => [
 				'request' => [
-					[
-						'hostid' => 'plain_r'
-					],
-					[
-						'hostid' => 'plain_d'
-					],
-					[
-						'hostid' => 'macros_rw_1'
-					],
-					[
-						'hostid' => 'macros_r_2'
-					],
-					[
-						'hostid' => 'macros_rw_3'
-					],
-					[
-						'hostid' => 'interface_rw_1'
-					],
-					[
-						'hostid' => 'interface_rw_2'
-					],
-					[
-						'hostid' => 'inventory_rw_1'
-					],
-					[
-						'hostid' => 'inventory_rw_2'
-					]
+					['hostid' => 'plain_r'],
+					['hostid' => 'plain_d'],
+					['hostid' => 'macros_rw_1'],
+					['hostid' => 'macros_r_2'],
+					['hostid' => 'macros_rw_3'],
+					['hostid' => 'interface_rw_1'],
+					['hostid' => 'interface_rw_2'],
+					['hostid' => 'inventory_rw_1'],
+					['hostid' => 'inventory_rw_2']
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
@@ -8729,7 +8713,7 @@ class testScripts extends CAPITest {
 							'manualinput_validator_type' => (string) ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 							'manualinput_default_value' => ''
 						],
-						// Webhook does not return parameters. Mostly frontend needs only  script ID anyway.
+						// Webhook does not return parameters. Mostly frontend needs only script ID anyway.
 						[
 							'scriptid' => 'get_hosts_webhook',
 							'name' => 'API test script.getScriptsByHosts - Webhook',
@@ -9134,33 +9118,15 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByHosts with admin' => [
 				'request' => [
 					'login' => ['user' => 'api_test_admin', 'password' => '4P1T3$tEr'],
-					[
-						'hostid' => 'plain_r'
-					],
-					[
-						'hostid' => 'plain_d'
-					],
-					[
-						'hostid' => 'macros_rw_1'
-					],
-					[
-						'hostid' => 'macros_r_2'
-					],
-					[
-						'hostid' => 'macros_rw_3'
-					],
-					[
-						'hostid' => 'interface_rw_1'
-					],
-					[
-						'hostid' => 'interface_rw_2'
-					],
-					[
-						'hostid' => 'inventory_rw_1'
-					],
-					[
-						'hostid' => 'inventory_rw_2'
-					]
+					['hostid' => 'plain_r'],
+					['hostid' => 'plain_d'],
+					['hostid' => 'macros_rw_1'],
+					['hostid' => 'macros_r_2'],
+					['hostid' => 'macros_rw_3'],
+					['hostid' => 'interface_rw_1'],
+					['hostid' => 'interface_rw_2'],
+					['hostid' => 'inventory_rw_1'],
+					['hostid' => 'inventory_rw_2']
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
@@ -9168,7 +9134,8 @@ class testScripts extends CAPITest {
 						'plain_r' => ['get_hosts_url', 'get_hosts_ipmi'],
 						'plain_d' => [],
 						'macros_rw_1' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
-							'get_hosts_url_with_manualinput'],
+							'get_hosts_url_with_manualinput'
+						],
 						'macros_r_2' => ['get_hosts_url', 'get_hosts_ipmi'],
 						'macros_rw_3' => ['get_hosts_url', 'get_hosts_ipmi', 'get_hosts_ssh', 'get_hosts_script',
 							'get_hosts_url_with_manualinput'
@@ -9188,7 +9155,8 @@ class testScripts extends CAPITest {
 					],
 					'!has.hostid:scriptid' => [
 						'plain_r' => ['get_hosts_webhook', 'get_hosts_ssh', 'get_hosts_script',
-							'get_hosts_url_with_manualinput'],
+							'get_hosts_url_with_manualinput'
+						],
 						'plain_d' => ['get_hosts_url', 'get_hosts_webhook', 'get_hosts_ipmi', 'get_hosts_ssh',
 							'get_hosts_script', 'get_hosts_url_with_manualinput'
 						],
@@ -9608,33 +9576,15 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByHosts with user' => [
 				'request' => [
 					'login' => ['user' => 'api_test_user', 'password' => '4P1T3$tEr'],
-					[
-						'hostid' => 'plain_r'
-					],
-					[
-						'hostid' => 'plain_d'
-					],
-					[
-						'hostid' => 'macros_rw_1'
-					],
-					[
-						'hostid' => 'macros_r_2'
-					],
-					[
-						'hostid' => 'macros_rw_3'
-					],
-					[
-						'hostid' => 'interface_rw_1'
-					],
-					[
-						'hostid' => 'interface_rw_2'
-					],
-					[
-						'hostid' => 'inventory_rw_1'
-					],
-					[
-						'hostid' => 'inventory_rw_2'
-					]
+					['hostid' => 'plain_r'],
+					['hostid' => 'plain_d'],
+					['hostid' => 'macros_rw_1'],
+					['hostid' => 'macros_r_2'],
+					['hostid' => 'macros_rw_3'],
+					['hostid' => 'interface_rw_1'],
+					['hostid' => 'interface_rw_2'],
+					['hostid' => 'inventory_rw_1'],
+					['hostid' => 'inventory_rw_2']
 				],
 				'expected_result' => [
 					'has.hostid:scriptid' => [
@@ -10500,7 +10450,7 @@ class testScripts extends CAPITest {
 		if ($expected_error === null) {
 			if (array_key_exists('has.hostid:scriptid', $expected_result)) {
 				foreach ($expected_result['has.hostid:scriptid'] as $hostid => $scriptids) {
-					$this->assertTrue(array_key_exists($hostid, $result['result']), 'expected host ID '.$hostid);
+					$this->assertTrue(array_key_exists($hostid, $result['result']), 'Expected host ID: '.$hostid);
 					$ids = array_column($result['result'][$hostid], 'scriptid');
 					$this->assertEmpty(array_diff($scriptids, $ids), 'Expected ids: '.implode(',', $scriptids));
 				}
@@ -10508,7 +10458,7 @@ class testScripts extends CAPITest {
 
 			if (array_key_exists('!has.hostid:scriptid', $expected_result)) {
 				foreach ($expected_result['!has.hostid:scriptid'] as $hostid => $scriptids) {
-					$this->assertTrue(array_key_exists($hostid, $result['result']), 'expected host ID '.$hostid);
+					$this->assertTrue(array_key_exists($hostid, $result['result']), 'Expected host ID: '.$hostid);
 					$ids = array_column($result['result'][$hostid], 'scriptid');
 					$this->assertEquals($scriptids, array_diff($scriptids, $ids));
 				}
@@ -13133,15 +13083,15 @@ class testScripts extends CAPITest {
 		if ($expected_error === null) {
 			if (array_key_exists('has.eventid:scriptid', $expected_result)) {
 				foreach ($expected_result['has.eventid:scriptid'] as $eventid => $scriptids) {
-					$this->assertTrue(array_key_exists($eventid, $result['result']), 'expected eventid ID '.$eventid);
+					$this->assertTrue(array_key_exists($eventid, $result['result']), 'Expected event ID: '.$eventid);
 					$ids = array_column($result['result'][$eventid], 'scriptid');
-					$this->assertEmpty(array_diff($scriptids, $ids), 'Expected ids: '.implode(',', $scriptids));
+					$this->assertEmpty(array_diff($scriptids, $ids), 'Expected IDs: '.implode(',', $scriptids));
 				}
 			}
 
 			if (array_key_exists('!has.eventid:scriptid', $expected_result)) {
 				foreach ($expected_result['!has.eventid:scriptid'] as $eventid => $scriptids) {
-					$this->assertTrue(array_key_exists($eventid, $result['result']), 'expected eventid ID '.$eventid);
+					$this->assertTrue(array_key_exists($eventid, $result['result']), 'Expected event ID: '.$eventid);
 					$ids = array_column($result['result'][$eventid], 'scriptid');
 					$this->assertEquals($scriptids, array_diff($scriptids, $ids));
 				}
