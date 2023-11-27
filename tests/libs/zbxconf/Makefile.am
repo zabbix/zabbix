@@ -6,6 +6,7 @@ parse_cfg_file_SOURCES = \
 	../../zbxmocktest.h
 
 parse_cfg_file_LDADD = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \

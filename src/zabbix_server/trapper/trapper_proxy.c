@@ -19,6 +19,9 @@
 
 #include "trapper_request.h"
 
+#include "trapper.h"
+
+#include "zbxcommshigh.h"
 #include "../taskmanager/taskmanager_server.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
 
@@ -30,14 +33,12 @@
 #include "zbxcompress.h"
 #include "zbxcachehistory.h"
 
-extern unsigned char	program_type;
-
 #define	LOCK_PROXY_HISTORY	zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	zbx_mutex_unlock(proxy_lock)
 
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 
-int	init_proxy_history_lock(char **error)
+int	init_proxy_history_lock(unsigned char program_type, char **error)
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
@@ -45,7 +46,7 @@ int	init_proxy_history_lock(char **error)
 	return SUCCEED;
 }
 
-void	free_proxy_history_lock(void)
+void	free_proxy_history_lock(unsigned char program_type)
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		zbx_mutex_destroy(&proxy_lock);
@@ -330,7 +331,8 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 		{
 			zbx_recv_proxyconfig(sock, config_comms->config_tls, config_vault, config_comms->config_timeout,
 					config_comms->config_trapper_timeout, config_comms->config_source_ip,
-					config_comms->server);
+					config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
+					config_comms->config_ssl_key_location, config_comms->server);
 			return SUCCEED;
 		}
 		else if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))

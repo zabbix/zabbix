@@ -17,25 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DBCONFIG_H
-#define ZABBIX_DBCONFIG_H
+#include "nix_internal.h"
+#include "zbxnix.h"
 
-#include "zbxthreads.h"
-#include "zbxvault.h"
+#include "zbxcommon.h"
 
-typedef struct
+static zbx_get_progname_f	get_progname_func_cb = NULL;
+
+void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb)
 {
-	zbx_config_vault_t	*config_vault;
-	int			config_timeout;
-	int			proxyconfig_frequency;
-	int			proxydata_frequency;
-	const char		*config_source_ip;
-	const char		*config_ssl_ca_location;
-	const char		*config_ssl_cert_location;
-	const char		*config_ssl_key_location;
+	get_progname_func_cb = get_progname_cb;
 }
-zbx_thread_dbconfig_args;
 
-ZBX_THREAD_ENTRY(dbconfig_thread, args);
-
-#endif
+zbx_get_progname_f	nix_get_progname_cb(void)
+{
+	return get_progname_func_cb;
+}
