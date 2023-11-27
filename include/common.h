@@ -353,7 +353,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_GROUP		0
 #define CONDITION_TYPE_HOST			1
 #define CONDITION_TYPE_TRIGGER			2
-#define CONDITION_TYPE_TRIGGER_NAME		3
+#define CONDITION_TYPE_EVENT_NAME		3
 #define CONDITION_TYPE_TRIGGER_SEVERITY		4
 /* #define CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define CONDITION_TYPE_TIME_PERIOD		6
@@ -1355,6 +1355,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+const char	*get_bom_econding(char *in, size_t in_size);
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);

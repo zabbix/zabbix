@@ -1,4 +1,62 @@
 
+# Acronis Cyber Protect Cloud by HTTP
+
+## Overview
+
+This template is designed for the effortless deployment of Acronis Cyber Protect Cloud monitoring by Zabbix via HTTP and doesn't require any external scripts.
+
+## Requirements
+
+Zabbix version: 6.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Acronis Cloud Platform version 23.07
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This is a master template that needs to be assigned to a host, and it will automatically create MSP host prototype, which will monitor Acronis Cyber Protect Cloud metrics.
+
+Before using this template it is required to create a new MSP-level API client for Zabbix to use. To do that, sign into your Acronis Cyber Protect Cloud WEB interface, navigate to `Settings` -> `API clients` and create new API client.
+You will be shown credentials for this API client. These credentials need to be entered in the following user macros of this template:
+
+* `{$ACRONIS.CPC.AUTH.CLIENT.ID}` - enter `Client ID` here;
+
+* `{$ACRONIS.CPC.AUTH.SECRET}` - enter `Secret` here;
+
+* `{$ACRONIS.CPC.DATACENTER.URL}` - enter `Data center URL`
+
+This is all the configuration needed for this integration.
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$ACRONIS.CPC.DATACENTER.URL}|<p>Acronis Cyber Protect Cloud datacenter URL, e.g., https://eu2-cloud.acronis.com.</p>||
+|{$ACRONIS.CPC.AUTH.INTERVAL}|<p>API token regeneration interval, in minutes. By default, Acronis Cyber Protect Cloud tokens expire after 2 hours.</p>|`110m`|
+|{$ACRONIS.CPC.HTTP.PROXY}|<p>Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
+|{$ACRONIS.CPC.AUTH.CLIENT.ID}|<p>Client ID for API user access.</p>||
+|{$ACRONIS.CPC.AUTH.SECRET}|<p>Secret for API user access.</p>||
+|{$ACRONIS.CPC.PATH.ACCOUNT.MANAGEMENT}|<p>Sub-path for the Account Management API.</p>|`/api/2`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Acronis CPC: Get access token|<p>Authorizes API user and receives access token.</p>|HTTP agent|acronis.cpc.account_manager.get_token<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+
+### LLD rule Acronis CPC: MSP Discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Acronis CPC: MSP Discovery|<p>Discovers MSP and creates host prototype based on that.</p>|Dependent item|acronis.cpc.lld.msp_discovery|
+
 # Acronis Cyber Protect Cloud MSP by HTTP
 
 ## Overview
@@ -145,64 +203,6 @@ If needed, you can specify an HTTP proxy for the template to use by changing the
 |Device [{#NAME}]:[{#ID}]: Scheduled vulnerability assessment failed to run|<p>Scheduled vulnerability assessment failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Previous patch management run not successful|<p>Previous patch management run did not run successfully.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev[{#NAME}],1m)`|Average|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Scheduled patch management failed to run|<p>Scheduled patch management failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
-
-# Acronis Cyber Protect Cloud by HTTP
-
-## Overview
-
-This template is designed for the effortless deployment of Acronis Cyber Protect Cloud monitoring by Zabbix via HTTP and doesn't require any external scripts.
-
-## Requirements
-
-Zabbix version: 6.0 and higher.
-
-## Tested versions
-
-This template has been tested on:
-- Acronis Cloud Platform version 23.07
-
-## Configuration
-
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
-
-## Setup
-
-This is a master template that needs to be assigned to a host, and it will automatically create MSP host prototype, which will monitor Acronis Cyber Protect Cloud metrics.
-
-Before using this template it is required to create a new MSP-level API client for Zabbix to use. To do that, sign into your Acronis Cyber Protect Cloud WEB interface, navigate to `Settings` -> `API clients` and create new API client.
-You will be shown credentials for this API client. These credentials need to be entered in the following user macros of this template:
-
-* `{$ACRONIS.CPC.AUTH.CLIENT.ID}` - enter `Client ID` here;
-
-* `{$ACRONIS.CPC.AUTH.SECRET}` - enter `Secret` here;
-
-* `{$ACRONIS.CPC.DATACENTER.URL}` - enter `Data center URL`
-
-This is all the configuration needed for this integration.
-
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$ACRONIS.CPC.DATACENTER.URL}|<p>Acronis Cyber Protect Cloud datacenter URL, e.g., https://eu2-cloud.acronis.com.</p>||
-|{$ACRONIS.CPC.AUTH.INTERVAL}|<p>API token regeneration interval, in minutes. By default, Acronis Cyber Protect Cloud tokens expire after 2 hours.</p>|`110m`|
-|{$ACRONIS.CPC.HTTP.PROXY}|<p>Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
-|{$ACRONIS.CPC.AUTH.CLIENT.ID}|<p>Client ID for API user access.</p>||
-|{$ACRONIS.CPC.AUTH.SECRET}|<p>Secret for API user access.</p>||
-|{$ACRONIS.CPC.PATH.ACCOUNT.MANAGEMENT}|<p>Sub-path for the Account Management API.</p>|`/api/2`|
-
-### Items
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Acronis CPC: Get access token|<p>Authorizes API user and receives access token.</p>|HTTP agent|acronis.cpc.account_manager.get_token<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-
-### LLD rule Acronis CPC: MSP Discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Acronis CPC: MSP Discovery|<p>Discovers MSP and creates host prototype based on that.</p>|Dependent item|acronis.cpc.lld.msp_discovery|
 
 ## Feedback
 
