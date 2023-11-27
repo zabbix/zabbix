@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup items
  *
- * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups
+ * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups, AllItemValueTypes
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
