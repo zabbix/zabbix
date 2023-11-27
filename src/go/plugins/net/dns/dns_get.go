@@ -485,17 +485,12 @@ var dnsRespCodesMappingGet = map[int]string{
 }
 
 func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
-	result := make(map[string]interface{})
-
 	rCodeMapped, ok := dnsRespCodesMappingGet[rh.Rcode]
-
-	if ok {
-		result["response_code"] = rCodeMapped
-	} else {
-		result["response_code"] = rh.Rcode
+	if !ok {
+		return map[string]any{"response_code": rh.Rcode}
 	}
 
-	return result
+	return map[string]any{"response_code": rCodeMapped}
 }
 
 const (
