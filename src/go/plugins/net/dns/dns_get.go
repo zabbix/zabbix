@@ -574,29 +574,29 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 
 	parsedAnswerSection, err := parseRRs(resp.Answer, "answer_section")
 	if err != nil {
-		msg, err := prepareJsonErrorResponse(err)
+		failedResultMessage, err := prepareJsonErrorResponse(err)
 		if err != nil {
 			return "", err
 		}
-		return msg, nil
+		return failedResultMessage, nil
 	}
 
-	parsedAuthoritySection, e := parseRRs(resp.Ns, "authority_section")
-	if e != nil {
-		msg, err := prepareJsonErrorResponse(e)
+	parsedAuthoritySection, err := parseRRs(resp.Ns, "authority_section")
+	if err != nil {
+		failedResultMessage, err := prepareJsonErrorResponse(err)
 		if err != nil {
 			return "", err
 		}
-		return msg, nil
+		return failedResultMessage, nil
 	}
 
-	parsedAdditionalSection, e := parseRRs(resp.Extra, "additional_section")
-	if e != nil {
-		msg, err := prepareJsonErrorResponse(e)
+	parsedAdditionalSection, err := parseRRs(resp.Extra, "additional_section")
+	if err != nil {
+		failedResultMessage, err := prepareJsonErrorResponse(err)
 		if err != nil {
 			return "", err
 		}
-		return msg, nil
+		return failedResultMessage, nil
 	}
 
 	// Almost complete since it is not marshaled yet and without
@@ -625,22 +625,16 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	// If original marshal succeeds - attach the success
 	// response to the original result. If this results into error
 	// in subsequent marshall - then return the regular error.
-	_, err = json.Marshal(almostCompleteResultBlock)
-	if err != nil {
-		msg, err := prepareJsonErrorResponse(err)
-		if err != nil {
-			return "", err
-		}
-		return msg, nil
-	}
-
-	resultOkParse := make(map[string]interface{})
-	resultOkParse["zbx_error_code"] = noErrorResponseCodeFinalJsonResult
-	almostCompleteResultBlock = append(almostCompleteResultBlock, resultOkParse)
+	almostCompleteResultBlock = append(almostCompleteResultBlock,
+		map[string]any{"zbx_error_code": noErrorResponseCodeFinalJsonResult})
 
 	finalResultJson, errFinalResultParse := json.Marshal(almostCompleteResultBlock)
 	if errFinalResultParse != nil {
-		return nil, errFinalResultParse
+		finalResultJson, err := prepareJsonErrorResponse(errFinalResultParse)
+		if err != nil {
+			return "", err
+		}
+		return string(finalResultJson), nil
 	}
 
 	return string(finalResultJson), nil
