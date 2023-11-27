@@ -731,7 +731,7 @@ int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = expr_db_item_value(trigger, lastvalue, N_functionid, time(NULL), 999999999, raw);
+	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
