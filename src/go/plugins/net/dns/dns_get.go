@@ -229,8 +229,8 @@ func parseParamsGet(params []string) (o dnsGetOptions, err error) {
 	return
 }
 
-func reverseMap(m map[string]uint16) map[interface{}]string {
-	n := make(map[interface{}]string, len(m))
+func reverseMap(m map[string]uint16) map[any]string {
+	n := make(map[any]string, len(m))
 	for k, v := range m {
 		n[v] = k
 	}
@@ -484,7 +484,7 @@ var dnsRespCodesMappingGet = map[int]string{
 	23: "BADCOOKIE",
 }
 
-func parseRespCode(rh dns.MsgHdr) map[string]interface{} {
+func parseRespCode(rh dns.MsgHdr) map[string]any {
 	rCodeMapped, ok := dnsRespCodesMappingGet[rh.Rcode]
 	if !ok {
 		return map[string]any{"response_code": rh.Rcode}
@@ -500,19 +500,21 @@ const (
 )
 
 func prepareJsonErrorResponse(e error) (string, error) {
-	resultFailParse := make(map[string]interface{})
-	resultFailParse["zbx_error_code"] = jsonParsingErrorCodeFinalJsonResult
-	resultFailParse["zbx_error_msg"] = e.Error()
-	resultJsonFailParse, errFailParse := json.Marshal(resultFailParse)
-
-	if errFailParse != nil {
-		return "", errFailParse
+	resultFailedParsing := map[string]any{
+		"zbx_error_code": jsonParsingErrorCodeFinalJsonResult,
+		"zbx_error_msg":  e.Error(),
 	}
 
-	return string(resultJsonFailParse), nil
+	resultJsonFailedParsing, errWhileProcessingFailedParsing := json.Marshal(resultFailedParsing)
+
+	if errWhileProcessingFailedParsing != nil {
+		return "", errWhileProcessingFailedParsing
+	}
+
+	return string(resultJsonFailedParsing), nil
 }
 
-func exportDnsGet(params []string) (result interface{}, err error) {
+func exportDnsGet(params []string) (result any, err error) {
 	options, err := parseParamsGet(params)
 	if err != nil {
 		return "", err
@@ -531,12 +533,12 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	}
 
 	if err != nil {
-		networkErrorMessageBlock := make(map[string]interface{})
-
-		networkErrorMessageBlock["zbx_error_code"] = communicationErrorCodeFinalJsonResult
-		networkErrorMessageBlock["zbx_error_msg"] = "Communication error: " + err.Error()
-
-		resultJson, err := json.Marshal(networkErrorMessageBlock)
+		resultJson, err := json.Marshal(
+			map[string]any{
+				"zbx_error_code": communicationErrorCodeFinalJsonResult,
+				"zbx_error_msg":  "Communication error: " + err.Error(),
+			},
+		)
 		if err != nil {
 			// There is communication error, however we failed to parse it
 			// return the original communivation error as regular error.
@@ -547,8 +549,9 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	}
 
 	timeDNSResponseReceived := time.Since(timeBeforeQuery).Seconds()
-	queryTimeSection := make(map[string]interface{})
-	queryTimeSection["query_time"] = fmt.Sprintf("%.2f", timeDNSResponseReceived)
+	queryTimeSection := map[string]any{
+		"query_time": fmt.Sprintf("%.2f", timeDNSResponseReceived),
+	}
 
 	// Now, resp from the DNS library is ready to be processed:
 	//    type Msg struct {
@@ -601,7 +604,7 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 
 	// Almost complete since it is not marshaled yet and without
 	// zbx_error_code (and possibly zbx_error_msg).
-	almostCompleteResultBlock := []interface{}{
+	almostCompleteResultBlock := []any{
 		parsedFlagsSection,
 		parsedResponseCode,
 		queryTimeSection,
