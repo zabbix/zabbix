@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
+ *
+ * @dataSource AllItemValueTypes
  */
 class testItemTypeSelection extends CWebTest {
 
@@ -134,6 +136,18 @@ class testItemTypeSelection extends CWebTest {
 					'hint_text' => 'This type of information may not match the key.',
 					'type' => 'Log'
 				]
+			] ,
+			[
+				[
+					'fields' => [
+						'Type' => 'Dependent item',
+						'Name' => 'Binary',
+						'Key' => 'Binary_item_type_for_dependent_item[{#KEY}]',
+						'Type of information' => 'Binary'
+					],
+					'type' => 'Binary',
+					'hint' => false
+				]
 			]
 		];
 	}
@@ -179,7 +193,7 @@ class testItemTypeSelection extends CWebTest {
 			$icon = $this->query('class:js-hint')->waitUntilClickable()->one();
 			$icon->click();
 			$this->assertEquals($data['hint_text'],
-				$form->query('xpath://div[@class="hintbox-wrap"]')->waitUntilPresent()->one()->getText()
+					$form->query('xpath://div[@class="hintbox-wrap"]')->waitUntilPresent()->one()->getText()
 			);
 		}
 		elseif (CTestArrayHelper::get($data, 'hint') === false) {
@@ -192,22 +206,30 @@ class testItemTypeSelection extends CWebTest {
 
 		// Check dependent item type for item prototype, select Master item manually.
 		if (CTestArrayHelper::get($data['fields'], 'Type of information') === 'Binary' && $prototype) {
-			$this->query('xpath://button[@name="button"][normalize-space()="Select"]')->one()->click();
-			COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link:Master Item for testItemTypeSelection')->one()->click();
+			$form->getFieldContainer('Master item')->query('button:Select')->waitUntilClickable()->one()->click();
+			COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link:Master Item for testItemTypeSelection')
+					->one()->click();
 		}
 
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype added' : 'Item added');
 
 		// Check saved item form in DB and Frontend.
-		$id = CDBHelper::getValue('SELECT itemid FROM items'.
-			' WHERE key_ ='.zbx_dbstr($data['fields']['Key']).
-			' AND name ='.zbx_dbstr($data['fields']['Name'])
-		);
+		$this->assertEquals(1, CDBHelper::getCount('SELECT itemid FROM items'.
+				' WHERE key_ ='.zbx_dbstr($data['fields']['Key']).
+				' AND name ='.zbx_dbstr($data['fields']['Name'])
+		));
 
 		$this->page->open($link)->waitUntilReady();
 		$this->query('link:'.$data['fields']['Name'])->one()->click();
 		$form->invalidate();
+
+		if (CTestArrayHelper::get($data['fields'], 'Type of information') === 'Binary') {
+			$data['fields']['Master item'] = $prototype
+				? 'Host for host prototype tests: Master Item for testItemTypeSelection'
+				: 'Simple form test host: testFormItem';
+		}
+
 		$form->checkValue($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'hint')) {
@@ -230,7 +252,7 @@ class testItemTypeSelection extends CWebTest {
 			// Check that type is the same when preprocessing is cleared.
 			$form->selectTab('Preprocessing');
 			$form->query('xpath:.//li[@data-step="0"]')->waitUntilPresent()->one()->query('button:Remove')
-				->waitUntilClickable()->one()->click();
+					->waitUntilClickable()->one()->click();
 
 			$form->selectTab(($prototype) ? 'Item prototype' : 'Item');
 			$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());

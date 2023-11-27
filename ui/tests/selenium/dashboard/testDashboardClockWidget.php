@@ -961,8 +961,6 @@ class testDashboardClockWidget extends testWidgets {
 	 *
 	 * @param array      $data      data provider
 	 * @param boolean    $update    true if update scenario, false if create
-	 *
-	 * @dataProvider getClockWidgetCommonData
 	 */
 	public function checkFormClockWidget($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {

@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 
 /**
+ * Test for checking Item Value Widget.
+ *
  * @backup dashboard
  *
  * @onBefore prepareDashboardData
@@ -212,8 +214,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	}
 
 	/**
-	 * Test to check Item Value Widget.
-	 * Check authentication form fields layout.
+	 * Test of the Item Value widget form fields layout.
 	 */
 	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
