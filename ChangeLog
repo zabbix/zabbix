@@ -1,6 +1,7 @@
 Changes for 7.0.0alpha8
 
 New features:
+A.F.I..PST [ZBXNEXT-7460] added support for user macros in item and item prototype names (agriscenko, vso)
 A.F....PS. [ZBXNEXT-8735] added attempt interval and item data type-based filtering to connectors (dfofanovs, dgoloscapov)
 ...G...PS. [ZBXNEXT-1400] added support for configuration file validation (asestakovs, dimir)
 A.F.I..... [ZBXNEXT-7578] modified 'headers' and 'query_fields' parameter structure for item, item prototype, and LLD rule API objects (akozlovs, jfreibergs, vmaksimovs)
@@ -4729,8 +4730,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 
 --------------------------------------------------------------------------------
 Changes for 5.0.40rc1
-
-New features:
 
 Bug fixes:
 .......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
