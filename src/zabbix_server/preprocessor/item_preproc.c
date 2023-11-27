@@ -1224,7 +1224,7 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 	xmlDoc			*doc = NULL;
 	xmlXPathContext		*xpathCtx = NULL;
 	xmlXPathObject		*xpathObj = NULL;
-	xmlErrorPtr		pErr;
+	const xmlError		*pErr;
 	xmlBufferPtr		xmlBufferLocal;
 
 	zbx_variant_copy(&value_str, value);
