@@ -193,7 +193,7 @@ class testItemTypeSelection extends CWebTest {
 		// Check dependent item type for item prototype, select Master item manually.
 		if (CTestArrayHelper::get($data['fields'], 'Type of information') === 'Binary' && $prototype) {
 			$this->query('xpath://button[@name="button"][normalize-space()="Select"]')->one()->click();
-			COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link:Master Item')->one()->click();
+			COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link:Master Item for testItemTypeSelection')->one()->click();
 		}
 
 		$form->submit();

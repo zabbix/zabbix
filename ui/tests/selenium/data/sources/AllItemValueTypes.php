@@ -99,7 +99,17 @@ class AllItemValueTypes {
 			];
 		}
 
-		CDataHelper::call('item.create', $items_data	);
+		$master_item_data[] = [
+			[
+				'name' => 'Master Item for testItemTypeSelection',
+				'key_' => 'graph[1]',
+				'hostid' => 90001, // Host for host prototype tests
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			]
+		];
+
+		CDataHelper::call('item.create', array_merge_recursive($items_data, $master_item_data));
 		$simple_itemids = CDataHelper::getIds('name');
 
 		// Add dependent item.
@@ -122,19 +132,7 @@ class AllItemValueTypes {
 		CDataHelper::call('item.create', $dependent_items_data);
 		$dependent_itemids = CDataHelper::getIds('name');
 
-		CDataHelper::call('item.create', [
-			[
-				'name' => 'Master Item',
-				'key_' => 'graph[1]',
-				'hostid' => 90001,
-				'type' => 2,
-				'value_type' => 4
-			]
-		]);
-
-		$additional_itemids = CDataHelper::getIds('name');
-
-		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids, $additional_itemids);
+		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids);
 
 		return [
 			'hostid' => $hostid,
