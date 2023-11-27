@@ -346,7 +346,7 @@ class CHistory extends CApiService {
 	/**
 	 * Returns true if database supports data compression. False otherwise.
 	 */
-	public static function checkCompressionAvailability(): bool {
+	private static function checkCompressionAvailability(): bool {
 		$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
 		foreach ($dbversion_status as $dbversion) {
