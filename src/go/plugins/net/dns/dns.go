@@ -503,11 +503,12 @@ func (o *options) setDefaultName() {
 }
 
 func runQuery(resolver, domain, net string, record uint16, timeout time.Duration) (*dns.Msg, error) {
-	c := new(dns.Client)
-	c.Net = net
-	c.DialTimeout = timeout
-	c.ReadTimeout = timeout
-	c.WriteTimeout = timeout
+	c := &dns.Client{
+		Net: net,
+		DialTimeout: timeout,
+		ReadTimeout: timeout,
+		WriteTimeout: timeout,
+	}
 
 	if record == dns.TypePTR {
 		rdomain, revAddrErr := dns.ReverseAddr(domain)

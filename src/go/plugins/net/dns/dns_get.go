@@ -673,11 +673,12 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 	timeout := o.timeout
 	flags := o.flags
 
-	c := new(dns.Client)
-	c.Net = net
-	c.DialTimeout = timeout
-	c.ReadTimeout = timeout
-	c.WriteTimeout = timeout
+	c := &dns.Client{
+		Net: net,
+		DialTimeout: timeout,
+		ReadTimeout: timeout,
+		WriteTimeout: timeout,
+	}
 
 	if record == dns.TypePTR {
 		rdomain, revAddrErr := dns.ReverseAddr(domain)
