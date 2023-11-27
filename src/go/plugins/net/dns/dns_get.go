@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
-	"reflect"
 	"strings"
 	"time"
 )
@@ -94,7 +93,7 @@ var dnsTypesGet = map[string]uint16{
 
 	"TKEY": dns.TypeTKEY,
 	"TSIG": dns.TypeTSIG,
-	//
+
 	"IXFR":  dns.TypeIXFR,
 	"AXFR":  dns.TypeAXFR,
 	"MAILB": dns.TypeMAILB,
@@ -271,106 +270,138 @@ func insertAtEveryNthPosition(s string, n int, r rune) string {
 	return buffer.String()
 }
 
-func parseClassInHeader(isOPT bool, fieldValue *any, fieldName *string) {
-	if !isOPT {
-		classValue, ok := (*fieldValue).(uint16)
+func parseRRs(rrs []dns.RR, source string) (map[string][]any, error) {
+	parsedSection := make(map[string][]any)
+	parsedRRs := make([]any, 0, len(rrs))
+
+	for _, rr := range rrs {
+		switch rr := rr.(type) {
+		case *dns.OPT:
+			parsedRR, err := parseOptRR(rr)
+			if err != nil {
+				return nil, err
+			}
+
+			parsedRRs = append(parsedRRs, parsedRR)
+		default:
+			parsedRR, err := parseDefaultRR(rr)
+			if err != nil {
+				return nil, err
+			}
+
+			parsedRRs = append(parsedRRs, parsedRR)
+		}
+	}
+
+	if len(parsedRRs) != 0 {
+		parsedSection[source] = parsedRRs
+	}
+
+	return parsedSection, nil
+}
+
+func parseHeaderRRtype(header *dns.RR_Header) string {
+	rrTypeNewValue := fmt.Sprintf("%d", header.Rrtype)
+	mappedFieldValue, ok := dnsTypesGetReverse[header.Rrtype]
+	if ok {
+		rrTypeNewValue = mappedFieldValue
+	}
+
+	return rrTypeNewValue
+}
+
+func parseHeaderClass(header *dns.RR_Header) string {
+	headerClassNewValue := fmt.Sprintf("%d", header.Class)
+	mappedClass, ok := dnsClassesGet[header.Class]
+
+	if ok {
+		headerClassNewValue = mappedClass
+	}
+
+	return headerClassNewValue
+}
+
+func parseOptRR(optRR *dns.OPT) (map[string]any, error) {
+	parsedOpts := make([]any, 0, len(optRR.Option))
+
+	for _, o := range optRR.Option {
+		oMap, err := structToMap(o)
+		if err != nil {
+			return nil, err
+		}
+
+		code, ok := oMap["Code"]
 		if ok {
-			mappedClass, ok2 := dnsClassesGet[classValue]
-
-			if ok2 {
-				*fieldValue = mappedClass
-			}
+			delete(oMap, "Code")
+			oMap["code"] = code
 		}
-	} else {
-		*fieldName = "udp_payload"
+
+		nsid, ok := oMap["Nsid"]
+		if ok {
+			const numOfDigitsTogetherInNSID = 2
+			nsidValue := insertAtEveryNthPosition(nsid.(string), numOfDigitsTogetherInNSID, ' ')
+
+			delete(oMap, "Nsid")
+			oMap["nsid"] = nsidValue
+		}
+
+		parsedOpts = append(parsedOpts, oMap)
 	}
+
+	header := optRR.Header()
+
+	rData2 := map[string]any{}
+	rData2["options"] = parsedOpts
+
+	return map[string]any{
+		"udp_payload":    header.Class,
+		"name":           header.Name,
+		"rdata":          rData2,
+		"rdlength":       header.Rdlength,
+		"extended_rcode": header.Ttl,
+		"type":           parseHeaderRRtype(header),
+	}, nil
 }
 
-func parseHeader(header reflect.Value, result map[string]interface{}, isOPT bool) {
-	for i := 0; i < header.NumField(); i++ {
-		fieldValue := header.Field(i).Interface()
-		fieldName := strings.ToLower(header.Type().Field(i).Name)
-
-		if fieldName == "rrtype" {
-			fieldName = "type"
-			mappedFieldValue, ok := dnsTypesGetReverse[fieldValue]
-			if ok {
-				fieldValue = mappedFieldValue
-			}
-		} else if fieldName == "class" {
-			parseClassInHeader(isOPT, &fieldValue, &fieldName)
-		} else if "ttl" == fieldName && isOPT {
-			fieldName = "extended_rcode"
-		}
-		result[fieldName] = fieldValue
+func parseDefaultRR(rr dns.RR) (map[string]any, error) {
+	rData, err := structToMap(rr)
+	if err != nil {
+		return nil, err
 	}
+
+	delete(rData, "Hdr")
+
+	header := rr.Header()
+
+	rData2 := map[string]any{}
+	for k, v := range rData {
+		rData2[strings.ToLower(k)] = v
+	}
+
+	return map[string]any{
+		"class":    parseHeaderClass(header),
+		"name":     header.Name,
+		"rdata":    rData2,
+		"rdlength": header.Rdlength,
+		"ttl":      header.Ttl,
+		"type":     parseHeaderRRtype(header),
+	}, nil
 }
 
-func parseRest(RRFieldButNotHeader reflect.Value, fieldType reflect.StructField, isOPT bool,
-	result map[string]interface{}) {
-	fieldInterface := RRFieldButNotHeader.Interface()
-	fieldName := strings.ToLower(fieldType.Name)
-
-	if isOPT && fieldName == "option" {
-		fieldName = "options"
-		optionResults := make([]interface{}, 0)
-		EDNS0Field, isEDNS0Field := fieldInterface.([]dns.EDNS0)
-
-		if isEDNS0Field {
-			for _, edns0FieldNextPart := range EDNS0Field {
-				optionResult := make(map[string]interface{})
-				edns0_NSIDField, isEDNS0_NSIDField := edns0FieldNextPart.(*dns.EDNS0_NSID)
-
-				if isEDNS0_NSIDField {
-					optionResult["code"] = edns0_NSIDField.Code
-					nsidValue := edns0_NSIDField.Nsid
-					const numOfDigitsTogetherInNSID = 2
-					nsidValue = insertAtEveryNthPosition(nsidValue, numOfDigitsTogetherInNSID, ' ')
-					optionResult["nsid"] = nsidValue
-					optionResults = append(optionResults, optionResult)
-				}
-			}
-		}
-		result[fieldName] = optionResults
-	} else {
-		result[fieldName] = fieldInterface
-	}
-}
-
-func parseRRs(in []dns.RR, source string) map[string][]interface{} {
-	result := make(map[string][]interface{})
-
-	for _, rrNext := range in {
-		resultPart := make(map[string]interface{})
-
-		rrNextValue := reflect.ValueOf(rrNext)
-
-		// OPT can exist only in additional section
-		_, isOPT := rrNextValue.Interface().(*dns.OPT)
-
-		// if it is a pointer - dereference it
-		if rrNextValue.Kind() == reflect.Ptr {
-			rrNextValue = rrNextValue.Elem()
-		}
-
-		resFieldAggregatedValues := make(map[string]interface{})
-
-		for i := 0; i < rrNextValue.NumField(); i++ {
-			fieldTypeOfrrNextValue := rrNextValue.Type().Field(i)
-
-			if fieldTypeOfrrNextValue.Name == "Hdr" {
-				parseHeader(rrNextValue.Field(i), resultPart, isOPT)
-			} else {
-				parseRest(rrNextValue.Field(i), fieldTypeOfrrNextValue, isOPT,
-					resFieldAggregatedValues)
-			}
-		}
-
-		resultPart["rdata"] = resFieldAggregatedValues
-		result[source] = append(result[source], resultPart)
+func structToMap(s any) (map[string]any, error) {
+	b, err := json.Marshal(s)
+	if err != nil {
+		return nil, err
 	}
 
-	return result
+	rData := map[string]any{}
+
+	err = json.Unmarshal(b, &rData)
+	if err != nil {
+		return nil, err
+	}
+
+	return rData, nil
 }
 
 func parseRespQuestion(respQuestion []dns.Question) map[string][]any {
@@ -473,6 +504,19 @@ const (
 	jsonParsingErrorCodeFinalJsonResult   = -2
 )
 
+func prepareJsonErrorResponse(e error) (string, error) {
+	resultFailParse := make(map[string]interface{})
+	resultFailParse["zbx_error_code"] = jsonParsingErrorCodeFinalJsonResult
+	resultFailParse["zbx_error_msg"] = e.Error()
+	resultJsonFailParse, errFailParse := json.Marshal(resultFailParse)
+
+	if errFailParse != nil {
+		return "", errFailParse
+	}
+
+	return string(resultJsonFailParse), nil
+}
+
 func exportDnsGet(params []string) (result interface{}, err error) {
 	options, err := parseParamsGet(params)
 	if err != nil {
@@ -532,9 +576,33 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	parsedFlagsSection := parseRespFlags(resp.MsgHdr)
 	parsedResponseCode := parseRespCode(resp.MsgHdr)
 	parsedQuestionSection := parseRespQuestion(resp.Question)
-	parsedAnswerSection := parseRRs(resp.Answer, "answer_section")
-	parsedAuthoritySection := parseRRs(resp.Ns, "authority_section")
-	parsedAdditionalSection := parseRRs(resp.Extra, "additional_section")
+
+	parsedAnswerSection, err := parseRRs(resp.Answer, "answer_section")
+	if err != nil {
+		msg, err := prepareJsonErrorResponse(err)
+		if err != nil {
+			return "", err
+		}
+		return msg, nil
+	}
+
+	parsedAuthoritySection, e := parseRRs(resp.Ns, "authority_section")
+	if e != nil {
+		msg, err := prepareJsonErrorResponse(e)
+		if err != nil {
+			return "", err
+		}
+		return msg, nil
+	}
+
+	parsedAdditionalSection, e := parseRRs(resp.Extra, "additional_section")
+	if e != nil {
+		msg, err := prepareJsonErrorResponse(e)
+		if err != nil {
+			return "", err
+		}
+		return msg, nil
+	}
 
 	// Almost complete since it is not marshaled yet and without
 	// zbx_error_code (and possibly zbx_error_msg).
@@ -559,23 +627,16 @@ func exportDnsGet(params []string) (result interface{}, err error) {
 	// 1) return appropriate error encoded in json
 	// 2) if it also fails, return regular error.
 	//
-	// If original marshal succeeds - need to attach the success
+	// If original marshal succeeds - attach the success
 	// response to the original result. If this results into error
-	// in subsequent marshall - then return regular error.
-
-	_, errResultParse := json.Marshal(almostCompleteResultBlock)
-
-	if errResultParse != nil {
-		resultFailParse := make(map[string]interface{})
-		resultFailParse["zbx_error_code"] = jsonParsingErrorCodeFinalJsonResult
-		resultFailParse["zbx_error_msg"] = errResultParse.Error()
-		resultJsonFailParse, errFailParse := json.Marshal(resultFailParse)
-
-		if errFailParse != nil {
-			return nil, errFailParse
+	// in subsequent marshall - then return the regular error.
+	_, err = json.Marshal(almostCompleteResultBlock)
+	if err != nil {
+		msg, err := prepareJsonErrorResponse(err)
+		if err != nil {
+			return "", err
 		}
-
-		return string(resultJsonFailParse), nil
+		return msg, nil
 	}
 
 	resultOkParse := make(map[string]interface{})
