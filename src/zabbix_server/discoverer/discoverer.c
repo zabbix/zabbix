@@ -944,14 +944,12 @@ static int	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t
 		{
 			discovery_icmp_result_proc(druleid, dcheck_idx, task, &hosts, results);
 		}
+	}
 
-		for (i = 0; i < hosts.values_num; i++)
-		{
-			zbx_str_free(hosts.values[i].addr);
-			zbx_str_free(hosts.values[i].dnsname);
-		}
-
-		zbx_vector_fping_host_clear(&hosts);
+	for (i = 0; i < hosts.values_num; i++)
+	{
+		zbx_str_free(hosts.values[i].addr);
+		zbx_str_free(hosts.values[i].dnsname);
 	}
 
 	zbx_vector_fping_host_destroy(&hosts);

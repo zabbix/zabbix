@@ -753,7 +753,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	{
 		zbx_snprintf(resp->linebuf, resp->linebuf_size, "no output");
 	}
-	else
+	else if (NULL == strstr(resp->linebuf, " error:"))
 	{
 		for (i = 0; i < args->hosts_count; i++)
 		{
