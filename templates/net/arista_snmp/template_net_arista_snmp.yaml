@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:32:03Z'
+  date: '2023-11-01T20:50:36Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1746,9 +1746,6 @@ zabbix_export:
                       value:
                         host: 'Arista by SNMP'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'memory utilization'
                   x: '12'
@@ -1763,9 +1760,6 @@ zabbix_export:
                       value:
                         host: 'Arista by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'network traffic'
                   x: '12'
@@ -1781,9 +1775,6 @@ zabbix_export:
                       value:
                         host: 'Arista by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 318f3041aea04848a223de86e589c232
           name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'

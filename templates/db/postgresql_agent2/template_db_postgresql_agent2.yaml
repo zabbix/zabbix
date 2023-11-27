@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-19T15:09:50Z'
+  date: '2023-11-01T20:49:17Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2401,9 +2401,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: pg_stat_database metrics'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -2417,9 +2414,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Size'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '12'
@@ -2433,9 +2427,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Queries'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -2449,9 +2440,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Locks'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -2466,9 +2454,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Number of bloating tables'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -2483,9 +2468,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB [{#DBNAME}]: Slow queries'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: cd2d975b0d7e4f8e89afb1033fce4ce2
           name: 'PostgreSQL checksum failure status'

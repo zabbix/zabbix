@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:29:45Z'
+  date: '2023-11-01T20:49:54Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -476,9 +476,6 @@ zabbix_export:
                       value:
                         host: 'Interfaces Windows by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 4b84f531e2df454a8824070608bfbf49
           name: 'IF-MIB::ifOperStatus'

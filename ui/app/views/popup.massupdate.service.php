@@ -33,7 +33,7 @@ $form = (new CForm())
 
 $tags_form_grid = (new CFormGrid())
 	->addItem([
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		new CFormField(
 			(new CDiv([
 				(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
@@ -48,7 +48,7 @@ $tags_form_grid = (new CFormGrid())
 				(new CScriptTemplate('tag-row-tmpl'))
 					->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))
 			]))
-				->setId('tags-div')
+				->setId('tags-field')
 				->addClass(ZBX_STYLE_TABLE_FORMS)
 		)
 	]);

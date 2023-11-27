@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:21:53Z'
+  date: '2023-11-01T20:47:30Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -2035,9 +2035,6 @@ zabbix_export:
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: CPU Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2051,9 +2048,6 @@ zabbix_export:
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -2067,9 +2061,6 @@ zabbix_export:
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 6b0f40b56f1c49f0beb66ffb85009c15
           name: 'Alarm state'

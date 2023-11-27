@@ -62,7 +62,7 @@
 
 // History mode.
 (() => {
-	const history_elem = document.querySelector('#history_div');
+	const history_elem = document.querySelector('#history-field');
 
 	if (!history_elem) {
 		return false;
@@ -95,7 +95,7 @@
 
 // Trends mode.
 (() => {
-	const trends_elem = document.querySelector('#trends_div');
+	const trends_elem = document.querySelector('#trends-field');
 
 	if (!trends_elem) {
 		return false;
