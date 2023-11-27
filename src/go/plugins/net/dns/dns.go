@@ -532,8 +532,11 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 
 	m.Question[0] = dns.Question{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET}
 	r, _, err := c.Exchange(m, resolver)
+	if err != nil {
+		return nil, err
+	}
 
-	return r, err
+	return r, nil
 }
 
 func init() {

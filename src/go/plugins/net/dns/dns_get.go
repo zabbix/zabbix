@@ -728,6 +728,9 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 	}
 
 	r, _, err := c.Exchange(m, resolver)
+	if err != nil {
+		return nil, err
+	}
 
-	return r, err
+	return r, nil
 }
