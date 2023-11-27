@@ -903,9 +903,7 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 }
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
-	API::History()->clear([getRequest('itemid')]);
-
-	$result = !hasErrorMessages();
+	$result = (bool) API::History()->clear([getRequest('itemid')]);
 
 	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
@@ -980,9 +978,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 }
 // clean history for selected items
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory' && hasRequest('group_itemid')) {
-	API::History()->clear(getRequest('group_itemid'));
-
-	$result = !hasErrorMessages();
+	$result = (bool) API::History()->clear(getRequest('group_itemid'));
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));
