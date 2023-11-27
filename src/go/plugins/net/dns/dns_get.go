@@ -514,17 +514,46 @@ func prepareJsonErrorResponse(e error) (string, error) {
 	return string(resultJsonFailedParsing), nil
 }
 
+func prepareAlmostCompleteResultBlock(parsedAnswerSection map[string][]any, parsedAuthoritySection map[string][]any,
+	parsedAdditionalSection map[string][]any, parsedFlagsSection map[string][]string,
+	parsedResponseCode map[string]any, queryTimeSection map[string]any,
+	parsedQuestionSection map[string][]any) []any {
+	// Almost complete since it is not marshaled yet and without
+	// zbx_error_code (and possibly zbx_error_msg).
+	almostCompleteResultBlock := []any{
+		parsedFlagsSection,
+		parsedResponseCode,
+		queryTimeSection,
+		parsedQuestionSection,
+	}
+
+	if len(parsedAnswerSection) != 0 {
+		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAnswerSection)
+	}
+	if len(parsedAuthoritySection) != 0 {
+		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAuthoritySection)
+	}
+	if len(parsedAdditionalSection) != 0 {
+		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAdditionalSection)
+	}
+
+	almostCompleteResultBlock = append(almostCompleteResultBlock,
+		map[string]any{"zbx_error_code": noErrorResponseCodeFinalJsonResult})
+
+	return almostCompleteResultBlock
+}
+
 func exportDnsGet(params []string) (result any, err error) {
 	options, err := parseParamsGet(params)
 	if err != nil {
 		return "", err
 	}
+
 	timeBeforeQuery := time.Now()
 
 	var resp *dns.Msg
 	for i := 1; i <= options.count; i++ {
 		resp, err = runQueryGet(&options)
-
 		if err != nil {
 			continue
 		}
@@ -541,7 +570,7 @@ func exportDnsGet(params []string) (result any, err error) {
 		)
 		if err != nil {
 			// There is communication error, however we failed to parse it
-			// return the original communivation error as regular error.
+			// return the original communication error as regular error.
 			return nil, err
 		}
 
@@ -581,6 +610,7 @@ func exportDnsGet(params []string) (result any, err error) {
 		if err != nil {
 			return "", err
 		}
+
 		return failedResultMessage, nil
 	}
 
@@ -590,6 +620,7 @@ func exportDnsGet(params []string) (result any, err error) {
 		if err != nil {
 			return "", err
 		}
+
 		return failedResultMessage, nil
 	}
 
@@ -599,37 +630,12 @@ func exportDnsGet(params []string) (result any, err error) {
 		if err != nil {
 			return "", err
 		}
+
 		return failedResultMessage, nil
 	}
 
-	// Almost complete since it is not marshaled yet and without
-	// zbx_error_code (and possibly zbx_error_msg).
-	almostCompleteResultBlock := []any{
-		parsedFlagsSection,
-		parsedResponseCode,
-		queryTimeSection,
-		parsedQuestionSection,
-	}
-
-	if len(parsedAnswerSection) != 0 {
-		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAnswerSection)
-	}
-	if len(parsedAuthoritySection) != 0 {
-		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAuthoritySection)
-	}
-	if len(parsedAdditionalSection) != 0 {
-		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAdditionalSection)
-	}
-
-	// Check if the result can be marshaled first and if not:
-	// 1) return appropriate error encoded in json
-	// 2) if it also fails, return regular error.
-	//
-	// If original marshal succeeds - attach the success
-	// response to the original result. If this results into error
-	// in subsequent marshall - then return the regular error.
-	almostCompleteResultBlock = append(almostCompleteResultBlock,
-		map[string]any{"zbx_error_code": noErrorResponseCodeFinalJsonResult})
+	almostCompleteResultBlock := prepareAlmostCompleteResultBlock(parsedAnswerSection, parsedAuthoritySection,
+		parsedAdditionalSection, parsedFlagsSection, parsedResponseCode, queryTimeSection, parsedQuestionSection)
 
 	finalResultJson, errFinalResultParse := json.Marshal(almostCompleteResultBlock)
 	if errFinalResultParse != nil {
@@ -637,7 +643,8 @@ func exportDnsGet(params []string) (result any, err error) {
 		if err != nil {
 			return "", err
 		}
-		return string(finalResultJson), nil
+
+		return finalResultJson, nil
 	}
 
 	return string(finalResultJson), nil
