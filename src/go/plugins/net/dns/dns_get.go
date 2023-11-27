@@ -681,13 +681,10 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 	}
 
 	if record == dns.TypePTR {
-		rdomain, revAddrErr := dns.ReverseAddr(domain)
-
-		if revAddrErr != nil {
-			return nil, revAddrErr
+		domain, err := dns.ReverseAddr(domain)
+		if err != nil {
+			return nil, err
 		}
-
-		domain = rdomain
 	}
 
 	m := &dns.Msg{
@@ -716,10 +713,9 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 			o.SetUDPSize(dns.DefaultMsgSize)
 		}
 		if flags["nsid"] {
-			e := &dns.EDNS0_NSID{
-				Code: dns.EDNS0NSID,
-			}
-			o.Option = append(o.Option, e)
+			o.Option = append(o.Option,
+				&dns.EDNS0_NSID{Code: dns.EDNS0NSID},
+			)
 			// NSD will not return nsid when the udp message size is too small
 			o.SetUDPSize(dns.DefaultMsgSize)
 		}

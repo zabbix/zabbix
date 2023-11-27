@@ -511,13 +511,10 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 	}
 
 	if record == dns.TypePTR {
-		rdomain, revAddrErr := dns.ReverseAddr(domain)
-
-		if revAddrErr != nil {
-			return nil, revAddrErr
+		domain, err := dns.ReverseAddr(domain)
+		if err != nil {
+			return nil, err
 		}
-
-		domain = rdomain
 	}
 
 	m := &dns.Msg{
