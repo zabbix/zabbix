@@ -116,7 +116,7 @@ class CControllerMiscConfigEdit extends CController {
 		$data['x_frame_header_enabled'] = strcasecmp('null', $x_frame_options) == 0 ? 0 : 1;
 		$data['x_frame_options'] = $data['x_frame_header_enabled'] == 1
 			? $x_frame_options
-			: DB::getDefault('config', 'x_frame_options');
+			: '';
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
