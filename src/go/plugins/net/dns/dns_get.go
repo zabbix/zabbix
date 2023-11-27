@@ -10,10 +10,11 @@ import (
 	"time"
 )
 
-type dnsGetOptions struct {
-	options
-	flags map[string]bool
-}
+const (
+	noErrorResponseCodeFinalJsonResult    = 0
+	communicationErrorCodeFinalJsonResult = -1
+	jsonParsingErrorCodeFinalJsonResult   = -2
+)
 
 var dnsTypesGet = map[string]uint16{
 	"None":       dns.TypeNone,
@@ -103,6 +104,158 @@ var dnsTypesGet = map[string]uint16{
 	"TA":       dns.TypeTA,
 	"DLV":      dns.TypeDLV,
 	"Reserved": dns.TypeReserved,
+}
+
+var dnsTypesGetReverse = reverseMap(dnsTypesGet)
+
+var dnsRespCodesMappingGet = map[int]string{
+	0:  "NOERROR",
+	1:  "FORMERR",
+	2:  "SERVFAIL",
+	3:  "NXDOMAIN",
+	4:  "NOTIMP",
+	5:  "REFUSED",
+	6:  "YXDOMAIN",
+	7:  "YXRRSET",
+	8:  "NXRRSET",
+	9:  "NOTAUTH",
+	10: "NOTZONE",
+	16: "BADSIG/BADVERS",
+	17: "BADKEY",
+	18: "BADTIME",
+	19: "BADMODE",
+	20: "BADNAME",
+	21: "BADALG",
+	22: "BADTRUNC",
+	23: "BADCOOKIE",
+}
+
+var dnsClassesGet = map[uint16]string{
+	1:   "IN",
+	3:   "CH",
+	4:   "HS",
+	254: "NONE",
+	255: "ANY",
+}
+
+var dnsExtraQuestionTypesGet = map[uint16]string{
+	251: "IXFR",
+	252: "AXFR",
+	253: "MAILB",
+	254: "MAILA",
+	255: "ANY",
+}
+
+type dnsGetOptions struct {
+	options
+	flags map[string]bool
+}
+
+func exportDnsGet(params []string) (result any, err error) {
+	optionsPtr, err := parseParamsGet(params)
+	if err != nil {
+		return "", err
+	}
+
+	timeBeforeQuery := time.Now()
+
+	var resp *dns.Msg
+	for i := 1; i <= (*optionsPtr).count; i++ {
+		resp, err = runQueryGet(optionsPtr)
+		if err != nil {
+			continue
+		}
+
+		break
+	}
+
+	if err != nil {
+		resultJson, err := json.Marshal(
+			map[string]any{
+				"zbx_error_code": communicationErrorCodeFinalJsonResult,
+				"zbx_error_msg":  "Communication error: " + err.Error(),
+			},
+		)
+		if err != nil {
+			// There is communication error, however we failed to parse it
+			// return the original communication error as regular error.
+			return nil, err
+		}
+
+		return string(resultJson), nil
+	}
+
+	timeDNSResponseReceived := time.Since(timeBeforeQuery).Seconds()
+	queryTimeSection := map[string]any{
+		"query_time": fmt.Sprintf("%.2f", timeDNSResponseReceived),
+	}
+
+	// Now, resp from the DNS library is ready to be processed:
+	//    type Msg struct {
+	//    MsgHdr
+	//    Compress bool       `json:"-"`
+	//    Question []Question // Holds the RR(s) of the question section.
+	//    Answer   []RR       // Holds the RR(s) of the answer section.
+	//    Ns       []RR       // Holds the RR(s) of the authority section.
+	//    Extra    []RR       // Holds the RR(s) of the additional section.
+	//    }
+	//
+	// This gets parsed, with some new data attached. At the end, large JSON response,
+	// consisting of several sections is returned:
+	// 1) Meta-data: zbx_error_code and query_time - internally generated,
+	//               not coming from the DNS library
+	// 2) MsgHdr data: response_code and flags
+	// 3) Question, Answer section, Ns and Extra sections data, mostly untouched,
+	//    but formatted to make it more consistent with other Zabbix JSON returning items.
+
+	parsedFlagsSection := parseRespFlags(resp.MsgHdr)
+	parsedResponseCode := parseRespCode(resp.MsgHdr)
+	parsedQuestionSection := parseRespQuestion(resp.Question)
+
+	parsedAnswerSection, err := parseRRs(resp.Answer, "answer_section")
+	if err != nil {
+		failedResultMessage, err := prepareJsonErrorResponse(err)
+		if err != nil {
+			return "", err
+		}
+
+		return failedResultMessage, nil
+	}
+
+	parsedAuthoritySection, err := parseRRs(resp.Ns, "authority_section")
+	if err != nil {
+		failedResultMessage, err := prepareJsonErrorResponse(err)
+		if err != nil {
+			return "", err
+		}
+
+		return failedResultMessage, nil
+	}
+
+	parsedAdditionalSection, err := parseRRs(resp.Extra, "additional_section")
+	if err != nil {
+		failedResultMessage, err := prepareJsonErrorResponse(err)
+		if err != nil {
+			return "", err
+		}
+
+		return failedResultMessage, nil
+	}
+
+	almostCompleteResultBlock := prepareAlmostCompleteResultBlock(parsedAnswerSection, parsedAuthoritySection,
+		parsedAdditionalSection, parsedFlagsSection, parsedResponseCode, queryTimeSection, parsedQuestionSection)
+
+	finalResultJson, errFinalResultParse := json.Marshal(almostCompleteResultBlock)
+	if errFinalResultParse != nil {
+		finalResultJson, err := prepareJsonErrorResponse(errFinalResultParse)
+		if err != nil {
+			return "", err
+		}
+
+		return finalResultJson, nil
+	}
+
+	return string(finalResultJson), nil
 }
 
 func (o *dnsGetOptions) setFlags(flags string) error {
@@ -238,24 +391,6 @@ func reverseMap(m map[string]uint16) map[any]string {
 	}
 
 	return n
-}
-
-var dnsTypesGetReverse = reverseMap(dnsTypesGet)
-
-var dnsClassesGet = map[uint16]string{
-	1:   "IN",
-	3:   "CH",
-	4:   "HS",
-	254: "NONE",
-	255: "ANY",
-}
-
-var dnsExtraQuestionTypesGet = map[uint16]string{
-	251: "IXFR",
-	252: "AXFR",
-	253: "MAILB",
-	254: "MAILA",
-	255: "ANY",
 }
 
 func insertAtEveryNthPosition(s string, n int, r rune) string {
@@ -464,28 +599,6 @@ func parseRespFlags(rh dns.MsgHdr) map[string][]string {
 	return map[string][]string{"flags": answerFlags}
 }
 
-var dnsRespCodesMappingGet = map[int]string{
-	0:  "NOERROR",
-	1:  "FORMERR",
-	2:  "SERVFAIL",
-	3:  "NXDOMAIN",
-	4:  "NOTIMP",
-	5:  "REFUSED",
-	6:  "YXDOMAIN",
-	7:  "YXRRSET",
-	8:  "NXRRSET",
-	9:  "NOTAUTH",
-	10: "NOTZONE",
-	16: "BADSIG/BADVERS",
-	17: "BADKEY",
-	18: "BADTIME",
-	19: "BADMODE",
-	20: "BADNAME",
-	21: "BADALG",
-	22: "BADTRUNC",
-	23: "BADCOOKIE",
-}
-
 func parseRespCode(rh dns.MsgHdr) map[string]any {
 	rCodeMapped, ok := dnsRespCodesMappingGet[rh.Rcode]
 	if !ok {
@@ -494,12 +607,6 @@ func parseRespCode(rh dns.MsgHdr) map[string]any {
 
 	return map[string]any{"response_code": rCodeMapped}
 }
-
-const (
-	noErrorResponseCodeFinalJsonResult    = 0
-	communicationErrorCodeFinalJsonResult = -1
-	jsonParsingErrorCodeFinalJsonResult   = -2
-)
 
 func prepareJsonErrorResponse(e error) (string, error) {
 	resultFailedParsing := map[string]any{
@@ -545,113 +652,6 @@ func prepareAlmostCompleteResultBlock(parsedAnswerSection map[string][]any, pars
 	return almostCompleteResultBlock
 }
 
-func exportDnsGet(params []string) (result any, err error) {
-	optionsPtr, err := parseParamsGet(params)
-	if err != nil {
-		return "", err
-	}
-
-	timeBeforeQuery := time.Now()
-
-	var resp *dns.Msg
-	for i := 1; i <= (*optionsPtr).count; i++ {
-		resp, err = runQueryGet(optionsPtr)
-		if err != nil {
-			continue
-		}
-
-		break
-	}
-
-	if err != nil {
-		resultJson, err := json.Marshal(
-			map[string]any{
-				"zbx_error_code": communicationErrorCodeFinalJsonResult,
-				"zbx_error_msg":  "Communication error: " + err.Error(),
-			},
-		)
-		if err != nil {
-			// There is communication error, however we failed to parse it
-			// return the original communication error as regular error.
-			return nil, err
-		}
-
-		return string(resultJson), nil
-	}
-
-	timeDNSResponseReceived := time.Since(timeBeforeQuery).Seconds()
-	queryTimeSection := map[string]any{
-		"query_time": fmt.Sprintf("%.2f", timeDNSResponseReceived),
-	}
-
-	// Now, resp from the DNS library is ready to be processed:
-	//    type Msg struct {
-	//    MsgHdr
-	//    Compress bool       `json:"-"`
-	//    Question []Question // Holds the RR(s) of the question section.
-	//    Answer   []RR       // Holds the RR(s) of the answer section.
-	//    Ns       []RR       // Holds the RR(s) of the authority section.
-	//    Extra    []RR       // Holds the RR(s) of the additional section.
-	//    }
-	//
-	// This gets parsed, with some new data attached. At the end, large JSON response,
-	// consisting of several sections is returned:
-	// 1) Meta-data: zbx_error_code and query_time - internally generated,
-	//               not coming from the DNS library
-	// 2) MsgHdr data: response_code and flags
-	// 3) Question, Answer section, Ns and Extra sections data, mostly untouched,
-	//    but formatted to make it more consistent with other Zabbix JSON returning items.
-
-	parsedFlagsSection := parseRespFlags(resp.MsgHdr)
-	parsedResponseCode := parseRespCode(resp.MsgHdr)
-	parsedQuestionSection := parseRespQuestion(resp.Question)
-
-	parsedAnswerSection, err := parseRRs(resp.Answer, "answer_section")
-	if err != nil {
-		failedResultMessage, err := prepareJsonErrorResponse(err)
-		if err != nil {
-			return "", err
-		}
-
-		return failedResultMessage, nil
-	}
-
-	parsedAuthoritySection, err := parseRRs(resp.Ns, "authority_section")
-	if err != nil {
-		failedResultMessage, err := prepareJsonErrorResponse(err)
-		if err != nil {
-			return "", err
-		}
-
-		return failedResultMessage, nil
-	}
-
-	parsedAdditionalSection, err := parseRRs(resp.Extra, "additional_section")
-	if err != nil {
-		failedResultMessage, err := prepareJsonErrorResponse(err)
-		if err != nil {
-			return "", err
-		}
-
-		return failedResultMessage, nil
-	}
-
-	almostCompleteResultBlock := prepareAlmostCompleteResultBlock(parsedAnswerSection, parsedAuthoritySection,
-		parsedAdditionalSection, parsedFlagsSection, parsedResponseCode, queryTimeSection, parsedQuestionSection)
-
-	finalResultJson, errFinalResultParse := json.Marshal(almostCompleteResultBlock)
-	if errFinalResultParse != nil {
-		finalResultJson, err := prepareJsonErrorResponse(errFinalResultParse)
-		if err != nil {
-			return "", err
-		}
-
-		return finalResultJson, nil
-	}
-
-	return string(finalResultJson), nil
-}
-
 func (o *dnsGetOptions) setDNSTypeGet(dnsType string) error {
 	if dnsType == "" {
 		return nil
@@ -676,9 +676,9 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 	flags := o.flags
 
 	c := &dns.Client{
-		Net: net,
-		DialTimeout: timeout,
-		ReadTimeout: timeout,
+		Net:          net,
+		DialTimeout:  timeout,
+		ReadTimeout:  timeout,
 		WriteTimeout: timeout,
 	}
 

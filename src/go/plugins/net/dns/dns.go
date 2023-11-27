@@ -50,20 +50,6 @@ const (
 	seventhParam
 )
 
-type options struct {
-	ip       string
-	name     string
-	protocol string
-	dnsType  uint16
-	count    int
-	timeout  time.Duration
-}
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
 var impl Plugin
 
 var dnsTypes = map[string]uint16{
@@ -85,6 +71,20 @@ var dnsTypes = map[string]uint16{
 	"TXT":   dns.TypeTXT,
 	"AAAA":  dns.TypeAAAA,
 	"SRV":   dns.TypeSRV,
+}
+
+type options struct {
+	ip       string
+	name     string
+	protocol string
+	dnsType  uint16
+	count    int
+	timeout  time.Duration
+}
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
 }
 
 // Export -
@@ -507,9 +507,9 @@ func (o *options) setDefaultName() {
 
 func runQuery(resolver, domain, net string, record uint16, timeout time.Duration) (*dns.Msg, error) {
 	c := &dns.Client{
-		Net: net,
-		DialTimeout: timeout,
-		ReadTimeout: timeout,
+		Net:          net,
+		DialTimeout:  timeout,
+		ReadTimeout:  timeout,
 		WriteTimeout: timeout,
 	}
 
