@@ -114,18 +114,19 @@ $from_list = (new CFormList())
 			makeHelpIcon([
 				_('X-Frame-Options HTTP header supported values:'),
 				(new CList([
-					_s('%1$s (default) or %2$s (must be single-quoted) - the page can only be displayed in a frame on the same origin as the page itself',
+					_s('%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself',
 						'SAMEORIGIN', "'self'"
-					).';',
-					_s('%1$s (default) or %2$s (must be single-quoted) - the page cannot be displayed in a frame, regardless of the site attempting to do so',
+					),
+					_s('%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so',
 						'DENY', "'none'"
-					).';',
-					_s('a string of space-separated hostnames; adding %1$s (must be single-quoted) to the list will allow the page to be displayed in a frame on the same origin as the page itself',
+					),
+					_s('a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself',
 						"'self'"
-					).'.'
+					)
 				]))->addClass(ZBX_STYLE_LIST_DASHED),
-				_s('Note that using %1$s or %2$s without single quotes will result in them being regarded as hostnames.',
-					"'self'", "'none'"
+				new CTag('br'),
+				_s('Note that using %1$s or %2$s will be regarded as hostnames if used without single quotes', "'self'",
+					"'none'"
 				)
 			])
 		], 'x_frame_header_enabled'))->setAsteriskMark(),
