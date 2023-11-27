@@ -680,8 +680,9 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 		WriteTimeout: timeout,
 	}
 
+	var err error
 	if record == dns.TypePTR {
-		domain, err := dns.ReverseAddr(domain)
+		domain, err = dns.ReverseAddr(domain)
 		if err != nil {
 			return nil, err
 		}
@@ -696,10 +697,10 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 			Opcode:            dns.OpcodeQuery,
 			Rcode:             dns.RcodeSuccess,
 		},
-		Question: make([]dns.Question, 1),
+		Question: []dns.Question{
+			{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET},
+		},
 	}
-
-	m.Question[0] = dns.Question{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET}
 
 	if flags["dnssec"] || flags["nsid"] {
 		o := &dns.OPT{

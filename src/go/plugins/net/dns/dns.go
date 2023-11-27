@@ -510,8 +510,9 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 		WriteTimeout: timeout,
 	}
 
+	var err error
 	if record == dns.TypePTR {
-		domain, err := dns.ReverseAddr(domain)
+		domain, err = dns.ReverseAddr(domain)
 		if err != nil {
 			return nil, err
 		}
@@ -524,10 +525,11 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 			Opcode:           dns.OpcodeQuery,
 			Rcode:            dns.RcodeSuccess,
 		},
-		Question: make([]dns.Question, 1),
+		Question: []dns.Question{
+			{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET},
+		},
 	}
 
-	m.Question[0] = dns.Question{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET}
 	r, _, err := c.Exchange(m, resolver)
 	if err != nil {
 		return nil, err
