@@ -20,7 +20,9 @@
 #include "zbxmockdata.h"
 
 #include "zbxtypes.h"
-
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#endif
 /* unresolved symbols needed for linking */
 
 static unsigned char	program_type	= 0;
@@ -112,11 +114,6 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
-/* web monitoring */
-char	*CONFIG_SSL_CA_LOCATION		= NULL;
-char	*CONFIG_SSL_CERT_LOCATION	= NULL;
-char	*CONFIG_SSL_KEY_LOCATION	= NULL;
-
 char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
@@ -124,11 +121,7 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 /* not used in tests, defined for linking with comms.c */
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-const char	title_message[] = "mock_title_message";
-const char	*usage_message[] = {"mock_usage_message", NULL};
-const char	*help_message[] = {"mock_help_message", NULL};
-const char	*progname = "mock_progname";
-const char	syslog_app_name[] = "mock_syslog_app_name";
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "mock_progname")
 
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
@@ -160,7 +153,9 @@ int	main (void)
 	};
 
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
-	zbx_init_library_common(zbx_mock_log_impl);
-
+	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname);
+#ifndef _WINDOWS
+	zbx_init_library_nix(get_zbx_progname);
+#endif
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

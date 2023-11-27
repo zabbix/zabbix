@@ -16,26 +16,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#ifndef ZABBIX_NIX_INTERNAL_H
+#define ZABBIX_NIX_INTERNAL_H
 
-#ifndef ZABBIX_DBCONFIG_H
-#define ZABBIX_DBCONFIG_H
+#include "zbxcommon.h"
 
-#include "zbxthreads.h"
-#include "zbxvault.h"
+zbx_get_progname_f	nix_get_progname_cb(void);
 
-typedef struct
-{
-	zbx_config_vault_t	*config_vault;
-	int			config_timeout;
-	int			proxyconfig_frequency;
-	int			proxydata_frequency;
-	const char		*config_source_ip;
-	const char		*config_ssl_ca_location;
-	const char		*config_ssl_cert_location;
-	const char		*config_ssl_key_location;
-}
-zbx_thread_dbconfig_args;
-
-ZBX_THREAD_ENTRY(dbconfig_thread, args);
-
-#endif
+#endif /* ZABBIX_NIX_INTERNAL_H */
