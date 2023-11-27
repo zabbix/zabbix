@@ -100,13 +100,11 @@ class AllItemValueTypes {
 		}
 
 		$master_item_data[] = [
-			[
-				'name' => 'Master Item for testItemTypeSelection',
-				'key_' => 'graph[1]',
-				'hostid' => 90001, // Host for host prototype tests
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_TEXT
-			]
+			'hostid' => 90001, // Host for host prototype tests
+			'name' => 'Master Item for testItemTypeSelection',
+			'key_' => 'graph[1]',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
 		];
 
 		CDataHelper::call('item.create', array_merge_recursive($items_data, $master_item_data));
