@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-23T14:46:17Z'
+  date: '2023-11-27T09:43:57Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -603,8 +603,7 @@ zabbix_export:
             
             try {
                 AWS.setParams(JSON.parse(value));
-                var
-                services = AWS.listServices(),
+                var services = AWS.listServices(),
                     tasks = AWS.ListTasks();
                 return JSON.stringify(({ services, tasks }));
             }
