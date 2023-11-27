@@ -1608,10 +1608,10 @@ static char	**dbsync_interface_preproc_row(char **row)
 
 	/* expand user macros */
 	if (NULL != strstr(row[5], "{$"))
-		row[5] = dc_expand_user_macros_dyn(row[5], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		row[5] = dc_expand_user_and_func_macros_dyn(row[5], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 
 	if (NULL != strstr(row[6], "{$"))
-		row[6] = dc_expand_user_macros_dyn(row[6], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		row[6] = dc_expand_user_and_func_macros_dyn(row[6], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 
 	return row;
 }
@@ -4036,10 +4036,10 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connectorid,protocol,data_type,url,max_records,"
 			"max_senders,timeout,max_attempts,token,http_proxy,authtype,username,password,verify_peer,"
 			"verify_host,ssl_cert_file,ssl_key_file,ssl_key_password,status,"
-			"tags_evaltype"
+			"tags_evaltype,item_value_type,attempt_interval"
 		" from connector");
 
-	dbsync_prepare(sync, 20, NULL);
+	dbsync_prepare(sync, 22, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

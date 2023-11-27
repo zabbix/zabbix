@@ -350,7 +350,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 		if (FAIL == zbx_ip_reverse(zone, &reversed_zone, &error))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+			SET_MSG_RESULT(result, error);
 
 			return SYSINFO_RET_FAIL;
 		}

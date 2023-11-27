@@ -419,10 +419,12 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	}
 
 	result = zbx_db_select(
-			"select h.proxyid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error"
+			"select h.proxyid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error,"
+					"irn.name_resolved"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 				" left join item_rtdata ir on ir.itemid=i.itemid"
+				" left join item_rtname irn on irn.itemid=i.itemid"
 			" where i.itemid=" ZBX_FS_UI64, itemid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
@@ -438,7 +440,10 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
-				*replace_to = zbx_strdup(*replace_to, row[3]);
+				if (FAIL == zbx_db_is_null(row[8]))
+					*replace_to = zbx_strdup(*replace_to, row[8]);
+				else
+					*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_DESCRIPTION:
@@ -451,8 +456,8 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					um_handle = zbx_dc_open_user_macros();
 					*replace_to = zbx_strdup(NULL, row[5]);
 
-					(void)zbx_dc_expand_user_macros(um_handle, replace_to, &dc_item.host.hostid, 1,
-							NULL);
+					(void)zbx_dc_expand_user_and_func_macros(um_handle, replace_to,
+							&dc_item.host.hostid, 1, NULL);
 
 					zbx_dc_close_user_macros(um_handle);
 					ret = SUCCEED;
