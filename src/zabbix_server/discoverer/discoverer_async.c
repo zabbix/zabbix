@@ -197,7 +197,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 
 	zbx_set_snmp_bulkwalk_options();
 
-	if (FAIL == (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, async_result, NULL,
+	if (SUCCEED != (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, async_result, NULL,
 			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
 			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
@@ -289,7 +289,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 	item.timeout = dcheck->timeout;
 
-	if (FAIL == (ret = zbx_async_check_agent(&item, &result, process_agent_result, async_result, NULL,
+	if (SUCCEED != (ret = zbx_async_check_agent(&item, &result, process_agent_result, async_result, NULL,
 			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
 			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
@@ -416,7 +416,7 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 	item.timeout = dcheck->timeout;
 
-	if (FAIL == (ret = zbx_async_check_tcpsvc(&item, dcheck->type, &result, process_tcpsvc_result, async_result,
+	if (SUCCEED != (ret = zbx_async_check_tcpsvc(&item, dcheck->type, &result, process_tcpsvc_result, async_result,
 			NULL, poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
 			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
