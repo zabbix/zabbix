@@ -207,10 +207,11 @@ func parseAnswers(answers []dns.RR) string {
 }
 
 func getDNSAnswers(params []string) ([]dns.RR, error) {
-	options, err := parseParamas(params)
+	optionsPtr, err := parseParams(params)
 	if err != nil {
 		return nil, err
 	}
+	options := *optionsPtr
 
 	var resp *dns.Msg
 	for i := 1; i <= options.count; i++ {
@@ -324,33 +325,35 @@ func parseTXT(in ...string) string {
 	return strings.TrimSpace(out)
 }
 
-func parseParamas(params []string) (o options, err error) {
+func parseParams(params []string) (*options, error) {
+	var o options
+
 	switch len(params) {
 	case sixthParam:
-		err = o.setProtocol(params[sixthParam-1])
+		err := o.setProtocol(params[sixthParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
 	case fifthParam:
-		err = o.setCount(params[fifthParam-1])
+		err := o.setCount(params[fifthParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
 	case fourthParam:
-		err = o.setTimeout(params[fourthParam-1])
+		err := o.setTimeout(params[fourthParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
 	case thirdParam:
-		err = o.setDNSType(params[thirdParam-1])
+		err := o.setDNSType(params[thirdParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
@@ -359,24 +362,24 @@ func parseParamas(params []string) (o options, err error) {
 
 		fallthrough
 	case firstParam:
-		err = o.setIP(params[firstParam-1])
+		err := o.setIP(params[firstParam-1])
 		if err != nil {
-			return o, zbxerr.New(fmt.Sprintf("invalid fist parameter, %s", err.Error()))
+			return &o, zbxerr.New(fmt.Sprintf("invalid first parameter, %s", err.Error()))
 		}
 
 		fallthrough
 	case noneParam:
-		err = o.setDefaults()
+		err := o.setDefaults()
 		if err != nil {
-			return
+			return nil, err
 		}
 	default:
-		err = zbxerr.ErrorTooManyParameters
+		err := zbxerr.ErrorTooManyParameters
 
-		return
+		return nil, err
 	}
 
-	return
+	return &o, nil
 }
 
 func (o *options) setIP(ip string) error {

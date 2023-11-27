@@ -167,40 +167,42 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 	return nil
 }
 
-func parseParamsGet(params []string) (o dnsGetOptions, err error) {
+func parseParamsGet(params []string) (*dnsGetOptions, error) {
+	var o dnsGetOptions
+
 	switch len(params) {
 	case seventhParam:
-		err = o.setFlags(params[seventhParam-1])
+		err := o.setFlags(params[seventhParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
 	case sixthParam:
-		err = o.setProtocol(params[sixthParam-1])
+		err := o.setProtocol(params[sixthParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
 	case fifthParam:
-		err = o.setCount(params[fifthParam-1])
+		err := o.setCount(params[fifthParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
 	case fourthParam:
-		err = o.setTimeout(params[fourthParam-1])
+		err := o.setTimeout(params[fourthParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
 	case thirdParam:
-		err = o.setDNSTypeGet(params[thirdParam-1])
+		err := o.setDNSTypeGet(params[thirdParam-1])
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		fallthrough
@@ -209,24 +211,24 @@ func parseParamsGet(params []string) (o dnsGetOptions, err error) {
 
 		fallthrough
 	case firstParam:
-		err = o.setIP(params[firstParam-1])
+		err := o.setIP(params[firstParam-1])
 		if err != nil {
-			return o, zbxerr.New(fmt.Sprintf("invalid fist parameter, %s", err.Error()))
+			return &o, zbxerr.New(fmt.Sprintf("invalid first parameter, %s", err.Error()))
 		}
 
 		fallthrough
 	case noneParam:
-		err = o.setDefaults()
+		err := o.setDefaults()
 		if err != nil {
-			return
+			return nil, err
 		}
 	default:
-		err = zbxerr.ErrorTooManyParameters
+		err := zbxerr.ErrorTooManyParameters
 
-		return
+		return nil, err
 	}
 
-	return
+	return &o, nil
 }
 
 func reverseMap(m map[string]uint16) map[any]string {
@@ -544,7 +546,7 @@ func prepareAlmostCompleteResultBlock(parsedAnswerSection map[string][]any, pars
 }
 
 func exportDnsGet(params []string) (result any, err error) {
-	options, err := parseParamsGet(params)
+	optionsPtr, err := parseParamsGet(params)
 	if err != nil {
 		return "", err
 	}
@@ -552,8 +554,8 @@ func exportDnsGet(params []string) (result any, err error) {
 	timeBeforeQuery := time.Now()
 
 	var resp *dns.Msg
-	for i := 1; i <= options.count; i++ {
-		resp, err = runQueryGet(&options)
+	for i := 1; i <= (*optionsPtr).count; i++ {
+		resp, err = runQueryGet(optionsPtr)
 		if err != nil {
 			continue
 		}
