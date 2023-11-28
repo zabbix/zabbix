@@ -30,17 +30,18 @@ use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 $form = new CWidgetFormView($data);
 
-$groupids = array_key_exists('groupids', $data['fields'])
+$groupids_field = array_key_exists('groupids', $data['fields'])
 	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
 	: null;
 
+$hostids_field = $data['templateid'] === null
+	? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
+		->setFilterPreselect(['id' => $groupids_field->getId(), 'submit_as' => 'groupid'])
+	: null;
+
 $form
-	->addField($groupids)
-	->addField($data['templateid'] === null
-		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
-			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
-		: null
-	)
+	->addField($groupids_field)
+	->addField($hostids_field)
 	->addField(array_key_exists('evaltype_host', $data['fields'])
 		? new CWidgetFieldRadioButtonListView($data['fields']['evaltype_host'])
 		: null
@@ -51,7 +52,12 @@ $form
 		: null
 	)
 	->addField(
-		(new CWidgetFieldItemPatternSelectView($data['fields']['items']))->setPlaceholder(_('item pattern'))
+		(new CWidgetFieldPatternSelectItemView($data['fields']['items']))
+			->setPlaceholder(_('item pattern'))
+			->setFilterPreselect($hostids_field !== null
+				? ['id' => $hostids_field->getId(), 'submit_as' => 'hostid']
+				: []
+			)
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['evaltype_item'])
@@ -68,10 +74,32 @@ $form
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addFieldsGroup(
-				getPrimaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-primary-label')
+				getLabelFieldsGroupView($form, _('Primary label'), [
+					'label' =>					$data['fields']['primary_label'],
+					'label_bold' =>				$data['fields']['primary_label_bold'],
+					'label_color' =>			$data['fields']['primary_label_color'],
+					'label_decimal_places' =>	$data['fields']['primary_label_decimal_places'],
+					'label_size' =>				$data['fields']['primary_label_size'],
+					'label_size_type' =>		$data['fields']['primary_label_size_type'],
+					'label_type' =>				$data['fields']['primary_label_type'],
+					'label_units' =>			$data['fields']['primary_label_units'],
+					'label_units_pos' =>		$data['fields']['primary_label_units_pos'],
+					'label_units_show' =>		$data['fields']['primary_label_units_show']
+				])->addRowClass('fields-group-primary-label')
 			)
 			->addFieldsGroup(
-				getSecondaryLabelFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-secondary-label')
+				getLabelFieldsGroupView($form, _('Secondary label'), [
+					'label' =>					$data['fields']['secondary_label'],
+					'label_bold' =>				$data['fields']['secondary_label_bold'],
+					'label_color' =>			$data['fields']['secondary_label_color'],
+					'label_decimal_places' =>	$data['fields']['secondary_label_decimal_places'],
+					'label_size' =>				$data['fields']['secondary_label_size'],
+					'label_size_type' =>		$data['fields']['secondary_label_size_type'],
+					'label_type' =>				$data['fields']['secondary_label_type'],
+					'label_units' =>			$data['fields']['secondary_label_units'],
+					'label_units_pos' =>		$data['fields']['secondary_label_units_pos'],
+					'label_units_show' =>		$data['fields']['secondary_label_units_show']
+				])->addRowClass('fields-group-secondary-label')
 			)
 			->addField(
 				new CWidgetFieldColorView($data['fields']['bg_color'])
@@ -86,23 +114,22 @@ $form
 		], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$label_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['primary_label_size']));
-	$label_size_type_field = $form->registerField(
-		new CWidgetFieldRadioButtonListView($fields['primary_label_size_type'])
-	);
-	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['primary_label_units_show']));
-	$units_field = $form->registerField(
-		(new CWidgetFieldTextBoxView($fields['primary_label_units']))->setAdaptiveWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+function getLabelFieldsGroupView(CWidgetFormView $form, string $group_label, array $fields): CWidgetFieldsGroupView {
+	$label_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['label_size']));
+	$label_size_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['label_size_type']));
+	$label_units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['label_units_show']));
+	$label_units_field = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['label_units']))->setAdaptiveWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 
-	return (new CWidgetFieldsGroupView(_('Primary label')))
+	return (new CWidgetFieldsGroupView($group_label))
 		->addField(
-			(new CWidgetFieldRadioButtonListView($fields['primary_label_type']))
+			(new CWidgetFieldRadioButtonListView($fields['label_type']))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+				->addClass('js-label-type')
 		)
 		->addField(
-			(new CWidgetFieldTextAreaView($fields['primary_label']))
+			(new CWidgetFieldTextAreaView($fields['label']))
 				->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 				->setFieldHint(
 					makeHelpIcon([
@@ -117,108 +144,42 @@ function getPrimaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): C
 				)
 				->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addRowClass('js-primary-text-field')
+				->addRowClass('js-label')
 		)
 		->addField(
-			(new CWidgetFieldIntegerBoxView($fields['primary_label_decimal_places']))
+			(new CWidgetFieldIntegerBoxView($fields['label_decimal_places']))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addRowClass('js-primary-value-field')
+				->addRowClass('js-label-decimal-places')
 		)
 		->addItem([
 			$label_size_field->getLabel(),
 			new CFormField([
-				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				($label_size_type_field->getView())
+					->addClass('js-label-size-type')
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				($label_size_field->getView())
-					->addClass('custom_size_input')
-					->setId('primary_label_custom_size'),
+					->addClass('label-size')
+					->addClass('js-label-size'),
 				'%'
 			])
 		])
 		->addField(
-			new CWidgetFieldCheckBoxView($fields['primary_label_bold'])
+			new CWidgetFieldCheckBoxView($fields['label_bold'])
 		)
 		->addField(
-			new CWidgetFieldColorView($fields['primary_label_color'])
+			new CWidgetFieldColorView($fields['label_color'])
 		)
 		->addItem(
-			(new CTag('hr'))->addClass('js-primary-value-field')
+			(new CTag('hr'))->addClass('js-label-units-hr')
 		)
 		->addItem([
-			(new CDiv([$units_show_field->getView(), $units_field->getLabel()]))
-				->addClass('units-show')
-				->addClass('js-primary-value-field'),
-			(new CFormField($units_field->getView()))->addClass('js-primary-value-field')
+			(new CDiv([$label_units_show_field->getView(), $label_units_field->getLabel()]))
+				->addClass('label-units-show')
+				->addClass('js-label-units-show'),
+			(new CFormField($label_units_field->getView()))->addClass('js-label-units')
 		])
 		->addField(
-			(new CWidgetFieldSelectView($fields['primary_label_units_pos']))->addRowClass('js-primary-value-field')
-		);
-}
-
-function getSecondaryLabelFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$label_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['secondary_label_size']));
-	$label_size_type_field = $form->registerField(
-		new CWidgetFieldRadioButtonListView($fields['secondary_label_size_type'])
-	);
-	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['secondary_label_units_show']));
-	$units_field = $form->registerField(
-		(new CWidgetFieldTextBoxView($fields['secondary_label_units']))->setAdaptiveWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-
-	return (new CWidgetFieldsGroupView(_('Secondary label')))
-		->addField(
-			(new CWidgetFieldRadioButtonListView($fields['secondary_label_type']))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-		)
-		->addField(
-			(new CWidgetFieldTextAreaView($fields['secondary_label']))
-				->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
-				->setFieldHint(
-					makeHelpIcon([
-						_('Supported macros:'),
-						(new CList([
-							'{HOST.*}',
-							'{ITEM.*}',
-							'{INVENTORY.*}',
-							_('User macros')
-						]))->addClass(ZBX_STYLE_LIST_DASHED)
-					])
-				)
-				->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addRowClass('js-secondary-text-field')
-		)
-		->addField(
-			(new CWidgetFieldIntegerBoxView($fields['secondary_label_decimal_places']))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addRowClass('js-secondary-value-field')
-		)
-		->addItem([
-			$label_size_field->getLabel(),
-			new CFormField([
-				($label_size_type_field->getView())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				($label_size_field->getView())
-					->addClass('custom_size_input')
-					->setId('secondary_label_custom_size'),
-				'%'
-			])
-		])
-		->addField(
-			new CWidgetFieldCheckBoxView($fields['secondary_label_bold'])
-		)
-		->addField(
-			new CWidgetFieldColorView($fields['secondary_label_color'])
-		)
-		->addItem(
-			(new CTag('hr'))->addClass('js-secondary-value-field')
-		)
-		->addItem([
-			(new CDiv([$units_show_field->getView(), $units_field->getLabel()]))
-				->addClass('units-show')
-				->addClass('js-secondary-value-field'),
-			(new CFormField($units_field->getView()))->addClass('js-secondary-value-field')
-		])
-		->addField(
-			(new CWidgetFieldSelectView($fields['secondary_label_units_pos']))->addRowClass('js-secondary-value-field')
+			(new CWidgetFieldSelectView($fields['label_units_pos']))->addRowClass('js-label-units-pos')
 		);
 }
 

@@ -35,13 +35,23 @@ window.widget_honeycomb_form = new class {
 
 		colorPalette.setThemeColors(thresholds_colors);
 
-		this.#form.addEventListener('change', () => this.#updateForm());
+		this.#form.addEventListener('change', e => {
+			this.#updateForm();
+
+			if (e.target.id === 'primary_label_size_type_<?= WidgetForm::LABEL_SIZE_CUSTOM ?>') {
+				document.getElementById('primary_label_size').focus();
+			}
+
+			if (e.target.id === 'secondary_label_size_type_<?= WidgetForm::LABEL_SIZE_CUSTOM ?>') {
+				document.getElementById('secondary_label_size').focus();
+			}
+		});
 
 		$thresholds_table.on('afterremove.dynamicRows', () => this.#updateForm());
 
 		this._thresholds_table = $thresholds_table[0];
 
-		this._thresholds_table.addEventListener('input', (e) => {
+		this._thresholds_table.addEventListener('input', e => {
 			if (e.target.matches('input[name$="[threshold]"')) {
 				this.#updateForm();
 			}
@@ -49,7 +59,7 @@ window.widget_honeycomb_form = new class {
 
 		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
-				appendTo: ".overlay-dialogue-body",
+				appendTo: '.overlay-dialogue-body',
 				use_default: !colorpicker.name.includes('thresholds')
 			});
 		}
@@ -58,15 +68,13 @@ window.widget_honeycomb_form = new class {
 	}
 
 	#updateForm() {
-		const primary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY_LABEL ?>}`);
-		const secondary_show = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY_LABEL ?>}`);
+		const show_primary_label = document.getElementById(`show_${<?= WidgetForm::SHOW_PRIMARY_LABEL ?>}`).checked;
+		const show_secondary_label = document.getElementById(`show_${<?= WidgetForm::SHOW_SECONDARY_LABEL ?>}`).checked;
 
-		this.#updateLabelFields('primary', primary_show);
-		this.#updateLabelFields('secondary', secondary_show)
+		this.#updateLabelFields('fields-group-primary-label', show_primary_label);
+		this.#updateLabelFields('fields-group-secondary-label', show_secondary_label);
 
-		const filled_thresholds_count = this.#countFilledThresholds();
-
-		document.getElementById('interpolation').disabled = filled_thresholds_count < 2;
+		document.getElementById('interpolation').disabled = this.#countFilledThresholds() < 2;
 	}
 
 	#countFilledThresholds() {
@@ -81,49 +89,50 @@ window.widget_honeycomb_form = new class {
 		return count;
 	}
 
-	#updateLabelFields(type, show) {
-		const is_label_size_custom = this.#form
-			.querySelector(`[name="${type}_label_size_type"]:checked`).value == <?= WidgetForm::LABEL_SIZE_CUSTOM ?>;
-		const is_label_type_value = this.#form
-			.querySelector(`[name="${type}_label_type"]:checked`).value == <?= WidgetForm::LABEL_TYPE_VALUE ?>;
-		const units_show = document.getElementById(`${type}_label_units_show`);
+	#updateLabelFields(row_class, show) {
+		const fields_group_label = this.#form.querySelector(
+			`.<?= CFormGrid::ZBX_STYLE_FIELDS_GROUP_LABEL ?>.${row_class}`
+		);
+		const fields_group = this.#form.querySelector(`.<?= CFormGrid::ZBX_STYLE_FIELDS_GROUP ?>.${row_class}`);
 
-		for (const element of this.#form.querySelectorAll(`.fields-group-${type}-label`)) {
-			element.style.display = show.checked ? '' : 'none';
+		fields_group_label.style.display = show ? '' : 'none';
+		fields_group.style.display = show ? '' : 'none';
 
-			for (const input of element.querySelectorAll('input, textarea')) {
-				if (input.id === `${type}_label_custom_size`) {
-					input.style.display = is_label_size_custom && show.checked ? '' : 'none';
-					input.nextSibling.nodeValue = is_label_size_custom && show.checked ? '%' : '';
-					input.disabled = !is_label_size_custom || !show.checked;
-				}
-				else {
-					input.disabled = !show.checked;
-				}
-			}
+		fields_group.querySelectorAll('input, textarea').forEach(element => element.disabled = !show);
+
+		if (!show) {
+			return;
 		}
 
-		for (const element of this.#form.querySelectorAll(`.js-${type}-text-field`)) {
-			element.style.display = !is_label_type_value && show.checked ? '' : 'none';
-		}
+		const label_type_value = parseInt(fields_group.querySelector('.js-label-type input:checked').value);
+		const label_size_type_value = parseInt(fields_group.querySelector('.js-label-size-type input:checked').value);
+		const label_units_show_checked =
+			fields_group.querySelector('.js-label-units-show input[type="checkbox"]').checked;
 
-		document.getElementById(`${type}_label`).disabled = is_label_type_value || !show.checked;
+		fields_group.querySelectorAll('.js-label').forEach(
+			element => element.style.display = label_type_value === <?= WidgetForm::LABEL_TYPE_TEXT ?> ? '' : 'none'
+		);
+		fields_group.querySelector('.js-label textarea').disabled =
+			label_type_value !== <?= WidgetForm::LABEL_TYPE_TEXT ?>;
 
-		for (const element of this.#form.querySelectorAll(`.js-${type}-value-field`)) {
-			element.style.display = is_label_type_value && show.checked ? '' : 'none';
+		fields_group.querySelectorAll('.js-label-decimal-places').forEach(
+			element => element.style.display = label_type_value === <?= WidgetForm::LABEL_TYPE_VALUE ?> ? '' : 'none'
+		);
+		fields_group.querySelector('.js-label-decimal-places input').disabled =
+			label_type_value !== <?= WidgetForm::LABEL_TYPE_VALUE ?>;
 
-			for (const input of element.querySelectorAll('input, z-select')) {
-				if (input.id === `${type}_label_units` || input.id === `${type}_label_units_pos`) {
-					input.disabled = !is_label_type_value || !show.checked || !units_show.checked;
-				}
-				else {
-					input.disabled = !is_label_type_value || !show.checked;
-				}
-			}
-		}
+		fields_group.querySelector('.js-label-size').style.display =
+			label_size_type_value === <?= WidgetForm::LABEL_SIZE_CUSTOM ?> ? '' : 'none';
 
-		if (document.activeElement === document.getElementById(`${type}_label_size_type_1`)) {
-			document.getElementById(`${type}_label_custom_size`).focus();
-		}
+		fields_group.querySelector('.js-label-size').nextSibling.textContent =
+			label_size_type_value === <?= WidgetForm::LABEL_SIZE_CUSTOM ?> ? '%' : '';
+
+		fields_group.querySelectorAll('.js-label-units-hr, .js-label-units-show, .js-label-units, .js-label-units-pos')
+			.forEach(
+				element => element.style.display = label_type_value === <?= WidgetForm::LABEL_TYPE_VALUE ?> ? '' : 'none'
+			);
+
+		fields_group.querySelectorAll('.js-label-units input, .js-label-units-pos z-select')
+			.forEach(element => element.disabled = !label_units_show_checked);
 	}
 }

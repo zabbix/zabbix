@@ -4039,7 +4039,7 @@ form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.d
   row-gap: 5px; }
   form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .form-field, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .form-field {
     line-height: 24px; }
-  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .custom_size_input, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .custom_size_input {
+  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .label-size, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .label-size {
     margin-right: 5px; }
   form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label hr, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label hr {
     grid-column: 1 / -1;
@@ -4051,11 +4051,11 @@ form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .form-f
   grid-column: 1 / -1; }
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .field-fluid, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .field-fluid {
   grid-column: 2 / -1; }
-form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .units-show, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .units-show {
+form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .label-units-show, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .label-units-show {
   display: flex; }
-  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .units-show label[for='primary_label_units'],
-  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .units-show label[for='secondary_label_units'], form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .units-show label[for='primary_label_units'],
-  form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .units-show label[for='secondary_label_units'] {
+  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .label-units-show label[for='primary_label_units'],
+  form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label .label-units-show label[for='secondary_label_units'], form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .label-units-show label[for='primary_label_units'],
+  form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label .label-units-show label[for='secondary_label_units'] {
     width: 100%; }
 form.dashboard-widget-honeycomb .fields-group .form-row-interpolation {
   margin-bottom: 10px; }

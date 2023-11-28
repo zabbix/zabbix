@@ -23,9 +23,8 @@ namespace Zabbix\Widgets\Fields;
 
 use Zabbix\Widgets\CWidgetField;
 
-class CWidgetFieldItemPatternSelect extends CWidgetField {
+abstract class CWidgetFieldPatternSelect extends CWidgetField {
 
-	public const DEFAULT_VIEW = \CWidgetFieldItemPatternSelectView::class;
 	public const DEFAULT_VALUE = [];
 
 	public function __construct(string $name, string $label = null) {

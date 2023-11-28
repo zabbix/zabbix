@@ -25,7 +25,7 @@ form.dashboard-widget-honeycomb {
 				line-height: 24px;
 			}
 
-			.custom_size_input {
+			.label-size {
 				margin-right: 5px;
 			}
 
@@ -48,7 +48,7 @@ form.dashboard-widget-honeycomb {
 				grid-column: 2 / -1;
 			}
 
-			.units-show {
+			.label-units-show {
 				display: flex;
 
 				label[for='primary_label_units'],
