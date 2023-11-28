@@ -31,7 +31,7 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pthread_mutex_lock(&pgs->cache->lock);
+	pg_cache_lock(pgs->cache);
 
 	while (ptr - message->data < message->size)
 	{
@@ -55,7 +55,7 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 		}
 	}
 
-	pthread_mutex_unlock(&pgs->cache->lock);
+	pg_cache_unlock(pgs->cache);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -67,7 +67,7 @@ static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mes
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pthread_mutex_lock(&pgs->cache->lock);
+	pg_cache_lock(pgs->cache);
 
 	while (ptr - message->data < message->size)
 	{
@@ -76,8 +76,6 @@ static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mes
 		ptr += zbx_deserialize_value(ptr, &proxyid);
 		ptr += zbx_deserialize_value(ptr, &srcid);
 		ptr += zbx_deserialize_value(ptr, &dstid);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] %lu->%lu", srcid, dstid);
 
 		if (0 != srcid)
 		{
@@ -92,7 +90,7 @@ static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mes
 		}
 	}
 
-	pthread_mutex_unlock(&pgs->cache->lock);
+	pg_cache_unlock(pgs->cache);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

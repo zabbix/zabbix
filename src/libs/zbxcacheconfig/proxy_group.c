@@ -141,3 +141,25 @@ out:
 			zbx_result_string(ret), old_revision, *revision);
 	return ret;
 }
+
+void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_pg_proxy_t		*proxy;
+
+	zbx_hashset_iter_reset(proxies, &iter);
+
+	RDLOCK_CACHE;
+
+	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
+	{
+		ZBX_DC_PROXY	*dc_proxy;
+
+		if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy->proxyid)))
+			proxy->lastaccess = 0;
+		else
+			proxy->lastaccess = dc_proxy->lastaccess;
+	}
+
+	UNLOCK_CACHE;
+}

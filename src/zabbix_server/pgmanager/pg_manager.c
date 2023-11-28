@@ -26,6 +26,24 @@
 #include "zbxnix.h"
 #include "zbxcacheconfig.h"
 
+#define PGM_STATUS_CHECK_INTERVAL	5
+
+static void	pgm_init(zbx_pg_cache_t *cache)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	zbx_uint64_t	map_revision = 0;
+
+	result = zbx_db_select("select nextid from ids where table_name='host_group' and field_name='revision'");
+
+	if (NULL != (row = zbx_db_fetch(result)))
+		ZBX_DBROW2UINT64(map_revision, row[0]);
+
+	zbx_db_free_result(result);
+
+	pg_cache_init(cache, map_revision);
+}
+
 static void	pgm_dc_get_groups(zbx_pg_cache_t *cache)
 {
 	zbx_uint64_t	old_revision = cache->group_revision;
@@ -122,9 +140,9 @@ static void	pgm_db_get_proxies(zbx_pg_cache_t *cache)
 	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (clock - proxy->firstaccess >= proxy->group->failover_delay)
-			proxy->status = ZBX_PG_PROXY_STATE_OFFLINE;
+			proxy->status = ZBX_PG_PROXY_STATUS_OFFLINE;
 		else
-			proxy->status = ZBX_PG_PROXY_STATE_ONLINE;
+			proxy->status = ZBX_PG_PROXY_STATUS_ONLINE;
 
 		proxy->firstaccess = 0;
 	}
@@ -176,6 +194,111 @@ static void	pgm_db_get_map(zbx_pg_cache_t *cache)
 	}
 }
 
+static void	pgm_update_status(zbx_pg_cache_t *cache)
+{
+	pg_cache_lock(cache);
+	zbx_dc_get_group_proxy_lastaccess(&cache->proxies);
+
+	zbx_hashset_iter_t	iter;
+	zbx_pg_proxy_t		*proxy;
+	int			now;
+
+	pg_cache_lock(cache);
+
+	now = time(NULL);
+
+	zbx_hashset_iter_reset(&cache->proxies, &iter);
+	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int	status = ZBX_PG_PROXY_STATUS_UNKNOWN;
+
+		if (now - proxy->lastaccess >= proxy->group->failover_delay)
+		{
+			if (now - cache->startup_time >= proxy->group->failover_delay)
+			{
+				status = ZBX_PG_PROXY_STATUS_OFFLINE;
+				proxy->firstaccess = 0;
+			}
+		}
+		else
+		{
+			if (0 == proxy->firstaccess)
+				proxy->firstaccess = proxy->lastaccess;
+
+			if (now - proxy->firstaccess >= proxy->group->failover_delay)
+				status = ZBX_PG_PROXY_STATUS_ONLINE;
+		}
+
+		if (ZBX_PG_PROXY_STATUS_UNKNOWN == status || proxy->status == status)
+			continue;
+
+		proxy->status = status;
+		pg_cache_queue_update(cache, proxy->group);
+	}
+
+	for (int i = 0; i < cache->group_updates.values_num; i++)
+	{
+		zbx_pg_group_t	*group = cache->group_updates.values[i];
+		int		online = 0, healthy = 0;
+
+		for (int j = 0; j < group->proxies.values_num; j++)
+		{
+			if (ZBX_PG_PROXY_STATUS_ONLINE == group->proxies.values[i]->status)
+			{
+				online++;
+
+				if (now - group->proxies.values[i]->lastaccess + PGM_STATUS_CHECK_INTERVAL <
+						group->failover_delay)
+				{
+					healthy++;
+				}
+			}
+		}
+
+		int	status;
+
+		switch (group->status)
+		{
+			case ZBX_PG_GROUP_STATUS_UNKNOWN:
+				status = ZBX_PG_GROUP_STATUS_ONLINE;
+				ZBX_FALLTHROUGH;
+			case ZBX_PG_GROUP_STATUS_ONLINE:
+				if (group->min_online > healthy)
+					status = ZBX_PG_GROUP_STATUS_DECAY;
+				break;
+			case ZBX_PG_GROUP_STATUS_OFFLINE:
+				if (group->min_online <= online)
+					status = ZBX_PG_GROUP_STATUS_RECOVERY;
+				break;
+			case ZBX_PG_GROUP_STATUS_RECOVERY:
+				if (group->min_online > healthy)
+				{
+					status = ZBX_PG_GROUP_STATUS_DECAY;
+				}
+				else if (now - group->status_time > group->failover_delay ||
+						group->proxies.values_num == online)
+				{
+					status = ZBX_PG_GROUP_STATUS_RECOVERY;
+				}
+				break;
+			case ZBX_PG_GROUP_STATUS_DECAY:
+				if (group->min_online <= healthy)
+					status = ZBX_PG_GROUP_STATUS_ONLINE;
+				else if (group->min_online > online)
+					status = ZBX_PG_GROUP_STATUS_OFFLINE;
+				break;
+		}
+
+		if (status != group->status)
+		{
+			group->status = status;
+			group->status_time = now;
+		}
+
+	}
+
+	pg_cache_unlock(cache);
+}
 
 /*
  * main process loop
@@ -183,8 +306,6 @@ static void	pgm_db_get_map(zbx_pg_cache_t *cache)
 
 ZBX_THREAD_ENTRY(pg_manager_thread, args)
 {
-#define PGM_UPDATE_DELAY	5
-
 	zbx_pg_service_t	pgs;
 	char			*error = NULL;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
@@ -196,7 +317,9 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			info->server_num, get_process_type_string(info->process_type), info->process_num);
 
-	pg_cache_init(&cache);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+
+	pgm_init(&cache);
 
 	if (FAIL == pg_service_init(&pgs, &cache, &error))
 	{
@@ -204,8 +327,6 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	pgm_dc_get_groups(&cache);
 	pgm_db_get_hosts(&cache);
@@ -225,7 +346,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 		time_now = zbx_time();
 
-		if (PGM_UPDATE_DELAY >= time_update - time_now)
+		if (PGM_STATUS_CHECK_INTERVAL >= time_update - time_now)
 		{
 			pgm_dc_get_groups(&cache);
 			time_update = time_now;
@@ -248,6 +369,4 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-#undef PGM_UPDATE_DELAY
 }

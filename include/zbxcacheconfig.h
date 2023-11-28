@@ -1359,6 +1359,7 @@ typedef struct
 {
 	zbx_uint64_t		proxyid;
 	int			status;
+	int			lastaccess;
 	int			firstaccess;
 	struct zbx_pg_group	*group;
 	zbx_vector_uint64_t	hostids;
@@ -1376,6 +1377,7 @@ struct zbx_pg_group
 	int				failover_delay;
 	int				min_online;
 	int				status;
+	int				status_time;
 	zbx_uint32_t			flag;
 	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
 	zbx_vector_uint64_t		hostids;		/* hostids assigned to proxy group */
@@ -1385,5 +1387,6 @@ struct zbx_pg_group
 ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
 
 int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
+void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies);
 
 #endif

@@ -35,7 +35,7 @@ void	pg_proxy_clear(zbx_pg_proxy_t *proxy)
 	zbx_vector_uint64_destroy(&proxy->hostids);
 }
 
-void	pg_cache_init(zbx_pg_cache_t *cache)
+void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 {
 	zbx_hashset_create(&cache->groups, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	cache->group_revision = 0;
@@ -48,6 +48,9 @@ void	pg_cache_init(zbx_pg_cache_t *cache)
 	zbx_hashset_create(&cache->map_updates, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	pthread_mutex_init(&cache->lock, NULL);
+
+	cache->startup_time = time(NULL);
+	cache->map_revision = map_revision;
 }
 
 void	pg_cache_destroy(zbx_pg_cache_t *cache)
@@ -108,10 +111,12 @@ void	pg_cache_process_updates(zbx_pg_cache_t *cache)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:%d", __func__, cache->group_updates.values_num);
 
+	/* WDN: debug */
+	pg_cache_dump(cache);
+
 	for (int i = 0; i < cache->group_updates.values_num; i++)
 	{
 		/* TODO: host reassignment implementation */
-		pg_cache_dump_group(cache->group_updates.values[i]);
 	}
 
 	zbx_vector_pg_group_ptr_clear(&cache->group_updates);
@@ -207,6 +212,16 @@ void	pg_cache_group_add_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_u
 	}
 
 	pg_cache_queue_update(cache, group);
+}
+
+void	pg_cache_lock(zbx_pg_cache_t *cache)
+{
+	pthread_mutex_lock(&cache->lock);
+}
+
+void	pg_cache_unlock(zbx_pg_cache_t *cache)
+{
+	pthread_mutex_unlock(&cache->lock);
 }
 
 
