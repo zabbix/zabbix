@@ -152,7 +152,7 @@ type dnsGetOptions struct {
 }
 
 func exportDnsGet(params []string) (result any, err error) {
-	optionsPtr, err := parseParamsGet(params)
+	options, err := parseParamsGet(params)
 	if err != nil {
 		return "", err
 	}
@@ -160,8 +160,8 @@ func exportDnsGet(params []string) (result any, err error) {
 	timeBeforeQuery := time.Now()
 
 	var resp *dns.Msg
-	for i := 1; i <= (*optionsPtr).count; i++ {
-		resp, err = runQueryGet(optionsPtr)
+	for i := 1; i <= options.count; i++ {
+		resp, err = runQueryGet(options)
 		if err != nil {
 			continue
 		}
@@ -242,8 +242,14 @@ func exportDnsGet(params []string) (result any, err error) {
 		return failedResultMessage, nil
 	}
 
-	almostCompleteResultBlock := prepareAlmostCompleteResultBlock(parsedAnswerSection, parsedAuthoritySection,
-		parsedAdditionalSection, parsedFlagsSection, parsedResponseCode, queryTimeSection, parsedQuestionSection)
+	almostCompleteResultBlock := prepareAlmostCompleteResultBlock(
+		parsedAnswerSection,
+		parsedAuthoritySection,
+		parsedAdditionalSection,
+		parsedFlagsSection,
+		parsedResponseCode,
+		queryTimeSection,
+		parsedQuestionSection)
 
 	finalResultJson, errFinalResultParse := json.Marshal(almostCompleteResultBlock)
 	if errFinalResultParse != nil {
@@ -269,52 +275,42 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 		"adflag": false,
 	}
 
-	flagsSplit := strings.Split(flags, ",")
+	found := map[string]string{}
 
+	flagsSplit := strings.Split(flags, ",")
 	if len(flagsSplit) > len(o.flags) {
 		return zbxerr.New(fmt.Sprintf("Too many flags supplied: %d", len(o.flags)))
 	}
 
-	// For checking the duplicates. struct{} is redundant, this is go's version of set.
-	foundFlags := map[string]struct{}{}
-
-	for _, i := range flagsSplit {
-		_, ok := o.flags[i]
-		if !ok {
-			return zbxerr.New("Invalid flag supplied: " + i)
-		}
-
-		_, flagAlreadyParsed := foundFlags[i]
-
-		if flagAlreadyParsed {
-			return zbxerr.New("Duplicate flag supplied: " + i)
-		} else {
-			foundFlags[i] = struct{}{}
-		}
-	}
-
 	flags = "," + flags
 
-	if strings.Contains(flags, ",nsid") && strings.Contains(flags, "noedns0") {
-		return zbxerr.New("Invalid flags combination, cannot use noedns0 and nsid together")
-	}
-
-	for key, val := range o.flags {
-		flagIsNotPresent := strings.Contains(flags, ",no"+key)
-		flagIsPresent := strings.Contains(flags, ","+key)
-
-		if flagIsNotPresent && flagIsPresent {
+	for key, _ := range o.flags {
+		if strings.Contains(flags, ",no"+key) && strings.Contains(flags, ","+key) {
 			return zbxerr.New("Invalid flags combination, cannot use no" +
 				key + " and " + key + " together")
 		}
+	}
 
-		if flagIsNotPresent {
-			o.flags[key] = false
-		} else if flagIsPresent {
-			o.flags[key] = true
-		} else {
-			o.flags[key] = val
+	for _, flag := range flagsSplit {
+		key := strings.TrimPrefix(flag, "no")
+		value := !strings.HasPrefix(flag, "no")
+
+		_, ok := o.flags[key]
+		if !ok {
+			return zbxerr.New("Invalid flag supplied: " + flag)
 		}
+
+		_, ok = found[key]
+		if ok {
+			return zbxerr.New("Duplicate flag supplied: " + flag)
+		}
+
+		found[key] = flag
+		o.flags[key] = value
+	}
+
+	if o.flags["nsid"] && !o.flags["edns0"] {
+		return zbxerr.New("Invalid flags combination, cannot use noedns0 and nsid together")
 	}
 
 	return nil

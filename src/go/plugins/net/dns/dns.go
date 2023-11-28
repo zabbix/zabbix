@@ -207,11 +207,10 @@ func parseAnswers(answers []dns.RR) string {
 }
 
 func getDNSAnswers(params []string) ([]dns.RR, error) {
-	optionsPtr, err := parseParams(params)
+	options, err := parseParams(params)
 	if err != nil {
 		return nil, err
 	}
-	options := *optionsPtr
 
 	var resp *dns.Msg
 	for i := 1; i <= options.count; i++ {
