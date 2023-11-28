@@ -108,7 +108,7 @@ class CSVGGauge {
 	 *
 	 * @type {SVGGElement}
 	 */
-	#g_scalable;
+	#container;
 
 	/**
 	 * Created SVG child elements and related data.
@@ -188,9 +188,9 @@ class CSVGGauge {
 		this.#g.setAttribute('transform', `translate(${this.#padding.horizontal} ${this.#padding.vertical})`);
 		this.#g.setAttribute('clip-path', `url(#${g_clip_path.id})`);
 
-		this.#g_scalable = document.createElementNS(CSVGGauge.SVG_NS, 'g');
+		this.#container = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
-		this.#g.appendChild(this.#g_scalable);
+		this.#g.appendChild(this.#container);
 
 		if (this.#config.description.show) {
 			this.#createDescription();
@@ -244,8 +244,8 @@ class CSVGGauge {
 			this.#drawDescription();
 		}
 
-		// Fix imprecise calculation of "this.#g_scalable" dimensions.
-		this.#g_scalable.setAttribute('transform', `translate(0 0) scale(1000)`);
+		// Fix imprecise calculation of "this.#container" dimensions.
+		this.#container.setAttribute('transform', `translate(0 0) scale(1000)`);
 
 		this.#adjustScalableGroup();
 	}
@@ -397,7 +397,7 @@ class CSVGGauge {
 	#createArcs() {
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
-		this.#g_scalable.appendChild(container);
+		this.#container.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_ARCS);
 
@@ -495,7 +495,7 @@ class CSVGGauge {
 
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'path');
 
-		this.#g_scalable.appendChild(container);
+		this.#container.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_NEEDLE);
 
@@ -545,7 +545,7 @@ class CSVGGauge {
 
 			const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
-			this.#g_scalable.appendChild(container);
+			this.#container.appendChild(container);
 
 			container.classList.add(CSVGGauge.ZBX_STYLE_LABEL);
 
@@ -587,7 +587,7 @@ class CSVGGauge {
 	#createValueAndUnits() {
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'foreignObject');
 		container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS);
-		this.#g_scalable.appendChild(container);
+		this.#container.appendChild(container);
 
 		const contents = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
 		container.appendChild(contents);
@@ -792,7 +792,7 @@ class CSVGGauge {
 	#createNoData() {
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
-		this.#g_scalable.appendChild(container);
+		this.#container.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_NO_DATA);
 
@@ -852,7 +852,7 @@ class CSVGGauge {
 			? '&block;'
 			: '';
 
-		const scalable_bbox = this.#g_scalable.getBBox();
+		const scalable_bbox = this.#container.getBBox();
 
 		if (this.#config.value.show) {
 			this.#elements.value_and_units.value.container.textContent = value_text;
@@ -895,7 +895,7 @@ class CSVGGauge {
 				? description_height + description_gap
 				: 0);
 
-		this.#g_scalable.setAttribute('transform', `translate(${position_x} ${position_y}) scale(${scale})`);
+		this.#container.setAttribute('transform', `translate(${position_x} ${position_y}) scale(${scale})`);
 	}
 
 	/**
