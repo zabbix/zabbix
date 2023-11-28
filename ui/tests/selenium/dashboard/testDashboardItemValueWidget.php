@@ -1,5 +1,4 @@
 <?php
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -22,24 +21,30 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
+
 
 /**
+ * Test for checking Item Value Widget.
+ *
  * @backup dashboard
  *
  * @onBefore prepareDashboardData
  *
- * @dataSource WebScenarios
+ * @dataSource WebScenarios, AllItemValueTypes
  */
-class testDashboardItemValueWidget extends CWebTest {
+class testDashboardItemValueWidget extends testWidgets {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -208,7 +213,10 @@ class testDashboardItemValueWidget extends CWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-	public function testDashboardItemValueWidget_Layout() {
+	/**
+	 * Test of the Item Value widget form fields layout.
+	 */
+	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
@@ -1415,5 +1423,13 @@ class testDashboardItemValueWidget extends CWebTest {
 			);
 			$index++;
 		}
+	}
+
+	/**
+	 * Test function for assuring that binary items are not available in Item Value widget.
+	 */
+	public function testDashboardItemValueWidget_CheckAvailableItems() {
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+		$this->checkAvailableItems($url, 'Item value');
 	}
 }

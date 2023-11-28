@@ -11,6 +11,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
@@ -28,7 +29,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS)

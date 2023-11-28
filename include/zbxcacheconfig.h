@@ -630,7 +630,7 @@ typedef struct
 	char			*password_orig, *password;
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
-	char			*ssl_cert_file_orig,*ssl_cert_file;
+	char			*ssl_cert_file_orig, *ssl_cert_file;
 	char			*ssl_key_file_orig, *ssl_key_file;
 	char			*ssl_key_password_orig, *ssl_key_password;
 
@@ -638,6 +638,9 @@ typedef struct
 	zbx_list_t		data_point_link_queue;
 	int			time_flush;
 	int			senders;
+
+	int			item_value_type;
+	char			*attempt_interval;
 }
 zbx_connector_t;
 
@@ -734,11 +737,13 @@ zbx_synced_new_config_t;
 typedef struct zbx_dc_um_shared_handle zbx_dc_um_shared_handle_t;
 typedef struct zbx_um_cache zbx_um_cache_t;
 
-void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
+zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip);
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location);
+void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, char **error);
 void	zbx_free_configuration_cache(void);
@@ -1161,10 +1166,10 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle);
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
 
-int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error);
-int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, unsigned char env, char **error);
+int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, char **error);
+int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 

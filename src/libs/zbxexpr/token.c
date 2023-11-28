@@ -818,9 +818,10 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
  *                         macro                                              *
  *                                                                            *
  * Comments: This function parses token with a macro inside it. There are     *
- *           three types of nested macros - low-level discovery function      *
- *           macros, function macros and a specific case of simple macros     *
- *           where {HOST.HOSTn} macro is used as host name.                   *
+ *           four types of nested macros - low-level discovery function       *
+ *           macros, built-in function macros, user macros  and a specific    *
+ *           case of simple macros where {HOST.HOSTn} macro is used as host   *
+ *           name.                                                            *
  *                                                                            *
  *           If the macro points at valid macro in the expression then        *
  *           the generic token fields are set and either the                  *
@@ -862,6 +863,15 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 
 		ptr = expression + expr_token.loc.r;
 	}
+	else if ('$' == macro[2])
+	{
+		zbx_token_t	expr_token;
+
+		if (SUCCEED != token_parse_user_macro(expression, macro + 1, &expr_token))
+			return FAIL;
+
+		ptr = expression + expr_token.loc.r;
+	}
 	else
 	{
 		zbx_strloc_t	loc;
@@ -890,3 +900,32 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 
 	return FAIL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compares substring at the specified location with the specified   *
+ *          text                                                              *
+ *                                                                            *
+ * Parameters: src      - [IN] the source string                              *
+ *             loc      - [IN] the substring location                         *
+ *             text     - [IN] the text to compare with                       *
+ *             text_len - [IN] the text length                                *
+ *                                                                            *
+ * Return value: -1 - the substring is less than the specified text           *
+ *                0 - the substring is equal to the specified text            *
+ *                1 - the substring is greater than the specified text        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
+{
+	size_t	src_len = loc->r - loc->l + 1;
+
+	if (src_len < text_len)
+		return -1;
+
+	if (src_len > text_len)
+		return 1;
+
+	return memcmp(src + loc->l, text, text_len);
+}
+

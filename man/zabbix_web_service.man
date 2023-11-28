@@ -41,6 +41,11 @@ zabbix_web_service \- Zabbix web service
 .RB [ \-c
 .IR config\-file ]
 .br
+.B zabbix_web_service
+.RB [ \-c
+.IR config\-file ]
+.B \-T
+.br
 .B zabbix_web_service \-h
 .br
 .B zabbix_web_service \-V
@@ -50,6 +55,8 @@ is an application for providing web services to Zabbix components.
 .SH OPTIONS
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
+.IP "\fB\-T\fR, \fB\-\-test-config\fR"
+Validate configuration file and exit.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"
