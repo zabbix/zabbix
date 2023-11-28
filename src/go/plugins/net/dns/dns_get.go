@@ -380,8 +380,8 @@ func parseParamsGet(params []string) (*dnsGetOptions, error) {
 	return &o, nil
 }
 
-func reverseMap(m map[string]uint16) map[any]string {
-	n := make(map[any]string, len(m))
+func reverseMap(m map[string]uint16) map[uint16]string {
+	n := make(map[uint16]string, len(m))
 	for k, v := range m {
 		n[v] = k
 	}
@@ -619,10 +619,15 @@ func prepareJsonErrorResponse(e error) (string, error) {
 	return string(resultJsonFailedParsing), nil
 }
 
-func prepareAlmostCompleteResultBlock(parsedAnswerSection map[string][]any, parsedAuthoritySection map[string][]any,
-	parsedAdditionalSection map[string][]any, parsedFlagsSection map[string][]string,
-	parsedResponseCode map[string]any, queryTimeSection map[string]any,
-	parsedQuestionSection map[string][]any) []any {
+func prepareAlmostCompleteResultBlock(
+	parsedAnswerSection map[string][]any,
+	parsedAuthoritySection map[string][]any,
+	parsedAdditionalSection map[string][]any,
+	parsedFlagsSection map[string][]string,
+	parsedResponseCode map[string]any,
+	queryTimeSection map[string]any,
+	parsedQuestionSection map[string][]any,
+) []any {
 	// Almost complete since it is not marshaled yet and without
 	// zbx_error_code (and possibly zbx_error_msg).
 	almostCompleteResultBlock := []any{
@@ -642,8 +647,10 @@ func prepareAlmostCompleteResultBlock(parsedAnswerSection map[string][]any, pars
 		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAdditionalSection)
 	}
 
-	almostCompleteResultBlock = append(almostCompleteResultBlock,
-		map[string]any{"zbx_error_code": noErrorResponseCodeFinalJsonResult})
+	almostCompleteResultBlock = append(
+		almostCompleteResultBlock,
+		map[string]any{"zbx_error_code": noErrorResponseCodeFinalJsonResult},
+	)
 
 	return almostCompleteResultBlock
 }
