@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha8');
+define('ZABBIX_VERSION',		'7.0.0alpha9');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050146);
+define('ZABBIX_DB_VERSION',		6050158);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -582,6 +582,12 @@ define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
 define('ITEM_VALUE_TYPE_BINARY',	5);
+
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT',	0x01);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR',		0x02);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG',		0x04);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64',	0x08);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT',	0x10);
 
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);

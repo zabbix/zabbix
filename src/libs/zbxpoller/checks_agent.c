@@ -19,6 +19,7 @@
 
 #include "zbxpoller.h"
 
+#include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
