@@ -89,6 +89,7 @@ require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.ph
 require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 
 // Graphs.
+require_once dirname(__FILE__).'/graphs/testDataDisplayInGraphs.php';
 require_once dirname(__FILE__).'/graphs/testFormGraph.php';
 require_once dirname(__FILE__).'/graphs/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
@@ -197,7 +198,7 @@ require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
 require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
-require_once dirname(__FILE__) . '/reports/testPageReportsTopTriggers.php';
+require_once dirname(__FILE__).'/reports/testPageReportsTopTriggers.php';
 require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 
@@ -394,6 +395,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testGeomapWidgetScreenshots');
 
 		// Graphs.
+		$suite->addTestSuite('testDataDisplayInGraphs');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testGraphAxis');

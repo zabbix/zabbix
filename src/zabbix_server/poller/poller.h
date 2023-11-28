@@ -28,6 +28,7 @@ typedef struct
 {
 	zbx_config_comms_args_t	*config_comms;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	zbx_get_progname_f	zbx_get_progname_cb_arg;
 	unsigned char		poller_type;
 	int			config_startup_time;
 	int			config_unavailable_delay;
@@ -40,6 +41,9 @@ zbx_thread_poller_args;
 ZBX_THREAD_ENTRY(poller_thread, args);
 
 ZBX_THREAD_ENTRY(async_poller_thread, args);
+
+zbx_get_program_type_f  poller_get_program_type(void);
+zbx_get_progname_f	poller_get_progname(void);
 
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
 		char *host, char *key_orig, unsigned char **data, size_t *data_alloc, size_t *data_offset,
