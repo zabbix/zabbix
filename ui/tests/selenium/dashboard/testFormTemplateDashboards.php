@@ -1030,23 +1030,22 @@ class testFormTemplateDashboards extends CWebTest {
 								]
 							]
 						],
-						// TODO: fix after DEV-2674
-//						[
-//							'field' => 'Value arc',
-//							'type' => 'complex_field',
-//							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-value-arc"]',
-//							'contents' => [
-//								[
-//									'field' => 'Size',
-//									'fieldid' => 'value_arc_size',
-//									'value' => 20,
-//									'attributes' => [
-//										'maxlength' => 3
-//									],
-//									'symbol_after' => '%'
-//								]
-//							]
-//						],
+						[
+							'field' => 'Value arc',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-value-arc"]',
+							'contents' => [
+								[
+									'field' => 'Size',
+									'fieldid' => 'value_arc_size',
+									'value' => 20,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								]
+							]
+						],
 						[
 							'field' => 'Needle',
 							'type' => 'complex_field',
@@ -1799,7 +1798,7 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'skip_mandatory_check' => true,
-							'field_locator' => 'xpath:.//label[text()="By me"]/../following-sibling::li/input[@type="checkbox"]',
+							'field_locator' => 'id:acknowledged_by_me',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -2117,10 +2116,12 @@ class testFormTemplateDashboards extends CWebTest {
 				// Check that each of the fields in the list is hidden/disabled.
 				foreach ($data[$no_access_fields] as $no_access_field) {
 					if ($no_access_fields === 'hidden') {
-						$this->assertFalse($widget_form->query('xpath:.//label[text()='.
-								CXPathHelper::escapeQuotes($no_access_field['field']).']/following-sibling::div[1]')
-								->one(false)->isDisplayed()
-						);
+						$locator = (array_key_exists('field_locator', $no_access_field))
+							? $no_access_field['field_locator']
+							: 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($no_access_field['field']).
+									']/following-sibling::div[1]';
+
+						$this->assertFalse($widget_form->query($locator)->one(false)->isDisplayed());
 					}
 					else {
 						$field_locator = (array_key_exists('disabled_locator', $no_access_field))
@@ -2199,8 +2200,10 @@ class testFormTemplateDashboards extends CWebTest {
 		foreach ($fields as $field_details) {
 			// Field locator is used for stand-alone fields that cannot be located via label.
 			$field = (array_key_exists('field_locator', $field_details))
-				? $widget_form->query($field_details['field_locator'])->one()
+				? $widget_form->query($field_details['field_locator'])->one()->detect()
 				: $widget_form->getField($field_details['field']);
+
+			$this->assertTrue($field->isVisible());
 
 			// If the field replaces some other field, make sure that this other field is not displayed anymore.
 			if (array_key_exists('replaces', $field_details)) {
