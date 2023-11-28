@@ -3561,9 +3561,26 @@ section {
     text-anchor: end; }
   .svg-gauge .svg-gauge-label-center {
     text-anchor: middle; }
-  .svg-gauge .svg-gauge-value,
-  .svg-gauge .svg-gauge-units {
-    text-anchor: middle; }
+  .svg-gauge .svg-gauge-value-and-units {
+    text-align: center;
+    white-space: nowrap;
+    color: #f2f2f2; }
+    .svg-gauge .svg-gauge-value-and-units > div {
+      margin: auto;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+      .svg-gauge .svg-gauge-value-and-units > div .svg-gauge-value {
+        overflow: hidden;
+        text-overflow: ellipsis; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-units {
+    display: inline; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-space {
+    display: inline-block; }
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-units {
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .svg-gauge .svg-gauge-no-data {
     text-anchor: middle;
     fill: #737373; }
