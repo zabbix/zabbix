@@ -305,12 +305,8 @@ class CScreenHistory extends CScreenBase {
 				);
 
 				foreach ($history_data as $data) {
-					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-						$data['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
-					}
-					else {
+					if ($value_type != ITEM_VALUE_TYPE_BINARY) {
 						$data['value'] = rtrim($data['value'], " \t\r\n");
-						$data['value'] = zbx_nl2br($data['value']);
 					}
 
 					$item = $items[$data['itemid']];
@@ -380,7 +376,11 @@ class CScreenHistory extends CScreenBase {
 						}
 					}
 
-					$row[] = (new CCol(new CPre($data['value'])))->addClass($color);
+					$value = $value_type == ITEM_VALUE_TYPE_BINARY
+						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+						: zbx_nl2br($data['value']);
+
+					$row[] = (new CCol(new CPre($value)))->addClass($color);
 
 					$history_table->addRow($row);
 				}
