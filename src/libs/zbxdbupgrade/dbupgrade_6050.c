@@ -1920,7 +1920,8 @@ static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_na
 
 	for (int i = 0; i < ids->values_num; i++)
 	{
-		char			hash[ZBX_SHA256_DIGEST_SIZE], *id_str_p = id_str + 1;
+		unsigned char		hash[ZBX_SHA256_DIGEST_SIZE];
+		char			*id_str_p = id_str + 1;
 		sha256_ctx		ctx;
 		zbx_dbu_group_set_t	gset;
 
@@ -1951,7 +1952,7 @@ static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_na
 		}
 
 		zbx_sha256_finish(&ctx, hash);
-		(void)zbx_bin2hex((const unsigned char *)hash, ZBX_SHA256_DIGEST_SIZE, gset.hash_str,
+		(void)zbx_bin2hex(hash, ZBX_SHA256_DIGEST_SIZE, gset.hash_str,
 				ZBX_SHA256_DIGEST_SIZE * 2 + 1);
 
 		if (NULL == (gset_ptr = zbx_hashset_search(group_sets, &gset)))
