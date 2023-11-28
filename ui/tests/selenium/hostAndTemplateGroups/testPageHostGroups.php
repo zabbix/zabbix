@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore preparePageHostGroupsData
  *
- * @dataSource DiscoveredHosts, HostTemplateGroups
+ * @dataSource DiscoveredHosts, HostTemplateGroups, HostGroups
  */
 class testPageHostGroups extends testPageGroups {
 
@@ -164,6 +164,25 @@ class testPageHostGroups extends testPageGroups {
 						'Name' => self::LLD.': '.self::DISCOVERED_GROUP,
 						'Count' => '1',
 						'Hosts' => self::DISCOVERED_HOST,
+						'Info' => ''
+					],
+					[
+						'Name' => '12th LLD, ..., Četrpadsmitais LLD: 6 prototype group KEY',
+						'Count' => '6',
+						'Hosts' => 'KEY HP number 8, KEY HP number 9, KEY HP number 10, KEY HP number 11,'.
+								' KEY HP number 12, KEY HP number 13',
+						'Info' => ''
+					],
+					[
+						'Name' => 'LLD number 8, ..., sixth LLD: Trešais grupu prototips KEY',
+						'Count' => '3',
+						'Hosts' => 'KEY HP number 5, KEY HP number 6, KEY HP number 7',
+						'Info' => ''
+					],
+					[
+						'Name' => '15th LLD 🙃^天!, 16th LLD: Double GP KEY',
+						'Count' => '2',
+						'Hosts' => 'KEY HP number 14, KEY HP number 15',
 						'Info' => ''
 					]
 				]

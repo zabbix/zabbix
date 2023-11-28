@@ -230,8 +230,18 @@ class testPageGroups extends CWebTest {
 		}
 
 		if ($this->object === 'host') {
-			$names[array_search(self::DISCOVERED_GROUP, $names)] = self::LLD.': '.self::DISCOVERED_GROUP;
-			$names[array_search(self::DISCOVERED_GROUP2, $names)] = self::LLD.': '.self::DISCOVERED_GROUP2;
+			$discovered_hosts = [
+				self::DISCOVERED_GROUP => self::LLD,
+				self::DISCOVERED_GROUP2 => self::LLD,
+				'グループプロトタイプ番号 1 KEY' => '1st LLD, ..., forth LLD',
+				'Trešais grupu prototips KEY' => 'LLD number 8, ..., sixth LLD',
+				'Double GP KEY' => '15th LLD 🙃^天!, 16th LLD',
+				'6 prototype group KEY' => '12th LLD, ..., Četrpadsmitais LLD'
+			];
+
+			foreach ($discovered_hosts as $group_name => $llds) {
+				$names[array_search($group_name, $names)] = $llds.': '.$group_name;
+			}
 		}
 
 		return $names;
