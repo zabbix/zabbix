@@ -1815,7 +1815,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *             42 => array(
 	 *                 'manualinput_prompt' => 'Enter port number',
-	 *                 'url' => 'http://localhost:{MANUALINPUT}',
+	 *                 'url' => 'http://localhost/{MANUALINPUT}',
 	 *                 'manualinput_value' => '8080'
 	 *             )
 	 *         )
@@ -1834,7 +1834,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *            42 => array(
 	 *                 'manualinput_prompt' => 'Enter port number',
-	 *                 'url' => 'http://localhost:8080',
+	 *                 'url' => 'http://localhost/8080',
 	 *                 'manualinput_value' => '8080'
 	 *            )
 	 *         )
