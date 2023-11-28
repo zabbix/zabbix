@@ -1795,8 +1795,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
-	 * and user data macros.
+	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros,
+	 * user data macros and manual input macro.
 	 *
 	 * @param array $data                        Array of unresolved macros.
 	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
@@ -1815,7 +1815,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *             42 => array(
 	 *                 'manualinput_prompt' => 'Enter port number',
-	 *                 'url' => 'http://localhost/{MANUALINPUT}',
+	 *                 'url' => 'http://localhost:{MANUALINPUT}',
 	 *                 'manualinput_value' => '8080'
 	 *             )
 	 *         )
@@ -1834,7 +1834,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *             ),
 	 *            42 => array(
 	 *                 'manualinput_prompt' => 'Enter port number',
-	 *                 'url' => 'http://localhost/8080',
+	 *                 'url' => 'http://localhost:8080',
 	 *                 'manualinput_value' => '8080'
 	 *            )
 	 *         )
@@ -1893,7 +1893,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($data as $hostid => &$scripts) {
-			if ($macro_values) {
+			if ($macro_values && array_key_exists($hostid, $macro_values)) {
 				foreach ($macro_values[$hostid] as $type => &$macro_value) {
 					if ($manualinput_value && $type === '{MANUALINPUT}'
 							&& array_key_exists($hostid, $manualinput_value)) {
@@ -1901,9 +1901,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 				unset($macro_value);
-			}
 
-			if (array_key_exists($hostid, $macro_values)) {
 				foreach ($scripts as &$fields) {
 					foreach ($fields as &$value) {
 						$value = strtr($value, $macro_values[$hostid]);
@@ -1920,7 +1918,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 	/**
 	 * Resolve macros for manual event action scripts. Resolves host<1-9> macros, interface<1-9> macros,
-	 * inventory<1-9> macros, user macros, event macros and user data macros.
+	 * inventory<1-9> macros, user macros, event macros, user data macros and manual input macro.
 	 *
 	 * @param array $data                                  Array of unersolved macros.
 	 * @param array $data[<eventid>]                       Array of scripts. Contains script ID as keys.
@@ -1943,6 +1941,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *                 'manualinput_prompt' => 'Execute script for {HOST.HOST}?'
 	 *             ),
 	 *             42 => array(
+	 *                 'manualinput_prompt' => 'Enter port number',
 	 *                 'url' => 'http://localhost:{MANUALINPUT}',
 	 *                 'manualinput_value' => '8080'
 	 *             )
@@ -1961,6 +1960,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *                 'manualinput_prompt' => 'Execute script for Zabbix server?'
 	 *             ),
 	 *             42 => array(
+	 *                 'manualinput_prompt' => 'Enter port number',
 	 *                 'url' => 'http://localhost:8080',
 	 *                 'manualinput_value' => '8080'
 	 *             )
@@ -1988,7 +1988,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['user_data' => [], 'host_n' => [], 'interface_n' => [], 'inventory_n' => [], 'usermacros' => []];
+		$macros = ['user_data' => [], 'host_n' => [], 'interface_n' => [], 'inventory_n' => [], 'usermacros' => [],
+			'manualinput' => []
+		];
 		$manualinput_value = [];
 
 		foreach ($data as $eventid => &$script) {
@@ -2006,10 +2008,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$matched_macros = self::extractMacros($texts, $types);
 			$event = $events[$eventid];
 
-			foreach ($matched_macros['macros']['user_data'] as $token => $_data) {
-				$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['user_data'][$eventid][$_data['macro']][] =
-					['token' => $token] + array_intersect_key($_data, ['macrofunc' => null]);
+			foreach (['user_data', 'manualinput'] as $type) {
+				foreach ($matched_macros['macros'][$type] as $token => $_data) {
+					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros[$type][$eventid][$_data['macro']][] =
+						['token' => $token] + array_intersect_key($_data, ['macrofunc' => null]);
+				}
 			}
 
 			foreach ($matched_macros['macros_n'] as $sub_type => $macro_data) {
@@ -2018,12 +2022,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$macros[$sub_type][$event['objectid']][$_data['macro']][$_data['f_num']][] =
 						['token' => $token, 'key' => $eventid] + array_intersect_key($_data, ['macrofunc' => null]);
 				}
-			}
-
-			foreach ($matched_macros['macros']['manualinput'] as $token => $_data) {
-				$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['manualinput'][$eventid][$_data['macro']][] =
-					['token' => $token] + array_intersect_key($_data, ['macrofunc' => null]);
 			}
 
 			// Event macros.
@@ -2118,16 +2116,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 
 		foreach ($data as $eventid => &$scripts) {
-			if ($macro_values) {
+			if ($macro_values && array_key_exists($eventid, $macro_values)) {
 				foreach ($macro_values[$eventid] as $type => &$macro_value) {
 					if ($type === '{MANUALINPUT}' && array_key_exists($eventid, $manualinput_value)) {
 						$macro_value = $manualinput_value[$eventid];
 					}
 				}
 				unset($macro_value);
-			}
 
-			if (array_key_exists($eventid, $macro_values)) {
 				foreach ($scripts as &$fields) {
 					foreach ($fields as &$value) {
 						$value = strtr($value, $macro_values[$eventid]);

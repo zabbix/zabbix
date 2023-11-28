@@ -4553,6 +4553,12 @@ class CApiInputValidatorTest extends TestCase {
 				'text{EVENT.TAGS."JIRAID"}text'
 			],
 			[
+				['type' => API_URL, 'flags' => API_ALLOW_MANUALINPUT_MACRO],
+				'text{MANUALINPUT}text',
+				'/1/url',
+				'text{MANUALINPUT}text'
+			],
+			[
 				['type' => API_IP],
 				'',
 				'/1/ip',

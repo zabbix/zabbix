@@ -1141,6 +1141,12 @@ class testScripts extends CAPITest {
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => '1,2,3'
 			],
+			'update_url_with_manualinput' => [
+				'name' => 'API test script.update with "manualinput"',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_URL,
+				'url' => 'http://localhost/'
+			],
 
 			// script.getScriptsByHosts
 			'get_hosts_url' => [
@@ -1599,6 +1605,15 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_URL,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'url' => 'htp:/d'
+				],
+				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL.'
+			],
+			'Test script.create invalid URL (broken manual input macro)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_URL,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'url' => 'http://localhost:{MANUALINPUT'
 				],
 				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL.'
 			],
@@ -3677,6 +3692,22 @@ class testScripts extends CAPITest {
 						'manualinput_prompt' => 'Add number of packets to transmit',
 						'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 						'manualinput_validator' => '1,2,3,4,5,6,7'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.create successful URL type script with manual input' => [
+				'script' => [
+					[
+						'name' => 'API create URL script with manual input',
+						'type' => ZBX_SCRIPT_TYPE_URL,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'url' => 'http://localhost:{MANUALINPUT}',
+						'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+						'manualinput_prompt' => 'Enter port number',
+						'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+						'manualinput_validator' => '^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$',
+						'manualinput_default_value' => '80'
 					]
 				],
 				'expected_error' => null
@@ -6210,6 +6241,19 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "url" is missing.'
 			],
+			'Test script.update invalid URL (broken manual input macro)' => [
+				'script' => [
+					'scriptid' => 'update_url_with_manualinput',
+					'type' => ZBX_SCRIPT_TYPE_URL,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'url' => 'http://localhost:{MANUALINPUT',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'Enter port number',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$'
+				],
+				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL.'
+			],
 			'Test script.update URL change to custom' => [
 				'script' => [
 					'scriptid' => 'update_url',
@@ -6477,7 +6521,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: [A-Za-z].'
 			],
-			'Test script.update successful for event scope with "manualinput"' => [
+			'Test script.update empty "manualinput_prompt"' => [
 				'script' => [
 					'scriptid' => 'update_scope_event_with_manualinput',
 					'manualinput_prompt' => ''
@@ -7476,7 +7520,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test script update successful from action scope to host with "manualinput"' => [
+			'Test script.update successful from action scope to host with "manualinput"' => [
 				'script' => [
 					[
 						'scriptid' => 'update_scope_action_to_host_with_manualinput',
@@ -7489,7 +7533,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test script update successful "manualinput_validator_type"' => [
+			'Test script.update successful "manualinput_validator_type"' => [
 				'script' => [
 					[
 						'scriptid' => 'update_scope_action_to_host_with_manualinput',
@@ -7521,6 +7565,20 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '[A-Za-z]',
 					'manualinput_default_value' => 'A'
+				],
+				'expected_error' => null
+			],
+			'Test script.update successful URL type script with manual input' => [
+				'script' => [
+					[
+						'scriptid' => 'update_url_with_manualinput',
+						'url' => 'http://localhost:{MANUALINPUT}',
+						'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+						'manualinput_prompt' => 'Enter port number',
+						'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+						'manualinput_validator' => '^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$',
+						'manualinput_default_value' => '80'
+					]
 				],
 				'expected_error' => null
 			]

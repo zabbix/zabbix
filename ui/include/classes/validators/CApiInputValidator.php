@@ -2596,6 +2596,7 @@ class CApiInputValidator {
 
 		$options = [
 			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'allow_manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
 			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 

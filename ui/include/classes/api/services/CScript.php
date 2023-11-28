@@ -751,8 +751,13 @@ class CScript extends CApiService {
 				]],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
+			/*
+			 * Regardless of "manualinput" value, allow {MANUALINPUT} macro in URL. Otherwise changing "manualinput" to
+			 * DISABLED, will require additional URL re-validation and that would be not only confusing but also
+			 * annoying to user.
+			 */
 			'url' => ['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_URL], 'type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('scripts', 'url')],
+				['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_URL], 'type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_MACRO | API_ALLOW_MANUALINPUT_MACRO, 'length' => DB::getFieldLength('scripts', 'url')],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'new_window' => ['type' => API_MULTIPLE, 'rules' => [
