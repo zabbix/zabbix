@@ -109,7 +109,8 @@ $from_list = (new CFormList())
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setEnabled($data['validate_uri_schemes'] == 1)
 				->setAriaRequired()
-	])
+		]
+	)
 	->addRow(
 		(new CLabel([_('Use X-Frame-Options HTTP header'),
 			makeHelpIcon([
@@ -142,7 +143,8 @@ $from_list = (new CFormList())
 				->setAttribute('placeholder', _('X-Frame-Options HTTP header'))
 				->setAriaRequired()
 				->setEnabled($data['x_frame_header_enabled'] == 1)
-	])
+		]
+	)
 	->addRow(
 		new CLabel(_('Use iframe sandboxing'), 'iframe_sandboxing_enabled'),
 		[
@@ -156,7 +158,8 @@ $from_list = (new CFormList())
 				->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
 				->setEnabled($data['iframe_sandboxing_enabled'] == 1)
 				->setAriaRequired()
-	])
+		]
+	)
 	->addRow((new CTag('h4', true, _('Communication with Zabbix server')))->addClass('input-section-header'))
 	->addRow(
 		(new CLabel(_('Network timeout'), 'socket_timeout'))->setAsteriskMark(),
