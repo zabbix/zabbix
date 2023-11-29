@@ -1,1 +1,1 @@
-.......PS. [ZBX-23759] fixed agent poller sending IPC messages to wrong recipients (asestakovs)
+.......PS. [ZBX-23759] fixed agent poller process sending IPC messages to wrong recipients (asestakovs)
