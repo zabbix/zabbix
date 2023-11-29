@@ -1574,9 +1574,7 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 						&& data.params.confirmation !== '') {
 					item.url = data.params.url;
 
-					item.clickCallback = () => {
-						return confirm(data.params.confirmation);
-					}
+					item.clickCallback = () => confirm(data.params.confirmation);
 				}
 				else {
 					item.url = data.params.url;
