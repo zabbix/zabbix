@@ -23,6 +23,8 @@
 
 ZBX_PTR_VECTOR_IMPL(pg_proxy_ptr, zbx_pg_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
+ZBX_PTR_VECTOR_IMPL(pg_host_ptr, zbx_pg_host_t *)
+ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
 
 void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {

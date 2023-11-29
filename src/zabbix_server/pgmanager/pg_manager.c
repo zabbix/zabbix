@@ -46,9 +46,9 @@ static void	pgm_init(zbx_pg_cache_t *cache)
 
 static void	pgm_dc_get_groups(zbx_pg_cache_t *cache)
 {
-	zbx_uint64_t	old_revision = cache->group_revision;
+	zbx_uint64_t	old_revision = cache->groups_revision;
 
-	if (SUCCEED != zbx_dc_get_proxy_groups(&cache->groups, &cache->group_revision))
+	if (SUCCEED != zbx_dc_get_proxy_groups(&cache->groups, &cache->groups_revision))
 		return;
 
 	zbx_hashset_iter_t	iter;
@@ -67,7 +67,7 @@ static void	pgm_dc_get_groups(zbx_pg_cache_t *cache)
 		if (old_revision >= group->revision)
 			continue;
 
-		pg_cache_queue_update(cache, group);
+		pg_cache_queue_group_update(cache, group);
 	}
 }
 
@@ -153,16 +153,14 @@ static void	pgm_db_get_map(zbx_pg_cache_t *cache)
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
 
-	result = zbx_db_select("select hostid,proxyid,revision from host_proxy");
+	result = zbx_db_select("select hostproxyid,hostid,proxyid,revision from host_proxy");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_uint64_t	hostid, proxyid, revision;
+		zbx_uint64_t	hostproxyid, hostid, proxyid, revision;
 		zbx_pg_proxy_t	*proxy;
 
-		ZBX_DBROW2UINT64(hostid, row[0]);
-		ZBX_DBROW2UINT64(proxyid, row[1]);
-		ZBX_STR2UINT64(revision, row[2]);
+		ZBX_DBROW2UINT64(proxyid, row[2]);
 
 		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)))
 		{
@@ -170,11 +168,20 @@ static void	pgm_db_get_map(zbx_pg_cache_t *cache)
 			continue;
 		}
 
-		zbx_vector_uint64_append(&proxy->hostids, hostid);
+		ZBX_DBROW2UINT64(hostproxyid, row[0]);
+		ZBX_DBROW2UINT64(hostid, row[1]);
+		ZBX_STR2UINT64(revision, row[3]);
 
-		zbx_pg_host_t	host_local = {.hostid = hostid, .proxyid = proxyid, .revision = revision};
+		zbx_pg_host_t	host_local = {
+				.hostid = hostid,
+				.hostproxyid = hostproxyid,
+				.proxyid = proxyid,
+				.revision = revision
+			}, *host;
 
-		zbx_hashset_insert(&cache->map, &host_local, sizeof(host_local));
+		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->links, &host_local, sizeof(host_local));
+		zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
+
 	}
 	zbx_db_free_result(result);
 
@@ -188,7 +195,7 @@ static void	pgm_db_get_map(zbx_pg_cache_t *cache)
 	{
 		for (int i = 0; i < group->hostids.values_num; i++)
 		{
-			if (NULL == zbx_hashset_search(&cache->map, &group->hostids.values[i]))
+			if (NULL == zbx_hashset_search(&cache->links, &group->hostids.values[i]))
 				zbx_vector_uint64_append(&group->new_hostids, group->hostids.values[i]);
 		}
 	}
@@ -233,12 +240,12 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 			continue;
 
 		proxy->status = status;
-		pg_cache_queue_update(cache, proxy->group);
+		pg_cache_queue_group_update(cache, proxy->group);
 	}
 
-	for (int i = 0; i < cache->group_updates.values_num; i++)
+	for (int i = 0; i < cache->updates.values_num; i++)
 	{
-		zbx_pg_group_t	*group = cache->group_updates.values[i];
+		zbx_pg_group_t	*group = cache->updates.values[i];
 		int		online = 0, healthy = 0;
 
 		for (int j = 0; j < group->proxies.values_num; j++)
@@ -293,12 +300,130 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 		{
 			group->status = status;
 			group->status_time = now;
+			group->flags = ZBX_PG_GROUP_UPDATE_STATUS;
 		}
-
 	}
 
 	pg_cache_unlock(cache);
 }
+
+static void	pgm_flush_group_updates(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_vector_pg_update_t *groups)
+{
+	for (int i = 0; i < groups->values_num; i++)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+				"update proxy_group set status=%d where proxy_groupid=" ZBX_FS_UI64 ";\n",
+				groups->values[i].status, groups->values[i].proxy_groupid);
+
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+	}
+}
+
+static void	pgm_flush_host_proxy_updates(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_vector_pg_host_t *hosts)
+{
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+				"update host_proxy set proxyid=" ZBX_FS_UI64 ",revision=" ZBX_FS_UI64
+					" where hostid=" ZBX_FS_UI64 ";\n",
+				hosts->values[i].proxyid, hosts->values[i].revision, hosts->values[i].hostid);
+
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+	}
+}
+
+static void	pgm_flush_host_proxy_deletes(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_vector_pg_host_t *hosts)
+{
+	if (0 == hosts->values_num)
+		return;
+
+	zbx_vector_uint64_t	hostids;
+
+	zbx_vector_uint64_create(&hostids);
+
+	for (int i = 0; i < hosts->values_num; i++)
+		zbx_vector_uint64_append(&hostids, hosts->values[i].hostid);
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from host_group where ");
+	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, "hostid", hostids.values, hostids.values_num);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ";\n");
+
+	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+	zbx_vector_uint64_destroy(&hostids);
+}
+
+static void	pgm_flush_host_proxy_inserts(zbx_vector_pg_host_t *hosts)
+{
+	zbx_db_insert_t	db_insert;
+
+	zbx_db_insert_prepare(&db_insert, "host_proxy", "hostproxyid", "hostid", "proxyid", "revision", NULL);
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), hosts->values[i].hostid, hosts->values[i].proxyid,
+				hosts->values[i].revision);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "hostproxyid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+}
+
+static void	pgm_flush_updates(zbx_pg_cache_t *cache)
+{
+	zbx_vector_pg_update_t	groups;
+	zbx_vector_pg_host_t	hosts_new, hosts_mod, hosts_del;
+
+	zbx_vector_pg_update_create(&groups);
+	zbx_vector_pg_host_create(&hosts_new);
+	zbx_vector_pg_host_create(&hosts_mod);
+	zbx_vector_pg_host_create(&hosts_del);
+
+	pg_cache_get_updates(cache, &groups, &hosts_new, &hosts_mod, &hosts_del);
+
+	if (0 != groups.values_num || 0 != hosts_new.values_num || 0 != hosts_mod.values_num ||
+			0 != hosts_del.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0;
+
+		do
+		{
+			size_t	sql_offset = 0;
+
+			zbx_db_begin();
+
+			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+			pgm_flush_group_updates(&sql, &sql_alloc, &sql_offset, &groups);
+			pgm_flush_host_proxy_updates(&sql, &sql_alloc, &sql_offset, &hosts_mod);
+			pgm_flush_host_proxy_deletes(&sql, &sql_alloc, &sql_offset, &hosts_del);
+
+			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+			if (16 < sql_offset)
+				zbx_db_execute("%s", sql);
+
+			pgm_flush_host_proxy_inserts(&hosts_new);
+
+		}
+		while (ZBX_DB_DOWN == zbx_db_commit());
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_pg_host_destroy(&hosts_del);
+	zbx_vector_pg_host_destroy(&hosts_mod);
+	zbx_vector_pg_host_destroy(&hosts_new);
+	zbx_vector_pg_update_destroy(&groups);
+}
+
 
 /*
  * main process loop
@@ -349,6 +474,8 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		if (PGM_STATUS_CHECK_INTERVAL >= time_update - time_now)
 		{
 			pgm_dc_get_groups(&cache);
+			pgm_update_status(&cache);
+
 			time_update = time_now;
 		}
 
@@ -356,8 +483,8 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		zbx_sleep_loop(info, 1);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-		if (0 != cache.group_updates.values_num)
-			pg_cache_process_updates(&cache);
+		if (0 != cache.updates.values_num)
+			pgm_flush_updates(&cache);
 	}
 
 	pg_service_destroy(&pgs);

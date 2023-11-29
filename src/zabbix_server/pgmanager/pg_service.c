@@ -36,7 +36,6 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 	while (ptr - message->data < message->size)
 	{
 		zbx_pg_group_t	*group;
-		int		i;
 
 		ptr += zbx_deserialize_value(ptr, &hostid);
 		ptr += zbx_deserialize_value(ptr, &srcid);

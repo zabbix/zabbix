@@ -34,36 +34,42 @@
 #define ZBX_PG_GROUP_STATUS_ONLINE	3
 #define ZBX_PG_GROUP_STATUS_DECAY	4
 
-typedef struct
-{
-	zbx_uint64_t	hostid;
-	zbx_uint64_t	proxyid;
-	zbx_uint64_t	revision;
-}
-zbx_pg_host_t;
+#define ZBX_PG_GROUP_UPDATE_NONE	0x0000
+#define ZBX_PG_GROUP_UPDATE_STATUS	0x0001
 
 typedef struct
 {
 	int				startup_time;
 	zbx_hashset_t			groups;
-	zbx_hashset_t			map;
-	zbx_hashset_t			map_updates;
+	zbx_hashset_t			links;
+	zbx_hashset_t			new_links;
 	zbx_hashset_t			proxies;
-	zbx_uint64_t			group_revision;
-	zbx_vector_pg_group_ptr_t	group_updates;
+	zbx_uint64_t			groups_revision;
+	zbx_vector_pg_group_ptr_t	updates;
 	pthread_mutex_t			lock;
-	zbx_uint64_t			map_revision;
+	zbx_uint64_t			links_revision;
 }
 zbx_pg_cache_t;
+
+typedef struct
+{
+	zbx_uint64_t	proxy_groupid;
+	int		status;
+}
+zbx_pg_update_t;
+
+ZBX_VECTOR_DECL(pg_update, zbx_pg_update_t)
 
 void	pg_group_clear(zbx_pg_group_t *group);
 
 void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision);
 void	pg_cache_destroy(zbx_pg_cache_t *cache);
 
-void	pg_cache_queue_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
-void	pg_cache_process_updates(zbx_pg_cache_t *cache);
-zbx_pg_proxy_t	*pg_cache_group_add_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid, int clock);
+void	pg_cache_queue_group_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
+void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups, zbx_vector_pg_host_t *hosts_new,
+		zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del);
+zbx_pg_proxy_t	*pg_cache_group_add_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid,
+		int clock);
 void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid);
 
 void	pg_cache_group_remove_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t hostid);

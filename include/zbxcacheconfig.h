@@ -1353,16 +1353,29 @@ ZBX_VECTOR_DECL(objmove, zbx_objmove_t)
 
 /* proxy group manager local cache support */
 
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	hostproxyid;
+	zbx_uint64_t	proxyid;
+	zbx_uint64_t	revision;
+}
+zbx_pg_host_t;
+
+ZBX_PTR_VECTOR_DECL(pg_host_ptr, zbx_pg_host_t *)
+ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
+
 typedef struct zbx_pg_group zbx_pg_group_t;
 
 typedef struct
 {
-	zbx_uint64_t		proxyid;
-	int			status;
-	int			lastaccess;
-	int			firstaccess;
-	struct zbx_pg_group	*group;
-	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t			proxyid;
+	int				status;
+	int				lastaccess;
+	int				firstaccess;
+	zbx_uint64_t			flags;
+	struct zbx_pg_group		*group;
+	zbx_vector_pg_host_ptr_t	hosts;
 }
 zbx_pg_proxy_t;
 
@@ -1378,7 +1391,7 @@ struct zbx_pg_group
 	int				min_online;
 	int				status;
 	int				status_time;
-	zbx_uint32_t			flag;
+	zbx_uint32_t			flags;
 	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
 	zbx_vector_uint64_t		hostids;		/* hostids assigned to proxy group */
 	zbx_vector_uint64_t		new_hostids;		/* hostids to be assigned to proxies */
