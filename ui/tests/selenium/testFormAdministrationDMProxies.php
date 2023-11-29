@@ -382,7 +382,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 						'Subject' => 'test test'
 					]
 				]
-			],
+			]
 		];
 	}
 
