@@ -24,7 +24,9 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 	#include <string.h>
 #endif
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+/* on HP-UX IA-64 gcc default is -mbig-endian */
+#if ((__BYTE_ORDER == __LITTLE_ENDIAN) && !defined(__hpux)) || (defined(__hpux) && \
+		defined(__BYTE_ORDER) && (__BYTE_ORDER == __LITTLE_ENDIAN))
 # define SWAP(n) \
 	(((n) << 24) | (((n) & 0xff00) << 8) | (((n) >> 8) & 0xff00) | ((n) >> 24))
 #else
@@ -250,12 +252,14 @@ compilers don't.  */
 # define UNALIGNED_P(p) (((uintptr_t) p) % sizeof (uint32_t) != 0)
 #endif
 		if (UNALIGNED_P (buffer))
+		{
 			while (len > 64)
 			{
 				sha256_process_block (memcpy (ctx->buffer, buffer, 64), 64, ctx);
 				buffer = (const char *) buffer + 64;
 				len -= 64;
 			}
+		}
 		else
 		{
 			sha256_process_block (buffer, len & ~63, ctx);
