@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-28T11:07:32Z'
+  date: '2023-11-29T22:55:41Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -58,8 +58,9 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            This a daily metric for the bucket.
-            The amount of data in bytes stored in a bucket in the STANDARD storage class, INTELLIGENT_TIERING storage class, Standard-Infrequent Access (STANDARD_IA) storage class, OneZone-Infrequent Access (ONEZONE_IA), Reduced Redundancy Storage (RRS) class, S3 Glacier Instant Retrieval storage class, Deep Archive Storage (S3 Glacier Deep Archive) class or, S3 Glacier Flexible Retrieval (GLACIER) storage class. This value is calculated by summing the size of all objects and metadata in the bucket (both current and noncurrent objects), including the size of all parts for all incomplete multipart uploads to the bucket.
+            This is a daily metric for the bucket.
+            The amount of data in bytes stored in a bucket in the STANDARD storage class, INTELLIGENT_TIERING storage class, Standard-Infrequent Access (STANDARD_IA) storage class, OneZone-Infrequent Access (ONEZONE_IA), Reduced Redundancy Storage (RRS) class, S3 Glacier Instant Retrieval storage class, Deep Archive Storage (S3 Glacier Deep Archive) class, or S3 Glacier Flexible Retrieval (GLACIER) storage class.
+            This value is calculated by summing the size of all objects and metadata in the bucket (both current and noncurrent objects), including the size of all parts for all incomplete multipart uploads to the bucket.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -398,7 +399,7 @@ zabbix_export:
             
                             ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
                                 if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                                    throw 'Required credentials is not set: "' + field + '".';
+                                    throw 'Required credentials are not set: "' + field + '".';
                                 };
                                 AWS.params[field] = credentials[field];
                             });
@@ -698,8 +699,8 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            This a daily metric for the bucket.
-            The total number of objects stored in a bucket for all storage classes. 
+            This is a daily metric for the bucket.
+            The total number of objects stored in a bucket for all storage classes.
             This value is calculated by counting all objects in the bucket (both current and noncurrent objects) and the total number of parts for all incomplete multipart uploads to the bucket.
           preprocessing:
             - type: JSONPATH
@@ -727,7 +728,7 @@ zabbix_export:
                 value: '{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery bucket alarms.'
+          description: 'Discovery of bucket alarms.'
           item_prototypes:
             - uuid: b38bd6e4566445acb52e8ecce4014f0f
               name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State'
@@ -826,7 +827,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: 9ff609d143ae4552b395668718c43191
-          name: 'Metrics Configuration Discovery'
+          name: 'Request Metrics discovery'
           type: DEPENDENT
           key: aws.s3.configuration.discovery
           delay: '0'
@@ -840,7 +841,7 @@ zabbix_export:
                 value: '{$AWS.S3.LLD.FILTER.ID.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery bucket alarms.'
+          description: 'Discovery of request metrics.'
           item_prototypes:
             - uuid: 7c746594159f4f1c94e8790ed1bdf2af
               name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Errors, 4xx'
@@ -1036,7 +1037,7 @@ zabbix_export:
               units: ms
               description: |
                 The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
-                Statistic: 90 percentile.
+                Statistic: 90th percentile.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1115,7 +1116,7 @@ zabbix_export:
                 
                                 ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
                                     if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                                        throw 'Required credentials is not set: "' + field + '".';
+                                        throw 'Required credentials are not set: "' + field + '".';
                                     };
                                     AWS.params[field] = credentials[field];
                                 });
@@ -1175,7 +1176,6 @@ zabbix_export:
                             'BytesUploaded:Bytes:Average',
                             '4xxErrors:Count:Average',
                             '5xxErrors:Count:Average',
-                            'FirstByteLatency:Milliseconds:p90',
                             'TotalRequestLatency:Milliseconds:p90',
                             'FirstByteLatency:Milliseconds:p90',
                             'ReplicationLatency:Seconds:Average',
@@ -1484,7 +1484,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              description: 'The maximum number of seconds by which the replication destination Region is behind the source Region for a given replication rule.'
+              description: 'The maximum number of seconds by which the replication destination region is behind the source Region for a given replication rule.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1506,7 +1506,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: |
-                The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 buckets.
+                The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
                 Statistic: Average (bytes per request).
               preprocessing:
                 - type: JSONPATH
@@ -1600,7 +1600,7 @@ zabbix_export:
               description: |
                 The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
                 This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.
-                Statistic: 90 percentile.
+                Statistic: 90th percentile.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1654,10 +1654,10 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
         - macro: '{$AWS.S3.LLD.FILTER.ID.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable request metrics by filter id name.'
+          description: 'Filter of discoverable request metrics by filter ID name.'
         - macro: '{$AWS.S3.LLD.FILTER.ID.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered request metrics by filter id name.'
+          description: 'Filter to exclude discovered request metrics by filter ID name.'
         - macro: '{$AWS.S3.UPDATE.INTERVAL}'
           value: '1800'
           description: 'Interval in seconds for getting request metrics. Used in the metric configuration and in the JavaScript API query. Must be between 1 and 86400 seconds.'
