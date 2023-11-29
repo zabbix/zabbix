@@ -578,7 +578,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location)
 {
 	zbx_db_result_t		result;
 	zbx_db_httpstep		db_httpstep;
@@ -656,7 +657,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, httptest->httptest.ssl_cert_file,
 			httptest->httptest.ssl_key_file, httptest->httptest.ssl_key_password,
-			httptest->httptest.verify_peer, httptest->httptest.verify_host, config_source_ip, &err_str))
+			httptest->httptest.verify_peer, httptest->httptest.verify_host, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &err_str))
 	{
 		goto clean;
 	}
@@ -975,6 +977,10 @@ clean:
 	curl_easy_cleanup(easyhandle);
 #else
 	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
+	ZBX_UNUSED(config_ssl_cert_location);
+	ZBX_UNUSED(config_ssl_key_location);
+
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
 #endif	/* HAVE_LIBCURL */
 
@@ -1015,16 +1021,20 @@ httptest_error:
  *                                                                            *
  * Purpose: process httptests                                                 *
  *                                                                            *
- * Parameters: now              - [IN] current timestamp                      *
- *             config_source_ip - [IN]                                        *
- *             nextcheck        - [OUT]                                       *
+ * Parameters: now                      - [IN] current timestamp              *
+ *             config_source_ip         - [IN]                                *
+ *             config_ssl_ca_location   - [IN]                                *
+ *             config_ssl_cert_location - [IN]                                *
+ *             config_ssl_key_location  - [IN]                                *
+ *             nextcheck                - [OUT]                               *
  *                                                                            *
  * Return value: number of processed httptests                                *
  *                                                                            *
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_httptests(int now, const char *config_source_ip, time_t *nextcheck)
+int	process_httptests(int now, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, time_t *nextcheck)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1125,7 +1135,8 @@ int	process_httptests(int now, const char *config_source_ip, time_t *nextcheck)
 			/* add httptest variables to the current test macro cache */
 			http_process_variables(&httptest, &httptest.variables, NULL, NULL);
 
-			process_httptest(&host, &httptest, &delay, config_source_ip);
+			process_httptest(&host, &httptest, &delay, config_source_ip, config_ssl_ca_location,
+					config_ssl_cert_location, config_ssl_key_location);
 			zbx_dc_httptest_queue(now, httptestid, delay);
 
 			zbx_free(httptest.httptest.ssl_key_password);
