@@ -1056,8 +1056,7 @@
 	}
 }
 
-.dashboard-grid-widget-body,
-.dashboard-grid-iterator-body {
+.dashboard-grid-iterator-contents {
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}
@@ -1108,8 +1107,18 @@
 }
 
 .wrapper.layout-kioskmode {
-
 	.dashboard-navigation {
 		display: none;
+	}
+}
+
+@page {
+	margin: 10px;
+}
+
+@media print {
+	.dashboard-page {
+		margin: 10px;
+		break-after: page;
 	}
 }

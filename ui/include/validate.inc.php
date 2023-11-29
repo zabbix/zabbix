@@ -533,7 +533,8 @@ function validateNumber($value, $min = null, $max = null) {
 }
 
 function validateUserMacro($value) {
-	return ((new CUserMacroParser())->parse($value) == CParser::PARSE_SUCCESS);
+	return (new CUserMacroParser())->parse($value) == CParser::PARSE_SUCCESS
+		|| (new CUserMacroFunctionParser())->parse($value) == CParser::PARSE_SUCCESS;
 }
 
 /**

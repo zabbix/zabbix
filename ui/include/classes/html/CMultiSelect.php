@@ -87,6 +87,10 @@ class CMultiSelect extends CTag {
 			$this->params['url'] = $url->getUrl();
 		}
 
+		if (array_key_exists('multiselect_id', $options)) {
+			$this->params['multiselect_id'] = $options['multiselect_id'];
+		}
+
 		if (array_key_exists('data', $options)) {
 			$this->params['data'] = zbx_cleanHashes($options['data']);
 		}
@@ -155,8 +159,8 @@ class CMultiSelect extends CTag {
 	 * @return array
 	 */
 	protected function mapOptions(array $options) {
-		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
+		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
+			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
 		];
 
 		foreach ($options as $field => $value) {
@@ -169,6 +173,7 @@ class CMultiSelect extends CTag {
 		$mappings = [
 			'name' => 'name',
 			'object_name' => 'object_name',
+			'multiselect_id' => 'multiselect_id',
 			'disabled' => 'disabled',
 			'hidden' => 'hidden',
 			'default_value' => 'defaultValue',
@@ -250,7 +255,7 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only', 'group_status', 'hide_host_filter'
+					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -418,6 +423,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('group_status', $parameters)) {
 					$popup_parameters['group_status'] = $parameters['group_status'];
 					$autocomplete_parameters['group_status'] = $parameters['group_status'];
+				}
+
+				if (array_key_exists('resolve_macros', $parameters) && $parameters['resolve_macros']) {
+					$popup_parameters['resolve_macros'] = '1';
+					$autocomplete_parameters['resolve_macros'] = true;
 				}
 			}
 

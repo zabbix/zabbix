@@ -6,4 +6,7 @@ libzbxhttp_a_SOURCES = \
 	http.c \
 	punycode.c \
 	punycode.h \
-	urlencode.c
+	urlencode.c \
+	charset.c
+
+

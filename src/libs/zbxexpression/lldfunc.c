@@ -552,6 +552,8 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 
 		if (0 != (token.type & flags))
 		{
+			char	*m_ptr;
+
 			switch (token.type)
 			{
 				case ZBX_TOKEN_LLD_MACRO:
@@ -566,11 +568,13 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (NULL != func_macro_in_list(*data, &token.data.func_macro, NULL))
+					if (NULL != (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro,
+							NULL)))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, lld_macro_paths,
 								error, max_error_len);
 						pos = token.loc.r;
+						zbx_free(m_ptr);
 					}
 					break;
 				case ZBX_TOKEN_EXPRESSION_MACRO:

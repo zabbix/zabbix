@@ -87,6 +87,9 @@ class CApiInputValidator {
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
+			case API_ESCAPED_STRING_UTF8:
+				return self::validateEscapedStringUtf8($rule, $data, $path, $error);
+
 			case API_STRINGS_UTF8:
 				return self::validateStringsUtf8($rule, $data, $path, $error);
 
@@ -295,6 +298,7 @@ class CApiInputValidator {
 			case API_COND_FORMULA:
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
+			case API_ESCAPED_STRING_UTF8:
 			case API_INT32:
 			case API_INT32_RANGES:
 			case API_UINT64:
@@ -686,6 +690,36 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Escaped string validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']       (optional) API_NOT_EMPTY
+	 * @param string $rule['characters']  (optional) 'characters' option for CEscapedStringParser.
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEscapedStringUtf8($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$escaped_string_parser = new CEscapedStringParser(array_intersect_key($rule, array_flip(['characters'])));
+
+		if ($escaped_string_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $escaped_string_parser->getError());
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Array of strings validator.
 	 *
 	 * @param array  $rule
@@ -985,19 +1019,20 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
+				$macro_parsers = [];
 				if ($flags & API_ALLOW_USER_MACRO) {
-					$user_macro_parser = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroFunctionParser();
 				}
-
 				if ($flags & API_ALLOW_LLD_MACRO) {
-					$lld_macro_parser = new CLLDMacroParser();
-					$lld_macro_function_parser = new CLLDMacroFunctionParser();
+					$macro_parsers[] = new CLLDMacroParser();
+					$macro_parsers[] = new CLLDMacroFunctionParser();
 				}
 
-				if (($flags & API_ALLOW_USER_MACRO && $user_macro_parser->parse($data) == CParser::PARSE_SUCCESS)
-						|| ($flags & API_ALLOW_LLD_MACRO && ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS
-							|| $lld_macro_function_parser->parse($data) == CParser::PARSE_SUCCESS))) {
-					return true;
+				foreach ($macro_parsers as $macro_parser) {
+					if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+						return true;
+					}
 				}
 
 				$value = NAN;
@@ -2810,18 +2845,18 @@ class CApiInputValidator {
 			return false;
 		}
 
+		$macro_parsers = [];
 		if ($flags & API_ALLOW_USER_MACRO) {
-			$user_macro_parser = new CUserMacroParser();
-
-			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
 		}
 
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
 				return true;
 			}
 		}
@@ -4148,8 +4183,8 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
+					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'characters' => 'nrts'],
+					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '', 'characters' => 'nrts']
 				]];
 				break;
 

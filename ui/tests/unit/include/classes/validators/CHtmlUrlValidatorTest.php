@@ -97,6 +97,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['{$USER_URL_MACRO}?a=1',									[],															true],
 			['http://{$USER_URL_MACRO}?a=1',							[],															true],
 			['http://{$USER_URL_MACRO}',								[],															true],
+			['http://{{$M}.regsub("(.*)", \1)}',						[],															true],
 			['http://{{{$USER_URL_MACRO}',								[],															true],
 			['http://{$MACRO{$MACRO}}',									[],															true],
 			['{$MACRO{',												[],															true],
@@ -104,11 +105,12 @@ class CHtmlUrlValidatorTest extends TestCase {
 			["h\tt\rt\nps://zabbix.com",								[],															true], // CR, LF and TAB characters are ignored by browsers.
 			['ht tps://zabbix.com',										[],															true], // URL with spaces in schema is treated as a path.
 			// Inventory macros are going to be considered as "path".
-			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
-			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
-			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
-			['{INVENTORY.URL.A0}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
 			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_NONE],		true],
+			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
+			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
+			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
+			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
+			['{{INVENTORY.URL.B}.regsub("(\d+)", \1)}',					['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
 			// Event tag macros are going to be considered as "path".
 			['text{EVENT.TAGS."JIRAID"}text',							[],															true],
 			['text{EVENT.TAGS."JIRAID"}text',							['allow_event_tags_macro' => true],							true],
@@ -148,16 +150,17 @@ class CHtmlUrlValidatorTest extends TestCase {
 
 	public function dataProviderValidateSameSiteURL() {
 		return [
-			['items.php',								true],
-			['items.php?',								true],
-			['items.php?context=host',					true],
-			['items.php?context=host&itemids=12345',	true],
-			['items.php?context=host#id=12345',			true],
+			['zabbix.php',									true],
+			['zabbix.php?',									true],
+			['zabbix.php?action=host.list',					true],
+			['zabbix.php?action=item.list&context=host',	true],
+			['zabbix.php?action=host.list#id=12345',		true],
+			['zabbix.php?action=item.list&context=host&filter_hostids%5B%5D=10605',	true],
 
 			['items1.php',								false],
 			['items.html',								false],
-			['items.php&itemids=12345',					false],
-			['http://www.zabbix.com/items.php',			false],
+			['zabbix.php&itemids=12345',				false],
+			['http://www.zabbix.com/zabbix.php',		false],
 			['http://www.zabbix.com',					false],
 			['www.zabbix.com',							false],
 			['zabbix.com',								false]

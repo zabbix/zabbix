@@ -200,7 +200,7 @@
 					this.editSamlProvisionGroup(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove()
+					e.target.closest('tr').remove();
 				}
 			});
 
@@ -216,7 +216,7 @@
 						this.editSamlProvisionMedia(e.target.closest('tr'));
 					}
 					else if (e.target.classList.contains('js-remove')) {
-						e.target.closest('tr').remove()
+						e.target.closest('tr').remove();
 					}
 				});
 
@@ -321,7 +321,9 @@
 
 			popup_params.idp_type = <?= IDP_TYPE_SAML ?>;
 
-			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
+			const overlay = PopUp('popup.usergroupmapping.edit', popup_params,
+				{dialogueid: 'user_group_edit', dialogue_class: 'modal-popup-medium'}
+			);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const new_row = this._renderProvisionGroupRow({...e.detail, ...{row_index}});
@@ -358,7 +360,9 @@
 				};
 			}
 
-			const overlay = PopUp('popup.mediatypemapping.edit', popup_params, {dialogueid: 'media_type_mapping_edit'});
+			const overlay = PopUp('popup.mediatypemapping.edit', popup_params,
+				{dialogueid: 'media_type_mapping_edit', dialogue_class: 'modal-popup-medium'}
+			);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const saml_media_type_mapping = {...e.detail, ...{row_index: row_index}};
@@ -479,7 +483,9 @@
 				};
 			}
 
-			const overlay = PopUp('popup.ldap.edit', popup_params, {dialogueid: 'ldap_edit'});
+			const overlay = PopUp('popup.ldap.edit', popup_params,
+				{dialogueid: 'ldap_edit', dialogue_class: 'modal-popup-generic'}
+			);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const ldap = {...e.detail, ...{row_index: row_index}};

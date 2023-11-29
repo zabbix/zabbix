@@ -66,14 +66,17 @@
 	 */
 	function dropDocumentListeners(e, graph) {
 		let widgets_boxing = 0; // Number of widgets with active SBox.
-		ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
-			if (widget.getType() === 'svggraph' && widget._svg !== null) {
-				const options = jQuery(widget._svg).data('options');
-				if (options !== undefined && options.boxing) {
-					widgets_boxing++;
+
+		for (const dashboard_page of ZABBIX.Dashboard.getDashboardPages()) {
+			dashboard_page.getWidgets().forEach((widget) => {
+				if (widget.getType() === 'svggraph' && widget._svg !== null) {
+					const options = jQuery(widget._svg).data('options');
+					if (options !== undefined && options.boxing) {
+						widgets_boxing++;
+					}
 				}
-			}
-		});
+			});
+		}
 
 		if (widgets_boxing == 0 || (e && 'keyCode' in e && e.keyCode == 27)) {
 			jQuery(document)

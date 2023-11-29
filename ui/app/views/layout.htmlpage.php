@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 function local_showHeader(array $data): void {
@@ -95,6 +96,9 @@ function local_showFooter(array $data): void {
 }
 
 local_showHeader($data);
+
+echo '<body>';
+
 local_showSidebar($data);
 
 echo '<div class="'.ZBX_STYLE_LAYOUT_WRAPPER.

@@ -39,7 +39,7 @@
 			const overlay = PopUp('popup.services', {
 				title: <?= json_encode(_('Service')) ?>,
 				multiple: 0
-			}, {dialogueid: 'services'});
+			}, {dialogueid: 'services', dialogue_class: 'modal-popup-generic'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const data = [];
