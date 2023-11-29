@@ -27,9 +27,9 @@
 #include "vmware_internal.h"
 
 void	vmware_dsname_free(zbx_vmware_dsname_t *dsname);
+char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss, char *diskname);
 int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyhandle, const char *hv_uuid,
 		const char *hv_id, const zbx_vector_str_t *hv_dss, zbx_vector_vmware_datastore_t *dss, char **error);
-char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss, char *diskname);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

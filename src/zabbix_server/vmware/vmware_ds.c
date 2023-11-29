@@ -29,6 +29,57 @@
 
 ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
 
+#define ZBX_XPATH_PROP_SUFFIX(property)									\
+	"*[local-name()='propSet'][*[local-name()='name']"						\
+	"[substring(text(),string-length(text())-string-length('" property "')+1)='" property "']]"	\
+	"/*[local-name()='val']"
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store Datastore name data            *
+ *                                                                            *
+ * Parameters: dsname   - [IN] the Datastore name                             *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
+{
+	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
+	zbx_free(dsname->name);
+	zbx_free(dsname->uuid);
+	zbx_free(dsname);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find DS by canonical disk name (perf counter instance)            *
+ *                                                                            *
+ * Parameters: dss      - [IN] all known Datastores                           *
+ *             diskname - [IN] canonical disk name                            *
+ *                                                                            *
+ * Return value: uuid of Datastore or NULL                                    *
+ *                                                                            *
+ ******************************************************************************/
+char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss, char *diskname)
+{
+	zbx_vmware_diskextent_t	dx_cmp = {.diskname = diskname};
+	int			i;
+
+	for (i = 0; i< dss->values_num; i++)
+	{
+		zbx_vmware_datastore_t	*ds = dss->values[i];
+
+		if (FAIL == zbx_vector_vmware_diskextent_bsearch(&ds->diskextents, &dx_cmp,
+				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC))
+		{
+			continue;
+		}
+
+		return zbx_strdup(NULL, ds->uuid);
+	}
+
+	return NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: vmware_ds_uuid_compare                                           *
@@ -71,26 +122,6 @@ int	vmware_ds_id_compare(const void *d1, const void *d2)
 
 	return strcmp(ds1->id, ds2->id);
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees resources allocated to store Datastore name data            *
- *                                                                            *
- * Parameters: dsname   - [IN] the Datastore name                             *
- *                                                                            *
- ******************************************************************************/
-void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
-{
-	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
-	zbx_free(dsname->name);
-	zbx_free(dsname->uuid);
-	zbx_free(dsname);
-}
-
-#define ZBX_XPATH_PROP_SUFFIX(property)									\
-	"*[local-name()='propSet'][*[local-name()='name']"						\
-	"[substring(text(),string-length(text())-string-length('" property "')+1)='" property "']]"	\
-	"/*[local-name()='val']"
 
 /******************************************************************************
  *                                                                            *
@@ -146,37 +177,6 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mountinfo:" ZBX_FS_UI64, __func__, mi_access);
 
 	return mi_access;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: find DS by canonical disk name (perf counter instance)            *
- *                                                                            *
- * Parameters: dss      - [IN] all known Datastores                           *
- *             diskname - [IN] canonical disk name                            *
- *                                                                            *
- * Return value: uuid of Datastore or NULL                                    *
- *                                                                            *
- ******************************************************************************/
-char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss, char *diskname)
-{
-	zbx_vmware_diskextent_t	dx_cmp = {.diskname = diskname};
-	int			i;
-
-	for (i = 0; i< dss->values_num; i++)
-	{
-		zbx_vmware_datastore_t	*ds = dss->values[i];
-
-		if (FAIL == zbx_vector_vmware_diskextent_bsearch(&ds->diskextents, &dx_cmp,
-				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC))
-		{
-			continue;
-		}
-
-		return zbx_strdup(NULL, ds->uuid);
-	}
-
-	return NULL;
 }
 
 /******************************************************************************

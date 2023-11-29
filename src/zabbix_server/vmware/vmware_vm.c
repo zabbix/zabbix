@@ -31,6 +31,103 @@
 #	include <libxml/xpath.h>
 #endif
 
+#define ZBX_XPATH_VM_GUESTDISKS()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
+	"/*/*[local-name()='GuestDiskInfo']"
+
+#define ZBX_XPATH_VM_UUID()										\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
+		"/*[local-name()='val']"
+
+#define ZBX_XPATH_VM_INSTANCE_UUID()					\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
+		"/*[local-name()='val']"
+
+#define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()				\
+	ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
+
+#define ZBX_VMPROPMAP(property)										\
+	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
+
+static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
+
+static zbx_vmware_propmap_t	vm_propmap[] = {
+	ZBX_VMPROPMAP("summary.config.numCpu"),			/* ZBX_VMWARE_VMPROP_CPU_NUM */
+	ZBX_VMPROPMAP("summary.quickStats.overallCpuUsage"),	/* ZBX_VMWARE_VMPROP_CPU_USAGE */
+	ZBX_VMPROPMAP("summary.config.name"),			/* ZBX_VMWARE_VMPROP_NAME */
+	ZBX_VMPROPMAP("summary.config.memorySizeMB"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE */
+	ZBX_VMPROPMAP("summary.quickStats.balloonedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED */
+	ZBX_VMPROPMAP("summary.quickStats.compressedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED */
+	ZBX_VMPROPMAP("summary.quickStats.swappedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED */
+	ZBX_VMPROPMAP("summary.quickStats.guestMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST */
+	ZBX_VMPROPMAP("summary.quickStats.hostMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST */
+	ZBX_VMPROPMAP("summary.quickStats.privateMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
+	ZBX_VMPROPMAP("summary.quickStats.sharedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED */
+	ZBX_VMPROPMAP("summary.runtime.powerState"),		/* ZBX_VMWARE_VMPROP_POWER_STATE */
+	ZBX_VMPROPMAP("summary.storage.committed"),		/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
+	ZBX_VMPROPMAP("summary.storage.unshared"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
+	ZBX_VMPROPMAP("summary.storage.uncommitted"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
+	ZBX_VMPROPMAP("summary.quickStats.uptimeSeconds"),	/* ZBX_VMWARE_VMPROP_UPTIME */
+	ZBX_VMPROPMAP("guest.ipAddress"),			/* ZBX_VMWARE_VMPROP_IPADDRESS */
+	ZBX_VMPROPMAP("guest.hostName"),			/* ZBX_VMWARE_VMPROP_GUESTHOSTNAME */
+	ZBX_VMPROPMAP("guest.guestFamily"),			/* ZBX_VMWARE_VMPROP_GUESTFAMILY */
+	ZBX_VMPROPMAP("guest.guestFullName"),			/* ZBX_VMWARE_VMPROP_GUESTFULLNAME */
+	ZBX_VMPROPMAP("parent"),				/* ZBX_VMWARE_VMPROP_FOLDER */
+	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
+			ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
+			vmware_service_get_vm_snapshot, 0},
+	{"datastore", ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
+			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL, 0},
+	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
+	ZBX_VMPROPMAP("resourcePool"),				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
+	ZBX_VMPROPMAP("guest.toolsVersion"),			/* ZBX_VMWARE_VMPROP_TOOLS_VERSION */
+	ZBX_VMPROPMAP("guest.toolsRunningStatus"),		/* ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS */
+	ZBX_VMPROPMAP("guest.guestState")			/* ZBX_VMWARE_VMPROP_STATE */
+};
+
+#define ZBX_XPATH_GET_OBJECT_NAME(object, id)				\
+		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"				\
+		ZBX_XPATH_PROP_NAME_NODE("name")
+
+#define ZBX_XPATH_GET_FOLDER_NAME(id)									\
+		ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_FOLDER, id)
+
+#define ZBX_XPATH_GET_FOLDER_PARENTID(id)								\
+		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_FOLDER, "[text()='" id "']") "/"		\
+		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='Folder']"
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store virtual machine         *
+ *                                                                            *
+ * Parameters: vm   - [IN] the virtual machine                                *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
+{
+	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_shmem_dev_free);
+	zbx_vector_ptr_destroy(&vm->devs);
+
+	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_shmem_fs_free);
+	zbx_vector_ptr_destroy(&vm->file_systems);
+
+	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_shmem_custom_attr_free);
+	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
+
+	zbx_vector_str_clear_ext(&vm->alarm_ids, vmware_shared_strfree);
+	zbx_vector_str_destroy(&vm->alarm_ids);
+
+	if (NULL != vm->uuid)
+		vmware_shared_strfree(vm->uuid);
+
+	if (NULL != vm->id)
+		vmware_shared_strfree(vm->id);
+
+	vmware_shmem_props_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
+
+	vmware_shmem_vm_free(vm);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees resources allocated to store vm device object               *
@@ -73,7 +170,6 @@ static void	vmware_custom_attr_free(zbx_vmware_custom_attr_t *ca)
 	zbx_free(ca);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: frees resources allocated to store virtual machine                *
@@ -101,111 +197,143 @@ void	vmware_vm_free(zbx_vmware_vm_t *vm)
 	zbx_free(vm);
 }
 
-#define ZBX_VMPROPMAP(property)										\
-	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets list of ip for virtual machine network interface             *
+ *                                                                            *
+ * Parameters: details       - [IN] xml document containing vm data           *
+ *             guestnet_node - [IN] xml node containing list of guest ips     *
+ *             mac_addr      - [IN] mac address of network interface          *
+ *                                                                            *
+ * Return value: json with array of ip                                        *
+ *                                                                            *
+ ******************************************************************************/
+static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_node, const char *mac_addr)
+{
+	char			xpath[VMWARE_SHORT_STR_LEN], *val = NULL;
+	zbx_vector_str_t	ips;
 
-#define ZBX_XPATH_VM_UUID()										\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
-		"/*[local-name()='val']"
+	zbx_vector_str_create(&ips);
 
+	zbx_snprintf(xpath, sizeof(xpath), "*[*[local-name()='macAddress']/text()='%s']" ZBX_XPATH_LN("ipAddress") ,
+			mac_addr);
 
+	if (SUCCEED == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
+	{
+		struct zbx_json	json_data;
+		int		i;
 
+		zbx_json_initarray(&json_data, VMWARE_SHORT_STR_LEN);
 
-#define ZBX_XPATH_VM_GUESTDISKS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
-	"/*/*[local-name()='GuestDiskInfo']"
+		for (i = 0; i < ips.values_num; i++)
+			zbx_json_addstring(&json_data, NULL, ips.values[i], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json_data);
+		val = zbx_strdup(val, json_data.buffer);
+		zbx_json_free(&json_data);
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() empty list of guest ips for mac:%s", __func__, mac_addr);
+
+	zbx_vector_str_clear_ext(&ips, zbx_str_free);
+	zbx_vector_str_destroy(&ips);
+
+	return val;
+}
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets the parameters of virtual machine disks                      *
+ * Purpose: gets virtual machine network interface devices' additional        *
+ * properties (props member of zbx_vmware_dev_t)                              *
+ *                                                                            *
+ * Parameters: details - [IN] an xml document containing virtual machine data *
+ *             xmlNode - [IN] an xml document node that corresponds to given  *
+ *                            network interface device                        *
+ *             xmlNode - [IN] an xml node containing list of guest ips        *
+ *                                                                            *
+ ******************************************************************************/
+static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xmlNode *guestnet_node)
+{
+	char	**props;
+
+	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
+
+	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node, ZBX_XNN("macAddress"));
+	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("connectable") ZBX_XPATH_LN("connected"));
+	props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_xml_node_read_prop(node, "type");
+	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "switchUuid"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portgroupKey"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portKey"));
+	props[ZBX_VMWARE_DEV_PROPS_IFIPS] = vmware_vm_get_nic_device_ips(details, guestnet_node,
+			props[ZBX_VMWARE_DEV_PROPS_IFMAC]);
+
+	return props;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
  *             details - [IN] an xml document containing virtual machine data *
  *                                                                            *
+ * Comments: The network interface devices are taken from vm device list      *
+ *           filtered by macAddress key.                                      *
+ *                                                                            *
  ******************************************************************************/
-static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
+static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
-	int		i;
+	xmlNode		*guestnet_node;
+	int		i, nics = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	xpathCtx = xmlXPathNewContext(details);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_GUESTDISKS(), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
+			"[*[local-name()='macAddress']]", xpathCtx)))
+	{
 		goto clean;
+	}
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_ptr_reserve(&vm->file_systems, (size_t)(nodeset->nodeNr + vm->file_systems.values_alloc));
+	guestnet_node = zbx_xml_doc_get(details, ZBX_XPATH_PROP_NAME("guest.net"));
+	zbx_vector_ptr_reserve(&vm->devs, (size_t)(nodeset->nodeNr + vm->devs.values_alloc));
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		zbx_vmware_fs_t	*fs;
-		char		*value;
+		char			*key;
+		zbx_vmware_dev_t	*dev;
 
-		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='diskPath']")))
+		if (NULL == (key = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='key']")))
 			continue;
 
-		fs = (zbx_vmware_fs_t *)zbx_malloc(NULL, sizeof(zbx_vmware_fs_t));
-		memset(fs, 0, sizeof(zbx_vmware_fs_t));
+		dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
+		dev->type = ZBX_VMWARE_DEV_TYPE_NIC;
+		dev->instance = key;
+		dev->label = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				"*[local-name()='deviceInfo']/*[local-name()='label']");
+		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i], guestnet_node);
 
-		fs->path = value;
-
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='capacity']")))
-		{
-			ZBX_STR2UINT64(fs->capacity, value);
-			zbx_free(value);
-		}
-
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='freeSpace']")))
-		{
-			ZBX_STR2UINT64(fs->free_space, value);
-			zbx_free(value);
-		}
-
-		zbx_vector_ptr_append(&vm->file_systems, fs);
+		zbx_vector_ptr_append(&vm->devs, dev);
+		nics++;
 	}
 clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, vm->file_systems.values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees shared resources allocated to store virtual machine         *
- *                                                                            *
- * Parameters: vm   - [IN] the virtual machine                                *
- *                                                                            *
- ******************************************************************************/
-void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
-{
-	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_shmem_dev_free);
-	zbx_vector_ptr_destroy(&vm->devs);
-
-	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_shmem_fs_free);
-	zbx_vector_ptr_destroy(&vm->file_systems);
-
-	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_shmem_custom_attr_free);
-	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
-
-	zbx_vector_str_clear_ext(&vm->alarm_ids, vmware_shared_strfree);
-	zbx_vector_str_destroy(&vm->alarm_ids);
-
-	if (NULL != vm->uuid)
-		vmware_shared_strfree(vm->uuid);
-
-	if (NULL != vm->id)
-		vmware_shared_strfree(vm->id);
-
-	vmware_shmem_props_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
-
-	vmware_shmem_vm_free(vm);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, nics);
 }
 
 /******************************************************************************
@@ -338,8 +466,66 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, disks);
 }
 
-#define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()				\
-	ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets the parameters of virtual machine disks                      *
+ *                                                                            *
+ * Parameters: vm      - [OUT] the virtual machine                            *
+ *             details - [IN] an xml document containing virtual machine data *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	xpathCtx = xmlXPathNewContext(details);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_GUESTDISKS(), xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(&vm->file_systems, (size_t)(nodeset->nodeNr + vm->file_systems.values_alloc));
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_fs_t	*fs;
+		char		*value;
+
+		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='diskPath']")))
+			continue;
+
+		fs = (zbx_vmware_fs_t *)zbx_malloc(NULL, sizeof(zbx_vmware_fs_t));
+		memset(fs, 0, sizeof(zbx_vmware_fs_t));
+
+		fs->path = value;
+
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='capacity']")))
+		{
+			ZBX_STR2UINT64(fs->capacity, value);
+			zbx_free(value);
+		}
+
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='freeSpace']")))
+		{
+			ZBX_STR2UINT64(fs->free_space, value);
+			zbx_free(value);
+		}
+
+		zbx_vector_ptr_append(&vm->file_systems, fs);
+	}
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, vm->file_systems.values_num);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -406,8 +592,6 @@ clean:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() attributes:%d", __func__, vm->custom_attrs.values_num);
 }
-
-
 
 /******************************************************************************
  *                                                                            *
@@ -504,17 +688,6 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 	return ret;
 }
 
-#define ZBX_XPATH_GET_OBJECT_NAME(object, id)				\
-		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"				\
-		ZBX_XPATH_PROP_NAME_NODE("name")
-
-#define ZBX_XPATH_GET_FOLDER_NAME(id)									\
-		ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_FOLDER, id)
-
-#define ZBX_XPATH_GET_FOLDER_PARENTID(id)								\
-		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_FOLDER, "[text()='" id "']") "/"		\
-		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='Folder']"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: convert vm folder id to chain of folder names divided by '/'      *
@@ -569,49 +742,6 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): vm folder:%s", __func__, *vm_folder);
 
 	return SUCCEED;
-}
-/******************************************************************************
- *                                                                            *
- * Purpose: gets list of ip for virtual machine network interface             *
- *                                                                            *
- * Parameters: details       - [IN] xml document containing vm data           *
- *             guestnet_node - [IN] xml node containing list of guest ips     *
- *             mac_addr      - [IN] mac address of network interface          *
- *                                                                            *
- * Return value: json with array of ip                                        *
- *                                                                            *
- ******************************************************************************/
-static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_node, const char *mac_addr)
-{
-	char			xpath[VMWARE_SHORT_STR_LEN], *val = NULL;
-	zbx_vector_str_t	ips;
-
-	zbx_vector_str_create(&ips);
-
-	zbx_snprintf(xpath, sizeof(xpath), "*[*[local-name()='macAddress']/text()='%s']" ZBX_XPATH_LN("ipAddress") ,
-			mac_addr);
-
-	if (SUCCEED == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
-	{
-		struct zbx_json	json_data;
-		int		i;
-
-		zbx_json_initarray(&json_data, VMWARE_SHORT_STR_LEN);
-
-		for (i = 0; i < ips.values_num; i++)
-			zbx_json_addstring(&json_data, NULL, ips.values[i], ZBX_JSON_TYPE_STRING);
-
-		zbx_json_close(&json_data);
-		val = zbx_strdup(val, json_data.buffer);
-		zbx_json_free(&json_data);
-	}
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() empty list of guest ips for mac:%s", __func__, mac_addr);
-
-	zbx_vector_str_clear_ext(&ips, zbx_str_free);
-	zbx_vector_str_destroy(&ips);
-
-	return val;
 }
 
 /******************************************************************************
@@ -877,139 +1007,6 @@ out:
 	return ret;
 }
 
-static zbx_vmware_propmap_t	vm_propmap[] = {
-	ZBX_VMPROPMAP("summary.config.numCpu"),			/* ZBX_VMWARE_VMPROP_CPU_NUM */
-	ZBX_VMPROPMAP("summary.quickStats.overallCpuUsage"),	/* ZBX_VMWARE_VMPROP_CPU_USAGE */
-	ZBX_VMPROPMAP("summary.config.name"),			/* ZBX_VMWARE_VMPROP_NAME */
-	ZBX_VMPROPMAP("summary.config.memorySizeMB"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE */
-	ZBX_VMPROPMAP("summary.quickStats.balloonedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED */
-	ZBX_VMPROPMAP("summary.quickStats.compressedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED */
-	ZBX_VMPROPMAP("summary.quickStats.swappedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED */
-	ZBX_VMPROPMAP("summary.quickStats.guestMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST */
-	ZBX_VMPROPMAP("summary.quickStats.hostMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST */
-	ZBX_VMPROPMAP("summary.quickStats.privateMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
-	ZBX_VMPROPMAP("summary.quickStats.sharedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED */
-	ZBX_VMPROPMAP("summary.runtime.powerState"),		/* ZBX_VMWARE_VMPROP_POWER_STATE */
-	ZBX_VMPROPMAP("summary.storage.committed"),		/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
-	ZBX_VMPROPMAP("summary.storage.unshared"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
-	ZBX_VMPROPMAP("summary.storage.uncommitted"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
-	ZBX_VMPROPMAP("summary.quickStats.uptimeSeconds"),	/* ZBX_VMWARE_VMPROP_UPTIME */
-	ZBX_VMPROPMAP("guest.ipAddress"),			/* ZBX_VMWARE_VMPROP_IPADDRESS */
-	ZBX_VMPROPMAP("guest.hostName"),			/* ZBX_VMWARE_VMPROP_GUESTHOSTNAME */
-	ZBX_VMPROPMAP("guest.guestFamily"),			/* ZBX_VMWARE_VMPROP_GUESTFAMILY */
-	ZBX_VMPROPMAP("guest.guestFullName"),			/* ZBX_VMWARE_VMPROP_GUESTFULLNAME */
-	ZBX_VMPROPMAP("parent"),				/* ZBX_VMWARE_VMPROP_FOLDER */
-	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
-			ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
-			vmware_service_get_vm_snapshot, 0},
-	{"datastore", ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
-			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL, 0},
-	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
-	ZBX_VMPROPMAP("resourcePool"),				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
-	ZBX_VMPROPMAP("guest.toolsVersion"),			/* ZBX_VMWARE_VMPROP_TOOLS_VERSION */
-	ZBX_VMPROPMAP("guest.toolsRunningStatus"),		/* ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS */
-	ZBX_VMPROPMAP("guest.guestState")			/* ZBX_VMWARE_VMPROP_STATE */
-};
-
-/******************************************************************************
- *                                                                            *
- * Purpose: gets virtual machine network interface devices' additional        *
- * properties (props member of zbx_vmware_dev_t)                              *
- *                                                                            *
- * Parameters: details - [IN] an xml document containing virtual machine data *
- *             xmlNode - [IN] an xml document node that corresponds to given  *
- *                            network interface device                        *
- *             xmlNode - [IN] an xml node containing list of guest ips        *
- *                                                                            *
- ******************************************************************************/
-static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xmlNode *guestnet_node)
-{
-	char	**props;
-
-	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
-
-	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node, ZBX_XNN("macAddress"));
-	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("connectable") ZBX_XPATH_LN("connected"));
-	props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_xml_node_read_prop(node, "type");
-	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
-	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "switchUuid"));
-	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portgroupKey"));
-	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portKey"));
-	props[ZBX_VMWARE_DEV_PROPS_IFIPS] = vmware_vm_get_nic_device_ips(details, guestnet_node,
-			props[ZBX_VMWARE_DEV_PROPS_IFMAC]);
-
-	return props;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: gets virtual machine network interface devices                    *
- *                                                                            *
- * Parameters: vm      - [OUT] the virtual machine                            *
- *             details - [IN] an xml document containing virtual machine data *
- *                                                                            *
- * Comments: The network interface devices are taken from vm device list      *
- *           filtered by macAddress key.                                      *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlNode		*guestnet_node;
-	int		i, nics = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	xpathCtx = xmlXPathNewContext(details);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
-			"[*[local-name()='macAddress']]", xpathCtx)))
-	{
-		goto clean;
-	}
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-	guestnet_node = zbx_xml_doc_get(details, ZBX_XPATH_PROP_NAME("guest.net"));
-	zbx_vector_ptr_reserve(&vm->devs, (size_t)(nodeset->nodeNr + vm->devs.values_alloc));
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		char			*key;
-		zbx_vmware_dev_t	*dev;
-
-		if (NULL == (key = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='key']")))
-			continue;
-
-		dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
-		dev->type = ZBX_VMWARE_DEV_TYPE_NIC;
-		dev->instance = key;
-		dev->label = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-				"*[local-name()='deviceInfo']/*[local-name()='label']");
-		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i], guestnet_node);
-
-		zbx_vector_ptr_append(&vm->devs, dev);
-		nics++;
-	}
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, nics);
-}
-
-#define ZBX_XPATH_VM_INSTANCE_UUID()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
-		"/*[local-name()='val']"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create virtual machine object                                     *
@@ -1129,9 +1126,5 @@ out:
 
 	return vm;
 }
-
-
-
-
 
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

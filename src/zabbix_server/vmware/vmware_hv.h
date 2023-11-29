@@ -28,6 +28,7 @@
 
 zbx_hash_t	vmware_hv_hash(const void *data);
 int	vmware_hv_compare(const void *d1, const void *d2);
+void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv);
 void	vmware_hv_clean(zbx_vmware_hv_t *hv);
 
 int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
@@ -35,7 +36,6 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 		zbx_vector_cq_value_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
 		char **error);
 
-void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

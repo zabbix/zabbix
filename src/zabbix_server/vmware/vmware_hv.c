@@ -33,28 +33,37 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-
-/* hypervisor hashset support */
-zbx_hash_t	vmware_hv_hash(const void *data)
-{
-	const zbx_vmware_hv_t	*hv = (const zbx_vmware_hv_t *)data;
-
-	return ZBX_DEFAULT_STRING_HASH_ALGO(hv->uuid, strlen(hv->uuid), ZBX_DEFAULT_HASH_SEED);
-}
-
-int	vmware_hv_compare(const void *d1, const void *d2)
-{
-	const zbx_vmware_hv_t	*hv1 = (const zbx_vmware_hv_t *)d1;
-	const zbx_vmware_hv_t	*hv2 = (const zbx_vmware_hv_t *)d2;
-
-	return strcmp(hv1->uuid, hv2->uuid);
-}
-
+#define ZBX_XPATH_HV_PNICS()										\
+	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PhysicalNic']"	\
 
 #define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)			\
 	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
+
+#define ZBX_XPATH_HV_DATASTORES()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
+	"/*[local-name()='val']/*[@type='Datastore']"
+
+
+#define ZBX_XPATH_HV_VMS()										\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
+	"/*[local-name()='val']/*[@type='VirtualMachine']"
+
+#define ZBX_XPATH_HV_SCSI_TOPOLOGY					\
+		ZBX_XPATH_PROP_NAME("config.storageDevice.scsiTopology")				\
+		"/*[local-name()='adapter']/*[local-name()='target']"					\
+		"/*[local-name()='lun']/*[local-name()='scsiLun']"
+
+#define ZBX_XPATH_HV_MULTIPATH(state)					\
+		"count(/*/*/*/*/*/*[local-name()='propSet'][1]/*[local-name()='val']"			\
+		"/*[local-name()='lun'][*[local-name()='lun'][text()='%s']][1]"				\
+		"/*[local-name()='path']" state ")"
+
+#define ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
+#define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
+		ZBX_XPATH_HV_MULTIPATH("[*[local-name()='state'][text()='active']]")
+
 
 #define ZBX_HVPROPMAP_EXT(property, func, ver)								\
 	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
@@ -91,6 +100,40 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP_EXT("runtime.healthSystemRuntime.hardwareStatusInfo",
 			zbx_xmlnode_to_json, 0)			/* ZBX_VMWARE_HVPROP_HW_SENSOR */
 };
+
+#define ZBX_XPATH_NAME_BY_TYPE(type)									\
+	ZBX_XPATH_PROP_OBJECT(type) "*[local-name()='propSet'][*[local-name()='name']]"			\
+	"/*[local-name()='val']"
+
+
+#define ZBX_XPATH_HV_PARENTID										\
+	ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE("parent")
+
+#define ZBX_XPATH_HV_PARENTFOLDERNAME(parent_id)							\
+	"/*/*/*/*/*[local-name()='objects']["								\
+		"*[local-name()='obj'][@type='Folder'] and "						\
+		"*[local-name()='propSet'][*[local-name()='name'][text()='childEntity']]"		\
+		"/*[local-name()='val']/*[local-name()='ManagedObjectReference']=" parent_id " and "	\
+		"*[local-name()='propSet'][*[local-name()='name'][text()='parent']]"			\
+		"/*[local-name()='val'][@type!='Datacenter']"						\
+	"]/*[local-name()='propSet'][*[local-name()='name'][text()='name']]/*[local-name()='val']"
+
+
+/* hypervisor hashset support */
+zbx_hash_t	vmware_hv_hash(const void *data)
+{
+	const zbx_vmware_hv_t	*hv = (const zbx_vmware_hv_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(hv->uuid, strlen(hv->uuid), ZBX_DEFAULT_HASH_SEED);
+}
+
+int	vmware_hv_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_hv_t	*hv1 = (const zbx_vmware_hv_t *)d1;
+	const zbx_vmware_hv_t	*hv2 = (const zbx_vmware_hv_t *)d2;
+
+	return strcmp(hv1->uuid, hv2->uuid);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -217,9 +260,6 @@ void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 	vmware_props_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
-
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: gets the vmware hypervisor data                                   *
@@ -302,22 +342,6 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 #	undef	ZBX_POST_HV_DETAILS
 }
-
-#define ZBX_XPATH_HV_PARENTID										\
-	ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE("parent")
-
-#define ZBX_XPATH_HV_PARENTFOLDERNAME(parent_id)							\
-	"/*/*/*/*/*[local-name()='objects']["								\
-		"*[local-name()='obj'][@type='Folder'] and "						\
-		"*[local-name()='propSet'][*[local-name()='name'][text()='childEntity']]"		\
-		"/*[local-name()='val']/*[local-name()='ManagedObjectReference']=" parent_id " and "	\
-		"*[local-name()='propSet'][*[local-name()='name'][text()='parent']]"			\
-		"/*[local-name()='val'][@type!='Datacenter']"						\
-	"]/*[local-name()='propSet'][*[local-name()='name'][text()='name']]/*[local-name()='val']"
-
-#define ZBX_XPATH_NAME_BY_TYPE(type)									\
-	ZBX_XPATH_PROP_OBJECT(type) "*[local-name()='propSet'][*[local-name()='name']]"			\
-	"/*[local-name()='val']"
 
 /******************************************************************************
  *                                                                            *
@@ -727,11 +751,6 @@ clean:
 	return updated_vsan;
 }
 
-#define ZBX_XPATH_HV_SCSI_TOPOLOGY									\
-		ZBX_XPATH_PROP_NAME("config.storageDevice.scsiTopology")				\
-		"/*[local-name()='adapter']/*[local-name()='target']"					\
-		"/*[local-name()='lun']/*[local-name()='scsiLun']"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: gets the vmware hypervisor internal disks details info            *
@@ -888,7 +907,6 @@ static int	vmware_diskinfo_diskname_compare(const void *d1, const void *d2)
 
 	return strcmp(di1->diskname, di2->diskname);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1094,10 +1112,6 @@ out:
 	return value;
 }
 
-
-#define ZBX_XPATH_HV_PNICS()										\
-	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PhysicalNic']"	\
-
 static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_pnic_t *nics)
 {
 	xmlXPathContext	*xpathCtx;
@@ -1191,24 +1205,6 @@ static const char	*vmware_hv_vsan_uuid(zbx_vector_vmware_datastore_t *dss, zbx_v
 
 	return NULL;
 }
-
-#define ZBX_XPATH_HV_DATASTORES()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
-	"/*[local-name()='val']/*[@type='Datastore']"
-
-
-#define ZBX_XPATH_HV_VMS()										\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
-	"/*[local-name()='val']/*[@type='VirtualMachine']"
-
-#define ZBX_XPATH_HV_MULTIPATH(state)									\
-		"count(/*/*/*/*/*/*[local-name()='propSet'][1]/*[local-name()='val']"			\
-		"/*[local-name()='lun'][*[local-name()='lun'][text()='%s']][1]"				\
-		"/*[local-name()='path']" state ")"
-
-#define ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
-#define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
-		ZBX_XPATH_HV_MULTIPATH("[*[local-name()='state'][text()='active']]")
 
 /******************************************************************************
  *                                                                            *
