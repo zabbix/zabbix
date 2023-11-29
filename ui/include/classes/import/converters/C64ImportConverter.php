@@ -254,7 +254,7 @@ class C64ImportConverter extends CConverter {
 			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
 					&& array_key_exists('params', $item_prototype)) {
 				$item_prototype['params'] = self::convertExpression($item_prototype['params']);
-				$item_prototype['params'] = self::convertCalcItemFormula($item_prototype['params'], true);
+				$item_prototype['params'] = self::convertCalcItemFormula($item_prototype['params']);
 			}
 
 			if ($item_prototype['type'] !== CXmlConstantName::HTTP_AGENT
@@ -440,14 +440,13 @@ class C64ImportConverter extends CConverter {
 	 * Removes useless 2nd parameter from last_foreach() functions.
 	 *
 	 * @param string $formula
-	 * @param bool   $prototype
 	 *
 	 * @return string
 	 */
-	private static function convertCalcItemFormula(string $formula, bool $prototype = false): string {
+	private static function convertCalcItemFormula(string $formula): string {
 		$expression_parser = new CExpressionParser([
 			'usermacros' => true,
-			'lldmacros' => $prototype,
+			'lldmacros' => true,
 			'calculated' => true,
 			'host_macro' => true,
 			'empty_host' => true
