@@ -128,9 +128,11 @@ window.widget_honeycomb_form = new class {
 			label_size_type_value === <?= WidgetForm::LABEL_SIZE_CUSTOM ?> ? '%' : '';
 
 		fields_group.querySelectorAll('.js-label-units-hr, .js-label-units-show, .js-label-units, .js-label-units-pos')
-			.forEach(
-				element => element.style.display = label_type_value === <?= WidgetForm::LABEL_TYPE_VALUE ?> ? '' : 'none'
-			);
+			.forEach(element => {
+				element.style.display = label_type_value === <?= WidgetForm::LABEL_TYPE_VALUE ?>
+					? ''
+					: 'none';
+			});
 
 		fields_group.querySelectorAll('.js-label-units input, .js-label-units-pos z-select')
 			.forEach(element => element.disabled = !label_units_show_checked);

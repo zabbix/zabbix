@@ -48,15 +48,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'vars' => []
+			'vars' => [
+				'cells' => $this->getCells()
+			]
 		];
-
-		if ($this->isTemplateDashboard() && !$this->fields_values['hostids']) {
-			$data['vars']['cells']['no_data'] = true;
-		}
-		else {
-			$data['vars']['cells'] = $this->getCellData();
-		}
 
 		if ($this->hasInput('with_config')) {
 			$data['vars']['config'] = $this->getConfig();
@@ -65,61 +60,57 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getCellData(): array {
-		$cells = [];
-
-		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-			? getSubGroups($this->fields_values['groupids'])
-			: null;
-
-		$hostids = $this->fields_values['hostids'] ?: null;
-
-		$host_tags_exist = array_key_exists('host_tags', $this->fields_values);
-
-		$maintenance_status = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
-			? HOST_MAINTENANCE_STATUS_OFF
-			: null;
+	private function getCells(): array {
+		if ($this->isTemplateDashboard() && !$this->fields_values['hostids']) {
+			return [];
+		}
 
 		$hosts = API::Host()->get([
 			'output' => [],
-			'groupids' => $groupids,
-			'hostids' => $hostids,
-			'evaltype' => $host_tags_exist ? $this->fields_values['evaltype_host'] : null,
-			'tags' => $host_tags_exist ? $this->fields_values['host_tags'] : null,
-			'filter' => ['maintenance_status' => $maintenance_status],
+			'groupids' => !$this->isTemplateDashboard() && $this->fields_values['groupids']
+				? getSubGroups($this->fields_values['groupids'])
+				: null,
+			'hostids' => $this->fields_values['hostids'] ?: null,
+			'evaltype' => array_key_exists('host_tags', $this->fields_values)
+				? $this->fields_values['evaltype_host']
+				: null,
+			'tags' => array_key_exists('host_tags', $this->fields_values)
+				? $this->fields_values['host_tags']
+				: null,
+			'filter' => [
+				'maintenance_status' => $this->fields_values['maintenance'] != 1
+					? HOST_MAINTENANCE_STATUS_OFF
+					: null
+			],
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 
-		$hostids = array_keys($hosts);
-
-		if (!$hostids) {
-			$cells['no_data'] = true;
-
-			return $cells;
+		if (!$hosts) {
+			return [];
 		}
-
-		$item_tags_exist = array_key_exists('item_tags', $this->fields_values);
 
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'units', 'value_type'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
-			'hostids' => $hostids,
-			'evaltype' => $item_tags_exist ? $this->fields_values['evaltype_item'] : null,
-			'tags' => $item_tags_exist ? $this->fields_values['item_tags'] : null,
+			'hostids' => array_keys($hosts),
+			'evaltype' => array_key_exists('item_tags', $this->fields_values)
+				? $this->fields_values['evaltype_item']
+				: null,
+			'tags' => array_key_exists('item_tags', $this->fields_values)
+				? $this->fields_values['item_tags']
+				: null,
 			'selectValueMap' => ['mappings'],
 			'search' => [
-				'name' => self::processItemPattern($this->fields_values['items'])
+				'name' => in_array('*', $this->fields_values['items']) ? null : $this->fields_values['items']
 			],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true
 		]);
 
 		if (!$items) {
-			$cells['no_data'] = true;
-
-			return $cells;
+			return [];
 		}
 
 		foreach ($items as &$item) {
@@ -131,118 +122,99 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$history = Manager::History()->getLastValues($items, 1, $history_period);
+
 		$show = array_flip($this->fields_values['show']);
 
-		foreach ($items as &$item) {
-			$item['value'] = array_key_exists($item['itemid'], $history)
-				? $history[$item['itemid']][0]['value']
-				: null;
+		$cells = [];
 
-			if ($item['value'] !== null) {
-				$original_units = $item['units'];
-				$primary_label = '';
-				$secondary_label = '';
-
-				if (array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)) {
-					if ($this->fields_values['primary_label_type'] == WidgetForm::LABEL_TYPE_VALUE) {
-						if ($this->fields_values['primary_label_units_show'] == 1) {
-							if ($this->fields_values['primary_label_units'] !== '') {
-								$item['units'] = $this->fields_values['primary_label_units'];
-							}
-						}
-						else {
-							$item['units'] = '';
-						}
-
-						$formatted_primary_value = formatHistoryValueRaw($item['value'], $item, false, [
-							'decimals' => $this->fields_values['primary_label_decimal_places'],
-							'decimals_exact' => true,
-							'small_scientific' => false,
-							'zero_as_zero' => false
-						]);
-
-						$item['units'] = $original_units;
-
-						if ($this->fields_values['primary_label_units_show'] == 1) {
-							$primary_label =
-								$this->fields_values['primary_label_units_pos'] == WidgetForm::UNITS_POSITION_BEFORE
-									? $formatted_primary_value['units'].' '.$formatted_primary_value['value']
-									: $formatted_primary_value['value'].' '.$formatted_primary_value['units'];
-						}
-						else {
-							$primary_label = $formatted_primary_value['value'];
-						}
-					}
-					else {
-						$primary_label = $this->fields_values['primary_label'];
-
-						if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
-							[[
-								'primary_label' => $primary_label
-							]] = CMacrosResolverHelper::resolveLabels([$item + ['primary_label' => $primary_label
-								]], 'primary_label');
-						}
-					}
-				}
-
-				if (array_key_exists(WidgetForm::SHOW_SECONDARY_LABEL, $show)) {
-					if ($this->fields_values['secondary_label_type'] == WidgetForm::LABEL_TYPE_VALUE) {
-						if ($this->fields_values['secondary_label_units_show'] == 1) {
-							if ($this->fields_values['secondary_label_units'] !== '') {
-								$item['units'] = $this->fields_values['secondary_label_units'];
-							}
-						}
-						else {
-							$item['units'] = '';
-						}
-
-						$formatted_secondary_value = formatHistoryValueRaw($item['value'], $item, false, [
-							'decimals' => $this->fields_values['secondary_label_decimal_places'],
-							'decimals_exact' => true,
-							'small_scientific' => false,
-							'zero_as_zero' => false
-						]);
-
-						$item['units'] = $original_units;
-
-						if ($this->fields_values['secondary_label_units_show'] == 1) {
-							$secondary_label =
-								$this->fields_values['secondary_label_units_pos'] == WidgetForm::UNITS_POSITION_BEFORE
-									? $formatted_secondary_value['units'].' '.$formatted_secondary_value['value']
-									: $formatted_secondary_value['value'].' '.$formatted_secondary_value['units'];
-						}
-						else {
-							$secondary_label = $formatted_secondary_value['value'];
-						}
-					}
-					else {
-						$secondary_label = $this->fields_values['secondary_label'];
-
-						if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
-							[[
-								'secondary_label' => $secondary_label
-							]] = CMacrosResolverHelper::resolveLabels([$item + [
-									'secondary_label' => $secondary_label
-								]], 'secondary_label');
-						}
-					}
-				}
-
-				$cells[] = [
-					'hostid' => $item['hostid'],
-					'itemid' => $item['itemid'],
-					'primary_label' => $primary_label,
-					'secondary_label' => $secondary_label,
-					'value' => $item['value'],
-					'is_numeric' => $item['value_type'] == ITEM_VALUE_TYPE_FLOAT
-						|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64,
-					'is_binary_units' => isBinaryUnits($item['units'])
-				];
+		foreach ($items as $item) {
+			if (!array_key_exists($item['itemid'], $history)) {
+				continue;
 			}
+
+			$last_value = $history[$item['itemid']][0]['value'];
+
+			$primary_label = array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)
+				? self::getCellLabel($item, $last_value, [
+					'label' =>					$this->fields_values['primary_label'],
+					'label_decimal_places' =>	$this->fields_values['primary_label_decimal_places'],
+					'label_type' =>				$this->fields_values['primary_label_type'],
+					'label_units' =>			$this->fields_values['primary_label_units'],
+					'label_units_pos' =>		$this->fields_values['primary_label_units_pos'],
+					'label_units_show' =>		$this->fields_values['primary_label_units_show']
+				])
+				: '';
+
+			$secondary_label = array_key_exists(WidgetForm::SHOW_SECONDARY_LABEL, $show)
+				? self::getCellLabel($item, $last_value, [
+					'label' =>					$this->fields_values['secondary_label'],
+					'label_decimal_places' =>	$this->fields_values['secondary_label_decimal_places'],
+					'label_type' =>				$this->fields_values['secondary_label_type'],
+					'label_units' =>			$this->fields_values['secondary_label_units'],
+					'label_units_pos' =>		$this->fields_values['secondary_label_units_pos'],
+					'label_units_show' =>		$this->fields_values['secondary_label_units_show']
+				])
+				: '';
+
+			$cells[] = [
+				'hostid' => $item['hostid'],
+				'itemid' => $item['itemid'],
+				'primary_label' => $primary_label,
+				'secondary_label' => $secondary_label,
+				'value' => $last_value,
+				'is_numeric' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]),
+				'is_binary_units' => isBinaryUnits($item['units'])
+			];
 		}
-		unset($item);
 
 		return $cells;
+	}
+
+	private function getCellLabel(array $item, $last_value, array $context_fields_values): string {
+		if ($context_fields_values['label_type'] == WidgetForm::LABEL_TYPE_TEXT) {
+			$label = $context_fields_values['label'];
+
+			if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
+				$resolved_label = CMacrosResolverHelper::resolveLabels([$item + ['label' => $label]], 'label');
+				$label = $resolved_label[0]['label'];
+			}
+
+			return $label;
+		}
+
+		switch ($item['value_type']) {
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				if ($context_fields_values['label_units_show'] == 1) {
+					if ($context_fields_values['label_units'] !== '') {
+						$item['units'] = $context_fields_values['label_units'];
+					}
+				}
+				else {
+					$item['units'] = '';
+				}
+
+				$formatted_value = formatHistoryValueRaw($last_value, $item, false, [
+					'decimals' => $context_fields_values['label_decimal_places'],
+					'decimals_exact' => true,
+					'small_scientific' => false,
+					'zero_as_zero' => false
+				]);
+
+				if ($context_fields_values['label_units_show'] == 1) {
+					return $context_fields_values['label_units_pos'] == WidgetForm::UNITS_POSITION_BEFORE
+						? $formatted_value['units'].' '.$formatted_value['value']
+						: $formatted_value['value'].' '.$formatted_value['units'];
+				}
+
+				return $formatted_value['value'];
+
+			case ITEM_VALUE_TYPE_BINARY:
+				return _('binary value');
+
+			default:
+				return formatHistoryValue($last_value, $item, false);
+		}
 	}
 
 	private function getConfig(): array {
@@ -307,17 +279,5 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($threshold);
 
 		return $config;
-	}
-
-	/**
-	 * Prepare an array to be used for items filtering.
-	 *
-	 * @param array  $patterns  Array of strings containing item patterns.
-	 *
-	 * @return array|mixed  Returns array of patterns.
-	 *                      Returns NULL if array contains '*' (so any possible item search matches).
-	 */
-	private static function processItemPattern(array $patterns): ?array {
-		return in_array('*', $patterns, true) ? null : $patterns;
 	}
 }
