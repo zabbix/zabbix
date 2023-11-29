@@ -242,6 +242,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  *             N_functionid - [OUT] index of the macro in string (if valid)   *
  *                                                                            *
  * Return value: unindexed macro  or NULL.                                    *
+ * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
 char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)

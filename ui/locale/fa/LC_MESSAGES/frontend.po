@@ -16790,6 +16790,10 @@ msgstr ""
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr ""
 
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
 msgid "Revert"
@@ -23525,6 +23529,11 @@ msgstr ""
 #: app/views/administration.user.edit.php:491
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
+msgstr ""
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
 msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525

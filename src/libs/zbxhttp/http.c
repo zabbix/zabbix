@@ -28,10 +28,6 @@
 
 #ifdef HAVE_LIBCURL
 
-extern char	*CONFIG_SSL_CA_LOCATION;
-extern char	*CONFIG_SSL_CERT_LOCATION;
-extern char	*CONFIG_SSL_KEY_LOCATION;
-
 size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t			r_size = size * nmemb;
@@ -95,7 +91,8 @@ int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zb
 
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
-		const char *config_source_ip, char **error)
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 	CURLcode	err;
 
@@ -123,9 +120,9 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		}
 	}
 
-	if (0 != verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
+	if (0 != verify_peer && NULL != config_ssl_ca_location)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, config_ssl_ca_location)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot specify directory holding CA certificates: %s",
 					curl_easy_strerror(err));
@@ -135,9 +132,8 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 
 	if (NULL != ssl_cert_file && '\0' != *ssl_cert_file)
 	{
-		char	*file_name;
+		char	*file_name = zbx_dsprintf(NULL, "%s/%s", config_ssl_cert_location, ssl_cert_file);
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, ssl_cert_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL certificate file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
@@ -159,9 +155,8 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 
 	if (NULL != ssl_key_file && '\0' != *ssl_key_file)
 	{
-		char	*file_name;
+		char	*file_name = zbx_dsprintf(NULL, "%s/%s", config_ssl_key_location, ssl_key_file);
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, ssl_key_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL private key file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
@@ -314,7 +309,9 @@ char	*zbx_http_parse_header(char **headers)
 }
 
 int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, char **out, long *response_code, char **error)
+		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **out,
+		long *response_code, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -339,8 +336,11 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, "", 1, 1, config_source_ip, error))
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, "", 1, 1, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, error))
+	{
 		goto clean;
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)))
 	{
@@ -578,9 +578,12 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 	zbx_json_free(&json);
 }
 
-CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context)
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
+		int check_response_code)
 {
 	CURLcode	err;
+	char	status_codes[] = "200,400,401,403,404,405,415,422";
+	long	response_code;
 
 	/* try to retrieve page several times depending on number of retries */
 	do
@@ -589,6 +592,22 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 
 		if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 		{
+			if (1 == check_response_code)
+			{
+				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+						&response_code)))
+				{
+					zabbix_log(LOG_LEVEL_INFORMATION, "cannot get the response code: %s",
+							curl_easy_strerror(err));
+
+					goto next_attempt;
+				}
+				else if (FAIL == zbx_int_in_list(status_codes, (int)response_code))
+					goto next_attempt;
+
+				return err;
+			}
+
 			return err;
 		}
 		else
@@ -600,8 +619,12 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 			}
 		}
 
+next_attempt:
 		context->header.offset = 0;
 		context->body.offset = 0;
+
+		if (0 != attempt_interval && 1 < context->max_attempts)
+			sleep((unsigned int)attempt_interval);
 	}
 	while (0 < --context->max_attempts);
 
@@ -767,7 +790,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
 		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
-		char **error)
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 	CURLcode		err;
 	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], *headers_ptr, *line;
@@ -841,7 +865,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 	}
 
 	if (SUCCEED != zbx_http_prepare_ssl(context->easyhandle, ssl_cert_file, ssl_key_file, ssl_key_password,
-			verify_peer, verify_host, config_source_ip, error))
+			verify_peer, verify_host, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			config_ssl_key_location, error))
 	{
 		goto clean;
 	}

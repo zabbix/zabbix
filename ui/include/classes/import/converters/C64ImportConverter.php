@@ -193,6 +193,7 @@ class C64ImportConverter extends CConverter {
 
 			if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
 				$item['params'] = self::convertExpression($item['params']);
+				$item['params'] = self::convertCalcItemFormula($item['params']);
 			}
 
 			if ($item['type'] !== CXmlConstantName::HTTP_AGENT && $item['type'] !== CXmlConstantName::SCRIPT) {
@@ -253,6 +254,7 @@ class C64ImportConverter extends CConverter {
 			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
 					&& array_key_exists('params', $item_prototype)) {
 				$item_prototype['params'] = self::convertExpression($item_prototype['params']);
+				$item_prototype['params'] = self::convertCalcItemFormula($item_prototype['params'], true);
 			}
 
 			if ($item_prototype['type'] !== CXmlConstantName::HTTP_AGENT
@@ -432,6 +434,48 @@ class C64ImportConverter extends CConverter {
 		}
 
 		return $expression;
+	}
+
+	/**
+	 * Removes useless 2nd parameter from last_foreach() functions.
+	 *
+	 * @param string $formula
+	 * @param bool   $prototype
+	 *
+	 * @return string
+	 */
+	private static function convertCalcItemFormula(string $formula, bool $prototype = false): string {
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => $prototype,
+			'calculated' => true,
+			'host_macro' => true,
+			'empty_host' => true
+		]);
+
+		if ($expression_parser->parse($formula) != CParser::PARSE_SUCCESS) {
+			return $formula;
+		}
+
+		$tokens = $expression_parser
+			->getResult()
+			->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
+
+		foreach (array_reverse($tokens) as $token) {
+			if ($token['data']['function'] === 'last_foreach') {
+				if (count($token['data']['parameters']) == 2) {
+					$pos = $token['data']['parameters'][1]['pos'];
+					$length = $token['data']['parameters'][1]['length'];
+					for ($lpos = $pos; $formula[$lpos] !== ','; $lpos--)
+						;
+					$rpos = strpos($formula, ')', $pos + $length);
+
+					$formula = substr_replace($formula, '', $lpos, $rpos - $lpos);
+				}
+			}
+		}
+
+		return $formula;
 	}
 
 	/**
