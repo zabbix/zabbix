@@ -551,7 +551,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		info(_s('Error in search request for table "%1$s".', $table));
+		error(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$start = $options['startSearch'] ? '' : '%';

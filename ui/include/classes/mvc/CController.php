@@ -227,7 +227,7 @@ abstract class CController {
 					unset($input['formdata'], $input['data'], $input['sign']);
 				}
 				else {
-					info(_('Operation cannot be performed due to unauthorized request.'));
+					error(_('Operation cannot be performed due to unauthorized request.'));
 				}
 
 				// Replace window.history to avoid resubmission warning dialog.
@@ -253,7 +253,7 @@ abstract class CController {
 				$input += $json_input;
 			}
 			else {
-				info(_('JSON array input is expected.'));
+				error(_('JSON array input is expected.'));
 			}
 		}
 
@@ -340,14 +340,14 @@ abstract class CController {
 			->getTimestamp();
 
 		if ($period < ZBX_MIN_PERIOD) {
-			info(_n('Minimum time period to display is %1$s minute.',
+			error(_n('Minimum time period to display is %1$s minute.',
 				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			));
 
 			return false;
 		}
 		elseif ($period > $max_period) {
-			info(_n('Maximum time period to display is %1$s day.',
+			error(_n('Maximum time period to display is %1$s day.',
 				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 			));
 
