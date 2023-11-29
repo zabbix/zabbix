@@ -371,14 +371,7 @@ class C64ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('dependencies', $trigger)) {
-				foreach ($trigger['dependencies'] as &$dependency) {
-					$dependency['expression'] = self::convertExpression($dependency['expression']);
-
-					if (array_key_exists('recovery_expression', $dependency)) {
-						$dependency['recovery_expression'] = self::convertExpression($dependency['recovery_expression']);
-					}
-				}
-				unset($dependency);
+				$trigger['dependencies'] = self::convertTriggers($trigger['dependencies']);
 			}
 		}
 		unset($trigger);
