@@ -116,7 +116,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$data_last = $data_last ? reset($data_last) : null;
 
 			if ($with_data_prev && $data_last !== null) {
-				$time_from_prev = $time_from * 2 - $time_to - 1;
+				$time_from_prev = $time_from - ($time_to - $time_from) - 1;
 				$time_to_prev = $time_from - 1;
 
 				$item_prev = $this->addDataSource($item, $time_from_prev);
