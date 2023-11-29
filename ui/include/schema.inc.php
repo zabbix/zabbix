@@ -9945,14 +9945,25 @@ return [
 		]
 	],
 	'host_proxy' => [
-		'key' => 'hostid',
+		'key' => 'hostproxyid',
 		'fields' => [
-			'hostid' => [
+			'hostproxyid' => [
 				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'hostid' => [
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
+			],
+			'host' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
 			],
 			'proxyid' => [
 				'null' => false,
