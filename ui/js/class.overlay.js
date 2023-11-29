@@ -443,7 +443,25 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'prevent_navigation':
-			window.removeEventListener('beforeunload', this.preventNavigation);
+			const prevent_navigation_overlays = Object.values(overlays_stack.map).filter((overlay) =>
+				overlay.$dialogue[0].dataset.preventNavigation === 'true'
+			);
+
+			const was_closed_overlay_preventing_navigation = prevent_navigation_overlays.find((overlay) =>
+				overlay.dialogueid === this.$dialogue[0].dataset.dialogueid
+			) instanceof Overlay;
+
+			const allow_navigation_first_overlay = prevent_navigation_overlays?.length === 0
+				&& this.$dialogue[0].dataset.preventNavigation !== 'true';
+
+			const allow_navigation_inner_overlays = prevent_navigation_overlays?.length !== 0
+				&& was_closed_overlay_preventing_navigation
+				&& isVisible(this.$dialogue[0]);
+
+			if (allow_navigation_first_overlay || allow_navigation_inner_overlays) {
+				window.removeEventListener('beforeunload', this.preventNavigation);
+			}
+
 			break;
 	}
 };
@@ -512,6 +530,7 @@ Overlay.prototype.setProperties = function(obj) {
 				break;
 
 			case 'prevent_navigation':
+				this.$dialogue[0].dataset.preventNavigation = obj[key];
 				this.unsetProperty(key);
 				window.addEventListener('beforeunload', this.preventNavigation, {passive: false});
 				break;
