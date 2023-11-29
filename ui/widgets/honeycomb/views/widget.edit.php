@@ -36,7 +36,11 @@ $groupids_field = array_key_exists('groupids', $data['fields'])
 
 $hostids_field = $data['templateid'] === null
 	? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
-		->setFilterPreselect(['id' => $groupids_field->getId(), 'submit_as' => 'groupid'])
+		->setFilterPreselect([
+			'id' => $groupids_field->getId(),
+			'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
+			'submit_as' => 'groupid'
+		])
 	: null;
 
 $form
@@ -55,7 +59,11 @@ $form
 		(new CWidgetFieldPatternSelectItemView($data['fields']['items']))
 			->setPlaceholder(_('item pattern'))
 			->setFilterPreselect($hostids_field !== null
-				? ['id' => $hostids_field->getId(), 'submit_as' => 'hostid']
+				? [
+					'id' => $hostids_field->getId(),
+					'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
+					'submit_as' => 'hostid'
+				]
 				: []
 			)
 	)

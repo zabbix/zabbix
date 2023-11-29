@@ -43,7 +43,11 @@ $form
 	)
 	->addField(array_key_exists('hostids', $data['fields'])
 		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
-			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+			->setFilterPreselect([
+				'id' => $groupids->getId(),
+				'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
+				'submit_as' => 'groupid'
+			])
 		: null
 	)
 	->addField(
