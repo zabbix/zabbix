@@ -263,7 +263,7 @@ class CScript extends CApiService {
 		foreach ($scripts as $index => $script) {
 			if (($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT)
 					&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-				$this->checkManualInput($script, '/'.($index + 1), $regex_validator);
+				self::checkManualInput($script, '/'.($index + 1), $regex_validator);
 			}
 		}
 
@@ -616,14 +616,14 @@ class CScript extends CApiService {
 	/**
 	 * Validates manual input fields.
 	 *
-	 * @param array            $script     [IN/OUT] Script data.
-	 * @param string           $path       [IN] Script pathing index.
-	 * @param CRegexValidator  $validator  [IN] Regular expression validator.
+	 * @param array            $script     Script data.
+	 * @param string           $path       Script pathing index.
+	 * @param CRegexValidator  $validator  Regular expression validator.
 	 *
 	 * $script = [
 	 *     'manualinput_validator_type' => (int)     Manual input validator type.
 	 *     'manualinput_validator' =>      (string)  Regular expression or comma separated list.
-	 *     'manualinput_default_value' =>  (string)  Mmanual input default value (used when manual input validator type
+	 *     'manualinput_default_value' =>  (string)  Manual input default value (used when manual input validator type
 	 *                                               is list).
 	 * ]
 	 *
@@ -752,7 +752,7 @@ class CScript extends CApiService {
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			/*
-			 * Regardless of "manualinput" value, allow {MANUALINPUT} macro in URL. Otherwise changing "manualinput" to
+			 * Regardless of "manualinput" value, allow {MANUALINPUT} macro in URL. Otherwise, changing "manualinput" to
 			 * DISABLED, will require additional URL re-validation and that would be not only confusing but also
 			 * annoying to user.
 			 */
@@ -1224,7 +1224,7 @@ class CScript extends CApiService {
 	 * @param array  $options
 	 *
 	 *  $options = [
-	 *     'hostid' =>      (string)  Event ID to return scripts for.
+	 *     'eventid' =>     (string)  Event ID to return scripts for.
 	 *     'scriptid' =>    (string)  Script ID for value retrieval (optional).
 	 *     'manualinput' => (string)  Value of the user-provided {MANUALINPUT} macro value (optional).
 	 * ]

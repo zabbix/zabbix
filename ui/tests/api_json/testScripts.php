@@ -10574,7 +10574,7 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents invalid "scriptid" field (array)' => [
 				'request' => [
 					[
-						'eventid' =>  'plain_rw_single_d',
+						'eventid' => 'plain_rw_single_d',
 						'scriptid' => []
 					]
 				],
@@ -10584,7 +10584,7 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents invalid "scriptid" field (string)' => [
 				'request' => [
 					[
-						'eventid' =>  'plain_rw_single_d',
+						'eventid' => 'plain_rw_single_d',
 						'scriptid' => ''
 					]
 				],
@@ -10594,7 +10594,7 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents invalid "manualinput" field (array)' => [
 				'request' => [
 					[
-						'eventid' =>  'plain_rw_single_d',
+						'eventid' => 'plain_rw_single_d',
 						'manualinput' => []
 					]
 				],
@@ -10604,7 +10604,7 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents invalid "manualinput" field (integer)' => [
 				'request' => [
 					[
-						'eventid' =>  'plain_rw_single_d',
+						'eventid' => 'plain_rw_single_d',
 						'manualinput' => 555
 					]
 				],
@@ -10661,13 +10661,13 @@ class testScripts extends CAPITest {
 						'eventid' => 'plain_d_single_d'
 					],
 					[
-						'eventid' =>  'plain_rw_r_dual_d'
+						'eventid' => 'plain_rw_r_dual_d'
 					],
 					[
-						'eventid' =>  'macros_rw_single_1_h'
+						'eventid' => 'macros_rw_single_1_h'
 					],
 					[
-						'eventid' =>  'macros_rw_r_dual_1_2_h'
+						'eventid' => 'macros_rw_r_dual_1_2_h'
 					],
 					[
 						'eventid' => 'macros_rw_dual_1_3_h'

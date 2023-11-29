@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
@@ -38,13 +39,10 @@ class testScriptManualInput extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData(): bool {
-		// First, create host group and a host in that group
-		//
-		// Calling for a script execution requires a host context,
-		// regardless of where the script will eventually execute.
-		//
-		// Although a default Zabbix installation already defines a host, the
-		// server itself, we want the tests to be self-contained.
+		/*
+		 * Calling for a script execution requires a host context, regardless of where the script will eventually
+		 * execute. For tests to be self-contained, a new host and new host group is created.
+		 */
 		$response = CDataHelper::call('hostgroup.create', ['name' => 'Test Hosts']);
 
 		self::$hostgroupid = $response['groupids'][0];
@@ -60,45 +58,30 @@ class testScriptManualInput extends CIntegrationTest {
 
 		self::$hostid = $response['hostids'][0];
 
-		// Create scripts with and without manual input support
+		// Create scripts with and without manual input support.
 		$scripts = [
-			// See [1] for a reference of these script object descriptions.
-			//
-			// Required fields for script creation are:
-			// 	name, type, scope
-			// Required fields when the 'type' is set to 'Script':
-			// 	command
-			// Required fields when 'manualinput' is set to 'Enabled':
-			// 	manualinput_validator, manualinput_validator_type, manualinput_prompt
-			// Required fields when 'manualinput_validator_type' is set to 'String':
-			// 	manualinput_default_value
-			//
-			// Note:
-			//   When a script is created and is set to take manual input,
-			//   the API will also verify that 'manualinput_default_value'
-			//   passes the specified 'manualinput_validator', when the
-			//   validator is a regular expression
-			//   ('manualinput_validator_type' is ZBX_SCRIPT_MANUALINPUT_TYPE_STRING).
-			//
-			//   If no value for 'manualinput_default_value' is provided,
-			//   the API will fall back to setting it to an empty string,
-			//   which may not pass the validator, and thus fail the script
-			//   creation.
-			//
-			//   We explicitly set 'manualinput_prompt' and 'manualinput_default_value'
-			//   values here to appease the API, but they're not actually
-			//   relied upon in these tests.
-			//
-			// [1]: https://www.zabbix.com/documentation/current/en/manual/api/reference/script/object
-
+			/*
+			 * Required fields for script creation: 'name', 'type', and 'scope'.
+			 * If 'manualinput' = ZBX_SCRIPT_MANUALINPUT_ENABLED, required fields are:
+			 *   - 'manualinput_validator', 'manualinput_validator_type', 'manualinput_prompt'.
+			 *   - 'manualinput_default_value' (when 'manualinput_validator_type' = ZBX_SCRIPT_MANUALINPUT_TYPE_STRING).
+			 *
+			 * API validates 'manualinput_default_value' against 'manualinput_validator' (regular expression) if
+			 * 'manualinput_validator_type' = ZBX_SCRIPT_MANUALINPUT_TYPE_STRING. If 'manualinput_default_value' is not
+			 * provided, it defaults to an empty string.
+			 *
+			 * The values for 'manualinput_prompt' and 'manualinput_default_value' are set only for API requirements.
+			 *
+			 * See https://www.zabbix.com/documentation/7.0/en/manual/api/reference/script/object for a reference of
+			 * script object descriptions
+			 */
 			[
 				// Script that does not take any additional input
 				'name' => 'Manual Input Test Script #1',
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your mindmacro has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
-
-				'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+				'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED
 			],
 			[
 				// Script accepts one or more lowercase characters for {MANUALINPUT}
@@ -106,13 +89,11 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
-
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 				'manualinput_validator' => '^[a-z]+$',
-
 				'manualinput_prompt' => 'Tis but a prompt',
-				'manualinput_default_value' => 'abcdefghijklmnopqrstuvwxyz',
+				'manualinput_default_value' => 'abcdefghijklmnopqrstuvwxyz'
 			],
 			[
 				// Script accept one of a set of options for {MANUALINPUT}
@@ -120,12 +101,10 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
-
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => 'macro,mind',
-
-				'manualinput_prompt' => "T'is but a prompt",
+				'manualinput_prompt' => "T'is but a prompt"
 			]
 		];
 
@@ -135,6 +114,7 @@ class testScriptManualInput extends CIntegrationTest {
 
 		return true;
 	}
+
 	/**
 	 * Component configuration provider for server related tests.
 	 *
@@ -143,7 +123,7 @@ class testScriptManualInput extends CIntegrationTest {
 	public function serverConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
-				'StartTrappers' => 1,
+				'StartTrappers' => 1
 			]
 		];
 	}
@@ -151,8 +131,8 @@ class testScriptManualInput extends CIntegrationTest {
 	/**
 	 * @dataProvider validRequestDataProvider
 	 *
-	 * @param array $request_params Parameters to the script.execute API call
-	 * @param string $expected_result String matching a successful API call return value
+	 * @param array  $request_params   Parameters to the script.execute API call
+	 * @param string $expected_result  String matching a successful API call return value
 	 */
 	public function testScriptManualInput_ValidRequests(array $request_params, string $expected_result): void {
 		$response = $this->call('script.execute', $request_params);
@@ -166,8 +146,8 @@ class testScriptManualInput extends CIntegrationTest {
 	/**
 	 * @dataProvider invalidRequestDataProvider
 	 *
-	 * @param array $request_params Parameters to the script.execute API call
-	 * @param string $expected_result String matching a failed API call error value
+	 * @param array  $request_params   Parameters to the script.execute API call
+	 * @param string $expected_result  String matching a failed API call error value
 	 */
 	public function testScriptManualInput_InvalidRequests(array $request_params, string $expected_result): void {
 		$response = $this->call('script.execute', $request_params);
@@ -183,16 +163,16 @@ class testScriptManualInput extends CIntegrationTest {
 	 */
 	public function invalidRequestDataProvider(): array {
 		return [
-			// In general, there are only two scenarios in which a
-			// request will fail in regards to manual input:
-			//
-			// (1): there is no manual input provided at all
-			// (2): the input didn't pass validation
+			/*
+			 * Regarding 'manualinput', request failure is generally limited to two scenarios:
+			 *   - if no 'manualinput' is provided;
+			 *   - if 'manualinput' fails validation.
+			 */
 			[
 				'request_params' => [
 					'hostid' => self::$hostid,
 					'scriptid' => self::$scriptids[1],
-					'manualinput' => '5h0uld n0t m4tch a ^[a-z]+$ pattern',
+					'manualinput' => '5h0uld n0t m4tch a ^[a-z]+$ pattern'
 				],
 				'expected_result' => 'Provided script user input failed validation.'
 			],
@@ -200,17 +180,17 @@ class testScriptManualInput extends CIntegrationTest {
 				'request_params' => [
 					'hostid' => self::$hostid,
 					'scriptid' => self::$scriptids[2],
-					'manualinput' => 'orcam',
+					'manualinput' => 'orcam'
 				],
 				'expected_result' => 'Provided script user input failed validation.'
 			],
 			[
 				'request_params' => [
 					'hostid' => self::$hostid,
-					'scriptid' => self::$scriptids[2],
+					'scriptid' => self::$scriptids[2]
 				],
 				'expected_result' => 'Script takes user input, but none was provided.'
-			],
+			]
 		];
 	}
 
@@ -220,28 +200,24 @@ class testScriptManualInput extends CIntegrationTest {
 	public function validRequestDataProvider(): array {
 		return [
 			[
-				// This case tests the invocation of a script
-				// that doesn't take additional input but
-				// provides it in the request anyway.
-				//
-				// In such a case, the script should still
-				// execute, and, upon success, the response
-				// should still contain a value from the script
-				// execution, but the server should log a
-				// warning message indicating this.
+				/*
+				 * This case tests the invocation of a script that doesn't take additional input but provides it in the
+				 * request anyway. In such a case, the script should still execute, and, upon success, the response
+				 * should still contain a value from the script execution, but the server should log a warning message
+				 * indicating this.
+				 */
 				'request_params' => [
 					'hostid' => self::$hostid,
 					'scriptid' => self::$scriptids[0],
-					'manualinput' => 'abcdefghijklmnopqrstuvwxyz',
+					'manualinput' => 'abcdefghijklmnopqrstuvwxyz'
 				],
-				'expected_result' => 'Your mindmacro has been expanded',
+				'expected_result' => 'Your mindmacro has been expanded'
 			],
 			[
 				'request_params' => [
 					'hostid' => self::$hostid,
 					'scriptid' => self::$scriptids[1],
-					'manualinput' => 'abcdefghijklmnopqrstuvwxyz',
-
+					'manualinput' => 'abcdefghijklmnopqrstuvwxyz'
 				],
 				'expected_result' => 'Your abcdefghijklmnopqrstuvwxyz has been expanded'
 			],
@@ -249,11 +225,10 @@ class testScriptManualInput extends CIntegrationTest {
 				'request_params' => [
 					'hostid' => self::$hostid,
 					'scriptid' => self::$scriptids[2],
-					'manualinput' => 'macro',
-
+					'manualinput' => 'macro'
 				],
 				'expected_result' => 'Your macro has been expanded'
-			],
+			]
 		];
 	}
 
