@@ -120,24 +120,49 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertMaps(array $maps): array {
 		foreach ($maps as &$map) {
-			foreach ($map['selements'] as &$selement) {
-				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-					$selement['elements'] = self::convertTriggers($selement['elements']);
-				}
-			}
-			unset($selement);
-
-			foreach ($map['links'] as &$link) {
-				foreach ($link['linktriggers'] as &$linktrigger) {
-					$linktrigger['trigger'] = self::convertTriggers([$linktrigger['trigger']])[0];
-				}
-				unset($linktrigger);
-			}
-			unset($link);
+			$map['selements'] = self::convertMapSelements($map['selements']);
+			$map['links'] = self::convertMapLinks($map['links']);
 		}
 		unset($map);
 
 		return $maps;
+	}
+
+	/**
+	 * Convert map selements.
+	 *
+	 * @param array $selements
+	 *
+	 * @return array
+	 */
+	private static function convertMapSelements(array $selements): array {
+		foreach ($selements as &$selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selement['elements'] = self::convertTriggers($selement['elements']);
+			}
+		}
+		unset($selement);
+
+		return $selements;
+	}
+
+	/**
+	 * Convert map links.
+	 *
+	 * @param array $links
+	 *
+	 * @return array
+	 */
+	private static function convertMapLinks(array $links): array {
+		foreach ($links as &$link) {
+			foreach ($link['linktriggers'] as &$linktrigger) {
+				$linktrigger['trigger'] = self::convertTriggers([$linktrigger['trigger']])[0];
+			}
+			unset($linktrigger);
+		}
+		unset($link);
+
+		return $links;
 	}
 
 	/**
