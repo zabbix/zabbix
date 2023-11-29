@@ -29,10 +29,13 @@ AS_HELP_STRING([--with-libxml2@<:@=ARG@:>@],[use libxml2 client library @<:@defa
         [
         if test "$withval" = "no"; then
             want_libxml2="no"
+            _libxml2_with="no"
         elif test "$withval" = "yes"; then
             want_libxml2="yes"
+            _libxml2_with="yes"
         else
             want_libxml2="yes"
+            _libxml2_with=$withval
         fi
         ],
         [want_libxml2="no"]
@@ -51,7 +54,13 @@ AS_HELP_STRING([--with-libxml2@<:@=ARG@:>@],[use libxml2 client library @<:@defa
         AC_REQUIRE([PKG_PROG_PKG_CONFIG])
         m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
 
-        if test -x "$PKG_CONFIG"; then
+        if test "$_libxml2_with" != "yes"; then
+            XML2_INCDIR=$_libxml2_with/include
+            XML2_LIBDIR=$_libxml2_with/lib
+            LIBXML2_CFLAGS="-I$XML2_INCDIR"
+            LIBXML2_LDFLAGS="-L$XML2_LIBDIR"
+            configured_libxml2="yes"
+        elif test -x "$PKG_CONFIG"; then
 
             LIBXML2_CFLAGS="`$PKG_CONFIG --cflags libxml-2.0`"
 
@@ -70,6 +79,12 @@ AS_HELP_STRING([--with-libxml2@<:@=ARG@:>@],[use libxml2 client library @<:@defa
                 esac
             done
 
+            configured_libxml2="yes"
+        else
+            configured_libxml2="no"
+        fi
+
+        if test "$configured_libxml2" = "yes"; then
             if test "x$enable_static" = "xyes"; then
                 for i in $_full_libxml2_libs; do
                     case $i in
