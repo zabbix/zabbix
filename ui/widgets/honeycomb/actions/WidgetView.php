@@ -209,9 +209,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				return $formatted_value['value'];
 
-			case ITEM_VALUE_TYPE_BINARY:
-				return _('binary value');
-
 			default:
 				return formatHistoryValue($last_value, $item, false);
 		}
