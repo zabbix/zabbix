@@ -134,8 +134,8 @@ $from_list = (new CFormList())
 						"'self'"
 					)
 				]))->addClass(ZBX_STYLE_LIST_DASHED),
-				new CTag('br'),
-				_s('Note that using %1$s or %2$s will be regarded as hostnames if used without single quotes', "'self'",
+				BR(),
+				_s('Note that %1$s or %2$s will be regarded as hostnames if used without single quotes.', "'self'",
 					"'none'"
 				)
 			])
