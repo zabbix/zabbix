@@ -337,15 +337,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Proxy name has not been updated');
 	}
 
-	public static function dataClone() {
-		// Name, clone name
-		return [
-			['Active proxy 1', 'Active proxy 1 cloned'],
-			['Passive proxy 1', 'Passive proxy 1 cloned']
-		];
-	}
-
-	public function getProxyData() {
+	public function getCloneData() {
 		return [
 			[
 				[
@@ -370,12 +362,32 @@ class testFormAdministrationDMProxies extends CWebTest {
 						'Subject' => 'test test'
 					]
 				]
-			]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2',
+					'encryption_fields' => [
+						'Connections to proxy' => 'PSK',
+						'PSK identity' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//",
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb'
+					]
+				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2',
+					'encryption_fields' => [
+						'Connections to proxy' => 'Certificate',
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
+					]
+				]
+			],
 		];
 	}
 
 	/**
-	 * @dataProvider getProxyData
+	 * @dataProvider getCloneData
 	 */
 	public function testFormAdministrationDMProxies_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
@@ -385,7 +397,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$original_fields = $form->getFields()->asValues();
 
 		// Get original passive proxy interface fields.
-		if (strpos($data['proxy'], 'passive')) {
+		if (strpos($data['proxy'], 'Passive')) {
 			$original_fields = $this->getInterfaceValues($form, $original_fields);
 		}
 
@@ -411,7 +423,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		// Check "Encryption" tabs functionality.
 		if (CTestArrayHelper::get($data, 'encryption_fields')) {
 			$form->selectTab('Encryption');
-			$form->fill($data['encryption_fields']);
+			$form->fill($data['encryption_fields'])->waitUntilReady();
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Proxy updated');
 		}
@@ -433,8 +445,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		return $fields;
 	}
-
-
 
 	public static function dataDelete() {
 		return [
