@@ -2303,6 +2303,8 @@ static int	DBpatch_6050166(void)
 static int	DBpatch_6050167(void)
 {
 	return fix_expression_macro_escaping("triggers", "triggerid", "event_name", "event name of the trigger");
+}
+
 #endif
 
 DBPATCH_START(6050)
