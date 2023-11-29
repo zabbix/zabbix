@@ -25,6 +25,9 @@
 
 #include "zbxxml.h"
 
+#define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
+
+
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
 #define ZBX_POST_VSPHERE_HEADER									\
@@ -116,9 +119,6 @@ zbx_vmware_alarms_data_t;
 #define ZBX_XPATH_PROP_NAME(property)									\
 	"/*/*/*/*/*/" ZBX_XPATH_PROP_NAME_NODE(property)
 
-int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
-
-void	vmware_vm_free(zbx_vmware_vm_t *vm);
 void	vmware_props_free(char **props, int props_num);
 
 typedef struct

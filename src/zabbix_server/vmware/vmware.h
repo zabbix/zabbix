@@ -574,8 +574,6 @@ zbx_thread_vmware_args;
 
 ZBX_THREAD_ENTRY(vmware_thread, args);
 
-zbx_hash_t	vmware_hv_hash(const void *data);
-int	vmware_hv_compare(const void *d1, const void *d2);
 void	zbx_vmware_destroy(void);
 
 void	zbx_vmware_lock(void);

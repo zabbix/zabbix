@@ -12,6 +12,10 @@ libzbxvmware_a_SOURCES = \
 	vmware_service_cfglists.h \
 	vmware_hv.c \
 	vmware_hv.h \
+	vmware_ds.c \
+	vmware_ds.h \
+	vmware_vm.c \
+	vmware_vm.h \
 	vmware_rest.c \
 	vmware_manager.c \
 	vmware_internal.h \

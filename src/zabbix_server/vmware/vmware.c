@@ -22,7 +22,9 @@
 #include "vmware_perfcntr.h"
 #include "vmware_shmem.h"
 #include "vmware_service_cfglists.h"
+#include "vmware_vm.h"
 #include "vmware_hv.h"
+#include "vmware_ds.h"
 
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2
@@ -78,7 +80,6 @@ static zbx_hashset_t	evt_msg_strpool;
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 ZBX_PTR_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
-ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_datacenter, zbx_vmware_datacenter_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_diskextent, zbx_vmware_diskextent_t *)
 ZBX_VECTOR_IMPL(vmware_hvdisk, zbx_vmware_hvdisk_t)
@@ -181,24 +182,6 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
-
-#define ZBX_VM_NONAME_XML	"noname.xml"
-
-/* hypervisor hashset support */
-zbx_hash_t	vmware_hv_hash(const void *data)
-{
-	const zbx_vmware_hv_t	*hv = (const zbx_vmware_hv_t *)data;
-
-	return ZBX_DEFAULT_STRING_HASH_ALGO(hv->uuid, strlen(hv->uuid), ZBX_DEFAULT_HASH_SEED);
-}
-
-int	vmware_hv_compare(const void *d1, const void *d2)
-{
-	const zbx_vmware_hv_t	*hv1 = (const zbx_vmware_hv_t *)d1;
-	const zbx_vmware_hv_t	*hv2 = (const zbx_vmware_hv_t *)d2;
-
-	return strcmp(hv1->uuid, hv2->uuid);
-}
 
 /* string pool support */
 
@@ -875,75 +858,6 @@ void	vmware_props_free(char **props, int props_num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees resources allocated to store vm device object               *
- *                                                                            *
- * Parameters: dev - [IN] the vm device                                       *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_dev_free(zbx_vmware_dev_t *dev)
-{
-	zbx_free(dev->instance);
-	zbx_free(dev->label);
-	vmware_props_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
-	zbx_free(dev);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees resources allocated to store vm file system object          *
- *                                                                            *
- * Parameters: fs    - [IN] the file system                                   *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_fs_free(zbx_vmware_fs_t *fs)
-{
-	zbx_free(fs->path);
-	zbx_free(fs);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees resources allocated to store vm custom attributes           *
- *                                                                            *
- * Parameters: ca - [IN] the custom attribute                                 *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_custom_attr_free(zbx_vmware_custom_attr_t *ca)
-{
-	zbx_free(ca->name);
-	zbx_free(ca->value);
-	zbx_free(ca);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees resources allocated to store virtual machine                *
- *                                                                            *
- * Parameters: vm   - [IN] the virtual machine                                *
- *                                                                            *
- ******************************************************************************/
-void	vmware_vm_free(zbx_vmware_vm_t *vm)
-{
-	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_free);
-	zbx_vector_ptr_destroy(&vm->devs);
-
-	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_free);
-	zbx_vector_ptr_destroy(&vm->file_systems);
-
-	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_free);
-	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
-
-	zbx_vector_str_clear_ext(&vm->alarm_ids, zbx_str_free);
-	zbx_vector_str_destroy(&vm->alarm_ids);
-
-	zbx_free(vm->uuid);
-	zbx_free(vm->id);
-	vmware_props_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
-	zbx_free(vm);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: frees resources allocated to store alarm data                     *
  *                                                                            *
  * Parameters: alarm - [IN] the alarm object                                  *
@@ -1324,269 +1238,6 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: collect info about snapshot disk size                             *
- *                                                                            *
- * Parameters: xdoc       - [IN] the xml document with all details            *
- *             key        - [IN] the id of snapshot disk                      *
- *             layout_node- [IN] the xml node with snapshot disk info         *
- *             sz         - [OUT] size of snapshot disk                       *
- *             usz        - [OUT] uniquesize of snapshot disk                 *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *layout_node, zbx_uint64_t *sz,
-		zbx_uint64_t *usz)
-{
-	char	*value, xpath[MAX_STRING_LEN];
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("file") "[" ZBX_XNN("key") "='%s' and " ZBX_XNN("accessible")
-			"='true'][1]/" ZBX_XNN("size"), key);
-
-	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
-	{
-		if (SUCCEED != zbx_is_uint64(value, sz))
-			*sz = 0;
-
-		zbx_free(value);
-	}
-	else
-	{
-		zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("file") "[" ZBX_XNN("key") "='%s'][1]/" ZBX_XNN("size"),
-				key);	/* snapshot version < 6 */
-
-		if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
-		{
-			if (SUCCEED != zbx_is_uint64(value, sz))
-				*sz = 0;
-
-			zbx_free(value);
-			*usz = 0;
-			return;
-		}
-
-		*sz = 0;
-	}
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("file") "[" ZBX_XNN("key") "='%s' and " ZBX_XNN("accessible")
-			"='true'][1]/" ZBX_XNN("uniqueSize"), key);
-
-	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
-	{
-		if (SUCCEED != zbx_is_uint64(value, usz))
-			*usz = 0;
-
-		zbx_free(value);
-	}
-	else
-	{
-		*usz = 0;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: collect info about snapshots and create json                      *
- *                                                                            *
- * Parameters: xdoc       - [IN] the xml document with all details            *
- *             snap_node  - [IN] the xml node with snapshot info              *
- *             layout_node- [IN] the xml node with snapshot disk info         *
- *             disks_used - [IN/OUT] processed disk id                        *
- *             size       - [IN/OUT] total size of all snapshots              *
- *             uniquesize - [IN/OUT] total uniquesize of all snapshots        *
- *             count      - [IN/OUT] total number of all snapshots            *
- *             latestdate - [OUT] the date of last snapshot                   *
- *             oldestdate - [OUT] the date of oldest snapshot                 *
- *             json_data  - [OUT] json with info about snapshot               *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *layout_node,
-		zbx_vector_uint64_t *disks_used, zbx_uint64_t *size, zbx_uint64_t *uniquesize, zbx_uint64_t *count,
-		char **latestdate, char **oldestdate, struct zbx_json *json_data)
-{
-	int			i, ret = FAIL;
-	char			*value, xpath[MAX_STRING_LEN], *name, *desc, *crtime;
-	zbx_vector_str_t	ids;
-	zbx_uint64_t		snap_size, snap_usize;
-	xmlNode			*next_node;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() count:" ZBX_FS_UI64, __func__, *count);
-
-	zbx_vector_str_create(&ids);
-
-	if (NULL == (value = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("snapshot"))))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() snapshot empty", __func__);
-		goto out;
-	}
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("snapshot") "[" ZBX_XNN("key") "='%s'][1]" ZBX_XPATH_LN("disk")
-			ZBX_XPATH_LN("chain") ZBX_XPATH_LN("fileKey"), value);
-
-	if (FAIL == zbx_xml_node_read_values(xdoc, layout_node, xpath, &ids))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() empty list of fileKey", __func__);
-		zbx_free(value);
-		goto out;
-	}
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("snapshot") "[" ZBX_XNN("key") "='%s'][1]"
-			ZBX_XPATH_LN("dataKey"), value);
-	zbx_free(value);
-
-	if (NULL == (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() dataKey empty", __func__);
-		goto out;
-	}
-
-	if (0 <= atoi(value))
-	{
-		vmware_vm_snapshot_disksize(xdoc, value, layout_node, &snap_size, &snap_usize);
-	}
-	else
-	{
-		snap_size = 0;
-		snap_usize = 0;
-	}
-
-	zbx_free(value);
-
-	for (i = 0; i < ids.values_num; i++)
-	{
-		zbx_uint64_t	dsize, dusize, disk_id =  (unsigned int)atoi(ids.values[i]);
-
-		if (FAIL != zbx_vector_uint64_search(disks_used, disk_id, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			continue;
-
-		zbx_vector_uint64_append(disks_used, disk_id);
-		vmware_vm_snapshot_disksize(xdoc, ids.values[i], layout_node, &dsize, &dusize);
-		snap_size += dsize;
-		snap_usize += dusize;
-	}
-
-	name = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("name"));
-	desc = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("description"));
-	crtime = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("createTime"));
-
-	zbx_json_addobject(json_data, NULL);
-	zbx_json_addstring(json_data, "name", ZBX_NULL2EMPTY_STR(name), ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json_data, "description", ZBX_NULL2EMPTY_STR(desc), ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json_data, "createtime", ZBX_NULL2EMPTY_STR(crtime), ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(json_data, "size", snap_size);
-	zbx_json_adduint64(json_data, "uniquesize", snap_usize);
-	zbx_json_close(json_data);
-
-	if (NULL != oldestdate)
-		*oldestdate = zbx_strdup(NULL, crtime);
-
-	if (NULL != (next_node = zbx_xml_node_get(xdoc, snap_node, ZBX_XNN("childSnapshotList"))))
-	{
-		ret = vmware_vm_snapshot_collect(xdoc, next_node, layout_node, disks_used, size, uniquesize, count,
-				latestdate, NULL, json_data);
-	}
-	else
-	{
-		*latestdate = crtime;
-		crtime = NULL;
-		ret = SUCCEED;
-	}
-
-	*count += 1;
-	*size += snap_size;
-	*uniquesize += snap_usize;
-
-	zbx_free(name);
-	zbx_free(desc);
-	zbx_free(crtime);
-out:
-	zbx_vector_str_clear_ext(&ids, zbx_str_free);
-	zbx_vector_str_destroy(&ids);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: create json with info about vm snapshots                          *
- *                                                                            *
- * Parameters: xml_node - [IN] the xml node with last vm snapshot             *
- *             jstr     - [OUT] json with vm snapshot info                    *
- *                                                                            *
- ******************************************************************************/
-int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
-{
-	xmlNode			*root_node, *layout_node, *node = (xmlNode *)xml_node;
-	xmlDoc			*xdoc = node->doc;
-	struct zbx_json		json_data;
-	int			ret = FAIL;
-	char			*latestdate = NULL, *oldestdate = NULL;
-	zbx_uint64_t		count, size, uniquesize;
-	zbx_vector_uint64_t	disks_used;
-	time_t			xml_time, now = time(NULL), latest_age = 0, oldest_age = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
-	zbx_vector_uint64_create(&disks_used);
-
-	if (NULL == (root_node = zbx_xml_node_get(xdoc, node, ZBX_XNN("rootSnapshotList"))))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rootSnapshotList empty", __func__);
-		goto out;
-	}
-
-	if (NULL == (layout_node = zbx_xml_doc_get(xdoc, ZBX_XPATH_PROP_NAME("layoutEx"))))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() layoutEx empty", __func__);
-		goto out;
-	}
-
-	zbx_json_addarray(&json_data, "snapshot");
-
-	count = 0;
-	size = 0;
-	uniquesize = 0;
-
-	if (FAIL == (ret = vmware_vm_snapshot_collect(xdoc, root_node, layout_node, &disks_used, &size, &uniquesize,
-			&count, &latestdate, &oldestdate, &json_data)))
-	{
-		goto out;
-	}
-
-	if (SUCCEED == zbx_iso8601_utc(ZBX_NULL2EMPTY_STR(latestdate), &xml_time))
-		latest_age = now - xml_time;
-
-	if (SUCCEED == zbx_iso8601_utc(ZBX_NULL2EMPTY_STR(oldestdate), &xml_time))
-		oldest_age = now - xml_time;
-
-	zbx_json_close(&json_data);
-	zbx_json_adduint64(&json_data, "count", count);
-	zbx_json_addstring(&json_data, "latestdate", ZBX_NULL2EMPTY_STR(latestdate), ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json_data, "latestage", latest_age);
-	zbx_json_addstring(&json_data, "oldestdate", ZBX_NULL2EMPTY_STR(oldestdate), ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json_data, "oldestage", oldest_age);
-	zbx_json_adduint64(&json_data, "size", size);
-	zbx_json_adduint64(&json_data, "uniquesize", uniquesize);
-	zbx_json_close(&json_data);
-
-	*jstr = zbx_strdup(NULL, json_data.buffer);
-out:
-	zbx_free(latestdate);
-	zbx_free(oldestdate);
-	zbx_vector_uint64_destroy(&disks_used);
-	zbx_json_free(&json_data);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, FAIL == ret ? zbx_result_string(ret) :
-			ZBX_NULL2EMPTY_STR(*jstr));
-
-	return ret;
 }
 
 /******************************************************************************
@@ -1989,49 +1640,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return datastore;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_ds_uuid_compare                                           *
- *                                                                            *
- * Purpose: sorting function to sort Datastore vector by uuid                 *
- *                                                                            *
- ******************************************************************************/
-int	vmware_ds_uuid_compare(const void *d1, const void *d2)
-{
-	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
-	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
-
-	return strcmp(ds1->uuid, ds2->uuid);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_ds_name_compare                                           *
- *                                                                            *
- * Purpose: sorting function to sort Datastore vector by name                 *
- *                                                                            *
- ******************************************************************************/
-int	vmware_ds_name_compare(const void *d1, const void *d2)
-{
-	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
-	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
-
-	return strcmp(ds1->name, ds2->name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sorting function to sort Datastore vector by id                   *
- *                                                                            *
- ******************************************************************************/
-int	vmware_ds_id_compare(const void *d1, const void *d2)
-{
-	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
-	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
-
-	return strcmp(ds1->id, ds2->id);
 }
 
 /******************************************************************************
