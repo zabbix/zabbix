@@ -65,18 +65,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [];
 		}
 
+		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
+			? getSubGroups($this->fields_values['groupids'])
+			: null;
+
 		$hosts = API::Host()->get([
 			'output' => [],
-			'groupids' => !$this->isTemplateDashboard() && $this->fields_values['groupids']
-				? getSubGroups($this->fields_values['groupids'])
-				: null,
+			'groupids' => $groupids,
 			'hostids' => $this->fields_values['hostids'] ?: null,
-			'evaltype' => array_key_exists('host_tags', $this->fields_values)
-				? $this->fields_values['evaltype_host']
-				: null,
-			'tags' => array_key_exists('host_tags', $this->fields_values)
-				? $this->fields_values['host_tags']
-				: null,
+			'evaltype' => $this->fields_values['evaltype_host'],
+			'tags' => $this->fields_values['host_tags'] ?: null,
 			'filter' => [
 				'maintenance_status' => $this->fields_values['maintenance'] != 1
 					? HOST_MAINTENANCE_STATUS_OFF
@@ -95,12 +93,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'selectHosts' => ['name'],
 			'webitems' => true,
 			'hostids' => array_keys($hosts),
-			'evaltype' => array_key_exists('item_tags', $this->fields_values)
-				? $this->fields_values['evaltype_item']
-				: null,
-			'tags' => array_key_exists('item_tags', $this->fields_values)
-				? $this->fields_values['item_tags']
-				: null,
+			'evaltype' => $this->fields_values['evaltype_item'],
+			'tags' => $this->fields_values['item_tags'] ?: null,
 			'selectValueMap' => ['mappings'],
 			'search' => [
 				'name' => in_array('*', $this->fields_values['items']) ? null : $this->fields_values['items']
