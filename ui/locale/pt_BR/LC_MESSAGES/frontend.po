@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-27 04:19+0000\n"
-"Last-Translator: Patrick Silva <patrickeessd@gmail.com>\n"
+"PO-Revision-Date: 2023-11-04 18:46+0000\n"
+"Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -1345,7 +1345,7 @@ msgstr "Às %1$s:%2$s do dia %3$s de cada %4$s"
 
 #: app/views/popup.maintenance.period.php:154
 msgid "At (hour:minute)"
-msgstr "Às (horas:minutos)"
+msgstr "Às (hora:minuto)"
 
 #: app/views/administration.userrole.edit.php:115
 msgid "At least one UI element must be checked."
@@ -2106,7 +2106,7 @@ msgstr "Histórico não foi limpado"
 
 #: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Não é possível limpar o histórico e estatísticas"
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -2545,6 +2545,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Não é possível desabilitar o tipo de midia"
 msgstr[1] "Não é possível desabilitar os tipos de midia"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] "Não é possível desativar o módulo"
+msgstr[1] "Não é possível desativar os módulos"
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2628,6 +2634,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Não é possível ativar o tipo de mídia"
 msgstr[1] "Não é possível ativar os tipos de mídia"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] "Não é possível habilitar o módulo"
+msgstr[1] "Não é possível habilitar os módulos"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3368,6 +3380,10 @@ msgstr "Não é possível atualizar período de manutenção"
 msgid "Cannot update media type"
 msgstr "Não é possível atualizar o tipo de mídia"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr "Não é possível atualizar o módulo"
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
@@ -3740,11 +3756,11 @@ msgstr "Limpar histórico e estatísticas (médias)"
 
 #: include/views/configuration.item.list.php:293
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "Limpar o histórico e estatísticas dos itens selecionados?"
 
 #: include/views/configuration.httpconf.list.php:218
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "Limpar o histórico e estatísticas dos cenários web selecionados?"
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6764,6 +6780,10 @@ msgstr "Monitoração do log de eventos. Retorna: log"
 msgid "Event name"
 msgstr "Nome do Evento"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Conjunto de etiqueta de evento"
@@ -7981,7 +8001,7 @@ msgstr "Histórico"
 
 #: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
 msgid "History and trends cleared"
-msgstr ""
+msgstr "Histórico e estatísticas apagados"
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -11889,7 +11909,7 @@ msgstr "Severidade mínima"
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] "Período mínimo para apresentação é %1$s minuto."
-msgstr[1] "Período mínimo para apresentação são %1$s minutos."
+msgstr[1] "Período mínimo para apresentação é de %1$s minutos."
 
 #: app/views/popup.maintenance.period.php:175
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -11961,6 +11981,12 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Módulo excluído: %1$s."
 msgstr[1] "Módulos excluídos: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] "Módulo desativado"
+msgstr[1] "Módulos desativados"
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11968,12 +11994,22 @@ msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Módulo desativado: %1$s."
 msgstr[1] "Módulos desativados: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] "Módulo ativado"
+msgstr[1] "Módulos ativados"
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Módulo ativado: %1$s."
 msgstr[1] "Módulos ativados: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr "Módulo atualizado"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -19450,7 +19486,7 @@ msgstr "A função de usuário com ID \"%1$s\" não está disponível."
 #: include/classes/helpers/CMenuHelper.php:297
 #: include/classes/helpers/CRoleHelper.php:426
 msgid "User roles"
-msgstr "Papéis de utilizador"
+msgstr "Funções de usuário"
 
 #: app/views/administration.housekeeping.edit.php:108
 msgid "User sessions"
@@ -19459,7 +19495,7 @@ msgstr "Sessões de usuários"
 #: include/classes/helpers/CMenuHelper.php:391
 #: include/classes/helpers/CMenuHelper.php:405
 msgid "User settings"
-msgstr "Definições de Utilizadores"
+msgstr "Configurações do usuário"
 
 #: include/classes/api/services/CMap.php:709
 #: include/classes/api/services/CMap.php:1178
@@ -19476,7 +19512,7 @@ msgstr "Tipo de usuário"
 #: app/controllers/CControllerUserUnblock.php:65
 msgid "User unblocked"
 msgid_plural "Users unblocked"
-msgstr[0] "Utilizador desbloqueado"
+msgstr[0] "Usuário desbloqueado"
 msgstr[1] "Usuários desbloqueados"
 
 #: app/controllers/CControllerUserProfileUpdate.php:118
@@ -21675,7 +21711,7 @@ msgstr "mensagem de erro"
 #: include/views/js/configuration.host.discovery.edit.js.php:50
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:82
 msgid "exists"
-msgstr "rxiste"
+msgstr "existe"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
@@ -22084,7 +22120,7 @@ msgstr "ltrim() - Remove os caracteres especificados do início de uma string"
 #: include/func.inc.php:595 jsLoader.php:126 jsLoader.php:225 jsLoader.php:406
 msgctxt "minute short"
 msgid "m"
-msgstr "m"
+msgstr "min"
 
 #: include/func.inc.php:592 jsLoader.php:222
 msgctxt "month short"
