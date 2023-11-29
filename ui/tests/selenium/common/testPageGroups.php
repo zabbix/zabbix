@@ -233,10 +233,11 @@ class testPageGroups extends CWebTest {
 			$discovered_hosts = [
 				self::DISCOVERED_GROUP => self::LLD,
 				self::DISCOVERED_GROUP2 => self::LLD,
-				'グループプロトタイプ番号 1 KEY' => '1st LLD, ..., forth LLD',
-				'Trešais grupu prototips KEY' => 'LLD number 8, ..., sixth LLD',
-				'Double GP KEY' => '15th LLD 🙃^天!, 16th LLD',
-				'6 prototype group KEY' => '12th LLD, ..., Četrpadsmitais LLD'
+				'Single prototype group KEY' => '17th LLD',
+				'グループプロトタイプ番号 1 KEY' => '1st LLD, ..., sixth LLD',
+				'Trešais grupu prototips KEY' => 'LLD number 8, ..., sevenths LLD',
+				'Two prototype group KEY' => '15th LLD 🙃^天!, 16th LLD',
+				'5 prototype group KEY' => '12th LLD, ..., Četrpadsmitais LLD'
 			];
 
 			foreach ($discovered_hosts as $group_name => $llds) {

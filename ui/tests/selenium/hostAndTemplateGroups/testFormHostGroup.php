@@ -235,4 +235,11 @@ class testFormHostGroup extends testFormGroups {
 	public function testFormHostGroup_ApplyPermissionsToSubgroups($data) {
 		$this->checkSubgroupsPermissions($data);
 	}
+
+	/**
+	 * @dataProvider getLLDLinksData
+	 */
+	public function testFormHostGroup_CheckLLDLinks($data) {
+		$this->checkLLDLinks($data);
+	}
 }

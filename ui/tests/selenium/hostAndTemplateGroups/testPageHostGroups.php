@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore preparePageHostGroupsData
  *
- * @dataSource DiscoveredHosts, HostTemplateGroups, HostGroups
+ * @dataSource DiscoveredHosts, HostTemplateGroups
  */
 class testPageHostGroups extends testPageGroups {
 
@@ -167,20 +167,20 @@ class testPageHostGroups extends testPageGroups {
 						'Info' => ''
 					],
 					[
-						'Name' => '12th LLD, ..., Četrpadsmitais LLD: 6 prototype group KEY',
+						'Name' => '1st LLD, ..., sixth LLD: グループプロトタイプ番号 1 KEY',
 						'Count' => '6',
-						'Hosts' => 'KEY HP number 8, KEY HP number 9, KEY HP number 10, KEY HP number 11,'.
-								' KEY HP number 12, KEY HP number 13',
+						'Hosts' => 'KEY HP number 0, KEY HP number 1, KEY HP number 2, KEY HP number 3, KEY HP number 4,'.
+								' KEY HP number 5',
 						'Info' => ''
 					],
 					[
-						'Name' => 'LLD number 8, ..., sixth LLD: Trešais grupu prototips KEY',
+						'Name' => 'LLD number 8, ..., sevenths LLD: Trešais grupu prototips KEY',
 						'Count' => '3',
-						'Hosts' => 'KEY HP number 5, KEY HP number 6, KEY HP number 7',
+						'Hosts' => 'KEY HP number 6, KEY HP number 7, KEY HP number 8',
 						'Info' => ''
 					],
 					[
-						'Name' => '15th LLD 🙃^天!, 16th LLD: Double GP KEY',
+						'Name' => '15th LLD 🙃^天!, 16th LLD: Two prototype group KEY',
 						'Count' => '2',
 						'Hosts' => 'KEY HP number 14, KEY HP number 15',
 						'Info' => ''
@@ -513,5 +513,55 @@ class testPageHostGroups extends testPageGroups {
 	 */
 	public function testPageHostGroups_Delete($data) {
 		$this->delete($data);
+	}
+
+	public static function getLLDLinksData() {
+		return [
+			[
+				[
+					'name' => 'Single prototype group KEY',
+					'links' => ['17th LLD']
+				]
+			],
+			[
+				[
+					'name' => 'Two prototype group KEY',
+					'links' => ['15th LLD 🙃^天!', '16th LLD']
+				]
+			],
+			[
+				[
+					'name' => 'Trešais grupu prototips KEY',
+					'links' => ['LLD number 8', 'sevenths LLD'],
+					'ellipsis' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLLDLinksData
+	 */
+	public function testPageHostGroups_checkLLDLinks($data) {
+		$link_ids = CDataHelper::get('HostTemplateGroups.LLD_HP_ids');
+		$this->page->login()->open($this->link)->waitUntilReady();
+
+		// Locate the table cell that corresponds to the desired hostgroup name.
+		$table_cell = $this->query('link', $data['name'])->one()->parents('class:nowrap')->one();
+
+		foreach ($data['links'] as $lld_name) {
+			$link = $table_cell->query('link', $lld_name)->one();
+			$this->assertTrue($link->isClickable());
+
+			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['LLD id'].'&hostid='.
+					$link_ids[$lld_name]['HP id'].'&context=host';
+			$this->assertEquals($link_url, $link->getAttribute('href'));
+		}
+
+		// Check that 3 dots are added after 1st LLD name, if there's more than 2 parent LLDs and no more LLDs are shown.
+		if (array_key_exists('ellipsis', $data)) {
+			$name_parts = preg_split('/(,|:) /', $table_cell->getText());
+			$this->assertEquals([$data['links'][0], '...', $data['links'][1], $data['name']], $name_parts);
+		}
 	}
 }

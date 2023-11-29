@@ -923,4 +923,68 @@ class testFormGroups extends CWebTest {
 				'id:tag-filter-table'
 		);
 	}
+
+	public static function getLLDLinksData() {
+		return [
+			[
+				[
+					'name' => 'Single prototype group KEY',
+					'links' => ['17th LLD']
+				]
+			],
+			[
+				[
+					'name' => 'グループプロトタイプ番号 1 KEY',
+					'links' => ['1st LLD', '2nd LLD', '3rd LLD', 'fifth LLD', 'forth LLD'],
+					'ellipsis' => true
+				]
+			],
+			[
+				[
+					'name' => '5 prototype group KEY',
+					'links' => ['12th LLD', 'Eleventh LLD', 'Mūsu desmitais LLD', 'Trīspadsmitais LLD', 'Četrpadsmitais LLD']
+				]
+			],
+			[
+				[
+					'name' => 'Trešais grupu prototips KEY',
+					'links' => ['LLD number 8', 'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快', 'sevenths LLD']
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check the links to host prototypes in "Discovered by" field.
+	 *
+	 * @param array $data  data provider
+	 */
+	public function checkLLDLinks($data) {
+		$link_ids = CDataHelper::get('HostTemplateGroups.LLD_HP_ids');
+
+		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
+		$discovered_by = $form->getField('Discovered by');
+
+		foreach ($data['links'] as $lld_name) {
+			$link = $discovered_by->query('link', $lld_name)->one();
+			$this->assertTrue($link->isClickable());
+
+			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['LLD id'].'&hostid='.
+					$link_ids[$lld_name]['HP id'].'&context=host';
+			$this->assertEquals($link_url, $link->getAttribute('href'));
+		}
+
+		// Check that three dots are added after the 5th LLD name, if there are more than 5 parent LLDs.
+		if (array_key_exists('ellipsis', $data)) {
+			array_push($data['links'], '...');
+
+			$this->assertEquals($data['links'], explode(', ', $discovered_by->getText()));
+		}
+
+		$dialog->close();
+	}
 }
