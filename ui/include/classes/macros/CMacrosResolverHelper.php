@@ -482,17 +482,16 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in descriptions of item-based widgets.
+	 * Resolve macros in descriptions and labels of item-based widgets.
 	 *
 	 * @param array  $items
-	 *        string $items[<itemid>]['hostid']
-	 *        string $items[<itemid>]['itemid']
-	 *        string $items[<itemid>]['widget_description']  Field to resolve.
+	 * @param string $items[<itemid>]['label']
+	 * @param array  $fields                    A mapping between source and destination fields.
 	 *
-	 * @return array  Returns array of items with macros resolved.
+	 * @return array
 	 */
-	public static function resolveItemWidgetDescriptions(array $items): array {
-		return CMacrosResolver::resolveItemWidgetDescriptions($items);
+	public static function resolveItemBasedWidgetMacros(array $items, array $fields = ['label' => 'label']): array {
+		return CMacrosResolver::resolveItemBasedWidgetMacros($items, $fields);
 	}
 
 	/**
@@ -674,21 +673,5 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveManualEventActionScripts(array $data, array $events): array {
 		return CMacrosResolver::resolveManualEventActionScripts($data, $events);
-	}
-
-	/**
-	 * Resolve macros in labels of item-based widgets.
-	 *
-	 * @param array  $items
-	 *        string $items[n]['hostid']
-	 *        string $items[n]['itemid']
-	 * @param string $label Field to resolve (e.g., 'primary_label', 'secondary_label').
-	 *
-	 * @return array  Returns array of items with macros resolved.
-	 */
-	public static function resolveLabels(array $items, string $label): array {
-		self::init();
-
-		return self::$macrosResolver->resolveLabels($items, $label);
 	}
 }

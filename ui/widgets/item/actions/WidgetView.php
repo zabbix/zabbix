@@ -235,7 +235,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
 				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-					$items = CMacrosResolverHelper::resolveItemWidgetDescriptions($items);
+					$items = CMacrosResolverHelper::resolveItemBasedWidgetMacros($items,
+						['widget_description' => 'widget_description']
+					);
 				}
 
 				// All macros in item name are resolved here.

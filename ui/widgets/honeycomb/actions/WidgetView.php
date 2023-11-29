@@ -175,8 +175,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$label = $context_fields_values['label'];
 
 			if (!$this->isTemplateDashboard() || $this->fields_values['hostids']) {
-				$resolved_label = CMacrosResolverHelper::resolveLabels([$item + ['label' => $label]], 'label');
-				$label = $resolved_label[0]['label'];
+				$resolved_label = CMacrosResolverHelper::resolveItemBasedWidgetMacros([
+					$item['itemid'] => $item + ['label' => $label]
+				]);
+				$label = $resolved_label[$item['itemid']]['label'];
 			}
 
 			return $label;
