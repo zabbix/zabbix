@@ -602,7 +602,6 @@ class ZBase {
 			}
 
 			foreach ($input as $key => $value) {
-				sdff('$key = '.$key);
 				if ($key !== 'sid') {
 					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
