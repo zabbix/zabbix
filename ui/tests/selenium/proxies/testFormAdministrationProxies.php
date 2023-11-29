@@ -22,6 +22,7 @@
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
+
 /**
  * Test for checking Proxy host form.
  *
@@ -1148,6 +1149,26 @@ class testFormAdministrationProxies extends CWebTest {
 						'Subject' => 'test test'
 					]
 				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2',
+					'encryption_fields' => [
+						'Connections to proxy' => 'PSK',
+						'PSK identity' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//",
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb'
+					]
+				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2',
+					'encryption_fields' => [
+						'Connections to proxy' => 'Certificate',
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
+					]
+				]
 			]
 		];
 	}
@@ -1221,8 +1242,6 @@ class testFormAdministrationProxies extends CWebTest {
 		}
 
 		$this->assertEquals($original_fields, $cloned_fields);
-
-		//$dialog->invalidate();
 
 		// Check "Encryption" tabs functionality.
 		if (CTestArrayHelper::get($data, 'encryption_fields')) {
