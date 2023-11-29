@@ -139,8 +139,14 @@ class CWidgetHelper {
 			? makeHelpIcon($hint)
 			: null;
 
-		if ($field instanceof CWidgetFieldSelect) {
+		if ($field instanceof CWidgetFieldSelect || $field instanceof CWidgetFieldWidgetSelect) {
 			return (new CLabel([$field->getLabel(), $help_icon], 'label-'.$field->getName()))
+				->setAsteriskMark(self::isAriaRequired($field))
+				->addClass($class);
+		}
+
+		if ($field instanceof CWidgetFieldColor) {
+			return (new CLabel([$field->getLabel(), $help_icon], 'lbl_'.$field->getName()))
 				->setAsteriskMark(self::isAriaRequired($field))
 				->addClass($class);
 		}
@@ -1217,7 +1223,7 @@ class CWidgetHelper {
 					// Left column fields.
 					(new CDiv(
 						(new CFormList())
-							->addRow(_('Base color'),
+							->addRow(new CLabel(_('Base color'), 'lbl_'.$field_name.'['.$row_num.'][color]'),
 								(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
 									->appendColorPickerJs(false)
 							)
@@ -1230,7 +1236,7 @@ class CWidgetHelper {
 									->onChange('changeDataSetDrawType(this)')
 									->setModern(true)
 							)
-							->addRow(_('Width'),
+							->addRow(new CLabel(_('Width'), $field_name.'['.$row_num.'][width]'),
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1238,7 +1244,7 @@ class CWidgetHelper {
 									->setMin(0)
 									->setMax(10)
 							)
-							->addRow(_('Point size'),
+							->addRow(new CLabel(_('Point size'), $field_name.'['.$row_num.'][pointsize]'),
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1246,7 +1252,7 @@ class CWidgetHelper {
 									->setMin(1)
 									->setMax(10)
 							)
-							->addRow(_('Transparency'),
+							->addRow(new CLabel(_('Transparency'), $field_name.'['.$row_num.'][transparency]'),
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 										(int) $value['transparency'])
 									)
@@ -1255,7 +1261,7 @@ class CWidgetHelper {
 									->setMin(0)
 									->setMax(10)
 							)
-							->addRow(_('Fill'),
+							->addRow(new CLabel(_('Fill'), $field_name.'['.$row_num.'][fill]'),
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
