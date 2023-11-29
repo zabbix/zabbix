@@ -96,7 +96,9 @@ $from_list = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
-	->addRow(new CLabel(_('Validate URI schemes'), 'validate_uri_schemes'), [
+	->addRow(
+		new CLabel(_('Validate URI schemes'), 'validate_uri_schemes'),
+		[
 			(new CCheckBox('validate_uri_schemes'))
 				->setUncheckedValue('0')
 				->setChecked($data['validate_uri_schemes'] == 1),
@@ -107,8 +109,7 @@ $from_list = (new CFormList())
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setEnabled($data['validate_uri_schemes'] == 1)
 				->setAriaRequired()
-		]
-	)
+	])
 	->addRow(
 		(new CLabel([_('Use X-Frame-Options HTTP header'),
 			makeHelpIcon([
@@ -124,8 +125,8 @@ $from_list = (new CFormList())
 						"'self'"
 					)
 				]))->addClass(ZBX_STYLE_LIST_DASHED),
-				new CTag('br'),
-				_s('Note that using %1$s or %2$s will be regarded as hostnames if used without single quotes', "'self'",
+				BR(),
+				_s('Note that %1$s or %2$s will be regarded as hostnames if used without single quotes.', "'self'",
 					"'none'"
 				)
 			])
@@ -142,17 +143,19 @@ $from_list = (new CFormList())
 				->setAriaRequired()
 				->setEnabled($data['x_frame_header_enabled'] == 1)
 	])
-	->addRow(new CLabel(_('Use iframe sandboxing'), 'iframe_sandboxing_enabled'), [
-		(new CCheckBox('iframe_sandboxing_enabled'))
-			->setUncheckedValue('0')
-			->setChecked($data['iframe_sandboxing_enabled'] == 1),
-		(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
-			DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
-		))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
-			->setEnabled($data['iframe_sandboxing_enabled'] == 1)
-			->setAriaRequired()
+	->addRow(
+		new CLabel(_('Use iframe sandboxing'), 'iframe_sandboxing_enabled'),
+		[
+			(new CCheckBox('iframe_sandboxing_enabled'))
+				->setUncheckedValue('0')
+				->setChecked($data['iframe_sandboxing_enabled'] == 1),
+			(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
+				DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
+			))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
+				->setEnabled($data['iframe_sandboxing_enabled'] == 1)
+				->setAriaRequired()
 	])
 	->addRow((new CTag('h4', true, _('Communication with Zabbix server')))->addClass('input-section-header'))
 	->addRow(
