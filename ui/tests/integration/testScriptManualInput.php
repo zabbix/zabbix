@@ -40,8 +40,13 @@ class testScriptManualInput extends CIntegrationTest {
 	 */
 	public function prepareData(): bool {
 		/*
-		 * Calling for a script execution requires a host context, regardless of where the script will eventually
-		 * execute. For tests to be self-contained, a new host and new host group is created.
+		 * First, create host group and a host in that group
+		 *
+		 * Calling for a script execution requires a host context,
+		 * regardless of where the script will eventually execute.
+		 *
+		 * Although a default Zabbix installation already defines a host, the
+		 * server itself, we want the tests to be self-contained.
 		 */
 		$response = CDataHelper::call('hostgroup.create', ['name' => 'Test Hosts']);
 
@@ -61,19 +66,34 @@ class testScriptManualInput extends CIntegrationTest {
 		// Create scripts with and without manual input support.
 		$scripts = [
 			/*
-			 * Required fields for script creation: 'name', 'type', and 'scope'.
-			 * If 'manualinput' = ZBX_SCRIPT_MANUALINPUT_ENABLED, required fields are:
-			 *   - 'manualinput_validator', 'manualinput_validator_type', 'manualinput_prompt'.
-			 *   - 'manualinput_default_value' (when 'manualinput_validator_type' = ZBX_SCRIPT_MANUALINPUT_TYPE_STRING).
+			 * See [1] for a reference of these script object descriptions.
 			 *
-			 * API validates 'manualinput_default_value' against 'manualinput_validator' (regular expression) if
-			 * 'manualinput_validator_type' = ZBX_SCRIPT_MANUALINPUT_TYPE_STRING. If 'manualinput_default_value' is not
-			 * provided, it defaults to an empty string.
+			 * Required fields for script creation are:
+			 *     name, type, scope
+			 * Required fields when the 'type' is set to 'Script':
+			 *     command
+			 * Required fields when 'manualinput' is set to 'Enabled':
+			 *     manualinput_validator, manualinput_validator_type, manualinput_prompt
+			 * Required fields when 'manualinput_validator_type' is set to 'String':
+			 *     manualinput_default_value
 			 *
-			 * The values for 'manualinput_prompt' and 'manualinput_default_value' are set only for API requirements.
+			 * Note:
+			 * When a script is created and is set to take manual input,
+			 * the API will also verify that 'manualinput_default_value'
+			 * passes the specified 'manualinput_validator', when the
+			 * validator is a regular expression
+			 * ('manualinput_validator_type' is ZBX_SCRIPT_MANUALINPUT_TYPE_STRING).
 			 *
-			 * See https://www.zabbix.com/documentation/7.0/en/manual/api/reference/script/object for a reference of
-			 * script object descriptions
+			 * If no value for 'manualinput_default_value' is provided,
+			 * the API will fall back to setting it to an empty string,
+			 * which may not pass the validator, and thus fail the script
+			 * creation.
+			 *
+			 * We explicitly set 'manualinput_prompt' and 'manualinput_default_value'
+			 * values here to appease the API, but they're not actually
+			 * relied upon in these tests.
+			 *
+			 * [1]: https://www.zabbix.com/documentation/current/en/manual/api/reference/script/object
 			 */
 			[
 				// Script that does not take any additional input
@@ -164,9 +184,10 @@ class testScriptManualInput extends CIntegrationTest {
 	public function invalidRequestDataProvider(): array {
 		return [
 			/*
-			 * Regarding 'manualinput', request failure is generally limited to two scenarios:
-			 *   - if no 'manualinput' is provided;
-			 *   - if 'manualinput' fails validation.
+			 * In general, there are only two scenarios in which a
+			 * request will fail in regards to manual input:
+			 *     (1): there is no manual input provided at all
+			 *     (2): the input didn't pass validation
 			 */
 			[
 				'request_params' => [
