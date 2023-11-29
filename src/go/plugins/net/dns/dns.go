@@ -93,11 +93,34 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return exportDns(params)
 	case "net.dns.record":
 		return exportDnsRecord(params)
+	case "net.dns.perf":
+		return exportDnsPerf(params)
 	default:
 		err = zbxerr.ErrorUnsupportedMetric
 
 		return
 	}
+}
+
+func exportDnsPerf(params []string) (result interface{}, err error) {
+	time_before := time.Now()
+
+	answer, err := getDNSAnswers(params)
+	if err != nil {
+		if errors.Is(err, zbxerr.ErrorCannotFetchData.Unwrap()) {
+			return 0, nil
+		}
+
+		return
+	}
+
+	if len(answer) < 1 {
+		return 0, nil
+	}
+
+	t := time.Since(time_before).Seconds()
+
+	return t, nil
 }
 
 func exportDns(params []string) (result interface{}, err error) {
@@ -483,6 +506,16 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 	c.ReadTimeout = timeout
 	c.WriteTimeout = timeout
 
+	if (record == dns.TypePTR) {
+		rdomain, revAddrErr := dns.ReverseAddr(domain)
+
+		if (revAddrErr != nil) {
+			return nil, revAddrErr
+		}
+
+		domain = rdomain
+	}
+
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
 			CheckingDisabled: false,
@@ -502,6 +535,7 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 func init() {
 	plugin.RegisterMetrics(&impl, "DNS",
 		"net.dns", "Checks if DNS service is up.",
+		"net.dns.perf", "Measures DNS query time in seconds.",
 		"net.dns.record", "Performs a DNS query.",
 	)
 }

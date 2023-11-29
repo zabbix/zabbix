@@ -30,11 +30,14 @@ extern char	*CONFIG_STATS_ALLOWED_IP;
 
 #define ZBX_IPC_SERVICE_TRAPPER	"trapper"
 
+zbx_get_program_type_f trapper_get_program_type(void);
+
 typedef struct
 {
 	zbx_config_comms_args_t		*config_comms;
 	zbx_config_vault_t		*config_vault;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+	const char			*progname;
 	const zbx_events_funcs_t	*events_cbs;
 	zbx_socket_t			*listen_sock;
 	int				config_startup_time;

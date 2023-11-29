@@ -15486,6 +15486,10 @@ msgstr "Perzentilenstrich (links)"
 msgid "Percentile line (right)"
 msgstr "Perzentilenstrich (rechts)"
 
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Führt eine DNS-Abfrage durch. Gibt eine Zeichenkette mit dem gewünschten Informationstyp zurück"
@@ -16984,6 +16988,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Gibt den Prozentsatz der verlorenen ICMP-Ping-Pakete zurück."
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -23091,6 +23099,13 @@ msgstr "asin() - Der Arkussinus eines Wertes als Winkel, ausgedrückt in Radiant
 msgid "at least one day of the week must be selected"
 msgstr "mindestens ein Wochentag muss ausgewählt werden"
 
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
 msgstr "mindestens eine Vorrangoption muss angegeben werden"
@@ -23759,6 +23774,11 @@ msgstr "in() - Überprüft, ob ein Wert gleich einem der aufgelisteten Werte ist
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "einschließlich Untergruppen"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

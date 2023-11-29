@@ -87,16 +87,16 @@ class testItemTest extends CWebTest {
 	 * @param string	$items			pointer to form in URL
 	 */
 	public function checkTestButtonState($data, $item_name, $item_type, $success_text, $check_now, $is_host, $id, $items = null) {
-		$context = ($is_host === true) ? 'host' : 'template';
+		$context = $is_host ? 'host' : 'template';
 
 		if ($item_type === 'Discovery rule') {
 			$create_link = 'host_discovery.php?form=create&hostid='.$id.'&context='.$context;
 			$saved_link = $items.'.php?form=update&context=host&hostid='.$id.'&itemid=';
 		}
 		else {
-		$create_link = ($items === null)
-			? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
-			: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
+			$create_link = ($items === null)
+				? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
+				: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
 		}
 
 		$this->page->login()->open($create_link);
@@ -172,12 +172,7 @@ class testItemTest extends CWebTest {
 				}
 			}
 
-			if ($item_type == 'Discovery rule') {
-				$this->saveFormAndCheckMessage($item_type.' updated', true);
-			}
-			else {
-				$this->saveFormAndCheckMessage($item_type.' updated');
-			}
+			$this->saveFormAndCheckMessage($item_type.' updated', $item_type == 'Discovery rule' ? true : false);
 		}
 	}
 
@@ -1173,12 +1168,9 @@ class testItemTest extends CWebTest {
 
 	private function saveFormAndCheckMessage($message, $lld = 'false') {
 
-		if ($lld == true) {
-			$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		}
-		else {
-			$item_form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
-		}
+		$item_form = $lld
+			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
+			: COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 
 		$item_form->submit();
 		$this->page->waitUntilReady();

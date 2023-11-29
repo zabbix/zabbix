@@ -47,6 +47,11 @@ zabbix_proxy \- Zabbix proxy daemon
 .B \-R
 .I runtime\-option
 .br
+.B zabbix_proxy
+.RB [ \-c
+.IR config\-file ]
+.B \-T
+.br
 .B zabbix_proxy \-h
 .br
 .B zabbix_proxy \-V
@@ -152,6 +157,8 @@ Process identifier
 (rwlock, mutex, processing) can be used with process-type (e.g., history syncer,1,processing)
 .RE
 .RE
+.IP "\fB\-T\fR, \fB\-\-test-config\fR"
+Validate configuration file and exit.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"

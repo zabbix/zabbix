@@ -284,7 +284,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					array_column($inputs[$field], 'name'),
 					array_column($inputs[$field], 'value')
 				);
-				$texts_having_macros = array_filter($texts_having_macros, function($str) {
+				$texts_having_macros = array_filter($texts_having_macros, static function(string $str): bool {
 					return (strstr($str, '{') !== false);
 				});
 

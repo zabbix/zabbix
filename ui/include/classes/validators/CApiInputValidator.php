@@ -1019,19 +1019,20 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
+				$macro_parsers = [];
 				if ($flags & API_ALLOW_USER_MACRO) {
-					$user_macro_parser = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroFunctionParser();
 				}
-
 				if ($flags & API_ALLOW_LLD_MACRO) {
-					$lld_macro_parser = new CLLDMacroParser();
-					$lld_macro_function_parser = new CLLDMacroFunctionParser();
+					$macro_parsers[] = new CLLDMacroParser();
+					$macro_parsers[] = new CLLDMacroFunctionParser();
 				}
 
-				if (($flags & API_ALLOW_USER_MACRO && $user_macro_parser->parse($data) == CParser::PARSE_SUCCESS)
-						|| ($flags & API_ALLOW_LLD_MACRO && ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS
-							|| $lld_macro_function_parser->parse($data) == CParser::PARSE_SUCCESS))) {
-					return true;
+				foreach ($macro_parsers as $macro_parser) {
+					if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+						return true;
+					}
 				}
 
 				$value = NAN;
@@ -2844,18 +2845,18 @@ class CApiInputValidator {
 			return false;
 		}
 
+		$macro_parsers = [];
 		if ($flags & API_ALLOW_USER_MACRO) {
-			$user_macro_parser = new CUserMacroParser();
-
-			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
 		}
 
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
 				return true;
 			}
 		}
