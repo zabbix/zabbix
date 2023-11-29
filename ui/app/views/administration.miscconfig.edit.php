@@ -104,7 +104,9 @@ $from_list = (new CFormList())
 			->setModern(true)
 	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
-	->addRow(new CLabel(_('Validate URI schemes'), 'validate_uri_schemes'), [
+	->addRow(
+		new CLabel(_('Validate URI schemes'), 'validate_uri_schemes'),
+		[
 			(new CCheckBox('validate_uri_schemes'))
 				->setUncheckedValue('0')
 				->setChecked($data['validate_uri_schemes'] == 1),
@@ -149,21 +151,26 @@ $from_list = (new CFormList())
 				->setAttribute('placeholder', _('X-Frame-Options HTTP header'))
 				->setAriaRequired()
 				->setEnabled($data['x_frame_header_enabled'] == 1)
-		])
-	->addRow(new CLabel(_('Use iframe sandboxing'), 'iframe_sandboxing_enabled'), [
-		(new CCheckBox('iframe_sandboxing_enabled'))
-			->setUncheckedValue('0')
-			->setChecked($data['iframe_sandboxing_enabled'] == 1),
-		(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
-			DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
-		))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
-			->setEnabled($data['iframe_sandboxing_enabled'] == 1)
-			->setAriaRequired()
-	]);
+		]
+	)
+	->addRow(
+		new CLabel(_('Use iframe sandboxing'), 'iframe_sandboxing_enabled'),
+		[
+			(new CCheckBox('iframe_sandboxing_enabled'))
+				->setUncheckedValue('0')
+				->setChecked($data['iframe_sandboxing_enabled'] == 1),
+			(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
+				DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
+			))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
+				->setEnabled($data['iframe_sandboxing_enabled'] == 1)
+				->setAriaRequired()
+		]
+	);
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('miscconfig')))->removeId())
 	->setId('miscconfig-form')
 	->setName('otherForm')
 	->setAction((new CUrl('zabbix.php'))
