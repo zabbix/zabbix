@@ -72,14 +72,14 @@ $items = [];
 $value_type = '';
 
 if ($itemids) {
-	$items = API::Item()->get([
-		'output' => ['itemid', 'name', 'value_type'],
+	$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+		'output' => ['itemid', 'name_resolved', 'value_type'],
 		'selectHosts' => ['name'],
 		'itemids' => $itemids,
 		'preservekeys' => true,
 		'templated' => false,
 		'webitems' => true
-	]);
+	]), ['name_resolved' => 'name']);
 
 	if (getRequest('action') == HISTORY_BATCH_GRAPH) {
 		// Remove items that are not numeric.

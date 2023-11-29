@@ -649,7 +649,7 @@ function addValues(frame, values) {
 			jQuery(frm_storage).val(values[key]).change();
 		}
 		else {
-			jQuery(frm_storage).html(values[key]);
+			jQuery(frm_storage).text(values[key]);
 		}
 	}
 }

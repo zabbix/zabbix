@@ -162,13 +162,11 @@ class CHistFunctionValidator extends CValidator {
 		}
 
 		$macro_parsers = [];
-
 		if ($options['usermacros']) {
-			$macro_parsers[] = new CUserMacroParser();
+			array_push($macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($options['lldmacros']) {
-			$macro_parsers[] = new CLLDMacroParser();
-			$macro_parsers[] = new CLLDMacroFunctionParser();
+			array_push($macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 
 		for ($pos = strpos($value, '{'); $pos !== false; $pos = strpos($value, '{', $pos + 1)) {
