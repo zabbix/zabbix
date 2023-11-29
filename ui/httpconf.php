@@ -498,10 +498,6 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
-		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
-
 		$data['agent'] = ZBX_AGENT_OTHER;
 		$data['agent_other'] = $db_httptest['agent'];
 
@@ -540,7 +536,6 @@ if (isset($_REQUEST['form'])) {
 		$data['http_password'] = $db_httptest['http_password'];
 		$data['http_proxy'] = $db_httptest['http_proxy'];
 		$data['templated'] = (bool) $db_httptest['templateid'];
-
 		$data['verify_peer'] = $db_httptest['verify_peer'];
 		$data['verify_host'] = $db_httptest['verify_host'];
 		$data['ssl_cert_file'] = $db_httptest['ssl_cert_file'];
@@ -641,6 +636,10 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if ($db_httptest) {
+		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
 		$parent_templates = getHttpTestParentTemplates($db_httptests)['templates'];
 
 		$rw_templates = $data['host']['parentTemplates']

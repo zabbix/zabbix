@@ -19,8 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
 
 /**
  * @backup profiles
@@ -29,10 +29,19 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
+	/**
+	 * Attach TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
+	}
 
-	use TagTrait;
-	use TableTrait;
+	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
 
 	public static function allTemplates() {
 		return CDBHelper::getRandomizedDataProvider(
