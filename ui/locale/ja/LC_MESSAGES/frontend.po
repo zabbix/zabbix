@@ -15310,6 +15310,10 @@ msgstr "パーセンタイルライン (左)"
 msgid "Percentile line (right)"
 msgstr "パーセンタイルライン (右)"
 
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "DNSクエリの実行。要求した情報のタイプの文字列を返す。"
@@ -16804,6 +16808,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "ICMP pingパケットのロスト率を返す。"
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -22875,6 +22883,13 @@ msgstr "asin() - 角度の値のアークサイン、ラジアンで示す"
 msgid "at least one day of the week must be selected"
 msgstr "少なくとも1つの曜日を選択する必要があります"
 
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
 msgstr "少なくとも1つのオーバーライドオプションを指定する必要があります"
@@ -23543,6 +23558,11 @@ msgstr "in() - 値がリストアップされた値と同じかチェック (1 -
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "サブグループを含む"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

@@ -127,14 +127,14 @@ class CScreenHistory extends CScreenBase {
 	public function get() {
 		$output = [];
 
-		$items = API::Item()->get([
-			'output' => ['itemid', 'name', 'key_', 'value_type'],
+		$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+			'output' => ['itemid', 'name_resolved', 'key_', 'value_type'],
 			'selectHosts' => ['name'],
 			'selectValueMap' => ['mappings'],
 			'itemids' => $this->itemids,
 			'webitems' => true,
 			'preservekeys' => true
-		]);
+		]), ['name_resolved' => 'name']);
 
 		if (!$items) {
 			show_error_message(_('No permissions to referred object or it does not exist!'));
@@ -393,7 +393,6 @@ class CScreenHistory extends CScreenBase {
 			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())
-					->makeVerticalRotation()
 					->setHeader([(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Value')]);
 
 				$items_by_type = [];
@@ -462,8 +461,8 @@ class CScreenHistory extends CScreenBase {
 						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 					]);
 
-					$table_header[] = (new CColHeader($item['name']))
-						->addClass('vertical_rotation')
+					$table_header[] = (new CSpan($item['name']))
+						->addClass(ZBX_STYLE_TEXT_VERTICAL)
 						->setTitle($item['name']);
 					$history_data_index = 0;
 
@@ -499,7 +498,7 @@ class CScreenHistory extends CScreenBase {
 					new CUrl($this->page_file)
 				);
 
-				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
+				$history_table = (new CTableInfo())->setHeader($table_header);
 
 				foreach ($history_data as $history_data_row) {
 					$row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_data_row['clock'])))
@@ -603,6 +602,7 @@ class CScreenHistory extends CScreenBase {
 			->setArgument('to', $this->timeline['to'])
 			->setArgument('itemids', $itemIds)
 			->setArgument('type', $this->graphType)
+			->setArgument('resolve_macros', 1)
 			->setArgument('profileIdx', $this->profileIdx)
 			->setArgument('profileIdx2', $this->profileIdx2);
 
