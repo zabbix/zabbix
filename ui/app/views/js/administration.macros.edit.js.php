@@ -27,21 +27,35 @@
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
 					->disableSpellcheck()
+					->setErrorContainer('macro_#{rowNum}_error_container')
+					->setErrorLabel(_('Macro'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
+					->setErrorContainer('macro_#{rowNum}_error_container')
+					->setErrorLabel(_('Value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
 					->setAttribute('placeholder', _('description'))
+					->setErrorContainer('macro_#{rowNum}_error_container')
+					->setErrorLabel(_('Description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
+			->toString().
+		(new CRow([
+			(new CCol())
+				->setId('macro_#{rowNum}_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(4)
 		]))
 			->addClass('form_row')
 			->toString()
@@ -52,6 +66,73 @@
 	$(function() {
 		const table = $('#tbl_macros');
 		let removed = 0;
+
+		const form_element = document.forms.macrosForm;
+		const form = new Form(form_element, <?= json_encode($data['js_validation_rules']) ?>);
+
+		form_element.addEventListener('submit', (e) => {
+			e.preventDefault();
+
+			const fields = form.getAllValues();
+			const curl = new Curl(form.action);
+
+			form.validateSubmit(fields)
+				.then((result) => {
+					if (result && removed) {
+						return confirm(<?= json_encode(_('Are you sure you want to delete?')) ?> + ' ' + removed + ' '
+							+ <?= json_encode(_('macro(s)')) ?> + '?'
+						);
+					}
+
+					return result;
+				})
+				.then((result) => {
+					if (!result) {
+						return;
+					}
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(fields)
+					})
+						.then((response) => response.json())
+						.then((response) => {
+							if ('form_errors' in response) {
+								form.renderErrors(response.form_errors, true, true);
+							}
+							else if ('error' in response) {
+								throw {error: response.error};
+							}
+							else {
+								postMessageOk(response.success.title);
+								location.href = location.href;
+							}
+						})
+						.catch((exception) => {
+							for (const element of form_element.parentNode.children) {
+								if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+									element.parentNode.removeChild(element);
+								}
+							}
+
+							let title,
+								messages;
+
+							if (typeof exception === 'object' && 'error' in exception) {
+								title = exception.error.title;
+								messages = exception.error.messages;
+							}
+							else {
+								messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+							}
+
+							const message_box = makeMessageBox('bad', messages, title)[0];
+
+							form_element.parentNode.insertBefore(message_box, form_element);
+						});
+				});
+		});
 
 		table
 			.on('click', 'button.element-table-remove', function() {
