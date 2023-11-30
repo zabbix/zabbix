@@ -4147,6 +4147,10 @@ a.link-action {
 			border-top-right-radius: 2px;
 			border-bottom-right-radius: 2px;
 		}
+
+		&[data-hintbox='1'] {
+			cursor: pointer;
+		}
 	}
 
 	.status-na-bg,

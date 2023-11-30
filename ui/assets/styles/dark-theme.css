@@ -5329,6 +5329,8 @@ a.link-action {
     .status-container span:last-of-type {
       border-top-right-radius: 2px;
       border-bottom-right-radius: 2px; }
+    .status-container span[data-hintbox='1'] {
+      cursor: pointer; }
   .status-container .status-na-bg,
   .status-container .status-info-bg,
   .status-container .status-warning-bg,
