@@ -30,8 +30,6 @@
 #include "zbxdbconfigworker.h"
 #include "zbxtypes.h"
 
-extern int		CONFIG_CONFSYNCER_FREQUENCY;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically synchronises database data with memory cache         *
@@ -73,11 +71,11 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
 			dbconfig_args_in->config_ssl_key_location);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
-			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
+			get_process_type_string(process_type), (sec = zbx_time() - sec), dbconfig_args_in->config_confsyncer_frequency);
 
 	zbx_rtc_notify_config_sync(dbconfig_args_in->config_timeout, &rtc);
 
-	nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
+	nextcheck = (int)time(NULL) + dbconfig_args_in->config_confsyncer_frequency;
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -140,7 +138,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_dbconfig_worker_send_ids(&hostids);
 
 			zbx_dc_update_interfaces_availability();
-			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
+			nextcheck = (int)time(NULL) + dbconfig_args_in->config_confsyncer_frequency;
 
 			zbx_vc_remove_items_by_ids(&deleted_itemids);
 			zbx_vector_uint64_destroy(&deleted_itemids);
@@ -165,7 +163,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), sec, CONFIG_CONFSYNCER_FREQUENCY);
+				get_process_type_string(process_type), sec,
+				dbconfig_args_in->config_confsyncer_frequency);
 	}
 stop:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
