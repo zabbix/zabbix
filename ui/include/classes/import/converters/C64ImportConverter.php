@@ -417,7 +417,6 @@ class C64ImportConverter extends CConverter {
 				$expression = $expression_macro_parser
 					->getExpressionParser()
 					->getMatch();
-
 				$match = self::convertExpression($expression);
 
 				$text = substr_replace($text, $match, $p + 2, strlen($expression));
