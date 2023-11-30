@@ -106,14 +106,18 @@ class C64ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function importConverterDataProviderExpressionHistoryFunction(): array {
-		$source_expression = 'find(/host/key,10m,"regex","\.+\\\"[a-z]+")';
-		$expected_expression = 'find(/host/key,10m,"regex","\\\.+\\\\\"[a-z]+")';
+		$source_expression = 'find(/host/key,10m,"iregexp","\.+\\\"[a-z0-9]+")';
+		$source_expression_macro = '{?'.$source_expression.'}';
+		$source_expression_macro_function = '{'.$source_expression_macro.'.regsub("(.*)_([0-9]+)", \2)}';
+		$expected_expression = 'find(/host/key,10m,"iregexp","\\\.+\\\\\"[a-z0-9]+")';
+		$expected_expression_macro = '{?'.$expected_expression.'}';
+		$expected_expression_macro_function = '{'.$expected_expression_macro.'.regsub("(.*)_([0-9]+)", \2)}';
 
 		$source_triggers = [
 			[
 				'expression' => $source_expression,
 				'recovery_expression' => $source_expression,
-				'event_name' => '{?'.$source_expression.'}',
+				'event_name' => $source_expression_macro.' '.$source_expression_macro_function,
 				'dependencies' => [
 					[
 						'expression' => $source_expression,
@@ -126,7 +130,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 			[
 				'expression' => $expected_expression,
 				'recovery_expression' => $expected_expression,
-				'event_name' => '{?'.$expected_expression.'}',
+				'event_name' => $expected_expression_macro.' '.$expected_expression_macro_function,
 				'dependencies' => [
 					[
 						'expression' => $expected_expression,
@@ -238,13 +242,13 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
 					[
-						'value' => '{?'.$source_expression.'}'
+						'value' => $source_expression_macro.' '.$source_expression_macro_function,
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => '{?'.$source_expression.'}',
-						'message' => '{?'.$source_expression.'}'
+						'subject' => $source_expression_macro.' '.$source_expression_macro_function,
+						'message' => $source_expression_macro.' '.$source_expression_macro_function
 					]
 				]
 			],
@@ -252,14 +256,14 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::WEBHOOK,
 				'parameters' => [
 					[
-						'name' => '{?'.$source_expression.'}',
-						'value' => '{?'.$source_expression.'}'
+						'name' => $source_expression_macro.' '.$source_expression_macro_function,
+						'value' => $source_expression_macro.' '.$source_expression_macro_function
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => '{?'.$source_expression.'}',
-						'message' => '{?'.$source_expression.'}'
+						'subject' => $source_expression_macro.' '.$source_expression_macro_function,
+						'message' => $source_expression_macro.' '.$source_expression_macro_function
 					]
 				]
 			]
@@ -269,13 +273,13 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
 					[
-						'value' => '{?'.$expected_expression.'}'
+						'value' => $expected_expression_macro.' '.$expected_expression_macro_function
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => '{?'.$expected_expression.'}',
-						'message' => '{?'.$expected_expression.'}'
+						'subject' => $expected_expression_macro.' '.$expected_expression_macro_function,
+						'message' => $expected_expression_macro.' '.$expected_expression_macro_function,
 					]
 				]
 			],
@@ -283,14 +287,14 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::WEBHOOK,
 				'parameters' => [
 					[
-						'name' => '{?'.$expected_expression.'}',
-						'value' => '{?'.$expected_expression.'}'
+						'name' => $expected_expression_macro.' '.$expected_expression_macro_function,
+						'value' => $expected_expression_macro.' '.$expected_expression_macro_function
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => '{?'.$expected_expression.'}',
-						'message' => '{?'.$expected_expression.'}'
+						'subject' => $expected_expression_macro.' '.$expected_expression_macro_function,
+						'message' => $expected_expression_macro.' '.$expected_expression_macro_function
 					]
 				]
 			]

@@ -24,9 +24,6 @@
  */
 class C64ImportConverter extends CConverter {
 
-	private static CExpressionParser $expression_parser;
-	private static CExpressionMacroParser $expression_macro_parser;
-
 	/**
 	 * Convert import data from 6.4 to 7.0 version.
 	 *
@@ -36,9 +33,6 @@ class C64ImportConverter extends CConverter {
 	 */
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '7.0';
-
-		self::$expression_parser = new CExpressionParser(['escape_backslashes' => false]);
-		self::$expression_macro_parser = new CExpressionMacroParser(['escape_backslashes' => false]);
 
 		if (array_key_exists('templates', $data['zabbix_export'])) {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
@@ -177,11 +171,11 @@ class C64ImportConverter extends CConverter {
 			if (array_key_exists('parameters', $media_type)) {
 				foreach ($media_type['parameters'] as &$parameter) {
 					if ($media_type['type'] === CXmlConstantName::WEBHOOK) {
-						$parameter['name'] = self::convertExpression($parameter['name'], true);
+						$parameter['name'] = self::convertExpressionMacros($parameter['name']);
 					}
 
 					if (array_key_exists('value', $parameter)) {
-						$parameter['value'] = self::convertExpression($parameter['value'], true);
+						$parameter['value'] = self::convertExpressionMacros($parameter['value']);
 					}
 				}
 				unset($parameter);
@@ -191,7 +185,7 @@ class C64ImportConverter extends CConverter {
 				foreach ($media_type['message_templates'] as &$message_template) {
 					foreach (['subject', 'message'] as $field) {
 						if (array_key_exists($field, $message_template)) {
-							$message_template[$field] = self::convertExpression($message_template[$field], true);
+							$message_template[$field] = self::convertExpressionMacros($message_template[$field]);
 						}
 					}
 				}
@@ -215,7 +209,7 @@ class C64ImportConverter extends CConverter {
 			$item += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
 
 			if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
-				$item['params'] = self::convertExpression($item['params']);
+				$item['params'] = self::convertExpression($item['params'], true);
 				$item['params'] = self::convertCalcItemFormula($item['params']);
 			}
 
@@ -276,7 +270,7 @@ class C64ImportConverter extends CConverter {
 
 			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
 					&& array_key_exists('params', $item_prototype)) {
-				$item_prototype['params'] = self::convertExpression($item_prototype['params']);
+				$item_prototype['params'] = self::convertExpression($item_prototype['params'], true);
 				$item_prototype['params'] = self::convertCalcItemFormula($item_prototype['params']);
 			}
 
@@ -390,7 +384,7 @@ class C64ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('event_name', $trigger)) {
-				$trigger['event_name'] = self::convertExpression($trigger['event_name'], true);
+				$trigger['event_name'] = self::convertExpressionMacros($trigger['event_name']);
 			}
 
 			if (array_key_exists('dependencies', $trigger)) {
@@ -403,25 +397,72 @@ class C64ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert expression.
-	 *
-	 * @param string $expression
-	 * @param bool   $is_expression_macro
+	 * @param string $text
 	 *
 	 * @return string
 	 */
-	private static function convertExpression(string $expression, bool $is_expression_macro = false): string {
-		$parser = $is_expression_macro ? self::$expression_macro_parser : self::$expression_parser;
+	private static function convertExpressionMacros(string $text): string {
+		$expression_macro_parser = new CExpressionMacroParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true,
+			'escape_backslashes' => false
+		]);
 
-		if ($parser->parse($expression) != CParser::PARSE_SUCCESS) {
+		$p = 0;
+
+		while (isset($text[$p])) {
+			if ($text[$p] === '{' && $expression_macro_parser->parse($text, $p) != CParser::PARSE_FAIL) {
+				$expression = $expression_macro_parser
+					->getExpressionParser()
+					->getMatch();
+
+				$match = self::convertExpression($expression);
+
+				$text = substr_replace($text, $match, $p + 2, strlen($expression));
+
+				$p += strlen($match) + 2;
+			}
+
+			$p++;
+		}
+
+		return $text;
+	}
+
+	/**
+	 * Convert expression.
+	 *
+	 * @param string $expression
+	 * @param bool   $is_calc_item_formula
+	 *
+	 * @return string
+	 */
+	private static function convertExpression(string $expression, bool $is_calc_item_formula = false): string {
+		$options = [
+			'usermacros' => true,
+			'lldmacros' => true,
+			'escape_backslashes' => false
+		];
+
+		if ($is_calc_item_formula) {
+			$options += [
+				'calculated' => true,
+				'host_macro' => true,
+				'empty_host' => true
+			];
+		}
+
+		$expression_parser = new CExpressionParser($options);
+
+		if ($expression_parser->parse($expression) != CParser::PARSE_SUCCESS) {
 			return $expression;
 		}
 
-		if ($parser instanceof CExpressionMacroParser) {
-			$parser = $parser->getExpressionParser();
-		}
-
-		$tokens = $parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
+		$tokens = $expression_parser
+			->getResult()
+			->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
 		$convert_parameters = [];
 
 		foreach ($tokens as $token) {
@@ -441,12 +482,7 @@ class C64ImportConverter extends CConverter {
 			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'], false);
 			$parameter['match'] = CHistFunctionParser::quoteParam($parameter['match']);
 
-			$expression = substr_replace(
-				$expression,
-				$parameter['match'],
-				$parameter['pos'],
-				$parameter['length']
-			);
+			$expression = substr_replace($expression, $parameter['match'], $parameter['pos'], $parameter['length']);
 		}
 
 		return $expression;
