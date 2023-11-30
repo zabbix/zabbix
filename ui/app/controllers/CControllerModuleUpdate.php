@@ -17,16 +17,19 @@
 class CControllerModuleUpdate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'moduleid' =>	'required|db module.moduleid',
-			'status' =>		'in 1'
-		];
+	static function getValidationRules() {
+		return ['object', 'fields' => [
+			'moduleid' => ['db module.moduleid', 'required'],
+			'status' => ['boolean']
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput($this->getValidationRules());
 
 		if (!$ret) {
 			$this->setResponse(
