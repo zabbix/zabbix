@@ -40,11 +40,11 @@
 ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
 	double			sec = 0.0;
-	int			nextcheck = 0, sleeptime, secrets_reload = 0, cache_reload = 0;
+	int			sleeptime, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+				process_num = ((zbx_thread_args_t *)args)->info.process_num, nextcheck = 0,
+				secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD};
 
@@ -71,7 +71,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
 			dbconfig_args_in->config_ssl_key_location);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
-			get_process_type_string(process_type), (sec = zbx_time() - sec), dbconfig_args_in->config_confsyncer_frequency);
+			get_process_type_string(process_type), (sec = zbx_time() - sec),
+			dbconfig_args_in->config_confsyncer_frequency);
 
 	zbx_rtc_notify_config_sync(dbconfig_args_in->config_timeout, &rtc);
 
@@ -94,7 +95,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 					cache_reload = 1;
 				}
 				else
-					zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
+				{
+					zabbix_log(LOG_LEVEL_WARNING,
+							"configuration cache reloading is already in progress");
+				}
 			}
 			else if (ZBX_RTC_SECRETS_RELOAD == rtc_cmd)
 			{
@@ -104,7 +108,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 					secrets_reload = 1;
 				}
 				else
-					zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
+				{
+					zabbix_log(LOG_LEVEL_WARNING,
+							"configuration cache reloading is already in progress");
+				}
 			}
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				goto stop;
