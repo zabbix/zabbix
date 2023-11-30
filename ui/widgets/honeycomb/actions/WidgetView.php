@@ -73,10 +73,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => [],
 			'groupids' => $groupids,
 			'hostids' => $this->fields_values['hostids'] ?: null,
-			'evaltype' => !$this->isTemplateDashboard()
-				? $this->fields_values['evaltype_host']
-				: null,
-			'tags' => !$this->isTemplateDashboard()
+			'evaltype' => !$this->isTemplateDashboard() ? $this->fields_values['evaltype_host'] : null,
+			'tags' => !$this->isTemplateDashboard() && $this->fields_values['host_tags']
 				? $this->fields_values['host_tags']
 				: null,
 			'filter' => [
