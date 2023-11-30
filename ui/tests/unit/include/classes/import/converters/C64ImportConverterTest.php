@@ -242,7 +242,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
 					[
-						'value' => $source_expression_macro.' '.$source_expression_macro_function,
+						'value' => $source_expression_macro.' '.$source_expression_macro_function
 					]
 				],
 				'message_templates' => [
@@ -279,7 +279,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'message_templates' => [
 					[
 						'subject' => $expected_expression_macro.' '.$expected_expression_macro_function,
-						'message' => $expected_expression_macro.' '.$expected_expression_macro_function,
+						'message' => $expected_expression_macro.' '.$expected_expression_macro_function
 					]
 				]
 			],
