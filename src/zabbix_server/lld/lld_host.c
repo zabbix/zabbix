@@ -218,9 +218,9 @@ static int	lld_hgset_hash_search(const void *d1, const void *d2)
 typedef struct
 {
 	zbx_uint64_t			hostid;
-	zbx_vector_uint64_t		groupids;
-	zbx_vector_uint64_t		old_groupids;
+	zbx_vector_uint64_t		old_groupids;		/* current host groups */
 	zbx_vector_uint64_t		new_groupids;		/* host groups which should be added */
+	zbx_vector_uint64_t		groupids;		/* resulting host groups */
 	zbx_vector_uint64_t		lnk_templateids;	/* templates which should be linked */
 	zbx_vector_uint64_t		del_templateids;	/* templates which should be unlinked */
 	zbx_vector_ptr_t		new_hostmacros;	/* host macros which should be added, deleted or updated */
@@ -1444,7 +1444,6 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 				del_hgsetids->values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
-		zbx_vector_uint64_destroy(&hostids);
 
 		result = zbx_db_select("%s", sql);
 
@@ -1466,6 +1465,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 		zbx_db_free_result(result);
 	}
 
+	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1525,8 +1525,6 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 
 		for (i = 0; i < hgsets->values_num; i++)
 		{
-			int	k;
-
 			hgset = hgsets->values[i];
 
 			if (ZBX_LLD_HGSET_OPT_INSERT != hgset->opt)
@@ -1535,6 +1533,8 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 			if (FAIL != zbx_vector_uint64_bsearch(&hgset->hgroupids, hostgroupid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
+				int	k;
+
 				prm.hgset = hgset;
 
 				if (FAIL != (k = zbx_vector_lld_permission_search(permissions, prm,
