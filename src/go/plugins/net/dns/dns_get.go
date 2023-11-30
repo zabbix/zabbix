@@ -249,7 +249,8 @@ func exportDnsGet(params []string) (result any, err error) {
 		parsedFlagsSection,
 		parsedResponseCode,
 		queryTimeSection,
-		parsedQuestionSection)
+		parsedQuestionSection,
+	)
 
 	finalResultJson, errFinalResultParse := json.Marshal(almostCompleteResultBlock)
 	if errFinalResultParse != nil {
