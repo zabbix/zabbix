@@ -1818,7 +1818,7 @@ static int	DBpatch_6050153(void)
 
 static int	DBpatch_6050154(void)
 {
-	return DBcreate_index("host_proxy", "host_proxy_1", "hostid", 0);
+	return DBcreate_index("host_proxy", "host_proxy_1", "hostid", 1);
 }
 
 static int	DBpatch_6050155(void)

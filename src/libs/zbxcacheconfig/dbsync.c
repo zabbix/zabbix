@@ -4120,6 +4120,16 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for proxy_group table                       *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync)
 {
 	char	*sql = NULL;

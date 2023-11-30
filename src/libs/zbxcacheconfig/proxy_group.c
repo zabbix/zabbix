@@ -26,6 +26,20 @@ ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
 ZBX_PTR_VECTOR_IMPL(pg_host_ptr, zbx_pg_host_t *)
 ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync proxy groups with configuration cache                        *
+ *                                                                            *
+ * Parameters: sync     - [IN] db synchronization data                        *
+ *             revision - [IN] current sync revision                          *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - proxy_groupid                                                *
+ *           1 - failover_delay                                               *
+ *           2 - min_online                                                   *
+ *                                                                            *
+ ******************************************************************************/
 void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char			**row;
@@ -144,6 +158,13 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get locally cached proxy lastaccess from configuration cache      *
+ *                                                                            *
+ * Parameter: proxies - [IN/OUT] local proxy cache                            *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies)
 {
 	zbx_hashset_iter_t	iter;
@@ -161,6 +182,30 @@ void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies)
 			proxy->lastaccess = 0;
 		else
 			proxy->lastaccess = dc_proxy->lastaccess;
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update host proxy map revision in configuration cache for the     *
+ *          specified groups.                                                 *
+ *                                                                            *
+ * Parameter: groupids - [IN] target group identifiers                        *
+ *            revision - [IN] host proxy map revision                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_group_hpmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision)
+{
+	WRLOCK_CACHE;
+
+	for (int i = 0; i < groupids->values_num; i++)
+	{
+		zbx_pg_group_t	*group;
+
+		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&config->proxy_groups, &groupids->values[i])))
+			group->mapping_revision = revision;
 	}
 
 	UNLOCK_CACHE;

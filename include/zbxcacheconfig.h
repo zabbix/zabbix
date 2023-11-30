@@ -1353,10 +1353,10 @@ ZBX_VECTOR_DECL(objmove, zbx_objmove_t)
 
 /* proxy group manager local cache support */
 
+/* host-proxy mapping record */
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint64_t	hostproxyid;
 	zbx_uint64_t	proxyid;
 	zbx_uint64_t	revision;
 }
@@ -1367,6 +1367,7 @@ ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
 
 typedef struct zbx_pg_group zbx_pg_group_t;
 
+/* proxy */
 typedef struct
 {
 	zbx_uint64_t			proxyid;
@@ -1381,6 +1382,7 @@ zbx_pg_proxy_t;
 
 ZBX_PTR_VECTOR_DECL(pg_proxy_ptr, zbx_pg_proxy_t *)
 
+/* proxy group */
 struct zbx_pg_group
 {
 	zbx_uint64_t			proxy_groupid;
@@ -1401,5 +1403,6 @@ ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
 
 int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
 void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies);
+void	zbx_dc_update_group_hpmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision);
 
 #endif

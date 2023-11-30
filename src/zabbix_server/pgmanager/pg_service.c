@@ -24,6 +24,14 @@
 #include "zbxserialize.h"
 #include "zbxthreads.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: move hosts between proxy groups in cache                          *
+ *                                                                            *
+ * Parameter: pgs     - [IN] proxy group service                              *
+ *            message - [IN] IPC message with host relocation data            *
+ *                                                                            *
+ ******************************************************************************/
 static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
 {
 	unsigned char	*ptr = message->data;
@@ -59,6 +67,14 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: move proxies between proxy groups in cache                        *
+ *                                                                            *
+ * Parameter: pgs     - [IN] proxy group service                              *
+ *            message - [IN] IPC message with proxy relocation data           *
+ *                                                                            *
+ ******************************************************************************/
 static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
 {
 	unsigned char	*ptr = message->data;
@@ -94,6 +110,11 @@ static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mes
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: proxy group service thread entry                                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	*pg_service_entry(void *data)
 {
 	zbx_pg_service_t	*pgs = (zbx_pg_service_t *)data;
@@ -133,6 +154,11 @@ out:
 	return NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize proxy group service                                    *
+ *                                                                            *
+ ******************************************************************************/
 int	pg_service_init(zbx_pg_service_t *pgs, zbx_pg_cache_t *cache, char **error)
 {
 	int	ret = FAIL;
@@ -161,6 +187,11 @@ out:
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: destroy proxy group service                                       *
+ *                                                                            *
+ ******************************************************************************/
 void	pg_service_destroy(zbx_pg_service_t *pgs)
 {
 	zbx_ipc_socket_t	sock;
