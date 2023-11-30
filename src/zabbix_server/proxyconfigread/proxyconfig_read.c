@@ -1223,6 +1223,7 @@ out:
 #undef ZBX_PROXYCONFIG_SYNC_CONFIG
 #undef ZBX_PROXYCONFIG_SYNC_HTTPTESTS
 #undef ZBX_PROXYCONFIG_SYNC_AUTOREG
+#undef ZBX_PROXYCONFIG_SYNC_ALL
 }
 
 /******************************************************************************
