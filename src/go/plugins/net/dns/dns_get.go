@@ -138,6 +138,7 @@ var dnsClassesGet = map[uint16]string{
 	255: "ANY",
 }
 
+// QTYPES are a superset of TYPEs https://datatracker.ietf.org/doc/html/rfc1035
 var dnsExtraQuestionTypesGet = map[uint16]string{
 	251: "IXFR",
 	252: "AXFR",
