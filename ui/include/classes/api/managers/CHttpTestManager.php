@@ -1130,8 +1130,6 @@ class CHttpTestManager {
 										'values' => $upd_field,
 										'where' => ['httpstep_fieldid' => $db_field['httpstep_fieldid']]
 									];
-
-									$field['httpstep_fieldid'] = $db_field['httpstep_fieldid'];
 								}
 							}
 							else {
@@ -1178,8 +1176,6 @@ class CHttpTestManager {
 										'values' => $upd_field,
 										'where' => ['httpstep_fieldid' => $db_post['httpstep_fieldid']]
 									];
-
-									$post['httpstep_fieldid'] = $db_post['httpstep_fieldid'];
 								}
 							}
 							else {
