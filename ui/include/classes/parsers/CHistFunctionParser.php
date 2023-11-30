@@ -57,11 +57,13 @@ class CHistFunctionParser extends CParser {
 
 	private $query_parser;
 	private $period_parser;
-	private $user_macro_parser;
-	private $lld_macro_parser;
-	private $lld_macro_function_parser;
 	private $time_parser;
 	private $size_parser;
+
+	/**
+	 * @var array
+	 */
+	private $macro_parsers = [];
 
 	/**
 	 * Parsed function name.
@@ -99,12 +101,10 @@ class CHistFunctionParser extends CParser {
 		$this->time_parser = new CNumberParser(['with_time_suffix' => true, 'with_year' => true]);
 
 		if ($this->options['usermacros']) {
-			$this->user_macro_parser = new CUserMacroParser();
+			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
-
 		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 	}
 
@@ -158,14 +158,7 @@ class CHistFunctionParser extends CParser {
 		$num = 0;
 
 		// The list of parsers for unquoted parameters.
-		$parsers = [$this->size_parser, $this->time_parser];
-		if ($this->options['usermacros']) {
-			$parsers[] = $this->user_macro_parser;
-		}
-		if ($this->options['lldmacros']) {
-			$parsers[] = $this->lld_macro_parser;
-			$parsers[] = $this->lld_macro_function_parser;
-		}
+		$parsers = array_merge([$this->size_parser, $this->time_parser], $this->macro_parsers);
 
 		while (isset($source[$p])) {
 			switch ($state) {

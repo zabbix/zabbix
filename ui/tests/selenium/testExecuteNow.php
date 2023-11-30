@@ -189,7 +189,7 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_LatestDataPage($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
@@ -638,23 +638,18 @@ class testExecuteNow extends CWebTest {
 		if ($lld === false) {
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		}
+
 		// Disabled "Execute now" button.
 		if (!array_key_exists('expected', $data)) {
-			if ($lld === true) {
-				$this->query('button:Execute now')->one()->isEnabled(false);
-			}
-			else {
-				$this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
-			}
+			$lld
+				? $this->query('button:Execute now')->one()->isEnabled(false)
+				: $this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
 			return;
 		}
 
-		if ($lld === false) {
-			$dialog->getFooter()->query('button:Execute now')->one()->click();
-		}
-		else {
-			$this->query('button:Execute now')->one()->click();
-		}
+		$lld
+			? $this->query('button:Execute now')->one()->click()
+			: $dialog->getFooter()->query('button:Execute now')->one()->click();
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, $data['message']);

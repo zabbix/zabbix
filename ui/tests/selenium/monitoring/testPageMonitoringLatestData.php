@@ -40,7 +40,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	}
 
 	private function getTableSelector() {
-		return 'xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']';
+		return 'xpath://table['.CXPathHelper::fromClass('list-table fixed').']';
 	}
 
 	private function getTable() {
@@ -471,7 +471,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	public function testPageMonitoringLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+		$table = $this->getTable()->waitUntilPresent();
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
@@ -828,7 +828,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+		$table = $this->getTable()->waitUntilPresent();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();

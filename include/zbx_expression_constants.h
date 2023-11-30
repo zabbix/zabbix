@@ -281,4 +281,6 @@
 #define MVAR_USER_SURNAME		"{USER.SURNAME}"
 #define MVAR_USER_FULLNAME		"{USER.FULLNAME}"
 
+#define MVAR_USER_MACRO			"{$"
+
 #endif

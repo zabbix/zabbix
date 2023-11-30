@@ -48,6 +48,7 @@
 #endif
 
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
+static zbx_get_progname_f	get_progname_func_cb = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -97,9 +98,15 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb)
+void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_progname_f get_progname_cb)
 {
 	flush_value_func_cb = flush_value_cb;
+	get_progname_func_cb = get_progname_cb;
+}
+
+zbx_get_progname_f	preproc_get_progname_cb(void)
+{
+	return get_progname_func_cb;
 }
 
 /******************************************************************************
@@ -1161,7 +1168,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	double					time_stat, time_idle = 0, time_flush;
+	double					time_stat, time_idle = 0, time_flush, time_vps_update;
 	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
@@ -1211,6 +1218,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	/* initialize statistics */
 	time_stat = zbx_time();
 	time_flush = time_stat;
+	time_vps_update = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -1308,6 +1316,13 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			zbx_dc_flush_history();
 			time_flush = sec;
+		}
+
+		/* trigger vps monitor update at least once per second */
+		if (1 <= sec - time_vps_update)
+		{
+			zbx_vps_monitor_add_collected(0);
+			time_vps_update = sec;
 		}
 	}
 out:
