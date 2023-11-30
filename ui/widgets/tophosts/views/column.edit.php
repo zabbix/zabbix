@@ -144,7 +144,7 @@ $form_grid->addItem([
 			_('Aggregation function'),
 			$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
 		],
-		'label_aggregate_function'
+		'column_aggregate_function'
 	),
 	new CFormField(
 		(new CSelect('aggregate_function'))
@@ -159,7 +159,7 @@ $form_grid->addItem([
 				AGGREGATE_FIRST => _('first'),
 				AGGREGATE_LAST => _('last')
 			]))
-			->setFocusableElementId('label_aggregate_function')
+			->setFocusableElementId('column_aggregate_function')
 	)
 ]);
 
@@ -213,7 +213,7 @@ $form_grid->addItem([
 
 // Base color.
 $form_grid->addItem([
-	new CLabel(_('Base color'), 'base_color'),
+	new CLabel(_('Base color'), 'lbl_base_color'),
 	new CFormField(new CColor('base_color', $data['base_color']))
 ]);
 

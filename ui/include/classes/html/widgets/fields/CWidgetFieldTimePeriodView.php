@@ -93,7 +93,7 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 		if ($this->field->isWidgetAccepted()) {
 			$view_collection[] = [
-				'label' => (new CLabel(_('Widget'), $field_name.'_reference'.'_ms'))
+				'label' => (new CLabel(_('Widget'), $field_name.'_reference_ms'))
 					->addClass('js-'.$field_name.'-reference')
 					->setAsteriskMark($this->isRequired()),
 				'view' =>  (new CMultiSelect([
