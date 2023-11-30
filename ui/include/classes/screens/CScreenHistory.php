@@ -309,8 +309,12 @@ class CScreenHistory extends CScreenBase {
 					$host = reset($item['hosts']);
 					$color = null;
 
-					if ($value_type != ITEM_VALUE_TYPE_BINARY) {
+					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+						$value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+					}
+					else {
 						$data['value'] = rtrim($data['value'], " \t\r\n");
+						$value = zbx_nl2br($data['value']);
 
 						if ($this->filter !== '') {
 							$haystack = mb_strtolower($data['value']);
@@ -375,10 +379,6 @@ class CScreenHistory extends CScreenBase {
 								: '';
 						}
 					}
-
-					$value = $value_type == ITEM_VALUE_TYPE_BINARY
-						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
-						: zbx_nl2br($data['value']);
 
 					$row[] = (new CCol(new CPre($value)))->addClass($color);
 
