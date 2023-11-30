@@ -73,8 +73,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => [],
 			'groupids' => $groupids,
 			'hostids' => $this->fields_values['hostids'] ?: null,
-			'evaltype' => $this->fields_values['evaltype_host'],
-			'tags' => $this->fields_values['host_tags'] ?: null,
+			'evaltype' => array_key_exists('host_tags', $this->fields_values)
+				? $this->fields_values['evaltype_host']
+				: null,
+			'tags' => array_key_exists('host_tags', $this->fields_values)
+				? $this->fields_values['host_tags']
+				: null,
 			'filter' => [
 				'maintenance_status' => $this->fields_values['maintenance'] != 1
 					? HOST_MAINTENANCE_STATUS_OFF
