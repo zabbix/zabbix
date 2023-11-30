@@ -38,12 +38,15 @@ zbx_keys_path_t;
 ZBX_PTR_VECTOR_DECL(keys_path_ptr, zbx_keys_path_t *)
 ZBX_PTR_VECTOR_IMPL(keys_path_ptr, zbx_keys_path_t *)
 
-static int	keys_path_compare(const zbx_keys_path_t *ptr1, const zbx_keys_path_t *ptr2)
+static int	keys_path_compare(const void *d1, const void *d2)
 {
+	const zbx_keys_path_t	*ptr1 = *((const zbx_keys_path_t * const *)d1);
+	const zbx_keys_path_t	*ptr2 = *((const zbx_keys_path_t * const *)d2);
+
 	return strcmp(ptr1->path, ptr2->path);
 }
 
-static zbx_hash_t	keys_hash(const zbx_keys_path_t *data)
+static zbx_hash_t	keys_hash(const void *data)
 {
 	return ZBX_DEFAULT_STRING_HASH_ALGO(*(const char * const *)data, strlen(*(const char * const *)data),
 			ZBX_DEFAULT_HASH_SEED);
