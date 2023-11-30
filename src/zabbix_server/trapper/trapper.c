@@ -53,7 +53,13 @@
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
-static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
+
+zbx_get_program_type_f	trapper_get_program_type(void)
+{
+	return zbx_get_program_type_cb;
+}
+
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 typedef struct
@@ -1380,7 +1386,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			{
 				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
 				{
-					zbx_clear_cache_snmp(process_type, process_num);
+					zbx_clear_cache_snmp(process_type, process_num, trapper_args_in->progname);
 					snmp_reload = 1;
 				}
 				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)

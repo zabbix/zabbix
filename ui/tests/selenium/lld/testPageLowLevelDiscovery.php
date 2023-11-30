@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup items
  *
- * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups
+ * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups, AllItemValueTypes
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
@@ -457,6 +457,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'LLD for Discovered host tests',
 						'LLD for host group test',
 						'LLD number 8',
+						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
 						'Linux by Zabbix agent: Linux: Get filesystems: Mounted filesystem discovery',
 						'Mūsu desmitais LLD',
