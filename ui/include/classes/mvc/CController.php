@@ -316,7 +316,7 @@ abstract class CController {
 
 			return false;
 		}
-		elseif ($period > $max_period + 1) {
+		elseif ($period > $max_period) {
 			info(_n('Maximum time period to display is %1$s day.',
 				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 			));
