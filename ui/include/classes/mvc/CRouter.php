@@ -112,7 +112,7 @@ class CRouter {
 		'favorite.create'							=> ['CControllerFavoriteCreate',						'layout.javascript',	null],
 		'favorite.delete'							=> ['CControllerFavoriteDelete',						'layout.javascript',	null],
 		'geomaps.edit'								=> ['CControllerGeomapsEdit',							'layout.htmlpage',		'administration.geomaps.edit'],
-		'geomaps.update'							=> ['CControllerGeomapsUpdate',							null,					null],
+		'geomaps.update'							=> ['CControllerGeomapsUpdate',							'layout.json',			null],
 		'gui.edit'									=> ['CControllerGuiEdit',								'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'								=> ['CControllerGuiUpdate',								null,					null],
 		'hintbox.actionlist'						=> ['CControllerHintboxActionlist',						'layout.json',			'hintbox.actionlist'],

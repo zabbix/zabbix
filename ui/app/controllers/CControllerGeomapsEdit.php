@@ -24,20 +24,7 @@ class CControllerGeomapsEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'geomaps_tile_provider'	=> 'string',
-			'geomaps_tile_url'		=> 'string',
-			'geomaps_max_zoom'		=> 'string',
-			'geomaps_attribution'	=> 'string'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
@@ -49,7 +36,10 @@ class CControllerGeomapsEdit extends CController {
 			'geomaps_tile_provider' => $this->getInput('geomaps_tile_provider', CSettingsHelper::get(
 				CSettingsHelper::GEOMAPS_TILE_PROVIDER
 			)),
-			'tile_providers' => getTileProviders()
+			'tile_providers' => getTileProviders(),
+			'js_validation_rules' => (new CFormValidator(
+				CControllerGeomapsUpdate::getValidationRules()
+			))->getRules()
 		];
 
 		$data += (array_key_exists($data['geomaps_tile_provider'], $data['tile_providers']))

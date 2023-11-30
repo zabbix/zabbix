@@ -19,34 +19,43 @@
  */
 class CControllerGeomapsUpdate extends CController {
 
-	protected function checkInput(): bool {
-		$fields = [
-			'geomaps_tile_provider'		=> 'required|db config.geomaps_tile_provider',
-			'geomaps_tile_url'			=> 'required|not_empty|db config.geomaps_tile_url',
-			'geomaps_max_zoom'			=> 'required|not_empty|db config.geomaps_max_zoom|ge 1|le '.ZBX_GEOMAP_MAX_ZOOM,
-			'geomaps_attribution'		=> 'db config.geomaps_attribution'
-		];
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
 
-		$ret = $this->validateInput($fields);
+	static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'geomaps_tile_provider' => ['db config.geomaps_tile_provider', 'required'],
+			'geomaps_tile_url' => ['db config.geomaps_tile_url', 'required', 'not_empty',
+				'when' => ['geomaps_tile_provider', 'in' => ['']]
+			],
+			'geomaps_max_zoom' => ['db config.geomaps_max_zoom', 'required', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM,
+				'when' => ['geomaps_tile_provider', 'in' => ['']]
+			],
+			'geomaps_attribution' => ['db config.geomaps_attribution',
+				'when' => ['geomaps_tile_provider', 'in' => ['']]
+			]
+		]];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			switch ($this->getValidationResult()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'geomaps.edit')
-							->getUrl()
-					);
+			$form_errors = $this->getValidationError();
 
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode(array_filter([
+					'form_errors' => $form_errors ?? null,
+					'error' => !$form_errors
+						? [
+							'title' => _('Cannot update configuration'),
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+						: null
+				]))])
+			);
 		}
 
 		return $ret;
@@ -66,20 +75,24 @@ class CControllerGeomapsUpdate extends CController {
 
 		$result = API::Settings()->update($settings);
 
-		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'geomaps.edit')
-				->getUrl()
-		);
+		$output = [];
 
 		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Configuration updated'));
+			$success = ['title' => _('Configuration updated')];
+
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
+			}
+
+			$output['success'] = $success;
 		}
 		else {
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
+			$output['error'] = [
+				'title' => _('Cannot update configuration'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

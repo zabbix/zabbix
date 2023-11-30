@@ -124,7 +124,8 @@ $form = (new CForm())
 
 (new CScriptTag(
 	'view.init('.json_encode([
-		'tile_providers' => $data['tile_providers']
+		'tile_providers' => $data['tile_providers'],
+		'rules' => $data['js_validation_rules']
 	]).');'
 ))
 	->setOnDocumentReady()
