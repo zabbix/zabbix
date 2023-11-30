@@ -413,7 +413,7 @@ class C64ImportConverter extends CConverter {
 		$p = 0;
 
 		while (isset($text[$p])) {
-			if ($text[$p] === '{' && $expression_macro_parser->parse($text, $p) != CParser::PARSE_FAIL) {
+			if (substr($text, $p, 2) === '{?' && $expression_macro_parser->parse($text, $p) != CParser::PARSE_FAIL) {
 				$expression = $expression_macro_parser
 					->getExpressionParser()
 					->getMatch();
