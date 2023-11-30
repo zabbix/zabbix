@@ -36,7 +36,6 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 		zbx_vector_cq_value_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
 		char **error);
 
-
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 #endif	/* ZABBIX_VMWARE_HV_H */

@@ -136,7 +136,6 @@ int	vmware_ds_id_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, const char *ds_id)
 {
-
 	zbx_uint64_t	mi_access = ZBX_VMWARE_DS_NONE;
 	char		*value;
 

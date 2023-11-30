@@ -45,7 +45,6 @@
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
 	"/*[local-name()='val']/*[@type='Datastore']"
 
-
 #define ZBX_XPATH_HV_VMS()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
 	"/*[local-name()='val']/*[@type='VirtualMachine']"
@@ -63,7 +62,6 @@
 #define ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
 #define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
 		ZBX_XPATH_HV_MULTIPATH("[*[local-name()='state'][text()='active']]")
-
 
 #define ZBX_HVPROPMAP_EXT(property, func, ver)								\
 	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
@@ -104,7 +102,6 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 #define ZBX_XPATH_NAME_BY_TYPE(type)									\
 	ZBX_XPATH_PROP_OBJECT(type) "*[local-name()='propSet'][*[local-name()='name']]"			\
 	"/*[local-name()='val']"
-
 
 #define ZBX_XPATH_HV_PARENTID										\
 	ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE("parent")
