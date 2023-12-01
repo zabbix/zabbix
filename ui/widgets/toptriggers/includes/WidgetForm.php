@@ -73,7 +73,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldTags('tags')
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('show_lines', _('Trigger count'), ZBX_MIN_WIDGET_LINES,
+				(new CWidgetFieldIntegerBox('show_lines', _('Trigger limit'), ZBX_MIN_WIDGET_LINES,
 					ZBX_MAX_WIDGET_LINES
 				))
 					->setDefault(self::DEFAULT_TRIGGER_COUNT)
