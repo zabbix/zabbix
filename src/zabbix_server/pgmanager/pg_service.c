@@ -78,7 +78,6 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
 {
 	unsigned char	*ptr = message->data;
-	zbx_uint64_t	proxyid, srcid, dstid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -86,23 +85,13 @@ static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mes
 
 	while (ptr - message->data < message->size)
 	{
-		zbx_pg_group_t	*group;
+		zbx_objmove_t	reloc;
 
-		ptr += zbx_deserialize_value(ptr, &proxyid);
-		ptr += zbx_deserialize_value(ptr, &srcid);
-		ptr += zbx_deserialize_value(ptr, &dstid);
+		ptr += zbx_deserialize_value(ptr, &reloc.objid);
+		ptr += zbx_deserialize_value(ptr, &reloc.srcid);
+		ptr += zbx_deserialize_value(ptr, &reloc.dstid);
 
-		if (0 != srcid)
-		{
-			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &srcid)))
-				pg_cache_group_remove_proxy(pgs->cache, group, proxyid);
-		}
-
-		if (0 != dstid)
-		{
-			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &dstid)))
-				pg_cache_group_add_proxy(pgs->cache, group, proxyid, 0);
-		}
+		zbx_vector_objmove_append_ptr(&pgs->cache->relocated_proxies, &reloc);
 	}
 
 	pg_cache_unlock(pgs->cache);

@@ -1371,6 +1371,7 @@ typedef struct zbx_pg_group zbx_pg_group_t;
 typedef struct
 {
 	zbx_uint64_t			proxyid;
+	char				*name;
 	int				status;
 	int				lastaccess;
 	int				firstaccess;
@@ -1386,6 +1387,7 @@ ZBX_PTR_VECTOR_DECL(pg_proxy_ptr, zbx_pg_proxy_t *)
 struct zbx_pg_group
 {
 	zbx_uint64_t			proxy_groupid;
+	char				*name;
 	zbx_uint64_t			revision;
 	zbx_uint64_t			mapping_revision;
 	zbx_uint64_t			sync_revision;

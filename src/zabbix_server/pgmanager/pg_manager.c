@@ -124,7 +124,7 @@ static void	pgm_db_get_proxies(zbx_pg_cache_t *cache)
 	int		clock = 0;
 	zbx_pg_proxy_t *proxy;
 
-	result = zbx_db_select("select p.proxyid,p.proxy_groupid,rt.lastaccess"
+	result = zbx_db_select("select p.proxyid,p.proxy_groupid,rt.lastaccess,p.name"
 				" from proxy p,proxy_rtdata rt"
 				" where proxy_groupid is not null"
 					" and p.proxyid=rt.proxyid");
@@ -144,7 +144,7 @@ static void	pgm_db_get_proxies(zbx_pg_cache_t *cache)
 		}
 
 		/* the proxy lastacess is temporary stored in it's firstaccess */
-		proxy = pg_cache_group_add_proxy(cache, group, proxyid, atoi(row[2]));
+		proxy = pg_cache_group_add_proxy(cache, group, proxyid, row[3], atoi(row[2]));
 
 		if (proxy->firstaccess < clock)
 			proxy->firstaccess = clock;
@@ -651,6 +651,127 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	pgm_get_proxy_names(const zbx_vector_uint64_t *proxyids, zbx_vector_str_t *names)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		i = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select proxyid,name from proxy where ");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "proxyid", proxyids->values, proxyids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by proxyid");
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)) && i < proxyids->values_num)
+	{
+		zbx_uint64_t	proxyid;
+
+		ZBX_DBROW2UINT64(proxyid, row[0]);
+
+		while (proxyids->values[i] != proxyid)
+		{
+			zbx_vector_str_append(names, NULL);
+			if (++i == proxyids->values_num)
+				goto out;
+		}
+
+		zbx_vector_str_append(names, zbx_strdup(NULL, row[1]));
+		i++;
+	}
+out:
+	zbx_db_free_result(result);
+}
+
+static void	pgm_update_proxies(zbx_pg_cache_t *cache)
+{
+	zbx_vector_uint64_t	proxyids;
+	zbx_vector_str_t	names;
+
+	zbx_vector_uint64_create(&proxyids);
+	zbx_vector_str_create(&names);
+
+	pg_cache_lock(cache);
+
+	for (int i = 0; i < cache->relocated_proxies.values_num; i++)
+	{
+		zbx_objmove_t	*reloc = &cache->relocated_proxies.values[i];
+
+		if (0 == reloc->dstid)
+			continue;
+
+		if (NULL == zbx_hashset_search(&cache->proxies, &reloc->objid))
+			zbx_vector_uint64_append(&proxyids, reloc->objid);
+	}
+
+	if (0 != proxyids.values_num)
+	{
+		pg_cache_unlock(cache);
+
+		zbx_vector_uint64_sort(&proxyids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&proxyids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		pgm_get_proxy_names(&proxyids, &names);
+
+		pg_cache_lock(cache);
+	}
+
+	for (int i = 0; i < cache->relocated_proxies.values_num; i++)
+	{
+		zbx_pg_group_t	*group;
+		zbx_pg_proxy_t	*proxy = NULL;
+		zbx_objmove_t	*reloc = &cache->relocated_proxies.values[i];
+
+		if (0 != reloc->srcid)
+		{
+			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->srcid)))
+			{
+				proxy = pg_cache_group_remove_proxy(cache, group, reloc->objid);
+				pg_cache_queue_group_update(cache, group);
+			}
+		}
+
+		if (0 != reloc->dstid)
+		{
+			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->dstid)))
+			{
+				if (NULL == proxy)
+				{
+					int	j;
+					char	*name;
+
+					if (FAIL != (j = zbx_vector_uint64_search(&proxyids, reloc->objid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						name = names.values[j];
+					}
+					else
+						name = "";
+
+					pg_cache_group_add_proxy(cache, group, reloc->objid, name, 0);
+				}
+				else
+					zbx_vector_pg_proxy_ptr_append(&group->proxies, proxy);
+
+				pg_cache_queue_group_update(cache, group);
+			}
+		}
+		else if (NULL != proxy)
+			pg_cache_proxy_free(cache, proxy);
+	}
+
+	zbx_vector_objmove_clear(&cache->relocated_proxies);
+
+	pg_cache_unlock(cache);
+
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
+	zbx_vector_uint64_destroy(&proxyids);
+}
+
 /*
  * main process loop
  */
@@ -706,6 +827,9 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 			time_update = time_now;
 		}
+
+		if (0 != cache.relocated_proxies.values_num)
+			pgm_update_proxies(&cache);
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		zbx_sleep_loop(info, 1);
