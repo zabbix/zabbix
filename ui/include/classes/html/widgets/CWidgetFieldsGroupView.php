@@ -27,6 +27,8 @@ class CWidgetFieldsGroupView extends CDiv {
 
 	protected string $label;
 
+	protected ?string $focusable_element_id = null;
+
 	protected ?CTag $field_hint = null;
 
 	public function __construct(string $label, array $fields = []) {
@@ -64,7 +66,7 @@ class CWidgetFieldsGroupView extends CDiv {
 	}
 
 	public function getLabel(): CLabel {
-		return (new CLabel([$this->label, $this->field_hint]))
+		return (new CLabel([$this->label, $this->field_hint], $this->focusable_element_id))
 			->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP_LABEL)
 			->addClass($this->label_class_list ? implode(' ', $this->label_class_list) : null);
 	}
@@ -78,6 +80,14 @@ class CWidgetFieldsGroupView extends CDiv {
 	public function addLabelClass(?string $label_class): self {
 		if ($label_class !== null) {
 			$this->label_class_list[] = $label_class;
+		}
+
+		return $this;
+	}
+
+	public function setFocusableElementId(?string $focusable_element_id): self {
+		if ($focusable_element_id !== null) {
+			$this->focusable_element_id = $focusable_element_id;
 		}
 
 		return $this;
