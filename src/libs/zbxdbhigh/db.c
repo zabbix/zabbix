@@ -437,8 +437,8 @@ int	zbx_db_execute_once(const char *fmt, ...)
 	if (ZBX_DB_DOWN == rc)
 	{
 		zbx_db_close();
-		zbx_db_connect(ZBX_DB_CONNECT_ONCE);
-		rc = zbx_db_vexecute(fmt, args);
+		if (ZBX_DB_OK <= zbx_db_connect(ZBX_DB_CONNECT_ONCE))
+			rc = zbx_db_vexecute(fmt, args);
 	}
 #endif
 	va_end(args);
