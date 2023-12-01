@@ -1022,7 +1022,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$items[$itemid][$to] = strtr($items[$itemid][$from], $values);
 			}
 		}
-		unset($item);
 
 		return $items;
 	}
