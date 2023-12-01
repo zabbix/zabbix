@@ -27,7 +27,7 @@ import (
 	"testing"
 )
 
-func check(t *testing.T, tc *testCase) {
+func checkArgsFlagsParsing(t *testing.T, tc *argsFlagsParsingTestCase) {
 	var o dnsGetOptions
 	err := o.setFlags(tc.flagsInArgs)
 
@@ -45,14 +45,14 @@ func check(t *testing.T, tc *testCase) {
 	}
 }
 
-type testCase struct {
+type argsFlagsParsingTestCase struct {
 	flagsInArgs string
 	err         error
 	flagsOut    map[string]bool
 }
 
-func TestDNSGet(t *testing.T) {
-	testCases := []*testCase{
+func TestDNSGetFlagsArgsParsing(t *testing.T) {
+	argsFlagsParsingTestCases := []*argsFlagsParsingTestCase{
 		{
 			flagsInArgs: "cdflag,rdflag,dnssec,nsid,edns0,aaflag,adflag",
 			err:         nil,
@@ -192,7 +192,7 @@ func TestDNSGet(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		check(t, tc)
+	for _, tc := range argsFlagsParsingTestCases {
+		checkArgsFlagsParsing(t, tc)
 	}
 }
