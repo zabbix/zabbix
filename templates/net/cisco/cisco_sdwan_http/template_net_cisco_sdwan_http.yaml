@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:35:01Z'
+  date: '2023-11-01T20:51:28Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -2963,9 +2963,6 @@ zabbix_export:
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         name: '["{#FSNAME}"]: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'
@@ -3001,18 +2998,12 @@ zabbix_export:
                       value:
                         host: 'Cisco SD-WAN device by HTTP'
                         name: 'Interface ["{#IFNAME}"]: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Routes
               widgets:
                 - type: GRAPH_PROTOTYPE
                   width: '24'
                   height: '8'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:10:28Z'
+  date: '2023-11-01T20:43:58Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -703,9 +703,6 @@ zabbix_export:
                       value:
                         host: 'Apache by HTTP'
                         name: 'Apache: Current async connections{#SINGLETON}'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '7'
@@ -731,9 +728,6 @@ zabbix_export:
                       value:
                         host: 'Apache by HTTP'
                         name: 'Apache: Current async processes{#SINGLETON}'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: a5d1f911fb264bd4bc087ea582626d7f
           name: 'Service state'

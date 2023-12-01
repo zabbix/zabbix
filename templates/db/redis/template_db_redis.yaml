@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-18T11:11:48Z'
+  date: '2023-11-01T20:49:33Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2745,9 +2745,6 @@ zabbix_export:
                       value:
                         host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Replication lag time{#SINGLETON}'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'

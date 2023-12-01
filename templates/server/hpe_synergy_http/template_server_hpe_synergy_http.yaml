@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T17:07:23Z'
+  date: '2023-11-01T21:01:31Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -7168,9 +7168,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Enclosure [{#NAME}]: Power capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Storage pools'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -7185,9 +7182,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Storage pool [{#NAME}]: Capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Storage systems'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -7202,9 +7196,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Storage system [{#NAME}]: Capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Storage volumes'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -7219,9 +7210,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Storage volume [{#NAME}]: Capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 20d3a73c6cc84329a5dfafff29de32cc
           name: Boolean

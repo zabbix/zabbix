@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-29 06:01+0000\n"
-"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
+"PO-Revision-Date: 2023-11-22 13:44+0000\n"
+"Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -1022,7 +1022,7 @@ msgstr "Возраст"
 
 #: app/partials/monitoring.problem.filter.php:116
 msgid "Age less than"
-msgstr "Возраст менее чем"
+msgstr "Давность менее"
 
 #: app/views/administration.script.list.php:163 include/hosts.inc.php:1191
 #: include/items.inc.php:347 include/views/configuration.httpconf.edit.php:96
@@ -2598,6 +2598,13 @@ msgstr[0] "Не удалось деактивировать способ опо�
 msgstr[1] "Не удалось деактивировать способы оповещения"
 msgstr[2] "Не удалось деактивировать способы оповещения"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2693,6 +2700,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Не удалось активировать способ оповещения"
 msgstr[1] "Не удалось активировать способы оповещения"
 msgstr[2] "Не удалось активировать способы оповещения"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3442,6 +3456,10 @@ msgstr "Не удалось обновить обслуживание"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "Не удалось обновить способ оповещений"
+
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -12070,6 +12088,13 @@ msgstr[0] "Модуль удален: %1$s."
 msgstr[1] "Модуля удалено: %1$s."
 msgstr[2] "Модулей удалено: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -12078,6 +12103,13 @@ msgstr[0] "Модуль деактивирован: %1$s."
 msgstr[1] "Модуля деактивировано: %1$s."
 msgstr[2] "Модулей деактивировано: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
@@ -12085,6 +12117,10 @@ msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Модуль активирован: %1$s."
 msgstr[1] "Модуля активировано: %1$s."
 msgstr[2] "Модулей активировано: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
