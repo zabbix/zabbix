@@ -1,3 +1,22 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2023 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 package dns
 
 import (
@@ -281,7 +300,11 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 
 	flagsSplit := strings.Split(flags, ",")
 	if len(flagsSplit) > len(o.flags) {
-		return zbxerr.New(fmt.Sprintf("Too many flags supplied: %d", len(o.flags)))
+		return zbxerr.New(fmt.Sprintf("Too many flags supplied: %d", len(flagsSplit)))
+	}
+
+	if (len(flagsSplit) == 1 && flagsSplit[0] == "") {
+		return nil
 	}
 
 	flags = "," + flags
@@ -299,7 +322,7 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 
 		_, ok := o.flags[key]
 		if !ok {
-			return zbxerr.New("Invalid flag supplied: " + flag)
+			return zbxerr.New("Invalid flag supplied:" + flag)
 		}
 
 		_, ok = found[key]
@@ -699,7 +722,7 @@ func runQueryGet(o *dnsGetOptions) (*dns.Msg, error) {
 		MsgHdr: dns.MsgHdr{
 			Authoritative:     flags["aaflag"],
 			AuthenticatedData: flags["adflag"],
-			CheckingDisabled:  false,
+			CheckingDisabled:  flags["cdflag"],
 			RecursionDesired:  flags["rdflag"],
 			Opcode:            dns.OpcodeQuery,
 			Rcode:             dns.RcodeSuccess,

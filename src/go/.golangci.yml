@@ -264,3 +264,7 @@ issues:
     - path: pkg/zbxlib/expressions.go
       linters:
        - nlreturn
+    - path: plugins/net/dns/dns_get_test.go
+      linters:
+      - lll
+      - funlen
