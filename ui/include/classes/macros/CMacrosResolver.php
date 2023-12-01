@@ -964,15 +964,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve macros in descriptions and labels of item-based widgets.
+	 * Resolve macros in fields of item-based widgets.
 	 *
 	 * @param array  $items
-	 * @param string $items[<itemid>]['label']
-	 * @param array  $fields                    A mapping between source and destination fields.
+	 *        string $items[<itemid>]['hostid']
+	 *        string $items[<itemid>][<source_field>]  Particular source field, as referred by $fields.
+	 *
+	 * @param array  $fields                           Fields to resolve as [<source_field> => <resolved_field>].
 	 *
 	 * @return array
 	 */
-	public static function resolveItemBasedWidgetMacros(array $items, array $fields = ['label' => 'label']): array {
+	public static function resolveItemBasedWidgetMacros(array $items, array $fields): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
