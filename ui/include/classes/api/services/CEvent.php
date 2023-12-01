@@ -263,7 +263,7 @@ class CEvent extends CApiService {
 				elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
 					$sql_parts['from']['i'] = 'items i';
 					$sql_parts['from'][] = 'host_hgset hh';
-					$sql_parts['from'][] = 'permission hh';
+					$sql_parts['from'][] = 'permission p';
 					$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
 					$sql_parts['where'][] = 'i.hostid=hh.hostid';
 					$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
