@@ -120,7 +120,7 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 
 	zbx_hashset_iter_reset(groups, &iter);
 	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
-		group->sync_revision = 0;
+		group->flags = ZBX_PG_GROUP_FLAGS_NONE;
 
 	RDLOCK_CACHE;
 
@@ -137,7 +137,10 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 			zbx_vector_pg_proxy_ptr_create(&group->proxies);
 			zbx_vector_uint64_create(&group->hostids);
 			zbx_vector_uint64_create(&group->new_hostids);
+			group->flags = ZBX_PG_GROUP_SYNC_ADDED;
 		}
+		else
+			group->flags = ZBX_PG_GROUP_SYNC_MODIFIED;
 
 		group->sync_revision = *revision;
 

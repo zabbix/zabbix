@@ -60,6 +60,8 @@ void	pg_group_clear(zbx_pg_group_t *group)
 	zbx_vector_pg_proxy_ptr_destroy(&group->proxies);
 	zbx_vector_uint64_destroy(&group->hostids);
 	zbx_vector_uint64_destroy(&group->new_hostids);
+
+	zbx_free(group->name);
 }
 
 void	pg_proxy_clear(zbx_pg_proxy_t *proxy)
@@ -449,7 +451,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 
 		pg_cache_reassign_hosts(cache, group);
 
-		if (ZBX_PG_GROUP_UPDATE_NONE != group->flags)
+		if (ZBX_PG_GROUP_FLAGS_NONE != group->flags)
 		{
 			zbx_pg_update_t	update = {
 					.proxy_groupid = group->proxy_groupid,
@@ -458,7 +460,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 				};
 
 			zbx_vector_pg_update_append_ptr(groups, &update);
-			group->flags = ZBX_PG_GROUP_UPDATE_NONE;
+			group->flags = ZBX_PG_GROUP_FLAGS_NONE;
 		}
 	}
 
@@ -519,7 +521,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 
 void	pg_cache_dump_group(zbx_pg_group_t *group)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "proxy group:" ZBX_FS_UI64, group->proxy_groupid);
+	zabbix_log(LOG_LEVEL_DEBUG, "proxy group:" ZBX_FS_UI64 " %s", group->proxy_groupid, group->name);
 	zabbix_log(LOG_LEVEL_DEBUG, "    status:%d failover_delay:%d min_online:%d revision:" ZBX_FS_UI64,
 			group->status, group->failover_delay, group->min_online, group->revision);
 

@@ -49,6 +49,33 @@ static void	pgm_init(zbx_pg_cache_t *cache)
 	pg_cache_init(cache, map_revision);
 }
 
+static void	pgm_get_group_names(zbx_pg_cache_t *cache, const zbx_vector_uint64_t *groupids)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select proxy_groupid,name from proxy_group where ");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "proxy_groupid", groupids->values,
+			groupids->values_num);
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	proxy_groupid;
+		zbx_pg_group_t	*group;
+
+		ZBX_DBROW2UINT64(proxy_groupid, row[0]);
+
+		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &proxy_groupid)))
+			group->name = zbx_strdup(NULL, row[1]);
+	}
+	zbx_db_free_result(result);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: update proxy group cache from configuration cache                 *
@@ -63,22 +90,35 @@ static void	pgm_update_groups(zbx_pg_cache_t *cache)
 
 	zbx_hashset_iter_t	iter;
 	zbx_pg_group_t		*group;
+	zbx_vector_uint64_t	groupids;
+
+	zbx_vector_uint64_create(&groupids);
 
 	zbx_hashset_iter_reset(&cache->groups, &iter);
 	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (0 == group->sync_revision)
+		if (ZBX_PG_GROUP_FLAGS_NONE == group->flags)
 		{
 			pg_group_clear(group);
 			zbx_hashset_iter_remove(&iter);
 			continue;
 		}
 
+		if (ZBX_PG_GROUP_SYNC_ADDED == group->flags)
+			zbx_vector_uint64_append(&groupids, group->proxy_groupid);
+
+		group->flags = ZBX_PG_GROUP_FLAGS_NONE;
+
 		if (old_revision >= group->revision)
 			continue;
 
 		pg_cache_queue_group_update(cache, group);
 	}
+
+	if (0 != groupids.values_num)
+		pgm_get_group_names(cache, &groupids);
+
+	zbx_vector_uint64_destroy(&groupids);
 }
 
 /******************************************************************************
@@ -237,6 +277,8 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
  ******************************************************************************/
 static void	pgm_update_status(zbx_pg_cache_t *cache)
 {
+	const char	*proxy_status_str[] = {"unknown", "offline", "online"};
+	const char	*group_status_str[] = {"unknown", "offline", "recovery", "online", "decay"};
 	pg_cache_lock(cache);
 
 	zbx_dc_get_group_proxy_lastaccess(&cache->proxies);
@@ -274,6 +316,9 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 
 		if (ZBX_PG_PROXY_STATUS_UNKNOWN == status || proxy->status == status)
 			continue;
+
+		zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" changed status from %s to %s",
+				proxy->name, proxy_status_str[proxy->status], proxy_status_str[status]);
 
 		proxy->status = status;
 		pg_cache_queue_group_update(cache, proxy->group);
@@ -334,6 +379,9 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 
 		if (status != group->status)
 		{
+			zabbix_log(LOG_LEVEL_WARNING, "Proxy group \"%s\" changed status from %s to %s",
+					group->name, group_status_str[group->status], group_status_str[status]);
+
 			group->status = status;
 			group->status_time = now;
 			group->flags = ZBX_PG_GROUP_UPDATE_STATUS;
@@ -822,7 +870,6 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		if (PGM_STATUS_CHECK_INTERVAL >= time_update - time_now)
 		{
 			pgm_update_groups(&cache);
-
 			pgm_update_status(&cache);
 
 			time_update = time_now;

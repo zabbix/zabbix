@@ -1365,6 +1365,12 @@ zbx_pg_host_t;
 ZBX_PTR_VECTOR_DECL(pg_host_ptr, zbx_pg_host_t *)
 ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
 
+#define ZBX_PG_GROUP_FLAGS_NONE		0x0000
+#define ZBX_PG_GROUP_UPDATE_STATUS	0x0001
+#define ZBX_PG_GROUP_UPDATE_HP_MAP	0x0002
+#define ZBX_PG_GROUP_SYNC_ADDED		0x0100
+#define ZBX_PG_GROUP_SYNC_MODIFIED	0x0200
+
 typedef struct zbx_pg_group zbx_pg_group_t;
 
 /* proxy */

@@ -34,10 +34,6 @@
 #define ZBX_PG_GROUP_STATUS_ONLINE	3
 #define ZBX_PG_GROUP_STATUS_DECAY	4
 
-#define ZBX_PG_GROUP_UPDATE_NONE	0x0000
-#define ZBX_PG_GROUP_UPDATE_STATUS	0x0001
-#define ZBX_PG_GROUP_UPDATE_HP_MAP	0x8000
-
 typedef struct
 {
 	int				startup_time;
