@@ -85,7 +85,6 @@ void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uin
 void	pg_cache_lock(zbx_pg_cache_t *cache);
 void	pg_cache_unlock(zbx_pg_cache_t *cache);
 
-/* WDN: debug */
 void	pg_cache_dump_group(zbx_pg_group_t *group);
 void	pg_cache_dump(zbx_pg_cache_t *cache);
 

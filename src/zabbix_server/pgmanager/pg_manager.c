@@ -638,8 +638,9 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 
 		zbx_free(sql);
 
-		/* WDN: debug */
-		pg_cache_dump(cache);
+		/* WDN: change to trace loglevel */
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+			pg_cache_dump(cache);
 	}
 
 	zbx_vector_pg_host_destroy(&hosts_del);
@@ -683,8 +684,9 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 	pgm_db_get_proxies(&cache);
 	pgm_db_get_hpmap(&cache);
 
-	/* WDN: debug */
-	pg_cache_dump(&cache);
+	/* WDN: change to trace loglevel */
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		pg_cache_dump(&cache);
 
 	time_update = zbx_time();
 

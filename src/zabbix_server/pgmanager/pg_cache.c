@@ -209,7 +209,6 @@ void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, z
 
 	for (i = 0; i < proxy->hosts.values_num; i++)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] unassign host:" ZBX_FS_UI64, proxy->hosts.values[i]->hostid);
 		zbx_vector_uint64_append(&group->new_hostids, proxy->hosts.values[i]->hostid);
 		pg_cache_set_host_proxy(cache, proxy->hosts.values[i]->hostid, 0);
 	}
@@ -459,8 +458,6 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 	zbx_hashset_iter_t	iter;
 	zbx_pg_host_t		*host, *new_host;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] hpmap_updates:%d", cache->hpmap_updates.num_data);
-
 	zbx_hashset_iter_reset(&cache->hpmap_updates, &iter);
 	while (NULL != (new_host = (zbx_pg_host_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -506,8 +503,8 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/* WDN: change to trace log level */
 
-// WDN: debug
 void	pg_cache_dump_group(zbx_pg_group_t *group)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "proxy group:" ZBX_FS_UI64, group->proxy_groupid);
