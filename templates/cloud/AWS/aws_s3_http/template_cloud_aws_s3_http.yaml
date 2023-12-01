@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-29T22:55:41Z'
+  date: '2023-12-01T11:00:29Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -257,7 +257,6 @@ zabbix_export:
             
                 getBucketLocation: function (bucket_name) {
                     var payload = {};
-            
                     payload['location'] = '';
             
                     result = AWS.request('location', 'GET', 'us-east-1', 's3', AWS.prepareParams(payload), '', bucket_name);
@@ -313,7 +312,7 @@ zabbix_export:
             
             try {
                 AWS.setParams(JSON.parse(value));
-                region = AWS.getBucketLocation(AWS.params.bucket_name);
+                var region = AWS.getBucketLocation(AWS.params.bucket_name);
                 return JSON.stringify(AWS.getAlarms(region));
             }
             catch (error) {
@@ -513,21 +512,26 @@ zabbix_export:
                             signed_headers = 'content-encoding;host;x-amz-date';
                     }
             
-                    if (get === 'location') {
-                        canonical_uri = '/' + uri;
-                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                            url = 'https://' + host + canonical_uri + '?' + params;
-                    }
-                    if (get === 'metrics') {
-                        canonical_uri = '/',
+                    var canonical_uri = '/';
+            
+                    switch (get) {
+                        case 'location':
+                            canonical_uri = '/' + uri;
+                            canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+                                url = 'https://' + host + canonical_uri + '?' + params;
+                            break;
+                        case 'metrics':
                             canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                            url = 'https://' + host + canonical_uri;
+                                url = 'https://' + host + canonical_uri;
+                            break;
+                        case 'filter_id':
+                            canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+                                url = 'https://' + host + canonical_uri + '?' + params;
+                            break;
+                        default:
+                            throw 'Error: Invalid option "get" for request function';
                     }
-                    if (get === 'filter_id') {
-                        canonical_uri = '/';
-                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                            url = 'https://' + host + canonical_uri + '?' + params;
-                    }
+            
                     var credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                         request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
                         key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
@@ -549,32 +553,36 @@ zabbix_export:
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-            
-                    if (get === 'location' || get === 'filter_id') {
-                        url = 'https://' + host + canonical_uri + '?' + params,
+                    switch (get) {
+                        case 'location':
+                        case 'filter_id':
+                            url = 'https://' + host + canonical_uri + '?' + params;
+                            Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
                             response = request.get(url);
-                        if (response !== null) {
+                            Zabbix.log(4, '[ AWS S3 ] Received response with status code ' + request.getStatus() + ': ' + response);
+                            if (request.getStatus() !== 200) {
+                                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                            }
                             try {
                                 response = XML.toJson(response);
-                            }
-                            catch (error) {
+                            } catch (error) {
                                 throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
                             }
-                        }
-                    }
-                    if (get === 'metrics') {
-                        url = 'https://' + host + '/',
-                            request.addHeader('X-Amz-Target: GraniteServiceVersion20100801.GetMetricData'),
+                            break;
+            
+                        case 'metrics':
+                            url = 'https://' + host + '/';
+                            Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
+                            request.addHeader('X-Amz-Target: GraniteServiceVersion20100801.GetMetricData');
                             response = request.post(url, data);
+                            Zabbix.log(4, '[ AWS S3 ] Received response with status code ' + request.getStatus() + ': ' + response);
+                            if (request.getStatus() !== 200) {
+                                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                            }
+                            break;
             
-                    }
-            
-                    Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
-            
-                    Zabbix.log(4, '[ AWS S3 ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                        default:
+                            throw 'Error: Invalid option "get" for request function';
                     }
             
                     return JSON.parse(response);
@@ -582,7 +590,6 @@ zabbix_export:
             
                 getBucketLocation: function (bucket_name) {
                     var payload = {};
-            
                     payload['location'] = '';
             
                     result = AWS.request('location', 'GET', 'us-east-1', 's3', AWS.prepareParams(payload), '', bucket_name);
@@ -627,9 +634,9 @@ zabbix_export:
             
             try {
                 AWS.setParams(JSON.parse(value));
-                region = AWS.getBucketLocation(AWS.params.bucket_name);
-                metrics = AWS.getMetricsData(region);
-                filter_id = AWS.getBucketFilterId(AWS.params.bucket_name, region);
+                var region = AWS.getBucketLocation(AWS.params.bucket_name),
+                    metrics = AWS.getMetricsData(region),
+                    filter_id = AWS.getBucketFilterId(AWS.params.bucket_name, region);
                 return JSON.stringify({ metrics, filter_id });
             }
             catch (error) {
