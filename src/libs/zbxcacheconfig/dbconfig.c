@@ -1682,6 +1682,9 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 					}
 					config->revision.proxy_group = revision;
 				}
+
+				/* update host proxy index if host was renamed */
+				dc_update_host_proxy(host->host, row[2]);
 			}
 
 			host_h_local.host = row[2];
@@ -7320,7 +7323,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
 			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec, drules_sec, drules_sec2, httptest_sec,
 			httptest_sec2, connector_sec, connector_sec2, proxy_sec, proxy_sec2, proxy_group_sec,
-			proxy_group_sec2;
+			proxy_group_sec2, hp_sec, hp_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -7330,7 +7333,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
 			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
 			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
-			proxy_group_sync;
+			proxy_group_sync, hp_sync;
 
 	double		autoreg_csec, autoreg_csec2, autoreg_host_csec, autoreg_host_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -7385,6 +7388,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	zbx_dbsync_init(&autoreg_host_sync, mode);
 	zbx_dbsync_init(&proxy_group_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
+	zbx_dbsync_init(&hp_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
 	zbx_dbsync_init(&gmacro_sync, mode);
@@ -7435,6 +7439,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	zbx_dbsync_init(&connector_tag_sync, changelog_sync_mode);
 
 	zbx_dbsync_init(&proxy_sync, changelog_sync_mode);
+
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */
@@ -7588,6 +7593,11 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 		goto out;
 	connector_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_prepare_host_proxy(&hp_sync))
+		goto out;
+	hp_sec = zbx_time() - sec;
+
 	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 	START_SYNC;
@@ -7637,6 +7647,10 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	DCsync_connectors(&connector_sync, new_revision);
 	DCsync_connector_tags(&connector_tag_sync);
 	connector_sec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	dc_sync_host_proxy(&hp_sync);
+	hp_sec2 = zbx_time() - sec;
 
 	FINISH_SYNC;
 
@@ -7906,12 +7920,12 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				dsec + fsec + expr_sec + action_sec + action_op_sec + action_condition_sec +
 				trigger_tag_sec + correlation_sec + corr_condition_sec + corr_operation_sec +
 				hgroups_sec + itempp_sec + maintenance_sec + item_tag_sec + drules_sec + httptest_sec +
-				connector_sec + proxy_sec + proxy_group_sec;
+				connector_sec + proxy_sec + proxy_group_sec + hp_sec;
 		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
-				drules_sec2 + httptest_sec2 + connector_sec2 + proxy_sec2 + proxy_group_sec2;
+				drules_sec2 + httptest_sec2 + connector_sec2 + proxy_sec2 + proxy_group_sec2 + hp_sec2;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
@@ -8079,6 +8093,10 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				__func__, proxy_group_sec, proxy_group_sec2, proxy_group_sync.add_num,
 				proxy_group_sync.update_num, proxy_group_sync.remove_num);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_proxy: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, hp_sec, hp_sec2, hp_sync.add_num, hp_sync.update_num, hp_sync.remove_num);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
 
@@ -8208,6 +8226,8 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				config->connector_tags.num_data, config->connector_tags.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy groups : %d (%d slots)", __func__,
 				config->proxy_groups.num_data, config->proxy_groups.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host proxy   : %d (%d slots)", __func__,
+				config->host_proxy.num_data, config->host_proxy.num_slots);
 
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
@@ -8331,6 +8351,7 @@ clean:
 	zbx_dbsync_clear(&connector_tag_sync);
 	zbx_dbsync_clear(&proxy_sync);
 	zbx_dbsync_clear(&proxy_group_sync);
+	zbx_dbsync_clear(&hp_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -8678,6 +8699,21 @@ static int	__config_session_compare(const void *d1, const void *d2)
 	return strcmp(s1->token, s2->token);
 }
 
+static zbx_hash_t	dc_host_proxy_hash(const void *data)
+{
+	const zbx_dc_host_proxy_index_t	*hp = (const zbx_dc_host_proxy_index_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(hp->host, strlen(hp->host), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	dc_host_proxy_compare(const void *d1, const void *d2)
+{
+	const zbx_dc_host_proxy_index_t	*hp1 = (const zbx_dc_host_proxy_index_t *)d1;
+	const zbx_dc_host_proxy_index_t	*hp2 = (const zbx_dc_host_proxy_index_t *)d2;
+
+	return hp1->host == hp2->host ? 0 : strcmp(hp1->host, hp2->host);
+}
+
 int	cacheconfig_get_config_forks(unsigned char proc_type)
 {
 	return get_config_forks_cb(proc_type);
@@ -8809,6 +8845,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->connector_tags, 0);
 
 	CREATE_HASHSET(config->proxy_groups, 0);
+	CREATE_HASHSET(config->host_proxy, 0);
+	CREATE_HASHSET_EXT(config->host_proxy_index, 0, dc_host_proxy_hash, dc_host_proxy_compare);
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{

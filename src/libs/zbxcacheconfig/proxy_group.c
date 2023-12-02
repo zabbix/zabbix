@@ -26,7 +26,6 @@ ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
 ZBX_PTR_VECTOR_IMPL(pg_host_ptr, zbx_pg_host_t *)
 ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: sync proxy groups with configuration cache                        *
@@ -212,4 +211,107 @@ void	zbx_dc_update_group_hpmap_revision(zbx_vector_uint64_t *groupids, zbx_uint6
 	}
 
 	UNLOCK_CACHE;
+}
+
+static void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
+{
+	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
+
+	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+	{
+		hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_insert(&config->host_proxy_index, &hpi_local,
+				sizeof(hpi_local));
+		dc_strpool_acquire(hpi->host);
+	}
+
+	hpi->host_proxy = hp;
+}
+
+static void	dc_deregister_host_proxy(zbx_dc_host_proxy_t *hp)
+{
+	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
+
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+	{
+		dc_strpool_release(hpi->host);
+		zbx_hashset_remove_direct(&config->host_proxy_index, hpi);
+	}
+}
+
+void	dc_update_host_proxy(const char *host_old, const char *host_new)
+{
+	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host_old};
+
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+	{
+		dc_strpool_release(hpi->host);
+		zbx_hashset_remove_direct(&config->host_proxy_index, hpi);
+
+		hpi_local.host_proxy = hpi->host_proxy;
+		hpi_local.host = dc_strpool_intern(host_new);
+		zbx_hashset_insert(&config->host_proxy_index, &hpi_local, sizeof(hpi_local));
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync host proxy links with configuration cache                    *
+ *                                                                            *
+ * Parameters: sync     - [IN] db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - hostproxyid                                                  *
+ *           1 - hostid                                                       *
+ *           2 - host                                                         *
+ *           3 - proxyid                                                      *
+ *           4 - revision                                                     *
+ *           5 - host.host (NULL on proxies)                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	dc_sync_host_proxy(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+	zbx_dc_host_proxy_t	*hp;
+	int			ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		zbx_uint64_t	hostproxyid;
+		int		found;
+
+		ZBX_STR2UINT64(hostproxyid, row[0]);
+
+		hp = (zbx_dc_host_proxy_t *)DCfind_id(&config->host_proxy, hostproxyid, sizeof(ZBX_DC_PROXY),
+				&found);
+
+		ZBX_DBROW2UINT64(hp->hostid, row[1]);
+		ZBX_STR2UINT64(hp->proxyid, row[3]);
+		ZBX_STR2UINT64(hp->revision, row[4]);
+
+		if (SUCCEED != zbx_db_is_null(row[5]))
+			dc_strpool_replace(found, &hp->host, row[5]);
+		else
+			dc_strpool_replace(found, &hp->host, row[2]);
+
+		dc_register_host_proxy(hp);
+	}
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (hp = (zbx_dc_host_proxy_t *)zbx_hashset_search(&config->proxy_groups, &rowid)))
+			continue;
+
+		dc_deregister_host_proxy(hp);
+		zbx_hashset_remove_direct(&config->host_proxy, hp);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

@@ -4155,3 +4155,41 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for host_proxy table                       *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hp.hostproxyid,hp.hostid,hp.host,hp.proxyid,hp.revision,h.host"
+			" left join hosts"
+				" on hp.hostid=h.hostid");
+
+	dbsync_prepare(sync, 5, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostproxyid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_PROXY_GROUP)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}

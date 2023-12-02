@@ -916,6 +916,23 @@ zbx_dc_proxy_group_t;
 
 typedef struct
 {
+	zbx_uint64_t	hostproxyid;
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	proxyid;
+	zbx_uint64_t	revision;
+	const char	*host;
+}
+zbx_dc_host_proxy_t;
+
+typedef struct
+{
+	const char		*host;
+	zbx_dc_host_proxy_t	*host_proxy;
+}
+zbx_dc_host_proxy_index_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -1009,6 +1026,8 @@ typedef struct
 	zbx_hashset_t		connectors;
 	zbx_hashset_t		connector_tags;
 	zbx_hashset_t		proxy_groups;
+	zbx_hashset_t		host_proxy;
+	zbx_hashset_t		host_proxy_index;
 	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
