@@ -1527,6 +1527,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	dc_strpool_release(proxy->allowed_addresses);
 	dc_strpool_release(proxy->address);
 	dc_strpool_release(proxy->port);
+	dc_strpool_release(proxy->local_address);
 	dc_strpool_release(proxy->version_str);
 	dc_strpool_release(proxy->item_timeouts.agent);
 	dc_strpool_release(proxy->item_timeouts.simple);
@@ -7215,6 +7216,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		dc_strpool_replace(found, &proxy->allowed_addresses, row[9]);
 		dc_strpool_replace(found, &proxy->address, row[10]);
 		dc_strpool_replace(found, &proxy->port, row[11]);
+		dc_strpool_replace(found, &proxy->local_address, row[24]);
 
 		dc_strpool_replace(found, &proxy->item_timeouts.agent, row[13]);
 		dc_strpool_replace(found, &proxy->item_timeouts.simple, row[14]);
@@ -8731,7 +8733,7 @@ size_t	zbx_maintenance_update_flags_num(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, char **error)
+		zbx_uint64_t conf_cache_size, const char *hostname, char **error)
 {
 	int	i, ret;
 
@@ -8956,6 +8958,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	else
 		config->session_token = NULL;
 
+	config->hostname = (NULL != hostname ? dc_strdup(hostname) : NULL);
+
 	zbx_dbsync_env_init(config);
 
 #undef CREATE_HASHSET
@@ -9119,7 +9123,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, char **error)
+		zbx_uint64_t *revision, zbx_host_redirect_t *redirect, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -9131,6 +9135,12 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 #endif
 
 	RDLOCK_CACHE;
+
+	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, redirect))
+	{
+		*error = zbx_dsprintf(NULL, "host \"%s\" is monitored by another proxy", host);
+		return FAIL;
+	}
 
 	if (NULL == (dc_host = DCfind_host(host)))
 	{

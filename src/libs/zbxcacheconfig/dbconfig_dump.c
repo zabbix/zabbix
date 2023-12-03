@@ -1582,6 +1582,21 @@ static void	DCdump_proxy_groups(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+
+static void	DCdump_host_proxy_index(void)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_dc_host_proxy_index_t	*hpi;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->host_proxy_index, &iter);
+	while (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_iter_next(&iter)))
+		zabbix_log(LOG_LEVEL_TRACE, "host:%s proxyid:" ZBX_FS_UI64, hpi->host, hpi->host_proxy->proxyid);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
@@ -1621,6 +1636,7 @@ void	DCdump_configuration(void)
 	DCdump_autoreg_hosts();
 	DCdump_connectors();
 	DCdump_proxy_groups();
+	DCdump_host_proxy_index();
 #ifdef HAVE_TESTS
 	DCdump_strpool();
 #endif

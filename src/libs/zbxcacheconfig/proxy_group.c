@@ -315,3 +315,34 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get redirection information for the host                          *
+ *                                                                            *
+ * Parameters: host     - [IN] host name                                      *
+ *             redirect - [OUT] redirection information                       *
+ *                                                                            *
+ * Return value: SUCCEED - host must be redirected to the returned address    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	dc_get_host_redirect(const char *host, zbx_host_redirect_t *redirect)
+{
+	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
+	ZBX_DC_PROXY			*proxy;
+
+	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+		return FAIL;
+
+	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hpi->host_proxy->proxyid)))
+		return FAIL;
+
+	if (NULL != config->hostname && 0 == strcmp(proxy->name, config->hostname))
+		return FAIL;
+
+	zbx_strlcpy(redirect->address, proxy->local_address, sizeof(redirect->address));
+	redirect->revision = hpi->host_proxy->revision;
+
+	return SUCCEED;
+}

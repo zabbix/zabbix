@@ -486,6 +486,7 @@ typedef struct
 #endif
 	const char			*address;
 	const char			*port;
+	const char			*local_address;
 
 	unsigned char			custom_timeouts;
 	zbx_config_item_type_timeouts_t	item_timeouts;
@@ -1041,6 +1042,7 @@ typedef struct
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
+	char			*hostname;
 }
 ZBX_DC_CONFIG;
 

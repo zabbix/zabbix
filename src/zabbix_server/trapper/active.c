@@ -168,7 +168,7 @@ out:
 static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
 		unsigned short port, const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
 		const zbx_events_funcs_t *events_cbs, int config_timeout, zbx_uint64_t *hostid, zbx_uint64_t *revision,
-		char *error)
+		zbx_host_redirect_t *redirect, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -184,7 +184,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	}
 
 	/* if host exists then check host connection permissions */
-	if (FAIL == zbx_dc_check_host_permissions(host, sock, hostid, revision, &ch_error))
+	if (FAIL == zbx_dc_check_host_permissions(host, sock, hostid, revision, redirect, &ch_error))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);
@@ -274,7 +274,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 
 	/* no host metadata in older versions of agent */
 	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",
-			events_cbs, config_timeout, &hostid, &revision, error))
+			events_cbs, config_timeout, &hostid, &revision, NULL, error))
 	{
 		goto out;
 	}
@@ -445,6 +445,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_session_t		*session = NULL;
 	zbx_vector_expression_t	regexps;
 	zbx_vector_str_t	names;
+	zbx_host_redirect_t	redirect = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -516,7 +517,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, ip, port, host_metadata, flag, interface, events_cbs,
-			config_timeout, &hostid, &revision, error))
+			config_timeout, &hostid, &revision, &redirect, error))
 	{
 		goto error;
 	}
@@ -730,7 +731,16 @@ error:
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
+
+	if (0 != redirect.revision)
+	{
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_REDIRECT);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REVISION, redirect.revision);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_ADDRESS, redirect.address, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+	}
+	else
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 

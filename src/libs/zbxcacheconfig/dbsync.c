@@ -4098,12 +4098,12 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 				"p.timeout_zabbix_agent,p.timeout_simple_check,p.timeout_snmp_agent,"
 				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,"
 				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts,"
-				"p.proxy_groupid"
+				"p.proxy_groupid,p.local_address"
 			" from proxy p"
 			" join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");
 
-	dbsync_prepare(sync, 24, NULL);
+	dbsync_prepare(sync, 25, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -4174,7 +4174,8 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hp.hostproxyid,hp.hostid,hp.host,hp.proxyid,hp.revision,h.host"
-			" left join hosts"
+			" from host_proxy hp"
+			" left join hosts h"
 				" on hp.hostid=h.hostid");
 
 	dbsync_prepare(sync, 5, NULL);

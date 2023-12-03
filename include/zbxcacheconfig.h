@@ -743,7 +743,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, char **error);
+		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
 void	zbx_free_configuration_cache(void);
 
 void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const zbx_uint64_t *triggerids,
@@ -851,13 +851,22 @@ int	zbx_dc_config_get_last_sync_time(void);
 int	zbx_dc_config_get_proxypoller_hosts(zbx_dc_proxy_t *proxies, int max_hosts);
 int	zbx_dc_config_get_proxypoller_nextcheck(void);
 
+#define ZBX_PROXY_LOCAL_ADDRESS_LEN	255
+
+typedef struct
+{
+	char		address[ZBX_PROXY_LOCAL_ADDRESS_LEN + 1];
+	zbx_uint64_t	revision;
+}
+zbx_host_redirect_t;
+
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
 void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, int proxy_conn_err,
 		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, char **error);
+		zbx_uint64_t *revision, zbx_host_redirect_t *redirect, char **error);
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
 		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat);
 
