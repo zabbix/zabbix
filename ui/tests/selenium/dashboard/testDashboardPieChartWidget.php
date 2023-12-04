@@ -27,15 +27,13 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareData
  */
-class testDashboardPieChartWidget extends CWebTest
-{
+class testDashboardPieChartWidget extends CWebTest {
 	protected static $dashboardid;
 	protected static $item_ids;
 	const TYPE_ITEM_PATTERN = 'Item pattern';
 	const TYPE_ITEM_LIST = 'Item list';
 	const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
 	const HOST_NAME_SCREENSHOTS = 'Host for Pie chart screenshots';
-
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -51,9 +49,9 @@ class testDashboardPieChartWidget extends CWebTest
 	 */
 	public function prepareData() {
 		// Set Pie chart as the default widget type.
-		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashboard.last_widget_type\' AND userid=\'1\'');
+		DBexecute("DELETE FROM profiles WHERE idx='web.dashboard.last_widget_type' AND userid='1'");
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
-				' VALUES (99999,1,\'web.dashboard.last_widget_type\',\'piechart\',3)');
+				" VALUES (99999, 1, 'web.dashboard.last_widget_type', 'piechart', 3)");
 
 		// Create a Dashboard for creating widgets.
 		$dashboards = CDataHelper::call('dashboard.create', [
@@ -114,51 +112,21 @@ class testDashboardPieChartWidget extends CWebTest
 				]
 			]
 		]);
-
 		self::$item_ids = $response['itemids'];
-	}
-
-	public function getLayoutData() {
-		return [
-			[
-				[
-					'action' => 'create',
-					'header_text' => 'Add widget',
-					'primary_button_text' => 'Add'
-				]
-			],
-			[
-				[
-					'action' => 'edit',
-					'header_text' => 'Edit widget',
-					'primary_button_text' => 'Apply'
-				]
-			],
-		];
 	}
 
 	/**
 	 * Test the elements and layout of the Pie chart create and edit form.
 	 *
-	 * @dataProvider getLayoutData
 	 */
-	public function testDashboardPieChartWidget_Layout($data) {
-		// Open the correct form.
-		if ($data['action'] === 'create') {
-			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-			$dashboard = CDashboardElement::find()->one();
-			$form = $dashboard->edit()->addWidget()->asForm();
-		}
-		else if ($data['action'] === 'edit') {
-			$widget_name = 'Layout widget';
-			$this->createCleanWidget($widget_name);
-			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-			$dashboard = CDashboardElement::find()->one();
-			$form = $dashboard->edit()->getWidget($widget_name)->edit();
-		}
+	public function testDashboardPieChartWidget_Layout() {
+		// Open the create form.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
 
 		$dialog = COverlayDialogElement::find()->one();
-		$this->assertEquals($data['header_text'], $dialog->getTitle());
+		$this->assertEquals('Add widget', $dialog->getTitle());
 
 		// Check Help button.
 		$this->assertTrue($dialog->query('xpath:.//*[@title="Help"]')->one()->isClickable());
@@ -263,7 +231,7 @@ class testDashboardPieChartWidget extends CWebTest
 		$form->invalidate();
 
 		foreach(['Size', 'Decimal places', 'Units', 'Bold', 'Colour'] as $label) {
-			$this->assertTrue($form->getField($label)->isEnabled(false));
+			$this->assertFalse($form->getField($label)->isEnabled());
 		}
 
 		$form->fill(['Show total value' => true]);
@@ -273,6 +241,11 @@ class testDashboardPieChartWidget extends CWebTest
 		}
 
 		$this->assertFalse($form->getField('Units')->isEnabled());
+
+		$form->fill(['Size' => 'Custom']);
+		$value_size = $form->getField('id:value_size_custom_input');
+		$this->assertTrue($value_size->isVisible() && $value_size->isEnabled());
+		$this->assertEquals('20', $value_size->getValue());
 
 		$form->fill(['id:units_show' => true]);
 		$this->assertTrue($form->getField('Units')->isEnabled());
@@ -286,24 +259,58 @@ class testDashboardPieChartWidget extends CWebTest
 		$this->assertTrue($time_period->isEnabled());
 		$this->assertEquals(['Dashboard', 'Widget', 'Custom'], $time_period->getLabels()->asText());
 
+		$form->fill(['Time period' => 'Widget']);
+		$widget_field = $form->getField('Widget');
+		$this->assertTrue($widget_field->isVisible());
+		$this->assertTrue($widget_field->isEnabled());
+		$this->assertTrue($form->isRequired('Widget'));
+		$widget_field->query('button:Select')->waitUntilClickable()->one()->click();
+		$widget_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$this->assertEquals('Widget', $widget_dialog->getTitle());
+		$widget_dialog->close();
+
+		$form->fill(['Time period' => 'Custom']);
+
+		foreach (['From', 'To'] as $label) {
+			$field = $form->getField($label);
+			$this->assertTrue($field->isVisible());
+			$this->assertTrue($field->isEnabled());
+			$this->assertTrue($form->isRequired($label));
+			$this->assertTrue($field->query('id', 'time_period_'.strtolower($label).'_calendar')->one()->isClickable());
+		}
+
 		// Legend tab.
 		$form->selectTab('Legend');
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
 		foreach (['Show legend', 'Show aggregation function', 'Number of rows', 'Number of columns'] as $label) {
-			$this->assertTrue($form->getLabel($label)->isClickable());
+			$field = $form->getField($label);
+			$this->assertTrue($field->isEnabled());
+			$this->assertTrue($field->isVisible());
 		}
 
 		foreach (['Show legend' => true, 'Show aggregation function' => false] as $label => $checked) {
 			$this->assertTrue($form->getField($label)->isChecked($checked));
 		}
 
-		$this->assertRangeLayout('Number of rows', 'legend_lines', $form, ['min' => '1', 'max' => '10', 'step' => '1', 'value' => '1']);
-		$this->assertRangeLayout('Number of columns', 'legend_columns', $form, ['min' => '1', 'max' => '4', 'step' => '1', 'value' => '4']);
+		$this->assertRangeLayout('Number of rows', 'legend_lines', $form,
+				['min' => '1', 'max' => '10', 'step' => '1', 'value' => '1']
+		);
+		$this->assertRangeLayout('Number of columns', 'legend_columns', $form,
+				['min' => '1', 'max' => '4', 'step' => '1', 'value' => '4']
+		);
+
+		$form->fill(['Show legend' => false]);
+
+		foreach (['Show aggregation function', 'Number of rows', 'Number of columns'] as $label) {
+			$field = $form->getField($label);
+			$this->assertFalse($field->isEnabled());
+			$this->assertTrue($field->isVisible());
+		}
 
 		// Footer buttons.
-		foreach([$data['primary_button_text'], 'Cancel'] as $button) {
+		foreach(['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
 		}
 	}
@@ -373,6 +380,7 @@ class testDashboardPieChartWidget extends CWebTest
 							'Space between sectors' => '2',
 							'id:merge' => true,
 							'id:merge_percent' => '10',
+							//'id:merge_color' => 'EEFF22',
 							'Show total value' => true,
 							'id:value_size_type' => 'Custom',
 							'id:value_size_custom_input' => '25',
@@ -575,6 +583,32 @@ class testDashboardPieChartWidget extends CWebTest
 					'error' => [
 						'Invalid parameter "Time period/From": a time is expected.',
 						'Invalid parameter "Time period/To": a time is expected.'
+					]
+				]
+			],
+			// Bad color values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Data set' => [
+							'host' => 'Host*',
+							'item' => 'Item*',
+							'color' => 'FFFFFG'
+						],
+						'Displaying options' => [
+							'id:merge' => true,
+							//'id:merge_percent' => '10',
+							//'id:merge_color' => 'FFFFFG',
+							'Draw' => 'Doughnut',
+							'Show total value' => true,
+							'Colour' => 'FFFFFG'
+						]
+					],
+					'error' => [
+						'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.',
+						//'Invalid parameter "merge_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Invalid parameter "Colour": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			]
@@ -970,26 +1004,24 @@ class testDashboardPieChartWidget extends CWebTest
 	 * @param string $widget_name  name of the widget to be created
 	 */
 	protected function createCleanWidget($widget_name){
-		CDataHelper::call('dashboard.update',
-			[
-				'dashboardid' => self::$dashboardid,
-				'pages' => [
-					[
-						'widgets' => [
-							[
-								'name' => $widget_name,
-								'type' => 'piechart',
-								'fields' => [
-									['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
-									['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Items'],
-									['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF465C'],
-								]
+		CDataHelper::call('dashboard.update', [
+			'dashboardid' => self::$dashboardid,
+			'pages' => [
+				[
+					'widgets' => [
+						[
+							'name' => $widget_name,
+							'type' => 'piechart',
+							'fields' => [
+								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
+								['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Items'],
+								['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF465C']
 							]
 						]
 					]
 				]
 			]
-		);
+		]);
 	}
 
 	/**
@@ -1113,9 +1145,7 @@ class testDashboardPieChartWidget extends CWebTest
 		}
 
 		// Fill the other tabs.
-		$tabs = ['Displaying options', 'Time period', 'Legend'];
-
-		foreach ($tabs as $tab) {
+		foreach (['Displaying options', 'Time period', 'Legend'] as $tab) {
 			if (array_key_exists($tab, $fields)) {
 				$form->selectTab($tab);
 				$form->fill($fields[$tab]);
