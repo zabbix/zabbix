@@ -682,6 +682,12 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 	zbx_vector_hp_item_value_ptr_t	values;
 	double				time_start;
 
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		*error = zbx_strdup(NULL, "Data collection has been paused.");
+		return FAIL;
+	}
+
 	time_start = zbx_time();
 
 	zbx_vector_hp_item_value_ptr_create(&values);

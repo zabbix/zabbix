@@ -1411,9 +1411,21 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'{{$MACRO}.func()}',
+				'/1/float',
+				'{{$MACRO}.func()}'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: with context}',
 				'/1/float',
 				'{$MACRO: with context}'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'{{$MACRO: with context}.func()}',
+				'/1/float',
+				'{{$MACRO: with context}.func()}'
 			],
 			[
 				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
@@ -4683,7 +4695,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_IP_RANGES],
 				'0.0.0;0',
 				'/1/ip_range',
-				'Invalid parameter "/1/ip_range": invalid address range "0.0.0;0".'
+				'Invalid parameter "/1/ip_range": incorrect address starting from "0.0.0;0".'
 			],
 			[
 				['type' => API_IP_RANGES],
@@ -4713,7 +4725,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_IP_RANGES],
 				'www.example.com',
 				'/1/ip_range',
-				'Invalid parameter "/1/ip_range": invalid address range "www.example.com".'
+				'Invalid parameter "/1/ip_range": incorrect address starting from "www.example.com".'
 			],
 			[
 				['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS],
@@ -4725,7 +4737,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_IP_RANGES],
 				'192.168.3.5,192.168.6.1-240',
 				'/1/ip_range',
-				'Invalid parameter "/1/ip_range": invalid address range "192.168.6.1-240".'
+				'Invalid parameter "/1/ip_range": incorrect address starting from "192.168.6.1-240".'
 			],
 			[
 				['type' => API_IP_RANGES, 'flags' => API_ALLOW_RANGE],
@@ -4737,7 +4749,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_IP_RANGES],
 				'{$MACRO}',
 				'/1/ip_range',
-				'Invalid parameter "/1/ip_range": invalid address range "{$MACRO}".'
+				'Invalid parameter "/1/ip_range": incorrect address starting from "{$MACRO}".'
 			],
 			[
 				['type' => API_IP_RANGES, 'flags' => API_ALLOW_USER_MACRO],
@@ -4749,7 +4761,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_IP_RANGES],
 				'{HOST.IP}',
 				'/1/ip_range',
-				'Invalid parameter "/1/ip_range": invalid address range "{HOST.IP}".'
+				'Invalid parameter "/1/ip_range": incorrect address starting from "{HOST.IP}".'
 			],
 			[
 				['type' => API_IP_RANGES, 'macros' => true],
@@ -4761,7 +4773,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_IP_RANGES, 'macros' => ['{HOST.IP}']],
 				'{HOST.DNS}',
 				'/1/ip_range',
-				'Invalid parameter "/1/ip_range": invalid address range "{HOST.DNS}".'
+				'Invalid parameter "/1/ip_range": incorrect address starting from "{HOST.DNS}".'
 			],
 			[
 				['type' => API_IP_RANGES, 'macros' => ['{HOST.IP}']],
@@ -4994,6 +5006,18 @@ class CApiInputValidatorTest extends TestCase {
 				'{$MACRO9}'
 			],
 			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				'{{$MACRO9}.func()}',
+				'/1/port',
+				'{{$MACRO9}.func()}'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				'{{$MACRO9: context}.func()}',
+				'/1/port',
+				'{{$MACRO9: context}.func()}'
+			],
+			[
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#}',
 				'/1/port',
@@ -5004,6 +5028,12 @@ class CApiInputValidatorTest extends TestCase {
 				'{#MACRO7}',
 				'/1/port',
 				'{#MACRO7}'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{{#MACRO7}.func()}',
+				'/1/port',
+				'{{#MACRO7}.func()}'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],

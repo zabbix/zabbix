@@ -30,7 +30,7 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs);
 
-int	init_proxy_history_lock(char **error);
-void	free_proxy_history_lock(void);
+int	init_proxy_history_lock(unsigned char program_type, char **error);
+void	free_proxy_history_lock(unsigned char program_type);
 
 #endif

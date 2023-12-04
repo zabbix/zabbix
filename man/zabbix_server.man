@@ -47,6 +47,11 @@ zabbix_server \- Zabbix server daemon
 .B \-R
 .I runtime\-option
 .br
+.B zabbix_server
+.RB [ \-c
+.IR config\-file ]
+.B \-T
+.br
 .B zabbix_server \-h
 .br
 .B zabbix_server \-V
@@ -147,7 +152,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, availability\ manager, configuration\ syncer, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
+All processes of specified type (alerter, alert\ manager, availability\ manager, configuration\ syncer, configuration\ syncer worker, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
 .RE
 .RS 4
 .TP 4
@@ -166,7 +171,7 @@ Profiling control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, availability\ manager, configuration\ syncer, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
+All processes of specified type (alerter, alert\ manager, availability\ manager, configuration\ syncer, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
 .RE
 .RS 4
 .TP 4
@@ -184,6 +189,8 @@ Process identifier
 (rwlock, mutex, processing) can be used with process-type (e.g., history syncer,1,processing)
 .RE
 .RE
+.IP "\fB\-T\fR, \fB\-\-test-config\fR"
+Validate configuration file and exit.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"

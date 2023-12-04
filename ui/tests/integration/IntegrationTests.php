@@ -48,6 +48,7 @@ require_once dirname(__FILE__).'/testDiscoveryRules.php';
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
+require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -87,6 +88,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
+		$suite->addTestSuite('testUserMacrosInItemNames');
 
 		return $suite;
 	}

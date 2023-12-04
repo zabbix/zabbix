@@ -76,6 +76,7 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxsysinfo/common/Makefile
 			tests/libs/zbxtagfilter/Makefile
 			tests/libs/zbxtrends/Makefile
+			tests/libs/zbxhttp/Makefile
 			tests/libs/zbxtime/Makefile
 			tests/zabbix_server/Makefile
 			tests/zabbix_server/pinger/Makefile

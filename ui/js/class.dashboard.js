@@ -1388,29 +1388,6 @@ class CDashboard {
 					overlay.$btn_submit[0].disabled = true;
 				}
 			}
-
-			document.getElementById('type').addEventListener('change', () => this.reloadWidgetProperties());
-
-			form.addEventListener('change', (e) => {
-				const do_trim = e.target.matches(
-					'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
-				);
-
-				if (do_trim) {
-					e.target.value = e.target.value.trim();
-				}
-			}, {capture: true});
-
-			for (const fieldset of
-					form.querySelectorAll(`fieldset.${ZBX_STYLE_COLLAPSIBLE}`)) {
-				new CFormFieldsetCollapsible(fieldset);
-			}
-
-			try {
-				new TabIndicators();
-			}
-			catch (error) {
-			}
 		});
 
 		overlay.$dialogue[0].removeEventListener('dialogue.close', this._events.editWidgetPropertiesClose);
@@ -1570,6 +1547,36 @@ class CDashboard {
 				overlay.unsetLoading();
 				this._deleteBusyCondition(busy_condition);
 			});
+	}
+
+	initWidgetPropertiesForm() {
+		const overlay = overlays_stack.getById('widget_properties');
+		const form = overlay.$dialogue.$body[0].querySelector('form');
+
+		form.fields = {};
+
+		document.getElementById('type').addEventListener('change', () => this.reloadWidgetProperties());
+
+		form.addEventListener('change', (e) => {
+			const do_trim = e.target.matches(
+				'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
+			);
+
+			if (do_trim) {
+				e.target.value = e.target.value.trim();
+			}
+		}, {capture: true});
+
+		for (const fieldset of
+				form.querySelectorAll(`fieldset.${ZBX_STYLE_COLLAPSIBLE}`)) {
+			new CFormFieldsetCollapsible(fieldset);
+		}
+
+		try {
+			new TabIndicators();
+		}
+		catch (error) {
+		}
 	}
 
 	getEditingWidgetContext() {

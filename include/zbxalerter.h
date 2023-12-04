@@ -68,6 +68,7 @@ zbx_alerter_dispatch_t;
 typedef struct
 {
 	const char	*config_source_ip;
+	const char	*config_ssl_ca_location;
 }
 zbx_thread_alerter_args;
 
