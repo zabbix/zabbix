@@ -234,6 +234,8 @@ const char	*zbx_result_string(int result)
 {
 	switch (result)
 	{
+		case SUCCEED_PARTIAL:
+			return "SUCCEED_PARTIAL";
 		case SUCCEED:
 			return "SUCCEED";
 		case FAIL:

@@ -750,7 +750,6 @@ void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const 
 		int *errcode, size_t num);
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num);
 int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
-int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	zbx_dc_config_get_hosts_by_hostids(zbx_dc_host_t *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	zbx_dc_config_get_items_by_keys(zbx_dc_item_t *items, zbx_host_key_t *keys, int *errcodes, size_t num);
@@ -851,22 +850,13 @@ int	zbx_dc_config_get_last_sync_time(void);
 int	zbx_dc_config_get_proxypoller_hosts(zbx_dc_proxy_t *proxies, int max_hosts);
 int	zbx_dc_config_get_proxypoller_nextcheck(void);
 
-#define ZBX_PROXY_LOCAL_ADDRESS_LEN	255
-
-typedef struct
-{
-	char		address[ZBX_PROXY_LOCAL_ADDRESS_LEN + 1];
-	zbx_uint64_t	revision;
-}
-zbx_host_redirect_t;
-
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
 void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, int proxy_conn_err,
 		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, zbx_host_redirect_t *redirect, char **error);
+		zbx_uint64_t *revision, zbx_comms_redirect_t *redirect, char **error);
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
 		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat);
 
@@ -1421,5 +1411,9 @@ ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
 int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
 void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies);
 void	zbx_dc_update_group_hpmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision);
+
+int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid, zbx_comms_redirect_t *redirect);
+int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *recv_host,
+		zbx_comms_redirect_t *redirect);
 
 #endif

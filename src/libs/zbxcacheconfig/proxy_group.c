@@ -327,7 +327,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	dc_get_host_redirect(const char *host, zbx_host_redirect_t *redirect)
+int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
 	ZBX_DC_PROXY			*proxy;

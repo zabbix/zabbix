@@ -24,6 +24,7 @@
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"
 #include "zbxtagfilter.h"
+#include "proxy_group.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 
@@ -1018,4 +1019,92 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		zbx_dc_close_user_macros(um_handle);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host information by name                                      *
+ *                                                                            *
+ * Parameters: host      - [IN] host name                                     *
+ *             mode      - [IN] host retrieval mode                           *
+ *             recv_host - [OUT] host information                             *
+ *             redirect  - [OUT] host redirection data (optional)             *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_config_get_host_by_name(const char *host, int mode, zbx_history_recv_host_t *recv_host,
+		zbx_comms_redirect_t *redirect)
+{
+	const ZBX_DC_HOST	*dc_host;
+	int			ret = FAIL;
+
+	RDLOCK_CACHE;
+
+	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, redirect))
+	{
+		ret = SUCCEED_PARTIAL;
+		goto out;
+	}
+
+	if (NULL != (dc_host = DCfind_host(host)))
+	{
+		dc_get_history_recv_host(recv_host, dc_host, mode);
+		ret = SUCCEED;
+	}
+out:
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host information by name                                      *
+ *                                                                            *
+ * Parameters: host      - [IN] host name                                     *
+ *             recv_host - [OUT] host information                             *
+ *             redirect  - [OUT] host redirection data (optional)             *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *recv_host,
+		zbx_comms_redirect_t *redirect)
+{
+	return dc_config_get_host_by_name(host, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host identifier by name                                       *
+ *                                                                            *
+ * Parameters: host     - [IN] host name                                      *
+ *             hostid   - [OUT] host identifier                               *
+ *             redirect - [OUT] host redirection data (optional)              *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid, zbx_comms_redirect_t *redirect)
+{
+	zbx_history_recv_host_t	recv_host;
+	int			ret;
+
+	if (SUCCEED == (ret = dc_config_get_host_by_name(host, 0, &recv_host, redirect)))
+		*hostid = recv_host.hostid;
+
+	return ret;
+}
+
+
 #undef ZBX_CONNECTOR_STATUS_ENABLED
+

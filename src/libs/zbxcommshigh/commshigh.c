@@ -363,3 +363,19 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add redirection information to json response                      *
+ *                                                                            *
+ * Parameters: json     - [IN/OUT] json response                              *
+ *             redirect - [IN] redirection information                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t *redirect)
+{
+	zbx_json_addobject(json, ZBX_PROTO_TAG_REDIRECT);
+	zbx_json_adduint64(json, ZBX_PROTO_TAG_REVISION, redirect->revision);
+	zbx_json_addstring(json, ZBX_PROTO_TAG_ADDRESS, redirect->address, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(json);
+}

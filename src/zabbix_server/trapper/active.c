@@ -32,6 +32,7 @@
 #include "zbx_item_constants.h"
 #include "zbxautoreg.h"
 #include "zbxscripts.h"
+#include "zbxcommshigh.h"
 
 extern unsigned char	program_type;
 
@@ -168,7 +169,7 @@ out:
 static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
 		unsigned short port, const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
 		const zbx_events_funcs_t *events_cbs, int config_timeout, zbx_uint64_t *hostid, zbx_uint64_t *revision,
-		zbx_host_redirect_t *redirect, char *error)
+		zbx_comms_redirect_t *redirect, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -445,7 +446,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_session_t		*session = NULL;
 	zbx_vector_expression_t	regexps;
 	zbx_vector_str_t	names;
-	zbx_host_redirect_t	redirect = {0};
+	zbx_comms_redirect_t	redirect = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -733,12 +734,7 @@ error:
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 
 	if (0 != redirect.revision)
-	{
-		zbx_json_addobject(&json, ZBX_PROTO_TAG_REDIRECT);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REVISION, redirect.revision);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_ADDRESS, redirect.address, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&json);
-	}
+		zbx_add_redirect_response(&json, &redirect);
 	else
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
 

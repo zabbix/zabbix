@@ -406,8 +406,6 @@ typedef struct
 }
 zbx_thread_sendval_args;
 
-#define SUCCEED_PARTIAL	2
-
 #if !defined(_WINDOWS)
 static void	zbx_thread_handle_pipe_response(zbx_thread_sendval_args *sendval_args)
 {

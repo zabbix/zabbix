@@ -208,6 +208,7 @@ zbx_uint128_t;
 
 typedef struct zbx_variant zbx_variant_t;
 
+#define SUCCEED_PARTIAL	2
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2

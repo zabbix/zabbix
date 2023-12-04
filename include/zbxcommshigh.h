@@ -22,6 +22,7 @@
 
 #include "zbxcomms.h"
 #include "cfg.h"
+#include "zbxjson.h"
 
 int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls);
@@ -46,5 +47,7 @@ int	zbx_send_response_json(zbx_socket_t *sock, int result, const char *info, con
 		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, timeout)
 
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
+
+void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t *redirect);
 
 #endif // ZABBIX_COMMSHIGH_H

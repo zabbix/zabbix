@@ -450,4 +450,14 @@ unsigned int	zbx_tls_get_psk_usage(void);
 
 /* TLS BLOCK END */
 
+#define ZBX_REDIRECT_ADDRESS_LEN	255
+
+typedef struct
+{
+	char		address[ZBX_REDIRECT_ADDRESS_LEN + 1];
+	zbx_uint64_t	revision;
+}
+zbx_comms_redirect_t;
+
+
 #endif /* ZABBIX_ZBXCOMMS_H */
