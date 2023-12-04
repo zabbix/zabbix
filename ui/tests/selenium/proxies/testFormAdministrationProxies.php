@@ -1908,7 +1908,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'proxy' => 'Passive proxy 2',
+					'proxy' => 'Passive proxy 3',
 					'encryption_fields' => [
 						'Connections to proxy' => 'Certificate',
 						'Issuer' => 'test test',
