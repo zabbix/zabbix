@@ -24,7 +24,7 @@
 #include "db.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags, unsigned char suppressed)
+		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags, int suppressed)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;

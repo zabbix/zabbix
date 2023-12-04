@@ -276,7 +276,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select distinct(eventid) from event_suppress");
+	result = DBselect("select eventid,count(eventid) from event_suppress group by eventid");
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_event_t	event_local, *event_p, **ptr;
@@ -287,7 +287,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 		if (NULL != (ptr = zbx_hashset_search(problem_events, &event_p)))
 		{
 			event_p = *ptr;
-			event_p->suppressed = 1;
+			event_p->suppressed = atoi(row[1]);
 		}
 	}
 	DBfree_result(result);
@@ -2594,7 +2594,8 @@ static void	db_update_services(zbx_service_manager_t *manager)
 			if (NULL != (ptr = zbx_hashset_search(&manager->problem_events, &event)))
 			{
 				event = *ptr;
-				if (1 == event->suppressed)
+
+				if (0 < event->suppressed)
 					continue;
 			}
 
@@ -2742,7 +2743,7 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 }
 
 static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_service_manager_t *service_manager,
-		int suppressed)
+		int is_suppressed)
 {
 	int		i;
 
@@ -2750,24 +2751,27 @@ static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_servi
 	{
 		zbx_event_t			event_local, *event = &event_local, **pevent;
 		zbx_service_problem_index_t	*pi, pi_local;
-		zbx_services_diff_t	*services_diff, services_diff_local;
+		zbx_services_diff_t		*services_diff, services_diff_local;
+		int				suppressed_old;
 
 		event_local.eventid = eventids->values[i];
 
 		if (NULL == (pevent = (zbx_event_t **)zbx_hashset_search(&service_manager->problem_events, &event)))
-		{
 			continue;
-		}
 
-		(*pevent)->suppressed = suppressed;
+		suppressed_old = (*pevent)->suppressed;
+
+		(*pevent)->suppressed += is_suppressed;
+
+		if (0 != suppressed_old && 0 != (*pevent)->suppressed)
+			continue;
+
 		(*pevent)->mtime = (int)time(NULL);
 
 		pi_local.eventid = eventids->values[i];
 
 		if (NULL == (pi = zbx_hashset_search(&service_manager->service_problems_index, &pi_local)))
-		{
 			continue;
-		}
 
 		for (int j = 0; j < pi->services.values_num; j++)
 		{
@@ -3511,7 +3515,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS:
 					zbx_service_deserialize_ids(message->data, message->size, &eventids);
-					process_problem_suppression(&eventids, &service_manager, 0);
+					process_problem_suppression(&eventids, &service_manager, -1);
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS:
 					zbx_service_deserialize_ids(message->data, message->size, &eventids);
