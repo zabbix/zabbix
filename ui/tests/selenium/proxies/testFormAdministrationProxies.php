@@ -22,7 +22,6 @@
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
-
 /**
  * Test for checking Proxy host form.
  *
@@ -1216,7 +1215,7 @@ class testFormAdministrationProxies extends CWebTest {
 		$original_fields = $form->getFields()->asValues();
 
 		// Get original passive proxy interface fields.
-		if (strpos($data['proxy'], 'passive')) {
+		if (str_contains($data['proxy'], 'Passive')) {
 			$original_fields = $this->getInterfaceValues($dialog, $original_fields);
 		}
 
@@ -1237,7 +1236,7 @@ class testFormAdministrationProxies extends CWebTest {
 		$cloned_fields = $form->getFields()->asValues();
 
 		// Get cloned passive proxy interface fields.
-		if (strpos($data['proxy'], 'passive')) {
+		if (str_contains($data['proxy'], 'Passive')) {
 			$cloned_fields = $this->getInterfaceValues($dialog, $cloned_fields);
 		}
 
@@ -1264,10 +1263,9 @@ class testFormAdministrationProxies extends CWebTest {
 	 * @return array
 	 */
 	private function getInterfaceValues($dialog, $fields) {
-		foreach (['ip', 'dns', 'port'] as $id) {
+		foreach (['address', 'port'] as $id) {
 			$fields[$id] = $dialog->query('id', $id)->one()->getValue();
 		}
-		$fields['useip'] = $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue();
 
 		return $fields;
 	}
