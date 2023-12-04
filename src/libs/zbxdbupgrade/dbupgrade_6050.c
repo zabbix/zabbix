@@ -1996,14 +1996,14 @@ static int	DBpatch_6050159(void)
 
 		for (ptr = row[1]; ptr < row[1] + params_len; ptr += sep_pos + 1)
 		{
-			zbx_lld_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+			zbx_function_param_parse_ext(ptr, ZBX_TOKEN_USER_MACRO, ZBX_BACKSLASH_ESC_OFF,
+					&param_pos, &param_len, &sep_pos);
 
 			if (param_pos < sep_pos)
 			{
 				if ('"' != ptr[param_pos])
 				{
-					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos,
-							sep_pos - param_pos);
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, sep_pos);
 				}
 				else
 				{
@@ -2012,6 +2012,7 @@ static int	DBpatch_6050159(void)
 
 					/* zbx_function_param_quote() should always succeed with esc_bs set to 1 */
 					zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON);
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, param_pos);
 					zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 				}
 			}
@@ -2202,8 +2203,8 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 
 		cmd_len = strlen(command);
 
-		while (SUCCEED == zbx_token_find(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) &&
-				cmd_len >= pos)
+		while (SUCCEED == zbx_token_find_ext(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO,
+				ZBX_BACKSLASH_ESC_OFF) && cmd_len >= pos)
 		{
 			if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
 			{
@@ -2259,6 +2260,13 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 	}
 
 	zbx_db_free_result(result);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			ret = FAIL;
+	}
 clean:
 	zbx_free(like_condition);
 	zbx_free(sql);
@@ -2303,6 +2311,18 @@ static int	DBpatch_6050166(void)
 static int	DBpatch_6050167(void)
 {
 	return fix_expression_macro_escaping("triggers", "triggerid", "event_name", "event name of the trigger");
+}
+
+static int	DBpatch_6050168(void)
+{
+	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "value",
+			"media type parameter value");
+}
+
+static int	DBpatch_6050169(void)
+{
+	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "name",
+			"media type parameter name");
 }
 
 #endif
@@ -2477,5 +2497,7 @@ DBPATCH_ADD(6050164, 0, 1)
 DBPATCH_ADD(6050165, 0, 1)
 DBPATCH_ADD(6050166, 0, 1)
 DBPATCH_ADD(6050167, 0, 1)
+DBPATCH_ADD(6050168, 0, 1)
+DBPATCH_ADD(6050169, 0, 1)
 
 DBPATCH_END()

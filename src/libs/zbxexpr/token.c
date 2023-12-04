@@ -131,6 +131,7 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *             macro         - [IN] beginning of the token                    *
  *             token_search  - [IN] specify if references will be searched    *
  *             token         - [OUT]                                          *
+ *             esc_bs        - [IN] 0 - don't escape backslashes in strings   *
  *                                                                            *
  * Return value: SUCCEED - expression macro was parsed successfully           *
  *               FAIL    - macro does not point at valid expression macro     *
@@ -143,8 +144,8 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *           keys with string arguments.                                      *
  *                                                                            *
  ******************************************************************************/
-static int	token_parse_expression_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
-		zbx_token_t *token)
+static int	token_parse_expression_macro(const char *expression, const char *macro,
+		zbx_token_search_t token_search, zbx_token_t *token, int esc_bs)
 {
 	const char			*ptr;
 	size_t				offset;
@@ -157,8 +158,12 @@ static int	token_parse_expression_macro(const char *expression, const char *macr
 		{
 			if ('\\' == *ptr)
 			{
-				if ('\0' == *(++ptr))
+				if (ZBX_BACKSLASH_ESC_ON == esc_bs || '\\' != *(ptr + 1))
+					ptr++;
+
+				if ('\0' == *ptr)
 					break;
+
 				continue;
 			}
 
@@ -637,6 +642,115 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: parses token with nested macros                                   *
+ *                                                                            *
+ * Parameters: expression   - [IN]                                            *
+ *             macro        - [IN] beginning of token                         *
+ *             token_search - [IN] specify if references will be searched     *
+ *             token        - [OUT]                                           *
+ *             esc_bs       - [IN] 0 - don't escape backslashes in strings    *
+ *                                                                            *
+ * Return value: SUCCEED - token was parsed successfully                      *
+ *               FAIL    - macro does not point at valid function or simple   *
+ *                         macro                                              *
+ *                                                                            *
+ * Comments: This function parses token with a macro inside it. There are     *
+ *           four types of nested macros - low-level discovery function       *
+ *           macros, built-in function macros, user macros  and a specific    *
+ *           case of simple macros where {HOST.HOSTn} macro is used as host   *
+ *           name.                                                            *
+ *                                                                            *
+ *           If the macro points at valid macro in the expression then        *
+ *           the generic token fields are set and either the                  *
+ *           token->data.lld_func_macro, token->data.func_macro or            *
+ *           token->data.simple_macro (depending on token type) structure is  *
+ *           filled with macro specific data.                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_nested_macro_ext(const char *expression, const char *macro,
+		zbx_token_search_t token_search, zbx_token_t *token, int esc_bs)
+{
+	const char	*ptr;
+
+	if ('#' == macro[2])
+	{
+		/* find the end of the nested macro by validating its name until the closing bracket '}' */
+		for (ptr = macro + 3; '}' != *ptr; ptr++)
+		{
+			if ('\0' == *ptr)
+				return FAIL;
+
+			if (SUCCEED != zbx_is_macro_char(*ptr))
+				return FAIL;
+		}
+
+		/* empty macro name */
+		if (3 == ptr - macro)
+			return FAIL;
+	}
+	else if ('?' == macro[2])
+	{
+		zbx_token_t	expr_token;
+
+		if (0 == (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
+			return FAIL;
+
+		if (SUCCEED != token_parse_expression_macro(expression, macro + 1, token_search, &expr_token, esc_bs))
+			return FAIL;
+
+		ptr = expression + expr_token.loc.r;
+	}
+	else if ('$' == macro[2])
+	{
+		zbx_token_t	expr_token;
+
+		if (SUCCEED != token_parse_user_macro(expression, macro + 1, &expr_token))
+			return FAIL;
+
+		ptr = expression + expr_token.loc.r;
+	}
+	else
+	{
+		zbx_strloc_t	loc;
+
+		if (SUCCEED != token_parse_macro_name(expression, macro + 2, &loc))
+			return FAIL;
+
+		if ('}' != expression[loc.r + 1])
+			return FAIL;
+
+		ptr = expression + loc.r + 1;
+	}
+
+	/* Determine the token type.                                                   */
+	/* Nested macros formats:                                                      */
+	/*               low-level discovery function macros  {{#MACRO}.function()}    */
+	/*               function macros                      {{MACRO}.function()}     */
+	/*               simple macros                        {{MACRO}:key.function()} */
+	if ('.' == ptr[1])
+	{
+		return token_parse_func_macro(expression, macro, ptr + 2, token, '#' == macro[2] ?
+				ZBX_TOKEN_LLD_FUNC_MACRO : ZBX_TOKEN_FUNC_MACRO);
+	}
+	else if (0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) && '#' != macro[2] && ':' == ptr[1])
+		return token_parse_simple_macro_key(expression, macro, ptr + 2, token);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: public wrapper for zbx_token_parse_nested_macro_ext() function    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
+		zbx_token_t *token)
+{
+	return zbx_token_parse_nested_macro_ext(expression, macro, token_search, token, ZBX_BACKSLASH_ESC_ON);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Finds token {} inside expression starting at the specified        *
  *          position and also searches for reference if requested.            *
  *                                                                            *
@@ -644,6 +758,7 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
  *             pos          - [IN] starting position                          *
  *             token        - [OUT]                                           *
  *             token_search - [IN] specify if references will be searched     *
+ *             esc_bs       - [IN] 0 - don't escape backslashes in strings    *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - expression does not contain valid token.           *
@@ -662,7 +777,8 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
  *           }                                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
+int	zbx_token_find_ext(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search,
+		int esc_bs)
 {
 	int		ret = FAIL;
 	const char	*ptr = expression + pos, *dollar = ptr;
@@ -684,8 +800,12 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 					case '\\':
 						if (0 != quoted)
 						{
-							if ('\0' == *(++ptr))
+							if (ZBX_BACKSLASH_ESC_ON == esc_bs || '\\' != *(ptr + 1))
+								ptr++;
+
+							if ('\0' == *ptr)
 								return FAIL;
+
 						}
 						break;
 					case '"':
@@ -732,10 +852,11 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				break;
 			case '?':
 				if (0 != (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
-					ret = token_parse_expression_macro(expression, ptr, token_search, token);
+					ret = token_parse_expression_macro(expression, ptr, token_search, token,
+							esc_bs);
 				break;
 			case '{':
-				ret = zbx_token_parse_nested_macro(expression, ptr, token_search, token);
+				ret = zbx_token_parse_nested_macro_ext(expression, ptr, token_search, token, esc_bs);
 				break;
 			case '0':
 			case '1':
@@ -762,6 +883,16 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 	}
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: public wrapper for zbx_token_find_ext() function                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
+{
+	return zbx_token_find_ext(expression, pos, token, token_search, ZBX_BACKSLASH_ESC_ON);
 }
 
 /******************************************************************************
@@ -802,103 +933,6 @@ int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_toke
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
 	return token_parse_lld_macro(expression, macro, token);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parses token with nested macros                                   *
- *                                                                            *
- * Parameters: expression   - [IN]                                            *
- *             macro        - [IN] beginning of token                         *
- *             token_search - [IN] specify if references will be searched     *
- *             token        - [OUT]                                           *
- *                                                                            *
- * Return value: SUCCEED - token was parsed successfully                      *
- *               FAIL    - macro does not point at valid function or simple   *
- *                         macro                                              *
- *                                                                            *
- * Comments: This function parses token with a macro inside it. There are     *
- *           four types of nested macros - low-level discovery function       *
- *           macros, built-in function macros, user macros  and a specific    *
- *           case of simple macros where {HOST.HOSTn} macro is used as host   *
- *           name.                                                            *
- *                                                                            *
- *           If the macro points at valid macro in the expression then        *
- *           the generic token fields are set and either the                  *
- *           token->data.lld_func_macro, token->data.func_macro or            *
- *           token->data.simple_macro (depending on token type) structure is  *
- *           filled with macro specific data.                                 *
- *                                                                            *
- ******************************************************************************/
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
-		zbx_token_t *token)
-{
-	const char	*ptr;
-
-	if ('#' == macro[2])
-	{
-		/* find the end of the nested macro by validating its name until the closing bracket '}' */
-		for (ptr = macro + 3; '}' != *ptr; ptr++)
-		{
-			if ('\0' == *ptr)
-				return FAIL;
-
-			if (SUCCEED != zbx_is_macro_char(*ptr))
-				return FAIL;
-		}
-
-		/* empty macro name */
-		if (3 == ptr - macro)
-			return FAIL;
-	}
-	else if ('?' == macro[2])
-	{
-		zbx_token_t	expr_token;
-
-		if (0 == (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
-			return FAIL;
-
-		if (SUCCEED != token_parse_expression_macro(expression, macro + 1, token_search, &expr_token))
-			return FAIL;
-
-		ptr = expression + expr_token.loc.r;
-	}
-	else if ('$' == macro[2])
-	{
-		zbx_token_t	expr_token;
-
-		if (SUCCEED != token_parse_user_macro(expression, macro + 1, &expr_token))
-			return FAIL;
-
-		ptr = expression + expr_token.loc.r;
-	}
-	else
-	{
-		zbx_strloc_t	loc;
-
-		if (SUCCEED != token_parse_macro_name(expression, macro + 2, &loc))
-			return FAIL;
-
-		if ('}' != expression[loc.r + 1])
-			return FAIL;
-
-		ptr = expression + loc.r + 1;
-	}
-
-	/* Determine the token type.                                                   */
-	/* Nested macros formats:                                                      */
-	/*               low-level discovery function macros  {{#MACRO}.function()}    */
-	/*               function macros                      {{MACRO}.function()}     */
-	/*               simple macros                        {{MACRO}:key.function()} */
-	if ('.' == ptr[1])
-	{
-		return token_parse_func_macro(expression, macro, ptr + 2, token, '#' == macro[2] ?
-				ZBX_TOKEN_LLD_FUNC_MACRO : ZBX_TOKEN_FUNC_MACRO);
-	}
-	else if (0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) && '#' != macro[2] && ':' == ptr[1])
-		return token_parse_simple_macro_key(expression, macro, ptr + 2, token);
-
-	return FAIL;
 }
 
 /******************************************************************************
