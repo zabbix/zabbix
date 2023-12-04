@@ -22,7 +22,7 @@
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
@@ -32,7 +32,7 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup hosts
  */
-class testFormAdministrationDMProxies extends CWebTest {
+class testFormAdministrationDMProxies extends CLegacyWebTest  {
 	private $proxy_name = 'proxy_name_1';
 	private $new_proxy_name = 'proxy_name_new';
 	private $cloned_proxy_name = 'proxy_name_new_clone';
