@@ -303,16 +303,16 @@ struct buf_read_save {
  *                                                                             *
  * Parameters:                                                                 *
  *         fd       - [IN] file descriptor to read from                        *
- *         buf      - [OUT] buffer to read into                                *
+ *         buf      - [IN] buffer to read into                                 *
  *         bufsz    - [IN] buffer size in bytes. Must divisible by 4.          *
  *         encoding - [IN] pointer to a text string describing encoding.       *
  *                        See function zbx_find_cr_lf_szbyte() for supported   *
  *                        encodings.                                           *
  *                        "" (empty string) means a single-byte character set. *
  *         value    - [OUT] resulting pointer to start of line                 *
- *         saveptr  - [IN] pointer to context. This pointer should be NULL on  *
- *                         first call of the function. Caller must free this   *
- *                         pointer after usage.                                *
+ *         saveptr  - [IN/OUT] pointer to context. This pointer should be NULL *
+ *                        on first call of the function. Caller must free      *
+ *                        this pointer after usage.                            *
  *                                                                             *
  * Comment: This function does not add NULL character at end of line.          *
  *                                                                             *
