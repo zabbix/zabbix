@@ -69,7 +69,9 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
 			dbconfig_args_in->proxyconfig_frequency);
-	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip);
+	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
+			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
+			dbconfig_args_in->config_ssl_key_location);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
 
@@ -129,7 +131,11 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			revision = zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES,
 					&deleted_itemids, dbconfig_args_in->config_vault,
 					dbconfig_args_in->proxyconfig_frequency);
-			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip);
+			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
+					dbconfig_args_in->config_ssl_ca_location,
+					dbconfig_args_in->config_ssl_cert_location,
+					dbconfig_args_in->config_ssl_key_location);
+
 			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
 			zbx_dbconfig_worker_send_ids(&hostids);
 
@@ -148,7 +154,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		}
 		else
 		{
-			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip);
+			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
+					dbconfig_args_in->config_ssl_ca_location,
+					dbconfig_args_in->config_ssl_cert_location,
+					dbconfig_args_in->config_ssl_key_location);
 			secrets_reload = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}
