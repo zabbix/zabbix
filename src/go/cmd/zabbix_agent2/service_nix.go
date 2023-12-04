@@ -40,7 +40,7 @@ func eventLogErr(err error) error { return nil }
 
 func confirmService() {}
 
-func validateExclusiveFlags(args *Arguments) error { return nil }
+func validateExclusiveFlags() error { return nil }
 
 func handleWindowsService(conf string) error { return nil }
 

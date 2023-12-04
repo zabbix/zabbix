@@ -65,17 +65,6 @@ func osDependentFlags() zbxflag.Flags {
 	return zbxflag.Flags{
 		&zbxflag.BoolFlag{
 			Flag: zbxflag.Flag{
-				Name:      "multiple-agents",
-				Shorthand: "m",
-				Description: "For -i -d -s -x functions service name will " +
-					"include Hostname parameter specified in configuration file",
-			},
-			Default: false,
-			Dest:    &svcMultipleAgentFlag,
-		},
-
-		&zbxflag.BoolFlag{
-			Flag: zbxflag.Flag{
 				Name:        "install",
 				Shorthand:   "i",
 				Description: "Install Zabbix agent 2 as service",
@@ -109,6 +98,16 @@ func osDependentFlags() zbxflag.Flags {
 			},
 			Default: false,
 			Dest:    &svcStopFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:      "multiple-agents",
+				Shorthand: "m",
+				Description: "For -i -d -s -x functions service name will " +
+					"include Hostname parameter specified in configuration file",
+			},
+			Default: false,
+			Dest:    &svcMultipleAgentFlag,
 		},
 	}
 }
@@ -170,13 +169,10 @@ func eventLogErr(err error) error {
 	return nil
 }
 
-func validateExclusiveFlags(args *Arguments) error {
-	var (
-		defaultFlagSet  = args.test != "" || args.print || args.verbose
-		serviceFlagsSet = []bool{svcInstallFlag, svcUninstallFlag, svcStartFlag, svcStopFlag}
-		count           int
-	)
-
+func validateExclusiveFlags() error {
+	defaultFlagSet := argTest || argPrint || argVerbose
+	serviceFlagsSet := []bool{svcInstallFlag, svcUninstallFlag, svcStartFlag, svcStopFlag}
+	var count int
 	for _, serserviceFlagSet := range serviceFlagsSet {
 		if serserviceFlagSet {
 			count++
@@ -317,7 +313,7 @@ func getAgentPath() (p string, err error) {
 func svcInstall(conf string) error {
 	exepath, err := getAgentPath()
 	if err != nil {
-		return fmt.Errorf("failed to get Zabbix Agent 2 executable path: %s", err.Error())
+		return fmt.Errorf("failed to get Zabbix Agent 2 exeutable path: %s", err.Error())
 	}
 
 	m, err := mgr.Connect()
@@ -332,18 +328,10 @@ func svcInstall(conf string) error {
 		return errors.New("service already exists")
 	}
 
-	s, err = m.CreateService(
-		serviceName,
-		exepath,
-		mgr.Config{
-			StartType:      mgr.StartAutomatic,
-			DisplayName:    serviceName,
-			Description:    "Provides system monitoring",
-			BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf),
-		},
-		"-c", conf,
-		"-f=false",
-	)
+	s, err = m.CreateService(serviceName, exepath, mgr.Config{
+		StartType: mgr.StartAutomatic, DisplayName: serviceName,
+		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf),
+	}, "-c", conf, "-f=false")
 	if err != nil {
 		return fmt.Errorf("failed to create service: %s", err.Error())
 	}

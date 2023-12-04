@@ -52,6 +52,18 @@ import (
 
 const runtimeCommandSendingTimeout = time.Second
 
+const runtimeControlHelpMessageFormat = //
+`Perform administrative functions (%s timeout)
+
+    Runtime control interface, available commands:
+      help                   list available commands
+      log_level_increase     Increase log level
+      log_level_decrease     Decrease log level
+      userparameter_reload   Reload user parameters
+      metrics                List available metrics
+      version                Display Agent version
+`
+
 const usageMessageFormat = //
 `Usage of Zabbix agent 2:
   %[1]s [-c config-file]
@@ -60,43 +72,26 @@ const usageMessageFormat = //
   %[1]s [-c config-file] -R runtime-option
   %[1]s -h
   %[1]s -V
+`
 
-A Zabbix daemon for monitoring of various server parameters.
+const helpMessageFormat = //
+`A Zabbix daemon for monitoring of various server parameters.
 
 Options:
-%[2]s
+%[1]s
 
-Example: zabbix_agent2 -c %[3]s
+Example: zabbix_agent2 -c %[2]s
 
 Report bugs to: <https://support.zabbix.com>
-Zabbix home page: <http://www.zabbix.com>
+Zabbix home page: <https://www.zabbix.com>
 Documentation: <https://www.zabbix.com/documentation>
 `
-
-const usageMessageFormatRuntimeControlFormat = //
-`Perform administrative functions (%s timeout)
-
-    Remote control interface, available commands:
-      log_level_increase     Increase log level
-      log_level_decrease     Decrease log level
-      userparameter_reload   Reload user parameters
-      metrics                List available metrics
-      version                Display Agent version
-`
-
-// variables set at build
-var (
-	confDefault     string
-	applicationName string
-)
 
 var (
 	manager          *scheduler.Manager
 	listeners        []*serverlistener.ServerListener
 	serverConnectors []*serverconnector.Connector
 	closeChan        = make(chan bool)
-	pidFile          *pidfile.File
-	pluginsocket     string
 )
 
 type AgentUserParamOption struct {
@@ -120,7 +115,6 @@ func processLoglevelIncreaseCommand(c *runtimecontrol.Client) (err error) {
 		message := fmt.Sprintf("Increased log level to %s", log.Level())
 		log.Infof(message)
 		err = c.Reply(message)
-
 		return
 	}
 	err = fmt.Errorf("Cannot increase log level above %s", log.Level())
@@ -134,7 +128,6 @@ func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
 		message := fmt.Sprintf("Decreased log level to %s", log.Level())
 		log.Infof(message)
 		err = c.Reply(message)
-
 		return
 	}
 	err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
@@ -145,40 +138,55 @@ func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
 
 func processMetricsCommand(c *runtimecontrol.Client) (err error) {
 	data := manager.Query("metrics")
-
 	return c.Reply(data)
 }
 
 func processVersionCommand(c *runtimecontrol.Client) (err error) {
 	data := version.Long()
-
 	return c.Reply(data)
 }
 
-func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
+func processHelpCommand(c *runtimecontrol.Client) (err error) {
+	help := `Remote control interface, available commands:
+	log_level_increase - Increase log level
+	log_level_decrease - Decrease log level
+	userparameter_reload - Reload user parameters
+	metrics - List available metrics
+	version - Display Agent version
+	help - Display this help message`
+	return c.Reply(help)
+}
+
+func processUserParamReloadCommand(c *runtimecontrol.Client) error {
 	var userparams AgentUserParamOption
 
-	if err = conf.LoadUserParams(&userparams); err != nil {
+	err := conf.LoadUserParams(&userparams)
+	if err != nil {
 		err = fmt.Errorf("Cannot load user parameters: %s", err.Error())
 		log.Infof(err.Error())
 
-		return
+		return err
 	}
 
 	agent.Options.UserParameter = userparams.UserParameter
 
-	if res := manager.QueryUserParams(); res != "ok" {
-		err = fmt.Errorf("Failed to reload user parameters: %s", res)
+	status := manager.QueryUserParams()
+	if status != "ok" {
+		err := fmt.Errorf("Failed to reload user parameters: %s", status)
 		log.Infof(err.Error())
 
-		return
+		return err
 	}
 
 	message := "User parameters reloaded"
 	log.Infof(message)
-	err = c.Reply(message)
 
-	return
+	err = c.Reply(message)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func processRemoteCommand(c *runtimecontrol.Client) (err error) {
@@ -186,7 +194,7 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	switch len(params) {
 	case 0:
 		return errors.New("Empty command")
-	case 2: //nolint:gomnd
+	case 2:
 		return errors.New("Too many commands")
 	default:
 	}
@@ -196,6 +204,8 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 		err = processLoglevelIncreaseCommand(c)
 	case "log_level_decrease":
 		err = processLoglevelDecreaseCommand(c)
+	case "help":
+		err = processHelpCommand(c)
 	case "metrics":
 		err = processMetricsCommand(c)
 	case "version":
@@ -205,17 +215,15 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	default:
 		return errors.New("Unknown command")
 	}
-
 	return
 }
+
+var pidFile *pidfile.File
 
 func run() error {
 	sigs := createSigsChan()
 
-	control, err := runtimecontrol.New(
-		agent.Options.ControlSocket,
-		runtimeCommandSendingTimeout,
-	)
+	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
 	if err != nil {
 		return err
 	}
@@ -223,66 +231,84 @@ func run() error {
 	confirmService()
 	control.Start()
 
-loop:
+	defer control.Stop()
+
 	for {
 		select {
 		case sig := <-sigs:
 			if !handleSig(sig) {
-				break loop
+				return nil
 			}
 		case client := <-control.Client():
-			if rerr := processRemoteCommand(client); rerr != nil {
-				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
-					log.Warningf("cannot reply to runtime command: %s", rerr)
+			err := processRemoteCommand(client)
+			if err != nil {
+				rerr := client.Reply(fmt.Sprintf("error: %s", err.Error()))
+				if rerr != nil {
+					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
 
 			client.Close()
 		case serviceStop := <-closeChan:
 			if serviceStop {
-				break loop
+				return nil
 			}
 		}
 	}
-
-	control.Stop()
-
-	return nil
 }
 
-func main() { //nolint:funlen,gocognit,gocyclo
-	version.Init(
-		applicationName,
-		tls.CopyrightMessage(),
-		copyrightMessageMQTT(),
-		copyrightMessageModbus(),
-	)
+var (
+	confDefault     string
+	applicationName string
+	pluginsocket    string
 
-	fs := flag.NewFlagSet("", flag.ContinueOnError)
-	fs.SetOutput(io.Discard)
+	argConfig  bool
+	argTest    bool
+	argPrint   bool
+	argVersion bool
+	argVerbose bool
+)
 
-	args, err := parseArgs(fs)
+func main() {
+	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
+
+	flagsUsage, fs, args, err := parseArgs()
 	if err != nil {
-		fmt.Fprintf(os.Stdout, "%s\n", err)
-
-		return
+		// parseArgs prints usage message on parse error,
+		// safe to allways exit 1.
+		os.Exit(1)
 	}
 
 	if args.help {
-		fs.Usage()
+		fmt.Println(helpMessage(flagsUsage))
 
-		return
+		os.Exit(0)
 	}
 
 	setServiceRun(args.foreground)
 
-	if args.version {
-		version.Display([]string{fmt.Sprintf(
-			"Plugin communication protocol version is %s",
-			comms.ProtocolVersion,
-		)})
+	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
-		return
+	// Need to manually check if the flag was specified, as default flag package
+	// does not offer automatic detection. Consider using third party package.
+	fs.Visit(func(f *flag.Flag) {
+		switch f.Name {
+		case "c", "config":
+			argConfig = true
+		case "t", "test":
+			argTest = true
+		case "p", "print":
+			argPrint = true
+		case "V", "version":
+			argVersion = true
+		case "v", "verbose":
+			argVerbose = true
+		}
+	})
+
+	if argVersion {
+		version.Display([]string{fmt.Sprintf("Plugin communication protocol version is %s", comms.ProtocolVersion)})
+		os.Exit(0)
 	}
 
 	err = openEventLog()
@@ -290,105 +316,129 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fatalExit("", err)
 	}
 
-	err = validateExclusiveFlags(args)
-	if err != nil {
-		fatalExit("", errors.Join(err, eventLogErr(err)))
+	if err = validateExclusiveFlags(); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("", err)
 	}
 
-	err = conf.Load(args.configPath, &agent.Options)
-	if err != nil {
-		if args.configPath != "" {
-			fatalExit("", errors.Join(err, eventLogErr(err)))
+	if err = conf.Load(args.configPath, &agent.Options); err != nil {
+		if argConfig || !(argTest || argPrint) {
+			if eerr := eventLogErr(err); eerr != nil {
+				err = fmt.Errorf("%s and %s", err, eerr)
+			}
+			fatalExit("", err)
 		}
-
 		// create default configuration for testing options
-		// pass empty string to config arg to trigger this
-		err = conf.Unmarshal([]byte{}, &agent.Options)
-		if err != nil {
-			fatalExit("", errors.Join(err, eventLogErr(err)))
+		if !argConfig {
+			_ = conf.Unmarshal([]byte{}, &agent.Options)
 		}
-
-		log.Infof("Using default configuration")
 	}
 
-	err = agent.ValidateOptions(&agent.Options)
-	if err != nil {
-		fatalExit(
-			"cannot validate configuration", errors.Join(err, eventLogErr(err)),
-		)
+	if err = agent.ValidateOptions(&agent.Options); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("cannot validate configuration", err)
 	}
 
-	err = handleWindowsService(args.configPath)
-	if err != nil {
-		fatalExit("", errors.Join(err, eventLogErr(err)))
+	if err = handleWindowsService(args.configPath); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("", err)
 	}
 
-	err = log.Open(log.Console, log.Warning, "", 0)
-	if err != nil {
+	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
 	if args.runtimeCommand != "" {
 		if agent.Options.ControlSocket == "" {
-			log.Errf(
-				"Cannot send runtime command: ControlSocket configuration parameter is not defined",
-			)
-
-			return
+			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
+			os.Exit(0)
 		}
 
 		reply, err := runtimecontrol.SendCommand(
-			agent.Options.ControlSocket,
-			args.runtimeCommand,
-			runtimeCommandSendingTimeout,
+			agent.Options.ControlSocket, args.runtimeCommand, runtimeCommandSendingTimeout,
 		)
 		if err != nil {
-			log.Errf("Cannot send runtime command: %s", err)
-
-			return
+			log.Errf("Cannot send remote command: %s", err)
+			os.Exit(1)
 		}
 
 		log.Infof(reply)
-
-		return
+		os.Exit(0)
 	}
 
-	pluginsocket, err = initExternalPlugins(&agent.Options)
-	if err != nil {
+	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
 		fatalExit("cannot register plugins", err)
 	}
-
 	defer cleanUpExternal()
 
-	if args.test != "" || args.print {
-		m, err := prepareMetricPrintManager(args.verbose)
-		if err != nil {
-			fatalExit("failed to prepare metric print", err)
+	if argTest || argPrint {
+		var level int
+		if argVerbose {
+			level = log.Trace
+		} else {
+			level = log.None
+		}
+		if err = log.Open(log.Console, level, "", 0); err != nil {
+			fatalExit("cannot initialize logger", err)
 		}
 
-		if args.test != "" {
+		if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+			fatalExit("failed to load key access rules", err)
+		}
+
+		if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+			agent.Options.UserParameterDir); err != nil {
+			fatalExit("cannot initialize user parameters", err)
+		}
+
+		var m *scheduler.Manager
+		if m, err = scheduler.NewManager(&agent.Options); err != nil {
+			fatalExit("cannot create scheduling manager", err)
+		}
+
+		m.Start()
+
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
+		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+		if err != nil {
+			fatalExit("cannot parse the \"Hostname\" parameter", err)
+		}
+		agent.FirstHostname = hostnames[0]
+
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
+
+		agent.SetPerformTask(scheduler.Scheduler(m).PerformTask)
+
+		if argTest {
 			checkMetric(m, args.test)
 		} else {
 			checkMetrics(m)
 		}
 
 		m.Stop()
+
 		monitor.Wait(monitor.Scheduler)
+
 		cleanUpExternal()
 
-		return
+		os.Exit(0)
 	}
 
-	if args.verbose {
-		fatalExit(
-			"",
-			errors.New(
-				"verbose parameter can be specified only with test or print parameters",
-			),
-		)
+	if argVerbose {
+		fatalExit("", errors.New("verbose parameter can be specified only with test or print parameters"))
 	}
 
-	var logType int
+	var logType, logLevel int
 	switch agent.Options.LogType {
 	case "system":
 		logType = log.System
@@ -397,18 +447,26 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	case "file":
 		logType = log.File
 	}
+	switch agent.Options.DebugLevel {
+	case 0:
+		logLevel = log.Info
+	case 1:
+		logLevel = log.Crit
+	case 2:
+		logLevel = log.Err
+	case 3:
+		logLevel = log.Warning
+	case 4:
+		logLevel = log.Debug
+	case 5:
+		logLevel = log.Trace
+	}
 
-	err = log.Open(
-		logType,
-		agent.Options.DebugLevel,
-		agent.Options.LogFile,
-		agent.Options.LogFileSize,
-	)
-	if err != nil {
+	if err = log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	zbxlib.SetLogLevel(agent.Options.DebugLevel)
+	zbxlib.SetLogLevel(logLevel)
 
 	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
 	log.Infof(greeting)
@@ -418,20 +476,17 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fatalExit("cannot parse the \"ServerActive\" parameter", err)
 	}
 
-	tlsConfig, err := agent.GetTLSConfig(&agent.Options)
-	if err != nil {
+	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
 		fatalExit("cannot use encryption configuration", err)
-	}
-
-	if tlsConfig != nil {
-		err = tls.Init(tlsConfig)
-		if err != nil {
-			fatalExit("cannot configure encryption", err)
+	} else {
+		if tlsConfig != nil {
+			if err = tls.Init(tlsConfig); err != nil {
+				fatalExit("cannot configure encryption", err)
+			}
 		}
 	}
 
-	pidFile, err = pidfile.New(agent.Options.PidFile)
-	if err != nil {
+	if pidFile, err = pidfile.New(agent.Options.PidFile); err != nil {
 		fatalExit("cannot initialize PID file", err)
 	}
 
@@ -441,44 +496,30 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 		fatalExit("Failed to load key access rules", err)
+		os.Exit(1)
 	}
 
-	_, err = agent.InitUserParameterPlugin(
-		agent.Options.UserParameter,
-		agent.Options.UnsafeUserParameters,
-		agent.Options.UserParameterDir,
-	)
-	if err != nil {
+	if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+		agent.Options.UserParameterDir); err != nil {
 		fatalExit("cannot initialize user parameters", err)
 	}
 
-	manager, err = scheduler.NewManager(&agent.Options)
-	if err != nil {
+	if manager, err = scheduler.NewManager(&agent.Options); err != nil {
 		fatalExit("cannot create scheduling manager", err)
 	}
 
 	// replacement of deprecated StartAgents
-	if len(agent.Options.Server) != 0 {
+	if 0 != len(agent.Options.Server) {
 		var listenIPs []string
-
-		listenIPs, err = serverlistener.ParseListenIP(&agent.Options)
-		if err != nil {
+		if listenIPs, err = serverlistener.ParseListenIP(&agent.Options); err != nil {
 			fatalExit("cannot parse \"ListenIP\" parameter", err)
 		}
-
 		for i := 0; i < len(listenIPs); i++ {
-			listener := serverlistener.New(
-				i,
-				manager,
-				listenIPs[i],
-				&agent.Options,
-			)
+			listener := serverlistener.New(i, manager, listenIPs[i], &agent.Options)
 			listeners = append(listeners, listener)
 		}
 	}
-
-	err = loadOSDependentItems()
-	if err != nil {
+	if err = loadOSDependentItems(); err != nil {
 		fatalExit("cannot load os dependent items", err)
 	}
 
@@ -490,8 +531,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	manager.Start()
 
-	err = configUpdateItemParameters(manager, &agent.Options)
-	if err != nil {
+	if err = configUpdateItemParameters(manager, &agent.Options); err != nil {
 		fatalExit("cannot process configuration", err)
 	}
 
@@ -499,42 +539,27 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	if err != nil {
 		fatalExit("cannot parse the \"Hostname\" parameter", err)
 	}
-
 	agent.FirstHostname = hostnames[0]
-	hostmessage := fmt.Sprintf(
-		"Zabbix Agent2 hostname: [%s]",
-		agent.Options.Hostname,
-	)
+	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
 	log.Infof(hostmessage)
-
 	if args.foreground {
 		if agent.Options.LogType != "console" {
 			fmt.Println(hostmessage)
 		}
-
 		fmt.Println("Press Ctrl+C to exit.")
 	}
-
-	err = resultcache.Prepare(&agent.Options, addresses, hostnames)
-	if err != nil {
+	if err = resultcache.Prepare(&agent.Options, addresses, hostnames); err != nil {
 		fatalExit("cannot prepare result cache", err)
 	}
 
-	serverConnectors = make(
-		[]*serverconnector.Connector,
-		len(addresses)*len(hostnames),
-	)
+	serverConnectors = make([]*serverconnector.Connector, len(addresses)*len(hostnames))
 
 	var idx int
 	for i := 0; i < len(addresses); i++ {
 		for j := 0; j < len(hostnames); j++ {
-			serverConnectors[idx], err = serverconnector.New(
-				manager, addresses[i], hostnames[j], &agent.Options,
-			)
-			if err != nil {
+			if serverConnectors[idx], err = serverconnector.New(manager, addresses[i], hostnames[j], &agent.Options); err != nil {
 				fatalExit("cannot create server connector", err)
 			}
-
 			serverConnectors[idx].Start()
 			agent.SetHostname(serverConnectors[idx].ClientID(), hostnames[j])
 			idx++
@@ -565,26 +590,24 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	if agent.Options.StatusPort != 0 {
 		statuslistener.Stop()
 	}
-
 	for _, listener := range listeners {
 		listener.Stop()
 	}
-
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopConnector()
 	}
-
 	monitor.Wait(monitor.Input)
+
 	manager.Stop()
+
 	monitor.Wait(monitor.Scheduler)
 
-	// split shutdown in two steps to ensure that result cache is still running
-	// while manager is being stopped, because there might be pending exporters
-	// that could block if result cache is stopped and its input channel is full.
-	for _, connector := range serverConnectors {
-		connector.StopCache()
+	// split shutdown in two steps to ensure that result cache is still running while manager is
+	// being stopped, because there might be pending exporters that could block if result cache
+	// is stopped and its input channel is full.
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].StopCache()
 	}
-
 	monitor.Wait(monitor.Output)
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
@@ -596,7 +619,13 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	waitServiceClose()
 }
 
-func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
+func parseArgs() (string, *flag.FlagSet, *Arguments, error) {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	// set to empty cause lib triggers Usage func on --help/-h and invalid
+	// flags error, we want to handle these cases manually
+	fs.Usage = func() {}
+
 	args := &Arguments{}
 
 	f := zbxflag.Flags{
@@ -620,6 +649,15 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 			Default: true,
 			Dest:    &args.foreground,
 		},
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:        "test",
+				Shorthand:   "t",
+				Description: "Test specified item and exit",
+			},
+			Default: "",
+			Dest:    &args.test,
+		},
 		&zbxflag.BoolFlag{
 			Flag: zbxflag.Flag{
 				Name:        "print",
@@ -631,19 +669,10 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 		},
 		&zbxflag.StringFlag{
 			Flag: zbxflag.Flag{
-				Name:        "test",
-				Shorthand:   "t",
-				Description: "Test specified item and exit",
-			},
-			Default: "",
-			Dest:    &args.test,
-		},
-		&zbxflag.StringFlag{
-			Flag: zbxflag.Flag{
 				Name:      "runtime-control",
 				Shorthand: "R",
 				Description: fmt.Sprintf(
-					usageMessageFormatRuntimeControlFormat,
+					runtimeControlHelpMessageFormat,
 					runtimeCommandSendingTimeout.String(),
 				),
 			},
@@ -681,76 +710,34 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 	}
 
 	f.Register(fs)
-	fs.Usage = func() {
-		fmt.Printf(
-			usageMessageFormat,
-			filepath.Base(os.Args[0]),
-			f.Usage(),
-			usageMessageExampleConfPath,
-		)
-	}
 
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
-		return nil, zbxerr.New("failed to parse flags").Wrap(err)
+		fmt.Printf("failed to parse flags: %s\n%s", err.Error(), usageMessage())
+
+		return "", nil, nil, zbxerr.ErrorOSExitZero
 	}
 
-	return args, nil
+	return f.Usage(), fs, args, nil
 }
 
-func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
-	level := log.None
-
-	if verbose {
-		level = log.Trace
-	}
-
-	err := log.Open(log.Console, level, "", 0)
-	if err != nil {
-		return nil, zbxerr.New("failed to initialize logger").Wrap(err)
-	}
-
-	err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey)
-	if err != nil {
-		return nil, zbxerr.New("failed to load key access rules").Wrap(err)
-	}
-
-	_, err = agent.InitUserParameterPlugin(
-		agent.Options.UserParameter,
-		agent.Options.UnsafeUserParameters,
-		agent.Options.UserParameterDir,
+func usageMessage() string {
+	return fmt.Sprintf(
+		usageMessageFormat,
+		filepath.Base(os.Args[0]),
 	)
-	if err != nil {
-		return nil, zbxerr.New("failed to initialize user parameters").Wrap(err)
-	}
+}
 
-	m, err := scheduler.NewManager(&agent.Options)
-	if err != nil {
-		return nil, zbxerr.New("failed to create scheduling manager").Wrap(err)
-	}
-
-	m.Start()
-
-	err = configUpdateItemParameters(m, &agent.Options)
-	if err != nil {
-		return nil, zbxerr.New("failed to process configuration").Wrap(err)
-	}
-
-	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
-	if err != nil {
-		return nil, zbxerr.New(`failed to parse "Hostname" parameter`).Wrap(err)
-	}
-
-	agent.FirstHostname = hostnames[0]
-
-	err = configUpdateItemParameters(m, &agent.Options)
-	if err != nil {
-		return nil, zbxerr.New("failed to uptade item parameters").Wrap(err)
-	}
-
-	agent.SetPerformTask(scheduler.Scheduler(m).PerformTask)
-
-	return m, nil
+func helpMessage(flagsUsage string) string {
+	return fmt.Sprintf(
+		"%s\n%s",
+		usageMessage(),
+		fmt.Sprintf(
+			helpMessageFormat,
+			flagsUsage,
+			usageMessageExampleConfPath,
+		),
+	)
 }
 
 func fatalExit(message string, err error) {
