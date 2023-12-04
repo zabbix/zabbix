@@ -1989,7 +1989,7 @@ static int	DBpatch_6050159(void)
 	{
 		const char	*ptr;
 		char		*tmp, *param = NULL;
-		int		quoted;
+		int		func_params_changed = 0;
 		size_t		param_pos, param_len, sep_pos, buf_offset = 0, params_len;
 
 		params_len = strlen(row[1]);
@@ -2001,20 +2001,25 @@ static int	DBpatch_6050159(void)
 
 			if (param_pos < sep_pos)
 			{
-				if ('"' != ptr[param_pos])
-				{
-					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, sep_pos);
-				}
-				else
+				int	quoted, changed = 0;
+
+				if ('"' == ptr[param_pos])
 				{
 					param = zbx_function_param_unquote_dyn_compat(ptr + param_pos,
 							sep_pos - param_pos, &quoted);
 
 					/* zbx_function_param_quote() should always succeed with esc_bs set to 1 */
 					zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON);
-					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, param_pos);
-					zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
+
+					if (0 != strncmp(param, ptr + param_pos, strlen(param))) {
+						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, param_pos);
+						zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
+						func_params_changed = changed = 1;
+					}
 				}
+
+				if (0 == changed)
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, sep_pos);
 			}
 
 			if (',' == ptr[sep_pos])
@@ -2025,10 +2030,12 @@ static int	DBpatch_6050159(void)
 		if (0 == buf_offset)
 			continue;
 
-		tmp = zbx_db_dyn_escape_string(buf);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
-		zbx_free(tmp);
+		if (0 != func_params_changed) {
+			tmp = zbx_db_dyn_escape_string(buf);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
+			zbx_free(tmp);
+		}
 
 		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			break;
