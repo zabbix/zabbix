@@ -7,7 +7,6 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 	#include <endian.h>
 #elif __hpux	/* on HP-UX IA-64 gcc default is -mbig-endian */
 # define SWAP(n) (n)
-/* Nothing to do in HP-UX */
 #elif _AIX	/* IBM AIX is big-endian */
 # define SWAP(n) (n)
 #elif defined(_WINDOWS) || defined(__MINGW32__)
