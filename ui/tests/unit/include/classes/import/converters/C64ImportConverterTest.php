@@ -126,11 +126,11 @@ class C64ImportConverterTest extends CImportConverterTest {
 		$expected_expression_macro_host_macro = '{?'.$expected_expression_host_macro.'}';
 
 		$source_text = 'prefix'.$expression_macro_simple.$source_expression_macro.
-					$source_expression_macro_function.$source_expression_macro_empty_host.
-					$source_expression_macro_host_macroo.'suffix';
+			$source_expression_macro_function.$source_expression_macro_empty_host.
+			$source_expression_macro_host_macro.'suffix';
 		$expected_text = 'prefix'.$expression_macro_simple.$expected_expression_macro.
-					$expected_expression_macro_function.$expected_expression_macro_empty_host.
-					$expected_expression_macro_host_macroo.'suffix';
+			$expected_expression_macro_function.$expected_expression_macro_empty_host.
+			$expected_expression_macro_host_macro.'suffix';
 
 		$source_triggers = [
 			[
