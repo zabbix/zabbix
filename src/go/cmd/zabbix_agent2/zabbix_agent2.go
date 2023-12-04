@@ -280,7 +280,7 @@ func main() {
 	}
 
 	if args.help {
-		fmt.Println(helpMessage(flagsUsage))
+		fmt.Printf(helpMessage(flagsUsage))
 
 		os.Exit(0)
 	}
