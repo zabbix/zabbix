@@ -274,13 +274,9 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 	}
 
 	if ((ssize_t)nbyte < (frag_data + frag_sz) - frag_pos)
-	{
 		mv_len = nbyte;
-	}
 	else
-	{
 		mv_len = (frag_data + frag_sz) - frag_pos;
-	}
 
 	memcpy(buf, frag_pos, mv_len);
 
