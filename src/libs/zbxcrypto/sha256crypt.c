@@ -5,10 +5,11 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 
 #ifdef __linux__
 	#include <endian.h>
-#elif __hpux
+#elif __hpux	/* on HP-UX IA-64 gcc default is -mbig-endian */
+# define SWAP(n) (n)
 /* Nothing to do in HP-UX */
-#elif _AIX
-/* Nothing to do in AIX */
+#elif _AIX	/* IBM AIX is big-endian */
+# define SWAP(n) (n)
 #elif defined(_WINDOWS) || defined(__MINGW32__)
 /* Nothing to do in Windows */
 #else
@@ -24,13 +25,13 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 	#include <string.h>
 #endif
 
-/* on HP-UX IA-64 gcc default is -mbig-endian */
-#if ((__BYTE_ORDER == __LITTLE_ENDIAN) && !defined(__hpux)) || (defined(__hpux) && \
-		defined(__BYTE_ORDER) && (__BYTE_ORDER == __LITTLE_ENDIAN))
+#if !defined(SWAP)
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 # define SWAP(n) \
 	(((n) << 24) | (((n) & 0xff00) << 8) | (((n) >> 8) & 0xff00) | ((n) >> 24))
 #else
 # define SWAP(n) (n)
+#endif
 #endif
 
 /* This array contains the bytes used to pad the buffer to the next
