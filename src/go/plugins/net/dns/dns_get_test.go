@@ -1,5 +1,3 @@
-//go:build linux && (amd64 || arm64)
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -24,175 +22,306 @@ package dns
 import (
 	"errors"
 	"fmt"
+	"github.com/miekg/dns"
+	"reflect"
 	"testing"
 )
 
-func checkArgsFlagsParsing(t *testing.T, tc *argsFlagsParsingTestCase) {
-	var o dnsGetOptions
-	err := o.setFlags(tc.flagsInArgs)
+func Test_dnsGetOptions_setFlags(t *testing.T) {
+	tests := []struct {
+		name        string
+		flagsInArgs string
+		flagsOut    map[string]bool
+		err         error
+	}{
+		{
+			"basic_scenario",
+			"cdflag,rdflag,dnssec,nsid,edns0,aaflag,adflag",
+			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": true, "nsid": true, "edns0": true, "aaflag": true, "adflag": true},
+			nil,
+		},
 
-	if err != nil {
-		if tc.err.Error() != err.Error() {
-			t.Errorf("\nExpected error: ->%v<-, but received: ->%v<-\n", tc.err, err)
-		}
+		{
+			"empty_flags",
+			"",
+			map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			nil,
+		},
 
-		return
+		{
+			"single_flag1",
+			"cdflag",
+			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			nil,
+		},
+
+		{
+			"single_flag2",
+			"rdflag",
+			map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			nil,
+		},
+
+		{
+			"two_flags",
+			"cdflag,rdflag",
+			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			nil,
+		},
+
+		{
+			"many_negative_flags",
+			"nocdflag,nordflag,nodnssec,nonsid,noedns0,noaaflag,noadflag",
+			map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false, "edns0": false, "aaflag": false, "adflag": false},
+			nil,
+		},
+
+		{
+			"many_negative_flags_reordered",
+			"noadflag,noaaflag,noedns0,nonsid,nodnssec,nordflag,nocdflag",
+			map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false, "edns0": false, "aaflag": false, "adflag": false},
+			nil,
+		},
+
+		{
+			"coma",
+			",",
+			nil,
+			errors.New("Invalid flag supplied:."),
+		},
+
+		{
+			"empty_space",
+			" ",
+			nil,
+			errors.New("Invalid flag supplied: ."),
+		},
+
+		{
+			"backslash",
+			"\\",
+			nil,
+			errors.New("Invalid flag supplied:\\."),
+		},
+
+		{
+			"coma_invalid_flag",
+			",dflag",
+			nil,
+			errors.New("Invalid flag supplied:."),
+		},
+
+		{
+			"invalid_flag",
+			"dflag",
+			nil,
+			errors.New("Invalid flag supplied:dflag."),
+		},
+
+		{
+			"invalid_flag_combo",
+			"cdflagrdflag",
+			nil,
+			errors.New("Invalid flag supplied:cdflagrdflag."),
+		},
+
+		{
+			"zero",
+			"0",
+			nil,
+			errors.New("Invalid flag supplied:0."),
+		},
+
+		{
+			"extra_coma",
+			"noadflag,noaaflag,noedns0,nonsid,nodnssec,nordflag,",
+			nil,
+			errors.New("Invalid flag supplied:."),
+		},
+
+		{
+			"opposite_flags",
+			"aaflag,noaaflag",
+			nil,
+			errors.New("Invalid flags combination, cannot use noaaflag and aaflag together."),
+		},
+
+		{
+			"regular_flag_before_opposite_flags",
+			"rdflag,aaflag,noaaflag",
+			nil,
+			errors.New("Invalid flags combination, cannot use noaaflag and aaflag together."),
+		},
+
+		{
+			"regular_flag_between_opposite_flags",
+			"rdflag,aaflag,nsid,noaaflag",
+			nil,
+			errors.New("Invalid flags combination, cannot use noaaflag and aaflag together."),
+		},
+
+		{
+			"noedns_and_nsid_used_together",
+			"noedns0,nsid",
+			nil,
+			errors.New("Invalid flags combination, cannot use noedns0 and nsid together."),
+		},
+
+		{
+			"too_many_flags_1",
+			"noadflag,noaaflag,noedns0,nonsid,nodnssec,nordflag,nocdflag,",
+			nil,
+			errors.New("Too many flags supplied: 8."),
+		},
+
+		{
+			"too_many_flags_2",
+			",,,,,,,,,,",
+			nil,
+			errors.New("Too many flags supplied: 11."),
+		},
+
+		{
+			"duplicate_flag",
+			"noadflag,aaflag,noedns0,nordflag,aaflag,",
+			nil,
+			errors.New("Duplicate flag supplied: aaflag."),
+		},
+
+		{
+			"invalid_flag",
+			"noadflag,aaflag,x,aaflag,noadflag",
+			nil,
+			errors.New("Invalid flag supplied:x."),
+		},
 	}
 
-	if fmt.Sprint(tc.flagsOut) != fmt.Sprint(o.flags) {
-		t.Errorf("\nExpected options: ->%v<-\nFor input flags: ->%s<-\nBut received: ->%v<-\n", tc.flagsOut,
-			tc.flagsInArgs, o.flags)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var o dnsGetOptions
+			err := o.setFlags(tt.flagsInArgs)
+
+			if err != nil {
+				if tt.err.Error() != err.Error() {
+					t.Errorf("\nExpected error: ->%v<-, but received: ->%v<-\n", tt.err, err)
+				}
+
+				return
+			}
+			if fmt.Sprint(tt.flagsOut) != fmt.Sprint(o.flags) {
+				t.Errorf("\nExpected options: ->%v<-\nFor input flags: ->%s<-\nBut received: ->%v<-\n", tt.flagsOut,
+					tt.flagsInArgs, o.flags)
+			}
+		})
 	}
 }
 
-type argsFlagsParsingTestCase struct {
-	flagsInArgs string
-	err         error
-	flagsOut    map[string]bool
-}
-
-func TestDNSGetFlagsArgsParsing(t *testing.T) {
-	argsFlagsParsingTestCases := []*argsFlagsParsingTestCase{
+func Test_insertAtEveryNthPosition(t *testing.T) {
+	type args struct {
+		s string
+		n int
+		r rune
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
 		{
-			flagsInArgs: "cdflag,rdflag,dnssec,nsid,edns0,aaflag,adflag",
-			err:         nil,
-			flagsOut:    map[string]bool{"cdflag": true, "rdflag": true, "dnssec": true, "nsid": true, "edns0": true, "aaflag": true, "adflag": true},
+			"basic_scenario",
+			args{s: "6770646e732d61726e", n: 2, r: ' '},
+			"67 70 64 6e 73 2d 61 72 6e",
 		},
 
 		{
-			flagsInArgs: "",
-			err:         nil,
-			flagsOut:    map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			"empty",
+			args{s: "", n: 2, r: ' '},
+			"",
 		},
 
 		{
-			flagsInArgs: "cdflag",
-			err:         nil,
-			flagsOut:    map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			"1_char",
+			args{s: "6", n: 2, r: ' '},
+			"6",
 		},
 
 		{
-			flagsInArgs: "rdflag",
-			err:         nil,
-			flagsOut:    map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			"2_chars",
+			args{s: "67", n: 2, r: ' '},
+			"67",
 		},
 
 		{
-			flagsInArgs: "cdflag,rdflag",
-			err:         nil,
-			flagsOut:    map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			"3_chars",
+			args{s: "677", n: 2, r: ' '},
+			"67 7",
 		},
 
 		{
-			flagsInArgs: "nocdflag,nordflag,nodnssec,nonsid,noedns0,noaaflag,noadflag",
-			err:         nil,
-			flagsOut:    map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false, "edns0": false, "aaflag": false, "adflag": false},
+			"3_chars_single_delimiter",
+			args{s: "677", n: 1, r: ' '},
+			"6 7 7",
 		},
 
 		{
-			flagsInArgs: "noadflag,noaaflag,noedns0,nonsid,nodnssec,nordflag,nocdflag",
-			err:         nil,
-			flagsOut:    map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false, "edns0": false, "aaflag": false, "adflag": false},
-		},
-
-		{
-			flagsInArgs: ",",
-			err:         errors.New("Invalid flag supplied:."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: " ",
-			err:         errors.New("Invalid flag supplied: ."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "\\",
-			err:         errors.New("Invalid flag supplied:\\."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: ",dflag",
-			err:         errors.New("Invalid flag supplied:."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "dflag",
-			err:         errors.New("Invalid flag supplied:dflag."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "cdflagrdflag",
-			err:         errors.New("Invalid flag supplied:cdflagrdflag."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "0",
-			err:         errors.New("Invalid flag supplied:0."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "noadflag,noaaflag,noedns0,nonsid,nodnssec,nordflag,",
-			err:         errors.New("Invalid flag supplied:."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "aaflag,noaaflag",
-			err:         errors.New("Invalid flags combination, cannot use noaaflag and aaflag together."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "rdflag,aaflag,noaaflag",
-			err:         errors.New("Invalid flags combination, cannot use noaaflag and aaflag together."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "rdflag,aaflag,nsid,noaaflag",
-			err:         errors.New("Invalid flags combination, cannot use noaaflag and aaflag together."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "noedns0,nsid",
-			err:         errors.New("Invalid flags combination, cannot use noedns0 and nsid together."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "noadflag,noaaflag,noedns0,nonsid,nodnssec,nordflag,nocdflag,",
-			err:         errors.New("Too many flags supplied: 8."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: ",,,,,,,,,,",
-			err:         errors.New("Too many flags supplied: 11."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "noadflag,aaflag,noedns0,nordflag,aaflag,",
-			err:         errors.New("Duplicate flag supplied: aaflag."),
-			flagsOut:    nil,
-		},
-
-		{
-			flagsInArgs: "noadflag,aaflag,x,aaflag,noadflag",
-			err:         errors.New("Invalid flag supplied:x."),
-			flagsOut:    nil,
+			"3_chars_zero_delimiter",
+			args{s: "677", n: 0, r: ' '},
+			"677",
 		},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := insertAtEveryNthPosition(tt.args.s, tt.args.n, tt.args.r); got != tt.want {
+				t.Errorf("insertAtEveryNthPosition() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
-	for _, tc := range argsFlagsParsingTestCases {
-		checkArgsFlagsParsing(t, tc)
+func Test_parseRRs(t *testing.T) {
+	type args struct {
+		rrs    []dns.RR
+		source string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    map[string][]any
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := parseRRs(tt.args.rrs, tt.args.source)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseRRs() error = %v, wantErr %v", err, tt.wantErr)
+
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseRRs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseRespQuestion(t *testing.T) {
+	type args struct {
+		respQuestion []dns.Question
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string][]any
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := parseRespQuestion(tt.args.respQuestion); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseRespQuestion() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

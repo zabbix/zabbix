@@ -416,11 +416,16 @@ func reverseMap(m map[string]uint16) map[uint16]string {
 
 func insertAtEveryNthPosition(s string, n int, r rune) string {
 	var buffer bytes.Buffer
+
+	if (n <= 0) {
+		return s
+	}
+
 	var n1 = n - 1
 	var l1 = len(s) - 1
 	for i, rune := range s {
 		buffer.WriteRune(rune)
-		if i%n == n1 && i != l1 {
+		if i % n == n1 && i != l1 {
 			buffer.WriteRune(r)
 		}
 	}
