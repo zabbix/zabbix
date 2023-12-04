@@ -135,7 +135,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	}
 
 	if args.help {
-		fmt.Printf(helpMessage(flagsUsage))
+		fmt.Print(helpMessage(flagsUsage))
 		os.Exit(0)
 	}
 
