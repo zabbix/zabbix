@@ -397,6 +397,39 @@ class C64ImportConverter extends CConverter {
 	}
 
 	/**
+	 * Escaping backslashes in string parameters of history functions.
+	 *
+	 * @param CExpressionParser $expression_parser
+	 * @param string            $expression
+	 *
+	 * @return string
+	 */
+	private static function escapeBackslashes(CExpressionParser $expression_parser, string $expression): string {
+		$tokens = $expression_parser
+			->getResult()
+			->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
+		$convert_parameters = [];
+
+		foreach ($tokens as $token) {
+			foreach ($token['data']['parameters'] as $parameter) {
+				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
+						&& strpos($parameter['match'], '\\') !== false) {
+					$convert_parameters[] = $parameter;
+				}
+			}
+		}
+
+		foreach (array_reverse($convert_parameters) as $parameter) {
+			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'], false);
+			$parameter['match'] = CHistFunctionParser::quoteParam($parameter['match']);
+
+			$expression = substr_replace($expression, $parameter['match'], $parameter['pos'], $parameter['length']);
+		}
+
+		return $expression;
+	}
+
+	/**
 	 * @param string $text
 	 *
 	 * @return string
@@ -410,21 +443,11 @@ class C64ImportConverter extends CConverter {
 			'escape_backslashes' => false
 		]);
 
-		$p = 0;
-
-		while (isset($text[$p])) {
-			if (substr($text, $p, 2) === '{?' && $expression_macro_parser->parse($text, $p) != CParser::PARSE_FAIL) {
-				$expression = $expression_macro_parser
-					->getExpressionParser()
-					->getMatch();
-				$match = self::convertExpression($expression);
-
-				$text = substr_replace($text, $match, $p + 2, strlen($expression));
-
-				$p += strlen($match) + 2;
+		for ($p = strpos($text, '{'); $p !== false; $p = strpos($text, '{', $p + 1)) {
+			if ($expression_macro_parser->parse($text, $p) != CParser::PARSE_FAIL) {
+				$text = self::escapeBackslashes($expression_macro_parser->getExpressionParser(), $text);
+				$p += $expression_macro_parser->getLength() - 1;
 			}
-
-			$p++;
 		}
 
 		return $text;
@@ -455,36 +478,9 @@ class C64ImportConverter extends CConverter {
 
 		$expression_parser = new CExpressionParser($options);
 
-		if ($expression_parser->parse($expression) != CParser::PARSE_SUCCESS) {
-			return $expression;
-		}
-
-		$tokens = $expression_parser
-			->getResult()
-			->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
-		$convert_parameters = [];
-
-		foreach ($tokens as $token) {
-			foreach ($token['data']['parameters'] as $parameter) {
-				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
-						&& strpos($parameter['match'], '\\') !== false) {
-					$convert_parameters[] = $parameter;
-				}
-			}
-		}
-
-		if (!$convert_parameters) {
-			return $expression;
-		}
-
-		foreach (array_reverse($convert_parameters) as $parameter) {
-			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'], false);
-			$parameter['match'] = CHistFunctionParser::quoteParam($parameter['match']);
-
-			$expression = substr_replace($expression, $parameter['match'], $parameter['pos'], $parameter['length']);
-		}
-
-		return $expression;
+		return $expression_parser->parse($expression) == CParser::PARSE_SUCCESS
+			? self::escapeBackslashes($expression_parser, $expression)
+			: $expression;
 	}
 
 	/**

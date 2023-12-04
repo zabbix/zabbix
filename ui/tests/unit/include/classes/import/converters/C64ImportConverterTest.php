@@ -106,18 +106,37 @@ class C64ImportConverterTest extends CImportConverterTest {
 	}
 
 	public function importConverterDataProviderExpressionHistoryFunction(): array {
+		$expression_simple = 'last(/host/key)';
+		$expression_macro_simple = '{?'.$expression_simple.'}';
+
 		$source_expression = 'find(/host/key,10m,"iregexp","\.+\\\"[a-z0-9]+")';
+		$source_expression_empty_host = 'find(//key,10m,"iregexp","\.+\\\"[a-z0-9]+")';
+		$source_expression_host_macro = 'find(/{HOST.HOST}/key,10m,"iregexp","\.+\\\"[a-z0-9]+")';
 		$source_expression_macro = '{?'.$source_expression.'}';
 		$source_expression_macro_function = '{'.$source_expression_macro.'.regsub("(.*)_([0-9]+)", \2)}';
+		$source_expression_macro_empty_host = '{?'.$source_expression_empty_host.'}';
+		$source_expression_macro_host_macro = '{?'.$source_expression_host_macro.'}';
+
 		$expected_expression = 'find(/host/key,10m,"iregexp","\\\.+\\\\\"[a-z0-9]+")';
+		$expected_expression_empty_host = 'find(//key,10m,"iregexp","\\\.+\\\\\"[a-z0-9]+")';
+		$expected_expression_host_macro = 'find(/{HOST.HOST}/key,10m,"iregexp","\\\.+\\\\\"[a-z0-9]+")';
 		$expected_expression_macro = '{?'.$expected_expression.'}';
 		$expected_expression_macro_function = '{'.$expected_expression_macro.'.regsub("(.*)_([0-9]+)", \2)}';
+		$expected_expression_macro_empty_host = '{?'.$expected_expression_empty_host.'}';
+		$expected_expression_macro_host_macro = '{?'.$expected_expression_host_macro.'}';
+
+		$source_text = 'prefix'.$expression_macro_simple.$source_expression_macro.
+					$source_expression_macro_function.$source_expression_macro_empty_host.
+					$source_expression_macro_host_macroo.'suffix';
+		$expected_text = 'prefix'.$expression_macro_simple.$expected_expression_macro.
+					$expected_expression_macro_function.$expected_expression_macro_empty_host.
+					$expected_expression_macro_host_macroo.'suffix';
 
 		$source_triggers = [
 			[
 				'expression' => $source_expression,
 				'recovery_expression' => $source_expression,
-				'event_name' => $source_expression_macro.' '.$source_expression_macro_function,
+				'event_name' => $source_text,
 				'dependencies' => [
 					[
 						'expression' => $source_expression,
@@ -130,7 +149,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 			[
 				'expression' => $expected_expression,
 				'recovery_expression' => $expected_expression,
-				'event_name' => $expected_expression_macro.' '.$expected_expression_macro_function,
+				'event_name' => $expected_text,
 				'dependencies' => [
 					[
 						'expression' => $expected_expression,
@@ -242,13 +261,13 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
 					[
-						'value' => $source_expression_macro.' '.$source_expression_macro_function
+						'value' => $source_text
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => $source_expression_macro.' '.$source_expression_macro_function,
-						'message' => $source_expression_macro.' '.$source_expression_macro_function
+						'subject' => $source_text,
+						'message' => $source_text
 					]
 				]
 			],
@@ -256,14 +275,14 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::WEBHOOK,
 				'parameters' => [
 					[
-						'name' => $source_expression_macro.' '.$source_expression_macro_function,
-						'value' => $source_expression_macro.' '.$source_expression_macro_function
+						'name' => $source_text,
+						'value' => $source_text
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => $source_expression_macro.' '.$source_expression_macro_function,
-						'message' => $source_expression_macro.' '.$source_expression_macro_function
+						'subject' => $source_text,
+						'message' => $source_text
 					]
 				]
 			]
@@ -273,13 +292,13 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
 					[
-						'value' => $expected_expression_macro.' '.$expected_expression_macro_function
+						'value' => $expected_text
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => $expected_expression_macro.' '.$expected_expression_macro_function,
-						'message' => $expected_expression_macro.' '.$expected_expression_macro_function
+						'subject' => $expected_text,
+						'message' => $expected_text
 					]
 				]
 			],
@@ -287,14 +306,14 @@ class C64ImportConverterTest extends CImportConverterTest {
 				'type' => CXmlConstantName::WEBHOOK,
 				'parameters' => [
 					[
-						'name' => $expected_expression_macro.' '.$expected_expression_macro_function,
-						'value' => $expected_expression_macro.' '.$expected_expression_macro_function
+						'name' => $expected_text,
+						'value' => $expected_text
 					]
 				],
 				'message_templates' => [
 					[
-						'subject' => $expected_expression_macro.' '.$expected_expression_macro_function,
-						'message' => $expected_expression_macro.' '.$expected_expression_macro_function
+						'subject' => $expected_text,
+						'message' => $expected_text
 					]
 				]
 			]
