@@ -1099,6 +1099,11 @@ class CHttpTestManager {
 		$ins_fields = [];
 		$upd_fields = [];
 		$del_fieldids = [];
+		$step_fields = [
+			ZBX_HTTPFIELD_HEADER => 'headers',
+			ZBX_HTTPFIELD_VARIABLE => 'variables',
+			ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields'
+		];
 
 		foreach ($httptests as $httptest) {
 			if (!array_key_exists('steps', $httptest)) {
@@ -1111,11 +1116,6 @@ class CHttpTestManager {
 				$db_step = ($db_httptest !== null && array_key_exists($step['httpstepid'], $db_httptest['steps']))
 					? $db_httptest['steps'][$step['httpstepid']]
 					: null;
-
-				$step_fields = [
-					ZBX_HTTPFIELD_HEADER => 'headers',
-					ZBX_HTTPFIELD_VARIABLE => 'variables',
-					ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields'];
 
 				foreach ($step_fields as $field_type => $step_field) {
 					if (array_key_exists($step_field, $step)) {
