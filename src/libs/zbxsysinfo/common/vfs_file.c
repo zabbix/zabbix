@@ -470,8 +470,8 @@ err:
 
 int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL, *line;
+	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str, buf[MAX_BUFFER_LEN],
+			*utf8, *tmp, *ptr = NULL, *line;
 	int		f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts = zbx_time();
@@ -605,8 +605,8 @@ err:
 
 int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*filename, *regexp, *tmp, encoding[32], *line;
-	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
+	char		*filename, *regexp, *tmp, encoding[32], *line, buf[MAX_BUFFER_LEN], *utf8, *start_line_str,
+			*end_line_str;
 	int		res, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts = zbx_time();

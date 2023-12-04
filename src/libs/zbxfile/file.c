@@ -357,9 +357,7 @@ read_buf:	/* refill buffer */
 		save->p_end = buf + (size_t)nbytes;	/* no data from this position */
 	}
 	else
-	{
 		save->p_start = save->p_next;		/* jump to next line */
-	}
 
 	while (NULL == (p_nl = zbx_find_buf_newline(save->p_start, &save->p_next, save->p_end, save->cr, save->lf,
 			save->szbyte)))
