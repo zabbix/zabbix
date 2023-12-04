@@ -397,7 +397,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$original_fields = $form->getFields()->asValues();
 
 		// Get original passive proxy interface fields.
-		if (strpos($data['proxy'], 'Passive')) {
+		if (str_contains($data['proxy'], 'Passive')) {
 			$original_fields = $this->getInterfaceValues($form, $original_fields);
 		}
 
@@ -414,7 +414,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$cloned_fields = $form->getFields()->asValues();
 
 		// Get cloned passive proxy interface fields.
-		if (strpos($data['proxy'], 'passive')) {
+		if (str_contains($data['proxy'], 'Passive')) {
 			$cloned_fields = $this->getInterfaceValues($form, $cloned_fields);
 		}
 
