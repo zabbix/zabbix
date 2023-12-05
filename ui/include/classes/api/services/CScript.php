@@ -1098,8 +1098,8 @@ class CScript extends CApiService {
 	 */
 	public function getScriptsByHosts(array $options): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
-			'hostid' =>			['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
-			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'scriptid' =>		['type' => API_ID],
 			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
 		]];
 
@@ -1226,8 +1226,8 @@ class CScript extends CApiService {
 	 */
 	public function getScriptsByEvents(array $options): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['eventid']], 'fields' => [
-			'eventid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
-			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
+			'eventid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'scriptid' =>		['type' => API_ID],
 			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
 		]];
 
