@@ -69,6 +69,86 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#define ZBX_PROXY_SYNC_NONE	0
+#define ZBX_PROXY_SYNC_FULL	1
+#define ZBX_PROXY_SYNC_PARTIAL	2
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy configuration sync data                                 *
+ *                                                                            *
+ * Parameter: pgs     - [IN] proxy group service                              *
+ *            message - [IN] IPC message with host relocation data            *
+ *                                                                            *
+ ******************************************************************************/
+static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+{
+	unsigned char	*ptr = message->data, *data, mode;
+	zbx_uint64_t	proxyid, hostmap_revision;
+	int		now;
+	zbx_uint32_t	data_len;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ptr += zbx_deserialize_value(ptr, &proxyid);
+	(void)zbx_deserialize_value(ptr, &hostmap_revision);
+
+	now = time(NULL);
+
+	pg_cache_lock(pgs->cache);
+
+	zbx_pg_proxy_t	*proxy;
+
+	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t);
+
+	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)))
+	{
+		if (SEC_PER_DAY <= now - proxy->sync_time)
+		{
+			zbx_vector_pg_host_clear(&proxy->deleted_group_hosts);
+			mode = ZBX_PROXY_SYNC_FULL;
+		}
+		else
+		{
+			for (int i = 0; i < proxy->deleted_group_hosts.values_num;)
+			{
+				if (proxy->deleted_group_hosts.values[i].revision <= hostmap_revision)
+					zbx_vector_pg_host_remove_noorder(&proxy->deleted_group_hosts, i);
+				else
+					i++;
+			}
+
+			data_len += sizeof(int) + proxy->deleted_group_hosts.values_num * sizeof(zbx_uint64_t);
+			mode = ZBX_PROXY_SYNC_PARTIAL;
+		}
+
+		if (proxy->remote_hostmap_revision != hostmap_revision)
+			proxy->sync_time = now;
+	}
+	else
+		mode = ZBX_PROXY_SYNC_NONE;
+
+	ptr = data =(unsigned char *)zbx_malloc(NULL, data_len);
+	ptr += zbx_serialize_value(ptr, mode);
+	ptr += zbx_serialize_value(ptr, pgs->cache->hpmap_revision);
+
+	if (ZBX_PROXY_SYNC_PARTIAL == mode)
+	{
+		ptr += zbx_serialize_value(ptr, proxy->deleted_group_hosts.values_num);
+
+		for (int i = 0; i < proxy->deleted_group_hosts.values_num; i++)
+			ptr += zbx_serialize_value(ptr, proxy->deleted_group_hosts.values[i]);
+	}
+
+	pg_cache_unlock(pgs->cache);
+
+	zbx_ipc_client_send(client, ZBX_IPC_PGM_PROXY_SYNC_DATA, data, data_len);
+	zbx_free(data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: proxy group service thread entry                                  *
@@ -93,6 +173,9 @@ static void	*pg_service_entry(void *data)
 			{
 				case ZBX_IPC_PGM_HOST_PGROUP_UPDATE:
 					pg_update_host_pgroup(pgs, message);
+					break;
+				case ZBX_IPC_PGM_GET_PROXY_SYNC_DATA:
+					pg_get_proxy_sync_data(pgs, client, message);
 					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;

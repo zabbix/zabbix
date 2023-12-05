@@ -510,9 +510,9 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 			/* Full hostmap sync will be forced if proxy has not been connected yet   */
 			/* or its last connection was more than 24h ago. Until then track deleted */
 			/* host-proxy links so they can be synced to proxies.                     */
-			if (0 != proxy->lastaccess)
+			if (0 != proxy->sync_time)
 			{
-				if (SEC_PER_DAY > now - proxy->lastaccess)
+				if (SEC_PER_DAY > now - proxy->sync_time)
 					zbx_vector_pg_host_append_ptr(&proxy->deleted_group_hosts, host);
 				else
 					zbx_vector_pg_host_clear(&proxy->deleted_group_hosts);

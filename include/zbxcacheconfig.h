@@ -1381,6 +1381,8 @@ typedef struct
 	int				status;
 	int				lastaccess;
 	int				firstaccess;
+	int				sync_time;
+	zbx_uint64_t			remote_hostmap_revision;
 	struct zbx_pg_group		*group;
 	zbx_vector_pg_host_ptr_t	hosts;
 	zbx_vector_pg_host_t		deleted_group_hosts;
