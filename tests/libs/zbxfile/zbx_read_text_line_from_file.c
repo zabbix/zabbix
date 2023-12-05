@@ -40,13 +40,15 @@ void	zbx_mock_test_entry(void **state)
 	encoding = zbx_mock_get_parameter_string("in.encoding");
 	bufsz = zbx_mock_get_parameter_uint64("in.bufsz");
 
-	line_count = zbx_mock_get_parameter_uint64("out.line_count");
+	line_count = (ssize_t)zbx_mock_get_parameter_uint64("out.line_count");
 	result = zbx_mock_get_parameter_string("out.result");
 
 	f = zbx_open("", O_RDWR); /* in.fragments */
 	zbx_mock_assert_int_ne("Cannot open file:", -1, f);
 
-	char	buf[bufsz+1];
+	char	*buf;
+
+	buf = malloc(bufsz + 1);
 
 	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, bufsz, encoding)))
 	{
@@ -55,8 +57,10 @@ void	zbx_mock_test_entry(void **state)
 		lines++;
 	}
 
-	zbx_mock_assert_int_eq("Read lines", line_count, lines);
-	zbx_mock_assert_int_eq("Read result", atoi(result), nbytes);
+	zbx_free(buf);
+
+	zbx_mock_assert_int_eq("Read lines", (int)line_count, lines);
+	zbx_mock_assert_int_eq("Read result", atoi(result), (int)nbytes);
 
 	close(f);
 }

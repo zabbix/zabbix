@@ -202,8 +202,6 @@ int	__wrap_connect(int socket, void *addr, socklen_t address_len)
 	return 0;
 }
 
-int	__wrap_poll(struct pollfd *pds, int nfds, int timeout);
-
 int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 {
 	ZBX_UNUSED(timeout);

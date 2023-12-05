@@ -18,7 +18,6 @@
 **/
 
 #include "zbxfile.h"
-#include "zbxstr.h"
 
 void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte)
 {
