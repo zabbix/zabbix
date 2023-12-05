@@ -1355,6 +1355,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+const char	*get_bom_econding(char *in, size_t in_size);
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
@@ -1844,5 +1845,4 @@ typedef enum
 zbx_err_codes_t;
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
-#define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #endif

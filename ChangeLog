@@ -1,23 +1,38 @@
+Changes for 6.0.25rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.24
+
+6.0.24rc1 was released as 6.0.24 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.24rc1
 
 New features:
 ...G.....T [ZBXNEXT-8705] implemented new tablespace item to retrieve percentage about current tablespace usage from max for both Oracle templates (knaglis)
-...G...... [ZBXNEXT-8708] add version metric to oracle plugin in Zabbix agent 2 (rzvejs)
+...G...... [ZBXNEXT-8708] added version metric to Oracle plugin in Zabbix agent 2 (rzvejs)
 .......PS. [ZBXNEXT-8729] updated max supported TimescaleDB version to 2.12 (mprihodko)
 .........T [ZBXNEXT-8522] added HPE iLO by HTTP template (drasikhov)
 .........T [ZBXNEXT-7486] added openshift-state-metrics in Kubernetes cluster state by HTTP (egordymov)
 
 Bug fixes:
-.......PS. [ZBX-23621] fixed snmp discovery looping forever with empty trend response (wiper)
+A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item formula when item key includes 'last' function and a fourth parameter (Ivo, mprihodko)
+.......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
+...G...PS. [ZBX-23490] improved HTTP agent, web scenarios, web checks and JavaScript to convert to UTF-8 from charset specified in HTTP header or HTTP meta tag (vso)
+.......PS. [ZBX-23621] fixed SNMP discovery looping forever with empty trend response (wiper)
 ...G...... [ZBX-23644] fixed Zabbix agent compilation on AIX (Andris)
 ..F....... [ZBX-23525] fixed template tab name in template configuration form (agriscenko)
 .D........ [ZBX-23620] reordered sub-templates in READMEs of Acronis, Control-M and Openstack templates (knaglis)
-.........T [ZBX-23381] fixed unit for metric FreeStorageSpace in JavaScript AWS RDS instance by HTTP template (egordymov)
-..F....... [ZBX-23269] fixed sizes of loading modals (apoga)
+.........T [ZBX-23381] fixed unit for FreeStorageSpace metric in JavaScript AWS RDS instance by HTTP template (egordymov)
+..F....... [ZBX-23269] fixed sizes of loading modal windows (apoga)
 ..F....... [ZBX-22400] fixed Web scenarios configuration form to display parent web scenarios on page refresh (ddauksa)
-..F....... [ZBX-23290] fixed gap in the filter by tags on Monitoring > Latest data page (agriscenko)
+..F....... [ZBX-23290] fixed gap when filtering by tags in Latest data (agriscenko)
 ..F....... [ZBX-23430] fixed selected filter tab in high contrast themes being indistinguishable from others when collapsed (agriscenko)
-.........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
+.........T [ZBX-23639] changed value type for 'Pool Percent Used' item prototype in Ceph by Zabbix agent 2 template (akotsegubov)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 ..F....... [ZBX-23521] fixed password field label not changing to key passphrase and back for SSH agent item when changing authentication method (agriscenko)
 ..F....... [ZBX-23431] fixed non-working "Network timeout for item test" setting (agriscenko)
@@ -2813,11 +2828,22 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.40rc1
+Changes for 5.0.41rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.40
+
+5.0.40rc1 was released as 5.0.40 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.40rc1
+
+Bug fixes:
+.......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
 .........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 
