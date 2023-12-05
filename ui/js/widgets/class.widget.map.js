@@ -123,6 +123,13 @@ class CWidgetMap extends CWidget {
 
 	_promiseUpdate() {
 		if (!this._has_contents || this._map_svg === null) {
+			if (this._sysmapid === null
+					&& this._source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER
+					&& Object.keys(this._filter_widget?._navtree || {}).length > 0) {
+				this._filter_itemid = this._filter_widget._navtree[this._filter_widget._navtree_item_selected]?.sysmapid;
+				this._sysmapid = this._filter_itemid;
+			}
+
 			if (this._sysmapid !== null
 					|| this._source_type == WIDGET_SYSMAP_SOURCETYPE_MAP
 					|| this._filter_widget === null) {
