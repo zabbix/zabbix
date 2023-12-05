@@ -443,3 +443,31 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy group hostmap revision                                  *
+ *                                                                            *
+ * Return value: SUCCEED - proxy group hostmap revision was retrieved         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision)
+{
+	zbx_dc_proxy_group_t	*pg;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups, &proxy_groupid)))
+	{
+		*hostmap_revision = pg->hostmap_revision;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}

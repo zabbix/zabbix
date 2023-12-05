@@ -1027,8 +1027,9 @@ out:
 }
 
 static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,
-		const zbx_dc_revision_t *dc_revision, struct zbx_json *j, zbx_proxyconfig_status_t *status,
-		const zbx_config_vault_t *config_vault, const char *config_source_ip, char **error)
+		zbx_uint64_t proxy_hostmap_revision, const zbx_dc_revision_t *dc_revision, struct zbx_json *j,
+		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault, const char *config_source_ip,
+		char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -1050,7 +1051,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 				macro_hostids;
 	zbx_vector_ptr_t	keys_paths;
 	int			global_macros = FAIL, ret = FAIL, i;
-	zbx_uint64_t		flags = 0, hostmap_revision = 0;
+	zbx_uint64_t		flags = 0;
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&updated_hostids);
@@ -1070,7 +1071,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 		zbx_vector_uint64_reserve(&del_macro_hostids, 100);
 
 		zbx_dc_get_proxy_config_updates(proxy->proxyid, proxy_config_revision, &hostids, &updated_hostids,
-				&removed_hostids, &httptestids, &hostmap_revision);
+				&removed_hostids, &httptestids);
 
 		zbx_dc_get_macro_updates(&hostids, &updated_hostids, proxy_config_revision, &macro_hostids,
 				&global_macros, &del_macro_hostids);
@@ -1104,8 +1105,13 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 
 		if (0 != proxy->proxy_groupid)
 		{
-			if (0 == hostmap_revision || proxy_config_revision < hostmap_revision)
+			zbx_uint64_t	hostmap_revision;
+
+			if (FAIL == zbx_dc_get_proxy_group_hostmap_revision(proxy->proxy_groupid, &hostmap_revision) ||
+					proxy_hostmap_revision < hostmap_revision)
+			{
 				flags |= ZBX_PROXYCONFIG_SYNC_PROXY_GROUPS;
+			}
 		}
 	}
 	else
@@ -1309,8 +1315,8 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 
 	if (proxy_config_revision != dc_revision.config)
 	{
-		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision, j, status,
-				config_vault, config_source_ip, error)))
+		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, proxy_hostmap_revision,
+				&dc_revision, j, status, config_vault, config_source_ip, error)))
 		{
 			goto out;
 		}

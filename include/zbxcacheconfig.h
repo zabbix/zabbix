@@ -1237,7 +1237,7 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision);
 
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
-		zbx_vector_uint64_t *httptestids, zbx_uint64_t *hostmap_revision);
+		zbx_vector_uint64_t *httptestids);
 
 void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *updated_hostids,
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
@@ -1420,5 +1420,7 @@ void	zbx_dc_update_group_hostmap_revision(zbx_vector_uint64_t *groupids, zbx_uin
 int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid, zbx_comms_redirect_t *redirect);
 int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *recv_host,
 		zbx_comms_redirect_t *redirect);
+
+int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision);
 
 #endif

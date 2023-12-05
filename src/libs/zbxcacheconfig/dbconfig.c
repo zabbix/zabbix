@@ -16295,12 +16295,11 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision)
  *             removed_hostids - [OUT] the hosts removed since specified      *
  *                                     configuration revision, sorted         *
  *             httptestids     - [OUT] the web scenarios monitored by proxy   *
- *             hostmap_revision - [OUT] proxy group revision                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
-		zbx_vector_uint64_t *httptestids, zbx_uint64_t *hostmap_revision)
+		zbx_vector_uint64_t *httptestids)
 {
 	ZBX_DC_PROXY	*proxy;
 
@@ -16346,17 +16345,6 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision
 				}
 				else
 					i++;
-			}
-		}
-
-		if (0 != proxy->proxy_groupid)
-		{
-			zbx_dc_proxy_group_t	*pg;
-
-			if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups,
-					&proxy->proxy_groupid)))
-			{
-				*hostmap_revision = pg->hostmap_revision;
 			}
 		}
 	}
