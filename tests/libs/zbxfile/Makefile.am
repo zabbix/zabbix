@@ -1,6 +1,5 @@
 noinst_PROGRAMS = \
-	zbx_buf_readln \
-	zbx_read_text_line_from_file
+	zbx_buf_readln
 
 COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
@@ -37,23 +36,3 @@ zbx_buf_readln_LDADD += @PROXY_LIBS@
 zbx_buf_readln_LDFLAGS += @PROXY_LDFLAGS@
 endif
 endif
-
-zbx_read_text_line_from_file_SOURCES = \
-	zbx_read_text_line_from_file.c
-
-zbx_read_text_line_from_file_CFLAGS = \
-	-I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
-
-zbx_read_text_line_from_file_LDADD = $(COMMON_LIBS)
-zbx_read_text_line_from_file_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
-
-if SERVER
-zbx_read_text_line_from_file_LDADD += @SERVER_LIBS@
-zbx_read_text_line_from_file_LDFLAGS += @SERVER_LDFLAGS@
-else
-if PROXY
-zbx_read_text_line_from_file_LDADD += @PROXY_LIBS@
-zbx_read_text_line_from_file_LDFLAGS += @PROXY_LDFLAGS@
-endif
-endif
-

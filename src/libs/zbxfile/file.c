@@ -83,6 +83,8 @@ void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **l
  * Comments: Reading stops after a newline. If the newline is read, it is     *
  *           stored into the buffer.                                          *
  *                                                                            *
+ * Note: This function is left for testing purposes.                          *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding)
 {
