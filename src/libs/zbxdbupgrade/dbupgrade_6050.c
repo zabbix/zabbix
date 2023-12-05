@@ -23,6 +23,8 @@
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxregexp.h"
+#include "zbxeval.h"
+#include "zbx_host_constants.h"
 #include "zbxhash.h"
 #include "zbxcrypto.h"
 
@@ -91,6 +93,7 @@ static int	DBpatch_6050007(void)
 static int	DBpatch_6050008(void)
 {
 	const zbx_db_field_t	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int	ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -98,9 +101,17 @@ static int	DBpatch_6050008(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("history", "value", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("history", &field))
+		return SUCCEED;
+#endif
+	if (SUCCEED != (ret = DBmodify_field_type("history", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of history table, please check upgrade"
+				" notes");
+	}
 
-	return DBmodify_field_type("history", &field, &field);
+	return ret;
 }
 
 static int	DBpatch_6050009(void)
@@ -113,14 +124,17 @@ static int	DBpatch_6050009(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_min", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
-
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
+		return SUCCEED;
+#endif
 	return DBmodify_field_type("trends", &field, &field);
 }
 
 static int	DBpatch_6050010(void)
 {
 	const zbx_db_field_t	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int			ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -128,24 +142,43 @@ static int	DBpatch_6050010(void)
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_avg", ZBX_TYPE_FLOAT))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
+		return SUCCEED;
+#endif
 
-	return DBmodify_field_type("trends", &field, &field);
+	if (SUCCEED != (ret = DBmodify_field_type("trends", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of trends table, please check upgrade"
+				" notes");
+	}
+
+	return ret;
 }
 
 static int	DBpatch_6050011(void)
 {
 	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+	int			ret;
 
 #if defined(HAVE_ORACLE)
 	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
+		return SUCCEED;
+#elif defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
 #endif /* defined(HAVE_ORACLE) */
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBmodify_field_type("trends", &field, &field);
+	if (SUCCEED != (ret = DBmodify_field_type("trends", &field, &field)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade of trends table, please check upgrade"
+				" notes");
+	}
+
+	return ret;
 }
 
 static int	DBpatch_6050012(void)
@@ -193,29 +226,28 @@ static int	DBpatch_6050014(void)
 
 static int	DBpatch_6050015(void)
 {
-	const zbx_db_field_t	field = {"http_user", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"http_user", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("httptest", &field, NULL);
 }
 
 static int	DBpatch_6050016(void)
 {
-	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("httptest", &field, NULL);
 }
 
 static int	DBpatch_6050017(void)
 {
-	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, NULL);
 }
 
 static int	DBpatch_6050018(void)
 {
-	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, NULL);
 }
@@ -1042,24 +1074,21 @@ static int	DBpatch_6050100(void)
 
 static int	DBpatch_6050101(void)
 {
-	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050102(void)
 {
-	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050103(void)
 {
-	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -1067,47 +1096,42 @@ static int	DBpatch_6050103(void)
 static int	DBpatch_6050104(void)
 {
 	const zbx_db_field_t	field = {"timeout_external_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+			ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050105(void)
 {
-	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050106(void)
 {
-	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050107(void)
 {
-	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050108(void)
 {
-	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050109(void)
 {
-	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
-			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -1149,7 +1173,7 @@ static int	DBpatch_6050111(void)
 
 static int	DBpatch_6050112(void)
 {
-	const zbx_db_field_t	field = {"timeout", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
 }
@@ -1667,6 +1691,277 @@ static int	DBpatch_6050139(void)
 
 static int	DBpatch_6050140(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050141(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050142(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050143(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050144(void)
+{
+	const zbx_db_field_t	field = {"hk_audit", "31d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_6050145(void)
+{
+	const zbx_db_field_t	field = {"hk_history", "31d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_6050146(void)
+{
+	const zbx_db_field_t	old_field = {"query_fields", "", NULL, NULL, 2048, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"query_fields", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_6050147(void)
+{
+	const zbx_db_field_t	field = {"item_value_type", "31", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("connector", &field);
+}
+
+static int	DBpatch_6050148(void)
+{
+	const zbx_db_field_t	field = {"attempt_interval", "5s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("connector", &field);
+}
+
+static int	DBpatch_6050149(void)
+{
+/* -------------------------------------------------------*/
+/* Formula:                                               */
+/* aggregate_function(last_foreach(filter))               */
+/* aggregate_function(last_foreach(filter,time))          */
+/*--------------------------------------------------------*/
+/* Relative positioning of tokens on a stack              */
+/*----------------------------+---------------------------*/
+/* Time is present in formula | Time is absent in formula */
+/*----------------------------+---------------------------*/
+/* [i-2] filter               |                           */
+/* [i-1] time                 | [i-1] filter              */
+/*   [i] last_foreach         |   [i] last_foreach        */
+/* [i+2] aggregate function   | [i+2]                     */
+/*----------------------------+---------------------------*/
+
+/* Offset in stack of tokens is relative to last_foreach() history function token, */
+/* assuming that time is present in formula. */
+#define OFFSET_TIME	(-1)
+#define TOKEN_LEN(loc)	(loc->r - loc->l + 1)
+#define LAST_FOREACH	"last_foreach"
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	int			ret = SUCCEED;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql = NULL, *params = NULL;
+	zbx_eval_context_t	ctx;
+	zbx_vector_uint32_t	del_idx;
+
+	zbx_eval_init(&ctx);
+	zbx_vector_uint32_create(&del_idx);
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* ITEM_TYPE_CALCULATED = 15 */
+	result = zbx_db_select("select itemid,params from items where type=15 and params like '%%%s%%'", LAST_FOREACH);
+
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	{
+		int	i;
+		char	*esc, *error = NULL;
+
+		zbx_eval_clear(&ctx);
+
+		if (FAIL == zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: error parsing calculated item formula '%s' for itemid %s",
+					__func__, row[1], row[0]);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_vector_uint32_clear(&del_idx);
+
+		for (i = 0; i < ctx.stack.values_num; i++)
+		{
+			zbx_strloc_t	*loc;
+
+			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i].type)
+				continue;
+
+			loc = &ctx.stack.values[i].loc;
+
+			if (0 != strncmp(LAST_FOREACH, &ctx.expression[loc->l], TOKEN_LEN(loc)))
+				continue;
+
+			/* if time is absent in formula */
+			if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			if (ZBX_EVAL_TOKEN_ARG_NULL == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			zbx_vector_uint32_append(&del_idx, (zbx_uint32_t)(i + OFFSET_TIME));
+		}
+
+		if (0 == del_idx.values_num)
+			continue;
+
+		params = zbx_strdup(params, ctx.expression);
+
+		for (i = del_idx.values_num - 1; i >= 0; i--)
+		{
+			size_t		l, r;
+			zbx_strloc_t	*loc = &ctx.stack.values[(int)del_idx.values[i]].loc;
+
+			for (l = loc->l - 1; ',' != params[l]; l--) {}
+			for (r = loc->r + 1; ')' != params[r]; r++) {}
+
+			memmove(&params[l], &params[r], strlen(params) - r + 1);
+		}
+
+		esc = zbx_db_dyn_escape_string(params);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items set params='%s' where itemid=%s;\n", esc, row[0]);
+		zbx_free(esc);
+
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_eval_clear(&ctx);
+	zbx_vector_uint32_destroy(&del_idx);
+
+	zbx_free(sql);
+	zbx_free(params);
+
+	return ret;
+#undef OFFSET_TIME
+#undef TOKEN_LEN
+#undef LAST_FOREACH
+}
+
+static int	DBpatch_6050150(void)
+{
+	const zbx_db_table_t	table =
+			{"item_rtname", "itemid", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name_resolved", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"name_resolved_upper", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050151(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_rtname", 1, &field);
+}
+
+static int	DBpatch_6050152(void)
+{
+	if (ZBX_DB_OK <= zbx_db_execute("insert into item_rtname (itemid,name_resolved,name_resolved_upper)"
+			" select i.itemid,i.name,i.name_upper from"
+			" items i,hosts h"
+			" where i.hostid=h.hostid and (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_6050153(void)
+{
+	return DBdrop_index("items", "items_9");
+}
+
+static int	DBpatch_6050154(void)
+{
+	return DBdrop_field("items", "name_upper");
+}
+
+static int	DBpatch_6050155(void)
+{
+	return zbx_dbupgrade_drop_trigger_on_insert("items", "name_upper");
+}
+
+static int	DBpatch_6050156(void)
+{
+	return zbx_dbupgrade_drop_trigger_on_update("items", "name_upper");
+}
+
+static int	DBpatch_6050157(void)
+{
+	return zbx_dbupgrade_drop_trigger_function_on_insert("items", "name_upper", "upper");
+}
+
+static int	DBpatch_6050158(void)
+{
+	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
+}
+
+static int	DBpatch_6050159(void)
+{
 	const zbx_db_table_t table =
 			{"ugset", "ugsetid", 0,
 				{
@@ -1680,12 +1975,12 @@ static int	DBpatch_6050140(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050141(void)
+static int	DBpatch_6050160(void)
 {
 	return DBcreate_index("ugset", "ugset_1", "hash", 0);
 }
 
-static int	DBpatch_6050142(void)
+static int	DBpatch_6050161(void)
 {
 	const zbx_db_table_t table =
 			{"ugset_group", "ugsetid,usrgrpid", 0,
@@ -1700,12 +1995,12 @@ static int	DBpatch_6050142(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050143(void)
+static int	DBpatch_6050162(void)
 {
 	return DBcreate_index("ugset_group", "ugset_group_1", "usrgrpid", 0);
 }
 
-static int	DBpatch_6050144(void)
+static int	DBpatch_6050163(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1713,14 +2008,14 @@ static int	DBpatch_6050144(void)
 	return DBadd_foreign_key("ugset_group", 1, &field);
 }
 
-static int	DBpatch_6050145(void)
+static int	DBpatch_6050164(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("ugset_group", 2, &field);
 }
 
-static int	DBpatch_6050146(void)
+static int	DBpatch_6050165(void)
 {
 	const zbx_db_table_t table =
 			{"user_ugset", "userid", 0,
@@ -1735,12 +2030,12 @@ static int	DBpatch_6050146(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050147(void)
+static int	DBpatch_6050166(void)
 {
 	return DBcreate_index("user_ugset", "user_ugset_1", "ugsetid", 0);
 }
 
-static int	DBpatch_6050148(void)
+static int	DBpatch_6050167(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1748,14 +2043,14 @@ static int	DBpatch_6050148(void)
 	return DBadd_foreign_key("user_ugset", 1, &field);
 }
 
-static int	DBpatch_6050149(void)
+static int	DBpatch_6050168(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("user_ugset", 2, &field);
 }
 
-static int	DBpatch_6050150(void)
+static int	DBpatch_6050169(void)
 {
 	const zbx_db_table_t table =
 			{"hgset", "hgsetid", 0,
@@ -1770,12 +2065,12 @@ static int	DBpatch_6050150(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050151(void)
+static int	DBpatch_6050170(void)
 {
 	return DBcreate_index("hgset", "hgset_1", "hash", 0);
 }
 
-static int	DBpatch_6050152(void)
+static int	DBpatch_6050171(void)
 {
 	const zbx_db_table_t table =
 			{"hgset_group", "hgsetid,groupid", 0,
@@ -1790,12 +2085,12 @@ static int	DBpatch_6050152(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050153(void)
+static int	DBpatch_6050172(void)
 {
 	return DBcreate_index("hgset_group", "hgset_group_1", "groupid", 0);
 }
 
-static int	DBpatch_6050154(void)
+static int	DBpatch_6050173(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1803,14 +2098,14 @@ static int	DBpatch_6050154(void)
 	return DBadd_foreign_key("hgset_group", 1, &field);
 }
 
-static int	DBpatch_6050155(void)
+static int	DBpatch_6050174(void)
 {
 	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("hgset_group", 2, &field);
 }
 
-static int	DBpatch_6050156(void)
+static int	DBpatch_6050175(void)
 {
 	const zbx_db_table_t table =
 			{"host_hgset", "hostid", 0,
@@ -1825,12 +2120,12 @@ static int	DBpatch_6050156(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050157(void)
+static int	DBpatch_6050176(void)
 {
 	return DBcreate_index("host_hgset", "host_hgset_1", "hgsetid", 0);
 }
 
-static int	DBpatch_6050158(void)
+static int	DBpatch_6050177(void)
 {
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1838,14 +2133,14 @@ static int	DBpatch_6050158(void)
 	return DBadd_foreign_key("host_hgset", 1, &field);
 }
 
-static int	DBpatch_6050159(void)
+static int	DBpatch_6050178(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_hgset", 2, &field);
 }
 
-static int	DBpatch_6050160(void)
+static int	DBpatch_6050179(void)
 {
 	const zbx_db_table_t table =
 			{"permission", "ugsetid,hgsetid", 0,
@@ -1861,12 +2156,12 @@ static int	DBpatch_6050160(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050161(void)
+static int	DBpatch_6050180(void)
 {
 	return DBcreate_index("permission", "permission_1", "hgsetid", 0);
 }
 
-static int	DBpatch_6050162(void)
+static int	DBpatch_6050181(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1874,7 +2169,7 @@ static int	DBpatch_6050162(void)
 	return DBadd_foreign_key("permission", 1, &field);
 }
 
-static int	DBpatch_6050163(void)
+static int	DBpatch_6050182(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2029,7 +2324,7 @@ static void	dbupgrade_groupsets_destroy(zbx_hashset_t *group_sets)
 	zbx_hashset_destroy(group_sets);
 }
 
-static int	DBpatch_6050164(void)
+static int	DBpatch_6050183(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -2060,7 +2355,7 @@ static int	DBpatch_6050164(void)
 	return ret;
 }
 
-static int	DBpatch_6050165(void)
+static int	DBpatch_6050184(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -2091,7 +2386,7 @@ static int	DBpatch_6050165(void)
 	return ret;
 }
 
-static int	DBpatch_6050166(void)
+static int	DBpatch_6050185(void)
 {
 	int		ret;
 	zbx_db_result_t	result;
@@ -2306,5 +2601,24 @@ DBPATCH_ADD(6050163, 0, 1)
 DBPATCH_ADD(6050164, 0, 1)
 DBPATCH_ADD(6050165, 0, 1)
 DBPATCH_ADD(6050166, 0, 1)
+DBPATCH_ADD(6050167, 0, 1)
+DBPATCH_ADD(6050168, 0, 1)
+DBPATCH_ADD(6050169, 0, 1)
+DBPATCH_ADD(6050170, 0, 1)
+DBPATCH_ADD(6050171, 0, 1)
+DBPATCH_ADD(6050172, 0, 1)
+DBPATCH_ADD(6050173, 0, 1)
+DBPATCH_ADD(6050174, 0, 1)
+DBPATCH_ADD(6050175, 0, 1)
+DBPATCH_ADD(6050176, 0, 1)
+DBPATCH_ADD(6050177, 0, 1)
+DBPATCH_ADD(6050178, 0, 1)
+DBPATCH_ADD(6050179, 0, 1)
+DBPATCH_ADD(6050180, 0, 1)
+DBPATCH_ADD(6050181, 0, 1)
+DBPATCH_ADD(6050182, 0, 1)
+DBPATCH_ADD(6050183, 0, 1)
+DBPATCH_ADD(6050184, 0, 1)
+DBPATCH_ADD(6050185, 0, 1)
 
 DBPATCH_END()

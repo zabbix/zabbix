@@ -47,7 +47,8 @@ class CWidgetFieldMultiSelectItemView extends CWidgetFieldMultiSelectView {
 				'hide_host_filter' => true
 			]
 			: [
-				'real_hosts' => true
+				'real_hosts' => true,
+				'resolve_macros' => true
 			]
 		);
 	}

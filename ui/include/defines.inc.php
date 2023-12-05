@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha7');
+define('ZABBIX_VERSION',		'7.0.0alpha9');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050166);
+define('ZABBIX_DB_VERSION',		6050185);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -583,6 +583,12 @@ define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
 define('ITEM_VALUE_TYPE_BINARY',	5);
 
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT',	0x01);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR',		0x02);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG',		0x04);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64',	0x08);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT',	0x10);
+
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
@@ -917,6 +923,7 @@ define('DASHBOARD_MAX_COLUMNS',		24);
 define('DASHBOARD_MAX_ROWS',		64);
 define('DASHBOARD_WIDGET_MIN_ROWS',	2);
 define('DASHBOARD_WIDGET_MAX_ROWS',	32);
+define('DASHBOARD_ROW_HEIGHT',		70);
 define('DASHBOARD_FILTER_SHOW_ALL',	0);
 define('DASHBOARD_FILTER_SHOW_MY',	1);
 define('DASHBOARD_DISPLAY_PERIODS',	[10, 30, 60, 120, 600, 1800, 3600]);
@@ -1410,17 +1417,11 @@ define('GEOMAP_LNG_MIN', -180);
 define('GEOMAP_LNG_MAX', 180);
 
 // Regular expressions.
-define('ZBX_PREG_PRINT', '^\x00-\x1F');
-define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
-define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
 define('ZBX_PREG_INT', '(?<int>-?\d+)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
-define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-define('ZBX_PREG_EXPRESSION_LLD_MACROS', '(\{\#'.ZBX_PREG_MACRO_NAME_LLD.'\})');
 
 define('TRIGGER_QUERY_PLACEHOLDER', '$'); // !!! Don't forget sync code with C !!!
 
@@ -1553,6 +1554,7 @@ define('API_PREPROC_PARAMS',		66);
 define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
 define('API_HOST_ADDRESS',			69);
+define('API_ESCAPED_STRING_UTF8',	70);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -2007,6 +2009,7 @@ define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
+define('ZBX_STYLE_LIST_TABLE_FIXED', 'fixed');
 define('ZBX_STYLE_LIST_TABLE_ACTIONS', 'list-table-actions');
 define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
 define('ZBX_STYLE_LIST_TABLE_STICKY_HEADER', 'sticky-header');
@@ -2107,6 +2110,7 @@ define('ZBX_STYLE_SYSMAP', 'sysmap');
 define('ZBX_STYLE_SYSMAP_CAPTION', 'sysmap-caption');
 define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
+define('ZBX_STYLE_TABLE_SUBFORMS', 'table-subforms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
 define('ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN', 'table-forms-second-column');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
@@ -2118,6 +2122,7 @@ define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
+define('ZBX_STYLE_TEXT_VERTICAL', 'text-vertical');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');

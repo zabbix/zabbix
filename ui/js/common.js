@@ -449,13 +449,15 @@ function PopUp(action, parameters, {
  * @returns {Overlay}
  */
 function acknowledgePopUp(parameters, trigger_element) {
-	var overlay = PopUp('popup.acknowledge.edit', parameters, {trigger_element}),
-		backurl = location.href;
+	const overlay = PopUp('popup.acknowledge.edit', parameters,
+		{dialogue_class: 'modal-popup-generic', trigger_element}
+	);
+	const backurl = location.href;
 
 	overlay.trigger_parents = $(trigger_element).parents();
 
 	overlay.xhr.then(function() {
-		var url = new Curl('zabbix.php');
+		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup');
 		url.setArgument('popup_action', 'acknowledge.edit');
 		url.setArgument('eventids', parameters.eventids);
@@ -647,7 +649,7 @@ function addValues(frame, values) {
 			jQuery(frm_storage).val(values[key]).change();
 		}
 		else {
-			jQuery(frm_storage).html(values[key]);
+			jQuery(frm_storage).text(values[key]);
 		}
 	}
 }
@@ -1042,7 +1044,7 @@ function openMassupdatePopup(action, parameters = {}, {
 	}
 
 	switch (action) {
-		case 'popup.massupdate.item':
+		case 'item.massupdate':
 			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 0;
 			break;
@@ -1051,7 +1053,7 @@ function openMassupdatePopup(action, parameters = {}, {
 			parameters.context = form.querySelector('#form_context').value;
 			break;
 
-		case 'popup.massupdate.itemprototype':
+		case 'item.prototype.massupdate':
 		case 'trigger.prototype.massupdate':
 			parameters.parent_discoveryid = form.querySelector('#form_parent_discoveryid').value;
 			parameters.context = form.querySelector('#form_context').value;

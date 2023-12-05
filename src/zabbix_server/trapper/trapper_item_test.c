@@ -24,7 +24,7 @@
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
 #ifdef HAVE_OPENIPMI
-#include "../ipmi/ipmi.h"
+#include "zbxipmi.h"
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
@@ -65,7 +65,7 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  password:'%s'", item->password);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_contextname:'%s'", item->snmpv3_contextname);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  jmx_endpoint:'%s'", item->jmx_endpoint);
-		zbx_log_handle(LOG_LEVEL_TRACE, "  timeout:'%s'", item->timeout);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  timeout: %d", item->timeout);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  url:'%s'", item->url);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  query_fields:'%s'", item->query_fields);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  posts:'%s'", ZBX_NULL2STR(item->posts));
@@ -142,7 +142,7 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 }
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -204,7 +204,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_HTTPAGENT:
-			item.timeout = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout");
+			db_string_from_json(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig, sizeof(item.timeout_orig));
 			break;
 	}
 
@@ -386,7 +386,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		}
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
-				config_startup_time);
+				config_startup_time, program_type);
 
 		switch (errcode)
 		{
@@ -422,7 +422,6 @@ out:
 	zbx_free(item.privatekey);
 	zbx_free(item.password);
 	zbx_free(item.jmx_endpoint);
-	zbx_free(item.timeout);
 	zbx_free(item.url);
 	zbx_free(item.query_fields);
 	zbx_free(item.posts);
@@ -446,7 +445,7 @@ out:
 }
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
@@ -483,7 +482,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	else
 		proxyid = 0;
 
-	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time);
+	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);

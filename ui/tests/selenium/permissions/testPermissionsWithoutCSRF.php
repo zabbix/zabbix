@@ -165,16 +165,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=update&hostid=50011&itemid=99086&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'overlay' => 'item_update'
 				]
 			],
 			// #11 Item create.
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=create&hostid=50011&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'overlay' => 'create'
 				]
 			],
 			// #12 Trigger update.
@@ -640,6 +640,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'link' => 'zabbix.php?action=audit.settings.edit',
 					'return_button' => true
 				]
+			],
+			// #70 Timeout options update.
+			[
+				[
+					'db' => 'SELECT * FROM config',
+					'link' => 'zabbix.php?action=timeouts.edit',
+					'return_button' => true
+				]
 			]
 		];
 	}
@@ -659,6 +667,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				'create' => "//div[@class=\"header-controls\"]//button",
 				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
 				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[4]/a",
+				'item_update' => "//table[@class=\"list-table\"]//tr[1]/td[3]/a",
 				'problem' => '//table[@class="list-table"]//tr[1]//a[text()="Update"]',
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];
@@ -698,15 +707,15 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 	public static function getCheckTokenData() {
 		return [
-			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL (update item).
+			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL (update LLD).
 			[
 				[
 					'token' => true,
-					'token_url' => 'items.php?form=update&hostid=99134&itemid=99114&context=host',
+					'token_url' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host',
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=update&hostid=99134&itemid=99114&context=host&name=4_item&description='.
-							'&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT&update=Update'.
-							'&_csrf_token=',
+					'link' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host&name=test'.
+						'&description=&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT'.
+						'&lifetime=1&formula=test&evaltype=1&update=Update&_csrf_token=',
 					'error' => self::INCORRECT_REQUEST
 				]
 			],

@@ -53,7 +53,13 @@
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
-static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
+
+zbx_get_program_type_f	trapper_get_program_type(void)
+{
+	return zbx_get_program_type_cb;
+}
+
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 typedef struct
@@ -118,12 +124,18 @@ zbx_status_section_t;
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		int config_timeout)
 {
-	char	*info = NULL;
+	char	*info = NULL, *ext = NULL;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		ext = "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\"" ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}";
+		info = zbx_strdup(info, "data collection is paused");
+		ret = FAIL;
+	}
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -138,7 +150,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zbx_process_command_results(jp);
 
-	zbx_send_response_same(sock, ret, info, config_timeout);
+	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
 	zbx_free(info);
 
@@ -160,7 +172,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 	if (SUCCEED != (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 	}
 	else if (!ZBX_IS_RUNNING())
 	{
@@ -1096,7 +1108,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_get_config_forks_f get_config_forks)
 {
 	int	ret = SUCCEED;
 
@@ -1150,7 +1163,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
-						config_comms->config_trapper_timeout, config_comms->config_source_ip);
+						config_comms->config_trapper_timeout, config_comms->config_source_ip,
+						get_config_forks, zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1180,7 +1194,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time);
+			{
+				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
+						zbx_get_program_type_cb());
+			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
 		{
@@ -1213,6 +1230,12 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
 					ZBX_FS_UI64 " for XML protocol received from \"%s\"", bytes_received,
 					(zbx_uint64_t)ZBX_GIBIBYTE, sock->peer);
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_vps_monitor_capped())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot accept data: data collection has been paused.");
 			return FAIL;
 		}
 
@@ -1272,7 +1295,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_get_config_forks_f get_config_forks)
 {
 	ssize_t	bytes_received;
 
@@ -1280,7 +1304,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
-			events_cbs, proxydata_frequency);
+			events_cbs, proxydata_frequency, get_config_forks);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1330,8 +1354,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		int		snmp_reload = 0;
 #endif
 
-		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
-				get_process_type_string(process_type), process_num, sec);
+		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection%s]",
+				get_process_type_string(process_type), process_num, sec, zbx_vps_monitor_status());
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
@@ -1362,7 +1386,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			{
 				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
 				{
-					zbx_clear_cache_snmp(process_type, process_num);
+					zbx_clear_cache_snmp(process_type, process_num, trapper_args_in->progname);
 					snmp_reload = 1;
 				}
 				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
@@ -1376,7 +1400,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,
-					trapper_args_in->proxydata_frequency);
+					trapper_args_in->proxydata_frequency,
+					trapper_args_in->get_process_forks_cb_arg);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

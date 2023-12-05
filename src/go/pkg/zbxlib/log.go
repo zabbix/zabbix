@@ -26,6 +26,8 @@ package zbxlib
 
 int	zbx_agent_pid;
 
+ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
+
 void handleZabbixLog(int level, const char *message);
 
 void zbx_log_go_impl(int level, const char *fmt, va_list args)
@@ -34,19 +36,12 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 	if (zbx_agent_pid == getpid() && -1 != level)
 	{
 		va_list	tmp;
-		int	rv;
 		size_t	size;
 
 		va_copy(tmp, args);
 
-		if (0 > (rv = zbx_vsnprintf_check_len(fmt, tmp)))
-		{
-			va_end(tmp);
-
-			return;
-		}
-
-		size = (size_t)rv + 2;
+		// zbx_vsnprintf_check_len() cannot return negative result
+		size = (size_t)zbx_vsnprintf_check_len(fmt, tmp) + 2;
 
 		va_end(tmp);
 
@@ -71,7 +66,7 @@ int	zbx_redirect_stdio(const char *filename)
 
 void	log_init(void)
 {
-	zbx_init_library_common(zbx_log_go_impl);
+	zbx_init_library_common(zbx_log_go_impl, get_zbx_progname);
 }
 
 */

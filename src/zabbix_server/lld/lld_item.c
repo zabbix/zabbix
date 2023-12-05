@@ -411,7 +411,6 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 					(zbx_item_discovery_t *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
-				zbx_db_free_result(result);
 				continue;
 			}
 
@@ -2803,7 +2802,8 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes,
  ******************************************************************************/
 static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_lld_item_full_t *item,
 		zbx_uint64_t *itemid, zbx_uint64_t *itemdiscoveryid, zbx_db_insert_t *db_insert_items,
-		zbx_db_insert_t *db_insert_idiscovery, zbx_db_insert_t *db_insert_irtdata)
+		zbx_db_insert_t *db_insert_idiscovery, zbx_db_insert_t *db_insert_irtdata,
+		zbx_db_insert_t *db_insert_irtname)
 {
 	int	index;
 
@@ -2843,6 +2843,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				item->parent_itemid, item_prototype->key);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
+		zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
 
 		zbx_audit_item_create_entry(ZBX_AUDIT_ACTION_ADD, *itemid, item->name, ZBX_FLAG_DISCOVERY_CREATED);
 		zbx_audit_item_update_json_add_lld_data(*itemid, item, item_prototype, hostid);
@@ -2855,7 +2856,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		dependent->master_itemid = item->itemid;
 		lld_item_save(hostid, item_prototypes, dependent, itemid, itemdiscoveryid, db_insert_items,
-				db_insert_idiscovery, db_insert_irtdata);
+				db_insert_idiscovery, db_insert_irtdata, db_insert_irtname);
 	}
 }
 
@@ -3245,6 +3246,18 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 
 	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
+	{
+		value_esc = zbx_db_dyn_escape_string(item->name);
+
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update item_rtname set"
+				" name_resolved='%s',name_resolved_upper=upper('%s')"
+				" where itemid=" ZBX_FS_UI64 ";\n",
+				value_esc, value_esc, item->itemid);
+		zbx_free(value_esc);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+	}
 }
 
 /******************************************************************************
@@ -3299,7 +3312,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	int				ret = SUCCEED, i, new_items = 0, upd_items = 0;
 	zbx_lld_item_full_t		*item;
 	zbx_uint64_t			itemid, itemdiscoveryid;
-	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata;
+	zbx_db_insert_t			db_insert_items, db_insert_idiscovery, db_insert_irtdata, db_insert_irtname;
 	zbx_lld_item_index_t		item_index_local;
 	zbx_vector_uint64_t		upd_keys, item_protoids;
 	char				*sql = NULL;
@@ -3412,6 +3425,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				"parent_itemid", "key_", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
+				"name_resolved_upper", (char *)NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -3423,7 +3438,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		if (0 == item->master_itemid)
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert_items,
-					&db_insert_idiscovery, &db_insert_irtdata);
+					&db_insert_idiscovery, &db_insert_irtdata, &db_insert_irtname);
 		}
 		else
 		{
@@ -3434,7 +3449,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
 			{
 				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid,
-						&db_insert_items, &db_insert_idiscovery, &db_insert_irtdata);
+						&db_insert_items, &db_insert_idiscovery, &db_insert_irtdata,
+						&db_insert_irtname);
 			}
 		}
 
@@ -3448,6 +3464,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		zbx_db_insert_execute(&db_insert_idiscovery);
 		zbx_db_insert_clean(&db_insert_idiscovery);
 
+		zbx_db_insert_execute(&db_insert_irtname);
+		zbx_db_insert_clean(&db_insert_irtname);
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 

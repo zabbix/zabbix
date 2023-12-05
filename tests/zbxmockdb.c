@@ -72,6 +72,7 @@ struct zbx_db_result
 zbx_db_result_t	__fwd_zbx_db_select(const char *fmt, ...);
 zbx_db_result_t	__wrap_zbx_db_select_n_basic(const char *query, int n);
 int	__wrap___zbx_db_execute(const char *fmt, ...);
+int	__wrap_zbx_db_commit(void);
 
 /* zbx_mockdb_t:queries hashset support */
 static zbx_hash_t	mockdb_query_hash(const void *data)

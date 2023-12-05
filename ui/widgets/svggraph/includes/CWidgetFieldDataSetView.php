@@ -70,7 +70,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		$itemids = array_merge(...array_column($values, 'itemids'));
 		$item_names = [];
 		if ($itemids) {
-			$item_names = CWidgetFieldDataSet::getItemNames($itemids);
+			$item_names = CWidgetFieldDataSet::getItemNames($itemids, !$this->field->isTemplateDashboard());
 		}
 
 		foreach ($values as $i => $value) {
@@ -182,6 +182,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							'srcfld1' => 'name',
 							'real_hosts' => 1,
 							'numeric' => 1,
+							'resolve_macros' => 1,
 							'dstfrm' => $this->form_name,
 							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
 						],

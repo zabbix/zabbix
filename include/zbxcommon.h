@@ -310,7 +310,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_HTTPAGENT_POLLER	40
 #define ZBX_PROCESS_TYPE_AGENT_POLLER		41
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
-#define ZBX_PROCESS_TYPE_COUNT			43	/* number of process types */
+#define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
+#define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
+#define ZBX_PROCESS_TYPE_COUNT			45	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -348,38 +350,6 @@ typedef enum
 	PERM_READ_WRITE
 }
 zbx_user_permission_t;
-
-typedef struct
-{
-	unsigned char	type;
-	unsigned char	execute_on;
-	char		*port;
-	unsigned char	authtype;
-	char		*username;
-	char		*password;
-	char		*publickey;
-	char		*privatekey;
-	char		*command;
-	char		*command_orig;
-	zbx_uint64_t	scriptid;
-	unsigned char	host_access;
-	int		timeout;
-}
-zbx_script_t;
-
-#define ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT	0
-#define ZBX_SCRIPT_TYPE_IPMI		1
-#define ZBX_SCRIPT_TYPE_SSH		2
-#define ZBX_SCRIPT_TYPE_TELNET		3
-#define ZBX_SCRIPT_TYPE_WEBHOOK		5
-
-#define ZBX_SCRIPT_SCOPE_ACTION	1
-#define ZBX_SCRIPT_SCOPE_HOST	2
-#define ZBX_SCRIPT_SCOPE_EVENT	4
-
-#define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
-#define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
-#define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	5
@@ -457,17 +427,11 @@ while (0)
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
 			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
-extern const char	*progname;
-extern const char	title_message[];
-extern const char	syslog_app_name[];
-extern const char	*usage_message[];
-extern const char	*help_message[];
-
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_help(const char *param);
-void	zbx_usage(void);
-void	zbx_version(void);
+void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname);
+void	zbx_print_usage(const char **usage_message, const char *progname);
+void	zbx_print_version(const char *title_message);
 
 const char	*get_program_name(const char *path);
 typedef unsigned char	(*zbx_get_program_type_f)(void);
@@ -488,10 +452,11 @@ typedef enum
 	ZBX_TASK_INSTALL_SERVICE,
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
-	ZBX_TASK_STOP_SERVICE
+	ZBX_TASK_STOP_SERVICE,
 #else
-	ZBX_TASK_RUNTIME_CONTROL
+	ZBX_TASK_RUNTIME_CONTROL,
 #endif
+	ZBX_TASK_TEST_CONFIG
 }
 zbx_task_t;
 
@@ -592,6 +557,10 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 /* could be moved into libzbxstr.a but it seems to be logically grouped with surrounding functions */
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
+
+#if defined(__hpux)
+int	zbx_hpux_vsnprintf_is_c99(void);
+#endif
 
 /* used by log */
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
@@ -805,7 +774,7 @@ static	type2	get_##varname(void) \
 
 typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
 
-void	zbx_init_library_common(zbx_log_func_t log_func);
+void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname);
 void	zbx_log_handle(int level, const char *fmt, ...);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);
