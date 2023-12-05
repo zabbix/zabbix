@@ -1096,7 +1096,7 @@ class CScript extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function getScriptsByHosts(array $options = []): array {
+	public function getScriptsByHosts(array $options): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>			['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
@@ -1224,7 +1224,7 @@ class CScript extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function getScriptsByEvents(array $options = []): array {
+	public function getScriptsByEvents(array $options): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['eventid']], 'fields' => [
 			'eventid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
