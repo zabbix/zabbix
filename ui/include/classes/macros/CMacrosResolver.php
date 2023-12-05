@@ -1857,7 +1857,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = [];
 		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'user_data' => [], 'usermacros' => []];
 
-		foreach ($data as $hostid => &$script) {
+		foreach ($data as $hostid => $script) {
 			$texts = [];
 			foreach ($script as $fields) {
 				$texts = array_merge($texts, array_values($fields));
@@ -1877,7 +1877,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$macros['usermacros'][$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
-		unset($script);
 
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
@@ -1985,7 +1984,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'manualinput' => []
 		];
 
-		foreach ($data as $eventid => &$script) {
+		foreach ($data as $eventid => $script) {
 			$texts = [];
 			foreach ($script as $fields) {
 				$texts = array_merge($texts, array_values($fields));
@@ -2089,7 +2088,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				];
 			}
 		}
-		unset($script);
 
 		$macro_values = self::getUserDataMacros($macros['user_data'], $macro_values);
 
