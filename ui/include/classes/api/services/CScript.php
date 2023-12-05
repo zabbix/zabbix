@@ -1097,15 +1097,7 @@ class CScript extends CApiService {
 	 * @return array
 	 */
 	public function getScriptsByHosts(array $options = []): array {
-		$options = zbx_toArray($options);
-		$hostids = array_column($options, 'hostid');
-		$scripts_by_host = [];
-
-		if (!$hostids) {
-			return $scripts_by_host;
-		}
-
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>			['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
 			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
@@ -1113,6 +1105,13 @@ class CScript extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$hostids = array_column($options, 'hostid');
+		$scripts_by_host = [];
+
+		if (!$hostids) {
+			return $scripts_by_host;
 		}
 
 		foreach ($hostids as $hostid) {
@@ -1226,10 +1225,7 @@ class CScript extends CApiService {
 	 * @return array
 	 */
 	public function getScriptsByEvents(array $options = []): array {
-		$options = zbx_toArray($options);
-		$eventids = array_column($options, 'eventid');
-
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['eventid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['eventid']], 'fields' => [
 			'eventid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
 			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
@@ -1251,6 +1247,7 @@ class CScript extends CApiService {
 			}
 		}
 
+		$eventids = array_column($options, 'eventid');
 		$eventid_validation_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($eventid_validation_rules, $eventids, '/', $error)) {
