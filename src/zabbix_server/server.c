@@ -289,7 +289,7 @@ static char	*config_server		= NULL;		/* not used in zabbix_server, required for 
 
 static int	config_housekeeping_frequency	= 1;
 static int	config_max_housekeeper_delete	= 5000;		/* applies for every separate field value */
-int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
+static int	config_confsyncer_frequency	= 10;
 
 static int	config_problemhousekeeping_frequency = 60;
 
@@ -861,7 +861,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&config_value_cache_size,		TYPE_UINT64,
 			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
-		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
+		{"CacheUpdateFrequency",	&config_confsyncer_frequency,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
@@ -1470,8 +1470,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout,
 							config_proxyconfig_frequency, config_proxydata_frequency,
-							zbx_config_source_ip, config_ssl_ca_location,
-							config_ssl_cert_location, config_ssl_key_location};
+							config_confsyncer_frequency, zbx_config_source_ip,
+							config_ssl_ca_location, config_ssl_cert_location,
+							config_ssl_key_location};
 	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
@@ -1486,7 +1487,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 									config_ssl_cert_location,
 									config_ssl_key_location};
 	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
-	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
+	zbx_thread_alert_syncer_args	alert_syncer_args = {config_confsyncer_frequency};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
 								zbx_config_dbhigh, zbx_config_source_ip};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
