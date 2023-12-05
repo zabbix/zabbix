@@ -323,6 +323,9 @@ int	__wrap_close(int fd)
 {
 	if (fd != INT_MAX) return __real_close(fd);
 
+	frag_data = frag_pos = NULL;
+	frag_sz = 0;
+
 	return 0;
 }
 

@@ -377,13 +377,13 @@ read_buf:	/* refill buffer */
 				save->p_next = save->p_end;
 				break;	/* line end with EOF - just return line */
 			}
+		}
 
-			if ((ssize_t)bufsz == save->p_end - save->p_start)
-			{
-				p_nl = save->p_end - 1;
-				save->p_next = save->p_end;
-				break;	/* line is split but it is bigger than buffer - just return line */
-			}
+		if ((ssize_t)bufsz == save->p_end - save->p_start)
+		{
+			p_nl = save->p_end - 1;
+			save->p_next = save->p_end;
+			break;	/* line is split but it is bigger than buffer - just return line */
 		}
 
 		/* read next buffer window from start of this line */

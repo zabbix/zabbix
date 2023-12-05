@@ -28,11 +28,26 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-static void	test1(uint64_t bufsz, const char *encoding, int *lines, ssize_t *result)
+static void print_line(const char *line, int size)
 {
-	int	f;
-	char	*line, *buf;
-	void	*saveptr = NULL;
+	printf("line: \"");
+	for (int i = 0; i < size; i++)
+	{
+		if (isgraph(line[i]))
+			printf("%c", line[i]);
+		else
+			printf("\\x%02X", line[i]);
+	}
+	printf("\" size: %d\n", size);
+}
+
+static void test1(uint64_t bufsz, const char *encoding, int *lines, ssize_t *result)
+{
+	int f;
+	char *line, *buf;
+	void *saveptr = NULL;
+
+	printf("Test 1:\n");
 
 	f = zbx_open("", O_RDWR); /* in.fragments */
 	zbx_mock_assert_int_ne("Cannot open file:", -1, f);
@@ -42,8 +57,9 @@ static void	test1(uint64_t bufsz, const char *encoding, int *lines, ssize_t *res
 
 	while (0 < (*result = zbx_buf_readln(f, buf, bufsz, encoding, &line, &saveptr)))
 	{
-		if ('\n' == line[*result-1]) line[*result - 1] = 0;
-		printf("Line: %.*s\n", (int)*result, line);
+		if ('\n' == line[*result - 1])
+			line[*result - 1] = 0;
+		print_line(line, (int)*result);
 		*lines += 1;
 	}
 
@@ -53,10 +69,12 @@ static void	test1(uint64_t bufsz, const char *encoding, int *lines, ssize_t *res
 	close(f);
 }
 
-static void	test2(uint64_t bufsz, const char *encoding, int *lines, int *result)
+static void test2(uint64_t bufsz, const char *encoding, int *lines, int *result)
 {
-	int	f;
-	char	*buf;
+	int f;
+	char *buf;
+
+	printf("Test 2:\n");
 
 	f = zbx_open("", O_RDWR); /* in.fragments */
 	zbx_mock_assert_int_ne("Cannot open file:", -1, f);
@@ -66,20 +84,21 @@ static void	test2(uint64_t bufsz, const char *encoding, int *lines, int *result)
 
 	while (0 < (*result = zbx_read_text_line_from_file(f, buf, bufsz, encoding)))
 	{
-		if ('\n' == buf[*result-1]) buf[*result - 1] = 0;
-		printf("Line: %.*s\n", (int)*result, buf);
+		if ('\n' == buf[*result - 1])
+			buf[*result - 1] = 0;
+		print_line(buf, *result);
 		*lines += 1;
 	}
 
 	close(f);
 }
 
-void	zbx_mock_test_entry(void **state)
+void zbx_mock_test_entry(void **state)
 {
-	int		lines1, lines2, result2;
-	const char	*encoding, *result;
-	ssize_t		line_count, result1;
-	uint64_t	bufsz;
+	int lines1, lines2, result2;
+	const char *encoding, *result;
+	ssize_t line_count, result1;
+	uint64_t bufsz;
 
 	ZBX_UNUSED(state);
 

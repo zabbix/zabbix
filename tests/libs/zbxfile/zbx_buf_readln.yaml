@@ -68,4 +68,24 @@ in:
 out:
   line_count: 6
   result: 0
+---
+test case: Infinite loop fix (1)
+in:
+  fragments:
+    - '\xff\xfe\x61\x00\x62\x00\x63\x00\x64\x00\x00\x00\x34\x00'
+  encoding: ''
+  bufsz: 3
+out:
+  line_count: 5
+  result: 0
+---
+test case: Infinite loop fix (2)
+in:
+  fragments:
+    - '\xff\xfe\x61\x00\x62\x00\x63\x00\x64\x00\x00\x00\x34\x00'
+  encoding: 'UTF-16'
+  bufsz: 4
+out:
+  line_count: 4
+  result: 0
 ...
