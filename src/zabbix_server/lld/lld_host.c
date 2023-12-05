@@ -3525,7 +3525,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		goto out;
 	}
 
-	if (0 < used_hgsetids.values_num && SUCCEED != zbx_db_lock_hgsetids(&used_hgsetids))
+	if (0 != used_hgsetids.values_num && SUCCEED != zbx_db_lock_hgsetids(&used_hgsetids))
 	{
 		zbx_db_rollback();
 		goto out;
