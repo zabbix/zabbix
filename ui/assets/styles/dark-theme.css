@@ -2155,8 +2155,7 @@ button {
   .dashboard-widget-graph-link:link {
     border: 0; }
 
-.dashboard-grid-widget-body.is-loading::before,
-.dashboard-grid-iterator-body.is-loading::before {
+.dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
 .dashboard-list .dashboard-list-item {

@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardGaugeWidget extends CWebTest {
+class testDashboardGaugeWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -92,8 +92,10 @@ class testDashboardGaugeWidget extends CWebTest {
 	}
 
 	public function prepareDashboardData() {
+		$float_item_id =CDataHelper::get('AllItemValueTypes.itemids.Float item');
+
 		// Add item data to move needle on Gauge.
-		CDataHelper::addItemData(CDataHelper::get('AllItemValueTypes.Float item'), 50);
+		CDataHelper::addItemData($float_item_id, 50);
 
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Gauge widget dashboard',
@@ -113,7 +115,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 									'name' => 'itemid',
-									'value' => CDataHelper::get('AllItemValueTypes.Float item')
+									'value' => $float_item_id
 								]
 							]
 						],
@@ -129,7 +131,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 									'name' => 'itemid',
-									'value' => CDataHelper::get('AllItemValueTypes.Float item')
+									'value' => $float_item_id
 								]
 							]
 						]
@@ -1109,16 +1111,8 @@ class testDashboardGaugeWidget extends CWebTest {
 	 * Test function for assuring that text, log, binary and char items are not available in Gauge widget.
 	 */
 	public function testDashboardGaugeWidget_CheckAvailableItems() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
-		$dialog =  $dashboard->edit()->addWidget()->asForm();
-		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
-		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
-		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
-		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST);
-		$table->waitUntilReloaded();
-		$this->assertTableDataColumn(['Float item', 'Unsigned item', 'Unsigned_dependent item']);
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+		$this->checkAvailableItems($url, 'Gauge');
 	}
 
 	public static function getScreenshotsData() {

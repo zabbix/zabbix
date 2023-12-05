@@ -43,4 +43,6 @@ struct zbx_pp_manager
 	zbx_dc_um_shared_handle_t	*um_handle;
 };
 
+zbx_get_progname_f	preproc_get_progname_cb(void);
+
 #endif

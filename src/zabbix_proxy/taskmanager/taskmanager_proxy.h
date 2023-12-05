@@ -30,6 +30,7 @@ typedef struct
 {
 	const zbx_config_comms_args_t	*config_comms;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+	const char			*progname;
 	int				config_startup_time;
 	int				config_enable_remote_commands;
 	int				config_log_remote_commands;

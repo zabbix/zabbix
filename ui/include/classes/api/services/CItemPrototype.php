@@ -297,7 +297,6 @@ class CItemPrototype extends CItemGeneral {
 
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
-			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		if (!$options['preservekeys']) {
@@ -1356,12 +1355,6 @@ class CItemPrototype extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
-
-		if ($upcased_index !== false) {
-			unset($sqlParts['select'][$upcased_index]);
-		}
 
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {
