@@ -73,41 +73,25 @@ class CHtmlUrlValidator {
 			}
 		}
 
+		$macro_parsers = [];
+
 		if ($options['allow_event_tags_macro'] === true) {
 			$parser_options = [
 				'macros' => ['{EVENT.TAGS}'],
 				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
 			];
-			$macro_parsers = [new CMacroParser($parser_options), new CMacroFunctionParser($parser_options)];
-
-			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
-				foreach ($macro_parsers as $macro_parser) {
-					if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
-						return true;
-					}
-				}
-			}
+			array_push($macro_parsers, new CMacroParser($parser_options), new CMacroFunctionParser($parser_options));
 		}
 
 		if ($options['allow_user_macro'] === true) {
-			$macro_parsers = [new CUserMacroParser, new CUserMacroFunctionParser];
-
-			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
-				foreach ($macro_parsers as $macro_parser) {
-					if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
-						return true;
-					}
-				}
-			}
+			array_push($macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 
 		if ($options['allow_manualinput_macro'] === true) {
-			$parser_options = [
-				'macros' => ['{MANUALINPUT}'],
-				'ref_type' => CMacroParser::REFERENCE_NONE
-			];
-			$macro_parsers = [new CMacroParser($parser_options)];
+			$macro_parsers[] = new CMacroParser(['macros' => ['{MANUALINPUT}']]);
+		}
 
+		if ($macro_parsers) {
 			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
 				foreach ($macro_parsers as $macro_parser) {
 					if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
