@@ -1855,7 +1855,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'user_data' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'user_data' => [], 'usermacros' => [],
+			'manualinput' => []
+		];
 
 		foreach ($data as $hostid => $script) {
 			$texts = [];
@@ -1883,16 +1885,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macros['user_data'], $macro_values);
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
+		$macro_values = self::getManualInputMacros($macros['manualinput'], $macro_values, $manualinput_values);
 
 		foreach ($data as $hostid => &$scripts) {
-			if ($macro_values && array_key_exists($hostid, $macro_values)) {
-				foreach ($macro_values[$hostid] as $type => &$macro_value) {
-					if ($type === '{MANUALINPUT}' && array_key_exists($hostid, $manualinput_values)) {
-						$macro_value = $manualinput_values[$hostid];
-					}
-				}
-				unset($macro_value);
-
+			if (array_key_exists($hostid, $macro_values)) {
 				foreach ($scripts as &$fields) {
 					foreach ($fields as &$value) {
 						$value = strtr($value, $macro_values[$hostid]);
@@ -1993,10 +1989,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$matched_macros = self::extractMacros($texts, $types);
 			$event = $events[$eventid];
 
-			foreach (['user_data', 'manualinput'] as $type) {
-				foreach ($matched_macros['macros'][$type] as $token => $_data) {
+			foreach (['user_data', 'manualinput'] as $sub_type) {
+				foreach ($matched_macros['macros'][$sub_type] as $token => $_data) {
 					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
-					$macros[$type][$eventid][$_data['macro']][] =
+					$macros[$sub_type][$eventid][$_data['macro']][] =
 						['token' => $token] + array_intersect_key($_data, ['macrofunc' => null]);
 				}
 			}
@@ -2098,16 +2094,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInterfaceNMacros($macros['interface_n'], $macro_values, $trigger_hosts_by_f_num);
 		$macro_values = self::getInventoryNMacros($macros['inventory_n'], $macro_values, $trigger_hosts_by_f_num);
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
+		$macro_values = self::getManualInputMacros($macros['manualinput'], $macro_values, $manualinput_values);
 
 		foreach ($data as $eventid => &$scripts) {
-			if ($macro_values && array_key_exists($eventid, $macro_values)) {
-				foreach ($macro_values[$eventid] as $type => &$macro_value) {
-					if ($type === '{MANUALINPUT}' && array_key_exists($eventid, $manualinput_values)) {
-						$macro_value = $manualinput_values[$eventid];
-					}
-				}
-				unset($macro_value);
-
+			if (array_key_exists($eventid, $macro_values)) {
 				foreach ($scripts as &$fields) {
 					foreach ($fields as &$value) {
 						$value = strtr($value, $macro_values[$eventid]);
