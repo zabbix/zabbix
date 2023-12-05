@@ -1038,17 +1038,19 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 #define ZBX_PROXYCONFIG_SYNC_CONFIG		0x0020
 #define ZBX_PROXYCONFIG_SYNC_HTTPTESTS		0x0040
 #define ZBX_PROXYCONFIG_SYNC_AUTOREG		0x0080
+#define ZBX_PROXYCONFIG_SYNC_PROXY_GROUPS	0x0100
 
 #define ZBX_PROXYCONFIG_SYNC_ALL	(ZBX_PROXYCONFIG_SYNC_HOSTS | ZBX_PROXYCONFIG_SYNC_GMACROS | 		\
 					ZBX_PROXYCONFIG_SYNC_HMACROS |ZBX_PROXYCONFIG_SYNC_DRULES |		\
 					ZBX_PROXYCONFIG_SYNC_EXPRESSIONS | ZBX_PROXYCONFIG_SYNC_CONFIG | 	\
-					ZBX_PROXYCONFIG_SYNC_HTTPTESTS | ZBX_PROXYCONFIG_SYNC_AUTOREG)
+					ZBX_PROXYCONFIG_SYNC_HTTPTESTS | ZBX_PROXYCONFIG_SYNC_AUTOREG |		\
+					ZBX_PROXYCONFIG_SYNC_PROXY_GROUPS)
 
 	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids,
 				macro_hostids;
 	zbx_vector_ptr_t	keys_paths;
 	int			global_macros = FAIL, ret = FAIL, i;
-	zbx_uint64_t		flags = 0;
+	zbx_uint64_t		flags = 0, hostmap_revision = 0;
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&updated_hostids);
@@ -1068,7 +1070,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 		zbx_vector_uint64_reserve(&del_macro_hostids, 100);
 
 		zbx_dc_get_proxy_config_updates(proxy->proxyid, proxy_config_revision, &hostids, &updated_hostids,
-				&removed_hostids, &httptestids);
+				&removed_hostids, &httptestids, &hostmap_revision);
 
 		zbx_dc_get_macro_updates(&hostids, &updated_hostids, proxy_config_revision, &macro_hostids,
 				&global_macros, &del_macro_hostids);
@@ -1099,6 +1101,12 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 
 		if (proxy_config_revision < dc_revision->autoreg_tls)
 			flags |= ZBX_PROXYCONFIG_SYNC_AUTOREG;
+
+		if (0 != proxy->proxy_groupid)
+		{
+			if (0 == hostmap_revision || proxy_config_revision < hostmap_revision)
+				flags |= ZBX_PROXYCONFIG_SYNC_PROXY_GROUPS;
+		}
 	}
 	else
 		flags = ZBX_PROXYCONFIG_SYNC_ALL;
@@ -1166,6 +1174,22 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 						error))
 		{
 			goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_PROXY_GROUPS))
+		{
+			zbx_vector_uint64_t	proxy_groupids;
+
+			zbx_vector_uint64_create(&proxy_groupids);
+			zbx_vector_uint64_append(&proxy_groupids, proxy->proxy_groupid);
+
+			if (SUCCEED != proxyconfig_get_table_data("proxy", "proxy_groupid", &proxy_groupids, NULL, NULL,
+					j, error))
+			{
+				goto out;
+			}
+
+			zbx_vector_uint64_destroy(&proxy_groupids);
 		}
 	}
 
@@ -1253,17 +1277,22 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		goto out;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_HOSTMAP_REVISION, tmp, sizeof(tmp), NULL))
-	{
-		*error = zbx_strdup(NULL, "cannot get revision from proxy configuration request");
-		goto out;
-	}
-
 	if (SUCCEED != zbx_is_uint64(tmp, &proxy_config_revision))
 	{
 		*error = zbx_dsprintf(NULL, "invalid proxy configuration revision: %s", tmp);
 		goto out;
 	}
+
+	if (SUCCEED == zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_HOSTMAP_REVISION, tmp, sizeof(tmp), NULL))
+	{
+		if (SUCCEED != zbx_is_uint64(tmp, &proxy_hostmap_revision))
+		{
+			*error = zbx_dsprintf(NULL, "invalid proxy host-proxy map revision: %s", tmp);
+			goto out;
+		}
+	}
+	else
+		proxy_hostmap_revision = 0;
 
 	if (0 != zbx_dc_register_config_session(proxy->proxyid, token, proxy_config_revision, &dc_revision) ||
 			0 == proxy_config_revision)

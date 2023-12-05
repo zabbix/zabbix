@@ -356,6 +356,7 @@ ZBX_PTR_VECTOR_DECL(dc_trigger, zbx_dc_trigger_t *)
 typedef struct
 {
 	zbx_uint64_t			proxyid;
+	zbx_uint64_t			proxy_groupid;
 	char				name[ZBX_HOSTNAME_BUF_LEN];
 	time_t				proxy_config_nextcheck;
 	time_t				proxy_data_nextcheck;
@@ -1236,7 +1237,7 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision);
 
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
-		zbx_vector_uint64_t *httptestids);
+		zbx_vector_uint64_t *httptestids, zbx_uint64_t *hostmap_revision);
 
 void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *updated_hostids,
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
