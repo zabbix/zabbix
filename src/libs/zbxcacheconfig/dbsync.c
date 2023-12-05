@@ -4137,9 +4137,9 @@ int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select proxy_groupid,failover_delay,min_online from proxy_group");
+			"select proxy_groupid,failover_delay,min_online,name from proxy_group");
 
-	dbsync_prepare(sync, 3, NULL);
+	dbsync_prepare(sync, 4, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

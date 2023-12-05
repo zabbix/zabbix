@@ -41,6 +41,8 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 
 	pg_cache_lock(pgs->cache);
 
+	pg_cache_update_groups(pgs->cache);
+
 	while (ptr - message->data < message->size)
 	{
 		zbx_pg_group_t	*group;
@@ -60,38 +62,6 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &dstid)))
 				pg_cache_group_add_host(pgs->cache, group, hostid);
 		}
-	}
-
-	pg_cache_unlock(pgs->cache);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: move proxies between proxy groups in cache                        *
- *                                                                            *
- * Parameter: pgs     - [IN] proxy group service                              *
- *            message - [IN] IPC message with proxy relocation data           *
- *                                                                            *
- ******************************************************************************/
-static void	pg_update_proxy_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
-{
-	unsigned char	*ptr = message->data;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	pg_cache_lock(pgs->cache);
-
-	while (ptr - message->data < message->size)
-	{
-		zbx_objmove_t	reloc;
-
-		ptr += zbx_deserialize_value(ptr, &reloc.objid);
-		ptr += zbx_deserialize_value(ptr, &reloc.srcid);
-		ptr += zbx_deserialize_value(ptr, &reloc.dstid);
-
-		zbx_vector_objmove_append_ptr(&pgs->cache->relocated_proxies, &reloc);
 	}
 
 	pg_cache_unlock(pgs->cache);
@@ -123,9 +93,6 @@ static void	*pg_service_entry(void *data)
 			{
 				case ZBX_IPC_PGM_HOST_PGROUP_UPDATE:
 					pg_update_host_pgroup(pgs, message);
-					break;
-				case ZBX_IPC_PGM_PROXY_PGROUP_UPDATE:
-					pg_update_proxy_pgroup(pgs, message);
 					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;

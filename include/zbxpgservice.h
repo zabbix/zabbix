@@ -25,7 +25,6 @@
 #define ZBX_IPC_SERVICE_PG_MANAGER		"pgmanager"
 
 #define ZBX_IPC_PGM_HOST_PGROUP_UPDATE		1
-#define ZBX_IPC_PGM_PROXY_PGROUP_UPDATE		2
 #define ZBX_IPC_PGM_STOP			100
 
 #endif

@@ -79,6 +79,7 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 {
 	zbx_hashset_create(&cache->groups, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	cache->group_revision = 0;
+	cache->proxy_revision = 0;
 
 	zbx_vector_pg_group_ptr_create(&cache->group_updates);
 
@@ -86,8 +87,6 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 	zbx_hashset_create(&cache->hpmap, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create(&cache->hpmap_updates, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_vector_objmove_create(&cache->relocated_proxies);
 
 	pthread_mutex_init(&cache->lock, NULL);
 
@@ -103,8 +102,6 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 void	pg_cache_destroy(zbx_pg_cache_t *cache)
 {
 	pthread_mutex_destroy(&cache->lock);
-
-	zbx_vector_objmove_destroy(&cache->relocated_proxies);
 
 	zbx_hashset_destroy(&cache->hpmap_updates);
 	zbx_hashset_destroy(&cache->hpmap);
@@ -203,20 +200,14 @@ zbx_pg_proxy_t	*pg_cache_group_add_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *
  *                                                                            *
  * Purpose: remove proxy from group                                           *
  *                                                                            *
- * Parameters: cache   - [IN] proxy group cache                               *
- *             group   - [IN] target group                                    *
- *             proxyid - [IN] proxy identifier                                *
- *                                                                            *
- * Return value: Removed proxy.                                               *
+ * Parameters: cache - [IN] proxy group cache                                 *
+ *             group - [IN] target group                                      *
+ *             proxy - [IN] proxy to remove                                   *
  *                                                                            *
  ******************************************************************************/
-zbx_pg_proxy_t	*pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid)
+void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy)
 {
-	zbx_pg_proxy_t	*proxy;
-	int		i;
-
-	if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)))
-		return NULL;
+	int	i;
 
 	for (i = 0; i < proxy->hosts.values_num; i++)
 	{
@@ -232,8 +223,6 @@ zbx_pg_proxy_t	*pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_
 			zbx_vector_pg_proxy_ptr_remove_noorder(&proxy->group->proxies, i);
 		}
 	}
-
-	return proxy;
 }
 
 void	pg_cache_proxy_free(zbx_pg_cache_t *cache, zbx_pg_proxy_t *proxy)
@@ -441,15 +430,14 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups, zbx_vector_pg_host_t *hosts_new,
 		zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del)
 {
-	pg_cache_lock(cache);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:%d", __func__, cache->group_updates.values_num);
 
 	for (int i = 0; i < cache->group_updates.values_num; i++)
 	{
 		zbx_pg_group_t	*group = cache->group_updates.values[i];
 
-		pg_cache_reassign_hosts(cache, group);
+		if (ZBX_PG_GROUP_STATUS_ONLINE == group->status)
+			pg_cache_reassign_hosts(cache, group);
 
 		if (ZBX_PG_GROUP_FLAGS_NONE != group->flags)
 		{
@@ -512,9 +500,41 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 
 	zbx_hashset_clear(&cache->hpmap_updates);
 
-	pg_cache_unlock(cache);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update proxy group cache from configuration cache                 *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_update_groups(zbx_pg_cache_t *cache)
+{
+	zbx_uint64_t	old_revision = cache->group_revision;
+
+	if (SUCCEED != zbx_dc_fetch_proxy_groups(&cache->groups, &cache->group_revision))
+		return;
+
+	zbx_hashset_iter_t	iter;
+	zbx_pg_group_t		*group;
+
+	zbx_hashset_iter_reset(&cache->groups, &iter);
+	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (ZBX_PG_GROUP_FLAGS_NONE == group->flags)
+		{
+			pg_group_clear(group);
+			zbx_hashset_iter_remove(&iter);
+			continue;
+		}
+
+		group->flags = ZBX_PG_GROUP_FLAGS_NONE;
+
+		if (old_revision >= group->revision)
+			continue;
+
+		pg_cache_queue_group_update(cache, group);
+	}
 }
 
 /* WDN: change to trace log level */

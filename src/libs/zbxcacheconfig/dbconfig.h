@@ -909,9 +909,10 @@ typedef struct
 	zbx_uint64_t	proxy_groupid;
 	int		failover_delay;
 	int		min_online;
+	const char	*name;
 
 	zbx_uint64_t	revision;
-	zbx_uint64_t	host_mapping_revision;
+	zbx_uint64_t	hostmap_revision;
 }
 zbx_dc_proxy_group_t;
 

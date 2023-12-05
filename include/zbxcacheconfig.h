@@ -1035,6 +1035,7 @@ typedef struct
 	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
 	zbx_uint64_t	connector;
 	zbx_uint64_t	proxy_group;	/* summary revision of all proxy groups */
+	zbx_uint64_t	proxy;		/* summary revision of all proxies */
 }
 zbx_dc_revision_t;
 
@@ -1364,13 +1365,11 @@ zbx_pg_host_t;
 ZBX_PTR_VECTOR_DECL(pg_host_ptr, zbx_pg_host_t *)
 ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
 
-#define ZBX_PG_GROUP_FLAGS_NONE		0x0000
-#define ZBX_PG_GROUP_UPDATE_STATUS	0x0001
-#define ZBX_PG_GROUP_UPDATE_HP_MAP	0x0002
-#define ZBX_PG_GROUP_SYNC_ADDED		0x0100
-#define ZBX_PG_GROUP_SYNC_MODIFIED	0x0200
-
 typedef struct zbx_pg_group zbx_pg_group_t;
+
+#define ZBX_PG_PROXY_FLAGS_NONE		0x0000
+#define ZBX_PG_PROXY_SYNC_ADDED		0x0100
+#define ZBX_PG_PROXY_SYNC_MODIFIED	0x0200
 
 /* proxy */
 typedef struct
@@ -1380,7 +1379,6 @@ typedef struct
 	int				status;
 	int				lastaccess;
 	int				firstaccess;
-	zbx_uint64_t			flags;
 	struct zbx_pg_group		*group;
 	zbx_vector_pg_host_ptr_t	hosts;
 }
@@ -1388,13 +1386,19 @@ zbx_pg_proxy_t;
 
 ZBX_PTR_VECTOR_DECL(pg_proxy_ptr, zbx_pg_proxy_t *)
 
+#define ZBX_PG_GROUP_FLAGS_NONE		0x0000
+#define ZBX_PG_GROUP_UPDATE_STATUS	0x0001
+#define ZBX_PG_GROUP_UPDATE_HP_MAP	0x0002
+#define ZBX_PG_GROUP_SYNC_ADDED		0x0100
+#define ZBX_PG_GROUP_SYNC_MODIFIED	0x0200
+
 /* proxy group */
 struct zbx_pg_group
 {
 	zbx_uint64_t			proxy_groupid;
 	char				*name;
 	zbx_uint64_t			revision;
-	zbx_uint64_t			mapping_revision;
+	zbx_uint64_t			hostmap_revision;
 	zbx_uint64_t			sync_revision;
 	int				failover_delay;
 	int				min_online;
@@ -1408,9 +1412,9 @@ struct zbx_pg_group
 
 ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
 
-int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
-void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies);
-void	zbx_dc_update_group_hpmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision);
+int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
+int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vector_objmove_t *proxy_reloc);
+void	zbx_dc_update_group_hostmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision);
 
 int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid, zbx_comms_redirect_t *redirect);
 int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *recv_host,

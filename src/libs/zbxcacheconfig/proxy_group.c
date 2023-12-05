@@ -64,7 +64,7 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				&found);
 
 		if (0 == found)
-			pg->host_mapping_revision = 0;
+			pg->hostmap_revision = 0;
 
 		if (FAIL == zbx_is_time_suffix(row[1], &pg->failover_delay, ZBX_LENGTH_UNLIMITED))
 		{
@@ -74,6 +74,7 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		pg->min_online = atoi(row[2]);
+		dc_strpool_replace(found, &pg->name, row[3]);
 
 		pg->revision = revision;
 	}
@@ -83,6 +84,7 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (NULL == (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups, &rowid)))
 			continue;
 
+		dc_strpool_release(pg->name);
 		zbx_hashset_remove_direct(&config->proxy_groups, pg);
 	}
 
@@ -103,7 +105,7 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
+int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 {
 	int		ret = FAIL;
 	zbx_uint64_t	old_revision = *revision;
@@ -148,7 +150,102 @@ int	zbx_dc_get_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 			group->revision = dc_group->revision;
 			group->failover_delay = dc_group->failover_delay;
 			group->min_online = dc_group->min_online;
+
+			if (NULL == group->name || 0 != strcmp(group->name, dc_group->name))
+				group->name = zbx_strdup(group->name, dc_group->name);
 		}
+	}
+
+	UNLOCK_CACHE;
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s revision:" ZBX_FS_UI64 "->" ZBX_FS_UI64, __func__,
+			zbx_result_string(ret), old_revision, *revision);
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update local proxy cache                                          *
+ *                                                                            *
+ * Parameter: proxies  - [IN/OUT] local proxy cache                           *
+ *            revision - [IN/OUT] local proxy cache revision                  *
+ *                                                                            *
+ * Return value: SUCCEED - local cache was updated                            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vector_objmove_t *proxy_reloc)
+{
+	int		ret = FAIL;
+	zbx_uint64_t	old_revision = *revision;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (*revision >= config->revision.proxy)
+		goto out;
+
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_PROXY		*dc_proxy;
+	zbx_pg_proxy_t		*proxy;
+
+	RDLOCK_CACHE;
+
+	*revision = config->revision.proxy;
+
+	zbx_hashset_iter_reset(&config->proxies, &iter);
+
+	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_uint64_t	old_proxy_groupid;
+
+		proxy = (zbx_pg_proxy_t *)zbx_hashset_search(proxies, &dc_proxy->proxyid);
+
+		if (0 == dc_proxy->proxy_groupid)
+		{
+			if (NULL != proxy && NULL != proxy->group)
+			{
+				zbx_objmove_t	reloc = {
+						.objid = proxy->proxyid,
+						.srcid = proxy->group->proxy_groupid,
+						.dstid = 0
+					};
+
+				zbx_vector_objmove_append_ptr(proxy_reloc, &reloc);
+			}
+			continue;
+		}
+
+		if (NULL == proxy)
+		{
+			zbx_pg_proxy_t	proxy_local = {.proxyid = dc_proxy->proxyid};
+
+			proxy = (zbx_pg_proxy_t *)zbx_hashset_insert(proxies, &proxy_local, sizeof(proxy_local));
+
+			zbx_vector_pg_host_ptr_create(&proxy->hosts);
+
+			/* WDN: force online status */
+			proxy->status = 2;
+		}
+
+		proxy->lastaccess = dc_proxy->lastaccess;
+
+		old_proxy_groupid = (NULL == proxy->group ? 0 : proxy->group->proxy_groupid);
+
+		if (old_proxy_groupid != dc_proxy->proxy_groupid)
+		{
+			zbx_objmove_t	reloc = {
+					.objid = proxy->proxyid,
+					.srcid = old_proxy_groupid,
+					.dstid = dc_proxy->proxy_groupid
+				};
+
+			zbx_vector_objmove_append_ptr(proxy_reloc, &reloc);
+		}
+
+		if (NULL == proxy->name || 0 != strcmp(proxy->name, dc_proxy->name))
+			proxy->name = zbx_strdup(proxy->name, dc_proxy->name);
 	}
 
 	UNLOCK_CACHE;
@@ -198,7 +295,7 @@ void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies)
  *            revision - [IN] host proxy map revision                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_group_hpmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision)
+void	zbx_dc_update_group_hostmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision)
 {
 	WRLOCK_CACHE;
 
@@ -207,7 +304,7 @@ void	zbx_dc_update_group_hpmap_revision(zbx_vector_uint64_t *groupids, zbx_uint6
 		zbx_pg_group_t	*group;
 
 		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&config->proxy_groups, &groupids->values[i])))
-			group->mapping_revision = revision;
+			group->hostmap_revision = revision;
 	}
 
 	UNLOCK_CACHE;

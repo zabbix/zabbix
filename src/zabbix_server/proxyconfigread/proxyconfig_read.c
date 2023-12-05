@@ -1236,7 +1236,7 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
-	zbx_uint64_t		proxy_config_revision;
+	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision;
 	zbx_dc_revision_t	dc_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:" ZBX_FS_UI64, __func__, proxy->proxyid);
@@ -1248,6 +1248,12 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL))
+	{
+		*error = zbx_strdup(NULL, "cannot get revision from proxy configuration request");
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_HOSTMAP_REVISION, tmp, sizeof(tmp), NULL))
 	{
 		*error = zbx_strdup(NULL, "cannot get revision from proxy configuration request");
 		goto out;
