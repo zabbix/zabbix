@@ -18,9 +18,10 @@
 **/
 
 #include "postinit.h"
-#include "zbxexpression.h"
 
-#include "db_lengths.h"
+#include "../db_lengths.h"
+
+#include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxnum.h"
 #include "zbxcachevalue.h"
