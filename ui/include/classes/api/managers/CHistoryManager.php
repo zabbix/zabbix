@@ -1193,25 +1193,24 @@ class CHistoryManager {
 	 * @return array  Aggregation data of items. Each entry will contain 'value', 'clock' and 'itemid' properties.
 	 */
 	public function getAggregatedValues(array $items, string $function, int $time_from, int $time_to = null): ?array {
-		if (in_array($function, [AGGREGATE_COUNT, AGGREGATE_FIRST, AGGREGATE_LAST])) {
-			$items_valid = [];
+		$is_numeric_aggregation = in_array($function, [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM]);
 
-			foreach ($items as $item) {
-				if ($item['source'] === 'history'
-						|| in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-					$items_valid[] = $item;
-				}
+		$items_valid = [];
+
+		foreach ($items as $item) {
+			$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+
+			if ($is_numeric_item || ($item['source'] === 'history' && !$is_numeric_aggregation)) {
+				$items_valid[] = $item;
 			}
-		}
-		else {
-			$items_valid = $items;
 		}
 
 		$grouped_items = $this->getItemsGroupedByStorage($items_valid);
 
 		$results = [];
+
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
-			$results = $this->getAggregatedValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+			$results += $this->getAggregatedValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
 				$function, $time_from, $time_to
 			);
 		}
