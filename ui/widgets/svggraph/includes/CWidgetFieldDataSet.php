@@ -112,11 +112,11 @@ class CWidgetFieldDataSet extends CWidgetField {
 		];
 	}
 
-	public static function getItemNames(array $itemids): array {
+	public static function getItemNames(array $itemids, bool $resolve_macros): array {
 		$names = [];
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name'],
+			'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name'],
 			'selectHosts' => ['hostid', 'name'],
 			'webitems' => true,
 			'itemids' => $itemids,
@@ -129,7 +129,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 		foreach ($items as $item) {
 			$hosts = array_column($item['hosts'], 'name', 'hostid');
-			$names[$item['itemid']] = $hosts[$item['hostid']].NAME_DELIMITER.$item['name'];
+			$names[$item['itemid']] = $resolve_macros
+				? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_resolved']
+				: $hosts[$item['hostid']].NAME_DELIMITER.$item['name'];
 		}
 
 		return $names;

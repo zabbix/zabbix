@@ -202,7 +202,7 @@ static char				snmp_rwlock_init_done;
 	if (0 != snmp_rwlock_init_done)				\
 		pthread_rwlock_unlock(&snmp_exec_rwlock)
 
-static void	zbx_init_snmp(void);
+static void	zbx_init_snmp(const char *progname);
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 {
@@ -568,8 +568,9 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 }
 
 static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const char *ip, unsigned short port,
-		char *snmp_community, char *snmpv3_securityname, char *snmpv3_contextname, unsigned char snmpv3_securitylevel,
-		unsigned char snmpv3_authprotocol, char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol, char *snmpv3_privpassphrase, char *error, size_t max_error_len,
+		char *snmp_community, char *snmpv3_securityname, char *snmpv3_contextname,
+		unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol, char *snmpv3_authpassphrase,
+		unsigned char snmpv3_privprotocol, char *snmpv3_privpassphrase, char *error, size_t max_error_len,
 		int timeout, const char *config_source_ip)
 {
 /* item snmpv3 privacy protocol */
@@ -2460,11 +2461,11 @@ out:
 
 static ZBX_THREAD_LOCAL zbx_snmp_format_opts_t	default_opts;
 
-void	zbx_set_snmp_bulkwalk_options(void)
+void	zbx_set_snmp_bulkwalk_options(const char *progname)
 {
 	zbx_snmp_format_opts_t	bulk_opts;
 
-	zbx_init_snmp();
+	zbx_init_snmp(progname);
 
 	if (1 == zbx_snmp_init_bulkwalk_done)
 		return;
@@ -3051,16 +3052,18 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_
 }
 
 int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *progname)
 {
 	int	errcode = SUCCEED;
 
-	get_values_snmp(item, result, &errcode, 1, poller_type, config_source_ip);
+	get_values_snmp(item, result, &errcode, 1, poller_type, config_source_ip, progname);
 
 	return errcode;
 }
 
-static void	zbx_init_snmp(void)
+/* Actually this could be called by discoverer, without poller being initialized, */
+/* so cannot call poller_get_progname(), need progname to be passed directly. */
+static void	zbx_init_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;
 
@@ -3073,14 +3076,15 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
-
 	init_snmp(progname);
 	zbx_snmp_init_done = 1;
 
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-static void	zbx_shutdown_snmp(void)
+/* Actually this could be called by discoverer, without poller being initialized, */
+/* so cannot call poller_get_progname(), need progname to be passed directly. */
+static void	zbx_shutdown_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;
 
@@ -3092,6 +3096,7 @@ static void	zbx_shutdown_snmp(void)
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	snmp_shutdown(progname);
+
 	zbx_snmp_init_done = 0;
 
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
@@ -3099,13 +3104,13 @@ static void	zbx_shutdown_snmp(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Initialize snmp and load mibs files for multithread environment   *
+ * Purpose: initializes snmp and loads mibs files for multithread environment *
  *                                                                            *
  ******************************************************************************/
-void	zbx_init_library_mt_snmp(void)
+void	zbx_init_library_mt_snmp(const char *progname)
 {
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 0);
-	zbx_init_snmp();
+	zbx_init_snmp(progname);
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 
 	if (0 == snmp_rwlock_init_done)
@@ -3119,7 +3124,7 @@ void	zbx_init_library_mt_snmp(void)
 	}
 }
 
-void	zbx_shutdown_library_mt_snmp(void)
+void	zbx_shutdown_library_mt_snmp(const char *progname)
 {
 	if (1 == snmp_rwlock_init_done)
 	{
@@ -3132,8 +3137,7 @@ void	zbx_shutdown_library_mt_snmp(void)
 		else
 			snmp_rwlock_init_done = 0;
 	}
-
-	zbx_shutdown_snmp();
+	zbx_shutdown_snmp(progname);
 }
 
 static void	process_snmp_result(void *data)
@@ -3155,7 +3159,7 @@ static void	process_snmp_result(void *data)
 }
 
 void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, const char *config_source_ip)
+		unsigned char poller_type, const char *config_source_ip, const char *progname)
 {
 	zbx_snmp_sess_t		ssp;
 	char			error[MAX_STRING_LEN];
@@ -3165,7 +3169,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__func__, items[0].host.host, items[0].interface.addr, num);
 
-	zbx_init_snmp();	/* avoid high CPU usage by only initializing SNMP once used */
+	zbx_init_snmp(progname);	/* avoid high CPU usage by only initializing SNMP once used */
 
 	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
@@ -3199,7 +3203,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			goto out;
 		}
 
-		zbx_set_snmp_bulkwalk_options();
+		zbx_set_snmp_bulkwalk_options(progname);
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
 				&snmp_result, NULL, snmp_result.base, dnsbase, config_source_ip)))
@@ -3319,13 +3323,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clear snmpv3 user authentication cache                            *
+ * Purpose: clears snmpv3 user authentication cache                           *
  *                                                                            *
  * Parameters: process_type - [IN] type of process                            *
  *             process_num  - [IN] unique id of process                       *
+ *                 progname - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
 			get_process_type_string(process_type), process_num);
@@ -3336,10 +3341,10 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 	SNMP_MT_INITLOCK;
 
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
-	zbx_shutdown_snmp();
+	zbx_shutdown_snmp(progname);
 
 	if (0 != snmp_rwlock_init_done)
-		zbx_init_library_mt_snmp();
+		zbx_init_library_mt_snmp(progname);
 
 	SNMP_MT_UNLOCK;
 }

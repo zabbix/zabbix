@@ -28,6 +28,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
-		const char *config_source_ip, const char *server);
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, const char *server);
 
 #endif

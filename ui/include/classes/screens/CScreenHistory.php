@@ -127,14 +127,14 @@ class CScreenHistory extends CScreenBase {
 	public function get() {
 		$output = [];
 
-		$items = API::Item()->get([
-			'output' => ['itemid', 'name', 'key_', 'value_type'],
+		$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+			'output' => ['itemid', 'name_resolved', 'key_', 'value_type'],
 			'selectHosts' => ['name'],
 			'selectValueMap' => ['mappings'],
 			'itemids' => $this->itemids,
 			'webitems' => true,
 			'preservekeys' => true
-		]);
+		]), ['name_resolved' => 'name']);
 
 		if (!$items) {
 			show_error_message(_('No permissions to referred object or it does not exist!'));
@@ -602,6 +602,7 @@ class CScreenHistory extends CScreenBase {
 			->setArgument('to', $this->timeline['to'])
 			->setArgument('itemids', $itemIds)
 			->setArgument('type', $this->graphType)
+			->setArgument('resolve_macros', 1)
 			->setArgument('profileIdx', $this->profileIdx)
 			->setArgument('profileIdx2', $this->profileIdx2);
 
