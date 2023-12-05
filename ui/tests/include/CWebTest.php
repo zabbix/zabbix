@@ -25,6 +25,12 @@ require_once dirname(__FILE__).'/web/CPage.php';
 require_once dirname(__FILE__).'/helpers/CXPathHelper.php';
 require_once dirname(__FILE__).'/helpers/CImageHelper.php';
 
+require_once __DIR__.'/../selenium/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CPreprocessingBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CTableBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CTagBehavior.php';
+
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
 define('TEST_ERROR', 2);
