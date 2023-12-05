@@ -1595,6 +1595,8 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 	if (FAIL == (ret = zbx_dc_config_get_host_by_name(tmp, &host, &redirect)))
 	{
 		*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
+		/* send success response so agent will not retry upload with the same non-existing host */
+		ret = SUCCEED;
 		goto out;
 	}
 
