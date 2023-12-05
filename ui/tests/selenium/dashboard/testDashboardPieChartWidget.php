@@ -380,7 +380,7 @@ class testDashboardPieChartWidget extends CWebTest {
 							'Space between sectors' => '2',
 							'id:merge' => true,
 							'id:merge_percent' => '10',
-							//'id:merge_color' => 'EEFF22',
+							'xpath:.//input[@id="merge_color"]/..' => 'EEFF22',
 							'Show total value' => true,
 							'id:value_size_type' => 'Custom',
 							'id:value_size_custom_input' => '25',
@@ -598,8 +598,7 @@ class testDashboardPieChartWidget extends CWebTest {
 						],
 						'Displaying options' => [
 							'id:merge' => true,
-							//'id:merge_percent' => '10',
-							//'id:merge_color' => 'FFFFFG',
+							'xpath:.//input[@id="merge_color"]/..' => 'FFFFFG',
 							'Draw' => 'Doughnut',
 							'Show total value' => true,
 							'Colour' => 'FFFFFG'
@@ -607,7 +606,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.',
-						//'Invalid parameter "merge_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Invalid parameter "merge_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Invalid parameter "Colour": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
