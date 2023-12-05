@@ -1157,7 +1157,6 @@ class CScript extends CApiService {
 
 		if ($scripts) {
 			$host_scripts = [];
-			$manualinput_values = [];
 			$macros_data = [];
 
 			foreach ($options as $option) {
@@ -1171,20 +1170,12 @@ class CScript extends CApiService {
 						elseif (!array_key_exists('scriptid', $option)) {
 							$host_scripts[$option['hostid']][$scriptid] = $script;
 						}
-
-						if (array_key_exists('manualinput', $option)) {
-							$manualinput_values[$option['hostid']] = $option['manualinput'];
-						}
 					}
 				}
 			}
 
 			foreach ($host_scripts as $hostid => $scripts) {
 				foreach ($scripts as $scriptid => $script) {
-					if (array_key_exists($hostid, $manualinput_values)) {
-						$macros_data[$hostid]['manualinput_value'] = $manualinput_values[$hostid];
-					}
-
 					foreach (['confirmation', 'url', 'manualinput_prompt'] as $field) {
 						if (strpos($script[$field], '{') !== false) {
 							$macros_data[$hostid][$scriptid][$field] = $script[$field];
@@ -1193,7 +1184,8 @@ class CScript extends CApiService {
 				}
 			}
 
-			$macros_data = CMacrosResolverHelper::resolveManualHostActionScripts($macros_data);
+			$manualinput_values = array_column($options, 'manualinput', 'hostid');
+			$macros_data = CMacrosResolverHelper::resolveManualHostActionScripts($macros_data, $manualinput_values);
 
 			foreach ($host_scripts as $hostid => $scripts) {
 				foreach ($scripts as $scriptid => $script) {
@@ -1377,7 +1369,6 @@ class CScript extends CApiService {
 			$event_scripts = [];
 			$macros_data = [];
 			$processed_scripts_per_event = [];
-			$manualinput_values = [];
 
 			foreach ($options as $option) {
 				$event_scripts[$option['eventid']] = [];
@@ -1397,10 +1388,6 @@ class CScript extends CApiService {
 									elseif (!array_key_exists('scriptid', $option)) {
 										$event_scripts[$option['eventid']][$scriptid] = $script;
 									}
-
-									if (array_key_exists('manualinput', $option)) {
-										$manualinput_values[$option['eventid']] = $option['manualinput'];
-									}
 								}
 							}
 						}
@@ -1415,10 +1402,6 @@ class CScript extends CApiService {
 
 						foreach ($events[$eventid]['hosts'] as $event_host) {
 							foreach ($hosts as $host) {
-								if (array_key_exists($eventid, $manualinput_values)) {
-									$macros_data[$eventid]['manualinput_value'] = $manualinput_values[$eventid];
-								}
-
 								if (bccomp($host['hostid'], $event_host['hostid']) == 0
 										&& array_key_exists($eventid, $scripts_by_events)) {
 									foreach (['confirmation', 'url', 'manualinput_prompt'] as $field) {
@@ -1433,7 +1416,10 @@ class CScript extends CApiService {
 				}
 			}
 
-			$macros_data = CMacrosResolverHelper::resolveManualEventActionScripts($macros_data, $events);
+			$manualinput_values = array_column($options, 'manualinput', 'eventid');
+			$macros_data = CMacrosResolverHelper::resolveManualEventActionScripts($macros_data, $events,
+				$manualinput_values
+			);
 
 			foreach ($event_scripts as $eventid => $scripts) {
 				foreach ($scripts as $scriptid => $script) {
