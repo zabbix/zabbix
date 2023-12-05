@@ -179,10 +179,10 @@ int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from host_hgset hgh,permission p,user_ugset ugu"
-					" where hgh.hgsetid=p.hgsetid"
-						" and p.ugsetid=ugu.ugsetid"
-						" and ugu.userid=" ZBX_FS_UI64
+					" from host_hgset hh,permission p,user_ugset uu"
+					" where hh.hgsetid=p.hgsetid"
+						" and p.ugsetid=uu.ugsetid"
+						" and uu.userid=" ZBX_FS_UI64
 				")",
 				*userid);
 	}
@@ -261,11 +261,11 @@ int	expr_db_get_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64_
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from host_hgset hgh,permission p,user_ugset ugu"
-					" where i.hostid=hgh.hostid"
-						" and hgh.hgsetid=p.hgsetid"
-						" and p.ugsetid=ugu.ugsetid"
-						" and ugu.userid=" ZBX_FS_UI64
+					" from host_hgset hh,permission p,user_ugset uu"
+					" where i.hostid=hh.hostid"
+						" and hh.hgsetid=p.hgsetid"
+						" and p.ugsetid=uu.ugsetid"
+						" and uu.userid=" ZBX_FS_UI64
 				")",
 				*userid);
 	}

@@ -88,11 +88,11 @@ int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **use
 
 	sql = zbx_dsprintf(NULL,
 			"select p.permission from items i"
-			" join host_hgset hgh on i.hostid=hgh.hostid"
-			" join permission p on hgh.hgsetid=p.hgsetid"
-			" join user_ugset ugu on p.ugsetid=ugu.ugsetid"
+			" join host_hgset h on i.hostid=h.hostid"
+			" join permission p on h.hgsetid=p.hgsetid"
+			" join user_ugset u on p.ugsetid=u.ugsetid"
 			" where i.itemid=" ZBX_FS_UI64
-				" and ugu.userid=" ZBX_FS_UI64,
+				" and u.userid=" ZBX_FS_UI64,
 			itemid, userid);
 
 	result = zbx_db_select_n(sql, 1);
@@ -131,11 +131,11 @@ int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid)
 	}
 
 	sql = zbx_dsprintf(NULL,
-			"select p.permission from host_hgset hgh"
-			" join permission p on hgh.hgsetid=p.hgsetid"
-			" join user_ugset ugu on p.ugsetid=ugu.ugsetid"
-			" where hgh.hostid=" ZBX_FS_UI64
-				" and ugu.userid=" ZBX_FS_UI64,
+			"select p.permission from host_hgset h"
+			" join permission p on h.hgsetid=p.hgsetid"
+			" join user_ugset u on p.ugsetid=u.ugsetid"
+			" where h.hostid=" ZBX_FS_UI64
+				" and u.userid=" ZBX_FS_UI64,
 			hostid, user->userid);
 
 	result = zbx_db_select_n(sql, 1);

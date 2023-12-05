@@ -650,11 +650,11 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 
 	result = zbx_db_select(
 		"select null"
-			" from host_hgset hgh,permission p,user_ugset ugu"
-		" where ugu.ugsetid=p.ugsetid"
-			" and p.hgsetid=hgh.hgsetid"
-			" and hgh.hostid=" ZBX_FS_UI64
-			" and ugu.userid=" ZBX_FS_UI64
+			" from host_hgset h,permission p,user_ugset u"
+		" where u.ugsetid=p.ugsetid"
+			" and p.hgsetid=h.hgsetid"
+			" and h.hostid=" ZBX_FS_UI64
+			" and u.userid=" ZBX_FS_UI64
 			" and p.permission>=%d",
 		hostid,
 		userid,

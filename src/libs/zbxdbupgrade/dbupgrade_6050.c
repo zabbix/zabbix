@@ -2398,18 +2398,18 @@ static int	DBpatch_6050185(void)
 
 	zbx_db_insert_prepare(&db_insert, "permission", "ugsetid", "hgsetid", "permission", (char*)NULL);
 
-	result = zbx_db_select("select ugs.ugsetid,hgs.hgsetid,max(r.permission)"
-			" from hgset hgs"
-			" join hgset_group hgsg"
-				" on hgs.hgsetid=hgsg.hgsetid"
-			" join rights r on hgsg.groupid=r.id"
-			" join ugset_group ugsg"
-				" on r.groupid=ugsg.usrgrpid"
-			" join ugset ugs"
-				" on ugsg.ugsetid=ugs.ugsetid"
-			" group by ugs.ugsetid,hgs.hgsetid"
+	result = zbx_db_select("select ugs.ugsetid,h.hgsetid,max(r.permission)"
+			" from hgset h"
+			" join hgset_group hg"
+				" on h.hgsetid=hg.hgsetid"
+			" join rights r on hg.groupid=r.id"
+			" join ugset_group ug"
+				" on r.groupid=ug.usrgrpid"
+			" join ugset u"
+				" on ug.ugsetid=u.ugsetid"
+			" group by u.ugsetid,h.hgsetid"
 			" having min(r.permission)>0"
-			" order by ugs.ugsetid,hgs.hgsetid");
+			" order by u.ugsetid,h.hgsetid");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{

@@ -6545,10 +6545,10 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hgsetid from hgset hg"
-			" left join host_hgset hgh on hgh.hgsetid=hg.hgsetid"
-			" where hgh.hgsetid is null and");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hgsetid", del_hgsetids.values,
+			"select hgsetid from hgset h"
+			" left join host_hgset hh on hh.hgsetid=h.hgsetid"
+			" where hh.hgsetid is null and");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.hgsetid", del_hgsetids.values,
 			del_hgsetids.values_num);
 
 	zbx_vector_uint64_clear(&ids);
