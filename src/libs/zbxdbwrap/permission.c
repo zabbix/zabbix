@@ -72,10 +72,11 @@ int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_tim
  ******************************************************************************/
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	int			perm = PERM_DENY;
-	zbx_uint64_t		roleid;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		perm = PERM_DENY;
+	char		*sql;
+	zbx_uint64_t	roleid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -85,7 +86,7 @@ int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **use
 		goto out;
 	}
 
-	result = zbx_db_select(
+	sql = zbx_dsprintf(NULL,
 			"select p.permission from items i"
 			" join host_hgset hgh on i.hostid=hgh.hostid"
 			" join permission p on hgh.hgsetid=p.hgsetid"
@@ -93,6 +94,9 @@ int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **use
 			" where i.itemid=" ZBX_FS_UI64
 				" and ugu.userid=" ZBX_FS_UI64,
 			itemid, userid);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
 
 	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]))
 		perm = atoi(row[0]);
@@ -113,9 +117,10 @@ out:
  ******************************************************************************/
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	int			perm = PERM_DENY;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql;
+	int		perm = PERM_DENY;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -125,13 +130,16 @@ int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid)
 		goto out;
 	}
 
-	result = zbx_db_select(
+	sql = zbx_dsprintf(NULL,
 			"select p.permission from host_hgset hgh"
 			" join permission p on hgh.hgsetid=p.hgsetid"
 			" join user_ugset ugu on p.ugsetid=ugu.ugsetid"
 			" where hgh.hostid=" ZBX_FS_UI64
 				" and ugu.userid=" ZBX_FS_UI64,
 			hostid, user->userid);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
 
 	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]))
 		perm = atoi(row[0]);

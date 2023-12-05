@@ -168,8 +168,8 @@ int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct h.name"
-			" from host_hgset hgh,items i,functions f"
-			" where hgh.hostid=i.hostid"
+			" from hosts h,items i,functions f"
+			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
@@ -179,7 +179,7 @@ int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from permission p,user_ugset ugu"
+					" from host_hgset hgh,permission p,user_ugset ugu"
 					" where hgh.hgsetid=p.hgsetid"
 						" and p.ugsetid=ugu.ugsetid"
 						" and ugu.userid=" ZBX_FS_UI64
