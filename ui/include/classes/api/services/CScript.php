@@ -1235,27 +1235,10 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'eventid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY | API_REQUIRED],
-			'scriptid' =>		['type' => API_ID, 'flags' => API_NOT_EMPTY],
-			'manualinput' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value'), 'default' => '']
-		]];
+		$scripts_by_events = [];
 
-		foreach ($options as $index => $option) {
-			if (!CApiInputValidator::validate($api_input_rules, $option, '/'.($index + 1), $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
-
-		$eventids = array_column($options, 'eventid');
-		$eventid_validation_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($eventid_validation_rules, $eventids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		foreach ($eventids as $eventid) {
-			$scripts_by_events[$eventid] = [];
+		foreach ($options as $option) {
+			$scripts_by_events[$option['eventid']] = [];
 		}
 
 		$events = API::Event()->get([
@@ -1263,7 +1246,7 @@ class CScript extends CApiService {
 			'selectHosts' => ['hostid'],
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
-			'eventids' => $eventids,
+			'eventids' => array_keys($scripts_by_events),
 			'preservekeys' => true
 		]);
 
