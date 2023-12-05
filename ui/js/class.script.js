@@ -21,7 +21,7 @@
 class Script {
 
 	/**
-	 * Execute script.
+	 * Executes script, handling optional manual input and confirmation.
 	 *
 	 * @param {string|null} scriptid                    Script ID.
 	 * @param {string}      confirmation                Confirmation text.
@@ -92,7 +92,7 @@ class Script {
 	}
 
 	/**
-	 * Open manualinput popup before redirecting user to provided URL.
+	 * Redirects user to the provided URL, handling optional manual input and confirmation.
 	 *
 	 * @param {string|null} scriptid                    Script ID.
 	 * @param {string}      confirmation                Confirmation text.
