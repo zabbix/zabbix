@@ -1507,6 +1507,46 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: peek first host name in host:key history data array               *
+ *                                                                            *
+ * Parameters: jp_data  - [IN] JSON with history data                         *
+ *             host     - [OUT] host of first host:key record                 *
+ *             host_len - [IN] host buffer length                             *
+ *             error    - [OUT] error message.                                *
+ *                                                                            *
+ * Return value:  SUCCEED - host name was returned successfully               *
+ *                FAIL    - no history records (in this case error is NULL)   *
+ *                          or history records have invalid format            *
+ *                                                                            *
+ ******************************************************************************/
+int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, size_t host_len, char **error)
+{
+	const char		*pnext = NULL;
+	struct zbx_json_parse	jp_row;
+
+	if (NULL == (pnext = zbx_json_next(jp_data, pnext)))
+	{
+		*error = NULL;
+		return FAIL;
+	}
+
+	if (FAIL == zbx_json_brackets_open(pnext, &jp_row))
+	{
+		*error = zbx_dsprintf(*error, "cannot open \"%s\" token", ZBX_PROTO_TAG_DATA);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, host_len, NULL))
+	{
+		*error = zbx_dsprintf(*error, "cannot find \"%s\" token in data", ZBX_PROTO_TAG_HOST);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process history data received from Zabbix active agent            *
  *                                                                            *
  * Parameters: sock         - [IN] the connection socket                      *
@@ -1562,24 +1602,10 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) > version)
 	{
-		const char		*pnext = NULL;
-		struct zbx_json_parse	jp_row;
-
-		if (NULL == (pnext = zbx_json_next(&jp_data, pnext)))
+		if (SUCCEED != peek_hostkey_host(&jp_data, tmp, sizeof(tmp), info))
 		{
-			ret = SUCCEED;
-			goto out;
-		}
-
-		if (FAIL == zbx_json_brackets_open(pnext, &jp_row))
-		{
-			*info = zbx_dsprintf(*info, "cannot open \"%s\" token", ZBX_PROTO_TAG_DATA);
-			goto out;
-		}
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, tmp, sizeof(tmp), NULL))
-		{
-			*info = zbx_dsprintf(*info, "cannot find \"%s\" token in data", ZBX_PROTO_TAG_HOST);
+			if (NULL == *info)
+				ret = SUCCEED;
 			goto out;
 		}
 	}
@@ -1658,6 +1684,7 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 	int			ret = FAIL;
 	zbx_dc_um_handle_t	*um_handle;
 	struct zbx_json_parse	jp_data;
+	char			host[ZBX_HOSTNAME_BUF_LEN];
 
 	if (SUCCEED == zbx_vps_monitor_capped())
 	{
@@ -1670,10 +1697,31 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 	um_handle = zbx_dc_open_user_macros();
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		if (SUCCEED == (ret = peek_hostkey_host(&jp_data, host, sizeof(host), info)))
+		{
+			zbx_comms_redirect_t	redirect;
+			zbx_uint64_t		hostid;
+
+			if (SUCCEED_PARTIAL == (ret = zbx_dc_config_get_hostid_by_name(host, &hostid, &redirect)))
+			{
+				struct zbx_json	j;
+
+				zbx_json_init(&j, 1024);
+				zbx_add_redirect_response(&j, &redirect);
+				*info = zbx_strdup(NULL, j.buffer);
+				zbx_json_free(&j);
+
+				goto out;
+			}
+		}
+
 		process_history_data_by_keys(sock, sender_item_validator, &rights, info, &jp_data, NULL);
+		ret = SUCCEED;
+	}
 	else
 		*info = zbx_dsprintf(*info, "cannot open \"%s\" token", ZBX_PROTO_TAG_DATA);
-
+out:
 	zbx_dc_close_user_macros(um_handle);
 
 	return ret;
