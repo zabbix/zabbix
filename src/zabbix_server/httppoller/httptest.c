@@ -867,10 +867,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 			}
 
 			if (NULL == data)
-			{
-				err_str = zbx_strdup(err_str, "received empty response");
 				data = "";
-			}
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __func__, httpstep.url, data);
 
