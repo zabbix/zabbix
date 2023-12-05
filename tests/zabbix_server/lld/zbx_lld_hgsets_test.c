@@ -28,6 +28,7 @@ static void	host_free(zbx_lld_host_t *host)
 {
 	zbx_vector_uint64_destroy(&host->groupids);
 	zbx_vector_uint64_destroy(&host->old_groupids);
+	zbx_vector_uint64_destroy(&host->new_groupids);
 
 	zbx_free(host);
 }
@@ -100,13 +101,25 @@ void	zbx_mock_test_entry(void **state)
 		host = (zbx_lld_host_t *)zbx_malloc(NULL, sizeof(zbx_lld_host_t));
 
 		host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
-		zbx_vector_uint64_create(&host->groupids);
 		zbx_vector_uint64_create(&host->old_groupids);
+		zbx_vector_uint64_create(&host->new_groupids);
+		zbx_vector_uint64_create(&host->groupids);
 
 		host->hostid = zbx_mock_get_object_member_uint64(element, "hostid");
 		host->hgsetid_orig = zbx_mock_get_object_member_uint64(element, "hgsetid_orig");
-		get_object_member_vector_elements_uint64(element, "res_groupids", &host->groupids);
 		get_object_member_vector_elements_uint64(element, "old_groupids", &host->old_groupids);
+		get_object_member_vector_elements_uint64(element, "res_groupids", &host->groupids);
+
+		for (i = 0; i < host->groupids.values_num; i++)
+		{
+			zbx_uint64_t	groupid = host->groupids.values[i];
+
+			if (FAIL == zbx_vector_uint64_search(&host->old_groupids, groupid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_append(&host->new_groupids, groupid);
+			}
+		}
 
 		zbx_vector_ptr_append(&hosts, host);
 	}
