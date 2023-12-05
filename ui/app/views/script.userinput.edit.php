@@ -58,26 +58,31 @@ else {
 		);
 }
 
+$buttons = [
+	[
+		'title' => _('Cancel'),
+		'class' => ZBX_STYLE_BTN_ALT,
+		'cancel' => true,
+		'action' => ''
+	]
+];
+
 if ($data['test']) {
-	$buttons = [
-		[
-			'title' => _('Test'),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'script_userinput_popup.submitTestForm();',
-			'class' => 'userinput-submit',
-			'enabled' => $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
-		]
+	$buttons[] = [
+		'title' => _('Test'),
+		'keepOpen' => true,
+		'isSubmit' => true,
+		'action' => 'script_userinput_popup.submitTestForm();',
+		'class' => 'userinput-submit',
+		'enabled' => $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
 	];
 }
 else {
-	$buttons = [
-		[
-			'title' => $data['confirmation'] ? _('Continue') : _('Execute'),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'script_userinput_popup.submit();'
-		]
+	$buttons[] = [
+		'title' => $data['has_confirmation'] ? _('Continue') : _('Execute'),
+		'keepOpen' => true,
+		'isSubmit' => true,
+		'action' => 'script_userinput_popup.submit();'
 	];
 }
 

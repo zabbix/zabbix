@@ -89,7 +89,6 @@ class CControllerScriptUpdate extends CController {
 
 	protected function doAction(): void {
 		$script = [];
-		$output = [];
 
 		$this->getInputs($script, ['scriptid', 'name', 'description', 'groupid']);
 
@@ -184,6 +183,7 @@ class CControllerScriptUpdate extends CController {
 		}
 
 		$result = (bool) API::Script()->update($script);
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _('Script updated');

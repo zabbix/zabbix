@@ -1505,8 +1505,8 @@ function getMenuPopupURLData(urls, trigger_element, hostid, eventid) {
 				manualinput_validator: url.manualinput_validator,
 				manualinput_default_value: url.manualinput_default_value,
 				scriptid: url.scriptid,
-				hostid: hostid,
-				eventid: eventid
+				hostid,
+				eventid
 			});
 		}
 	}
@@ -1566,19 +1566,11 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 			if (typeof data.params !== 'undefined') {
 				item.target = data.params.target;
 				item.rel = data.params.rel;
-
-				if (data.params.manualinput == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-					item.clickCallback = () => openManualinputDialogue(item, data, trigger_elm);
-				}
-				else if (data.params.manualinput == ZBX_SCRIPT_MANUALINPUT_DISABLED
-						&& data.params.confirmation !== '') {
-					item.url = data.params.url;
-
-					item.clickCallback = () => confirm(data.params.confirmation);
-				}
-				else {
-					item.url = data.params.url;
-				}
+				item.clickCallback = () => Script.openUrl(data.params.scriptid, data.params.confirmation, trigger_elm,
+					data.params.hostid, data.params.eventid, data.params.url, data.params.target,
+					data.params.manualinput, data.params.manualinput_prompt, data.params.manualinput_validator_type,
+					data.params.manualinput_validator, data.params.manualinput_default_value
+				);
 			}
 
 			items[items.length] = item;
@@ -1586,112 +1578,6 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 	}
 
 	return items;
-}
-
-/**
- * Open manualinput popup before redirecting user to provided URL or before displaying confirmation dialogue.
- *
- * @param {object} item  Item object.
- * @param {object} data  Data object.
- */
-function openManualinputDialogue(item, data, trigger_element) {
-	const parameters = {
-		manualinput_prompt: data.params.manualinput_prompt,
-		manualinput_default_value: data.params.manualinput_default_value,
-		manualinput_validator_type: data.params.manualinput_validator_type,
-		manualinput_validator: data.params.manualinput_validator,
-		confirmation: data.params.confirmation
-	};
-
-	const overlay = PopUp('script.userinput.edit', parameters, {
-		dialogueid: 'script-userinput-form',
-		dialogue_class: 'modal-popup-small position-middle',
-		trigger_element: trigger_element
-	});
-
-	overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-		const curl = new Curl('jsrpc.php');
-
-		curl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
-		curl.setArgument('scriptid', data.params.scriptid);
-		curl.setArgument('manualinput', e.detail.data.manualinput);
-
-		if (data.params.hostid !== null) {
-			curl.setArgument('method', 'get_scripts_by_hosts');
-			curl.setArgument('hostid', data.params.hostid);
-		}
-		else if (data.params.eventid !== null) {
-			curl.setArgument('method', 'get_scripts_by_events');
-			curl.setArgument('eventid', data.params.eventid);
-		}
-
-		const form = document.getElementById('script-userinput-form');
-		this.overlay = overlays_stack.getById('script-userinput-form');
-
-		fetch(curl.getUrl())
-			.then((response) => response.json())
-			.then((response) => {
-				this.overlay.unsetLoading();
-
-				for (const element of form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				if ('error' in response.result) {
-					const message_box = makeMessageBox('bad', [response.result.error], '', true, true)[0];
-
-					form.parentNode.insertBefore(message_box, form);
-				}
-				else {
-					item.url = response.result.url;
-
-					try {
-						new URL(item.url);
-
-						if (response.result.confirmation === '') {
-							window.open(item.url, '_blank');
-							overlayDialogueDestroy(overlay.dialogueid);
-						}
-						else {
-							if (confirm(response.result.confirmation)) {
-								window.open(item.url, '_blank');
-								overlayDialogueDestroy(overlay.dialogueid);
-							}
-							else {
-								overlay.recoverFocus();
-								overlay.containFocus();
-							}
-						}
-					}
-					catch (e) {
-						for (const element of form.parentNode.children) {
-							if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-								element.parentNode.removeChild(element);
-							}
-						}
-
-						const message = t('Invalid URL') + ': ' + item.url;
-						const message_box = makeMessageBox('bad', [message], t('Cannot open URL'))[0];
-
-						form.parentNode.insertBefore(message_box, form);
-					}
-				}
-			})
-			.catch((exception) => {
-				for (const element of form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				const title = t('Unexpected server error.');
-				const message_box = makeMessageBox('bad', [exception], title)[0];
-
-				form.parentNode.insertBefore(message_box, form);
-			});
-	});
 }
 
 /**
@@ -1719,7 +1605,7 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 					jQuery(this)
 						.closest('.menu-popup-top')
 						.menuPopup('close', trigger_elm, false);
-					executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
+					Script.execute(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
 						data.params.eventid, csrf_token, data.params.manualinput, data.params.manualinput_prompt,
 						data.params.manualinput_validator_type, data.params.manualinput_validator,
 						data.params.manualinput_default_value

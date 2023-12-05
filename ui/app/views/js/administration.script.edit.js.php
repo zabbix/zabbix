@@ -89,36 +89,45 @@ window.script_edit_popup = new class {
 		const type = this.form.querySelector('#type');
 
 		// Load scope fields.
-		this.form.querySelector('#scope').onchange = (e) => {
+		this.form.querySelector('#scope').addEventListener('change', (e) => {
 			this.#hideFormFields('all');
 			this.#loadScopeFields(e);
 			type.dispatchEvent(new Event('change'));
-		};
+		});
 
 		// Load type fields.
-		type.onchange = (e) => this.#loadTypeFields(script, e);
+		type.addEventListener('change', (e) => this.#loadTypeFields(script, e));
 
 		// Update user input fields.
-		this.form.querySelector('#manualinput').onchange = (e) => this.#loadUserInputFields(e);
+		this.form.querySelector('#manualinput').addEventListener('change', (e) => this.#loadUserInputFields(e));
 		this.form.querySelector('#manualinput').dispatchEvent(new Event('change'));
 
 
 		// Update confirmation fields.
-		this.form.querySelector('#enable_confirmation').onchange = (e) => this.#loadConfirmationFields(e);
+		this.form.querySelector('#enable_confirmation').addEventListener('change', (e) =>
+			this.#loadConfirmationFields(e)
+		);
 
 		// Test user input button.
 		this.form.querySelector('#test_user_input').addEventListener('click', () => this.#openManualinputTestPopup());
 
 		// Test confirmation button.
-		this.form.querySelector('#test_confirmation').addEventListener('click', (e) =>
-			executeScript(null, this.form.querySelector('#confirmation').value, e.target)
-		);
+		this.form.querySelector('#test_confirmation').addEventListener('click', (e) => {
+			if (this.form.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+				Script.openUrl(null, this.form.querySelector('#confirmation').value, e.target);
+			}
+			else {
+				Script.execute(null, this.form.querySelector('#confirmation').value, e.target)
+			}
+		});
 
 		// Host group selection.
 		const hgstype = this.form.querySelector('#hgstype-select');
 		const hostgroup_selection = this.form.querySelector('#host-group-selection');
 
-		hgstype.onchange = () => hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none';
+		hgstype.addEventListener('change', () =>
+			hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none'
+		);
 
 		hgstype.dispatchEvent(new Event('change'));
 		this.form.removeAttribute('style');
@@ -378,7 +387,7 @@ window.script_edit_popup = new class {
 
 				const authtype = this.form.querySelector('#authtype');
 
-				authtype.onchange = (e) => this.#loadAuthFields(e);
+				authtype.addEventListener('change', (e) => this.#loadAuthFields(e));
 				authtype.dispatchEvent(new Event('change'));
 				break;
 

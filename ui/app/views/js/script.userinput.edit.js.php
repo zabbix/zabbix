@@ -26,6 +26,8 @@
 
 window.script_userinput_popup = new class {
 
+	#abort_controller = null;
+
 	/**
 	 * Manualinput form setup.
 	 *
@@ -42,6 +44,12 @@ window.script_userinput_popup = new class {
 		this.input_type = input_type;
 		this.input_validator = input_validator;
 		this.default_input = default_input;
+
+		this.dialogue.addEventListener('dialogue.close', () => {
+			if (this.#abort_controller !== null) {
+				this.#abort_controller.abort();
+			}
+		});
 	}
 
 	submitTestForm() {
@@ -74,7 +82,7 @@ window.script_userinput_popup = new class {
 		curl.setArgument('action', 'script.userinput.check');
 
 		if (this.overlay) {
-			if (this.overlay.hasLoading()) {
+			if (this.overlay.isLoading()) {
 				return;
 			}
 
@@ -85,10 +93,13 @@ window.script_userinput_popup = new class {
 	}
 
 	#post(url, data) {
+		this.#abort_controller = new AbortController();
+
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: this.#abort_controller.signal
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -119,6 +130,10 @@ window.script_userinput_popup = new class {
 				}
 			})
 			.catch((exception) => {
+				if (this.#abort_controller.signal.aborted) {
+					return;
+				}
+
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -138,6 +153,9 @@ window.script_userinput_popup = new class {
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.#abort_controller = null;
 			});
 	}
 }

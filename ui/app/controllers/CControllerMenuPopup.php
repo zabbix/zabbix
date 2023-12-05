@@ -845,33 +845,30 @@ class CControllerMenuPopup extends CController {
 			$scripts = [];
 			$urls = [];
 
-			if ($scripts_by_events) {
-				foreach ($scripts_by_events as &$event_scripts) {
-					foreach ($event_scripts as $num => &$event_script) {
-						if ($event_script['scope'] != ZBX_SCRIPT_SCOPE_EVENT) {
-							unset($event_script[$num]);
-							continue;
-						}
+			foreach ($scripts_by_events as &$event_scripts) {
+				foreach ($event_scripts as $num => &$event_script) {
+					if ($event_script['scope'] != ZBX_SCRIPT_SCOPE_EVENT) {
+						unset($event_script[$num]);
+						continue;
+					}
 
-						$scriptid = $event_script['scriptid'];
+					$scriptid = $event_script['scriptid'];
 
-						// Split scripts and URLs.
-						if ($event_script['type'] == ZBX_SCRIPT_TYPE_URL) {
-							if (!array_key_exists($scriptid, $urls)) {
-								$urls[$scriptid] = $event_script;
-							}
-						}
-						else {
-							if (!array_key_exists($scriptid, $scripts)) {
-								$scripts[$scriptid] = $event_script;
-							}
+					// Split scripts and URLs.
+					if ($event_script['type'] == ZBX_SCRIPT_TYPE_URL) {
+						if (!array_key_exists($scriptid, $urls)) {
+							$urls[$scriptid] = $event_script;
 						}
 					}
-					unset($event_script);
+					else {
+						if (!array_key_exists($scriptid, $scripts)) {
+							$scripts[$scriptid] = $event_script;
+						}
+					}
 				}
-				unset($event_scripts);
+				unset($event_script);
 			}
-
+			unset($event_scripts);
 
 			if ($event) {
 				foreach ($event['urls'] as &$url) {

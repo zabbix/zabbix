@@ -202,7 +202,7 @@ Overlay.prototype.containFocus = function() {
 	}
 };
 
-Overlay.prototype.hasLoading = function() {
+Overlay.prototype.isLoading = function() {
 	return this.$dialogue.$body.hasClass('is-loading');
 };
 

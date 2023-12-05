@@ -374,22 +374,15 @@ function PopUp(action, parameters, {
 						});
 						break;
 
-					case 'script.userinput.edit':
-						buttons.unshift({
-							'title': t('Cancel'),
-							'class': 'btn-alt js-cancel',
-							'cancel': true,
-							'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
-						});
-						break;
-
 					default:
-						buttons.push({
-							'title': t('Cancel'),
-							'class': 'btn-alt js-cancel',
-							'cancel': true,
-							'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
-						});
+						if (!buttons.some(button => button.cancel)) {
+							buttons.push({
+								'title': t('Cancel'),
+								'class': 'btn-alt js-cancel',
+								'cancel': true,
+								'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
+							});
+						}
 				}
 
 				overlay.setProperties({

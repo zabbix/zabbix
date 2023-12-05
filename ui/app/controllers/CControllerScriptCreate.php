@@ -83,7 +83,6 @@ class CControllerScriptCreate extends CController {
 
 	protected function doAction(): void {
 		$script = [];
-		$output = [];
 
 		$this->getInputs($script, ['name', 'description', 'groupid']);
 
@@ -175,6 +174,7 @@ class CControllerScriptCreate extends CController {
 		}
 
 		$result = (bool) API::Script()->create($script);
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _('Script added');

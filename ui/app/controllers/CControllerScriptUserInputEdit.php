@@ -60,7 +60,7 @@ class CControllerScriptUserInputEdit extends CController {
 			'manualinput_validator_type' => $this->getInput('manualinput_validator_type'),
 			'manualinput_validator' => $this->getInput('manualinput_validator', ''),
 			'manualinput_default_value' => $this->getInput('manualinput_default_value', ''),
-			'confirmation' => $this->hasInput('confirmation') && $this->getInput('confirmation') !== '',
+			'has_confirmation' => $this->hasInput('confirmation') && $this->getInput('confirmation') !== '',
 			'test' => $this->hasInput('test'),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];

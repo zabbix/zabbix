@@ -862,7 +862,7 @@ switch ($data['method']) {
 		break;
 
 	case 'get_scripts_by_hosts':
-		$result = '';
+		$result = [];
 
 		if (array_key_exists('hostid', $data) && is_scalar($data['hostid'])) {
 			$scripts = API::Script()->getScriptsByHosts([
@@ -878,15 +878,14 @@ switch ($data['method']) {
 					'error' => array_values(array_column($errors, 'message'))
 				];
 			}
-
-			if ($scripts) {
+			elseif ($scripts) {
 				$result = $scripts[$data['hostid']][0];
 			}
 		}
 		break;
 
 	case 'get_scripts_by_events':
-		$result = '';
+		$result = [];
 
 		if (array_key_exists('eventid', $data) && is_scalar($data['eventid'])) {
 			$scripts = API::Script()->getScriptsByEvents([
@@ -902,8 +901,7 @@ switch ($data['method']) {
 					'error' => array_values(array_column($errors, 'message'))
 				];
 			}
-
-			if ($scripts) {
+			elseif ($scripts) {
 				$result = $scripts[$data['eventid']][0];
 			}
 		}
