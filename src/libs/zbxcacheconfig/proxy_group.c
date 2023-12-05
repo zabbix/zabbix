@@ -224,9 +224,10 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vec
 			proxy = (zbx_pg_proxy_t *)zbx_hashset_insert(proxies, &proxy_local, sizeof(proxy_local));
 
 			zbx_vector_pg_host_ptr_create(&proxy->hosts);
+			zbx_vector_pg_host_create(&proxy->deleted_group_hosts);
 
 			/* WDN: force online status */
-			proxy->status = 2;
+			proxy->lastaccess = time(NULL);
 		}
 
 		proxy->lastaccess = dc_proxy->lastaccess;

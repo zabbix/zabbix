@@ -90,11 +90,11 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
 
-	result = zbx_db_select("select hostid,proxyid,revision from host_proxy");
+	result = zbx_db_select("select hostid,proxyid,revision,hostproxyid from host_proxy");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_uint64_t	hostid, proxyid, revision;
+		zbx_uint64_t	hostid, proxyid, revision,hostproxyid;
 		zbx_pg_proxy_t	*proxy;
 
 		ZBX_DBROW2UINT64(proxyid, row[1]);
@@ -107,11 +107,13 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 		}
 
 		ZBX_STR2UINT64(revision, row[2]);
+		ZBX_STR2UINT64(hostproxyid, row[3]);
 
 		zbx_pg_host_t	host_local = {
 				.hostid = hostid,
 				.proxyid = proxyid,
-				.revision = revision
+				.revision = revision,
+				.hostproxyid = hostproxyid
 			}, *host;
 
 		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hpmap, &host_local, sizeof(host_local));
@@ -403,11 +405,10 @@ static void	pgm_db_flush_host_proxy_insert_batch(zbx_pg_host_t *hosts, int hosts
 		if (NULL == zbx_hashset_search(&proxy_index, &hosts[i].proxyid))
 			continue;
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), hosts[i].hostid, hosts[i].proxyid,
+		zbx_db_insert_add_values(&db_insert, hosts[i].hostproxyid, hosts[i].hostid, hosts[i].proxyid,
 				hosts[i].revision);
 	}
 
-	zbx_db_insert_autoincrement(&db_insert, "hostproxyid");
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 

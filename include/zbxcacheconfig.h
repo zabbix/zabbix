@@ -1360,6 +1360,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxyid;
 	zbx_uint64_t	revision;
+	zbx_uint64_t	hostproxyid;
 }
 zbx_pg_host_t;
 
@@ -1382,6 +1383,7 @@ typedef struct
 	int				firstaccess;
 	struct zbx_pg_group		*group;
 	zbx_vector_pg_host_ptr_t	hosts;
+	zbx_vector_pg_host_t		deleted_group_hosts;
 }
 zbx_pg_proxy_t;
 

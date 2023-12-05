@@ -71,8 +71,6 @@ void	pg_cache_destroy(zbx_pg_cache_t *cache);
 void	pg_cache_queue_group_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
 void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups, zbx_vector_pg_host_t *hosts_new,
 		zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del);
-zbx_pg_proxy_t	*pg_cache_group_add_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid,
-		const char *name, int firstaccess);
 void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy);
 void	pg_cache_proxy_free(zbx_pg_cache_t *cache, zbx_pg_proxy_t *proxy);
 

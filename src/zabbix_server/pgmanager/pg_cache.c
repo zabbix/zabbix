@@ -67,6 +67,7 @@ void	pg_group_clear(zbx_pg_group_t *group)
 void	pg_proxy_clear(zbx_pg_proxy_t *proxy)
 {
 	zbx_vector_pg_host_ptr_destroy(&proxy->hosts);
+	zbx_vector_pg_host_destroy(&proxy->deleted_group_hosts);
 	zbx_free(proxy->name);
 }
 
@@ -160,40 +161,6 @@ void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uin
 	}
 	else
 		host->proxyid = proxyid;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: add proxy to group                                                *
- *                                                                            *
- * Parameters: cache   - [IN] proxy group cache                               *
- *             group   - [IN] target group                                    *
- *             proxyid - [IN] proxy identifier                                *
- *             name    - [IN] proxy name
- *             clock   - [IN] firstaccess timestamp during initial cache sync *
- *                            with database                                   *
- *                                                                            *
- ******************************************************************************/
-zbx_pg_proxy_t	*pg_cache_group_add_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t proxyid,
-		const char *name, int firstaccess)
-{
-	zbx_pg_proxy_t	*proxy, proxy_local = {.proxyid = proxyid, .group = group, .firstaccess = firstaccess};
-
-	/* WDN: set initial online status for debug */
-	proxy_local.status = ZBX_PG_PROXY_STATUS_ONLINE;
-
-	proxy = (zbx_pg_proxy_t *)zbx_hashset_insert(&cache->proxies, &proxy_local, sizeof(proxy_local));
-	zbx_vector_pg_host_ptr_create(&proxy->hosts);
-	proxy->name = zbx_strdup(NULL, name);
-
-	zbx_vector_pg_proxy_ptr_append(&group->proxies, proxy);
-
-	/* non zero clock will be during initial setup loading from db, */
-	/* which will queue all groups for update anyway                */
-	if (0 == firstaccess)
-		pg_cache_queue_group_update(cache, group);
-
-	return proxy;
 }
 
 /******************************************************************************
@@ -457,8 +424,11 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 	if (0 != groups->values_num || 0 != cache->hpmap_updates.num_data)
 		cache->hpmap_revision++;
 
-	zbx_hashset_iter_t	iter;
-	zbx_pg_host_t		*host, *new_host;
+	zbx_hashset_iter_t		iter;
+	zbx_pg_host_t			*host, *new_host;
+	zbx_vector_pg_host_ptr_t	added_hosts;
+
+	zbx_vector_pg_host_ptr_create(&added_hosts);
 
 	zbx_hashset_iter_reset(&cache->hpmap_updates, &iter);
 	while (NULL != (new_host = (zbx_pg_host_t *)zbx_hashset_iter_next(&iter)))
@@ -471,8 +441,11 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 
 		if (NULL != (host = (zbx_pg_host_t *)zbx_hashset_search(&cache->hpmap, &new_host->hostid)))
 		{
+			host_local.hostproxyid = host->hostproxyid;
+
 			if (0 == new_host->proxyid)
 			{
+				host_local.proxyid = host->proxyid;
 				zbx_hashset_remove_direct(&cache->hpmap, host);
 				zbx_vector_pg_host_append_ptr(hosts_del, &host_local);
 			}
@@ -487,6 +460,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 		{
 			zbx_vector_pg_host_append_ptr(hosts_new, &host_local);
 			host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hpmap, &host_local, sizeof(host_local));
+			zbx_vector_pg_host_ptr_append(&added_hosts, host);
 		}
 
 		if (0 != new_host->proxyid)
@@ -497,6 +471,56 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 				zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
 		}
 	}
+
+	/* assign hostproxyid for new hosts-proxy links */
+
+	zbx_uint64_t	hostproxyid;
+
+	hostproxyid = zbx_db_get_maxid_num("host_proxy", added_hosts.values_num);
+	for (int i = 0; i < added_hosts.values_num; i++)
+	{
+		added_hosts.values[i]->hostproxyid = hostproxyid;
+		hosts_new->values[i].hostproxyid = hostproxyid++;
+	}
+
+	/* add deleted host-group links to every group proxy so they are synced to them */
+
+	time_t	now;
+
+	now = time(NULL);
+
+	for (int i = 0; i < hosts_del->values_num; i++)
+	{
+		zbx_pg_proxy_t	*proxy;
+
+		host = &hosts_del->values[i];
+
+		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &host->proxyid)) ||
+				NULL == proxy->group)
+		{
+			continue;
+		}
+
+		zbx_pg_group_t	*group = proxy->group;
+
+		for (int j = 0; j < group->proxies.values_num; j++)
+		{
+			proxy = group->proxies.values[j];
+
+			/* Full hostmap sync will be forced if proxy has not been connected yet   */
+			/* or its last connection was more than 24h ago. Until then track deleted */
+			/* host-proxy links so they can be synced to proxies.                     */
+			if (0 != proxy->lastaccess)
+			{
+				if (SEC_PER_DAY > now - proxy->lastaccess)
+					zbx_vector_pg_host_append_ptr(&proxy->deleted_group_hosts, host);
+				else
+					zbx_vector_pg_host_clear(&proxy->deleted_group_hosts);
+			}
+		}
+	}
+
+	zbx_vector_pg_host_ptr_destroy(&added_hosts);
 
 	zbx_hashset_clear(&cache->hpmap_updates);
 
@@ -573,6 +597,10 @@ void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 	zabbix_log(LOG_LEVEL_DEBUG, "    hostids:");
 	for (int i = 0; i < proxy->hosts.values_num; i++)
 		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, proxy->hosts.values[i]->hostid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "    deleted group hostproxyids:");
+	for (int i = 0; i < proxy->deleted_group_hosts.values_num; i++)
+		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, proxy->deleted_group_hosts.values[i].hostproxyid);
 
 }
 
