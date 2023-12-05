@@ -202,10 +202,6 @@ Overlay.prototype.containFocus = function() {
 	}
 };
 
-Overlay.prototype.isLoading = function() {
-	return this.$dialogue.$body.hasClass('is-loading');
-};
-
 /**
  * Sets dialogue in loading state.
  */

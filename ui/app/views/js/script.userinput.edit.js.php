@@ -81,14 +81,6 @@ window.script_userinput_popup = new class {
 
 		curl.setArgument('action', 'script.userinput.check');
 
-		if (this.overlay) {
-			if (this.overlay.isLoading()) {
-				return;
-			}
-
-			this.overlay.setLoading();
-		}
-
 		this.#post(curl.getUrl(), fields);
 	}
 
