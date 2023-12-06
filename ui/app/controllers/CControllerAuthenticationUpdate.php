@@ -37,7 +37,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'form_refresh' =>				'int32',
 			'ldap_test_user' =>				'string',
-			'ldap_test_password' =>			'string',
+			'ldap_test_password' =>			'password',
 			'ldap_test' =>					'in 1',
 			'db_authentication_type' =>		'int32',
 			'change_bind_password' =>		'in 0,1',
@@ -50,7 +50,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_base_dn' =>				'db config.ldap_base_dn',
 			'ldap_bind_dn' =>				'db config.ldap_bind_dn',
 			'ldap_search_attribute' =>		'db config.ldap_search_attribute',
-			'ldap_bind_password' =>			'db config.ldap_bind_password',
+			'ldap_bind_password' =>			'db config.ldap_bind_password|password',
 			'http_auth_enabled' =>			'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>			'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>			'db config.http_strip_domains',
