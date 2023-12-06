@@ -43,9 +43,9 @@ static void print_line(const char *line, int size)
 
 static void test1(uint64_t bufsz, const char *encoding, int *lines, ssize_t *result)
 {
-	int f;
-	char *line, *buf;
-	void *saveptr = NULL;
+	int	f;
+	char	*line, *buf;
+	void	*saveptr = NULL;
 
 	printf("Test 1:\n");
 
@@ -71,8 +71,8 @@ static void test1(uint64_t bufsz, const char *encoding, int *lines, ssize_t *res
 
 static void test2(uint64_t bufsz, const char *encoding, int *lines, int *result)
 {
-	int f;
-	char *buf;
+	int	f;
+	char	*buf;
 
 	printf("Test 2:\n");
 
@@ -97,10 +97,10 @@ static void test2(uint64_t bufsz, const char *encoding, int *lines, int *result)
 
 void zbx_mock_test_entry(void **state)
 {
-	int lines1, lines2, result2;
-	const char *encoding, *result;
-	ssize_t line_count, result1;
-	uint64_t bufsz;
+	int		lines1, lines2, result2;
+	const char	*encoding, *result;
+	ssize_t		line_count, result1;
+	uint64_t	bufsz;
 
 	ZBX_UNUSED(state);
 
