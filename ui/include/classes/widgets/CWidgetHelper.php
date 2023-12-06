@@ -151,6 +151,12 @@ class CWidgetHelper {
 				->addClass($class);
 		}
 
+		if ($field instanceof CWidgetFieldHostPatternSelect) {
+			return (new CLabel([$field->getLabel(), $help_icon], $field->getName().'__ms'))
+				->setAsteriskMark(self::isAriaRequired($field))
+				->addClass($class);
+		}
+
 		return (new CLabel([$field->getLabel(), $help_icon], $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field))
 			->addClass($class);
