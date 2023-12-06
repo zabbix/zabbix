@@ -4416,11 +4416,11 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_close(&json_data);
 			zbx_json_addarray(&json_data, "net_if");
 
-			for (i = 0; i < vm->devs.values_num; i++)
+			for (j = 0; j < vm->devs.values_num; j++)
 			{
 				zbx_vmware_dev_t	*dev;
 
-				dev = (zbx_vmware_dev_t *)vm->devs.values[i];
+				dev = (zbx_vmware_dev_t *)vm->devs.values[j];
 
 				if (ZBX_VMWARE_DEV_TYPE_NIC != dev->type)
 					continue;

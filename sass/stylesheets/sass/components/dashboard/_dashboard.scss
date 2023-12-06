@@ -1056,8 +1056,7 @@
 	}
 }
 
-.dashboard-grid-widget-body,
-.dashboard-grid-iterator-body {
+.dashboard-grid-iterator-contents {
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}

@@ -24,6 +24,7 @@
 #include "zbxtypes.h"
 #include "zbxregexp.h"
 #include "zbxeval.h"
+#include "zbx_host_constants.h"
 
 /*
  * 7.0 development database patches
@@ -1889,6 +1890,74 @@ static int	DBpatch_6050149(void)
 #undef LAST_FOREACH
 }
 
+static int	DBpatch_6050150(void)
+{
+	const zbx_db_table_t	table =
+			{"item_rtname", "itemid", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name_resolved", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"name_resolved_upper", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050151(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_rtname", 1, &field);
+}
+
+static int	DBpatch_6050152(void)
+{
+	if (ZBX_DB_OK <= zbx_db_execute("insert into item_rtname (itemid,name_resolved,name_resolved_upper)"
+			" select i.itemid,i.name,i.name_upper from"
+			" items i,hosts h"
+			" where i.hostid=h.hostid and (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_6050153(void)
+{
+	return DBdrop_index("items", "items_9");
+}
+
+static int	DBpatch_6050154(void)
+{
+	return DBdrop_field("items", "name_upper");
+}
+
+static int	DBpatch_6050155(void)
+{
+	return zbx_dbupgrade_drop_trigger_on_insert("items", "name_upper");
+}
+
+static int	DBpatch_6050156(void)
+{
+	return zbx_dbupgrade_drop_trigger_on_update("items", "name_upper");
+}
+
+static int	DBpatch_6050157(void)
+{
+	return zbx_dbupgrade_drop_trigger_function_on_insert("items", "name_upper", "upper");
+}
+
+static int	DBpatch_6050158(void)
+{
+	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -2043,5 +2112,14 @@ DBPATCH_ADD(6050146, 0, 1)
 DBPATCH_ADD(6050147, 0, 1)
 DBPATCH_ADD(6050148, 0, 1)
 DBPATCH_ADD(6050149, 0, 1)
+DBPATCH_ADD(6050150, 0, 1)
+DBPATCH_ADD(6050151, 0, 1)
+DBPATCH_ADD(6050152, 0, 1)
+DBPATCH_ADD(6050153, 0, 1)
+DBPATCH_ADD(6050154, 0, 1)
+DBPATCH_ADD(6050155, 0, 1)
+DBPATCH_ADD(6050156, 0, 1)
+DBPATCH_ADD(6050157, 0, 1)
+DBPATCH_ADD(6050158, 0, 1)
 
 DBPATCH_END()

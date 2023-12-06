@@ -1,6 +1,16 @@
+Changes for 7.0.0alpha9
+
+New features:
+.........T [ZBXNEXT-8707] updated version check for MongoDB node by Zabbix agent 2 template (atocko)
+
+Bug fixes:
+...G...... [ZBX-23672] fixed issue of binary items breaking module compatibility (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0alpha8
 
 New features:
+A.F.I..PST [ZBXNEXT-7460] added support for user macros in item and item prototype names (agriscenko, vso)
 A.F....PS. [ZBXNEXT-8735] added attempt interval and item data type-based filtering to connectors (dfofanovs, dgoloscapov)
 ...G...PS. [ZBXNEXT-1400] added support for configuration file validation (asestakovs, dimir)
 A.F.I..... [ZBXNEXT-7578] modified 'headers' and 'query_fields' parameter structure for item, item prototype, and LLD rule API objects (akozlovs, jfreibergs, vmaksimovs)
@@ -392,6 +402,18 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.10rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.9
+
+6.4.9rc1 was released as 6.4.9 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.9rc1
@@ -1908,6 +1930,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.25rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.24
+
+6.0.24rc1 was released as 6.0.24 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.24rc1
@@ -4728,9 +4762,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.40rc1
+Changes for 5.0.41rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.40
+
+5.0.40rc1 was released as 5.0.40 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.40rc1
 
 Bug fixes:
 .......P.. [ZBX-22493] fixed foreign key support with SQLite3 database (wiper)
