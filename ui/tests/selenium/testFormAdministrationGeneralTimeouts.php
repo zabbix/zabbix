@@ -1478,7 +1478,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
 				]
 			],
-			// #103.
+			// #104.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1488,7 +1488,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
 				]
 			],
-			// #104.
+			// #105.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1498,7 +1498,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
 				]
 			],
-			// #105.
+			// #106.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1508,7 +1508,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
 				]
 			],
-			// #106.
+			// #107.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1518,7 +1518,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
 				]
 			],
-			// #107.
+			// #108.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1528,7 +1528,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
 				]
 			],
-			// #108.
+			// #109.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1538,7 +1538,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
 				]
 			],
-			// #109.
+			// #110.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1548,7 +1548,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
 				]
 			],
-			// #110 All network timeouts errors with LLD macros.
+			// #111 All network timeouts errors with LLD macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1570,7 +1570,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #111 All network timeouts errors with global macros.
+			// #112 All network timeouts errors with global macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1592,7 +1592,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #112 All network timeouts errors with user macros.
+			// #113 All network timeouts errors with user macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1613,158 +1613,187 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Incorrect value for field "report_test_timeout": a time unit is expected.'
 					]
 				]
+			],
+			// #114.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Zabbix agent' => '   15s   '
+					],
+					'db' => [
+						'timeout_zabbix_agent' => '15s'
+					]
+				]
+			],
+			// #115.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Simple check' => '   15s   '
+					],
+					'db' => [
+						'timeout_simple_check' => '15s'
+					]
+				]
+			],
+			// #116.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'SNMP agent' => '   15s   '
+					],
+					'db' => [
+						'timeout_snmp_agent' => '15s'
+					]
+				]
+			],
+			// #117.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'External check' => '   15s   '
+					],
+					'db' => [
+						'timeout_external_check' => '15s'
+					]
+				]
+			],
+			// #118.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Database monitor' => '   15s   '
+					],
+					'db' => [
+						'timeout_db_monitor' => '15s'
+					]
+				]
+			],
+			// #119.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'HTTP agent' => '   15s   '
+					],
+					'db' => [
+						'timeout_http_agent' => '15s'
+					]
+				]
+			],
+			// #120.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'SSH agent' => '   15s   '
+					],
+					'db' => [
+						'timeout_ssh_agent' => '15s'
+					]
+				]
+			],
+			// #121.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'TELNET agent' => '   15s   '
+					],
+					'db' => [
+						'timeout_telnet_agent' => '15s'
+					]
+				]
+			],
+			// #122.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Script' => '   15s   '
+					],
+					'db' => [
+						'timeout_script' => '15s'
+					]
+				]
+			],
+			// #123.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Communication' => '   15s   '
+					],
+					'db' => [
+						'socket_timeout' => '15s'
+					]
+				]
+			],
+			// #124.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Connection' => '   15s   '
+					],
+					'db' => [
+						'connect_timeout' => '15s'
+					]
+				]
+			],
+			// #125.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Media type test' => '   15s   '
+					],
+					'db' => [
+						'media_type_test_timeout' => '15s'
+					]
+				]
+			],
+			// #126.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Script execution' => '   15s   '
+					],
+					'db' => [
+						'script_timeout' => '15s'
+					]
+				]
+			],
+			// #127.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Item test' => '   15s   '
+					],
+					'db' => [
+						'item_test_timeout' => '15s'
+					]
+				]
+			],
+			// #128.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Scheduled report test' => '   15s   '
+					],
+					'db' => [
+						'report_test_timeout' => '15s'
+					]
+				]
 			]
-			// TODO: uncomment after ZBX-23636. Fields should be trimmed.
-//			[
-//				[
-//					'fields' => [
-//						'Zabbix agent' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_zabbix_agent' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Simple check' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_simple_check' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'SNMP agent' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_snmp_agent' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'External check' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_external_check' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Database monitor' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_db_monitor' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'HTTP agent' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_http_agent' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'SSH agent' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_ssh_agent' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'TELNET agent' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_telnet_agent' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Script' => '   15s   '
-//					],
-//					'db' => [
-//						'timeout_script' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Communication' => '   15s   '
-//					],
-//					'db' => [
-//						'socket_timeout' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Connection' => '   15s   '
-//					],
-//					'db' => [
-//						'connect_timeout' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Media type test' => '   15s   '
-//					],
-//					'db' => [
-//						'media_type_test_timeout' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Script execution' => '   15s   '
-//					],
-//					'db' => [
-//						'script_timeout' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Item test' => '   15s   '
-//					],
-//					'db' => [
-//						'item_test_timeout' => '15s'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'fields' => [
-//						'Scheduled report test' => '   15s   '
-//					],
-//					'db' => [
-//						'report_test_timeout' => '15s'
-//					]
-//				]
-//			]
 		];
 	}
 
