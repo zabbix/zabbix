@@ -2210,37 +2210,50 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 
 		cmd_len = strlen(command);
 
-		while (SUCCEED == zbx_token_find_ext(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO,
-				ZBX_BACKSLASH_ESC_OFF) && cmd_len >= pos)
+		while (SUCCEED == zbx_token_find_ext(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, 1) &&
+				cmd_len >= pos)
 		{
 			if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
 			{
-				char	*substitute = NULL, *expression = NULL;
-				size_t	expr_alloc = 0, expr_offset = 0;
+				const char	*ptr = command + token.loc.l + 2, *macro_end;
+				int		res = FAIL;
 
-				zbx_strncpy_alloc(&expression, &expr_alloc, &expr_offset,
+				macro_end = ptr;
+
+				while (NULL != (macro_end = strstr(macro_end, "}")) && res == FAIL)
+				{
+					char	*substitute = NULL, *expression = NULL;
+					size_t	expr_alloc = 0, expr_offset = 0;
+
+					token.loc.r = macro_end - ptr + 2;
+
+					zbx_strncpy_alloc(&expression, &expr_alloc, &expr_offset,
 						command + token.loc.l + 2, token.loc.r - token.loc.l - 2);
 
-				if (SUCCEED == update_escaping_in_expression(expression, &substitute, &error))
-				{
-					replaced = 1;
-					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-						command + pos, token.loc.l - pos + 2);
-					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-						substitute, strlen(substitute));
-					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, "}", 1);
-					zbx_free(substitute);
+					if (SUCCEED == (res = update_escaping_in_expression(
+							expression, &substitute, &error)))
+					{
+						replaced = 1;
+						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
+							command + pos, token.loc.l - pos + 2);
+						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
+							substitute, strlen(substitute));
+						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, "}", 1);
+						zbx_free(substitute);
+					}
+
+					zbx_free(expression);
+					macro_end++;
 				}
-				else {
+
+				if (FAIL == res)
+				{
 					zabbix_log(LOG_LEVEL_WARNING, "Failed to parse expression macro"
-							" \"%s\" in %s with id %s: %s",
-							expression, data_name, row[0], error);
+							" in %s with id %s: %s", data_name, row[0], error);
 					zbx_free(error);
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
 						command + pos, token.loc.r - pos + 1);
 				}
-
-				zbx_free(expression);
 			}
 			else
 				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, token.loc.r - pos + 1);

@@ -131,7 +131,8 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *             macro         - [IN] beginning of the token                    *
  *             token_search  - [IN] specify if references will be searched    *
  *             token         - [OUT]                                          *
- *             esc_bs        - [IN] 0 - don't escape backslashes in strings   *
+ *             stop_at_expr  - [IN] 0 - do not stop at finding expression     *
+ *                                  macro                                     *
  *                                                                            *
  * Return value: SUCCEED - expression macro was parsed successfully           *
  *               FAIL    - macro does not point at valid expression macro     *
@@ -145,12 +146,20 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *                                                                            *
  ******************************************************************************/
 static int	token_parse_expression_macro(const char *expression, const char *macro,
-		zbx_token_search_t token_search, zbx_token_t *token, int esc_bs)
+		zbx_token_search_t token_search, zbx_token_t *token, int stop_at_expr)
 {
 	const char			*ptr;
 	size_t				offset;
 	zbx_token_expression_macro_t	*data;
 	int				quoted = 0;
+
+	if (0 != stop_at_expr) {
+		token->type = ZBX_TOKEN_EXPRESSION_MACRO;
+		token->loc.l = macro - expression;
+		token->loc.r = 0;
+
+		return SUCCEED;
+	}
 
 	for (ptr = macro + 2; '\0' != *ptr ; ptr++)
 	{
@@ -158,10 +167,7 @@ static int	token_parse_expression_macro(const char *expression, const char *macr
 		{
 			if ('\\' == *ptr)
 			{
-				if (ZBX_BACKSLASH_ESC_ON == esc_bs || '\\' != *(ptr + 1))
-					ptr++;
-
-				if ('\0' == *ptr)
+				if ('\0' == *(++ptr))
 					break;
 
 				continue;
@@ -648,7 +654,8 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
  *             macro        - [IN] beginning of token                         *
  *             token_search - [IN] specify if references will be searched     *
  *             token        - [OUT]                                           *
- *             esc_bs       - [IN] 0 - don't escape backslashes in strings    *
+ *             stop_at_expr - [IN] 0 - do not stop at finding expression      *
+ *                                 macro                                      *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - macro does not point at valid function or simple   *
@@ -668,7 +675,7 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
  *                                                                            *
  ******************************************************************************/
 static int	zbx_token_parse_nested_macro_ext(const char *expression, const char *macro,
-		zbx_token_search_t token_search, zbx_token_t *token, int esc_bs)
+		zbx_token_search_t token_search, zbx_token_t *token, int stop_at_expr)
 {
 	const char	*ptr;
 
@@ -695,8 +702,11 @@ static int	zbx_token_parse_nested_macro_ext(const char *expression, const char *
 		if (0 == (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 			return FAIL;
 
-		if (SUCCEED != token_parse_expression_macro(expression, macro + 1, token_search, &expr_token, esc_bs))
+		if (SUCCEED != token_parse_expression_macro(expression, macro + 1, token_search, &expr_token,
+				stop_at_expr))
+		{
 			return FAIL;
+		}
 
 		ptr = expression + expr_token.loc.r;
 	}
@@ -746,7 +756,7 @@ static int	zbx_token_parse_nested_macro_ext(const char *expression, const char *
 int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token)
 {
-	return zbx_token_parse_nested_macro_ext(expression, macro, token_search, token, ZBX_BACKSLASH_ESC_ON);
+	return zbx_token_parse_nested_macro_ext(expression, macro, token_search, token, 0);
 }
 
 /******************************************************************************
@@ -758,7 +768,8 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
  *             pos          - [IN] starting position                          *
  *             token        - [OUT]                                           *
  *             token_search - [IN] specify if references will be searched     *
- *             esc_bs       - [IN] 0 - don't escape backslashes in strings    *
+ *             stop_at_expr - [IN] 0 - do not stop at finding expression      *
+ *                                 macro                                      *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - expression does not contain valid token.           *
@@ -778,7 +789,7 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
  *                                                                            *
  ******************************************************************************/
 int	zbx_token_find_ext(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search,
-		int esc_bs)
+		int stop_at_expr)
 {
 	int		ret = FAIL;
 	const char	*ptr = expression + pos, *dollar = ptr;
@@ -800,12 +811,8 @@ int	zbx_token_find_ext(const char *expression, int pos, zbx_token_t *token, zbx_
 					case '\\':
 						if (0 != quoted)
 						{
-							if (ZBX_BACKSLASH_ESC_ON == esc_bs || '\\' != *(ptr + 1))
-								ptr++;
-
-							if ('\0' == *ptr)
+							if ('\0' == *(++ptr))
 								return FAIL;
-
 						}
 						break;
 					case '"':
@@ -853,10 +860,11 @@ int	zbx_token_find_ext(const char *expression, int pos, zbx_token_t *token, zbx_
 			case '?':
 				if (0 != (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 					ret = token_parse_expression_macro(expression, ptr, token_search, token,
-							esc_bs);
+							stop_at_expr);
 				break;
 			case '{':
-				ret = zbx_token_parse_nested_macro_ext(expression, ptr, token_search, token, esc_bs);
+				ret = zbx_token_parse_nested_macro_ext(expression, ptr, token_search, token,
+						stop_at_expr);
 				break;
 			case '0':
 			case '1':
@@ -892,7 +900,7 @@ int	zbx_token_find_ext(const char *expression, int pos, zbx_token_t *token, zbx_
  ******************************************************************************/
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
 {
-	return zbx_token_find_ext(expression, pos, token, token_search, ZBX_BACKSLASH_ESC_ON);
+	return zbx_token_find_ext(expression, pos, token, token_search, 0);
 }
 
 /******************************************************************************

@@ -200,7 +200,7 @@ zbx_token_t;
 typedef int zbx_token_search_t;
 
 int	zbx_token_find_ext(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search,
-		int esc_bs);
+		int stop_at_expr);
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
 
 int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_token_t *token);
