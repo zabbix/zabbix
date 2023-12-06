@@ -478,7 +478,7 @@ func (o *options) setDefaults() error {
 	}
 
 	if o.name == "" {
-		o.setDefaultName()
+		return zbxerr.New("second parameter cannot be empty")
 	}
 
 	if o.dnsType == dns.TypeNone {
@@ -498,10 +498,6 @@ func (o *options) setDefaults() error {
 	}
 
 	return nil
-}
-
-func (o *options) setDefaultName() {
-	o.name = "zabbix.com"
 }
 
 func runQuery(resolver, domain, net string, record uint16, timeout time.Duration) (*dns.Msg, error) {
