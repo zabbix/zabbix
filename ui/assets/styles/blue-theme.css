@@ -5242,9 +5242,10 @@ select {
   opacity: 0; }
   .checkbox-radio + label span {
     position: relative;
+    box-sizing: border-box;
     display: inline-block;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     margin-right: 4px;
     vertical-align: text-bottom;
     background-color: #ffffff;
