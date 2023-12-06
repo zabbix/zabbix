@@ -7193,6 +7193,16 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		dc_strpool_replace(found, &proxy->allowed_addresses, row[9]);
 		dc_strpool_replace(found, &proxy->address, row[10]);
 		dc_strpool_replace(found, &proxy->port, row[11]);
+
+		/* in the case of local address change for proxy in a proxy group */
+		/* force re-sync of proxy lists to group proxies                  */
+		if (0 != proxy_groupid && 0 != found && 0 != strcmp(proxy->local_address, row[24]))
+		{
+			zbx_pg_group_t	*pg;
+
+			if (NULL != (pg = (zbx_pg_group_t *)zbx_hashset_search(&config->proxy_groups, &proxy_groupid)))
+				pg->revision = revision;
+		}
 		dc_strpool_replace(found, &proxy->local_address, row[24]);
 
 		dc_strpool_replace(found, &proxy->item_timeouts.agent, row[13]);
@@ -16295,11 +16305,13 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision)
  *             removed_hostids - [OUT] the hosts removed since specified      *
  *                                     configuration revision, sorted         *
  *             httptestids     - [OUT] the web scenarios monitored by proxy   *
+ *             proxy_group_revision - [OUT] proxy group revision if proxy is  *
+ *                                     a part of proxy group                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
-		zbx_vector_uint64_t *httptestids)
+		zbx_vector_uint64_t *httptestids, zbx_uint64_t *proxy_group_revision)
 {
 	ZBX_DC_PROXY	*proxy;
 
@@ -16346,6 +16358,19 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision
 				else
 					i++;
 			}
+		}
+
+		if (0 != proxy->proxy_groupid)
+		{
+			zbx_dc_proxy_group_t	*pg;
+
+			if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups,
+					&proxy->proxy_groupid)))
+			{
+				*proxy_group_revision = pg->revision;
+			}
+			else
+				*proxy_group_revision = 0;
 		}
 	}
 

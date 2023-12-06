@@ -211,6 +211,8 @@
 #define ZBX_PROTO_TAG_REDIRECT			"redirect"
 #define ZBX_PROTO_TAG_REVISION			"revision"
 #define ZBX_PROTO_TAG_HOSTMAP_REVISION		"hostmap_revision"
+#define ZBX_PROTO_TAG_PROXY_GROUP		"proxy_group"
+#define ZBX_PROTO_TAG_DEL_HOSTPROXYIDS		"del_hostproxyids"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

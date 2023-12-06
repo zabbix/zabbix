@@ -69,10 +69,6 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-#define ZBX_PROXY_SYNC_NONE	0
-#define ZBX_PROXY_SYNC_FULL	1
-#define ZBX_PROXY_SYNC_PARTIAL	2
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get proxy configuration sync data                                 *
@@ -128,7 +124,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	else
 		mode = ZBX_PROXY_SYNC_NONE;
 
-	ptr = data =(unsigned char *)zbx_malloc(NULL, data_len);
+	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, mode);
 	ptr += zbx_serialize_value(ptr, pgs->cache->hpmap_revision);
 

@@ -1828,72 +1828,77 @@ static int	DBpatch_6050155(void)
 
 static int	DBpatch_6050156(void)
 {
+	return DBcreate_index("host_proxy", "host_proxy_3", "revision", 0);
+}
+
+static int	DBpatch_6050157(void)
+{
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_proxy", 1, &field);
 }
 
-static int	DBpatch_6050157(void)
+static int	DBpatch_6050158(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_proxy", 2, &field);
 }
 
-static int	DBpatch_6050158(void)
+static int	DBpatch_6050159(void)
 {
 	return DBcreate_changelog_insert_trigger("host_proxy", "hostproxyid");
 }
 
-static int	DBpatch_6050159(void)
+static int	DBpatch_6050160(void)
 {
 	return DBcreate_changelog_update_trigger("host_proxy", "hostproxyid");
 }
 
-static int	DBpatch_6050160(void)
+static int	DBpatch_6050161(void)
 {
 	return DBcreate_changelog_delete_trigger("host_proxy", "hostproxyid");
 }
 
-static int	DBpatch_6050161(void)
+static int	DBpatch_6050162(void)
 {
 	const zbx_db_field_t	field = {"local_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050162(void)
+static int	DBpatch_6050163(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050163(void)
+static int	DBpatch_6050164(void)
 {
 	return DBcreate_index("proxy", "proxy_2", "proxy_groupid", 0);
 }
 
-static int	DBpatch_6050164(void)
+static int	DBpatch_6050165(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("proxy", 1, &field);
 }
 
-static int	DBpatch_6050165(void)
+static int	DBpatch_6050166(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_6050166(void)
+static int	DBpatch_6050167(void)
 {
 	return DBcreate_index("hosts", "hosts_8", "proxy_groupid", 0);
 }
 
-static int	DBpatch_6050167(void)
+static int	DBpatch_6050168(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
 
@@ -2072,5 +2077,6 @@ DBPATCH_ADD(6050164, 0, 1)
 DBPATCH_ADD(6050165, 0, 1)
 DBPATCH_ADD(6050166, 0, 1)
 DBPATCH_ADD(6050167, 0, 1)
+DBPATCH_ADD(6050168, 0, 1)
 
 DBPATCH_END()

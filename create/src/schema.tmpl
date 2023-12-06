@@ -2205,15 +2205,16 @@ CHANGELOG	|20
 TABLE|host_proxy|hostproxyid|0
 FIELD		|hostproxyid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NULL		|0|1|hosts	|	|RESTRICT
-FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|0
-FIELD		|proxyid	|t_id		|	|NOT NULL	|0|2|proxy	|	|RESTRICT
-FIELD		|revision	|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|proxyid	|t_id		|	|NOT NULL	|ZBX_PROXY|2|proxy	|	|RESTRICT
+FIELD		|revision	|t_bigint	|'0'	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid
 INDEX		|2		|proxyid
+INDEX		|3		|revision
 CHANGELOG	|21
 
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050167	|6050167
+ROW		|1		|6050168	|6050168

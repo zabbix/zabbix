@@ -29,4 +29,8 @@
 #define ZBX_IPC_PGM_PROXY_SYNC_DATA		3
 #define ZBX_IPC_PGM_STOP			100
 
+#define ZBX_PROXY_SYNC_NONE	0
+#define ZBX_PROXY_SYNC_FULL	1
+#define ZBX_PROXY_SYNC_PARTIAL	2
+
 #endif
