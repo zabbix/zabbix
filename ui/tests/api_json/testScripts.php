@@ -4643,14 +4643,14 @@ class testScripts extends CAPITest {
 			],
 
 			// Check "manualinput" in search.
-			'Test script.get invalid parameter "manualinput" in search (bool)' => [
+			'Test script.get unexpected parameter "manualinput" in search (bool)' => [
 				'request' => [
 					'search' => [
 						'manualinput' => false
 					]
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/search/manualinput": an array is expected.'
+				'expected_error' => 'Invalid parameter "/search": unexpected parameter "manualinput".'
 			],
 
 			// Check "manualinput_prompt" in search.
@@ -4676,14 +4676,14 @@ class testScripts extends CAPITest {
 			],
 
 			// Check "manualinput_validator_type" in search.
-			'Test script.get invalid parameter "manualinput_validator_type" in search (bool)' => [
+			'Test script.get unexcpected parameter "manualinput_validator_type" in search' => [
 				'request' => [
 					'search' => [
 						'manualinput_validator_type' => false
 					]
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/search/manualinput_validator_type": an array is expected.'
+				'expected_error' => 'Invalid parameter "/search": unexpected parameter "manualinput_validator_type".'
 			],
 
 			// Check "manualinput_default_value" in search.
