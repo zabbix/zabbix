@@ -390,9 +390,8 @@ class CFilterParser extends CParser {
 	 *
 	 * The constant can be:
 	 *  - string
-	 *  - user macro like {$MACRO}
-	 *  - LLD macro like {#LLD}
-	 *  - LLD macro with function like {{#LLD}.func())}
+	 *  - user macros like {$MACRO} and {{$MACRO}.func())}
+	 *  - LLD macros like {#LLD} and {{#LLD}.func())}
 	 *
 	 * @param string  $source
 	 * @param int     $pos
@@ -407,6 +406,11 @@ class CFilterParser extends CParser {
 		}
 
 		if ($options['usermacros'] && self::parseUsing(new CUserMacroParser(), $source, $pos, $tokens,
+				self::TOKEN_TYPE_USER_MACRO)) {
+			return true;
+		}
+
+		if ($options['usermacros'] && self::parseUsing(new CUserMacroFunctionParser(), $source, $pos, $tokens,
 				self::TOKEN_TYPE_USER_MACRO)) {
 			return true;
 		}

@@ -273,6 +273,8 @@ static int	check_mib_existence(zbx_pp_step_t *op)
 }
 #endif
 
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "preproc_mock_progname")
+
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_variant_t		value, value_in, history_value, history_value_in;
@@ -286,6 +288,8 @@ void	zbx_mock_test_entry(void **state)
 
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
+
+	zbx_init_library_preproc(NULL, get_zbx_progname);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		mib_translation_case = 1;

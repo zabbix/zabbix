@@ -33,6 +33,9 @@ int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size
 int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
 		int timeout);
 
+int	zbx_send_response_json(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
+		int timeout, const char *ext);
+
 #define zbx_send_response(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, NULL, ZBX_TCP_PROTOCOL, timeout)
 

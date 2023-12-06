@@ -22,6 +22,7 @@
 namespace Widgets\Item\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
@@ -74,8 +75,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getItem(): ?array {
+		$resolve_macros = !$this->isTemplateDashboard() || $this->fields_values['override_hostid'];
+
 		$item_options = [
-			'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'value_type', 'units'],
+			'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'history', 'trends',
+				'value_type', 'units'
+			],
 			'selectValueMap' => ['mappings'],
 			'webitems' => true
 		];
@@ -100,7 +105,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$items = API::Item()->get($item_options);
 
-		return $items ? $items[0] : null;
+		if (!$items) {
+			return null;
+		}
+
+		return $resolve_macros ? CArrayHelper::renameKeys($items[0], ['name_resolved' => 'name']) : $items[0];
 	}
 
 	private function getItemValues(array $item, bool $with_data_prev): array {
@@ -398,12 +407,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getName(?array $item): string {
-		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
-			return $this->getInput('name', $this->widget->getDefaultName());
-		}
-
 		if ($this->getInput('name', '') !== '') {
 			return $this->getInput('name');
+		}
+
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
+			return $this->widget->getDefaultName();
 		}
 
 		$name = $item !== null ? $item['name'] : $this->widget->getDefaultName();

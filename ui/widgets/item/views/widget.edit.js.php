@@ -60,14 +60,7 @@ window.widget_item_form = new class {
 		const show = [this._show_description, this._show_value, this._show_time, this._show_change_indicator];
 
 		for (const checkbox of show) {
-			checkbox.addEventListener('change', (e) => {
-				if (show.filter((checkbox) => checkbox.checked).length > 0) {
-					this.updateForm();
-				}
-				else {
-					e.target.checked = true;
-				}
-			});
+			checkbox.addEventListener('change', () => this.updateForm());
 		}
 
 		document.getElementById('units_show').addEventListener('change', () => this.updateForm());

@@ -354,6 +354,7 @@
 					src.setArgument('height', $('#height').val());
 					src.setArgument('graphtype', $('#graphtype').val());
 					src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
+					src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
 
 					if (this.graphs.graphtype == <?= GRAPH_TYPE_PIE ?>
 							|| this.graphs.graphtype == <?= GRAPH_TYPE_EXPLODED ?>) {
@@ -580,7 +581,7 @@
 
 				$('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
 					'$.extend(' + JSON.stringify(parameters) + ', view.getOnlyHostParam()),' +
-					'{dialogue_class: "modal-popup-generic", trigger_element: this});'
+					'{dialogue_class: "modal-popup-generic", trigger_element: this.parentNode});'
 				);
 			}
 		},

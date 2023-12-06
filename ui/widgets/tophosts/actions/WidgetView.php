@@ -416,7 +416,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'monitored' => true,
 			'webitems' => true,
 			'filter' => [
-				'name' => $name,
+				'name_resolved' => $name,
 				'status' => ITEM_STATUS_ACTIVE,
 				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null
 			],

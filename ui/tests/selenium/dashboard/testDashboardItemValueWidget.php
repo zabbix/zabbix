@@ -21,24 +21,29 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
+ * Test for checking Item Value Widget.
+ *
  * @backup dashboard
  *
  * @onBefore prepareDashboardData
  *
- * @dataSource WebScenarios
+ * @dataSource WebScenarios, AllItemValueTypes
  */
-class testDashboardItemValueWidget extends CWebTest {
+class testDashboardItemValueWidget extends testWidgets {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -219,8 +224,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	}
 
 	/**
-	 * Test to check Item Value Widget.
-	 * Check authentication form fields layout.
+	 * Test of the Item Value widget form fields layout.
 	 */
 	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
@@ -236,10 +240,10 @@ class testDashboardItemValueWidget extends CWebTest {
 			'Refresh interval' => 'Default (1 minute)',
 			'Item' => '',
 			'Show header' => true,
-			'id:show_1' => true,
-			'id:show_2' => true,
-			'id:show_3' => true,
-			'id:show_4' => true,
+			'id:show_1' => true, // Description.
+			'id:show_2' => true, // Value.
+			'id:show_3' => true, // Time.
+			'id:show_4' => true, // Change indicator.
 			'Advanced configuration' => false,
 			'id:override_hostid_ms' => ''
 		];
@@ -515,10 +519,38 @@ class testDashboardItemValueWidget extends CWebTest {
 				);
 			}
 		}
+
+		$this->assertEquals(['Item', 'Show', 'Description'], $form->getRequiredLabels());
+
+		// Check Override host field.
+		$override = $form->getField('Override host');
+		$popup_menu_selector = 'xpath:.//button[contains(@class, "zi-chevron-down")]';
+
+		foreach (['button:Select', $popup_menu_selector] as $button) {
+			$this->assertTrue($override->query($button)->one()->isClickable());
+		}
+
+		$menu = $override->query($popup_menu_selector)->asPopupButton()->one()->getMenu();
+		$this->assertEquals(['Widget', 'Dashboard'], $menu->getItems()->asText());
+
+		$override->query($popup_menu_selector)->asPopupButton()->one()->getMenu()->select('Dashboard');
+		$form->checkValue(['Override host' => 'Dashboard']);
+		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+			->one()->isVisible()
+		);
+
+		$override->query('button:Select')->waitUntilCLickable()->one()->click();
+		$dialogs = COverlayDialogElement::find()->all();
+		$this->assertEquals('Widget', $dialogs->last()->getTitle());
+
+		for ($i = $dialogs->count() - 1; $i >= 0; $i--) {
+			$dialogs->get($i)->close(true);
+		}
 	}
 
 	public static function getWidgetData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -529,6 +561,22 @@ class testDashboardItemValueWidget extends CWebTest {
 					'error' => ['Invalid parameter "Item": cannot be empty.']
 				]
 			],
+			// #1.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'id:show_1' => false, // Description.
+						'id:show_2' => false, // Value.
+						'id:show_3' => false, // Time.
+						'id:show_4' => false  // Change indicator.
+					],
+					'error' => ['Invalid parameter "Show": at least one option must be selected.']
+				]
+			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -557,6 +605,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -585,6 +634,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -613,6 +663,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -641,6 +692,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -656,6 +708,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -671,6 +724,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -686,6 +740,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -703,6 +758,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -720,6 +776,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -737,6 +794,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -754,6 +812,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -772,6 +831,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -790,6 +850,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -807,6 +868,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -825,6 +887,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -842,6 +905,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1027,6 +1091,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1039,6 +1104,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1073,6 +1139,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1102,6 +1169,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1157,6 +1225,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1193,6 +1262,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1209,6 +1279,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1225,6 +1296,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1397,6 +1469,7 @@ class testDashboardItemValueWidget extends CWebTest {
 
 	public static function getWidgetUpdateData() {
 		return [
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1415,6 +1488,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					]
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2353,5 +2427,13 @@ class testDashboardItemValueWidget extends CWebTest {
 			}
 		}
 		unset($value);
+	}
+
+	/**
+	 * Test function for assuring that binary items are not available in Item Value widget.
+	 */
+	public function testDashboardItemValueWidget_CheckAvailableItems() {
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+		$this->checkAvailableItems($url, 'Item value');
 	}
 }
