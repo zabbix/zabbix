@@ -5,15 +5,22 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 
 #ifdef __linux__
 	#include <endian.h>
-#elif __hpux
-/* Nothing to do in HP-UX */
-#elif _AIX
-/* Nothing to do in AIX */
+#elif __hpux	/* on HP-UX IA-64 gcc default is -mbig-endian */
+# define SWAP(n) (n)
+#elif _AIX	/* IBM AIX is big-endian */
+# define SWAP(n) (n)
 #elif defined(_WINDOWS) || defined(__MINGW32__)
 /* Nothing to do in Windows */
 #else
 	#if defined(ZBX_OLD_SOLARIS)
 		#include <sys/isa_defs.h>
+
+		#if defined(_LITTLE_ENDIAN)
+			# define SWAP(n) \
+				(((n) << 24) | (((n) & 0xff00) << 8) | (((n) >> 8) & 0xff00) | ((n) >> 24))
+		#elif defined(_BIG_ENDIAN)
+			# define SWAP(n) (n)
+		#endif
 	#else
 		#include <machine/endian.h>
 	#endif
@@ -24,11 +31,13 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 	#include <string.h>
 #endif
 
+#if !defined(SWAP)
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 # define SWAP(n) \
 	(((n) << 24) | (((n) & 0xff00) << 8) | (((n) >> 8) & 0xff00) | ((n) >> 24))
 #else
 # define SWAP(n) (n)
+#endif
 #endif
 
 /* This array contains the bytes used to pad the buffer to the next
@@ -250,12 +259,14 @@ compilers don't.  */
 # define UNALIGNED_P(p) (((uintptr_t) p) % sizeof (uint32_t) != 0)
 #endif
 		if (UNALIGNED_P (buffer))
+		{
 			while (len > 64)
 			{
 				sha256_process_block (memcpy (ctx->buffer, buffer, 64), 64, ctx);
 				buffer = (const char *) buffer + 64;
 				len -= 64;
 			}
+		}
 		else
 		{
 			sha256_process_block (buffer, len & ~63, ctx);
