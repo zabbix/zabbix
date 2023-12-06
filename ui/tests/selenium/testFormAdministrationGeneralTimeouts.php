@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
  */
 class testFormAdministrationGeneralTimeouts extends testFormAdministrationGeneral {
 
-	public $form_selector = 'id:timeouts';
+	public $form_selector = 'id:timeouts-form';
 	public $config_link = 'zabbix.php?action=timeouts.edit';
 	public $default_values = [
 		'Zabbix agent' => '3s',

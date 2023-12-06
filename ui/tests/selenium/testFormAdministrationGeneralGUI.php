@@ -117,7 +117,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	 */
 	public function getCheckFormData() {
 		return [
-			// Minimal valid values. In period fields minimal valid time in seconds with 's'.
+			// #0 Minimal valid values. In period fields minimal valid time in seconds with 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -151,7 +151,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal valid time in seconds without 's'.
+			// #1 In period fields minimal valid time in seconds without 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -169,7 +169,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal valid time in minutes.
+			// #2 In period fields minimal valid time in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -185,7 +185,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal valid time in hours.
+			// #3 In period fields minimal valid time in hours.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -199,7 +199,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal valid time in days.
+			// #4 In period fields minimal valid time in days.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -213,7 +213,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal valid time in weeks.
+			// #5 In period fields minimal valid time in weeks.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -225,7 +225,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal valid time in Months.
+			// #6 In period fields minimal valid time in Months.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -237,7 +237,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal valid time in years.
+			// #7 In period fields minimal valid time in years.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -249,7 +249,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal valid time in seconds with 's'.
+			// #8 In period fields maximal valid time in seconds with 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -265,7 +265,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal valid time in seconds without 's'.
+			// #9 In period fields maximal valid time in seconds without 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -285,7 +285,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal valid time in minutes.
+			// #10 In period fields maximal valid time in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -301,7 +301,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal valid time in days.
+			// #11 In period fields maximal valid time in days.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -317,7 +317,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal valid time in weeks.
+			// #12 In period fields maximal valid time in weeks.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -333,7 +333,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal valid time in Months.
+			// #13 In period fields maximal valid time in Months.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -347,7 +347,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Maximal valid values. In period fields time in years.
+			// #14 Maximal valid values. In period fields time in years.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -373,7 +373,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Zero values without 's'.
+			// #15 Zero values without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -397,7 +397,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Zero values with 's'.
+			// #16 Zero values with 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -413,7 +413,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Empty values.
+			// #17 Empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -437,7 +437,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Invalid string values.
+			// #18 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -461,7 +461,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Invalid special symbol values.
+			// #19 Invalid special symbol values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -485,7 +485,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Invalid values. In period fields minimal invalid time in seconds with "s".
+			// #20 Invalid values. In period fields minimal invalid time in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -503,7 +503,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal invalid time in seconds without "s".
+			// #21 In period fields minimal invalid time in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -519,7 +519,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal invalid time in minutes.
+			// #22 In period fields minimal invalid time in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -535,7 +535,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal invalid time in hours.
+			// #23 In period fields minimal invalid time in hours.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -551,7 +551,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal invalid time in weeks.
+			// #24 In period fields minimal invalid time in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -567,7 +567,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal invalid time in Month.
+			// #25 In period fields minimal invalid time in Month.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -583,7 +583,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields minimal invalid time in years.
+			// #26 In period fields minimal invalid time in years.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -597,7 +597,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in seconds without 's'.
+			// #27 In period fields maximal invalid time in seconds without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -613,7 +613,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in seconds with 's'.
+			// #28 In period fields maximal invalid time in seconds with 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -629,7 +629,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in minutes.
+			// #29 In period fields maximal invalid time in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -645,7 +645,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in hours.
+			// #30 In period fields maximal invalid time in hours.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -661,7 +661,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in days.
+			// #31 In period fields maximal invalid time in days.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -677,7 +677,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in weeks.
+			// #32 In period fields maximal invalid time in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -693,7 +693,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in months.
+			// #33 In period fields maximal invalid time in months.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -707,7 +707,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time in years.
+			// #34 In period fields maximal invalid time in years.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -721,7 +721,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// In period fields maximal invalid time values.
+			// #35 In period fields maximal invalid time values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -737,7 +737,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Default period value larger than Max period.
+			// #36 Default period value larger than Max period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -750,7 +750,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Working time field values validation.
+			// #37 Working time field values validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -760,6 +760,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #38.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -769,6 +770,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #39.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -778,6 +780,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #40.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -787,6 +790,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #41.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -796,6 +800,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #42.
 			[
 				[
 						'expected' => TEST_BAD,
@@ -805,6 +810,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #43.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -814,6 +820,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #44.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -823,6 +830,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #45.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -832,6 +840,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -841,6 +850,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -850,6 +860,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -859,7 +870,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
-			// Negative values.
+			// #49 Negative values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -873,9 +884,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '-1'
 					],
 					'details' => [
-						'Incorrect value for field "search_limit": value must be no less than "1".',
 						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "max_in_table": value must be no less than "1".',
 						'Incorrect value for field "work_period": a time period is expected.',
 						'Incorrect value for field "history_period": a time unit is expected.',
 						'Incorrect value for field "period_default": a time unit is expected.',

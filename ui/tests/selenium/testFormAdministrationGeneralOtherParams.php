@@ -149,7 +149,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	 */
 	public function getCheckFormData() {
 		return [
-			// Minimal valid values. In period fields minimal valid time in seconds with 's'.
+			// #0 Minimal valid values. In period fields minimal valid time in seconds with 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -183,7 +183,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Minimal valid values. In period fields minimal valid time in seconds without 's'.
+			// #1 Minimal valid values. In period fields minimal valid time in seconds without 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -213,7 +213,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal valid time in minutes.
+			// #2 In period fields minimal valid time in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -227,7 +227,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal valid time in hours.
+			// #3 In period fields minimal valid time in hours.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -241,7 +241,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal valid values in seconds with "s".
+			// #4 Maximal valid values in seconds with "s".
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -281,7 +281,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields maximal valid values in seconds without "s".
+			// #5 In period fields maximal valid values in seconds without "s".
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -295,7 +295,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields maximal valid values in minutes.
+			// #6 In period fields maximal valid values in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -309,7 +309,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Symbol trimming in Login attempts.
+			// #7 Symbol trimming in Login attempts.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -321,7 +321,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid empty values.
+			// #8 Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -342,7 +342,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid string values.
+			// #9 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -357,7 +357,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid special symbol values.
+			// #10 Invalid special symbol values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -372,7 +372,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid zero values.
+			// #11 Invalid zero values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -387,7 +387,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid zero values in seconds with "s".
+			// #12 Invalid zero values in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -400,7 +400,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal invalid time in seconds without "s".
+			// #13 In period fields minimal invalid time in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -413,7 +413,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal invalid time in seconds with "s".
+			// #14 In period fields minimal invalid time in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -426,7 +426,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields maximal invalid time in seconds without "s".
+			// #15 In period fields maximal invalid time in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -441,7 +441,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in seconds with "s".
+			// #16 Maximal invalid time in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -454,7 +454,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in minutes.
+			// #17 Maximal invalid time in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -467,7 +467,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in hours.
+			// #18 Maximal invalid time in hours.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -480,7 +480,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in weeks.
+			// #19 Maximal invalid time in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -493,7 +493,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in Months (Months not supported).
+			// #20 Maximal invalid time in Months (Months not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -506,7 +506,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in years (years not supported).
+			// #21 Maximal invalid time in years (years not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -519,7 +519,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid values.
+			// #22 Maximal invalid values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -534,17 +534,16 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Negative values.
+			// #23 Negative values.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Authorization.
+						// Authorization. 'Login attempts' field value is automatically converted to "1" .
 						'Login attempts' => '-1',
 						'Login blocking interval' => '-1'
 					],
 					'details' => [
-						'Incorrect value for field "login_attempts": value must be no less than "1".',
 						'Incorrect value for field "login_block": a time unit is expected.'
 					]
 				]
