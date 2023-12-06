@@ -152,6 +152,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	ZBX_UNUSED(get_config_forks);
+
 	memset(&item, 0, sizeof(item));
 
 	if (NULL == table_items)
