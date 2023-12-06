@@ -23,9 +23,13 @@
 
 #include "zbxexpression.h"
 #include "zbxtasks.h"
-#include "zbxnum.h"
 #include "zbxcachevalue.h"
 #include "zbxdbwrap.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0

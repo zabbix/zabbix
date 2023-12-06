@@ -19,11 +19,15 @@
 
 #include "operations.h"
 
-#include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
-#include "zbxnum.h"
 #include "zbxdbwrap.h"
+#include "zbxcomms.h"
+#include "zbxdb.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_discoverer_constants.h"
 
