@@ -1846,4 +1846,5 @@ typedef enum
 zbx_err_codes_t;
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+#define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #endif
