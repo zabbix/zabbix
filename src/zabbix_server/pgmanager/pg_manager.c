@@ -116,11 +116,14 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 				.hostproxyid = hostproxyid
 			}, *host;
 
-		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hpmap, &host_local, sizeof(host_local));
+		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &host_local, sizeof(host_local));
 		zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
 
 		/* proxies with assigned hosts in most cases were online before restart */
 		proxy->status = ZBX_PG_PROXY_STATUS_ONLINE;
+
+		if (NULL != proxy->group && proxy->group->hostmap_revision < revision)
+			proxy->group->hostmap_revision = revision;
 
 	}
 	zbx_db_free_result(result);
@@ -135,7 +138,7 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 	{
 		for (int i = 0; i < group->hostids.values_num; i++)
 		{
-			if (NULL == zbx_hashset_search(&cache->hpmap, &group->hostids.values[i]))
+			if (NULL == zbx_hashset_search(&cache->hostmap, &group->hostids.values[i]))
 				zbx_vector_uint64_append(&group->new_hostids, group->hostids.values[i]);
 		}
 	}
@@ -480,28 +483,6 @@ static void	pgm_db_flush_host_proxy_revision(zbx_uint64_t revision)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: flush host-proxy mapping revision to configuration cache          *
- *                                                                            *
- ******************************************************************************/
-static void	pgm_dc_flush_host_proxy_revision(zbx_vector_pg_update_t *groups, zbx_uint64_t revision)
-{
-	zbx_vector_uint64_t	groupids;
-
-	zbx_vector_uint64_create(&groupids);
-
-	for (int i = 0; i < groups->values_num; i++)
-	{
-		if (0 != (groups->values[i].flags & ZBX_PG_GROUP_UPDATE_HP_MAP))
-			zbx_vector_uint64_append(&groupids, groups->values[i].proxy_groupid);
-	}
-
-	zbx_dc_update_group_hostmap_revision(&groupids, revision);
-
-	zbx_vector_uint64_destroy(&groupids);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: flush proxy group and host-proxy mapping updates to database      *
  *                                                                            *
  ******************************************************************************/
@@ -509,6 +490,7 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 {
 	zbx_vector_pg_update_t	groups;
 	zbx_vector_pg_host_t	hosts_new, hosts_mod, hosts_del;
+	zbx_vector_uint64_t	groupids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -516,9 +498,10 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 	zbx_vector_pg_host_create(&hosts_new);
 	zbx_vector_pg_host_create(&hosts_mod);
 	zbx_vector_pg_host_create(&hosts_del);
+	zbx_vector_uint64_create(&groupids);
 
 	pg_cache_lock(cache);
-	pg_cache_get_updates(cache, &groups, &hosts_new, &hosts_mod, &hosts_del);
+	pg_cache_get_updates(cache, &groups, &hosts_new, &hosts_mod, &hosts_del, &groupids);
 	pg_cache_unlock(cache);
 
 	if (0 != groups.values_num || 0 != hosts_new.values_num || 0 != hosts_mod.values_num ||
@@ -547,21 +530,29 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 
 			pgm_db_flush_host_proxy_inserts(&hosts_new);
 
-			pgm_db_flush_host_proxy_revision(cache->hpmap_revision);
+			pgm_db_flush_host_proxy_revision(cache->hostmap_revision);
 
 		}
 		while (ZBX_DB_DOWN == (ret = zbx_db_commit()));
 
-		if (ZBX_DB_OK <= ret)
-			pgm_dc_flush_host_proxy_revision(&groups, cache->hpmap_revision);
-
 		zbx_free(sql);
+
+		if (ZBX_DB_OK <= ret && 0 != groupids.values_num)
+		{
+			zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			pg_cache_lock(cache);
+			pg_cache_update_hostmap_revision(cache, &groupids);
+			pg_cache_unlock(cache);
+		}
 
 		/* WDN: change to trace loglevel */
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 			pg_cache_dump(cache);
 	}
 
+	zbx_vector_uint64_destroy(&groupids);
 	zbx_vector_pg_host_destroy(&hosts_del);
 	zbx_vector_pg_host_destroy(&hosts_mod);
 	zbx_vector_pg_host_destroy(&hosts_new);

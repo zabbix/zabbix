@@ -1419,7 +1419,6 @@ ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
 
 int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
 int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vector_objmove_t *proxy_reloc);
-void	zbx_dc_update_group_hostmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision);
 
 int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid, zbx_comms_redirect_t *redirect);
 int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *recv_host,

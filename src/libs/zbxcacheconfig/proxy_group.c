@@ -287,30 +287,6 @@ void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies)
 	UNLOCK_CACHE;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: update host proxy map revision in configuration cache for the     *
- *          specified groups.                                                 *
- *                                                                            *
- * Parameter: groupids - [IN] target group identifiers                        *
- *            revision - [IN] host proxy map revision                         *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_update_group_hostmap_revision(zbx_vector_uint64_t *groupids, zbx_uint64_t revision)
-{
-	WRLOCK_CACHE;
-
-	for (int i = 0; i < groupids->values_num; i++)
-	{
-		zbx_pg_group_t	*group;
-
-		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&config->proxy_groups, &groupids->values[i])))
-			group->hostmap_revision = revision;
-	}
-
-	UNLOCK_CACHE;
-}
-
 static void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};

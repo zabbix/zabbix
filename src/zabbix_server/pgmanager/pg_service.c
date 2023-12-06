@@ -99,24 +99,29 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 
 	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)))
 	{
-		if (SEC_PER_DAY <= now - proxy->sync_time)
+		if (NULL != proxy->group && hostmap_revision < proxy->group->hostmap_revision)
 		{
-			zbx_vector_pg_host_clear(&proxy->deleted_group_hosts);
-			mode = ZBX_PROXY_SYNC_FULL;
+			if (SEC_PER_DAY <= now - proxy->sync_time)
+			{
+				zbx_vector_pg_host_clear(&proxy->deleted_group_hosts);
+				mode = ZBX_PROXY_SYNC_FULL;
+			}
+			else
+			{
+				for (int i = 0; i < proxy->deleted_group_hosts.values_num;)
+				{
+					if (proxy->deleted_group_hosts.values[i].revision <= hostmap_revision)
+						zbx_vector_pg_host_remove_noorder(&proxy->deleted_group_hosts, i);
+					else
+						i++;
+				}
+
+				data_len += sizeof(int) + proxy->deleted_group_hosts.values_num * sizeof(zbx_uint64_t);
+				mode = ZBX_PROXY_SYNC_PARTIAL;
+			}
 		}
 		else
-		{
-			for (int i = 0; i < proxy->deleted_group_hosts.values_num;)
-			{
-				if (proxy->deleted_group_hosts.values[i].revision <= hostmap_revision)
-					zbx_vector_pg_host_remove_noorder(&proxy->deleted_group_hosts, i);
-				else
-					i++;
-			}
-
-			data_len += sizeof(int) + proxy->deleted_group_hosts.values_num * sizeof(zbx_uint64_t);
-			mode = ZBX_PROXY_SYNC_PARTIAL;
-		}
+			mode = ZBX_PROXY_SYNC_NONE;
 
 		if (proxy->remote_hostmap_revision != hostmap_revision)
 			proxy->sync_time = now;
@@ -126,7 +131,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, mode);
-	ptr += zbx_serialize_value(ptr, pgs->cache->hpmap_revision);
+	ptr += zbx_serialize_value(ptr, pgs->cache->hostmap_revision);
 
 	if (ZBX_PROXY_SYNC_PARTIAL == mode)
 	{
