@@ -14,6 +14,13 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #else
 	#if defined(ZBX_OLD_SOLARIS)
 		#include <sys/isa_defs.h>
+
+		#if defined(_LITTLE_ENDIAN)
+			# define SWAP(n) \
+				(((n) << 24) | (((n) & 0xff00) << 8) | (((n) >> 8) & 0xff00) | ((n) >> 24))
+		#elif defined(_BIG_ENDIAN)
+			# define SWAP(n) (n)
+		#endif
 	#else
 		#include <machine/endian.h>
 	#endif
