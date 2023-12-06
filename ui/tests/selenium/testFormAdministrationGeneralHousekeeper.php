@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=housekeeping.edit';
-	public $form_selector = 'id:housekeeping';
+	public $form_selector = 'id:housekeeping-form';
 
 	public $default_values = [
 		// Events and alerts.
