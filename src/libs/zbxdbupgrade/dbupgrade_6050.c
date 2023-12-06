@@ -2180,6 +2180,62 @@ clean:
 	return ret;
 }
 
+static int	find_expression_macro(const char *macro_start, const char **macro_end, char **substitute,
+		char **error)
+{
+	int		ret = FAIL;
+
+	*macro_end = macro_start + 2;
+
+	while (ret == FAIL && NULL != (*macro_end = strstr(*macro_end, "}")))
+	{
+		char	*expression = NULL;
+		size_t	expr_alloc = 0, expr_offset = 0;
+
+		zbx_free(*error);
+		zbx_strncpy_alloc(&expression, &expr_alloc, &expr_offset,
+				macro_start + 2, *macro_end - macro_start - 2);
+		ret = update_escaping_in_expression(expression, substitute, error);
+		zbx_free(expression);
+		(*macro_end)++;
+	}
+
+	return ret;
+}
+
+static int	replace_expression_macro(char **buf, size_t *alloc, size_t *offset, const char *data_name,
+		size_t token_end, const char *id, const char *command, size_t *pos, const char **expr_macro_start)
+{
+	const char	*macro_end;
+	char		*error = NULL, *substitute = NULL;
+	int		ret = FAIL;
+
+	if (NULL != *expr_macro_start &&
+			SUCCEED == find_expression_macro(*expr_macro_start, &macro_end, &substitute, &error))
+	{
+		zbx_strncpy_alloc(buf, alloc, offset, command + *pos, (*expr_macro_start - command) - *pos);
+		zbx_strcpy_alloc(buf, alloc, offset, "{?");
+		zbx_strcpy_alloc(buf, alloc, offset, substitute);
+		zbx_strcpy_alloc(buf, alloc, offset, "}");
+		zbx_free(substitute);
+
+		ret = SUCCEED;
+		*pos = macro_end - command;
+	}
+	else if (0 < token_end)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Failed to parse expression macro"
+				" in %s with id %s: %s", data_name, id, error);
+		zbx_free(error);
+		zbx_strncpy_alloc(buf, alloc, offset,
+			command + *pos, token_end - *pos + 1);
+	}
+
+	*expr_macro_start = (NULL != macro_end) ? strstr(macro_end, "{?") : strstr(*expr_macro_start + 2, "{?");
+
+	return ret;
+}
+
 static int	fix_expression_macro_escaping(const char *table, const char *id_col, const char *data_col,
 		const char *data_name)
 {
@@ -2202,63 +2258,41 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*command = row[1];
-		char		*buf = NULL, *error = NULL, *tmp = NULL;;
+		char		*buf = NULL, *tmp = NULL;
 		size_t		buf_alloc = 0, buf_offset = 0;
 		size_t		pos = 0, cmd_len;
 		int		replaced = 0;
 		zbx_token_t	token;
+		const char	*expr_macro_start;
+		int		res;
 
 		cmd_len = strlen(command);
+		expr_macro_start = strstr(command, "{?");
 
-		while (SUCCEED == zbx_token_find_ext(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, 1) &&
-				cmd_len >= pos)
+		while (SUCCEED == zbx_token_find(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) &&
+				cmd_len >= pos && NULL != expr_macro_start)
 		{
-			if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
+			char	*error = NULL;
+
+			if (token.loc.l >= expr_macro_start - command && SUCCEED == replace_expression_macro(&buf,
+					&buf_alloc, &buf_offset, data_name, token.loc.r, row[0], command, &pos,
+					&expr_macro_start))
 			{
-				const char	*ptr = command + token.loc.l + 2, *macro_end;
-				int		res = FAIL;
-
-				macro_end = ptr;
-
-				while (NULL != (macro_end = strstr(macro_end, "}")) && res == FAIL)
-				{
-					char	*substitute = NULL, *expression = NULL;
-					size_t	expr_alloc = 0, expr_offset = 0;
-
-					token.loc.r = macro_end - ptr + 2;
-
-					zbx_strncpy_alloc(&expression, &expr_alloc, &expr_offset,
-						command + token.loc.l + 2, token.loc.r - token.loc.l - 2);
-
-					if (SUCCEED == (res = update_escaping_in_expression(
-							expression, &substitute, &error)))
-					{
-						replaced = 1;
-						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-							command + pos, token.loc.l - pos + 2);
-						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-							substitute, strlen(substitute));
-						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, "}", 1);
-						zbx_free(substitute);
-					}
-
-					zbx_free(expression);
-					macro_end++;
-				}
-
-				if (FAIL == res)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Failed to parse expression macro"
-							" in %s with id %s: %s", data_name, row[0], error);
-					zbx_free(error);
-					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
-						command + pos, token.loc.r - pos + 1);
-				}
+				replaced = 1;
 			}
 			else
 				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, token.loc.r - pos + 1);
 
 			pos = token.loc.r + 1;
+		}
+
+		while (NULL != expr_macro_start)	/* expression macros after the end of tokens */
+		{
+			if (SUCCEED == replace_expression_macro(&buf, &buf_alloc, &buf_offset, data_name,
+					0, row[0], command, &pos, &expr_macro_start))
+			{
+				replaced = 1;
+			}
 		}
 
 		if (0 != replaced)
@@ -2517,7 +2551,5 @@ DBPATCH_ADD(6050164, 0, 1)
 DBPATCH_ADD(6050165, 0, 1)
 DBPATCH_ADD(6050166, 0, 1)
 DBPATCH_ADD(6050167, 0, 1)
-DBPATCH_ADD(6050168, 0, 1)
-DBPATCH_ADD(6050169, 0, 1)
 
 DBPATCH_END()
