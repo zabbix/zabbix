@@ -264,7 +264,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
 			proxyconfig_args_in->config_proxyconfig_frequency);
 
-	zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
+	zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
 
 	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
@@ -298,7 +298,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 						proxyconfig_args_in->config_proxyconfig_frequency);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
-				zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
+
+				zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout,
+					ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
 
 				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 				{
