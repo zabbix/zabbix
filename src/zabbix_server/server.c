@@ -353,7 +353,7 @@ char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
-char	*CONFIG_STATS_ALLOWED_IP	= NULL;
+static char	*config_stats_allowed_ip = NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 static char	*zbx_config_webservice_url	= NULL;
@@ -712,7 +712,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_STATS_ALLOWED_IP && FAIL == zbx_validate_peer_list(CONFIG_STATS_ALLOWED_IP, &ch_error))
+	if (NULL != config_stats_allowed_ip && FAIL == zbx_validate_peer_list(config_stats_allowed_ip, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"StatsAllowedIP\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
@@ -1017,7 +1017,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER],		TYPE_INT,
 			PARM_OPT,	1,			100},
-		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
+		{"StatsAllowedIP",		&config_stats_allowed_ip,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"StartHistoryPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTORYPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
@@ -1445,7 +1445,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_max_concurrent_checks_per_poller};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
-							config_proxydata_frequency, get_config_forks};
+							config_proxydata_frequency, get_config_forks,
+							config_stats_allowed_ip};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							get_config_forks};
