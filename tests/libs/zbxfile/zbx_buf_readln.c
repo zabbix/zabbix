@@ -90,6 +90,8 @@ static void test2(uint64_t bufsz, const char *encoding, int *lines, int *result)
 		*lines += 1;
 	}
 
+	zbx_free(buf);
+
 	close(f);
 }
 
