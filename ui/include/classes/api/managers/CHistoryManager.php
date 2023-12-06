@@ -1256,11 +1256,21 @@ class CHistoryManager {
 				$aggs_value_clock['value'] = ['sum' => ['field' => 'value']];
 				break;
 			case AGGREGATE_FIRST:
-				$aggs_value_clock['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
+				$aggs_value_clock['value'] = [
+					'top_hits' => [
+						'size' => 1,
+						'sort' => ['clock' => ['order' => 'asc'], 'ns' => ['order' => 'asc']]
+					]
+				];
 				$aggs_value_clock['clock'] = ['min' => ['field' => 'clock']];
 				break;
 			case AGGREGATE_LAST:
-				$aggs_value_clock['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
+				$aggs_value_clock['value'] = [
+					'top_hits' => [
+						'size' => 1,
+						'sort' => ['clock' => ['order' => 'desc'], 'ns' => ['order' => 'desc']]
+					]
+				];
 				break;
 		}
 
@@ -1413,8 +1423,15 @@ class CHistoryManager {
 					' GROUP BY itemid';
 
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
-					$sql = 'SELECT DISTINCT h.itemid,'.($source === 'history' ? 'h.value' : 'h.value_avg AS value').',h.clock'.
-						' FROM '.$sql_from.' h JOIN('.$sql.') hi ON h.itemid = hi.itemid AND h.clock=hi.clock';
+					$sql =
+						'SELECT h.itemid,'.($source === 'history' ? 'h.value' : 'h.value_avg AS value').',h.clock'.
+						' FROM '.$sql_from.' h'.
+						' JOIN ('.
+							'SELECT h2.itemid,h2.clock,'.($function == AGGREGATE_FIRST ? 'MIN' : 'MAX').'(h2.ns) AS ns'.
+							' FROM '.$sql_from.' h2'.
+							' JOIN ('.$sql.') s2 ON h2.itemid=s2.itemid AND h2.clock=s2.clock'.
+							' GROUP BY h2.itemid,h2.clock'.
+						') s ON h.itemid=s.itemid AND h.clock=s.clock AND h.ns=s.ns';
 				}
 
 				$sql_result = DBselect($sql);
