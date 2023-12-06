@@ -1,0 +1,1 @@
+...G...PS. [ZBX-23787,ZBX-23490] fixed crash on empty http response; fixed Zabbix agent build on Windows with libcurl (vso)
