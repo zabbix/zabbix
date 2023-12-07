@@ -1338,14 +1338,16 @@ class CHistoryManager {
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
-			foreach ($data['group_by_itemid']['buckets'] as $item_data) {
-				$result[$item_data['key']] = [
-					'itemid' => $item_data['key'],
-					'value' => $function == AGGREGATE_FIRST || $function == AGGREGATE_LAST
-						? (string) $item_data['value']['hits']['hits'][0]['_source']['value']
-						: (string) $item_data['value']['value'],
-					'clock' => (int) $item_data['clock']['value_as_string']
-				];
+			if (array_key_exists('group_by_itemid', $data)) {
+				foreach ($data['group_by_itemid']['buckets'] as $item_data) {
+					$result[$item_data['key']] = [
+						'itemid' => $item_data['key'],
+						'value' => $function == AGGREGATE_FIRST || $function == AGGREGATE_LAST
+							? (string) $item_data['value']['hits']['hits'][0]['_source']['value']
+							: (string) $item_data['value']['value'],
+						'clock' => (string) $item_data['clock']['value_as_string']
+					];
+				}
 			}
 		}
 
