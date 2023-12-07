@@ -1259,12 +1259,14 @@ class CScript extends CApiService {
 							$option = $options[$eventid];
 
 							if (!array_key_exists('scriptid', $option) || bccomp($option['scriptid'], $scriptid) == 0) {
-								unset($script['hosts']);
-								$scripts_by_events[$eventid][] = $script;
+								if (!array_key_exists($scriptid, $scripts_by_events[$eventid])) {
+									unset($script['hosts']);
+									$scripts_by_events[$eventid][$scriptid] = $script;
 
-								foreach (['confirmation', 'url', 'manualinput_prompt'] as $field) {
-									if (strpos($script[$field], '{') !== false) {
-										$macros_data[$eventid][$scriptid][$field] = $script[$field];
+									foreach (['confirmation', 'url', 'manualinput_prompt'] as $field) {
+										if (strpos($script[$field], '{') !== false) {
+											$macros_data[$eventid][$scriptid][$field] = $script[$field];
+										}
 									}
 								}
 							}
@@ -1281,12 +1283,14 @@ class CScript extends CApiService {
 
 		foreach ($scripts_by_events as $eventid => &$scripts) {
 			if (array_key_exists($eventid, $macros_data)) {
-				foreach ($scripts as &$script) {
-					if (array_key_exists($script['scriptid'], $macros_data[$eventid])) {
-						$script = $macros_data[$eventid][$script['scriptid']] + $script;
+				foreach ($scripts as $scriptid => &$script) {
+					if (array_key_exists($scriptid, $macros_data[$eventid])) {
+						$script = $macros_data[$eventid][$scriptid] + $script;
 					}
 				}
 				unset($script);
+
+				$scripts = array_values($scripts);
 			}
 		}
 		unset($scripts);
