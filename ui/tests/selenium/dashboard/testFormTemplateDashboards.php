@@ -2236,7 +2236,7 @@ class testFormTemplateDashboards extends CWebTest {
 						 * TODO: should be fixed after git-hook improvements in DEV-2396
 						 */
 						$label_xpath = "xpath:.//label[text()=".CXPathHelper::escapeQuotes($sub_field_details['field'])."]";
-						$field_locator =  array_key_exists('fieldid', $sub_field_details)
+						$field_locator = array_key_exists('fieldid', $sub_field_details)
 							? $label_xpath."/following-sibling::div/*[@id=".CXPathHelper::escapeQuotes($sub_field_details['fieldid'])."]"
 							: $label_xpath.'/following-sibling::div[1]';
 					}
@@ -3040,7 +3040,7 @@ class testFormTemplateDashboards extends CWebTest {
 						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
 						'fill' => [
 							'xpath:.//input[@id="thresholds_0_color"]/..' => 'FFC107',
-							'id:thresholds_0_threshold' => "50",
+							'id:thresholds_0_threshold' => '50',
 							'id:th_show_labels' => true,
 							'id:th_show_arc' => true,
 							'id:th_arc_size' => 55
@@ -3334,8 +3334,6 @@ class testFormTemplateDashboards extends CWebTest {
 						'Time period' => 'Custom',
 						'id:time_period_from' => '',
 						'id:time_period_to' => ''
-
-
 					],
 					'error_message' => [
 						'Invalid parameter "Item": cannot be empty',
@@ -3372,7 +3370,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'actions' => [
 						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
 						'fill' => [
-							'id:thresholds_0_threshold' => "abc"
+							'id:thresholds_0_threshold' => 'abc'
 						]
 					],
 					'swap_expected' => [

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Helper for array related operations.
  */
@@ -85,5 +86,22 @@ class CTestArrayHelper {
 
 			return 0;
 		});
+	}
+
+	/**
+	 * Recursive function for trimming all values in multi-level array.
+	 *
+	 * @param array    $array    array to be trimmed
+	 */
+	public static function trimArray(&$array) {
+		foreach ($array as &$value) {
+			if (!is_array($value)) {
+				$value = trim($value);
+			}
+			else {
+				self::trimArray($value);
+			}
+		}
+		unset($value);
 	}
 }

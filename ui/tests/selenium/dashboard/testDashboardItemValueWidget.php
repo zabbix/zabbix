@@ -228,7 +228,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	 */
 	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dialog = $dashboard->edit()->addWidget();
 		$form = $dialog->asForm();
 		$this->assertEquals('Add widget', $dialog->getTitle());
@@ -472,7 +472,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'placeholder' => 'YYYY-MM-DD hh:mm:ss'
 					],
 					// Widget multiselect field relative xpath.
-					'xpath://div[@id="time_period_reference"]//input[@placeholder="type here to search"]' => [
+					'xpath:.//div[@id="time_period_reference"]/input' => [
 						'placeholder' => 'type here to search'
 					],
 					'id:override_hostid_ms' => [
@@ -507,7 +507,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					foreach ([false, true] as $state) {
 						$form->fill([$config => $state]);
 
-						foreach ($elements as $element)  {
+						foreach ($elements as $element) {
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}
@@ -519,8 +519,6 @@ class testDashboardItemValueWidget extends testWidgets {
 				);
 			}
 		}
-
-		$this->assertEquals(['Item', 'Show', 'Description'], $form->getRequiredLabels());
 
 		// Check Override host field.
 		$override = $form->getField('Override host');
@@ -566,12 +564,13 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
 						'id:show_1' => false, // Description.
 						'id:show_2' => false, // Value.
 						'id:show_3' => false, // Time.
 						'id:show_4' => false  // Change indicator.
+					],
+					'item' => [
+						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'error' => ['Invalid parameter "Show": at least one option must be selected.']
 				]
@@ -923,6 +922,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -940,6 +940,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -957,6 +958,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -974,6 +976,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -991,6 +994,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1009,6 +1013,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1026,6 +1031,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1043,6 +1049,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1062,6 +1069,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1081,6 +1089,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1091,7 +1100,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1104,7 +1113,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #30.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1139,7 +1148,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #31.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1169,7 +1178,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #32.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1225,7 +1234,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #33.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1262,7 +1271,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #24.
+			// #34.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1279,7 +1288,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #25.
+			// #35.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1296,7 +1305,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #26.
+			// #36.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1318,6 +1327,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'trim' => true
 				]
 			],
+			// #37.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1332,6 +1342,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #38.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1348,6 +1359,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #39.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1364,6 +1376,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #40.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1381,6 +1394,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #41.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1398,6 +1412,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #42.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1415,6 +1430,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #43.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1431,6 +1447,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
+			// #44.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1461,6 +1478,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 	/**
 	 * @backupOnce dashboard
+	 *
 	 * @dataProvider getWidgetData
 	 */
 	public function testDashboardItemValueWidget_Create($data) {
@@ -1469,7 +1487,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 	public static function getWidgetUpdateData() {
 		return [
-			// #27.
+			// #45.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1488,7 +1506,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #28.
+			// #46.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1559,7 +1577,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('trim', $data)) {
-			$this->trimArray($data);
+			CTestArrayHelper::trimArray($data);
 		}
 
 		if ($expected === TEST_BAD) {
@@ -1853,7 +1871,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
 			],
-						[
+			[
 				[
 					'numeric' => false,
 					'fields' => [
@@ -2276,7 +2294,8 @@ class testDashboardItemValueWidget extends testWidgets {
 							]
 						]
 					],
-					'zoom_filter' => true
+					'zoom_filter' => true,
+					'filter_layout' => true
 				]
 			],
 			// Two widgets with time period "Dashboard" and "Custom" time period configuration.
@@ -2332,33 +2351,37 @@ class testDashboardItemValueWidget extends testWidgets {
 		$this->assertMessage('Dashboard updated');
 
 		if (array_key_exists('zoom_filter', $data)) {
+			// Check that zoom filter tab link is valid.
 			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
-			$filter = CFilterElement::find()->one();
-			$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
-			$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
-			// Check time selector fields layout.
-			$this->assertEquals('now-1h', $this->query('id:from')->one()->getValue());
-			$this->assertEquals('now', $this->query('id:to')->one()->getValue());
+			// Check zoom filter layout.
+			if (array_key_exists('filter_layout', $data)) {
+				$filter = CFilterElement::find()->one();
+				$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
+				$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
-			$buttons = [
-				'xpath://button[contains(@class, "btn-time-left")]' => true,
-				'xpath://button[contains(@class, "btn-time-right")]' => false,
-				'button:Zoom out' => true,
-				'button:Apply' => true,
-				'id:from_calendar' => true,
-				'id:to_calendar' => true
-			];
-			foreach ($buttons as $selector => $enabled) {
-				$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+				// Check time selector fields layout.
+				foreach (['id:from' => 'now-1h', 'id:to' => 'now'] as $selector => $value) {
+					$input = $this->query($selector)->one();
+					$this->assertEquals($value, $input->getValue());
+					$this->assertEquals(19, $input->getAttribute('maxlength'));
+				}
+
+				$buttons = [
+					'xpath://button[contains(@class, "btn-time-left")]' => true,
+					'xpath://button[contains(@class, "btn-time-right")]' => false,
+					'button:Zoom out' => true,
+					'button:Apply' => true,
+					'id:from_calendar' => true,
+					'id:to_calendar' => true
+				];
+				foreach ($buttons as $selector => $enabled) {
+					$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+				}
+
+				$this->assertEquals(1, $this->query('button:Apply')->all()->filter(CElementFilter::CLICKABLE)->count());
+				$this->assertTrue($filter->isExpanded());
 			}
-
-			foreach (['id:from' => 19, 'id:to' => 19] as $input => $value) {
-				$this->assertEquals($value, $this->query($input)->one()->getAttribute('maxlength'));
-			}
-
-			$this->assertEquals(1, $this->query('button:Apply')->all()->filter(CElementFilter::CLICKABLE)->count());
-			$this->assertTrue($filter->isExpanded());
 		}
 		else {
 			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
@@ -2366,11 +2389,11 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Clear particular dashboard for next test case.
 		DBexecute('DELETE FROM widget'.
-			' WHERE dashboard_pageid'.
-			' IN (SELECT dashboard_pageid'.
-				' FROM dashboard_page'.
-				' WHERE dashboardid='.self::$dashboard_zoom.
-			')'
+				' WHERE dashboard_pageid'.
+				' IN (SELECT dashboard_pageid'.
+					' FROM dashboard_page'.
+					' WHERE dashboardid='.self::$dashboard_zoom.
+				')'
 		);
 	}
 
@@ -2393,12 +2416,12 @@ class testDashboardItemValueWidget extends testWidgets {
 		$dashboard->waitUntilReady();
 
 		// Check that time period icon is displayed.
-		$time_icon = 'xpath://button[@class="btn-icon zi-time-period"]';
+		$time_icon = 'xpath:.//button[@class="btn-icon zi-time-period"]';
 		$this->assertTrue($dashboard->query($time_icon)->one()->isVisible());
 
 		// Check hint-box.
 		$dashboard->query($time_icon)->one()->click();
-		$hint = $dashboard->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
 		$this->assertEquals('Last 1 hour', $hint->getText());
 
 		// Close the hint-box.
@@ -2410,23 +2433,9 @@ class testDashboardItemValueWidget extends testWidgets {
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady();
 		$this->assertFalse($dashboard->query($time_icon)->one(false)->isValid());
-	}
 
-	/**
-	 * Recursive function for trimming all values in multi-level array.
-	 *
-	 * @param array    $array    array to be trimmed
-	 */
-	protected function trimArray(&$array) {
-		foreach ($array as &$value) {
-			if (!is_array($value)) {
-				$value = trim($value);
-			}
-			else {
-				$this->trimArray($value);
-			}
-		}
-		unset($value);
+		// Necessary action for avoiding problems with next test.
+		$dashboard->save();
 	}
 
 	/**

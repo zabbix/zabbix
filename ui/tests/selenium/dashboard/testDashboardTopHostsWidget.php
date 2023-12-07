@@ -259,7 +259,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #0 Minimum needed values to create and submit widget.
 			[
 				[
-					'main_fields' =>  [],
+					'main_fields' => [],
 					'column_fields' => [
 						[
 							'Name' => 'Min values',
@@ -272,7 +272,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #1 All fields filled for main form with all tags.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Name of Top hosts widget 😅',
 						'Refresh interval' => 'Default (1 minute)',
 						'Host groups' => 'Zabbix servers',
@@ -301,7 +301,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #2 Change order column for several items.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Several item columns',
 						'Order column' => 'duplicated colum name'
 					],
@@ -319,10 +319,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #3 Several item columns with different Aggregation function  and custom "From" time period.
+			// #3 Several item columns with different Aggregation function and custom "From" time period.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'All available aggregation function'
 					],
 					'column_fields' => [
@@ -379,7 +379,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'last',
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-2y', // maximum time period to display is 730 days.
+							'id:time_period_from' => 'now-730d', // maximum time period to display is 730 days.
 							'Item' => 'Available memory'
 						]
 					],
@@ -389,7 +389,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #4 Several item columns with different display, custom "From" time period, min/max and history data.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Different display and history data fields'
 					],
 					'column_fields' => [
@@ -474,7 +474,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #5 Add column with different Base color.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Another base color'
 					],
 					'column_fields' => [
@@ -490,7 +490,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #6 Add column with Threshold without color change.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'One Threshold'
 					],
 					'column_fields' => [
@@ -510,7 +510,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #7 Add several columns with Threshold without color change.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Several Threshold'
 					],
 					'column_fields' => [
@@ -536,7 +536,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #8 Add several columns with Threshold with color change and without color.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Several Thresholds with colors'
 					],
 					'column_fields' => [
@@ -569,7 +569,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #9 Add Host name columns.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Host name columns'
 					],
 					'column_fields' => [
@@ -593,7 +593,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #10 Add Text columns.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Text columns'
 					],
 					'column_fields' => [
@@ -625,7 +625,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Widget without columns'
 					],
 					'main_error' => [
@@ -638,7 +638,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Widget without item column name'
 					],
 					'column_fields' => [
@@ -655,7 +655,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Host count error with item column',
 						'Host count' => 'zzz'
 					],
@@ -675,7 +675,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Host count error without item column',
 						'Host count' => '333'
 					],
@@ -694,7 +694,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Color error in Host name column'
 					],
 					'column_fields' => [
@@ -713,7 +713,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Error in empty text column'
 					],
 					'column_fields' => [
@@ -731,7 +731,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Error in text column color'
 					],
 					'column_fields' => [
@@ -751,7 +751,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Error without item in item column'
 					],
 					'column_fields' => [
@@ -769,7 +769,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Incorrect time period'
 					],
 					'column_fields' => [
@@ -791,7 +791,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Maximum time period in From field'
 					],
 					'column_fields' => [
@@ -813,7 +813,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'From field is empty'
 					],
 					'column_fields' => [
@@ -835,7 +835,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'From field is with incorrect value'
 					],
 					'column_fields' => [
@@ -857,7 +857,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Incorrect time period'
 					],
 					'column_fields' => [
@@ -875,11 +875,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #24 Error when time period fields values "From" and "To" are changed and maximum time period is >730 days.
+			// #24 Error when time period fields values "From" and "To" are changed and maximum time period is > 730 days.
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Incorrect time period'
 					],
 					'column_fields' => [
@@ -889,7 +889,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item' => 'Available memory',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-4y',
+							'id:time_period_from' => 'now-3y-2s',
 							'id:time_period_to' => 'now-1y'
 						]
 					],
@@ -902,7 +902,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'To field is empty'
 					],
 					'column_fields' => [
@@ -920,11 +920,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #26 Error when time period "To" is below minimum time period.
+			// #26 Incorrect value passed in "To" field.
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'To field is with incorrect value'
 					],
 					'column_fields' => [
@@ -946,7 +946,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Both time selectors have invalid values'
 					],
 					'column_fields' => [
@@ -970,7 +970,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Both time selectors have invalid values'
 					],
 					'column_fields' => [
@@ -994,7 +994,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Both time selectors have invalid values'
 					],
 					'column_fields' => [
@@ -1015,7 +1015,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Incorrect min value'
 					],
 					'column_fields' => [
@@ -1036,7 +1036,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Incorrect max value'
 					],
 					'column_fields' => [
@@ -1057,7 +1057,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Error in item column color'
 					],
 					'column_fields' => [
@@ -1077,7 +1077,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Error in item column threshold color'
 					],
 					'column_fields' => [
@@ -1102,7 +1102,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Error in item column second threshold color'
 					],
 					'column_fields' => [
@@ -1131,7 +1131,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Error in item column second threshold color'
 					],
 					'column_fields' => [
@@ -1156,7 +1156,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'trim' => true,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => '            Spaces            ',
 						'Host count' => ' 1 '
 					],
@@ -1201,7 +1201,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'trim' => true,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => '{$USERMACRO}'
 					],
 					'tags' => [
@@ -1230,7 +1230,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'trim' => true,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => '{HOST.HOST}'
 					],
 					'tags' => [
@@ -1294,7 +1294,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Trim trailing and leading spaces in expected values before comparison.
 		if (CTestArrayHelper::get($data, 'trim', false)) {
-			$this->trimArray($data);
+			CTestArrayHelper::trimArray($data);
 		}
 
 		// Check error message in main widget form.
@@ -1411,7 +1411,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Host count' => '0'
 					],
 					'main_error' => [
@@ -1504,7 +1504,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #9  Error when time period fields values "From" and "To" are changed and maximum time period is >730 days.
+			// #9 Error when time period fields values "From" and "To" are changed and maximum time period is > 730 days.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1644,7 +1644,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #17 Update all main fields.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Updated main fields',
 						'Refresh interval' => '2 minutes',
 						'Host groups' => 'Zabbix servers',
@@ -1659,7 +1659,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #18 Update first item column to Text column and add some values.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Updated column type to text',
 						'Show hosts in maintenance' => false
 					],
@@ -1676,7 +1676,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #19 Update first column to Host name column and add some values.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Updated column type to host name'
 					],
 					'column_fields' => [
@@ -1691,7 +1691,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #20 Update first column to Item column and check time From/To.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Time From/To'
 					],
 					'column_fields' => [
@@ -1709,7 +1709,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #21 Update time From/To.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Time From/To'
 					],
 					'column_fields' => [
@@ -1727,7 +1727,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #22 Update time From/To (day before yesterday).
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Time shift 10h'
 					],
 					'column_fields' => [
@@ -1745,7 +1745,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #23 Update time From/To.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Time shift 10w'
 					],
 					'column_fields' => [
@@ -1764,7 +1764,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'trim' => true,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => '            Updated Spaces            ',
 						'Host count' => ' 1 '
 					],
@@ -1796,7 +1796,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 									'index' => 0,
 									'threshold' => '    5       '
 								],
-								[  'action' => USER_ACTION_UPDATE,
+								[
+									'action' => USER_ACTION_UPDATE,
 									'index' => 1,
 									'threshold' => '    10      '
 								]
@@ -1810,7 +1811,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'trim' => true,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => '{$UPDATED_USERMACRO}'
 					],
 					'tags' => [
@@ -1834,7 +1835,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'trim' => true,
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => '{HOST.HOST} updated'
 					],
 					'tags' => [
@@ -1857,7 +1858,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #27 Update item column adding new values and fields.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Updated values for item column 😅'
 					],
 					'column_fields' => [
@@ -1940,7 +1941,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Trim trailing and leading spaces in expected values before comparison.
 		if (CTestArrayHelper::get($data, 'trim', false)) {
-			$this->trimArray($data);
+			CTestArrayHelper::trimArray($data);
 		}
 
 		// Check error message in main widget form.
@@ -2201,7 +2202,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #0 As is.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Simple'
 					],
 					'column_fields' => [
@@ -2217,7 +2218,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #1 Bar.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Bar'
 					],
 					'column_fields' => [
@@ -2241,7 +2242,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #2 Bar with threshold.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Bar threshold'
 					],
 					'column_fields' => [
@@ -2265,7 +2266,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #3 Indicators.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Indicators'
 					],
 					'column_fields' => [
@@ -2289,7 +2290,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #4 Indicators with threshold.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Indicators threshold'
 					],
 					'column_fields' => [
@@ -2313,7 +2314,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #5 All 5 types visually.
 			[
 				[
-					'main_fields' =>   [
+					'main_fields' => [
 						'Name' => 'All three'
 					],
 					'column_fields' => [
@@ -2399,7 +2400,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #0 Text item - value displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Text value item'
 					],
 					'column_fields' => [
@@ -2415,7 +2416,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #1 Text item, history data Trends - value displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Text trends history'
 					],
 					'column_fields' => [
@@ -2432,7 +2433,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #2 Text item, display Bar - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Text display bar'
 					],
 					'column_fields' => [
@@ -2449,7 +2450,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #3 Text item, display Indicators - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Text display indicators'
 					],
 					'column_fields' => [
@@ -2466,7 +2467,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #4 Text item, Aggregation function max - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Text aggregation function'
 					],
 					'column_fields' => [
@@ -2483,7 +2484,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #5 Text item, Threshold - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Text threshold'
 					],
 					'column_fields' => [
@@ -2504,7 +2505,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #6 Log item - value displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Log value item'
 					],
 					'column_fields' => [
@@ -2520,7 +2521,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #7 Log item, history data Trends - value displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Log trends history'
 					],
 					'column_fields' => [
@@ -2537,7 +2538,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #8 Log item, display Bar - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Log display bar'
 					],
 					'column_fields' => [
@@ -2554,7 +2555,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #9 Log item, display Indicators - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Log display indicators'
 					],
 					'column_fields' => [
@@ -2571,7 +2572,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #10 Log item, Aggregation function max - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Log aggregation function'
 					],
 					'column_fields' => [
@@ -2588,7 +2589,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #11 Log item, Threshold - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Log threshold'
 					],
 					'column_fields' => [
@@ -2609,7 +2610,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #12 Char item - value displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Char value item'
 					],
 					'column_fields' => [
@@ -2625,7 +2626,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #13 Char item, history data Trends - value displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Char trends history'
 					],
 					'column_fields' => [
@@ -2642,7 +2643,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #14 Char item, display Bar - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Char display bar'
 					],
 					'column_fields' => [
@@ -2659,7 +2660,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #15 Char item, display Indicators - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Char display indicators'
 					],
 					'column_fields' => [
@@ -2676,7 +2677,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #16 Char item, Aggregation function max - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Char aggregation function'
 					],
 					'column_fields' => [
@@ -2693,7 +2694,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #17 Char item, Threshold - value not displayed.
 			[
 				[
-					'main_fields' =>  [
+					'main_fields' => [
 						'Name' => 'Char threshold'
 					],
 					'column_fields' => [
@@ -2862,7 +2863,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
-					'zoom_filter' => true
+					'zoom_filter' => true,
+					'filter_layout' => true
 				]
 			],
 			// Two widgets with time period "Dashboard" and "Custom" time period configuration.
@@ -2979,33 +2981,37 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->assertMessage('Dashboard updated');
 
 		if (array_key_exists('zoom_filter', $data)) {
+			// Check that zoom filter tab link is valid.
 			$this->assertTrue($this->query('xpath:.//a[@href="#tab_1"]')->one()->isValid());
-			$filter = CFilterElement::find()->one();
-			$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
-			$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
-			// Check time selector fields layout.
-			$this->assertEquals('now-1h', $this->query('id:from')->one()->getValue());
-			$this->assertEquals('now', $this->query('id:to')->one()->getValue());
+			// Check zoom filter layout.
+			if (array_key_exists('filter_layout', $data)) {
+				$filter = CFilterElement::find()->one();
+				$this->assertEquals('Last 1 hour', $filter->getSelectedTabName());
+				$this->assertEquals('Last 1 hour', $filter->query('link:Last 1 hour')->one()->getText());
 
-			$buttons = [
-				'xpath://button[contains(@class, "btn-time-left")]' => true,
-				'xpath://button[contains(@class, "btn-time-right")]' => false,
-				'button:Zoom out' => true,
-				'button:Apply' => true,
-				'id:from_calendar' => true,
-				'id:to_calendar' => true
-			];
-			foreach ($buttons as $selector => $enabled) {
-				$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+				// Check time selector fields layout.
+				foreach (['id:from' => 'now-1h', 'id:to' => 'now'] as $selector => $value) {
+					$input = $this->query($selector)->one();
+					$this->assertEquals($value, $input->getValue());
+					$this->assertEquals(19, $input->getAttribute('maxlength'));
+				}
+
+				$buttons = [
+					'xpath://button[contains(@class, "btn-time-left")]' => true,
+					'xpath://button[contains(@class, "btn-time-right")]' => false,
+					'button:Zoom out' => true,
+					'button:Apply' => true,
+					'id:from_calendar' => true,
+					'id:to_calendar' => true
+				];
+				foreach ($buttons as $selector => $enabled) {
+					$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+				}
+
+				$this->assertEquals(1, $this->query('button:Apply')->all()->filter(CElementFilter::CLICKABLE)->count());
+				$this->assertTrue($filter->isExpanded());
 			}
-
-			foreach (['id:from' => 19, 'id:to' => 19] as $input => $value) {
-				$this->assertEquals($value, $this->query($input)->one()->getAttribute('maxlength'));
-			}
-
-			$this->assertEquals(1, $this->query('button:Apply')->all()->filter(CElementFilter::CLICKABLE)->count());
-			$this->assertTrue($filter->isExpanded());
 		}
 		else {
 			$this->assertFalse($this->query('xpath:.//a[@href="#tab_1"]')->one(false)->isValid());
@@ -3013,11 +3019,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Clear particular dashboard for next test case.
 		DBexecute('DELETE FROM widget'.
-			' WHERE dashboard_pageid'.
-			' IN (SELECT dashboard_pageid'.
-				' FROM dashboard_page'.
-				' WHERE dashboardid='.CDataHelper::get('TopHostsWidget.dashboardids.top_host_zoom_filter').
-			')'
+				' WHERE dashboard_pageid'.
+				' IN (SELECT dashboard_pageid'.
+					' FROM dashboard_page'.
+					' WHERE dashboardid='.CDataHelper::get('TopHostsWidget.dashboardids.top_host_zoom_filter').
+				')'
 		);
 	}
 
@@ -3080,23 +3086,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$this->assertEquals($attributes['color'], $form->query($label)->asColorPicker()->one()->getValue());
 			}
 		}
-	}
-
-	/**
-	 * Recursive function for trimming all values in multi-level array.
-	 *
-	 * @param array    $array    array to be trimmed
-	 */
-	protected function trimArray(&$array) {
-		foreach ($array as &$value) {
-			if (!is_array($value)) {
-				$value = trim($value);
-			}
-			else {
-				$this->trimArray($value);
-			}
-		}
-		unset($value);
 	}
 
 	/**
