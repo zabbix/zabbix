@@ -5,7 +5,7 @@ New features:
 .........T [ZBXNEXT-8707] updated version check for MongoDB node by Zabbix agent 2 template (atocko)
 
 Bug fixes:
-.......PS. [ZBX-23799] fixed crash when updating and inserting interface at the same time (vso)
+.......PS. [ZBX-23799] fixed crash when host interfaces are added and updated at the same time (vso)
 ..F....... [ZBX-23565] fixed filtering by value not working in Latest data for log and text types (agriscenko)
 .......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware HV maintenance status (MVekslers)
 ...G...PS. [ZBX-23787,ZBX-23755] fixed crash on empty HTTP response; fixed Zabbix agent build on Windows with libcurl (vso)
@@ -426,7 +426,7 @@ New features:
 ........S. [ZBXNEXT-8857] updated max supported TimescaleDB version to 2.13 (mprihodko)
 
 Bug fixes:
-.......PS. [ZBX-23799] fixed crash when updating and inserting interface at the same time (vso)
+.......PS. [ZBX-23799] fixed crash when host interfaces are added and updated at the same time (vso)
 ........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
 ..F....... [ZBX-23699] fixed unchecking "Follow redirects" option not being saved in HTTP agent item configuration form (agriscenko)
 .......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware HV maintenance status (MVekslers)
