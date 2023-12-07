@@ -493,18 +493,16 @@ func parseOptRR(optRR *dns.OPT) (map[string]any, error) {
 			return nil, err
 		}
 
-		code, ok := oMap["Code"]
-		if ok {
-			delete(oMap, "Code")
-			oMap["code"] = code
+		for k, v := range oMap {
+			delete(oMap, k)
+			oMap[strings.ToLower(k)] = v
 		}
 
-		nsid, ok := oMap["Nsid"]
+		nsid, ok := oMap["nsid"]
 		if ok {
 			const numOfDigitsTogetherInNSID = 2
 			nsidValue := insertAtEveryNthPosition(nsid.(string), numOfDigitsTogetherInNSID, ' ')
 
-			delete(oMap, "Nsid")
 			oMap["nsid"] = nsidValue
 		}
 
