@@ -2398,7 +2398,7 @@ static int	DBpatch_6050185(void)
 
 	zbx_db_insert_prepare(&db_insert, "permission", "ugsetid", "hgsetid", "permission", (char*)NULL);
 
-	result = zbx_db_select("select ugs.ugsetid,h.hgsetid,max(r.permission)"
+	result = zbx_db_select("select u.ugsetid,h.hgsetid,max(r.permission)"
 			" from hgset h"
 			" join hgset_group hg"
 				" on h.hgsetid=hg.hgsetid"
