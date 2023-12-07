@@ -255,24 +255,11 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$regex_validator = new CRegexValidator([
-			'messageInvalid' => _('Regular expression must be a string'),
-			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
-		]);
-
-		foreach ($scripts as $index => $script) {
-			if (($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT)
-					&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-				self::checkManualInput($script, '/'.($index + 1), $regex_validator);
-			}
-		}
-
 		$this->checkUniqueness($scripts);
 		$this->checkDuplicates($scripts);
-
-		// Finally check User and Host IDs.
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
+		self::checkManualInput($scripts);
 	}
 
 	/**
@@ -405,12 +392,6 @@ class CScript extends CApiService {
 		// Once scope and type is validated, populate type field once more in case it was removed previously.
 		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['type']);
 
-		// Set up validator for later use.
-		$regex_validator = new CRegexValidator([
-			'messageInvalid' => _('Regular expression must be a string'),
-			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
-		]);
-
 		// Validate each script depending on changes made. Add required flags or set value from DB.
 		foreach ($scripts as $index => &$script) {
 			$db_script = $db_scripts[$script['scriptid']];
@@ -496,11 +477,6 @@ class CScript extends CApiService {
 
 			if (!CApiInputValidator::validate($api_input_rules, $script, '/'.($index + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			if (($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT)
-					&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-				self::checkManualInput($script, '/'.($index + 1), $regex_validator);
 			}
 
 			// Clear and reset all unnecessary fields on type change.
@@ -611,14 +587,13 @@ class CScript extends CApiService {
 		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
+		self::checkManualInput($scripts);
 	}
 
 	/**
 	 * Validates manual input fields.
 	 *
-	 * @param array            $script     Script data.
-	 * @param string           $path       Script pathing index.
-	 * @param CRegexValidator  $validator  Regular expression validator.
+	 * @param array  $scripts  Script data.
 	 *
 	 * $script = [
 	 *     'manualinput_validator_type' => (int)     Manual input validator type.
@@ -629,41 +604,30 @@ class CScript extends CApiService {
 	 *
 	 * @throws APIException if input is invalid
 	 */
-	private static function checkManualInput(array $script, string $path, CRegexValidator $validator): void {
-		if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
-			$regular_expression = '/'.str_replace('/', '\/', $script['manualinput_validator']).'/';
+	private static function checkManualInput(array $scripts): void {
+		foreach ($scripts as $index => $script) {
+			if (($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT)
+					&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
+				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
+					$regular_expression = '/'.str_replace('/', '\/', $script['manualinput_validator']).'/';
 
-			if ($script['manualinput_validator'] === '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', $path.'/manualinput_validator',
-						_('Expression cannot be empty')
-					)
-				);
-			}
-			elseif (!$validator->validate($script['manualinput_validator'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', $path.'/manualinput_validator',
-						$validator->getError()
-					)
-				);
-			}
-			elseif (!preg_match($regular_expression, $script['manualinput_default_value'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', $path.'/manualinput_default_value',
-						_s('input does not match the provided pattern: %1$s', $script['manualinput_validator'])
-					)
-				);
-			}
-		}
-		elseif ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
-			$manualinput_validator = array_map('trim', explode(',', $script['manualinput_validator']));
+					if (!preg_match($regular_expression, $script['manualinput_default_value'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1).'/manualinput_default_value',
+								_s('input does not match the provided pattern: %1$s', $script['manualinput_validator'])
+							)
+						);
+					}
+				}
+				elseif ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
+					$manualinput_validator = array_map('trim', explode(',', $script['manualinput_validator']));
 
-			if (array_unique($manualinput_validator) !== $manualinput_validator) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', $path.'/manualinput_validator',
-						_('values must be unique')
-					)
-				);
+					if (array_unique($manualinput_validator) !== $manualinput_validator) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($index + 1).'/manualinput_validator', _('values must be unique')
+						));
+					}
+				}
 			}
 		}
 	}
@@ -785,7 +749,7 @@ class CScript extends CApiService {
 			'manualinput_validator' =>		['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_MULTIPLE, 'rules' => [
-														['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
+														['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING], 'type' => API_REGEX, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
 														['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
 														['else' => true, 'type' => API_UNEXPECTED]
 													]],
@@ -821,7 +785,7 @@ class CScript extends CApiService {
 
 			$api_input_rules['fields']['manualinput_prompt']['rules'][0]['rules'][0]['flags'] |= API_REQUIRED;
 			$api_input_rules['fields']['manualinput_validator']['rules'][0]['rules'][0]['rules'][0]['flags']
-				= API_REQUIRED;
+				|= API_REQUIRED;
 			$api_input_rules['fields']['manualinput_validator']['rules'][0]['rules'][0]['rules'][1]['flags']
 				|= API_REQUIRED;
 			$api_input_rules['fields']['manualinput_default_value']['rules'][0]['rules'][0]['rules'][0]['flags']
