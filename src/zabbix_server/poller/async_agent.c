@@ -226,11 +226,11 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					&agent_context->tcp_recv_context, agent_context->item.flags, &event_new)))
 			{
 				zbx_protocol_t	protocol = agent_context->protocol;
-				
+
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->item.ret,
 						agent_context->item.interface.addr, &agent_context->item.result,
 						&agent_context->protocol);
-				
+
 				/* retry with other protocol */
 				if (FAIL == agent_context->item.ret && protocol != agent_context->protocol)
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
