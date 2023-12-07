@@ -897,9 +897,23 @@ class CHistoryManager {
 					' GROUP BY '.implode(', ', $sql_group_by);
 
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
-					$sql = 'SELECT DISTINCT h.itemid,h.'.($source === 'history' ? 'value' : 'value_avg').' AS value,h.clock,hi.tick'.
-						' FROM '.$sql_from.' h'.
-						' JOIN('.$sql.') hi ON h.itemid = hi.itemid AND h.clock = hi.clock';
+					if ($source === 'history') {
+						$sql =
+							'SELECT h.itemid,h.value,h.clock,s.tick'.
+							' FROM '.$sql_from.' h'.
+							' JOIN ('.
+								'SELECT h2.itemid,h2.clock,'.($function == AGGREGATE_FIRST ? 'MIN' : 'MAX').'(h2.ns) AS ns,s2.tick'.
+								' FROM '.$sql_from.' h2'.
+								' JOIN ('.$sql.') s2 ON h2.itemid=s2.itemid AND h2.clock=s2.clock'.
+								' GROUP BY h2.itemid,h2.clock,s2.tick'.
+							') s ON h.itemid=s.itemid AND h.clock=s.clock AND h.ns=s.ns';
+					}
+					else {
+						$sql =
+							'SELECT DISTINCT h.itemid,h.value_avg AS value,h.clock,s.tick'.
+							' FROM '.$sql_from.' h'.
+							' JOIN ('.$sql.') s ON h.itemid=s.itemid AND h.clock=s.clock';
+					}
 				}
 
 				$sql_result = DBselect($sql);
