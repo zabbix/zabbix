@@ -2150,11 +2150,17 @@ class testFormAlertsScripts extends CWebTest {
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertEquals($data['resolved_macros'], $popup->getItem($data['fields']['Name'])->getAttribute('href'));
 
-		// Check resolved macros in confirmation alert.
+		// Check resolved macros in confirmation popup.
 		$popup->fill($data['fields']['Name']);
-		$this->assertEquals($data['resolved_macros'], $this->page->getAlertText());
-		$this->page->dismissAlert();
-		$popup->close();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('URL opening confirmation', $dialog->getTitle());
+		$this->assertEquals($data['resolved_macros'], $dialog->query('class:confirmation-msg')->one()->getText());
+
+		// Check if buttons present and clickable.
+		$this->assertEquals(['Cancel', 'Open URL'], $dialog->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
+		$dialog->close();
 
 		// Check that script link is not present in the context menu for other manual action.
 		$table->query('link', $without_script)->one()->click();
