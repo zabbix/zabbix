@@ -2122,8 +2122,7 @@ button {
   .dashboard-widget-graph-link:link {
     border: 0; }
 
-.dashboard-grid-widget-body.is-loading::before,
-.dashboard-grid-iterator-body.is-loading::before {
+.dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
 .dashboard-list .dashboard-list-item {
@@ -5234,9 +5233,10 @@ select {
   opacity: 0; }
   .checkbox-radio + label span {
     position: relative;
+    box-sizing: border-box;
     display: inline-block;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     margin-right: 4px;
     vertical-align: text-bottom;
     background-color: #383838;
