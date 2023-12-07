@@ -334,16 +334,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			foreach ($column_item_values as $itemid => $column_item_value) {
 				if (in_array($column_items[$itemid]['hostid'], $master_hostids)) {
-					$item = $column_items[$itemid];
-
-					if ($column['aggregate_function'] == AGGREGATE_COUNT) {
-						$item['units'] = '';
-					}
-
 					$item_values[$column_index][$column_items[$itemid]['hostid']] = [
 						'value' => $column_item_value,
-						'item' => $item,
-						'is_binary_units' => isBinaryUnits($item['units'])
+						'item' => $column_items[$itemid],
+						'is_binary_units' => isBinaryUnits($column_items[$itemid]['units'])
 					];
 				}
 			}

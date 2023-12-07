@@ -1017,6 +1017,19 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	return $col;
 }
 
+function formatAggregatedHistoryValue(int $function, $value, array $item, bool $trim = true,
+		array $convert_options = []): string {
+	if (in_array($function, [AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])) {
+		unset($item['valuemap']['mappings']);
+	}
+
+	if ($function == AGGREGATE_COUNT) {
+		$item['units'] = '';
+	}
+
+	return formatHistoryValue($value, $item, $trim, $convert_options);
+}
+
 /**
  * Prepare item value for displaying, apply value map and/or convert units.
  *
@@ -1064,15 +1077,6 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 					'value' => $mapped_value.' ('.$value.')',
 					'units' => '',
 					'is_mapped' => true
-				];
-			}
-
-			if ($item['units'] === 's' && array_key_exists('decimals', $convert_options)
-					&& $convert_options['decimals'] != 0) {
-				return [
-					'value' => convertUnitSWithDecimals($value, false, $convert_options['decimals'], true),
-					'units' => '',
-					'is_mapped' => false
 				];
 			}
 

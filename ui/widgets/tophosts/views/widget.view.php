@@ -127,12 +127,14 @@ else {
 						$column['value'] = _('binary value');
 					}
 					else {
-						$formatted_value = formatHistoryValue($column['value'], $column['item'], true, [
-							'decimals' => $column_config['decimal_places'],
-							'decimals_exact' => true,
-							'small_scientific' => false,
-							'zero_as_zero' => false
-						]);
+						$formatted_value = formatAggregatedHistoryValue($column_config['aggregate_function'],
+							$column['value'], $column['item'], true, [
+								'decimals' => $column_config['decimal_places'],
+								'decimals_exact' => true,
+								'small_scientific' => false,
+								'zero_as_zero' => false
+							]
+						);
 					}
 
 					if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
