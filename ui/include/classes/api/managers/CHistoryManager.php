@@ -709,11 +709,21 @@ class CHistoryManager {
 				$aggs['value'] = ['sum' => ['field' => 'value']];
 				break;
 			case AGGREGATE_FIRST:
-				$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
+				$aggs['value'] = [
+					'top_hits' => [
+						'size' => 1,
+						'sort' => ['clock' => 'ASC', 'ns' => 'ASC']
+					]
+				];
 				$aggs['clock'] = ['min' => ['field' => 'clock']];
 				break;
 			case AGGREGATE_LAST:
-				$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
+				$aggs['value'] = [
+					'top_hits' => [
+						'size' => 1,
+						'sort' => ['clock' => 'DESC', 'ns' => 'DESC']
+					]
+				];
 				break;
 		}
 
@@ -1273,7 +1283,7 @@ class CHistoryManager {
 				$aggs_value_clock['value'] = [
 					'top_hits' => [
 						'size' => 1,
-						'sort' => ['clock' => ['order' => 'asc'], 'ns' => ['order' => 'asc']]
+						'sort' => ['clock' => 'ASC', 'ns' => 'ASC']
 					]
 				];
 				$aggs_value_clock['clock'] = ['min' => ['field' => 'clock']];
@@ -1282,7 +1292,7 @@ class CHistoryManager {
 				$aggs_value_clock['value'] = [
 					'top_hits' => [
 						'size' => 1,
-						'sort' => ['clock' => ['order' => 'desc'], 'ns' => ['order' => 'desc']]
+						'sort' => ['clock' => 'DESC', 'ns' => 'DESC']
 					]
 				];
 				break;
