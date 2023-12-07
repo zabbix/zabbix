@@ -1028,8 +1028,25 @@ out:
 	return ret;
 }
 
-static void	proxyconfig_get_hostmap_updates(const zbx_dc_proxy_t *proxy, zbx_uint64_t *proxy_hostmap_revision,
-		unsigned char *sync_mode, zbx_vector_uint64_t *del_hostproxyids)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy group updates from proxy group service to sync with     *
+ *          a proxy                                                           *
+ *                                                                            *
+ * Parameters: proxy            - [IN] syncing proxy                          *
+ *             proxy_hostmap_revision - [IN/OUT] proxy host mapping revision  *
+ *             sync_mode        - [OUT] sync mode, see ZBX_PG_PROXY_SYNC_     *
+ *                                      defines                               *
+ *             failover_delay   - [OUT] proxy group failover delay            *
+ *             del_hostproxyids - [OUT] identifiers of deleted host_proxy     *
+ *                                      records                               *
+ *                                                                            *
+ * Return value: SUCCEED - the data was read successfully                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxyconfig_get_proxy_group_updates(const zbx_dc_proxy_t *proxy, zbx_uint64_t *proxy_hostmap_revision,
+		unsigned char *sync_mode, int *failover_delay, zbx_vector_uint64_t *del_hostproxyids)
 {
 	static zbx_ipc_socket_t	pg_socket = {.fd = -1};
 
@@ -1070,6 +1087,7 @@ static void	proxyconfig_get_hostmap_updates(const zbx_dc_proxy_t *proxy, zbx_uin
 
 	ptr += zbx_deserialize_value(ptr, sync_mode);
 	ptr += zbx_deserialize_value(ptr, proxy_hostmap_revision);
+	ptr += zbx_deserialize_value(ptr, failover_delay);
 
 	if (ZBX_PROXY_SYNC_PARTIAL == *sync_mode)
 	{
@@ -1094,6 +1112,18 @@ static void	proxyconfig_get_hostmap_updates(const zbx_dc_proxy_t *proxy, zbx_uin
 	zbx_ipc_message_clean(&message);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fetch host_proxy records to sync with proxy                       *
+ *                                                                            *
+ * Parameters: proxy            - [IN] syncing proxy                          *
+ *             revision         - [IN] host mapping revision                  *
+ *             del_hostproxyids - [IN] identifiers of deleted host_proxy      *
+ *                                      records                               *
+ *             j                - [OUT] the output json                       *
+ *             error            - [OUT] error message                         *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_get_hostmap(const zbx_dc_proxy_t *proxy, zbx_uint64_t revision,
 		const zbx_vector_uint64_t *del_hostproxyids, struct zbx_json *j, char **error)
 {
@@ -1249,7 +1279,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 
 	if (0 != proxy->proxy_groupid)
 	{
-		proxyconfig_get_hostmap_updates(proxy, &hostmap_revision, &hostmap_sync, &del_hostproxyids);
+		proxyconfig_get_proxy_group_updates(proxy, &hostmap_revision, &hostmap_sync, &del_hostproxyids);
 
 		if (ZBX_PROXY_SYNC_NONE != hostmap_sync)
 			flags |= ZBX_PROXYCONFIG_SYNC_PROXY_LIST | ZBX_PROXYCONFIG_SYNC_HOSTMAP;
