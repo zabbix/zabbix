@@ -1935,8 +1935,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.25rc1
 
 New features:
+........S. [ZBXNEXT-8857] updated max supported TimescaleDB version to 2.13 (mprihodko)
+.......PS. [ZBXNEXT-8800] backported support of additional SSH options for ssh.run[] item as the 5th parameter (dgoloscapov)
 
 Bug fixes:
+........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
+...G...... [ZBX-23471] fixed sha256 sum calculation on AIX, HP-UX and Solaris, fixed crash on HP-UX (Andris)
+...G...PS. [ZBX-23787,ZBX-23755] fixed crash on empty http response; fixed Zabbix agent build on Windows with libcurl (vso)
+.......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware hv maintenance status (MVekslers)
+..F....... [ZBX-21132] fixed top hosts widget not showing all items by selected item name (Ivo)
+.........T [ZBX-23764] added an additional field for new events in SIGNL4 mediatype (aiantsen)
+...G...... [ZBX-23342] fixed Zabbix agent 2 mysql plugin connection not taking into account tls parameters (esneiders)
+.......PS. [ZBX-23685] added read-only transaction to a list of recoverable errors on PostgreSQL (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.24
