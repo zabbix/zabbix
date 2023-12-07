@@ -536,7 +536,18 @@ func parseDefaultRR(rr dns.RR) (map[string]any, error) {
 
 	rData2 := map[string]any{}
 	for k, v := range rData {
-		rData2[strings.ToLower(k)] = v
+		newKey := strings.ToLower(k)
+		if newKey == "typecovered" {
+			// unmarshalling produces float64 instead of the original uint16
+			// need to cast the value to float64 first and then to uint16
+			if newValue, ok := v.(float64); ok {
+				newValueS, ok := dnsTypesGetReverse[uint16(newValue)]
+				if ok {
+					v = newValueS
+				}
+			}
+		}
+		rData2[newKey] = v
 	}
 
 	return map[string]any{
