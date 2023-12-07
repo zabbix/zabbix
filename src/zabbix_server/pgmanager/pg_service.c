@@ -94,7 +94,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 
 	pg_cache_lock(pgs->cache);
 
-	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t);
+	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + sizeof(int);
 
 	/* if proxy is not cached or registered to proxy group return 'no sync' mode */
 	/* with 0 hostmap_revision, forcing full sync next time                      */
