@@ -48,73 +48,73 @@ class testTimeoutsDisplay extends CWebTest {
 	];
 
 	const GLOBAL_CUSTOM = [
-		'Zabbix agent' => '300s',
-		'Simple check' => '300s',
-		'SNMP agent' => '300s',
-		'External check' => '300s',
-		'Database monitor' => '300s',
-		'HTTP agent' => '300s',
-		'SSH agent' => '300s',
-		'TELNET agent' => '300s',
-		'Script' => '300s'
+		'Zabbix agent' => '111s',
+		'Simple check' => '222s',
+		'SNMP agent' => '333s',
+		'External check' => '444s',
+		'Database monitor' => '555s',
+		'HTTP agent' => '556s',
+		'SSH agent' => '557s',
+		'TELNET agent' => '558s',
+		'Script' => '559s'
 	];
 
 	const GLOBAL_MACROS = [
-		'Zabbix agent' => '{$MACROS}',
-		'Simple check' => '{$MACROS}',
-		'SNMP agent' => '{$MACROS}',
-		'External check' => '{$MACROS}',
-		'Database monitor' => '{$MACROS}',
-		'HTTP agent' => '{$MACROS}',
-		'SSH agent' => '{$MACROS}',
-		'TELNET agent' => '{$MACROS}',
-		'Script' => '{$MACROS}'
+		'Zabbix agent' => '{$MAC1}',
+		'Simple check' => '{$MAC2}',
+		'SNMP agent' => '{$MAC3}',
+		'External check' => '{$MAC4}',
+		'Database monitor' => '{$MAC5}',
+		'HTTP agent' => '{$MAC6}',
+		'SSH agent' => '{$MAC7}',
+		'TELNET agent' => '{$MAC8}',
+		'Script' => '{$MAC9}'
 	];
 
 	const PROXY_MACROS = [
-		'Zabbix agent' => '{$PROXY}',
-		'Simple check' => '{$PROXY}',
-		'SNMP agent' => '{$PROXY}',
-		'External check' => '{$PROXY}',
-		'Database monitor' => '{$PROXY}',
-		'HTTP agent' => '{$PROXY}',
-		'SSH agent' => '{$PROXY}',
-		'TELNET agent' => '{$PROXY}',
-		'Script' => '{$PROXY}'
+		'Zabbix agent' => '{$PRO1}',
+		'Simple check' => '{$PRO2}',
+		'SNMP agent' => '{$PRO3}',
+		'External check' => '{$PRO4}',
+		'Database monitor' => '{$PRO5}',
+		'HTTP agent' => '{$PRO6}',
+		'SSH agent' => '{$PRO7}',
+		'TELNET agent' => '{$PRO8}',
+		'Script' => '{$PRO9}'
 	];
 
 	const PROXY_CUSTOM = [
-		'Zabbix agent' => '255s',
-		'Simple check' => '255s',
-		'SNMP agent' => '255s',
-		'External check' => '255s',
-		'Database monitor' => '255s',
-		'HTTP agent' => '255s',
-		'SSH agent' => '255s',
-		'TELNET agent' => '255s',
-		'Script' => '255s'
+		'Zabbix agent' => '123s',
+		'Simple check' => '234s',
+		'SNMP agent' => '345s',
+		'External check' => '456s',
+		'Database monitor' => '567s',
+		'HTTP agent' => '568s',
+		'SSH agent' => '569s',
+		'TELNET agent' => '570s',
+		'Script' => '571s'
 	];
 
 	/**
 	 * Change global or proxy timeouts values and check them.
 	 *
-	 * @param string $timeout_values  		Reset default, macros values or custom values with/without proxy.
-	 * @param string $link    				Link to table with items, items prototype, LLD.
-	 * @param string $activity				Button name or table selector.
-	 * @param boolean $proxy				Fill proxy or global timeouts.
-	 * @param boolean $linked				Timeouts from linked template should be checked.
+	 * @param string $timeout_values    reset default, macros values or custom values with/without proxy
+	 * @param string $link    			link to table with items, items prototype, LLD
+	 * @param string $activity			button name or table selector
+	 * @param boolean $proxy			fill proxy or global timeouts
+	 * @param boolean $linked			timeouts from linked template should be checked
 	 */
 	public function checkGlobal($timeout_values, $link, $activity, $proxy = false, $linked = false) {
 		// Global Zabbix agent timeout used in active and passive agents. Add this value to array.
 		switch ($timeout_values) {
 			case 'proxy_macros':
 				$values = self::PROXY_MACROS;
-				$new_value = ['Zabbix agent (active)' => '{$PROXY}'];
+				$new_value = ['Zabbix agent (active)' => '{$PRO1}'];
 				break;
 
 			case 'proxy_custom':
 				$values = self::PROXY_CUSTOM;
-				$new_value = ['Zabbix agent (active)' => '255s'];
+				$new_value = ['Zabbix agent (active)' => '123s'];
 				break;
 
 			case 'global_default':
@@ -124,12 +124,12 @@ class testTimeoutsDisplay extends CWebTest {
 
 			case 'global_macros':
 				$values = self::GLOBAL_MACROS;
-				$new_value = ['Zabbix agent (active)' => '{$MACROS}'];
+				$new_value = ['Zabbix agent (active)' => '{$MAC1}'];
 				break;
 
 			case 'global_custom':
 				$values = self::GLOBAL_CUSTOM;
-				$new_value = ['Zabbix agent (active)' => '300s'];
+				$new_value = ['Zabbix agent (active)' => '111s'];
 				break;
 		}
 
@@ -160,7 +160,7 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Change global timeouts.
 	 *
-	 * @param array $values		Timeouts values to fill.
+	 * @param array $values    timeouts values to fill
 	 */
 	protected function fillGlobalTimeouts($values) {
 		$this->page->login()->open('zabbix.php?action=timeouts.edit')->waitUntilReady();
@@ -194,7 +194,7 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Change proxy timeouts.
 	 *
-	 * @param array $values		Timeouts values to fill.
+	 * @param array $values    timeouts values to fill
 	 */
 	protected function fillProxyTimeouts($values) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
@@ -229,9 +229,9 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Check timeouts in items/item prototypes/LLD after timeout changes.
 	 *
-	 * @param array $values				Values to check.
-	 * @param string $link				Link to page where to check timeouts.
-	 * @param string $button_name		Button name to add new item, item prototype, LLD.
+	 * @param array $values			 values to check
+	 * @param string $link			 link to page where to check timeouts
+	 * @param string $button_name    button name to add new item, item prototype, LLD
 	 */
 	protected function checkSimple($values, $link, $button_name) {
 		// Check timeout value in items one by one, after changes in Administration->Timeouts or Proxy->timeouts.
@@ -257,6 +257,8 @@ class testTimeoutsDisplay extends CWebTest {
 			$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
 			$this->assertEquals('Global', $radio->getText());
 			$this->assertTrue($radio->isEnabled());
+			$this->assertTrue($form->getField('Timeout')->isVisible());
+			$this->assertFalse($form->getField('Timeout')->isEnabled());
 			$form->checkValue(['Timeout' => $timeout]);
 
 			if ($button_name === 'Create discovery rule') {
@@ -271,9 +273,9 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Check timeouts in templated items/item prototypes/LLD after timeout changes.
 	 *
-	 * @param array $values					Values to check.
-	 * @param string $link					Link to page where to check timeouts.
-	 * @param string $table_selector		Table selector for items, item prototypes and LLD.
+	 * @param array $values				values to check
+	 * @param string $link				link to page where to check timeouts
+	 * @param string $table_selector    table selector for items, item prototypes and LLD
 	 */
 	protected function checkLinked($values, $link, $table_selector) {
 		// If we need to check linked item prototype timeouts, we should first navigate through discovery rule.

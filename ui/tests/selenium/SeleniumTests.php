@@ -238,6 +238,11 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 require_once dirname(__FILE__).'/templates/testFormTemplate.php';
 require_once dirname(__FILE__).'/templates/testPageTemplates.php';
 
+// Timeout.
+require_once dirname(__FILE__) . '/timeouts/testTimeoutsHosts.php';
+require_once dirname(__FILE__) . '/timeouts/testTimeoutsLinkedTemplates.php';
+require_once dirname(__FILE__) . '/timeouts/testTimeoutsTemplates.php';
+
 // Trigger dependence
 require_once dirname(__FILE__).'/triggerDependencies/testHostTriggerDependencies.php';
 require_once dirname(__FILE__).'/triggerDependencies/testTemplateTriggerDependencies.php';
@@ -276,9 +281,6 @@ require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
-require_once dirname(__FILE__).'/timeouts/testHostsTimeouts.php';
-require_once dirname(__FILE__).'/timeouts/testLinkedTimeouts.php';
-require_once dirname(__FILE__).'/timeouts/testTemplatesTimeouts.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
@@ -534,6 +536,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageTemplates');
 
+		// Timeout.
+		$suite->addTestSuite('testTimeoutsHosts');
+		$suite->addTestSuite('testTimeoutsLinkedTemplates');
+		$suite->addTestSuite('testTimeoutsTemplates');
+
 		// Trigger dependence
 		$suite->addTestSuite('testHostTriggerDependencies');
 		$suite->addTestSuite('testTemplateTriggerDependencies');
@@ -574,9 +581,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
 */
-		$suite->addTestSuite('testHostsTimeouts');
-		$suite->addTestSuite('testLinkedTimeouts');
-		$suite->addTestSuite('testTemplatesTimeouts');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
