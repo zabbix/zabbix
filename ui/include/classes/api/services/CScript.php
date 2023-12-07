@@ -336,37 +336,6 @@ class CScript extends CApiService {
 		// Populate name, type and scope.
 		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'scope']);
 
-		// Validate if scripts belong to actions and scope can be changed.
-		$action_scriptids = [];
-
-		foreach ($scripts as $script) {
-			$db_script = $db_scripts[$script['scriptid']];
-
-			if ($script['scope'] != ZBX_SCRIPT_SCOPE_ACTION && $db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
-				$action_scriptids[$script['scriptid']] = true;
-			}
-		}
-
-		if ($action_scriptids) {
-			$actions = API::Action()->get([
-				'output' => ['actionid', 'name'],
-				'selectOperations' => ['opcommand'],
-				'selectRecoveryOperations' => ['opcommand'],
-				'selectUpdateOperations' => ['opcommand'],
-				'scriptids' => array_keys($action_scriptids)
-			]);
-
-			if ($actions) {
-				foreach ($scripts as $script) {
-					$db_script = $db_scripts[$script['scriptid']];
-
-					if ($script['scope'] != ZBX_SCRIPT_SCOPE_ACTION && $db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
-						self::checkActionOperations($actions, $script);
-					}
-				}
-			}
-		}
-
 		// Validate type field in case scope changed to ACTION and type was URL.
 		foreach ($scripts as $index => &$script) {
 			$db_script = $db_scripts[$script['scriptid']];
@@ -588,6 +557,7 @@ class CScript extends CApiService {
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
 		self::checkManualInput($scripts);
+		self::checkActions($scripts, $db_scripts);
 	}
 
 	/**
@@ -1884,45 +1854,56 @@ class CScript extends CApiService {
 	 * Check if script belongs to action in one of the operations. If at least one usage of script is found
 	 * then script scope cannot be changed. Used only for script.update method.
 	 *
-	 * @param array  $actions  Array of actions.
-	 * @param array  $script   Script data.
+	 * @param array $scripts
+	 * @param array $db_script
 	 *
-	 * $actions = [[
-	 *     'name' => (string)  Action name.
-	 *     'operations' => [[
-	 *         'opcommand' => [
-	 *             'scriptid' => (string)  Script ID.
-	 *         ]
-	 *     ]]
-	 *     'recovery_operations' => [[
-	 *         'opcommand' => [
-	 *             'scriptid' => (string)  Script ID.
-	 *         ]
-	 *     ]]
-	 *     'update_operations' => [[
-	 *         'opcommand' => [
-	 *             'scriptid' => (string)  Script ID.
-	 *         ]
-	 *     ]]
-	 * ]]
+	 * $scripts = [
+	 *     [
+	 *         'scriptid' =>  (string)
+	 *         'name' =>      (string)
+	 *         'scope' =>     (int)
+	 *     ]
+	 * ]
 	 *
-	 * $script = [
-	 *     'name' =>      (string)  Script name.
-	 *     'scriptid' =>  (string)  Script ID.
+	 * $db_scripts = [
+	 *     <scriptid> => [
+	 *         'scope' =>     (int)
+	 *     ]
 	 * ]
 	 *
 	 * @throws APIException if script belongs to at least one of action operations.
 	 */
-	private static function checkActionOperations(array $actions, array $script): void {
-		foreach ($actions as $action) {
-			foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_type) {
-				if ($action[$operation_type]) {
+	private static function checkActions(array $scripts, array $db_scripts): void {
+		// Validate if scripts belong to actions and scope can be changed.
+		$action_scripts = [];
+
+		foreach ($scripts as $script) {
+			$db_script = $db_scripts[$script['scriptid']];
+
+			if ($script['scope'] != ZBX_SCRIPT_SCOPE_ACTION && $db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+				$action_scripts[$script['scriptid']] = [
+					'name' => $script['name']
+				];
+			}
+		}
+
+		if ($action_scripts) {
+			$actions = API::Action()->get([
+				'output' => ['actionid', 'name'],
+				'selectOperations' => ['opcommand'],
+				'selectRecoveryOperations' => ['opcommand'],
+				'selectUpdateOperations' => ['opcommand'],
+				'scriptids' => array_keys($action_scripts)
+			]);
+
+			foreach ($actions as $action) {
+				foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_type) {
 					foreach ($action[$operation_type] as $operation) {
 						if (array_key_exists('opcommand', $operation)
-								&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
+								&& array_key_exists($operation['opcommand']['scriptid'], $action_scripts)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Cannot update script scope. Script "%1$s" is used in action "%2$s".',
-									$script['name'], $action['name']
+									$action_scripts[$operation['opcommand']['scriptid']]['name'], $action['name']
 								)
 							);
 						}
