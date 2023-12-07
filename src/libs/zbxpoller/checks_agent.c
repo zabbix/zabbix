@@ -24,9 +24,42 @@
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 
-void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
+void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, const char *timeout)
+{
+	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_PASSIVE_CHECKS, ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
+
+	zbx_json_addobject(j, NULL);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_TIMEOUT, timeout, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(j);
+}
+
+void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result,
+		zbx_protocol_t *protocol)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
+
+	if (0 == received_len)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
+				" Assuming that agent dropped connection because of access permissions.",
+				addr));
+		*ret = NETWORK_ERROR;
+		return;
+	}
+
+	if (ZBX_PROTOCOL_JSON == *protocol)
+	{
+		struct zbx_json_parse	jp;
+
+		if (FAIL == zbx_json_open(s->buffer, &jp))
+		{
+			*protocol = ZBX_PROTOCOL_SIMPLE;
+			*ret = FAIL;
+			return;
+		}
+	}
 
 	if (0 == strcmp(s->buffer, ZBX_NOTSUPPORTED))
 	{
@@ -43,15 +76,11 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
 		*ret = AGENT_ERROR;
 	}
-	else if (0 == received_len)
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
-				" Assuming that agent dropped connection because of access permissions.",
-				addr));
-		*ret = NETWORK_ERROR;
-	}
 	else
+	{
 		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s->buffer);
+		*ret = SUCCEED;
+	}
 }
 
 /******************************************************************************
@@ -80,6 +109,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	const char	*tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
+	zbx_protocol_t	protocol = ZBX_PROTOCOL_SIMPLE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
 			item->interface.addr, item->key, zbx_tcp_connection_type_name(item->host.tls_connect));
@@ -144,7 +174,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	}
 
 	if (SUCCEED == ret)
-		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result);
+		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result, &protocol);
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 

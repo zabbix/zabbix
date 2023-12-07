@@ -212,6 +212,7 @@
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
 
+#define ZBX_PROTO_VALUE_GET_PASSIVE_CHECKS	"passive checks"
 #define ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS	"active checks"
 #define ZBX_PROTO_VALUE_PROXY_CONFIG		"proxy config"
 #define ZBX_PROTO_VALUE_PROXY_HEARTBEAT		"proxy heartbeat"

@@ -29,7 +29,9 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *inter
 		char *host, char *key_orig, unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		int unavailable_delay, int unreachable_period, int unreachable_delay, const char *error);
 
-void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result);
+void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, const char *timeout);
+void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result,
+		zbx_protocol_t *protocol);
 
 int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, unsigned char program_type,

@@ -101,6 +101,13 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
+typedef enum
+{
+	ZBX_PROTOCOL_JSON,
+	ZBX_PROTOCOL_SIMPLE
+}
+zbx_protocol_t;
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
