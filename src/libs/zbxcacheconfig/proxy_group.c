@@ -388,3 +388,20 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update proxy failover delay in configuration cache                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_proxy_failover_delay(int failover_delay)
+{
+	/* failover delay can be updated only by one process at time, */
+	/* so it can be checked without locking before update        */
+	if (config->proxy_failover_delay != failover_delay)
+	{
+		WRLOCK_CACHE;
+		config->proxy_failover_delay = failover_delay;
+		UNLOCK_CACHE;
+	}
+}

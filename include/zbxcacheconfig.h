@@ -1029,14 +1029,15 @@ zbx_session_t;
 
 typedef struct
 {
-	zbx_uint64_t	config;		/* configuration cache revision, increased every sync */
-	zbx_uint64_t	expression;	/* global expression revision */
-	zbx_uint64_t	autoreg_tls;	/* autoregistration tls revision */
-	zbx_uint64_t	upstream;	/* configuration revision received from server */
-	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
+	zbx_uint64_t	config;			/* configuration cache revision, increased every sync */
+	zbx_uint64_t	expression;		/* global expression revision */
+	zbx_uint64_t	autoreg_tls;		/* autoregistration tls revision */
+	zbx_uint64_t	upstream;		/* configuration revision received from server */
+	zbx_uint64_t	upstream_hostmap;	/* host mapping configuration revision received from server */
+	zbx_uint64_t	config_table;		/* the global configuration revision (config table) */
 	zbx_uint64_t	connector;
-	zbx_uint64_t	proxy_group;	/* summary revision of all proxy groups */
-	zbx_uint64_t	proxy;		/* summary revision of all proxies */
+	zbx_uint64_t	proxy_group;		/* summary revision of all proxy groups */
+	zbx_uint64_t	proxy;			/* summary revision of all proxies */
 }
 zbx_dc_revision_t;
 
@@ -1232,8 +1233,8 @@ void	zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
 
-zbx_uint64_t	zbx_dc_get_received_revision(void);
-void	zbx_dc_update_received_revision(zbx_uint64_t revision);
+void	zbx_dc_get_upstream_revision(zbx_uint64_t *config_revision, zbx_uint64_t *hostmap_revision);
+void	zbx_dc_set_upstream_revision(zbx_uint64_t config_revision, zbx_uint64_t hostmap_revision);
 
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
@@ -1425,5 +1426,6 @@ int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *re
 		zbx_comms_redirect_t *redirect);
 
 int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision);
+void	zbx_dc_update_proxy_failover_delay(int failover_delay);
 
 #endif

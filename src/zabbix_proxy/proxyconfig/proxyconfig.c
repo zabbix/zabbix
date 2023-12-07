@@ -43,18 +43,24 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	size_t			buffer_size, reserved;
 	struct zbx_json		j;
 	int			ret = FAIL;
+	zbx_uint64_t		config_revision, hostmap_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* reset the performance metric */
 	*data_size = 0;
 
+	zbx_dc_get_upstream_revision(&config_revision, &hostmap_revision);
+
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, "host", args->config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, zbx_dc_get_received_revision());
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, config_revision);
+
+	if (0 != hostmap_revision)
+		zbx_json_adduint64(&j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
@@ -139,7 +145,7 @@ error:
 	if (SUCCEED != ret)
 	{
 		/* reset received config_revision to force full resync after data transfer failure */
-		zbx_dc_update_received_revision(0);
+		zbx_dc_set_upstream_revision(0, 0);
 	}
 
 out:

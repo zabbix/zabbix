@@ -345,7 +345,17 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 		td->sql_filter = zbx_dsprintf(NULL, "status<>%d", HOST_STATUS_TEMPLATE);
 	}
 	else if (0 == strcmp(table->table, "items"))
+	{
 		td->reset_field = "master_itemid";
+	}
+	else if (0 == strcmp(table->table, "proxy"))
+	{
+		td->rename_field = "name";
+	}
+	else if (0 == strcmp(table->table, "host_proxy"))
+	{
+		td->reset_field = "proxyid";
+	}
 
 	/* get table fields from database schema */
 
@@ -677,7 +687,7 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 	{
 		if (-1 == (reset_index = table_data_get_field_index(td, td->reset_field)))
 		{
-			*error = zbx_dsprintf(NULL, "unknown rename field \"%s\" for table \"%s\"", td->reset_field,
+			*error = zbx_dsprintf(NULL, "unknown reset field \"%s\" for table \"%s\"", td->reset_field,
 					td->table->table);
 			return FAIL;
 		}
@@ -1919,7 +1929,119 @@ static int	proxyconfig_delete_globalmacros(char **error)
 	return ret;
 }
 
-#define proxyconfig_ZBX_TABLE_NUM	24
+static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tables, struct zbx_json_parse *jp,
+		unsigned char full_sync, char **error)
+{
+	zbx_table_data_t	*td;
+
+	if (NULL == (td = proxyconfig_get_table(config_tables, "host_proxy")))
+		return proxyconfig_sync_table(config_tables, "proxy", error);
+
+	if (0 == full_sync)
+	{
+		zbx_vector_uint64_t	recids;
+		zbx_hashset_iter_t	iter;
+		zbx_table_row_t		*row;
+
+		zbx_vector_uint64_create(&recids);
+
+		zbx_hashset_iter_reset(&td->rows, &iter);
+		while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
+			zbx_vector_uint64_append(&recids, row->recid);
+
+		proxyconfig_prepare_table(td, "hostproxyid", &recids, NULL);
+
+		/* read deleted hotsproxyids and add to table data */
+
+		struct zbx_json_parse	jp_del;
+		char	tmp[ZBX_MAX_UINT64_LEN + 1];
+
+		if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DEL_HOSTPROXYIDS, &jp_del))
+		{
+			const char	*p;
+			zbx_uint64_t	hostproxyid;
+
+			for (p = 0; NULL != (p = zbx_json_next_value(&jp_del, p, tmp, sizeof(tmp), NULL));)
+			{
+				if (SUCCEED == zbx_is_uint64(tmp, &hostproxyid))
+					zbx_vector_uint64_append(&td->del_ids, hostproxyid);
+			}
+		}
+
+		zbx_vector_uint64_destroy(&recids);
+	}
+	else
+		proxyconfig_prepare_table(td, NULL, NULL, NULL);
+
+	if (SUCCEED != proxyconfig_prepare_rows(td, error))
+		return FAIL;
+
+	if (SUCCEED != proxyconfig_delete_rows(td, error))
+		return FAIL;
+
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "proxy", error))
+		return FAIL;
+
+	if (SUCCEED != proxyconfig_insert_rows(td, error))
+		return FAIL;
+
+	return proxyconfig_update_rows(td, error);
+}
+
+static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_tables, struct zbx_json_parse *jp,
+		zbx_uint64_t *hostmap_revision, char **error)
+{
+	if (NULL == jp->start)
+	{
+		/* proxy is not assigned to proxy group - purge residual configuration data */
+		zbx_uint64_t	cfg_revision, cfg_hostmap_revision;
+
+		zbx_dc_get_upstream_revision(&cfg_revision, &cfg_hostmap_revision);
+
+		if (0 != cfg_hostmap_revision)
+		{
+			*hostmap_revision = 0;
+			if (ZBX_DB_OK <= zbx_db_execute("truncate table proxy") &&
+					ZBX_DB_OK <= zbx_db_execute("truncate table host_proxy"))
+			{
+				return SUCCEED;
+			}
+
+			return FAIL;
+		}
+	}
+
+	char	tmp[ZBX_MAX_UINT64_LEN + 1];
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTMAP_REVISION, tmp, sizeof(tmp), NULL))
+	{
+		*error = zbx_strdup(NULL, "no hostmap_revision tag in proxy group configuration");
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_is_uint64(tmp, hostmap_revision))
+	{
+		*error = zbx_strdup(NULL, "invalid hostmap_revision value in proxy group configuration");
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_FAILOVER_DELAY, tmp, sizeof(tmp), NULL))
+	{
+		*error = zbx_strdup(NULL, "no failover_delay tag in proxy group configuration");
+		return FAIL;
+	}
+
+	zbx_dc_update_proxy_failover_delay(atoi(tmp));
+
+	unsigned char	full_sync = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_FULL_SYNC, tmp, sizeof(tmp), NULL))
+		full_sync = atoi(tmp);
+
+	return proxyconfig_sync_proxy_group(config_tables, jp, full_sync, error);
+}
+
+#define PROXYCONFIG_ZBX_TABLE_NUM	26
 
 /******************************************************************************
  *                                                                            *
@@ -1931,9 +2053,9 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 	zbx_vector_table_data_ptr_t	config_tables;
 	int			ret = SUCCEED, full_sync = 0, delete_globalmacros = 0, loglevel;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1];
-	struct zbx_json_parse	jp_data = {NULL, NULL}, jp_del_hostids = {NULL, NULL},
+	struct zbx_json_parse	jp_data = {NULL, NULL}, jp_del_hostids = {NULL, NULL}, jp_proxy_group = {NULL, NULL},
 				jp_del_macro_hostids = {NULL, NULL};
-	zbx_uint64_t		config_revision;
+	zbx_uint64_t		config_revision, hostmap_revision = 0;
 	zbx_vector_uint64_t	del_hostids, del_macro_hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1941,6 +2063,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 	(void)zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data);
 	(void)zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_HOSTIDS, &jp_del_hostids);
 	(void)zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS, &jp_del_macro_hostids);
+	(void)zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PROXY_GROUP, &jp_proxy_group);
 
 	if ((NULL == jp_data.start || 1 == jp_data.end - jp_data.start) && NULL == jp_del_hostids.start &&
 			NULL == jp_del_macro_hostids.start)
@@ -1975,7 +2098,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 		full_sync = atoi(tmp);
 
 	zbx_vector_table_data_ptr_create(&config_tables);
-	zbx_vector_table_data_ptr_reserve(&config_tables, proxyconfig_ZBX_TABLE_NUM);
+	zbx_vector_table_data_ptr_reserve(&config_tables, PROXYCONFIG_ZBX_TABLE_NUM);
 	zbx_vector_uint64_create(&del_hostids);
 	zbx_vector_uint64_create(&del_macro_hostids);
 
@@ -2034,9 +2157,12 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 		ret = proxyconfig_delete_globalmacros(error);
 
 	if (SUCCEED == ret)
+		ret = proxyconfig_prepare_proxy_group(&config_tables, &jp_proxy_group, &hostmap_revision, error);
+
+	if (SUCCEED == ret)
 	{
 		if (ZBX_DB_OK == zbx_db_commit())
-			zbx_dc_update_received_revision(config_revision);
+			zbx_dc_set_upstream_revision(config_revision, hostmap_revision);
 	}
 	else
 		zbx_db_rollback();
@@ -2065,6 +2191,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	int			ret;
 	struct zbx_json		j;
 	char			*error = NULL;
+	zbx_uint64_t		config_revision, hostmap_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2074,10 +2201,15 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		goto out;
 	}
 
+	zbx_dc_get_upstream_revision(&config_revision, &hostmap_revision);
+
 	zbx_json_init(&j, 1024);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, config_revision);
+
+	if (0 != hostmap_revision)
+		zbx_json_adduint64(&j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
 
 	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, (unsigned char)sock->protocol,
 			config_timeout))

@@ -8937,6 +8937,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 		config->session_token = NULL;
 
 	config->hostname = (NULL != hostname ? dc_strdup(hostname) : NULL);
+	config->proxy_failover_delay = 0;
 
 	zbx_dbsync_env_init(config);
 
@@ -16277,9 +16278,10 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
  *           can access it at the same time.                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_dc_get_received_revision(void)
+void	zbx_dc_get_upstream_revision(zbx_uint64_t *config_revision, zbx_uint64_t *hostmap_revision)
 {
-	return config->revision.upstream;
+	*config_revision = config->revision.upstream;
+	*hostmap_revision = config->revision.upstream_hostmap;
 }
 
 /******************************************************************************
@@ -16290,9 +16292,10 @@ zbx_uint64_t	zbx_dc_get_received_revision(void)
  *           can access it at the same time.                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_received_revision(zbx_uint64_t revision)
+void	zbx_dc_set_upstream_revision(zbx_uint64_t config_revision, zbx_uint64_t hostmap_revision)
 {
-	config->revision.upstream = revision;
+	config->revision.upstream = config_revision;
+	config->revision.upstream_hostmap = hostmap_revision;
 }
 
 /******************************************************************************
