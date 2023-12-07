@@ -212,7 +212,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 */
 	public function getCheckFormData() {
 		return [
-			// All valid custom values, checked checkboxes, custom colors.
+			// #0 All valid custom values, checked checkboxes, custom colors.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -268,7 +268,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Unchecked checkboxes.
+			// #1 Unchecked checkboxes.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -288,7 +288,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Zeros in custom colors.
+			// #2 Zeros in custom colors.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -320,7 +320,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Letters in custom colors.
+			// #3 Letters in custom colors.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -352,7 +352,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Maximal valid values.
+			// #4 Maximal valid values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -396,7 +396,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in time in period fields without "s".
+			// #5 Valid zero values in time in period fields without "s".
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -410,7 +410,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in time in period fields with "s".
+			// #6 Valid zero values in time in period fields with "s".
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -424,7 +424,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in minutes.
+			// #7 Valid zero values in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -438,7 +438,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in hours.
+			// #8 Valid zero values in hours.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -452,7 +452,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in days.
+			// #9 Valid zero values in days.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -466,7 +466,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in weeks.
+			// #10 Valid zero values in weeks.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -480,7 +480,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields in seconds without "s".
+			// #11 Valid maximum values in period fields in seconds without "s".
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -494,7 +494,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields in seconds with "s".
+			// #12 Valid maximum values in period fields in seconds with "s".
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -508,7 +508,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields with in minutes.
+			// #13 Valid maximum values in period fields with in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -522,7 +522,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields with in hours.
+			// #14 Valid maximum values in period fields with in hours.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -536,7 +536,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields with in days.
+			// #15 Valid maximum values in period fields with in days.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -550,7 +550,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid zero values in Moths (Months not supported).
+			// #16 Invalid zero values in Moths (Months not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -564,7 +564,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid zero values in years (years not supported).
+			// #17 Invalid zero values in years (years not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -578,7 +578,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in seconds without "s".
+			// #18 Invalid maximum values in period fields in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -592,7 +592,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in seconds with "s".
+			// #19 Invalid maximum values in period fields in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
@@ -606,7 +606,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in minutes.
+			// #20 Invalid maximum values in period fields in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -620,7 +620,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in hours.
+			// #21 Invalid maximum values in period fields in hours.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -634,7 +634,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in days.
+			// #22 Invalid maximum values in period fields in days.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -648,7 +648,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Maximal invalid values in period fields.
+			// #23 Maximal invalid values in period fields.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -662,7 +662,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid string values.
+			// #24 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -677,7 +677,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid string values.
+			// #25 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -712,7 +712,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid empty values.
+			// #26 Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -759,7 +759,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid negative values.
+			// #27 Invalid negative values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -793,12 +793,39 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
 					]
 				]
+			],
+			// #28 Trimming spaces.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'fields' =>  [
+						'Display OK triggers for' => '   25m   ',
+						'On status change triggers blink for' => '   12m   ',
+						'Not classified' => '   Test Not classified     ',
+						'Information' => '   Test Information    ',
+						'Warning' => '   Test Warning    ',
+						'Average' => '  Test Average    ',
+						'High' => '   Test High    ',
+						'Disaster' => '     Test Disaster    '
+					],
+					'db' => [
+						'ok_period' => '25m',
+						'blink_period' => '12m',
+						'severity_name_0' => 'Test Not classified',
+						'severity_name_1' => 'Test Information',
+						'severity_name_2' => 'Test Warning',
+						'severity_name_3' => 'Test Average',
+						'severity_name_4' => 'Test High',
+						'severity_name_5' => 'Test Disaster'
+					]
+				]
 			]
 		];
 	}
 
 	/**
-	 * Backup in needed because of DEV-1673, and can be removed after bug is fixed.
+	 * TODO: Backup is needed because of DEV-1673, and can be removed after bug is fixed.
 	 * @backup config
 	 *
 	 * @dataProvider getCheckFormData
