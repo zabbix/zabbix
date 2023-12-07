@@ -48,6 +48,4 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		zbx_pp_step_t *step, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
 		const char *config_source_ip);
 
-int	pp_error_on_fail(zbx_variant_t *value, const zbx_pp_step_t *step);
-
 #endif

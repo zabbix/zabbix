@@ -21,6 +21,8 @@
 #define ZABBIX_DBUPGRADE_COMMON_H
 
 int	delete_problems_with_nonexistent_object(void);
+#ifndef HAVE_SQLITE3
 int	create_problem_3_index(void);
 int	drop_c_problem_2_index(void);
+#endif
 #endif
