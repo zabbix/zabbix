@@ -1525,29 +1525,28 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 
 		for (i = 0; i < hgsets->values_num; i++)
 		{
+			int	j;
+
 			hgset = hgsets->values[i];
 
-			if (ZBX_LLD_HGSET_OPT_INSERT != hgset->opt)
-				continue;
-
-			if (FAIL != zbx_vector_uint64_bsearch(&hgset->hgroupids, hostgroupid,
+			if (ZBX_LLD_HGSET_OPT_INSERT != hgset->opt ||
+					FAIL == zbx_vector_uint64_bsearch(&hgset->hgroupids, hostgroupid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				int	k;
-
-				prm.hgset = hgset;
-
-				if (FAIL != (k = zbx_vector_lld_permission_search(permissions, prm,
-						lld_permission_compare)))
-				{
-					int	*permission_old = &permissions->values[k].permission;
-
-					if (0 != *permission_old && *permission_old < prm.permission)
-						*permission_old = prm.permission;
-				}
-				else
-					zbx_vector_lld_permission_append(permissions, prm);
+				continue;
 			}
+
+			prm.hgset = hgset;
+
+			if (FAIL != (j = zbx_vector_lld_permission_search(permissions, prm, lld_permission_compare)))
+			{
+				int	*permission_old = &permissions->values[j].permission;
+
+				if (0 != *permission_old && *permission_old < prm.permission)
+					*permission_old = prm.permission;
+			}
+			else
+				zbx_vector_lld_permission_append(permissions, prm);
 		}
 	}
 	zbx_db_free_result(result);
@@ -4320,6 +4319,8 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_db_begin();
+
 	for (i = 0; i < hosts->values_num; i++)
 	{
 		host = (zbx_lld_host_t *)hosts->values[i];
@@ -4347,6 +4348,8 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 			}
 		}
 	}
+
+	zbx_db_commit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -4632,6 +4635,7 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 
 		if (0 != del_ids.values_num)
 		{
+			zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_uniq(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_db_delete_groups(&del_ids);
 		}

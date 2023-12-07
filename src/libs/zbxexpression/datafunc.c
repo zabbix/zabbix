@@ -180,7 +180,8 @@ int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t
 				" and exists("
 					"select null"
 					" from host_hgset hh,permission p,user_ugset uu"
-					" where hh.hgsetid=p.hgsetid"
+					" where h.hostid=hh.hostid"
+						" and hh.hgsetid=p.hgsetid"
 						" and p.ugsetid=uu.ugsetid"
 						" and uu.userid=" ZBX_FS_UI64
 				")",

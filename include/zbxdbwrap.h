@@ -91,8 +91,8 @@ void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode);
 
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 
-void	zbx_hostgroups_with_permissions_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
-void	zbx_hostgroups_with_permissions_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
+void	zbx_host_groups_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
+void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 
 void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
 
