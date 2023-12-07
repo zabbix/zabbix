@@ -330,36 +330,14 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		// Store original input of scripts.
-		$input_scripts = $scripts;
-
 		// Populate name, type and scope.
 		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'scope']);
 
-		// Validate type field in case scope changed to ACTION and type was URL.
-		foreach ($scripts as $index => &$script) {
-			$db_script = $db_scripts[$script['scriptid']];
+		$api_input_rules = self::getValidationRules('update');
 
-			if ($script['scope'] != $db_script['scope'] && $db_script['scope'] != ZBX_SCRIPT_SCOPE_ACTION
-					&& $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION && $db_script['type'] == ZBX_SCRIPT_TYPE_URL) {
-				// If type was URL and scope changed to ACTION, set type as mandatory field. Then proceed to validate.
-				$api_input_rules = self::getValidationRules('update');
-				$api_input_rules['type'] = API_OBJECT;
-				$api_input_rules['fields']['type']['flags'] = API_REQUIRED;
-
-				if (!array_key_exists('type', $input_scripts[$index])) {
-					unset($scripts[$index]['type']);
-				}
-
-				if (!CApiInputValidator::validate($api_input_rules, $script, '/'.($index + 1), $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
+		if (!CApiInputValidator::validate($api_input_rules, $scripts, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-		unset($script);
-
-		// Once scope and type is validated, populate type field once more in case it was removed previously.
-		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['type']);
 
 		// Validate each script depending on changes made. Add required flags or set value from DB.
 		foreach ($scripts as $index => &$script) {
@@ -614,11 +592,11 @@ class CScript extends CApiService {
 	private static function getValidationRules(string $method): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'name' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'name')],
-			'type' =>						['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL])],
-			'scope' =>						['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
-												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_URL], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
-												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'scope')]
+			'scope' =>						['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
+			'type' =>						['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION])], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])],
+												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL])],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'type')]
 			]],
 			'groupid' =>					['type' => API_ID],
 			'description' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'description')],
