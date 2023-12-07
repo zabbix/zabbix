@@ -547,6 +547,33 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Incorrect value for field "login_block": a time unit is expected.'
 					]
 				]
+			],
+			// #24 Trimming spaces.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'fields' =>  [
+						'Frontend URL' => '    zabbix.php    ',
+						// Authorization.
+						'Login attempts' => ' 5',
+						'Login blocking interval' => '    32s   ',
+						// Security.
+						'Valid URI schemes' => '   mailto,tel,ssh   ',
+						'X-Frame-Options HTTP header' => '    SAMEORIGIN    ',
+						'Iframe sandboxing exceptions' => '   test   '
+					],
+					'db' => [
+						'url' => 'zabbix.php',
+						// Authorization.
+						'login_attempts' => 5,
+						'login_block' => '32s',
+						// Security.
+						'uri_valid_schemes' => 'mailto,tel,ssh',
+						'x_frame_options' => 'SAMEORIGIN',
+						'iframe_sandboxing_exceptions' => 'test'
+					]
+				]
 			]
 		];
 	}

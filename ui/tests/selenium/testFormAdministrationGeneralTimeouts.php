@@ -1619,177 +1619,37 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 				[
 					'trim' => true,
 					'fields' => [
-						'Zabbix agent' => '   15s   '
-					],
-					'db' => [
-						'timeout_zabbix_agent' => '15s'
-					]
-				]
-			],
-			// #115.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Simple check' => '   15s   '
-					],
-					'db' => [
-						'timeout_simple_check' => '15s'
-					]
-				]
-			],
-			// #116.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'SNMP agent' => '   15s   '
-					],
-					'db' => [
-						'timeout_snmp_agent' => '15s'
-					]
-				]
-			],
-			// #117.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'External check' => '   15s   '
-					],
-					'db' => [
-						'timeout_external_check' => '15s'
-					]
-				]
-			],
-			// #118.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Database monitor' => '   15s   '
-					],
-					'db' => [
-						'timeout_db_monitor' => '15s'
-					]
-				]
-			],
-			// #119.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'HTTP agent' => '   15s   '
-					],
-					'db' => [
-						'timeout_http_agent' => '15s'
-					]
-				]
-			],
-			// #120.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'SSH agent' => '   15s   '
-					],
-					'db' => [
-						'timeout_ssh_agent' => '15s'
-					]
-				]
-			],
-			// #121.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'TELNET agent' => '   15s   '
-					],
-					'db' => [
-						'timeout_telnet_agent' => '15s'
-					]
-				]
-			],
-			// #122.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Script' => '   15s   '
-					],
-					'db' => [
-						'timeout_script' => '15s'
-					]
-				]
-			],
-			// #123.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Communication' => '   15s   '
-					],
-					'db' => [
-						'socket_timeout' => '15s'
-					]
-				]
-			],
-			// #124.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Connection' => '   15s   '
-					],
-					'db' => [
-						'connect_timeout' => '15s'
-					]
-				]
-			],
-			// #125.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Media type test' => '   15s   '
-					],
-					'db' => [
-						'media_type_test_timeout' => '15s'
-					]
-				]
-			],
-			// #126.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Script execution' => '   15s   '
-					],
-					'db' => [
-						'script_timeout' => '15s'
-					]
-				]
-			],
-			// #127.
-			[
-				[
-					'trim' => true,
-					'fields' => [
-						'Item test' => '   15s   '
-					],
-					'db' => [
-						'item_test_timeout' => '15s'
-					]
-				]
-			],
-			// #128.
-			[
-				[
-					'trim' => true,
-					'fields' => [
+						'Zabbix agent' => '   15s   ',
+						'Simple check' => '   15s   ',
+						'SNMP agent' => '   15s   ',
+						'External check' => '   15s   ',
+						'Database monitor' => '   15s   ',
+						'HTTP agent' => '   15s   ',
+						'SSH agent' => '   15s   ',
+						'TELNET agent' => '   15s   ',
+						'Script' => '   15s   ',
+						'Communication' => '   15s   ',
+						'Connection' => '   15s   ',
+						'Media type test' => '   15s   ',
+						'Script execution' => '   15s   ',
+						'Item test' => '   15s   ',
 						'Scheduled report test' => '   15s   '
 					],
 					'db' => [
+						'timeout_zabbix_agent' => '15s',
+						'timeout_simple_check' => '15s',
+						'timeout_snmp_agent' => '15s',
+						'timeout_external_check' => '15s',
+						'timeout_db_monitor' => '15s',
+						'timeout_http_agent' => '15s',
+						'timeout_ssh_agent' => '15s',
+						'timeout_telnet_agent' => '15s',
+						'timeout_script' => '15s',
+						'socket_timeout' => '15s',
+						'connect_timeout' => '15s',
+						'media_type_test_timeout' => '15s',
+						'script_timeout' => '15s',
+						'item_test_timeout' => '15s',
 						'report_test_timeout' => '15s'
 					]
 				]
