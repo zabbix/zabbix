@@ -407,8 +407,19 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.10rc1
 
 New features:
+........S. [ZBXNEXT-8857] updated max supported TimescaleDB version to 2.13 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
+..F....... [ZBX-23699] fixed unchecking "Follow redirects" option not being saved in HTTP agent item configuration form (agriscenko)
+.......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware hv maintenance status (MVekslers)
+...G...PS. [ZBX-23787,ZBX-23755] fixed crash on empty http response; fixed Zabbix agent build on Windows with libcurl (vso)
+.......PS. [ZBX-23437] added back support for user macros in "custom on fail" parameter (dimir)
+..F....... [ZBX-21132] fixed top hosts widget not showing all items by selected item name (Ivo)
+A......... [ZBX-23568] added clean up of incompatible item, item prototype and LLD rule properties from configuration import generated before v6.4 (jfreibergs)
+.........T [ZBX-23764] added an additional field for new events in SIGNL4 mediatype (aiantsen)
+.......PS. [ZBX-23685] added read-only transaction to a list of recoverable errors on PostgreSQL (vso)
+...G...... [ZBX-23342] fixed Zabbix agent 2 mysql plugin connection not taking into account tls parameters (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.9
