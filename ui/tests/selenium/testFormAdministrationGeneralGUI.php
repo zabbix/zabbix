@@ -892,6 +892,31 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Incorrect value for field "max_period": a time unit is expected.'
 					]
 				]
+			],
+			// #50 Trimming spaces.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'fields' =>  [
+						'Limit for search and filter results' => ' 50  ',
+						'Max number of columns and rows in overview tables' => ' 50  ',
+						'Max count of elements to show inside table cell' => ' 50  ',
+						'Working time' => '  1-5,09:00-18:00  ',
+						'Max history display period' => '  1d  ',
+						'Time filter default period' => '  60m    ',
+						'Max period for time selector' => '   3y  '
+					],
+					'db' => [
+						'search_limit' => 50,
+						'max_overview_table_size' => 50,
+						'max_in_table' => 50,
+						'work_period' => '1-5,09:00-18:00',
+						'history_period' => '1d',
+						'period_default' => '60m',
+						'max_period' => '3y'
+					]
+				]
 			]
 		];
 	}
