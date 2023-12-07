@@ -140,10 +140,57 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
         elif test "$oracle_home_lib_dir" = "yes"; then
             want_oracle_but_no_path="yes"
         fi
+    elif test "$want_oracle_oci" = "yes"; then
+        want_oracle_but_no_path="yes"
+    fi
+
+    dnl
+    dnl Search include/lib paths of Oracle client installed from RPM package
+    dnl
+
+    if test "x$want_oracle_but_no_path" = "xyes"; then
+        oracle_rpm_include_dir='/usr/include/oracle/*/*'
+        oracle_rpm_lib_dir='/usr/lib/oracle/*/*/lib'
+        cnt_include=0
+        cnt_lib=0
+
+        for d in $oracle_rpm_include_dir; do
+            if test -d $d; then
+                ((cnt_include++))
+                tmp_include_dir=$d
+            fi
+        done
+
+        for d in $oracle_rpm_lib_dir; do
+            if test -d $d; then
+                ((cnt_lib++))
+                tmp_lib_dir=$d
+            fi
+        done
+
+        AC_MSG_CHECKING([for Oracle include dir installed from RPM package])
+        if test $cnt_include -eq 1; then
+            AC_MSG_RESULT([yes])
+        else
+            AC_MSG_RESULT([no])
+        fi
+
+        AC_MSG_CHECKING([for Oracle lib dir installed from RPM package])
+        if test $cnt_lib -eq 1; then
+            AC_MSG_RESULT([yes])
+        else
+            AC_MSG_RESULT([no])
+        fi
+
+        if test $cnt_include -eq 1 && test $cnt_lib -eq 1; then
+            oracle_include_dir=$tmp_include_dir
+            oracle_lib_dir=$tmp_lib_dir
+            want_oracle_but_no_path="no"
+        fi
     fi
 
     if test "$want_oracle_but_no_path" = "yes"; then
-        AC_MSG_WARN([Oracle support is requested but no Oracle paths have been provided. \
+        AC_MSG_WARN([Oracle support is requested but no Oracle paths have been provided or automatically detected. \
 Please, locate Oracle directories using --with-oracle or \
 --with-oracle-include and --with-oracle-lib options.])
     fi
