@@ -672,7 +672,7 @@ class CMacrosResolverHelper {
 	 * @param array  $events[<eventid>][hosts][][<hostid>]  Host ID.
 	 * @param array  $events[<eventid>][objectid]           Trigger ID.
 	 * @param array  $manualinput_values
-	 * @param string $manualinput_values[<hostid>]          Value for resolving {MANUALINPUT} macros.
+	 * @param string $manualinput_values[<eventid>]         Value for resolving {MANUALINPUT} macros.
 	 * @return array
 	 */
 	public static function resolveManualEventActionScripts(array $data, array $events,

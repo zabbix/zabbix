@@ -1805,40 +1805,44 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $manualinput_values[<hostid>]  Value for resolving {MANUALINPUT} macros.
 	 *
 	 * Example input:
-	 *     array (
-	 *         10084 => array (
-	 *             57 => array (
+	 *     $data = [
+	 *         10084 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Are you sure you want to edit {HOST.HOST} now?',
 	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
-	 *             ),
-	 *             61 => array(
+	 *             ],
+	 *             61 => [
 	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
 	 *                 'manualinput_prompt' => 'Add manualinput value for script execution with {HOST.HOST}:'
-	 *             ),
-	 *             42 => array(
+	 *             ],
+	 *             42 => [
 	 *                 'manualinput_prompt' => 'Enter port number',
 	 *                 'url' => 'http://localhost:{MANUALINPUT}'
-	 *             )
-	 *         )
-	 *     )
+	 *             ]
+	 *         ]
+	 *     ];
+	 *
+	 *     $manualinput_values = [
+	 *         10084 => 8080
+	 *     ];
 	 *
 	 * Output:
-	 *     array (
-	 *         10084 => array (
-	 *             57 => array (
+	 *     [
+	 *         10084 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Are you sure you want to edit Zabbix server now?',
 	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid=10084'
-	 *             ),
-	 *             61 => array (
+	 *             ],
+	 *             61 => [
 	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
 	 *                 'manualinput_prompt' => 'Add manualinput value for script execution with Zabbix server:
-	 *             ),
-	 *            42 => array(
+	 *             ],
+	 *             42 => [
 	 *                 'manualinput_prompt' => 'Enter port number',
 	 *                 'url' => 'http://localhost:8080'
-	 *            )
-	 *         )
-	 *     )
+	 *             ]
+	 *         ]
+	 *     ]
 	 *
 	 * @return array
 	 */
@@ -1916,43 +1920,57 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param array  $events[<eventid>][hosts][][<hostid>]  Host ID.
 	 * @param array  $events[<eventid>][objectid]           Trigger ID.
 	 * @param array  $manualinput_values
-	 * @param string $manualinput_values[<hostid>]          Value for resolving {MANUALINPUT} macros.
+	 * @param string $manualinput_values[<eventid>]         Value for resolving {MANUALINPUT} macros.
 	 *
 	 * Example input:
-	 *     array (
-	 *         19 => array (
-	 *             57 => array (
+	 *     $data = [
+	 *         19 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Responsible hosts {HOST.HOST1}, {HOST.HOST2}! Navigate to triggers?',
 	 *                 'url' => 'http://zabbix/ui/triggers.php?context=host&filter_hostids[]={HOST.ID1}&filter_hostids[]={HOST.ID2}&filter_set=1'
-	 *             ),
-	 *             61 => array(
+	 *             ],
+	 *             61 => [
 	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
 	 *                 'manualinput_prompt' => 'Execute script for {HOST.HOST}?'
-	 *             ),
-	 *             42 => array(
+	 *             ],
+	 *             42 => [
 	 *                 'manualinput_prompt' => 'Enter port number',
 	 *                 'url' => 'http://localhost:{MANUALINPUT}'
-	 *             )
-	 *         )
-	 *     )
+	 *             ]
+	 *         ]
+	 *     ];
+	 *
+	 *     $events = [
+	 *         19 => [
+	 *             'hosts' => [
+	 *                 ['hostid' => 10084],
+	 *                 ['hostid' => 10134]
+	 *             ],
+	 *             'objectid' => 23507
+	 *         ]
+	 *     ];
+	 *
+	 *     $manualinput_values = [
+	 *         19 => 8080
+	 *     ];
 	 *
 	 * Output:
-	 *     array (
-	 *         19 => array (
-	 *             57 => array (
+	 *     [
+	 *         19 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Responsible hosts Zabbix server, Zabbix PC! Navigate to triggers?',
 	 *                 'url' => 'http://zabbix/ui/triggers.php?context=host&filter_hostids[]=10084&filter_hostids[]=10134&filter_set=1'
 	 *             ),
-	 *             61 => array (
+	 *             61 => [
 	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
 	 *                 'manualinput_prompt' => 'Execute script for Zabbix server?'
-	 *             ),
-	 *             42 => array(
+	 *             ],
+	 *             42 => [
 	 *                 'manualinput_prompt' => 'Enter port number',
 	 *                 'url' => 'http://localhost:8080'
-	 *             )
-	 *         )
-	 *     )
+	 *             ]
+	 *         ]
+	 *     ]
 	 *
 	 * @return array
 	 */
