@@ -116,8 +116,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Test the elements and layout of the Pie chart create and edit form.
-	 *
+	 * Test the elements and layout of the Pie chart create form.
 	 */
 	public function testDashboardPieChartWidget_Layout() {
 		// Open the create form.
@@ -784,7 +783,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'screenshot_id' => 'doughnut'
 				]
-			],
+			]
 		];
 	}
 
@@ -949,7 +948,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$hints = [
 			'Aggregation function' => 'Aggregates each item in the data set.',
 			'Data set aggregation' => 'Aggregates the whole data set.',
-			'Data set label' => 'Also used as legend label for aggregated data sets.',
+			'Data set label' => 'Also used as legend label for aggregated data sets.'
 		];
 
 		foreach ($hints as $field => $text) {
