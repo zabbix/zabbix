@@ -91,7 +91,6 @@ function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CW
 				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
 		)
-		->setFocusableElementId($fields['description']->getName())
 		->addField(
 			(new CWidgetFieldTextAreaView($fields['description']))
 				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)

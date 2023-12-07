@@ -40,6 +40,10 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
+	public function getFocusableElementId(): string {
+		return zbx_formatDomId($this->field->getName());
+	}
+
 	public function getLabel(): ?CLabel {
 		if (!$this->has_label) {
 			return null;
@@ -52,7 +56,7 @@ abstract class CWidgetFieldView {
 		}
 
 		return (new CLabel([$label, $this->field_hint]))
-			->setFor(zbx_formatDomId($this->field->getName()))
+			->setFor($this->getFocusableElementId())
 			->setAsteriskMark($this->isRequired())
 			->addClass($this->label_class_list ? implode(' ', $this->label_class_list) : null);
 	}
