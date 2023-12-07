@@ -1260,8 +1260,8 @@ class CScript extends CApiService {
 
 							if (!array_key_exists('scriptid', $option) || bccomp($option['scriptid'], $scriptid) == 0) {
 								if (!array_key_exists($scriptid, $scripts_by_events[$eventid])) {
-									unset($script['hosts']);
-									$scripts_by_events[$eventid][$scriptid] = $script;
+									$scripts_by_events[$eventid][$scriptid] =
+										array_diff_key($script, ['hosts' => true]);
 
 									foreach (['confirmation', 'url', 'manualinput_prompt'] as $field) {
 										if (strpos($script[$field], '{') !== false) {
