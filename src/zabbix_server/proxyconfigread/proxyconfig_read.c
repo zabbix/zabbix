@@ -1213,7 +1213,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids,
 				macro_hostids, del_hostproxyids;
 	zbx_vector_ptr_t	keys_paths;
-	int			global_macros = FAIL, ret = FAIL, i;
+	int			global_macros = FAIL, ret = FAIL, i, failover_delay;
 	zbx_uint64_t		flags = 0, hostmap_revision = proxy_hostmap_revision, proxy_group_revision;
 	unsigned char		hostmap_sync = ZBX_PROXY_SYNC_FULL;
 
@@ -1279,7 +1279,8 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 
 	if (0 != proxy->proxy_groupid)
 	{
-		proxyconfig_get_proxy_group_updates(proxy, &hostmap_revision, &hostmap_sync, &del_hostproxyids);
+		proxyconfig_get_proxy_group_updates(proxy, &hostmap_revision, &hostmap_sync, &failover_delay,
+				&del_hostproxyids);
 
 		if (ZBX_PROXY_SYNC_NONE != hostmap_sync)
 			flags |= ZBX_PROXYCONFIG_SYNC_PROXY_LIST | ZBX_PROXYCONFIG_SYNC_HOSTMAP;
@@ -1358,6 +1359,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 				zbx_json_addint64(j, ZBX_PROTO_TAG_FULL_SYNC, 1);
 
 			zbx_json_addint64(j, ZBX_PROTO_TAG_REVISION, hostmap_revision);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_FAILOVER_DELAY, failover_delay);
 
 			if (0 != (flags & ZBX_PROXYCONFIG_SYNC_PROXY_LIST))
 			{
