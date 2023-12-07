@@ -303,7 +303,7 @@ func (o *dnsGetOptions) setFlags(flags string) error {
 		return zbxerr.New(fmt.Sprintf("Too many flags supplied: %d", len(flagsSplit)))
 	}
 
-	if (len(flagsSplit) == 1 && flagsSplit[0] == "") {
+	if len(flagsSplit) == 1 && flagsSplit[0] == "" {
 		return nil
 	}
 
@@ -417,7 +417,7 @@ func reverseMap(m map[string]uint16) map[uint16]string {
 func insertAtEveryNthPosition(s string, n int, r rune) string {
 	var buffer bytes.Buffer
 
-	if (n <= 0) {
+	if n <= 0 {
 		return s
 	}
 
@@ -425,7 +425,7 @@ func insertAtEveryNthPosition(s string, n int, r rune) string {
 	var l1 = len(s) - 1
 	for i, rune := range s {
 		buffer.WriteRune(rune)
-		if i % n == n1 && i != l1 {
+		if i%n == n1 && i != l1 {
 			buffer.WriteRune(r)
 		}
 	}
@@ -657,30 +657,40 @@ func prepareAlmostCompleteResultBlock(
 	parsedResponseCode map[string]any,
 	queryTimeSection map[string]any,
 	parsedQuestionSection map[string][]any,
-) []any {
+) map[string]any {
 	// Almost complete since it is not marshaled yet and without
 	// zbx_error_code (and possibly zbx_error_msg).
-	almostCompleteResultBlock := []any{
-		parsedFlagsSection,
-		parsedResponseCode,
-		queryTimeSection,
-		parsedQuestionSection,
+	almostCompleteResultBlock := map[string]any{}
+
+	for k, v := range parsedFlagsSection {
+		almostCompleteResultBlock[k] = v
 	}
 
-	if len(parsedAnswerSection) != 0 {
-		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAnswerSection)
-	}
-	if len(parsedAuthoritySection) != 0 {
-		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAuthoritySection)
-	}
-	if len(parsedAdditionalSection) != 0 {
-		almostCompleteResultBlock = append(almostCompleteResultBlock, parsedAdditionalSection)
+	for k, v := range parsedResponseCode {
+		almostCompleteResultBlock[k] = v
 	}
 
-	almostCompleteResultBlock = append(
-		almostCompleteResultBlock,
-		map[string]any{"zbx_error_code": noErrorResponseCodeFinalJsonResult},
-	)
+	for k, v := range queryTimeSection {
+		almostCompleteResultBlock[k] = v
+	}
+
+	for k, v := range parsedQuestionSection {
+		almostCompleteResultBlock[k] = v
+	}
+
+	for k, v := range parsedAnswerSection {
+		almostCompleteResultBlock[k] = v
+	}
+
+	for k, v := range parsedAuthoritySection {
+		almostCompleteResultBlock[k] = v
+	}
+
+	for k, v := range parsedAdditionalSection {
+		almostCompleteResultBlock[k] = v
+	}
+
+	almostCompleteResultBlock["zbx_error_code"] = noErrorResponseCodeFinalJsonResult
 
 	return almostCompleteResultBlock
 }
