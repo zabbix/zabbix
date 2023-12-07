@@ -424,6 +424,7 @@ New features:
 ........S. [ZBXNEXT-8857] updated max supported TimescaleDB version to 2.13 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-23799] fixed crash when updating and inserting interface at the same time (vso)
 ........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
 ..F....... [ZBX-23699] fixed unchecking "Follow redirects" option not being saved in HTTP agent item configuration form (agriscenko)
 .......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware HV maintenance status (MVekslers)
