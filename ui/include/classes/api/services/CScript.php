@@ -800,8 +800,7 @@ class CScript extends CApiService {
 				DB::getDefault('scripts', 'manualinput_validator_type');
 		}
 		else {
-			$api_input_rules['uniq'] = [['scriptid']];
-			$api_input_rules['fields']['scriptid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
+			$api_input_rules['fields']['scriptid'] = ['type' => API_ID];
 		}
 
 		return $api_input_rules;
