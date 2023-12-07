@@ -2597,6 +2597,13 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
+			],
+			// #237 Administration -> General -> Timeouts.
+			[
+				[
+					'url' => 'zabbix.php?action=timeouts.edit',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
+				]
 			]
 		];
 	}
