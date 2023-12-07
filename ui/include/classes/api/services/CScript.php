@@ -905,7 +905,7 @@ class CScript extends CApiService {
 			'scriptid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'hostid' =>			['type' => API_ID],
 			'eventid' =>		['type' => API_ID],
-			'manualinput' =>	['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL]
+			'manualinput' =>	['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
