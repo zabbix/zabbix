@@ -16,6 +16,8 @@ libzbxvmware_a_SOURCES = \
 	vmware_ds.h \
 	vmware_vm.c \
 	vmware_vm.h \
+	vmware_event.c \
+	vmware_event.h \
 	vmware_rest.c \
 	vmware_manager.c \
 	vmware_internal.h \

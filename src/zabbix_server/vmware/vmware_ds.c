@@ -352,4 +352,107 @@ out:
 #	undef ZBX_POST_HV_DS_ACCESS
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get statically defined default value for maxquerymetrics for      *
+ *          vcenter when it could not be retrieved from soap, depending on    *
+ *          vcenter version (https://kb.vmware.com/s/article/2107096)         *
+ * Parameters: service   - [IN] the vmware service                            *
+ *                                                                            *
+ * Return value: maxquerymetrics                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_default_maxquerymetrics_for_vcenter(const zbx_vmware_service_t *service)
+{
+	if ((6 == service->major_version && 5 <= service->minor_version) ||
+			6 < service->major_version)
+	{
+		return ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS;
+	}
+	else
+		return ZBX_VCENTER_LESS_THAN_6_5_0_STATS_MAXQUERYMETRICS;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get vpxd.stats.maxquerymetrics parameter from vcenter only        *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
+ *             service      - [IN] the vmware service                         *
+ *             max_qm       - [OUT] max count of Datastore metrics in one     *
+ *                                  request                                   *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_service_t *service, int *max_qm,
+		char **error)
+{
+#	define ZBX_XPATH_MAXQUERYMETRICS()									\
+		"/*/*/*/*[*[local-name()='key']='config.vpxd.stats.maxQueryMetrics']/*[local-name()='value']"
+
+#	define ZBX_POST_MAXQUERYMETRICS										\
+		ZBX_POST_VSPHERE_HEADER										\
+		"<ns0:QueryOptions>"										\
+			"<ns0:_this type=\"OptionManager\">VpxSettings</ns0:_this>"				\
+			"<ns0:name>config.vpxd.stats.maxQueryMetrics</ns0:name>"				\
+		"</ns0:QueryOptions>"										\
+		ZBX_POST_VSPHERE_FOOTER
+
+	int	ret = FAIL;
+	char	*val;
+	xmlDoc	*doc = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_MAXQUERYMETRICS, &doc, NULL, error))
+	{
+		if (NULL == doc)	/* if not SOAP error */
+			goto out;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Error of query maxQueryMetrics: %s.", *error);
+		zbx_free(*error);
+	}
+
+	ret = SUCCEED;
+
+	if (NULL == (val = zbx_xml_doc_read_value(doc, ZBX_XPATH_MAXQUERYMETRICS())))
+	{
+		*max_qm = get_default_maxquerymetrics_for_vcenter(service);
+		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics defaults to %d", *max_qm);
+		goto out;
+	}
+
+	/* vmware article 2107096                                                                    */
+	/* Edit the config.vpxd.stats.maxQueryMetrics key in the advanced settings of vCenter Server */
+	/* To disable the limit, set a value to -1                                                   */
+	/* Edit the web.xml file. To disable the limit, set a value 0                                */
+	if (-1 == atoi(val))
+	{
+		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
+	}
+	else if (SUCCEED != zbx_is_uint31(val, max_qm))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot convert maxQueryMetrics from %s.", val);
+		*max_qm = get_default_maxquerymetrics_for_vcenter(service);
+		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics defaults to %d", *max_qm);
+	}
+	else if (0 == *max_qm)
+	{
+		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
+	}
+
+	zbx_free(val);
+out:
+	zbx_xml_free_doc(doc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+
+#	undef ZBX_POST_MAXQUERYMETRICS
+#	undef ZBX_XPATH_MAXQUERYMETRICS
+}
+
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
