@@ -14823,6 +14823,8 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			ps_win->values_num += ds_win->values_num;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
 		}
+
+		proxy->revision = config->revision.config;
 	}
 
 	UNLOCK_CACHE;

@@ -63,9 +63,6 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		pg = (zbx_dc_proxy_group_t *)DCfind_id(&config->proxy_groups, proxy_groupid, sizeof(ZBX_DC_PROXY),
 				&found);
 
-		if (0 == found)
-			pg->hostmap_revision = 0;
-
 		if (FAIL == zbx_is_time_suffix(row[1], &pg->failover_delay, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid proxy group '" ZBX_FS_UI64 "' failover delay '%s', "
@@ -225,12 +222,12 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vec
 
 			zbx_vector_pg_host_ptr_create(&proxy->hosts);
 			zbx_vector_pg_host_create(&proxy->deleted_group_hosts);
-
-			/* WDN: force online status */
-			proxy->lastaccess = time(NULL);
 		}
 
 		proxy->lastaccess = dc_proxy->lastaccess;
+
+		/* WDN: force online status */
+		proxy->lastaccess = time(NULL);
 
 		old_proxy_groupid = (NULL == proxy->group ? 0 : proxy->group->proxy_groupid);
 
@@ -256,35 +253,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s revision:" ZBX_FS_UI64 "->" ZBX_FS_UI64, __func__,
 			zbx_result_string(ret), old_revision, *revision);
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get locally cached proxy lastaccess from configuration cache      *
- *                                                                            *
- * Parameter: proxies - [IN/OUT] local proxy cache                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_get_group_proxy_lastaccess(zbx_hashset_t *proxies)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_pg_proxy_t		*proxy;
-
-	zbx_hashset_iter_reset(proxies, &iter);
-
-	RDLOCK_CACHE;
-
-	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
-	{
-		ZBX_DC_PROXY	*dc_proxy;
-
-		if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy->proxyid)))
-			proxy->lastaccess = 0;
-		else
-			proxy->lastaccess = dc_proxy->lastaccess;
-	}
-
-	UNLOCK_CACHE;
 }
 
 static void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
@@ -419,32 +387,4 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 	redirect->revision = hpi->host_proxy->revision;
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get proxy group hostmap revision                                  *
- *                                                                            *
- * Return value: SUCCEED - proxy group hostmap revision was retrieved         *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision)
-{
-	zbx_dc_proxy_group_t	*pg;
-	int			ret;
-
-	RDLOCK_CACHE;
-
-	if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups, &proxy_groupid)))
-	{
-		*hostmap_revision = pg->hostmap_revision;
-		ret = SUCCEED;
-	}
-	else
-		ret = FAIL;
-
-	UNLOCK_CACHE;
-
-	return ret;
 }

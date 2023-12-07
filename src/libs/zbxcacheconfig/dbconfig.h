@@ -912,7 +912,6 @@ typedef struct
 	const char	*name;
 
 	zbx_uint64_t	revision;
-	zbx_uint64_t	hostmap_revision;
 }
 zbx_dc_proxy_group_t;
 
