@@ -563,16 +563,18 @@ class CScript extends CApiService {
 	/**
 	 * Validates manual input fields.
 	 *
-	 * @param array  $scripts  Script data.
+	 * @param array $scripts  Script data.
 	 *
-	 * $script = [
-	 *     'manualinput_validator_type' => (int)     Manual input validator type.
+	 * $scripts = [[
+	 *     'scope' =>                      (int)     Script scope - Host or Event.
+	 *     'manualinput' =>                (int)     Is script manual input Enabled "1" or Disabled "0".
+	 *     'manualinput_validator_type' => (int)     Manual input validator type - string or list.
 	 *     'manualinput_validator' =>      (string)  Regular expression or comma separated list.
 	 *     'manualinput_default_value' =>  (string)  Manual input default value (used when manual input validator type
 	 *                                               is list).
-	 * ]
+	 * ]]
 	 *
-	 * @throws APIException if input is invalid
+	 * @throws APIException if input is invalid.
 	 */
 	private static function checkManualInput(array $scripts): void {
 		foreach ($scripts as $index => $script) {
