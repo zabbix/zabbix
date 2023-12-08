@@ -2873,7 +2873,7 @@ return [
 				'length' => 255,
 				'default' => '3s'
 			],
-			'auditlog_special_mode' => [
+			'auditlog_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

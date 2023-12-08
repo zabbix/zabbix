@@ -1958,6 +1958,13 @@ static int	DBpatch_6050158(void)
 	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
 }
 
+static int	DBpatch_6050159(void)
+{
+	const ZBX_FIELD	field = {"auditlog_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -2121,5 +2128,6 @@ DBPATCH_ADD(6050155, 0, 1)
 DBPATCH_ADD(6050156, 0, 1)
 DBPATCH_ADD(6050157, 0, 1)
 DBPATCH_ADD(6050158, 0, 1)
+DBPATCH_ADD(6050159, 0, 1)
 
 DBPATCH_END()
