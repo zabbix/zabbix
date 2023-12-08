@@ -184,7 +184,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
+		$this->assertMessage($expected, $message, CTestArrayHelper::get($data, 'details'));
 
 		// Check saved configuration in frontend.
 		$this->page->refresh();
