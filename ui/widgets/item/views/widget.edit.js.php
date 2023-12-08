@@ -128,7 +128,8 @@ window.widget_item_form = new class {
 		const history_data_trends = document.querySelector('#history input[name="history"]:checked')
 			.value == <?= Widget::HISTORY_DATA_TRENDS ?>;
 
-		document.getElementById('item-history-data-warning').style.display = history_data_trends && !this.#is_item_numeric
+		document.getElementById('item-history-data-warning').style.display =
+				history_data_trends && !this.#is_item_numeric
 			? ''
 			: 'none';
 
@@ -150,7 +151,7 @@ window.widget_item_form = new class {
 		const ms_item_data = $('#itemid').multiSelect('getData');
 
 		if (ms_item_data.length == 0) {
-			return Promise.resolve(false);
+			return Promise.resolve(null);
 		}
 
 		const curl = new Curl('jsrpc.php');
