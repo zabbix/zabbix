@@ -30,12 +30,20 @@
 #define AUDIT_USERNAME		"System"
 #define AUDIT_IP		""
 
-static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
 
-int	zbx_get_audit_mode(void)
+static int		auditlog_mode;
+
+int	zbx_get_auditlog_mode(void)
 {
-	return audit_mode;
+	return auditlog_mode;
+}
+
+static int		auditlog_enabled;
+
+int	zbx_get_auditlog_enabled(void)
+{
+	return auditlog_enabled;
 }
 
 zbx_hashset_t	*zbx_get_audit_hashset(void)
@@ -284,9 +292,10 @@ void	zbx_audit_clean(void)
 	zbx_hashset_destroy(&zbx_audit);
 }
 
-void	zbx_audit_init(int audit_mode_set)
+void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set)
 {
-	audit_mode = audit_mode_set;
+	auditlog_enabled = auditlog_enabled_set;
+	auditlog_mode = auditlog_mode_set;
 	RETURN_IF_AUDIT_OFF();
 #define AUDIT_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&zbx_audit, AUDIT_HASHSET_DEF_SIZE, zbx_audit_hash_func, zbx_audit_compare_func);
@@ -297,8 +306,8 @@ void	zbx_audit_prepare(void)
 {
 	zbx_config_t	cfg;
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
-	zbx_audit_init(cfg.auditlog_enabled);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
+	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode);
 }
 
 static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
@@ -355,7 +364,7 @@ int	zbx_audit_flush_once(void)
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())
+	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())
 		return ZBX_DB_OK;
 
 	zbx_new_cuid(recsetid_cuid);

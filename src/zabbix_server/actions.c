@@ -2729,8 +2729,8 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 			actionid);
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID | ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE |
-			ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
-	zbx_audit_init(cfg.auditlog_enabled);
+			ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
+	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{

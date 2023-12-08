@@ -46,17 +46,18 @@
 #define AUDIT_DETAILS_ACTION_DELETE	"delete"
 
 #define RETURN_IF_AUDIT_OFF()					\
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())	\
+	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())	\
 		return						\
 
-int	zbx_get_audit_mode(void);
+int	zbx_get_auditlog_enabled(void);
+int	zbx_get_auditlog_mode(void);
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
 		zbx_uint64_t proxyid, zbx_uint64_t userid, const char *username, const char *clientip,
 		const char *output, const char *error);
 
-void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set);
 void	zbx_audit_prepare(void);
 void	zbx_audit_clean(void);
 void	zbx_audit_flush(void);
