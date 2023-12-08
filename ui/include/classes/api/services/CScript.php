@@ -1585,7 +1585,6 @@ class CScript extends CApiService {
 	 * Check for unique script names within menu path in the input.
 	 *
 	 * @param array  $scripts  Array of scripts.
-	 * @param string $method   API method "create" or "update". Default "create".
 	 *
 	 * $scripts = [[
 	 *     'name' =>      (string)  Script name (optional for update method).
@@ -1594,37 +1593,13 @@ class CScript extends CApiService {
 	 *
 	 * @throws APIException if script names within menu paths are not unique.
 	 */
-	private function checkUniqueness(array $scripts, string $method = 'create'): void {
-		if ($method === 'update') {
-			$scripts = array_filter($scripts,
-				static fn($script) => array_key_exists('name', $script) || array_key_exists('menu_path', $script)
-			);
+	private function checkUniqueness(array $scripts): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name', 'menu_path']], 'fields' => [
+			'name' =>		['type' => API_STRING_UTF8],
+			'menu_path' =>	['type' => API_SCRIPT_MENU_PATH]
+		]];
 
-			if (!$scripts) {
-				return;
-			}
-		}
-
-		foreach ($scripts as &$script) {
-			$menu_path = '';
-
-			if (array_key_exists('menu_path', $script)) {
-				$menu_path = trimPath($script['menu_path']);
-			}
-
-			// Trim preceeding and trailing slashes for comparison.
-			$menu_path = trim($menu_path, '/');
-			$script['menu_path'] = $menu_path;
-		}
-		unset($script);
-
-		$api_input_rules = self::getValidationRules($method);
-		$api_input_rules['uniq'] = [['name', 'menu_path']];
-		$api_input_rules['fields'] = array_intersect_key($api_input_rules['fields'], array_flip(['name', 'menu_path']));
-		$api_input_rules['flags'] |= API_ALLOW_UNEXPECTED;
-		$api_input_rules['fields']['menu_path']['rules'][1]['type'] = API_STRING_UTF8;
-
-		if (!CApiInputValidator::validate($api_input_rules, $scripts, '/', $error)) {
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $scripts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}

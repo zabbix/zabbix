@@ -2336,9 +2336,18 @@ class CApiInputValidator {
 
 						$object_values[] = $object[$field_name];
 
-						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
-							? self::trimMacro($object[$field_name])
-							: $object[$field_name];
+						switch ($rule['fields'][$field_name]['type']) {
+							case API_SCRIPT_MENU_PATH:
+								$object_value = trimPath($object[$field_name]);
+								break;
+
+							case API_USER_MACRO:
+								$object_value = self::trimMacro($object[$field_name]);
+								break;
+
+							default:
+								$object_value = $object[$field_name];
+						}
 
 						if ($level < count($field_names)) {
 							if (!array_key_exists($object_value, $_uniq)) {
@@ -2382,9 +2391,18 @@ class CApiInputValidator {
 
 						$object_values[] = $object[$field_name];
 
-						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
-							? self::trimMacro($object[$field_name])
-							: $object[$field_name];
+						switch ($rule['fields'][$field_name]['type']) {
+							case API_SCRIPT_MENU_PATH:
+								$object_value = trimPath($object[$field_name]);
+								break;
+
+							case API_USER_MACRO:
+								$object_value = self::trimMacro($object[$field_name]);
+								break;
+
+							default:
+								$object_value = $object[$field_name];
+						}
 
 						if (!in_array($object_value, $values)) {
 							$_uniqs = [&$uniq];

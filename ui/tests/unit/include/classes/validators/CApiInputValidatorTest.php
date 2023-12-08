@@ -8991,6 +8991,40 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/7": value (hostid, macro)=(1, {$MACRO: "context"}) already exists.'
 			],
 			[
+				['type' => API_OBJECTS, 'uniq' => [['scriptid'], ['menu_path']], 'fields' => [
+					'scriptid'	=> ['type' => API_ID],
+					'menu_path'	=> ['type' => API_SCRIPT_MENU_PATH]
+				]],
+				[
+					['scriptid' => 2, 'menu_path' => 'System / Utils / Ping'],
+					['scriptid' => 3, 'menu_path' => 'System / Utils / Traceroute'],
+					['scriptid' => 1, 'menu_path' => 'System / Reboot'],
+					['scriptid' => 4, 'menu_path' => 'System / Console'],
+					['scriptid' => 5, 'menu_path' => 'System / Docker / Containers'],
+					['scriptid' => 6, 'menu_path' => 'System / Docker / Images'],
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['scriptid'], ['menu_path']], 'fields' => [
+					'scriptid'	=> ['type' => API_ID],
+					'menu_path'	=> ['type' => API_SCRIPT_MENU_PATH]
+				]],
+				[
+					['scriptid' => 2, 'menu_path' => 'System / Utils / Ping'],
+					['scriptid' => 3, 'menu_path' => 'System / Utils / Traceroute'],
+					['scriptid' => 1, 'menu_path' => 'System / Reboot'],
+					['scriptid' => 4, 'menu_path' => 'System / Console'],
+					['scriptid' => 5, 'menu_path' => 'System / Docker / Containers'],
+					['scriptid' => 6, 'menu_path' => 'System/Utils/Traceroute'],
+				],
+				'/',
+				false,
+				'Invalid parameter "/6": value (menu_path)=(System/Utils/Traceroute) already exists.'
+			],
+			[
 				['type' => API_OBJECT, 'fields' => [
 					'tags' => ['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
 						'tag'		=> ['type' => API_STRING_UTF8],
