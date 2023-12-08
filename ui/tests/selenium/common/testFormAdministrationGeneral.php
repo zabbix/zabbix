@@ -155,6 +155,19 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * @param boolean    $other		  If it is Other configuration parameters form
 	 */
 	public function executeCheckForm($data, $other = false) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+
+		if ($expected === TEST_GOOD) {
+			$message = 'Configuration updated';
+			$values = $data['fields'];
+			$db = CTestArrayHelper::get($data, 'db', []);
+		}
+		else {
+			$message = 'Cannot update configuration';
+			$values = $this->default_values;
+			$db = $this->db_default_values;
+		}
+
 		$this->page->login()->open($this->config_link);
 		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
 
@@ -171,9 +184,6 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		$message = (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD)
-			? 'Configuration updated'
-			: 'Cannot update configuration';
 		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
 
 		// Check saved configuration in frontend.
@@ -185,8 +195,7 @@ class testFormAdministrationGeneral extends CWebTest {
 			$data['fields']['Login attempts'] = '3';
 		}
 
-		$values = (CTestArrayHelper::get($data, 'expected', TEST_GOOD)) === TEST_GOOD ? $data['fields'] : $this->default_values;
-		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD && CTestArrayHelper::get($values, 'Default time zone')) {
+		if ($expected === TEST_BAD && CTestArrayHelper::get($values, 'Default time zone')) {
 			$values['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($values['Default time zone']);
 		}
 
@@ -198,9 +207,6 @@ class testFormAdministrationGeneral extends CWebTest {
 
 		// Check saved configuration in database.
 		$config = CDBHelper::getRow('SELECT * FROM config');
-		$db = (CTestArrayHelper::get($data, 'expected',TEST_GOOD) === TEST_GOOD)
-			? CTestArrayHelper::get($data, 'db', [])
-			: $this->db_default_values;
 
 		foreach ($db as $key => $value) {
 			$this->assertArrayHasKey($key, $config);
