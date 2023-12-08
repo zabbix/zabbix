@@ -120,7 +120,7 @@ class Script {
 				const form = overlay.$dialogue.$body[0].querySelector('form');
 
 				try {
-					const url = new URL(e.detail.url);
+					const url = new URL(e.detail.url, window.location.href);
 
 					if (confirmation !== '') {
 						Script.#confirm({
