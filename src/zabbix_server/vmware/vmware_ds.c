@@ -19,6 +19,7 @@
 
 #include "vmware_ds.h"
 #include "vmware_internal.h"
+#include "vmware_service_cfglists.h"
 
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2
@@ -26,6 +27,8 @@
 #endif
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#define ZBX_VMWARE_DS_REFRESH_VERSION	6
 
 ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
 
@@ -47,6 +50,54 @@ void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 	zbx_free(dsname->name);
 	zbx_free(dsname->uuid);
 	zbx_free(dsname);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store diskextent data                *
+ *                                                                            *
+ * Parameters: diskextent   - [IN] the diskextent                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_diskextent_free(zbx_vmware_diskextent_t *diskextent)
+{
+	zbx_free(diskextent->diskname);
+	zbx_free(diskextent);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free memory of vector element                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_str_uint64_pair_free(zbx_str_uint64_pair_t data)
+{
+	zbx_free(data.name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store datastore data                 *
+ *                                                                            *
+ * Parameters: datastore   - [IN] the datastore                               *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
+{
+	zbx_vector_str_uint64_pair_clear_ext(&datastore->hv_uuids_access, zbx_str_uint64_pair_free);
+	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
+
+	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_diskextent_free);
+	zbx_vector_vmware_diskextent_destroy(&datastore->diskextents);
+
+	zbx_vector_str_clear_ext(&datastore->alarm_ids, zbx_str_free);
+	zbx_vector_str_destroy(&datastore->alarm_ids);
+
+	zbx_free(datastore->name);
+	zbx_free(datastore->uuid);
+	zbx_free(datastore->id);
+	zbx_free(datastore->type);
+	zbx_free(datastore);
 }
 
 /******************************************************************************
@@ -121,6 +172,204 @@ int	vmware_ds_id_compare(const void *d1, const void *d2)
 	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
 
 	return strcmp(ds1->id, ds2->id);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Refreshes all storage related information including free-space,   *
+ *          capacity, and detailed usage of virtual machines.                 *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
+ *             id           - [IN] the datastore id                           *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Comments: This is required for ESX/ESXi hosts version < 6.0 only           *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_service_refresh_datastore_info(CURL *easyhandle, const char *id, char **error)
+{
+#	define ZBX_POST_REFRESH_DATASTORE							\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RefreshDatastoreStorageInfo>"						\
+			"<ns0:_this type=\"Datastore\">%s</ns0:_this>"				\
+		"</ns0:RefreshDatastoreStorageInfo>"						\
+		ZBX_POST_VSPHERE_FOOTER
+
+	char		tmp[MAX_STRING_LEN];
+	int		ret = FAIL;
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_REFRESH_DATASTORE, id);
+
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create vmware hypervisor datastore object                         *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *             easyhandle   - [IN] the CURL handle                            *
+ *             id           - [IN] the datastore id                           *
+ *             cq_values    - [IN/OUT] the custom query values                *
+ *             alarms_data  - [IN/OUT] the all alarms with cache              *
+ *                                                                            *
+ * Return value: The created datastore object or NULL if an error was         *
+ *                detected                                                    *
+ *                                                                            *
+ ******************************************************************************/
+zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service_t *service, CURL *easyhandle,
+		const char *id, zbx_vector_cq_value_t *cq_values, zbx_vmware_alarms_data_t *alarms_data)
+{
+#	define ZBX_XPATH_DATASTORE_SUMMARY(property)						\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"	\
+		"/*[local-name()='val']/*[local-name()='" property "']"
+
+#	define ZBX_POST_DATASTORE_GET								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrievePropertiesEx>"							\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>Datastore</ns0:type>"			\
+					"<ns0:pathSet>summary</ns0:pathSet>"			\
+					"<ns0:pathSet>info</ns0:pathSet>"			\
+					"%s"							\
+					"<ns0:pathSet>triggeredAlarmState</ns0:pathSet>"	\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"Datastore\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	char			*tmp, *cq_prop, *uuid = NULL, *name = NULL, *path, *id_esc, *value, *error = NULL;
+	int			ret;
+	zbx_vmware_datastore_t	*datastore = NULL;
+	zbx_uint64_t		capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64, uncommitted = ZBX_MAX_UINT64;
+	xmlDoc			*doc = NULL;
+	zbx_vector_cq_value_t	cqvs;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __func__, id);
+
+	zbx_vector_cq_value_create(&cqvs);
+	id_esc = zbx_xml_escape_dyn(id);
+
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version &&
+			ZBX_VMWARE_DS_REFRESH_VERSION > service->major_version && SUCCEED !=
+			vmware_service_refresh_datastore_info(easyhandle, id_esc, &error))
+	{
+		zbx_free(id_esc);
+		goto out;
+	}
+
+
+	cq_prop = vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_DS, id, &cqvs);
+	tmp = zbx_dsprintf(NULL, ZBX_POST_DATASTORE_GET, get_vmware_service_objects()[service->type].property_collector,
+			cq_prop, id_esc);
+	zbx_str_free(id_esc);
+	zbx_str_free(cq_prop);
+	ret = zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, &error);
+	zbx_str_free(tmp);
+
+	if (FAIL == ret)
+		goto out;
+
+	name = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("name"));
+
+	if (NULL != (path = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("url"))))
+	{
+		if ('\0' != *path)
+		{
+			size_t	len;
+			char	*ptr;
+
+			len = strlen(path);
+
+			if ('/' == path[len - 1])
+				path[len - 1] = '\0';
+
+			for (ptr = path + len - 2; ptr > path && *ptr != '/' && *ptr != ':'; ptr--)
+				;
+
+			uuid = zbx_strdup(NULL, ptr + 1);
+		}
+		zbx_free(path);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() datastore uuid not present for id:'%s'", __func__, id);
+		zbx_free(name);
+		goto out;
+	}
+
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
+	{
+		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("capacity"))))
+		{
+			zbx_is_uint64(value, &capacity);
+			zbx_free(value);
+		}
+
+		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("freeSpace"))))
+		{
+			zbx_is_uint64(value, &free_space);
+			zbx_free(value);
+		}
+
+		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("uncommitted"))))
+		{
+			zbx_is_uint64(value, &uncommitted);
+			zbx_free(value);
+		}
+	}
+
+	datastore = (zbx_vmware_datastore_t *)zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
+	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
+	datastore->uuid = uuid;
+	datastore->id = zbx_strdup(NULL, id);
+	datastore->type = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("type"));
+	datastore->capacity = capacity;
+	datastore->free_space = free_space;
+	datastore->uncommitted = uncommitted;
+	zbx_vector_str_create(&datastore->alarm_ids);
+	zbx_vector_str_uint64_pair_create(&datastore->hv_uuids_access);
+	zbx_vector_vmware_diskextent_create(&datastore->diskextents);
+	vmware_service_get_diskextents_list(doc, &datastore->diskextents);
+
+	if (0 != cqvs.values_num)
+		vmware_service_cq_prop_value(__func__, doc, &cqvs);
+
+	if (FAIL == vmware_service_get_alarms_data(__func__, service, easyhandle, doc, NULL, &datastore->alarm_ids,
+			alarms_data, &error))
+	{
+		vmware_datastore_free(datastore);
+		datastore = NULL;
+	}
+out:
+	zbx_xml_free_doc(doc);
+	zbx_vector_cq_value_destroy(&cqvs);
+
+	if (NULL != error)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot get Datastore info: %s.", error);
+		zbx_free(error);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return datastore;
+
+#	undef ZBX_XPATH_DATASTORE_SUMMARY
+#	undef ZBX_POST_DATASTORE_GET
 }
 
 /******************************************************************************
