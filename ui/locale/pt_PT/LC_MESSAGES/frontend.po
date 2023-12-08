@@ -9333,6 +9333,10 @@ msgstr "Vista global do inventário de host"
 msgid "Host label type"
 msgstr "Tipo de etiqueta do host"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14864,6 +14868,10 @@ msgstr "Ou"
 msgid "Order"
 msgstr "Ordem"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "Ordenar coluna"
@@ -20098,6 +20106,10 @@ msgstr "O trigger no template \"%1$s\" tem um dependência com o trigger no temp
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "Tipo de etiqueta do trigger"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
