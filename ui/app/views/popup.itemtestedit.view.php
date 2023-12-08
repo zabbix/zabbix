@@ -52,8 +52,8 @@ foreach ($data['inputs'] as $name => $value) {
 	}
 	elseif ($name === 'query_fields' || $name === 'headers' || $name === 'parameters') {
 		foreach ($value as $num => $row) {
-			$form->addVar($name.'['.$num.']'.'[name]', $row['name']);
-			$form->addVar($name.'['.$num.']'.'[value]', $row['value']);
+			$form->addVar($name.'['.$num.'][name]', $row['name']);
+			$form->addVar($name.'['.$num.'][value]', $row['value']);
 		}
 		continue;
 	}
