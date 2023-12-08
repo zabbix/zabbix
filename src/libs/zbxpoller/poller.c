@@ -153,7 +153,6 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interfa
 			__func__, interface->interfaceid, itemid, (int)type);
 
 	zbx_interface_availability_init(&in, interface->interfaceid);
-	
 
 	if (FAIL == interface_availability_by_item_type((unsigned char)type, interface->type))
 		goto out;
