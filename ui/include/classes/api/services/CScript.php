@@ -384,7 +384,7 @@ class CScript extends CApiService {
 						&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 					$api_input_rules['fields']['manualinput_prompt']['rules'][0]['rules'][0]['flags'] |= API_REQUIRED;
 					$api_input_rules['fields']['manualinput_validator']['rules'][0]['rules'][0]['rules'][0]['flags']
-						= API_REQUIRED;
+						|= API_REQUIRED;
 					$api_input_rules['fields']['manualinput_validator']['rules'][0]['rules'][0]['rules'][1]['flags']
 						|= API_REQUIRED;
 					$api_input_rules['fields']['manualinput_default_value']['rules'][0]['rules'][0]['rules'][0]['flags']
@@ -721,9 +721,9 @@ class CScript extends CApiService {
 
 		if ($method === 'create') {
 			$api_input_rules['fields']['name']['flags'] |= API_REQUIRED;
-			$api_input_rules['fields']['type']['flags'] = API_REQUIRED;
-			$api_input_rules['fields']['scope']['rules'][0]['flags'] = API_REQUIRED;
-			$api_input_rules['fields']['scope']['rules'][1]['flags'] = API_REQUIRED;
+			$api_input_rules['fields']['type']['rules'][0]['flags'] = API_REQUIRED;
+			$api_input_rules['fields']['type']['rules'][1]['flags'] = API_REQUIRED;
+			$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
 
 			$api_input_rules['fields']['command']['rules'][0]['flags'] |= API_REQUIRED;
 
