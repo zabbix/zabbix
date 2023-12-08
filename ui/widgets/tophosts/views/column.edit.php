@@ -57,7 +57,7 @@ $form_grid->addItem([
 
 // Data.
 $form_grid->addItem([
-	new CLabel(_('Data'), 'label_data'),
+	new CLabel(_('Data'), 'data'),
 	new CFormField(
 		(new CSelect('data'))
 			->setValue($data['data'])
@@ -66,7 +66,7 @@ $form_grid->addItem([
 				CWidgetFieldColumnsList::DATA_HOST_NAME => _('Host name'),
 				CWidgetFieldColumnsList::DATA_TEXT => _('Text')
 			]))
-			->setFocusableElementId('label_data')
+			->setFocusableElementId('data')
 	)
 ]);
 
