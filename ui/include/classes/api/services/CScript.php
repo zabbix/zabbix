@@ -255,7 +255,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkUniqueness($scripts);
+		self::checkUniqueness($scripts);
 		$this->checkDuplicates($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
@@ -429,7 +429,7 @@ class CScript extends CApiService {
 		}
 		unset($script);
 
-		$this->checkUniqueness($scripts);
+		self::checkUniqueness($scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
 		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
@@ -1574,7 +1574,7 @@ class CScript extends CApiService {
 	 *
 	 * @throws APIException if script names within menu paths are not unique.
 	 */
-	private function checkUniqueness(array $scripts): void {
+	private static function checkUniqueness(array $scripts): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name', 'menu_path']], 'fields' => [
 			'name' =>		['type' => API_STRING_UTF8],
 			'menu_path' =>	['type' => API_SCRIPT_MENU_PATH]
