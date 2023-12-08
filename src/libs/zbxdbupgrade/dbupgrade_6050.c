@@ -1960,7 +1960,7 @@ static int	DBpatch_6050158(void)
 
 static int	DBpatch_6050159(void)
 {
-	const ZBX_FIELD	field = {"auditlog_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"auditlog_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
