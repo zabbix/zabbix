@@ -2207,15 +2207,14 @@ static void	get_next_expr_macro_start(const char **expr_start, const char *str, 
 {
 	const char	*search_pos = *expr_start + 2;
 
-	if (search_pos - str < str_len)
+	if ((size_t)(search_pos - str) < str_len)
 		*expr_start = strstr(search_pos, "{?");
 	else
 		*expr_start = NULL;
 }
 
-static int	replace_expression_macro(char **buf, size_t *alloc, size_t *offset, const char *data_name,
-		size_t token_end, const char *id, const char *command, size_t cmd_len, size_t *pos,
-		const char **expr_macro_start)
+static int	replace_expression_macro(char **buf, size_t *alloc, size_t *offset, const char *command, size_t cmd_len,
+		size_t *pos, const char **expr_macro_start)
 {
 	const char	*macro_end;
 	char		*error = NULL, *substitute = NULL;
@@ -2243,8 +2242,7 @@ static int	replace_expression_macro(char **buf, size_t *alloc, size_t *offset, c
 	return ret;
 }
 
-static int	fix_expression_macro_escaping(const char *table, const char *id_col, const char *data_col,
-		const char *data_name)
+static int	fix_expression_macro_escaping(const char *table, const char *id_col, const char *data_col)
 {
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
@@ -2271,7 +2269,6 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 		int		replaced = 0;
 		zbx_token_t	token;
 		const char	*expr_macro_start;
-		int		res;
 
 		cmd_len = strlen(command);
 		expr_macro_start = strstr(command, "{?");
@@ -2279,17 +2276,15 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 		while (SUCCEED == zbx_token_find(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) &&
 				cmd_len >= pos && NULL != expr_macro_start)
 		{
-			char	*error = NULL;
-
-			if (token.loc.l >= expr_macro_start - command && SUCCEED == replace_expression_macro(&buf,
-					&buf_alloc, &buf_offset, data_name, token.loc.r, row[0], command, cmd_len, &pos,
-					&expr_macro_start))
+			if (token.loc.l >= (size_t)(expr_macro_start - command) &&
+					SUCCEED == replace_expression_macro(&buf, &buf_alloc, &buf_offset, command,
+							cmd_len, &pos, &expr_macro_start))
 			{
 				replaced = 1;
 			}
 			else if (ZBX_TOKEN_EXPRESSION_MACRO != token.type)
 			{
-				if (token.loc.r >= expr_macro_start - command)
+				if (token.loc.r >= (size_t)(expr_macro_start - command))
 					get_next_expr_macro_start(&expr_macro_start, command, cmd_len);
 
 				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, token.loc.r - pos + 1);
@@ -2299,8 +2294,9 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 
 		while (NULL != expr_macro_start)	/* expression macros after the end of tokens */
 		{
-			if (expr_macro_start - command >= pos && SUCCEED == replace_expression_macro(&buf, &buf_alloc,
-					&buf_offset, data_name, 0, row[0], command, cmd_len, &pos, &expr_macro_start))
+			if ((size_t)(expr_macro_start - command) >= pos &&
+					SUCCEED == replace_expression_macro(&buf, &buf_alloc, &buf_offset, command,
+							cmd_len, &pos, &expr_macro_start))
 			{
 				replaced = 1;
 			}
@@ -2345,51 +2341,47 @@ clean:
 
 static int	DBpatch_6050161(void)
 {
-	return fix_expression_macro_escaping("scripts", "scriptid", "command", "script");
+	return fix_expression_macro_escaping("scripts", "scriptid", "command");
 }
 
 static int	DBpatch_6050162(void)
 {
-	return fix_expression_macro_escaping("script_param", "script_paramid", "value", "script parameter");
+	return fix_expression_macro_escaping("script_param", "script_paramid", "value");
 }
 
 static int	DBpatch_6050163(void)
 {
-	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "message",
-			"media type message");
+	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "message");
 }
 
 static int	DBpatch_6050164(void)
 {
-	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "subject",
-			"media type subject");
+	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "subject");
 }
 
 static int	DBpatch_6050165(void)
 {
-	return fix_expression_macro_escaping("opmessage", "operationid", "message", "action operation message");
+	return fix_expression_macro_escaping("opmessage", "operationid", "message");
 }
 
 static int	DBpatch_6050166(void)
 {
-	return fix_expression_macro_escaping("opmessage", "operationid", "subject", "action operation subject");
+	return fix_expression_macro_escaping("opmessage", "operationid", "subject");
 }
 
 static int	DBpatch_6050167(void)
 {
-	return fix_expression_macro_escaping("triggers", "triggerid", "event_name", "event name of the trigger");
+	return fix_expression_macro_escaping("triggers", "triggerid", "event_name");
 }
 
 static int	DBpatch_6050168(void)
 {
-	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "value",
-			"media type parameter value");
+	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "value");
 }
 
 static int	DBpatch_6050169(void)
 {
-	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "name",
-			"media type parameter name");
+	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "name");
 }
 
 #endif
