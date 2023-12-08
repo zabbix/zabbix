@@ -529,7 +529,7 @@ class CScript extends CApiService {
 		}
 		unset($script);
 
-		$this->checkUniqueness($scripts, 'update');
+		$this->checkUniqueness($scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
 		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
