@@ -2284,7 +2284,6 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 							cmd_len, &pos, &expr_macro_start))
 				{
 					replaced = replace_success = 1;
-					break;
 				}
 			}
 
