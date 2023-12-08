@@ -50,6 +50,8 @@ typedef struct
 }
 zbx_service_problem_t;
 
+ZBX_PTR_VECTOR_DECL(service_problem_ptr, zbx_service_problem_t *)
+
 typedef struct
 {
 	zbx_uint64_t	servicetagid;
@@ -59,6 +61,8 @@ typedef struct
 	int		revision;
 }
 zbx_service_tag_t;
+
+ZBX_PTR_VECTOR_DECL(service_tag_ptr, zbx_service_tag_t *)
 
 typedef struct
 {
@@ -71,24 +75,50 @@ typedef struct
 }
 zbx_service_rule_t;
 
+ZBX_PTR_VECTOR_DECL(service_rule_ptr, zbx_service_rule_t *)
+
+
+typedef struct zbx_service_s zbx_service_t;
+
 typedef struct
 {
-	zbx_uint64_t		serviceid;
-	zbx_vector_ptr_t	tags;
-	zbx_vector_ptr_t	service_problems;
-	zbx_vector_ptr_t	service_problem_tags;
-	zbx_vector_ptr_t	children;
-	zbx_vector_ptr_t	parents;
-	zbx_vector_ptr_t	status_rules;
-	char			*name;
-	int			status;
-	int			algorithm;
-	int			revision;
-	int			weight;
-	int			propagation_rule;
-	int			propagation_value;
+	zbx_uint64_t	service_problem_tagid;
+	zbx_uint64_t	current_eventid;
+	zbx_service_t	*service;
+	char		*tag;
+	char		*value;
+	int		op;
+	int		revision;
 }
-zbx_service_t;
+zbx_service_problem_tag_t;
+
+ZBX_PTR_VECTOR_DECL(service_problem_tag_ptr, zbx_service_problem_tag_t *)
+
+
+//ZBX_PTR_VECTOR_DECL(service_ptr, struct zbx_service *)
+ZBX_VECTOR_STRUCT_DECL(service_ptr, zbx_service_t *)
+
+struct zbx_service_s
+{
+	zbx_uint64_t				serviceid;
+	zbx_vector_service_tag_ptr_t		tags;
+	zbx_vector_service_problem_ptr_t	service_problems;
+	zbx_vector_service_problem_tag_ptr_t	service_problem_tags;
+	zbx_vector_service_ptr_t		children;
+	zbx_vector_service_ptr_t		parents;
+	zbx_vector_service_rule_ptr_t		status_rules;
+	char					*name;
+	int					status;
+	int					algorithm;
+	int					revision;
+	int					weight;
+	int					propagation_rule;
+	int					propagation_value;
+};
+
+
+ZBX_PTR_VECTOR_FUNC_DECL(service_ptr, zbx_service_t *)
+
 
 /* status update queue items */
 typedef struct

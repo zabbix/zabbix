@@ -24,7 +24,7 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
-ZBX_PTR_VECTOR_DECL(service, zbx_db_service *)
+ZBX_PTR_VECTOR_DECL(db_service, zbx_db_service *)
 
 #define ZBX_IPC_SERVICE_SERVICE			"service"
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
@@ -59,7 +59,7 @@ void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, z
 void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		zbx_uint64_t serviceid, const zbx_vector_uint64_t *eventids);
 void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_service_t *services);
+		zbx_vector_db_service_t *services);
 
 zbx_uint32_t	zbx_service_serialize_parentids(unsigned char **data, const zbx_vector_uint64_t *ids);
 void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uint64_t *ids);

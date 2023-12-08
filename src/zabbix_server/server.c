@@ -358,7 +358,8 @@ static int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 static char	*zbx_config_webservice_url	= NULL;
 
-int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+//int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+static int	config_serviceman_sync_frequency = 60;
 
 static int	config_vps_limit		= 0;
 static int	config_vps_overcommit_limit	= 0;
@@ -1027,7 +1028,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ProblemHousekeepingFrequency",	&config_problemhousekeeping_frequency,	TYPE_INT,
 			PARM_OPT,	1,			3600},
-		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
+		{"ServiceManagerSyncFrequency",	&config_serviceman_sync_frequency,	TYPE_INT,
 			PARM_OPT,	1,			3600},
 		{"ListenBacklog",		&config_tcp_max_backlog_size,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
@@ -1497,6 +1498,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};
 	zbx_thread_snmptrapper_args	snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_service_manager_args	service_manager_args = {config_serviceman_sync_frequency};
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -1605,6 +1607,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				thread_args.args = &service_manager_args;
 				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:

@@ -42,8 +42,6 @@ int	__wrap_zbx_interface_availability_is_set(const void *ia);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
-int	CONFIG_SERVICEMAN_SYNC_FREQUENCY = 0;
-
 pid_t	*threads;
 int	threads_num;
 

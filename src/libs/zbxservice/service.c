@@ -26,7 +26,7 @@ void	zbx_event_severity_free(zbx_event_severity_t *event_severity)
 	zbx_free(event_severity);
 }
 
-ZBX_PTR_VECTOR_IMPL(service, zbx_db_service *)
+ZBX_PTR_VECTOR_IMPL(db_service, zbx_db_service *)
 ZBX_PTR_VECTOR_IMPL(event_severity_ptr, zbx_event_severity_t *)
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
