@@ -42,7 +42,24 @@ $form = (new CForm())
 $audit_settings_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable audit logging'), 'auditlog_enabled'),
-		new CFormField((new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1))
+		new CFormField(
+			(new CCheckBox('auditlog_enabled'))
+				->setChecked($data['auditlog_enabled'] == 1)
+		)
+	])
+	->addItem([
+		new CLabel([
+			_('Log system actions'),
+			NBSP(),
+			makeHelpIcon(
+				_s('Log changes by low-level discovery, network discovery and autoregistration')
+			)
+		], 'auditlog_special_mode'),
+		new CFormField(
+			(new CCheckBox('auditlog_special_mode'))
+				->setEnabled($data['auditlog_enabled'] == 1)
+				->setChecked($data['auditlog_special_mode'] == 1)
+		)
 	])
 	->addItem([
 		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),

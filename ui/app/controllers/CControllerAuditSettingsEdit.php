@@ -27,9 +27,10 @@ class CControllerAuditSettingsEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'auditlog_enabled'	=> 'db config.auditlog_enabled',
-			'hk_audit_mode'		=> 'db config.hk_audit_mode',
-			'hk_audit'			=> 'db config.hk_audit'
+			'auditlog_enabled'		=> 'db config.auditlog_enabled',
+			'auditlog_special_mode'	=> 'db config.auditlog_special_mode',
+			'hk_audit_mode'			=> 'db config.hk_audit_mode',
+			'hk_audit'				=> 'db config.hk_audit'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -50,6 +51,10 @@ class CControllerAuditSettingsEdit extends CController {
 			'auditlog_enabled' => $this->getInput('auditlog_enabled',
 				CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED)
 			),
+			'auditlog_special_mode' => $this->hasInput('auditlog_special_mode')
+				? $this->getInput('auditlog_special_mode', CSettingsHelper::get(CSettingsHelper::AUDITLOG_SPECIAL_MODE))
+				: CSettingsHelper::get(CSettingsHelper::AUDITLOG_SPECIAL_MODE)
+			,
 			'hk_audit_mode' => $this->getInput('hk_audit_mode', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_AUDIT_MODE
 			)),

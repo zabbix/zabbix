@@ -32,6 +32,10 @@
 			$form.trimValues(['#hk_audit']);
 		});
 
+		$('#auditlog_enabled').change(function() {
+			$('#auditlog_special_mode').prop('disabled', !this.checked);
+		});
+
 		$('#hk_audit_mode').change(function() {
 			$('#hk_audit').prop('disabled', !this.checked);
 		});
@@ -56,6 +60,10 @@
 								.prev('.msg-bad')
 								.remove();
 
+							$('#auditlog_special_mode')
+								.prop('checked',
+									<?= DB::getDefault('config', 'auditlog_special_mode') == 1 ? 'true' : 'false' ?>
+								),
 							$('#auditlog_enabled')
 								.prop('checked',
 									<?= (DB::getDefault('config', 'auditlog_enabled') == 1) ? 'true' : 'false' ?>
