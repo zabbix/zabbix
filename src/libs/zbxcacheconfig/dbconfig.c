@@ -2468,6 +2468,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			interface->reset_availability = 0;
 			interface->items_num = 0;
 			dc_strpool_replace(found, &interface->error, row[10]);
+			interface->version = 0;
 		}
 
 		/* update interfaces_ht index using new data, if not done already */
@@ -2550,6 +2551,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (0 != update->modified)
 		{
+			if (interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+
 			dc_host_update_revision(update->host, revision);
 
 			if (NULL != update->snmp)
@@ -9258,6 +9262,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->disable_until = src_interface->disable_until;
 		dst_interface->errors_from = src_interface->errors_from;
 		zbx_strscpy(dst_interface->error, src_interface->error);
+		dst_interface->version = src_interface->version;
 	}
 	else
 	{
@@ -9272,6 +9277,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->disable_until = 0;
 		dst_interface->errors_from = 0;
 		*dst_interface->error = '\0';
+		dst_interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
 	}
 
 	dst_interface->addr = (1 == dst_interface->useip ? dst_interface->ip_orig : dst_interface->dns_orig);
@@ -11863,6 +11869,18 @@ unlock:
 	UNLOCK_CACHE;
 out:
 	return ret;
+}
+
+void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version)
+{
+	ZBX_DC_INTERFACE	*dc_interface;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid)))
+		dc_interface->version = version;
+
+	UNLOCK_CACHE;
 }
 
 /***************************************************************************************

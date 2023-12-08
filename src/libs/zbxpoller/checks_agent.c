@@ -36,7 +36,7 @@ void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, const char *
 }
 
 void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result,
-		zbx_protocol_t *protocol)
+		int *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
 
@@ -49,13 +49,13 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 		return;
 	}
 
-	if (ZBX_PROTOCOL_JSON == *protocol)
+	if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 	{
 		struct zbx_json_parse	jp;
 
 		if (FAIL == zbx_json_open(s->buffer, &jp))
 		{
-			*protocol = ZBX_PROTOCOL_SIMPLE;
+			*version = ZBX_COMPONENT_VERSION(2, 0, 0);
 			*ret = FAIL;
 			return;
 		}
@@ -109,7 +109,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	const char	*tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
-	zbx_protocol_t	protocol = ZBX_PROTOCOL_SIMPLE;
+	int		version = ZBX_COMPONENT_VERSION(2, 0, 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
 			item->interface.addr, item->key, zbx_tcp_connection_type_name(item->host.tls_connect));
@@ -174,7 +174,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	}
 
 	if (SUCCEED == ret)
-		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result, &protocol);
+		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result, &version);
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 

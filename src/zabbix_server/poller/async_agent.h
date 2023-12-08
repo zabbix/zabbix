@@ -49,7 +49,6 @@ typedef struct
 	const char		*config_source_ip;
 	int			config_timeout;
 	struct zbx_json		j;
-	zbx_protocol_t		protocol;
 }
 zbx_agent_context;
 

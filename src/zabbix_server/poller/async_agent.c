@@ -128,7 +128,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			/* initialization */
 			agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
 
-			if (ZBX_PROTOCOL_JSON == agent_context->protocol)
+			if (ZBX_COMPONENT_VERSION(7, 0, 0) <= agent_context->item.version)
 			{
 				zbx_tcp_send_context_init(agent_context->j.buffer, agent_context->j.buffer_size, 0,
 						ZBX_TCP_PROTOCOL, &agent_context->tcp_send_context);
@@ -225,14 +225,12 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
 					&agent_context->tcp_recv_context, agent_context->item.flags, &event_new)))
 			{
-				zbx_protocol_t	protocol = agent_context->protocol;
-
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->item.ret,
 						agent_context->item.interface.addr, &agent_context->item.result,
-						&agent_context->protocol);
+						&agent_context->item.version);
 
 				/* retry with other protocol */
-				if (FAIL == agent_context->item.ret && protocol != agent_context->protocol)
+				if (FAIL == agent_context->item.ret)
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 
 				break;
@@ -298,6 +296,8 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 
 	agent_context->config_timeout = item->timeout;
 
+	agent_context->item.version = item->interface.version;
+
 	switch (agent_context->tls_connect)
 	{
 		case ZBX_TCP_SEC_UNENCRYPTED:
@@ -339,7 +339,6 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 #endif
 
 	zbx_agent_prepare_request(&agent_context->j, agent_context->item.key, item->timeout_orig);
-	agent_context->protocol = ZBX_PROTOCOL_JSON;
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 
 	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, item->timeout + 1,

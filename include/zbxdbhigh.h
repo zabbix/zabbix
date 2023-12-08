@@ -890,6 +890,7 @@ void	zbx_calc_timestamp(const char *line, int *timestamp, const char *format);
 
 char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp);
 int	zbx_get_proxy_protocol_version_int(const char *version_str);
+int	zbx_get_agent_protocol_version_int(const char *version_str);
 
 /* condition evaluation types */
 #define ZBX_CONDITION_EVAL_TYPE_AND_OR			0

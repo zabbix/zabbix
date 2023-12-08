@@ -145,20 +145,23 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
  *                                                                              *
  *******************************************************************************/
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
-		char *host, unsigned char **data, size_t *data_alloc, size_t *data_offset)
+		char *host, int version, unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 	zbx_interface_availability_t	in, out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__func__, interface->interfaceid, itemid, (int)type);
 
 	zbx_interface_availability_init(&in, interface->interfaceid);
-	zbx_interface_availability_init(&out, interface->interfaceid);
+	
 
 	if (FAIL == interface_availability_by_item_type((unsigned char)type, interface->type))
 		goto out;
 
 	interface_get_availability(interface, &in);
+
+	if (INTERFACE_TYPE_AGENT == interface->type && version != interface->version)
+		zbx_dc_set_interface_version(interface->interfaceid, version);
 
 	if (FAIL == zbx_dc_interface_activate(interface->interfaceid, ts, &in.agent, &out.agent))
 		goto out;
@@ -181,7 +184,7 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interfa
 out:
 	zbx_interface_availability_clean(&out);
 	zbx_interface_availability_clean(&in);
-
+zbx_interface_availability_init(&out, interface->interfaceid);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
