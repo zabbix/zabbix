@@ -721,9 +721,9 @@ class CScript extends CApiService {
 
 		if ($method === 'create') {
 			$api_input_rules['fields']['name']['flags'] |= API_REQUIRED;
+			$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
 			$api_input_rules['fields']['type']['rules'][0]['flags'] = API_REQUIRED;
 			$api_input_rules['fields']['type']['rules'][1]['flags'] = API_REQUIRED;
-			$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
 
 			$api_input_rules['fields']['command']['rules'][0]['flags'] |= API_REQUIRED;
 
