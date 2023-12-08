@@ -27,7 +27,6 @@
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxregexp.h"
-#include "zbxeval.h"
 #include "zbx_host_constants.h"
 #include "zbxstr.h"
 
@@ -2194,7 +2193,7 @@ static int	find_expression_macro(const char *macro_start, const char **macro_end
 
 		zbx_free(*error);
 		zbx_strncpy_alloc(&expression, &expr_alloc, &expr_offset,
-				macro_start + 2, *macro_end - macro_start - 2);
+				macro_start + 2, (size_t)(*macro_end - macro_start) - 2);
 		ret = update_escaping_in_expression(expression, substitute, error);
 		zbx_free(expression);
 		(*macro_end)++;
@@ -2223,14 +2222,14 @@ static int	replace_expression_macro(char **buf, size_t *alloc, size_t *offset, c
 	if (NULL != *expr_macro_start &&
 			SUCCEED == find_expression_macro(*expr_macro_start, &macro_end, &substitute, &error))
 	{
-		zbx_strncpy_alloc(buf, alloc, offset, command + *pos, (*expr_macro_start - command) - *pos);
+		zbx_strncpy_alloc(buf, alloc, offset, command + *pos, (size_t)(*expr_macro_start - command) - *pos);
 		zbx_strcpy_alloc(buf, alloc, offset, "{?");
 		zbx_strcpy_alloc(buf, alloc, offset, substitute);
 		zbx_strcpy_alloc(buf, alloc, offset, "}");
 		zbx_free(substitute);
 
 		*expr_macro_start = strstr(macro_end, "{?");
-		*pos = macro_end - command;
+		*pos = (size_t)(macro_end - command);
 		ret = SUCCEED;
 	}
 	else

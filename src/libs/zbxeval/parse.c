@@ -822,8 +822,6 @@ static int	eval_parse_property_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse token                                                       *
- *                                                                            *
  * Parameters: ctx   - [IN] evaluation context                                *
  *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
