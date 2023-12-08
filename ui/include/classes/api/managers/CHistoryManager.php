@@ -656,12 +656,13 @@ class CHistoryManager {
 	 * @param array  $items      Items to get aggregated values for.
 	 * @param int    $time_from  Start of time period, inclusive (unix time stamp).
 	 * @param int    $time_to    End of time period, inclusive (unix time stamp).
-	 * @param string $function   Aggregation function.
-	 * @param string $interval   Interval length (in seconds).
+	 * @param int    $function   Aggregation function.
+	 * @param int    $interval   Interval length (in seconds).
 	 *
 	 * @return array
 	 */
-	public function getAggregationByInterval(array $items, $time_from, $time_to, $function, $interval) {
+	public function getAggregationByInterval(array $items, int $time_from, int $time_to, int $function, int $interval)
+			: array {
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
@@ -685,8 +686,8 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getAggregationByInterval
 	 */
-	private function getAggregationByIntervalFromElasticsearch(array $items, $time_from, $time_to, $function,
-			$interval) {
+	private function getAggregationByIntervalFromElasticsearch(array $items, int $time_from, int $time_to,
+			int $function, int $interval): array {
 		$terms = [];
 
 		foreach ($items as $item) {
@@ -816,7 +817,8 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getAggregationByInterval
 	 */
-	private function getAggregationByIntervalFromSql(array $items, $time_from, $time_to, $function, $interval) {
+	private function getAggregationByIntervalFromSql(array $items, int $time_from, int $time_to, int $function,
+			int $interval): array {
 		$items_by_table = [];
 		foreach ($items as $item) {
 			$items_by_table[$item['value_type']][$item['source']][] = $item['itemid'];
@@ -931,6 +933,30 @@ class CHistoryManager {
 				while (($row = DBfetch($sql_result)) !== false) {
 					$result[$row['itemid']]['source'] = $source;
 					$result[$row['itemid']]['data'][] = $row;
+				}
+
+				if ($function == AGGREGATE_COUNT) {
+					foreach ($itemids as $itemid) {
+						if (!array_key_exists($itemid, $result)) {
+							$result[$itemid] = [
+								'source' => $source,
+								'data' => []
+							];
+						}
+
+						$db_ticks = array_column($result[$itemid]['data'], 'tick', 'tick');
+
+						for ($tick = $_time_from - $_time_from % $interval; $tick <= $time_to; $tick += $interval) {
+							if (!array_key_exists($tick, $db_ticks)) {
+								$result[$itemid]['data'][] = [
+									'itemid' => (string) $itemid,
+									'tick' => (string) $tick,
+									'count' => '0',
+									'clock' => (string) $tick
+								];
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1477,6 +1503,19 @@ class CHistoryManager {
 						'clock' => $row['clock']
 					];
 				}
+
+				if ($function == AGGREGATE_COUNT) {
+					foreach ($itemids as $itemid) {
+						if (!array_key_exists($itemid, $result)) {
+							$result[$itemid] = [
+								'itemid' => (string) $itemid,
+								'value' => '0',
+								'clock' => (string) $time_from_by_source[$source]
+							];
+						}
+					}
+				}
+
 			}
 		}
 
