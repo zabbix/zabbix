@@ -65,26 +65,26 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-variables-row">
 	<?= (new CRow([
-		(new CCol([
-			(new CDiv())
-		]))->addClass('td-separator'),
-		(new CTextBox(null, '#{name}'))
-			->setAttribute('placeholder', _('name'))
-			->setAttribute('data-type', 'name')
-			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-		RARR(),
-		(new CTextBox(null, '#{value}'))
-			->setAttribute('placeholder', _('value'))
-			->setAttribute('data-type', 'value')
-			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-		(new CCol(
-			(new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->addClass('form_row')
-		->toString()
+			(new CCol([
+				(new CDiv())
+			]))->addClass('td-separator'),
+			(new CTextBox(null, '#{name}'))
+				->setAttribute('placeholder', _('name'))
+				->setAttribute('data-type', 'name')
+				->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+			RARR(),
+			(new CTextBox(null, '#{value}'))
+				->setAttribute('placeholder', _('value'))
+				->setAttribute('data-type', 'value')
+				->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
+			->toString()
 	?>
 </script>
 
