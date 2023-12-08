@@ -6293,6 +6293,7 @@ static int	hgset_compare_new_hash(const void *d1, const void *d2)
 static void	hgset_free(zbx_hgset_t *hgset)
 {
 	zbx_vector_uint64_destroy(&hgset->hgroupids);
+	zbx_vector_uint64_destroy(&hgset->hostids);
 	zbx_free(hgset);
 }
 
@@ -6452,18 +6453,19 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_vector_str_create(&hashes);
 	zbx_vector_hgset_ptr_sort(&hgsets, hgset_compare_new_hash);
 
-	for (i = 1; i < hgsets.values_num; i++)
+	for (i = 0; i < hgsets.values_num - 1; i++)
 	{
-		zbx_hgset_t	*hgset_next = hgsets.values[i];
+		zbx_hgset_t	*hgset_next = hgsets.values[i + 1];
 
-		hgset = hgsets.values[i - 1];
+		hgset = hgsets.values[i];
 
 		if (0 == strcmp(hgset->hash_str_new, hgset_next->hash_str_new))
 		{
 			zbx_vector_uint64_append_array(&hgset->hostids, hgset_next->hostids.values,
 					hgset_next->hostids.values_num);
 			hgset_free(hgset_next);
-			zbx_vector_hgset_ptr_remove(&hgsets, i--);
+			zbx_vector_hgset_ptr_remove(&hgsets, i + 1);
+			i--;
 		}
 		else
 		{
