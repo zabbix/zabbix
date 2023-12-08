@@ -153,6 +153,7 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interfa
 			__func__, interface->interfaceid, itemid, (int)type);
 
 	zbx_interface_availability_init(&in, interface->interfaceid);
+	zbx_interface_availability_init(&out, interface->interfaceid);
 
 	if (FAIL == interface_availability_by_item_type((unsigned char)type, interface->type))
 		goto out;
@@ -183,7 +184,7 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interfa
 out:
 	zbx_interface_availability_clean(&out);
 	zbx_interface_availability_clean(&in);
-zbx_interface_availability_init(&out, interface->interfaceid);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
