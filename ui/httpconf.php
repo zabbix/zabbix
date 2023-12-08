@@ -509,6 +509,7 @@ if (isset($_REQUEST['form'])) {
 				$step['posts'] = '';
 			}
 
+			CArrayHelper::sort($step['variables'], ['name']);
 			$step['variables'] = array_values($step['variables']);
 		}
 		unset($step);
@@ -590,6 +591,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if ($data['variables']) {
+		CArrayHelper::sort($data['variables'], ['name']);
 		$data['variables'] = array_values($data['variables']);
 	}
 	else {

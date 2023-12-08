@@ -144,28 +144,12 @@ window.webscenario_step_edit_popup = new class {
 	#initVariables(variables) {
 		const $variables = jQuery('#step-variables');
 
-		$variables
-			.dynamicRows({
-				template: '#step-variable-row-tmpl',
-				rows: variables
-			})
-			.on('sortstop.dynamicRows', (e) => {
-				const rows = e.target.querySelectorAll('.form_row.sortable');
-
-				rows.forEach((row, index) => {
-					const textareas = row.querySelectorAll('textarea');
-
-					textareas.forEach((textarea) => {
-						const original_name = textarea.getAttribute('name');
-						const new_name = original_name.replace(/\[\d+/, `[${index}]`);
-
-						textarea.setAttribute('name', new_name);
-					});
-				});
-			});
+		$variables.dynamicRows({
+			template: '#step-variable-row-tmpl',
+			rows: variables
+		});
 
 		this.#initTextareaFlexible($variables);
-		this.#initSortable($variables);
 	}
 
 	#initHeaders(headers) {
