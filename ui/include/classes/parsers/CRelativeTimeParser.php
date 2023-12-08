@@ -161,6 +161,10 @@ class CRelativeTimeParser extends CParser {
 		$p++;
 
 		if (preg_match('/^(?P<offset_value>[0-9]+)(?P<offset_suffix>[yMwdhms])?/', substr($source, $p), $matches)) {
+			if (bccomp($matches['offset_value'], (string) ZBX_MAX_INT32) == 1) {
+				return false;
+			}
+
 			$this->tokens[] = [
 				'type' => self::ZBX_TOKEN_OFFSET,
 				'sign' => $sign_matches[0],
