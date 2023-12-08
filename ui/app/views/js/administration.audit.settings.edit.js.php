@@ -33,7 +33,7 @@
 		});
 
 		$('#auditlog_enabled').change(function() {
-			$('#auditlog_special_mode').prop('disabled', !this.checked);
+			$('#auditlog_mode').prop('disabled', !this.checked);
 		});
 
 		$('#hk_audit_mode').change(function() {
@@ -60,9 +60,9 @@
 								.prev('.msg-bad')
 								.remove();
 
-							$('#auditlog_special_mode')
+							$('#auditlog_mode')
 								.prop('checked',
-									<?= DB::getDefault('config', 'auditlog_special_mode') == 1 ? 'true' : 'false' ?>
+									<?= DB::getDefault('config', 'auditlog_mode') == 1 ? 'true' : 'false' ?>
 								),
 							$('#auditlog_enabled')
 								.prop('checked',

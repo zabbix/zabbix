@@ -54,11 +54,11 @@ $audit_settings_tab = (new CFormGrid())
 			makeHelpIcon(
 				_s('Log changes by low-level discovery, network discovery and autoregistration')
 			)
-		], 'auditlog_special_mode'),
+		], 'auditlog_mode'),
 		new CFormField(
-			(new CCheckBox('auditlog_special_mode'))
+			(new CCheckBox('auditlog_mode'))
 				->setEnabled($data['auditlog_enabled'] == 1)
-				->setChecked($data['auditlog_special_mode'] == 1)
+				->setChecked($data['auditlog_mode'] == 1)
 		)
 	])
 	->addItem([

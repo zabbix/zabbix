@@ -23,10 +23,10 @@ class CControllerAuditSettingsUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'auditlog_enabled'			=> 'db config.auditlog_enabled|in 1',
-			'auditlog_special_mode'		=> 'db config.auditlog_special_mode|in 1',
-			'hk_audit_mode'				=> 'db config.hk_audit_mode|in 1',
-			'hk_audit'					=> 'db config.hk_audit|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])
+			'auditlog_enabled'	=> 'db config.auditlog_enabled|in 1',
+			'auditlog_mode'		=> 'db config.auditlog_mode|in 1',
+			'hk_audit_mode'		=> 'db config.hk_audit_mode|in 1',
+			'hk_audit'			=> 'db config.hk_audit|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -69,7 +69,7 @@ class CControllerAuditSettingsUpdate extends CController {
 		$settings = [CSettingsHelper::AUDITLOG_ENABLED => $this->getInput('auditlog_enabled', 0)];
 
 		if ($settings[CSettingsHelper::AUDITLOG_ENABLED] == 1) {
-			$settings[CSettingsHelper::AUDITLOG_SPECIAL_MODE] = $this->getInput('auditlog_special_mode', 0);
+			$settings[CSettingsHelper::AUDITLOG_MODE] = $this->getInput('auditlog_mode', 0);
 		}
 
 		$result_housekeeping = API::Housekeeping()->update($housekeeping);
