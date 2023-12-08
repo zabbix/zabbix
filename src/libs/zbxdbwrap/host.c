@@ -6501,7 +6501,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	{
 		zbx_host_permission_t		prm;
 		zbx_vector_host_permission_t	permissions;
-		zbx_vector_uint64_t		hgroupids;
 
 		zbx_db_insert_prepare(&db_insert, "hgset", "hgsetid", "hash", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_group, "hgset_group", "hgsetid", "groupid", (char *)NULL);
@@ -6533,7 +6532,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_vector_uint64_create(&hgroupids);
 		zbx_vector_host_permission_create(&permissions);
 
 		sql_offset = 0;
@@ -6541,10 +6539,10 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 				"select distinct u.ugsetid,r.id,r.permission from ugset_group u"
 				" join rights r on u.usrgrpid=r.groupid"
 				" where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.id", hgroupids.values,
-				hgroupids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.id", ids.values,
+				ids.values_num);
 
-		zbx_vector_uint64_destroy(&hgroupids);
+		zbx_vector_uint64_clear(&ids);
 
 		result = zbx_db_select("%s", sql);
 
