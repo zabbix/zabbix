@@ -5744,7 +5744,6 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	//note: select affected hgsetids
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct hgsetid"
