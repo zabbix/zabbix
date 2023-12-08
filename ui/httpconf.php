@@ -529,6 +529,8 @@ if (isset($_REQUEST['form'])) {
 			'variables' => 'variables'
 		];
 
+		CArrayHelper::sort($db_httptest['variables'], ['name']);
+
 		foreach ($fields as $type => $field_name) {
 			foreach ($db_httptest[$field_name] as $pair) {
 				$data['pairs'][] = [
@@ -562,6 +564,8 @@ if (isset($_REQUEST['form'])) {
 
 		foreach ($data['steps'] as &$step) {
 			$step['pairs'] = [];
+
+			CArrayHelper::sort($step['variables'], ['name']);
 
 			foreach ($fields as $type => $field_name) {
 				if ($field_name !== 'posts' || $step['post_type'] == ZBX_POSTTYPE_FORM) {
