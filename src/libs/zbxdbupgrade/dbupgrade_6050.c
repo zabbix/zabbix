@@ -2273,20 +2273,25 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 		cmd_len = strlen(command);
 		expr_macro_start = strstr(command, "{?");
 
-		while (SUCCEED == zbx_token_find(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) &&
+		while (SUCCEED == zbx_token_find(command, (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC) &&
 				cmd_len >= pos && NULL != expr_macro_start)
 		{
-			if (token.loc.l >= (size_t)(expr_macro_start - command) &&
-					SUCCEED == replace_expression_macro(&buf, &buf_alloc, &buf_offset, command,
-							cmd_len, &pos, &expr_macro_start))
-			{
-				replaced = 1;
-			}
-			else if (ZBX_TOKEN_EXPRESSION_MACRO != token.type)
-			{
-				if (token.loc.r >= (size_t)(expr_macro_start - command))
-					get_next_expr_macro_start(&expr_macro_start, command, cmd_len);
+			int	replace_success = 0;
 
+			while (NULL != expr_macro_start && token.loc.l >= (size_t)(expr_macro_start - command))
+			{
+				if (SUCCEED == replace_expression_macro(&buf, &buf_alloc, &buf_offset, command,
+							cmd_len, &pos, &expr_macro_start))
+				{
+					replaced = replace_success = 1;
+					break;
+				}
+			}
+
+			if (0 == replace_success)
+			{
+				expr_macro_start = command + token.loc.r - 2;
+				get_next_expr_macro_start(&expr_macro_start, command, cmd_len);
 				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, token.loc.r - pos + 1);
 				pos = token.loc.r + 1;
 			}
