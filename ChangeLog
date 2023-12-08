@@ -5,6 +5,8 @@ New features:
 .........T [ZBXNEXT-8707] updated version check for MongoDB node by Zabbix agent 2 template (atocko)
 
 Bug fixes:
+........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
+.......PS. [ZBX-23145] disabled deprecated automatic reconnection in MySQL (mprihodko)
 .......PS. [ZBX-23799] fixed crash when host interfaces are added and updated at the same time (vso)
 ..F....... [ZBX-23565] fixed filtering by value not working in Latest data for log and text types (agriscenko)
 .......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware HV maintenance status (MVekslers)
