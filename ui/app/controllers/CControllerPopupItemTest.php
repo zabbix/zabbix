@@ -861,6 +861,12 @@ abstract class CControllerPopupItemTest extends CController {
 				unset($data['interface']['type']);
 			}
 			elseif ($key === 'query_fields' || $key === 'headers' || $key === 'parameters') {
+				foreach ($value as $num => $row) {
+					if ($row['name'] === '') {
+						unset($data[$key][$num]);
+					}
+				}
+
 				if (!$value) {
 					unset($data[$key]);
 				}
@@ -924,30 +930,6 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return $macros;
-	}
-
-	/**
-	 * Transform front-end familiar array of parameters fields to the form server is capable to handle. Server expects
-	 * one object where parameter names are keys and parameter values are values. Note that parameter names are unique.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return array
-	 */
-	protected function transformParametersFields(array $data): array {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result += [$data['name'][$num] => $data['value'][$num]];
-				}
-			}
-		}
-
-		return $result;
 	}
 
 	/**
@@ -1323,7 +1305,7 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * @param array $data
 	 */
-	protected static function transformHttpFields(array &$data): void {
+	protected static function transformFields(array &$data): void {
 		if (array_key_exists('query_fields', $data)) {
 			foreach ($data['query_fields'] as &$query_field) {
 				$query_field = [$query_field['name'] => $query_field['value']];
@@ -1340,6 +1322,16 @@ abstract class CControllerPopupItemTest extends CController {
 			unset($header);
 
 			$data['headers'] = implode("\r\n", $data['headers']);
+		}
+
+		if (array_key_exists('parameters', $data)) {
+			$parameters = [];
+
+			foreach ($data['parameters'] as $parameter) {
+				$parameters += [$parameter['name'] => $parameter['value']];
+			}
+
+			$data['parameters'] = $parameters;
 		}
 	}
 }
