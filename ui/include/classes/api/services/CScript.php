@@ -1045,7 +1045,9 @@ class CScript extends CApiService {
 			if (array_key_exists($hostid, $macros_data)) {
 				foreach ($scripts as &$script) {
 					if (array_key_exists($script['scriptid'], $macros_data[$hostid])) {
-						$script = $macros_data[$hostid][$script['scriptid']] + $script;
+						foreach ($macros_data[$hostid][$script['scriptid']] as $field => $value) {
+							$script[$field] = $value;
+						}
 					}
 				}
 				unset($script);
@@ -1232,7 +1234,9 @@ class CScript extends CApiService {
 			if (array_key_exists($eventid, $macros_data)) {
 				foreach ($scripts as $scriptid => &$script) {
 					if (array_key_exists($scriptid, $macros_data[$eventid])) {
-						$script = $macros_data[$eventid][$scriptid] + $script;
+						foreach ($macros_data[$eventid][$script['scriptid']] as $field => $value) {
+							$script[$field] = $value;
+						}
 					}
 				}
 				unset($script);
