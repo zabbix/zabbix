@@ -2298,14 +2298,11 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 
 		while (NULL != expr_macro_start)	/* expression macros after the end of tokens */
 		{
-			if ((size_t)(expr_macro_start - command) >= pos &&
-					SUCCEED == replace_expression_macro(&buf, &buf_alloc, &buf_offset, command,
+			if (SUCCEED == replace_expression_macro(&buf, &buf_alloc, &buf_offset, command,
 							cmd_len, &pos, &expr_macro_start))
 			{
 				replaced = 1;
 			}
-			else
-				get_next_expr_macro_start(&expr_macro_start, command, cmd_len);
 		}
 
 		if (0 != replaced)
