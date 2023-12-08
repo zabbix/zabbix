@@ -16,22 +16,24 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#ifndef ZABBIX_VMWARE_SERVICE_CFGLISTS_H
+#define ZABBIX_VMWARE_SERVICE_CFGLISTS_H
 
-#ifndef ZABBIX_TRAPPER_REQUEST_H
-#define ZABBIX_TRAPPER_REQUEST_H
+#include "config.h"
 
-#include "zbxcomms.h"
-#include "zbxjson.h"
-#include "zbxvault.h"
-#include "zbxdbhigh.h"
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
-		const zbx_config_vault_t *config_vault, int proxydata_frequency,
-		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
-		zbx_get_config_forks_f get_config_forks);
+#include "vmware.h"
+#include "vmware_internal.h"
 
-int	init_proxy_history_lock(unsigned char program_type, char **error);
-void	free_proxy_history_lock(unsigned char program_type);
+int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vmware_alarms_data_t *alarms_data, zbx_vector_str_t *hvs, zbx_vector_str_t *dss,
+		zbx_vector_vmware_datacenter_t *datacenters, zbx_vector_vmware_dvswitch_t *dvswitches,
+		zbx_vector_str_t *vc_alarm_ids, char **error);
 
-#endif
+
+int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_t *diskextents);
+
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
+
+#endif	/* ZABBIX_VMWARE_SERVICE_CFGLISTS_H */

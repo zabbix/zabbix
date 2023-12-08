@@ -16,22 +16,28 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#ifndef ZABBIX_VMWARE_HV_H
+#define ZABBIX_VMWARE_HV_H
 
-#ifndef ZABBIX_TRAPPER_REQUEST_H
-#define ZABBIX_TRAPPER_REQUEST_H
+#include "config.h"
 
-#include "zbxcomms.h"
-#include "zbxjson.h"
-#include "zbxvault.h"
-#include "zbxdbhigh.h"
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
-		const zbx_config_vault_t *config_vault, int proxydata_frequency,
-		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
-		zbx_get_config_forks_f get_config_forks);
+#include "vmware.h"
+#include "vmware_internal.h"
 
-int	init_proxy_history_lock(unsigned char program_type, char **error);
-void	free_proxy_history_lock(unsigned char program_type);
+zbx_hash_t	vmware_hv_hash(const void *data);
+int	vmware_hv_compare(const void *d1, const void *d2);
+void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv);
+void	vmware_hv_clean(zbx_vmware_hv_t *hv);
 
-#endif
+int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
+		zbx_vector_vmware_datastore_t *dss, zbx_vector_vmware_resourcepool_t *rpools,
+		zbx_vector_cq_value_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
+		char **error);
+
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
+
+#endif	/* ZABBIX_VMWARE_HV_H */
+
+
