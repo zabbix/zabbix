@@ -1704,7 +1704,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				thread_args.args = &proxyconfig_args;
 				zbx_thread_start(proxyconfig_thread, &thread_args, &zbx_threads[i]);
-				if (FAIL == zbx_rtc_wait_config_sync(&rtc, rtc_process_request_func))
+				if (FAIL == zbx_rtc_wait_for_sync_finish(&rtc, rtc_process_request_func))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
