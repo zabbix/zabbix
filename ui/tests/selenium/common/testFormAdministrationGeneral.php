@@ -191,15 +191,15 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form->invalidate();
 
 		// Check trimming symbols in Login attempts field.
-		if (CTestArrayHelper::get($data['fields'], 'Login attempts') === '3M') {
+		if (CTestArrayHelper::get($values, 'Login attempts') === '3M') {
 			$data['fields']['Login attempts'] = '3';
 		}
 
-		if ($expected === TEST_BAD && CTestArrayHelper::get($values, 'Default time zone')) {
+		if (CTestArrayHelper::get($values, 'Default time zone')) {
 			$values['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($values['Default time zone']);
 		}
 
-		if (CTestArrayHelper::get($data, 'trim', false)) {
+		if (CTestArrayHelper::get($data, 'trim')) {
 			$values = array_map('trim', $values);
 		}
 
