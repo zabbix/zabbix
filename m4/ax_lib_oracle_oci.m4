@@ -168,24 +168,24 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
             fi
         done
 
+        if test $cnt_include -eq 1 && test $cnt_lib -eq 1; then
+            oracle_include_dir=$tmp_include_dir
+            oracle_lib_dir=$tmp_lib_dir
+            want_oracle_but_no_path="no"
+        fi
+
         AC_MSG_CHECKING([for Oracle include dir installed from RPM package])
-        if test $cnt_include -eq 1; then
-            AC_MSG_RESULT([yes])
+        if test -n "$oracle_include_dir"; then
+            AC_MSG_RESULT([$oracle_include_dir])
         else
             AC_MSG_RESULT([no])
         fi
 
         AC_MSG_CHECKING([for Oracle lib dir installed from RPM package])
-        if test $cnt_lib -eq 1; then
-            AC_MSG_RESULT([yes])
+        if test -n "$oracle_lib_dir"; then
+            AC_MSG_RESULT([$oracle_lib_dir])
         else
             AC_MSG_RESULT([no])
-        fi
-
-        if test $cnt_include -eq 1 && test $cnt_lib -eq 1; then
-            oracle_include_dir=$tmp_include_dir
-            oracle_lib_dir=$tmp_lib_dir
-            want_oracle_but_no_path="no"
         fi
     fi
 
