@@ -318,11 +318,20 @@ Please, locate Oracle directories using --with-oracle or \
 
             dnl Add -lnnz1x flag to Oracle >= 10.x
             AC_MSG_CHECKING([for Oracle OCI version >= 10.x to use -lnnz1x flag])
-            oracle_nnz1x_flag=`expr $oracle_version_number / 1000000`
-            if test "$oracle_nnz1x_flag" -ge 10; then
-                oci_libs="$oci_libs -lnnz$oracle_nnz1x_flag"
-                LIBS="$LIBS -lnnz$oracle_nnz1x_flag"
-                AC_MSG_RESULT([-lnnz$oracle_nnz1x_flag])
+            if test "$oracle_version_major" -ge 10; then
+                oci_libs="$oci_libs -lnnz$oracle_version_major"
+                LIBS="$LIBS -lnnz$oracle_version_major"
+                AC_MSG_RESULT([-lnnz$oracle_version_major])
+            else
+                AC_MSG_RESULT([no])
+            fi
+
+            dnl Add -lons -lclntshcore -lmql1 -lipc1 flags to Oracle = 12.x
+            AC_MSG_CHECKING([for Oracle OCI version = 12.x to use -lons -lclntshcore -lmql1 -lipc1 flags])
+            if test "$oracle_version_major" -eq 12; then
+                oci_libs="$oci_libs -lons -lclntshcore -lmql1 -lipc1"
+                LIBS="$LIBS -lons -lclntshcore -lmql1 -lipc1"
+                AC_MSG_RESULT([yes])
             else
                 AC_MSG_RESULT([no])
             fi
