@@ -215,8 +215,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #0 All valid custom values, checked checkboxes, custom colors.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Unacknowledged PROBLEM events' => true,
 						'Acknowledged PROBLEM events' => true,
@@ -271,8 +270,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			//  #1 Unchecked checkboxes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => false,
 						'Unacknowledged PROBLEM events' => false,
 						'Acknowledged PROBLEM events' => false,
@@ -291,8 +289,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #2 Zeros in custom colors.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => '000000',
 						'xpath://button[@id="lbl_problem_ack_color"]/..' => '000000',
@@ -323,8 +320,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #3 Letters in custom colors.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => 'AAAAAA',
 						'xpath://button[@id="lbl_problem_ack_color"]/..' => 'BBBBBB',
@@ -355,8 +351,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #4 Maximal valid values.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Not classified' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
 						'Information' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
@@ -399,8 +394,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #5 Valid zero values in time in period fields without "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0',
 						'On status change triggers blink for' => '0'
 					],
@@ -413,8 +407,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #6 Valid zero values in time in period fields with "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0s',
 						'On status change triggers blink for' => '0s'
 					],
@@ -427,8 +420,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #7 Valid zero values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0m',
 						'On status change triggers blink for' => '0m'
 					],
@@ -441,8 +433,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #8 Valid zero values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0h',
 						'On status change triggers blink for' => '0h'
 					],
@@ -455,8 +446,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #9 Valid zero values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0d',
 						'On status change triggers blink for' => '0d'
 					],
@@ -469,8 +459,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #10 Valid zero values in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0w',
 						'On status change triggers blink for' => '0w'
 					],
@@ -483,8 +472,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #11 Valid maximum values in period fields in seconds without "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86400',
 						'On status change triggers blink for' => '86400'
 					],
@@ -497,8 +485,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #12 Valid maximum values in period fields in seconds with "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86400s',
 						'On status change triggers blink for' => '86400s'
 					],
@@ -511,8 +498,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #13 Valid maximum values in period fields with in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '1440m',
 						'On status change triggers blink for' => '1440m'
 					],
@@ -525,8 +511,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #14 Valid maximum values in period fields with in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '24h',
 						'On status change triggers blink for' => '24h'
 					],
@@ -539,8 +524,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #15 Valid maximum values in period fields with in days.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '1d',
 						'On status change triggers blink for' => '1d'
 					],
@@ -554,7 +538,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0M',
 						'On status change triggers blink for' => '0M'
 					],
@@ -568,7 +552,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0y',
 						'On status change triggers blink for' => '0y'
 					],
@@ -582,7 +566,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86401',
 						'On status change triggers blink for' => '86401'
 					],
@@ -596,7 +580,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86401s',
 						'On status change triggers blink for' => '86401s'
 					],
@@ -610,7 +594,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '1441m',
 						'On status change triggers blink for' => '1441m'
 					],
@@ -624,7 +608,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '25h',
 						'On status change triggers blink for' => '25h'
 					],
@@ -638,7 +622,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '2d',
 						'On status change triggers blink for' => '2d'
 					],
@@ -652,7 +636,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '99999999999999999999999999999999',
 						'On status change triggers blink for' => '99999999999999999999999999999999'
 					],
@@ -666,7 +650,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => 'test',
 						'On status change triggers blink for' => 'test'
@@ -681,7 +665,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => '!@#$%^&*()_+',
 						'On status change triggers blink for' => '!@#$%^&*()_+',
@@ -716,7 +700,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => '',
 						'On status change triggers blink for' => '',
@@ -763,7 +747,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => '-1',
 						'On status change triggers blink for' => '-1',
@@ -797,9 +781,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #28 Trimming spaces.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'trim' => true,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '   25m   ',
 						'On status change triggers blink for' => '   12m   ',
 						'Not classified' => '   Test Not classified     ',
