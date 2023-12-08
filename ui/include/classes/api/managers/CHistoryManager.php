@@ -1515,7 +1515,6 @@ class CHistoryManager {
 						}
 					}
 				}
-
 			}
 		}
 
