@@ -333,101 +333,13 @@ class CScript extends CApiService {
 
 		// Populate name, type and scope.
 		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'scope']);
+		self::addFieldsDataByType($scripts, $db_scripts);
 
 		$api_input_rules = self::getValidationRules('update');
 
 		if (!CApiInputValidator::validate($api_input_rules, $scripts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		// Validate each script depending on changes made. Add required flags or set value from DB.
-		foreach ($scripts as $index => &$script) {
-			$db_script = $db_scripts[$script['scriptid']];
-
-			$api_input_rules = self::getValidationRules('update');
-			$api_input_rules['type'] = API_OBJECT;
-
-			if ($script['type'] != $db_script['type']) {
-				// If type changed from something to SSH or TELNET then username is required.
-				if ($db_script['type'] != ZBX_SCRIPT_TYPE_TELNET && $db_script['type'] != ZBX_SCRIPT_TYPE_SSH
-						&& ($script['type'] == ZBX_SCRIPT_TYPE_TELNET || $script['type'] == ZBX_SCRIPT_TYPE_SSH)) {
-					$api_input_rules['fields']['username']['rules'][0]['flags'] |= API_REQUIRED;
-				}
-
-				// If type changed to URL, require "url" or if type changed to another type, require "command".
-				if ($db_script['type'] == ZBX_SCRIPT_TYPE_URL && $script['type'] != ZBX_SCRIPT_TYPE_URL) {
-					$api_input_rules['fields']['command']['rules'][0]['flags'] |= API_REQUIRED;
-				}
-				elseif ($db_script['type'] != ZBX_SCRIPT_TYPE_URL && $script['type'] == ZBX_SCRIPT_TYPE_URL) {
-					$api_input_rules['fields']['url']['rules'][0]['flags'] |= API_REQUIRED;
-					$api_input_rules['fields']['new_window']['rules'][0]['default'] =
-						DB::getDefault('scripts', 'new_window');
-				}
-			}
-
-			// If type is SSH and new "authtype" is set to public key, require "publickey" and "privatekey".
-			if ($script['type'] == ZBX_SCRIPT_TYPE_SSH) {
-				if (array_key_exists('authtype', $script)) {
-					if ($script['authtype'] != $db_script['authtype']
-							&& $script['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-						$api_input_rules['fields']['publickey']['rules'][0]['rules'][0]['flags'] |= API_REQUIRED;
-						$api_input_rules['fields']['privatekey']['rules'][0]['rules'][0]['flags'] |= API_REQUIRED;
-					}
-				}
-				else {
-					$script += ['authtype' => $db_script['authtype']];
-				}
-			}
-
-			// For host and event scope, check "manualinput" and "manualinput_validator_type" changes.
-			if ($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
-				if (array_key_exists('manualinput', $script) && $script['manualinput'] != $db_script['manualinput']
-						&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-					$api_input_rules['fields']['manualinput_prompt']['rules'][0]['rules'][0]['flags'] |= API_REQUIRED;
-					$api_input_rules['fields']['manualinput_validator']['rules'][0]['rules'][0]['rules'][0]['flags']
-						|= API_REQUIRED;
-					$api_input_rules['fields']['manualinput_validator']['rules'][0]['rules'][0]['rules'][1]['flags']
-						|= API_REQUIRED;
-					$api_input_rules['fields']['manualinput_default_value']['rules'][0]['rules'][0]['rules'][0]['flags']
-						= API_REQUIRED;
-
-					$api_input_rules['fields']['manualinput_validator_type']['rules'][0]['rules'][0]['default'] =
-						DB::getDefault('scripts', 'manualinput_validator_type');
-				}
-				elseif (!array_key_exists('manualinput', $script)
-						|| $script['manualinput'] == $db_script['manualinput']) {
-					if (!array_key_exists('manualinput', $script)) {
-						$script['manualinput'] = $db_script['manualinput'];
-					}
-
-					if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-						if (array_key_exists('manualinput_validator_type', $script)
-								&& $script['manualinput_validator_type'] != $db_script['manualinput_validator_type']
-								&& $script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
-							$default_value = &$api_input_rules['fields']['manualinput_default_value'];
-							$default_value['rules'][0]['rules'][0]['rules'][0]['flags'] = API_REQUIRED;
-						}
-						elseif (!array_key_exists('manualinput_validator_type', $script)
-								|| $script['manualinput_validator_type'] == $db_script['manualinput_validator_type']) {
-							if (!array_key_exists('manualinput_validator_type', $script)) {
-								$script['manualinput_validator_type'] = $db_script['manualinput_validator_type'];
-							}
-
-							if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
-								$script += ['manualinput_default_value' => $db_script['manualinput_default_value']];
-							}
-						}
-
-						$script += ['manualinput_validator' => $db_script['manualinput_validator']];
-					}
-				}
-			}
-
-			if (!CApiInputValidator::validate($api_input_rules, $script, '/'.($index + 1), $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
-		unset($script);
 
 		self::checkUniqueness($scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
@@ -436,6 +348,62 @@ class CScript extends CApiService {
 		$this->checkHostGroups($scripts);
 		self::checkManualInput($scripts);
 		self::checkActions($scripts, $db_scripts);
+	}
+
+	/**
+	 * Add values from the database as a result of changes ot the dependent field data.
+	 *
+	 * @param array $scripts
+	 * @param array $db_scripts
+	 */
+	private static function addFieldsDataByType(array &$scripts, array $db_scripts): void {
+		foreach ($scripts as &$script) {
+			$db_script = $db_scripts[$script['scriptid']];
+
+			if ($script['type'] != $db_script['type']) {
+				// If type changed to URL, require "url" or if type changed to another type, require "command".
+				if ($db_script['type'] == ZBX_SCRIPT_TYPE_URL) {
+					$script += array_intersect_key($db_script, array_flip(['command']));
+				}
+				elseif ($script['type'] == ZBX_SCRIPT_TYPE_URL) {
+					$script += array_intersect_key($db_script, array_flip(['url']));
+				}
+
+				// If type changed from something to SSH or TELNET then username is required.
+				if ($script['type'] == ZBX_SCRIPT_TYPE_TELNET || $script['type'] == ZBX_SCRIPT_TYPE_SSH) {
+					$script += array_intersect_key($db_script, array_flip(['username']));
+				}
+			}
+
+			// If type is SSH and new "authtype" is set to public key, require "publickey" and "privatekey".
+			if ($script['type'] == ZBX_SCRIPT_TYPE_SSH) {
+				$script += array_intersect_key($db_script, array_flip(['authtype']));
+
+				if ($script['authtype'] != $db_script['authtype'] && $script['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+					$script += array_intersect_key($db_script, array_flip(['publickey', 'privatekey']));
+				}
+			}
+
+			// For host and event scope, check "manualinput" and "manualinput_validator_type" changes.
+			if ($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
+				$script += array_intersect_key($db_script, array_flip(['manualinput']));
+
+				if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
+					$script += array_intersect_key($db_script, array_flip(['manualinput_validator_type']));
+
+					if ($script['manualinput'] != $db_script['manualinput']) {
+						$script += array_intersect_key($db_script, array_flip(['manualinput_prompt',
+							'manualinput_validator'
+						]));
+					}
+
+					if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
+						$script += array_intersect_key($db_script, array_flip(['manualinput_default_value']));
+					}
+				}
+			}
+		}
+		unset($script);
 	}
 
 	/**
@@ -583,68 +551,68 @@ class CScript extends CApiService {
 			'description' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'description')],
 			'menu_path' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_SCRIPT_MENU_PATH, 'length' => DB::getFieldLength('scripts', 'menu_path')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'menu_path')]
 			]],
 			'usrgrpid' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_ID],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_ID, 'in' => '0']
 			]],
 			'host_access' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'host_access')]
 			]],
 			'confirmation' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'confirmation')]
 			]],
 			'command' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'command')]
 			]],
 			'execute_on' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'execute_on')]
 			]],
 			'port' =>						['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET])], 'type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'port')]
 			]],
 			'authtype' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_SSH], 'type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'authtype')]
 			]],
 			'publickey' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_SSH], 'type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'publickey')],
-													['else' => true, 'type' => API_UNEXPECTED]
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'publickey')]
 												]],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'publickey')]
 			]],
 			'privatekey' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_SSH], 'type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'privatekey')],
-													['else' => true, 'type' => API_UNEXPECTED]
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'privatekey')]
 												]],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'privatekey')]
 			]],
 			'username' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'username')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'username')]
 			]],
 			'password' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'password')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'password')]
 			]],
 			'timeout' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_WEBHOOK], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:'.SEC_PER_MIN],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'timeout')]
 			]],
 			'parameters' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_WEBHOOK], 'type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 													'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('script_param', 'name')],
 													'value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('script_param', 'value')]
 												]],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			/*
 			 * Regardless of "manualinput" value, allow {MANUALINPUT} macro in URL. Otherwise, changing "manualinput" to
@@ -653,40 +621,40 @@ class CScript extends CApiService {
 			 */
 			'url' =>						['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_URL], 'type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_MACRO | API_ALLOW_MANUALINPUT_MACRO, 'length' => DB::getFieldLength('scripts', 'url')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'url')]
 			]],
 			'new_window' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => ZBX_SCRIPT_TYPE_URL], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'new_window')]
 			]],
 			'manualinput' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'manualinput')]
 			]],
 			'manualinput_prompt' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
-													['else' => true, 'type' => API_UNEXPECTED]
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_prompt')]
 												]],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_prompt')]
 			]],
 			'manualinput_validator_type' =>	['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST])],
-													['else' => true, 'type' => API_UNEXPECTED]
+													['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'manualinput_validator_type')]
 												]],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('scripts', 'manualinput_validator_type')]
 			]],
 			'manualinput_validator' =>		['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_MULTIPLE, 'rules' => [
 														['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING], 'type' => API_REGEX, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
 														['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')],
-														['else' => true, 'type' => API_UNEXPECTED]
+														['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_validator')]
 													]],
-													['else' => true, 'type' => API_UNEXPECTED]
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_validator')]
 												]],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_validator')]
 			]],
 			'manualinput_default_value' =>	['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_MULTIPLE, 'rules' => [
@@ -719,16 +687,14 @@ class CScript extends CApiService {
 				|= API_REQUIRED;
 			$api_input_rules['fields']['manualinput_validator']['rules'][0]['rules'][0]['rules'][1]['flags']
 				|= API_REQUIRED;
-			$api_input_rules['fields']['manualinput_default_value']['rules'][0]['rules'][0]['rules'][0]['flags']
-				= API_REQUIRED;
-
-			$api_input_rules['fields']['new_window']['rules'][0]['default'] = DB::getDefault('scripts', 'new_window');
 
 			$api_input_rules['fields']['authtype']['rules'][0]['default'] = DB::getDefault('scripts', 'authtype');
 
 			$api_input_rules['fields']['manualinput']['rules'][0]['default'] = DB::getDefault('scripts', 'manualinput');
 			$api_input_rules['fields']['manualinput_validator_type']['rules'][0]['rules'][0]['default'] =
 				DB::getDefault('scripts', 'manualinput_validator_type');
+			$api_input_rules['fields']['manualinput_default_value']['rules'][0]['rules'][0]['rules'][0]['default'] =
+				DB::getDefault('scripts', 'manualinput_default_value');
 		}
 		else {
 			$api_input_rules['fields']['scriptid'] = ['type' => API_ID];
