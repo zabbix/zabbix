@@ -413,7 +413,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'monitored' => true,
 			'webitems' => true,
 			'filter' => [
-				'name' => $name,
+				'name_resolved' => $name,
 				'status' => ITEM_STATUS_ACTIVE,
 				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null
 			],
@@ -422,13 +422,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		if ($items) {
-			$single_key = reset($items)['key_'];
+			$processed_hostids = [];
 
-			$items = array_filter($items,
-				static function ($item) use ($single_key): bool {
-					return $item['key_'] === $single_key;
+			$items = array_filter($items, static function ($item) use (&$processed_hostids) {
+				if (array_key_exists($item['hostid'], $processed_hostids)) {
+					return false;
 				}
-			);
+
+				$processed_hostids[$item['hostid']] = true;
+
+				return true;
+			});
 		}
 
 		return $items;

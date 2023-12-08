@@ -2819,8 +2819,13 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 			goto unlock;
 		}
 
-		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
-				counterid, datastore->uuid, 1, unit, result)))
+		ds_count++;
+
+		if (0 == strcmp(hv->props[ZBX_VMWARE_HVPROP_MAINTENANCE], "true"))
+			continue;
+
+		if (SYSINFO_RET_OK != vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
+				counterid, datastore->uuid, 1, unit, result))
 		{
 			char	*err, *msg = *ZBX_GET_MSG_RESULT(result);
 
@@ -2832,8 +2837,6 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 			SET_MSG_RESULT(result, err);
 			goto unlock;
 		}
-
-		ds_count++;
 
 		if (0 == ZBX_ISSET_VALUE(result))
 			continue;
@@ -2859,6 +2862,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		value = value / count;
 
 	SET_UI64_RESULT(result, value);
+	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4416,11 +4420,11 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_close(&json_data);
 			zbx_json_addarray(&json_data, "net_if");
 
-			for (i = 0; i < vm->devs.values_num; i++)
+			for (j = 0; j < vm->devs.values_num; j++)
 			{
 				zbx_vmware_dev_t	*dev;
 
-				dev = (zbx_vmware_dev_t *)vm->devs.values[i];
+				dev = (zbx_vmware_dev_t *)vm->devs.values[j];
 
 				if (ZBX_VMWARE_DEV_TYPE_NIC != dev->type)
 					continue;

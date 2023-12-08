@@ -234,6 +234,8 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 		const char *tz);
 /* interval END */
 
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
+
 /* condition operators */
 #define ZBX_CONDITION_OPERATOR_EQUAL		0
 #define ZBX_CONDITION_OPERATOR_NOT_EQUAL		1
@@ -249,5 +251,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 #define ZBX_CONDITION_OPERATOR_NO			11
 #define ZBX_CONDITION_OPERATOR_EXIST		12
 #define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
+
+int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
 
 #endif /* ZABBIX_EXPR_H */

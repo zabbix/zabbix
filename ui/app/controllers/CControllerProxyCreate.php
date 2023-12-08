@@ -67,7 +67,7 @@ class CControllerProxyCreate extends CController {
 				case PROXY_OPERATING_MODE_ACTIVE:
 					if (!$this->hasInput('tls_accept_none') && !$this->hasInput('tls_accept_psk')
 							&& !$this->hasInput('tls_accept_certificate')) {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'),
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'),
 							_('cannot be empty')
 						));
 
@@ -78,15 +78,13 @@ class CControllerProxyCreate extends CController {
 
 				case PROXY_OPERATING_MODE_PASSIVE:
 					if ($this->getInput('address', '')	== '') {
-						info(
-							_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty'))
-						);
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty')));
 
 						$ret = false;
 					}
 
 					if ($this->getInput('port', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
 
 						$ret = false;
 					}
@@ -95,17 +93,18 @@ class CControllerProxyCreate extends CController {
 			}
 
 			if (!$this->getInput('clone_psk')) {
-				if (($this->getInput('operating_mode') == PROXY_OPERATING_MODE_ACTIVE && $this->hasInput('tls_accept_psk'))
+				if (($this->getInput('operating_mode') == PROXY_OPERATING_MODE_ACTIVE
+							&& $this->hasInput('tls_accept_psk'))
 						|| ($this->getInput('operating_mode') == PROXY_OPERATING_MODE_PASSIVE
 							&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK)) {
 					if ($this->getInput('tls_psk_identity', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
 
 						$ret = false;
 					}
 
 					if ($this->getInput('tls_psk', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK'), _('cannot be empty')));
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('PSK'), _('cannot be empty')));
 
 						$ret = false;
 					}
@@ -134,7 +133,7 @@ class CControllerProxyCreate extends CController {
 				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
 				foreach ($validator->getAllErrors() as $error) {
-					info($error);
+					error($error);
 				}
 
 				$ret = !$validator->isErrorFatal() && !$validator->isError();

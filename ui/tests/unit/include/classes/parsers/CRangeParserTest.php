@@ -146,6 +146,22 @@ class CRangeParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M}.regsub("^([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}',
+					'range' => ['{{$M}.regsub("^([0-9]+)", \1)}']
+				]
+			],
+			[
+				'{{$M: "context"}.regsub("^([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M: "context"}.regsub("^([0-9]+)", \1)}',
+					'range' => ['{{$M: "context"}.regsub("^([0-9]+)", \1)}']
+				]
+			],
+			[
 				'{$M}  -100  ', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

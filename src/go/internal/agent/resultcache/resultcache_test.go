@@ -36,7 +36,7 @@ type mockWriter struct {
 	t       *testing.T
 }
 
-func (w *mockWriter) Write(data []byte, timeout time.Duration) (err []error) {
+func (w *mockWriter) Write(data []byte, timeout time.Duration) (upload bool, err []error) {
 	log.Debugf("%s", string(data))
 	if w.counter&1 != 0 {
 		err = []error{errors.New("mock error")}
@@ -51,7 +51,7 @@ func (w *mockWriter) Write(data []byte, timeout time.Duration) (err []error) {
 			w.lastid++
 		}
 	}
-
+	upload = true
 	w.counter++
 	return
 }

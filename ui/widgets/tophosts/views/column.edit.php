@@ -95,6 +95,7 @@ $parameters = [
 
 if ($data['templateid'] === '') {
 	$parameters['real_hosts'] = 1;
+	$parameters['resolve_macros'] = 1;
 }
 else {
 	$parameters += [
