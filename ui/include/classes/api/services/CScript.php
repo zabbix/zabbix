@@ -389,12 +389,12 @@ class CScript extends CApiService {
 				$script += array_intersect_key($db_script, array_flip(['manualinput']));
 
 				if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-					$script += array_intersect_key($db_script, array_flip(['manualinput_validator_type']));
+					$script += array_intersect_key($db_script, array_flip(['manualinput_validator_type',
+						'manualinput_validator'
+					]));
 
 					if ($script['manualinput'] != $db_script['manualinput']) {
-						$script += array_intersect_key($db_script, array_flip(['manualinput_prompt',
-							'manualinput_validator'
-						]));
+						$script += array_intersect_key($db_script, array_flip(['manualinput_prompt']));
 					}
 
 					if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
