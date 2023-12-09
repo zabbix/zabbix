@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/triggers.inc.php';
 require_once dirname(__FILE__).'/../../include/translateDefines.inc.php';
 
 /**
- * @backup ids, scripts, globalmacro
+ * @backup ids
  * @onBefore prepareScriptsData
  * @onAfter clearData
  */
