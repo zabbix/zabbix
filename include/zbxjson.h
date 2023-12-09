@@ -290,11 +290,15 @@ struct zbx_json
 	int			level;
 };
 
+typedef struct zbx_json zbx_json_t;
+
 struct zbx_json_parse
 {
 	const char		*start;
 	const char		*end;
 };
+
+typedef struct zbx_json_parse zbx_json_parse_t;
 
 const char	*zbx_json_strerror(void);
 
