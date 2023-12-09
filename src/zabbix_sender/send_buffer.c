@@ -89,6 +89,7 @@ void	sb_destroy(zbx_send_buffer_t *buf)
 
 	zbx_free(buf->key);
 	zbx_free(buf->value);
+	zbx_free(buf->host);
 }
 
 /******************************************************************************
@@ -258,6 +259,7 @@ int	sb_parse_line(zbx_send_buffer_t *buf, const char *line, size_t line_alloc, i
 	else if ('\0' != *p)
 	{
 		*error = zbx_strdup(NULL, "too many parameters");
+		return FAIL;
 	}
 
 	zbx_send_batch_t	*batch;

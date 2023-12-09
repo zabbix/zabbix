@@ -1605,7 +1605,7 @@ int	main(int argc, char **argv)
 
 			if (FAIL == sb_parse_line(&send_buffer, in_line, in_line_alloc, send_mode, &out, &error))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "[line %d] %s", error);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] %s", total_count, error);
 				zbx_free(error);
 				break;
 			}
