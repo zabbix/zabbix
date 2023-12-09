@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/triggers.inc.php';
 require_once dirname(__FILE__).'/../../include/translateDefines.inc.php';
 
 /**
- * @backup ids
+ * @backup ids, scripts, globalmacro
  * @onBefore prepareScriptsData
  * @onAfter clearData
  */
@@ -1412,6 +1412,7 @@ class testScripts extends CAPITest {
 			// Check script type.
 			'Test script.create missing type' => [
 				'script' => [
+					'scope' => 1,
 					'name' => 'API create script'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
@@ -1419,6 +1420,7 @@ class testScripts extends CAPITest {
 			'Test script.create invalid type (empty string)' => [
 				'script' => [
 					'name' => 'API create script',
+					'scope' => 1,
 					'type' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
@@ -1426,6 +1428,7 @@ class testScripts extends CAPITest {
 			'Test script.create invalid type (string)' => [
 				'script' => [
 					'name' => 'API create script',
+					'scope' => 1,
 					'type' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
@@ -1433,12 +1436,10 @@ class testScripts extends CAPITest {
 			'Test script.create invalid type' => [
 				'script' => [
 					'name' => 'API create script',
+					'scope' => 1,
 					'type' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
-						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL
-					]).'.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 2, 3, 5.'
 			],
 
 			// Check scope.
@@ -1471,17 +1472,15 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'scope' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
+				'expected_error' => 'Invalid parameter "/1/scope": value must be one of 1, 2, 4.'
 			],
-			'Test script.create invalid scope for URL type script' => [
+			'Test script.create invalid type for action scope' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_URL,
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION
 				],
-				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 2, 3, 5.'
 			],
 
 			// Check script command.
@@ -1578,7 +1577,7 @@ class testScripts extends CAPITest {
 					'url' => 'http://localhost/',
 					'command' => 'reboot server'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "command".'
+				'expected_error' => 'Invalid parameter "/1/command": value must be empty.'
 			],
 
 			// Check "url".
@@ -1625,7 +1624,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'url' => 'http://localhost/'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "url".'
+				'expected_error' => 'Invalid parameter "/1/url": value must be empty.'
 			],
 			'Test script.create unexpected URL for IPMI type script' => [
 				'script' => [
@@ -1635,7 +1634,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'url' => 'http://localhost/'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "url".'
+				'expected_error' => 'Invalid parameter "/1/url": value must be empty.'
 			],
 			'Test script.create unexpected URL for SSH type script' => [
 				'script' => [
@@ -1646,7 +1645,7 @@ class testScripts extends CAPITest {
 					'username' => 'username',
 					'url' => 'http://localhost/'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "url".'
+				'expected_error' => 'Invalid parameter "/1/url": value must be empty.'
 			],
 			'Test script.create unexpected URL for Telnet type script' => [
 				'script' => [
@@ -1657,7 +1656,7 @@ class testScripts extends CAPITest {
 					'username' => 'username',
 					'url' => 'http://localhost/'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "url".'
+				'expected_error' => 'Invalid parameter "/1/url": value must be empty.'
 			],
 			'Test script.create unexpected URL for Webhook type script' => [
 				'script' => [
@@ -1667,7 +1666,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'url' => 'http://localhost/'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "url".'
+				'expected_error' => 'Invalid parameter "/1/url": value must be empty.'
 			],
 
 			// Check script name.
@@ -1794,7 +1793,7 @@ class testScripts extends CAPITest {
 						'command' => 'reboot server'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, /folder1/folder2) already exists.'
 			],
 			'Test script.create duplicate name with custom same menu_path in input with trailing slash' => [
 				'script' => [
@@ -1813,7 +1812,7 @@ class testScripts extends CAPITest {
 						'command' => 'reboot server'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2/) already exists.'
 			],
 			'Test script.create duplicate name with custom same menu_path in input with both leading and trailing slashes' => [
 				'script' => [
@@ -1832,7 +1831,7 @@ class testScripts extends CAPITest {
 						'command' => 'reboot server'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, /folder1/folder2/) already exists.'
 			],
 
 			// Check script menu path.
@@ -1856,16 +1855,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
 			],
-			'Test script.create unexpected "menu_path" field for action scope (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'menu_path' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
-			],
 			'Test script.create unexpected "menu_path" field for action scope' => [
 				'script' => [
 					'name' => 'API create script',
@@ -1874,20 +1863,10 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'menu_path' => 'folder1/folder2/'.'/folder4'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+				'expected_error' => 'Invalid parameter "/1/menu_path": value must be empty.'
 			],
 
 			// Check script host access.
-			'Test script.create unexpected "host_access" field for action scope (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'host_access' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
-			],
 			'Test script.create unexpected "host_access" field for action scope' => [
 				'script' => [
 					'name' => 'API create script',
@@ -1896,17 +1875,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
-			],
-			'Test script.create invalid "host_access" field for host scope (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_HOST,
-					'command' => 'reboot server',
-					'host_access' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be 2.'
 			],
 			'Test script.create invalid "host_access" field for host scope (string)' => [
 				'script' => [
@@ -1926,28 +1895,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
-					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
-			],
-			'Test script.create invalid "host_access" field for event scope (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
-					'command' => 'reboot server',
-					'host_access' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
-			],
-			'Test script.create invalid "host_access" field for event scope (string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
-					'command' => 'reboot server',
-					'host_access' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of 2, 3.'
 			],
 			'Test script.create invalid "host_access" field event scope' => [
 				'script' => [
@@ -1957,31 +1905,10 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
-					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of 2, 3.'
 			],
 
 			// Check script user group.
-			'Test script.create unexpected "usrgrpid" field for action scope (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'usrgrpid' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
-			],
-			'Test script.create unexpected "usrgrpid" field for action scope' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'usrgrpid' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
-			],
 			'Test script.create invalid "usrgrpid" field for host scope (empty string)' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2002,16 +1929,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'User group with ID "999999" is not available.'
 			],
-			'Test script.create invalid "usrgrpid" field for event scope (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
-					'command' => 'reboot server',
-					'usrgrpid' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
-			],
 			'Test script.create invalid "usrgrpid" field for event scope' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2021,18 +1938,6 @@ class testScripts extends CAPITest {
 					'usrgrpid' => 999999
 				],
 				'expected_error' => 'User group with ID "999999" is not available.'
-			],
-
-			// Check script confirmation.
-			'Test script.create unexpected confirmation for action scope' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'confirmation' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
 			],
 
 			// Check script host group.
@@ -2070,16 +1975,6 @@ class testScripts extends CAPITest {
 			],
 
 			// Check script execute_on.
-			'Test script.create invalid "execute_on" field (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'execute_on' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
-			],
 			'Test script.create invalid "execute_on" field (string)' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2098,20 +1993,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
-						ZBX_SCRIPT_EXECUTE_ON_PROXY
-					]).'.'
-			],
-			'Test script.create unexpected "execute_on" field for IPMI type script (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_IPMI,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'execute_on' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of 0, 1, 2.'
 			],
 			'Test script.create unexpected "execute_on" field for IPMI type script' => [
 				'script' => [
@@ -2121,7 +2003,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.create unexpected "execute_on" field for SSH type script' => [
 				'script' => [
@@ -2131,7 +2013,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.create unexpected "execute_on" field for Telnet type script' => [
 				'script' => [
@@ -2141,7 +2023,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.create unexpected "execute_on" field for Webhook type script' => [
 				'script' => [
@@ -2151,7 +2033,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.create unexpected "execute_on" field for URL type script' => [
 				'script' => [
@@ -2161,7 +2043,7 @@ class testScripts extends CAPITest {
 					'url' => 'http://localhost/',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 
 			// Check script port.
@@ -2185,56 +2067,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
 					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
-			],
-			'Test script.create unexpected port field for custom type script (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'port' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
-			],
-			'Test script.create unexpected port field for custom type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'port' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
-			],
-			'Test script.create unexpected port field for IPMI type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_IPMI,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'port' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
-			],
-			'Test script.create unexpected port field for Webhook type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'port' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
-			],
-			'Test script.create unexpected port field for URL type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_URL,
-					'scope' => ZBX_SCRIPT_SCOPE_HOST,
-					'url' => 'http://localhost/',
-					'port' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
 			],
 
 			// Check script auth type.
@@ -2266,68 +2098,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'authtype' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
-					implode(', ', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]).'.'
-			],
-			'Test script.create unexpected authtype field for custom type script (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'authtype' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
-			],
-			'Test script.create unexpected "authtype" field for custom type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
-			],
-			'Test script.create unexpected "authtype" field for IPMI type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_IPMI,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
-			],
-			'Test script.create unexpected "authtype" field for Telnet type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_TELNET,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
-			],
-			'Test script.create unexpected "authtype" field for Webhook type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
-			],
-			'Test script.create unexpected "authtype" field for URL type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_URL,
-					'scope' => ZBX_SCRIPT_SCOPE_HOST,
-					'url' => 'http://localhost/',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of 0, 1.'
 			],
 
 			// Check script username.
@@ -2369,16 +2140,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
 			],
-			'Test script.create unexpected username for custom type script (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'username' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
-			],
 			'Test script.create unexpected username for custom type script' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2387,7 +2148,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 			'Test script.create unexpected username for IPMI type script' => [
 				'script' => [
@@ -2397,7 +2158,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 			'Test script.create unexpected username for Webhook type script' => [
 				'script' => [
@@ -2407,7 +2168,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 			'Test script.create unexpected username for URL type script' => [
 				'script' => [
@@ -2417,20 +2178,10 @@ class testScripts extends CAPITest {
 					'url' => 'http://localhost/',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 
 			// Check script password.
-			'Test script.create unexpected password for custom type script (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'password' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
-			],
 			'Test script.create unexpected password for custom type script' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2439,7 +2190,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 			'Test script.create unexpected password for IPMI type script' => [
 				'script' => [
@@ -2449,7 +2200,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 			'Test script.create unexpected password for Webhook type script' => [
 				'script' => [
@@ -2459,7 +2210,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 			'Test script.create unexpected password for URL type script' => [
 				'script' => [
@@ -2469,7 +2220,7 @@ class testScripts extends CAPITest {
 					'url' => 'http://localhost/',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 
 			// Check script public key.
@@ -2496,16 +2247,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/publickey": cannot be empty.'
 			],
-			'Test script.create unexpected "publickey" field for custom type script (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'publickey' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
-			],
 			'Test script.create unexpected "publickey" field for custom type script' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2514,7 +2255,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.create unexpected "publickey" field for IPMI type script' => [
 				'script' => [
@@ -2524,7 +2265,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.create unexpected "publickey" field for Telnet type script' => [
 				'script' => [
@@ -2534,7 +2275,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.create unexpected "publickey" field for Webhook type script' => [
 				'script' => [
@@ -2544,7 +2285,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.create unexpected "publickey" field for URL type script' => [
 				'script' => [
@@ -2554,7 +2295,7 @@ class testScripts extends CAPITest {
 					'url' => 'http://localhost/',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 
 			// Check script private key.
@@ -2583,16 +2324,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/privatekey": cannot be empty.'
 			],
-			'Test script.create unexpected "privatekey" field for custom type script (empty string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'privatekey' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
-			],
 			'Test script.create unexpected "privatekey" field for custom type script' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2601,7 +2332,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.create unexpected "privatekey" field for IPMI type script' => [
 				'script' => [
@@ -2611,7 +2342,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.create unexpected "privatekey" field for Telnet type script' => [
 				'script' => [
@@ -2621,7 +2352,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.create unexpected "privatekey" field for Webhook type script' => [
 				'script' => [
@@ -2631,7 +2362,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.create unexpected "privatekey" field for URL type script' => [
 				'script' => [
@@ -2641,7 +2372,7 @@ class testScripts extends CAPITest {
 					'url' => 'http://localhost/',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 
 			// Check script timeout.
@@ -2673,17 +2404,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'timeout' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
-			],
-			'Test script.create unexpected timeout for custom type script' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'timeout' => '30s'
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.create unexpected timeout for IPMI type script' => [
 				'script' => [
@@ -2691,9 +2412,9 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_IPMI,
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'command' => 'reboot server',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.create unexpected timeout for SSH type script' => [
 				'script' => [
@@ -2702,9 +2423,9 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'command' => 'reboot server',
 					'username' => 'username',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.create unexpected timeout for Telnet type script' => [
 				'script' => [
@@ -2713,9 +2434,9 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'command' => 'reboot server',
 					'username' => 'username',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.create unexpected timeout for URL type script' => [
 				'script' => [
@@ -2723,9 +2444,9 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_URL,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'url' => 'http://localhost/',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 
 			// Check script parameters.
@@ -2792,16 +2513,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/parameters/2": value (name)=(param1) already exists.'
 			],
-			'Test script.create unexpected parameters for custom type script (empty array)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'parameters' => []
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
-			],
 			'Test script.create unexpected parameters for custom type script (empty sub-params)' => [
 				'script' => [
 					'name' => 'API create script',
@@ -2810,7 +2521,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'parameters' => [[]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.create unexpected parameters for custom type script (string)' => [
 				'script' => [
@@ -2820,7 +2531,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'parameters' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
 			],
 			'Test script.create unexpected parameters for custom type script' => [
 				'script' => [
@@ -2833,7 +2544,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.create unexpected parameters for IPMI type script' => [
 				'script' => [
@@ -2846,7 +2557,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.create unexpected parameters for SSH type script' => [
 				'script' => [
@@ -2860,7 +2571,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.create unexpected parameters for Telnet type script' => [
 				'script' => [
@@ -2874,7 +2585,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.create unexpected parameters for URL type script' => [
 				'script' => [
@@ -2887,7 +2598,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 
 			// Check "new_window".
@@ -2919,8 +2630,7 @@ class testScripts extends CAPITest {
 					'url' => 'http://localhost/',
 					'new_window' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/new_window": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]).'.'
+				'expected_error' => 'Invalid parameter "/1/new_window": value must be one of 0, 1.'
 			],
 			'Test script.create unexpected "new_window" field for custom type script' => [
 				'script' => [
@@ -2930,7 +2640,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "new_window".'
+				'expected_error' => 'Invalid parameter "/1/new_window": value must be 1.'
 			],
 			'Test script.create unexpected "new_window" field for IPMI type script' => [
 				'script' => [
@@ -2940,7 +2650,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "new_window".'
+				'expected_error' => 'Invalid parameter "/1/new_window": value must be 1.'
 			],
 			'Test script.create unexpected "new_window" field for SSH type script' => [
 				'script' => [
@@ -2951,7 +2661,7 @@ class testScripts extends CAPITest {
 					'username' => 'John',
 					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "new_window".'
+				'expected_error' => 'Invalid parameter "/1/new_window": value must be 1.'
 			],
 			'Test script.create unexpected "new_window" field for Telnet type script' => [
 				'script' => [
@@ -2962,7 +2672,7 @@ class testScripts extends CAPITest {
 					'username' => 'John',
 					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "new_window".'
+				'expected_error' => 'Invalid parameter "/1/new_window": value must be 1.'
 			],
 			'Test script.create unexpected "new_window" field for Webhook type script' => [
 				'script' => [
@@ -2972,7 +2682,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "new_window".'
+				'expected_error' => 'Invalid parameter "/1/new_window": value must be 1.'
 			],
 
 			// Check "manualinput" fields.
@@ -2984,7 +2694,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+				'expected_error' => 'Invalid parameter "/1/manualinput": value must be 0.'
 			],
 			'Test script.create unexpected "manualinput_prompt" field for action scope' => [
 				'script' => [
@@ -2994,37 +2704,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_prompt' => 'prompt text'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
-			],
-			'Test script.create unexpected "manualinput_validator_type" field for action scope' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
-			],
-			'Test script.create unexpected "manualinput_validator" field for action scope' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'manualinput_validator' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
-			],
-			'Test script.create unexpected "manualinput_default_value" field for action scope' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server',
-					'manualinput_default_value' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": value must be empty.'
 			],
 			'Test script.create unexpected "manualinput_prompt" field when "manualinput" is disabled' => [
 				'script' => [
@@ -3035,7 +2715,7 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
 					'manualinput_prompt' => 'manualinput prompt text'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": value must be empty.'
 			],
 			'Test script.create unexpected "manualinput_validator_type" field when "manualinput" is disabled' => [
 				'script' => [
@@ -3046,7 +2726,7 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be 0.'
 			],
 			'Test script.create unexpected "manualinput_default_value" field when "manualinput" is disabled' => [
 				'script' => [
@@ -3068,7 +2748,7 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
 					'manualinput_validator' => 'regular expression'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": value must be empty.'
 			],
 			'Test script.create unexpected "manualinput_default_value" field when "manualinput" type is set to dropdown' => [
 				'script' => [
@@ -3174,7 +2854,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '',
 					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.'
 			],
 			'Test script.create "manualinput_validator" field empty when "manualinput_validator_type" is list' => [
 				'script' => [
@@ -3230,7 +2910,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '[[[[[',
 					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[[": "Compilation failed: missing terminating ] for character class at offset 5".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": invalid regular expression.'
 			],
 			'Test script.create "manualinput_validator" field for input type string (invalid regular expression - no closing parenthesis)' => [
 				'script' => [
@@ -3244,7 +2924,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => 'asd(',
 					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "asd(": "Compilation failed: missing closing parenthesis at offset 4".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": invalid regular expression.'
 			],
 			'Test script.create "manualinput_default_value" field does not match "manualinput_validator" field' => [
 				'script' => [
@@ -3258,7 +2938,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '\btest\b',
 					'manualinput_default_value' => '123'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: \btest\b.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: \btest\b.'
 			],
 			'Test script.create "manualinput_validator" field duplicate entries (empty strings)' => [
 				'script' => [
@@ -3271,7 +2951,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,,2,3,'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": values must be unique.'
 			],
 			'Test script.create "manualinput_validator" field duplicate entries' => [
 				'script' => [
@@ -3284,7 +2964,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,2,3,3'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": values must be unique.'
 			],
 			'Test script.create invalid "manualinput" field value' => [
 				'script' => [
@@ -3294,8 +2974,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]).'.'
+				'expected_error' => 'Invalid parameter "/1/manualinput": value must be one of 0, 1.'
 			],
 			'Test script.create invalid "manualinput_validator_type" field value' => [
 				'script' => [
@@ -3307,28 +2986,7 @@ class testScripts extends CAPITest {
 					'manualinput_prompt' => 'abc',
 					'manualinput_validator_type' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING, ZBX_SCRIPT_MANUALINPUT_TYPE_LIST]).'.'
-			],
-			'Test script.create unexpected "manualinput_prompt" field value for host scope' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_HOST,
-					'command' => 'reboot server',
-					'manualinput_prompt' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
-			],
-			'Test script.create unexpected "manualinput_validator_type" field value for host scope' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_HOST,
-					'command' => 'reboot server',
-					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be one of 0, 1.'
 			],
 			'Test script.create unexpected "manualinput_validator" field value for host scope' => [
 				'script' => [
@@ -3338,7 +2996,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_validator' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": value must be empty.'
 			],
 			'Test script.create unexpected "manualinput_default_value" field value for host scope' => [
 				'script' => [
@@ -3368,7 +3026,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_prompt' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": a character string is expected.'
 			],
 			'Test script.create invalid "manualinput_validator_type" field type for host scope' => [
 				'script' => [
@@ -3378,7 +3036,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_validator_type' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": an integer is expected.'
 			],
 			'Test script.create invalid "manualinput_validator" field type for host scope' => [
 				'script' => [
@@ -3388,7 +3046,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_validator' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
 			],
 			'Test script.create unexpected "manualinput_default_value" field for host scope' => [
 				'script' => [
@@ -5384,7 +5042,7 @@ class testScripts extends CAPITest {
 						'name' => 'Script with same name'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, /folder1/folder2) already exists.'
 			],
 			'Test script.update duplicate name with custom same menu_path in input with trailing slash' => [
 				'script' => [
@@ -5399,7 +5057,7 @@ class testScripts extends CAPITest {
 						'name' => 'Script with same name'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2/) already exists.'
 			],
 			'Test script.update duplicate name with custom same menu_path in input with both leading and trailing slashes' => [
 				'script' => [
@@ -5414,7 +5072,7 @@ class testScripts extends CAPITest {
 						'name' => 'Script with same name'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, /folder1/folder2/) already exists.'
 			],
 
 			// Check script command.
@@ -5446,18 +5104,15 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ipmi_action',
 					'type' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
-						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL
-					]).'.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 2, 3, 5.'
 			],
 			'Test script.update invalid type for wrong scope' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
+					'scope' => 1,
 					'type' => ZBX_SCRIPT_TYPE_URL
 				],
-				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 2, 3, 5.'
 			],
 
 			// Check script scope.
@@ -5480,15 +5135,14 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ipmi_action',
 					'scope' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
+				'expected_error' => 'Invalid parameter "/1/scope": value must be one of 1, 2, 4.'
 			],
 			'Test script.update invalid scope for wrong type' => [
 				'script' => [
 					'scriptid' => 'update_url',
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 2, 3, 5.'
 			],
 			'Test script.update scope change assigned to action' => [
 				'script' => [
@@ -5504,7 +5158,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ipmi_action',
 					'menu_path' => 'folder1/folder2/'.'/folder4'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+				'expected_error' => 'Invalid parameter "/1/menu_path": value must be empty.'
 			],
 			'Test script.update invalid "menu_path" field' => [
 				'script' => [
@@ -5519,20 +5173,13 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'menu_path' => 'folder1/folder2/'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+				'expected_error' => 'Invalid parameter "/1/menu_path": value must be empty.'
 			],
 
 			// Check script host access.
 			'Test script.update unexpected "host_access" field for action scope (empty string)' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
-					'host_access' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
-			],
-			'Test script.update invalid "host_access" field (empty string)' => [
-				'script' => [
-					'scriptid' => 'update_ipmi_host',
 					'host_access' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
@@ -5549,8 +5196,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ipmi_host',
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
-					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of 2, 3.'
 			],
 
 			// Check script user group.
@@ -5559,14 +5205,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ipmi_action',
 					'usrgrpid' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
-			],
-			'Test script.update unexpected "usrgrpid" field for action scope (int)' => [
-				'script' => [
-					'scriptid' => 'update_ipmi_action',
-					'usrgrpid' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			'Test script.update invalid "usrgrpid" field for host scope (empty string)' => [
 				'script' => [
@@ -5587,9 +5226,9 @@ class testScripts extends CAPITest {
 			'Test script.update unexpected "confirmation" for action scope' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
-					'confirmation' => ''
+					'confirmation' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+				'expected_error' => 'Invalid parameter "/1/confirmation": value must be empty.'
 			],
 
 			// Check script host group.
@@ -5618,13 +5257,6 @@ class testScripts extends CAPITest {
 			],
 
 			// Check script execute_on.
-			'Test script.update invalid "execute_on" field (empty string)' => [
-				'script' => [
-					'scriptid' => 'update_custom',
-					'execute_on' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
-			],
 			'Test script.update invalid "execute_on" field (string)' => [
 				'script' => [
 					'scriptid' => 'update_custom',
@@ -5637,52 +5269,42 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_custom',
 					'execute_on' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
-						ZBX_SCRIPT_EXECUTE_ON_PROXY
-					]).'.'
-			],
-			'Test script.update unexpected "execute_on" field for IPMI type (empty string)' => [
-				'script' => [
-					'scriptid' => 'update_ipmi_action',
-					'execute_on' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of 0, 1, 2.'
 			],
 			'Test script.update unexpected "execute_on" field for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.update unexpected "execute_on" field for SSH type' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.update unexpected "execute_on" field for Telnet type' => [
 				'script' => [
 					'scriptid' => 'update_telnet_host',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.update unexpected "execute_on" field for Webhook type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 			'Test script.update unexpected "execute_on" field for URL type' => [
 				'script' => [
 					'scriptid' => 'update_url',
 					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be 2.'
 			],
 
 			// Check script port.
@@ -5708,40 +5330,33 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
 					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
 			],
-			'Test script.update unexpected port field for custom script type (empty string)' => [
+			'Test script.update unexpected port field for custom script type (string)' => [
 				'script' => [
 					'scriptid' => 'update_custom',
-					'port' => ''
+					'port' => '22'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
-			],
-			'Test script.update unexpected port field for custom script type' => [
-				'script' => [
-					'scriptid' => 'update_custom',
-					'port' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+				'expected_error' => 'Invalid parameter "/1/port": value must be empty.'
 			],
 			'Test script.update unexpected port field for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
-					'port' => 0
+					'port' => '0'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+				'expected_error' => 'Invalid parameter "/1/port": value must be empty.'
 			],
 			'Test script.update unexpected port field for Webhook type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
-					'port' => 0
+					'port' => '0'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+				'expected_error' => 'Invalid parameter "/1/port": value must be empty.'
 			],
 			'Test script.update unexpected port field for URL type' => [
 				'script' => [
 					'scriptid' => 'update_url',
-					'port' => 0
+					'port' => '0'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+				'expected_error' => 'Invalid parameter "/1/port": value must be empty.'
 			],
 
 			// Check script auth type.
@@ -5764,50 +5379,49 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ssh_key',
 					'authtype' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
-					implode(', ', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]).'.'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of 0, 1.'
 			],
 			'Test script.update unexpected "authtype" field for custom script type (empty string)' => [
 				'script' => [
 					'scriptid' => 'update_custom',
 					'authtype' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
 			],
 			'Test script.update unexpected "authtype" field for custom script type' => [
 				'script' => [
 					'scriptid' => 'update_custom',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be 0.'
 			],
 			'Test script.update unexpected "authtype" field for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be 0.'
 			],
 			'Test script.update unexpected "authtype" field for Telnet type' => [
 				'script' => [
 					'scriptid' => 'update_telnet_host',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be 0.'
 			],
 			'Test script.update unexpected "authtype" field for Webhook type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be 0.'
 			],
 			'Test script.update unexpected "authtype" field for URL type' => [
 				'script' => [
 					'scriptid' => 'update_url',
-					'authtype' => ITEM_AUTHTYPE_PASSWORD
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be 0.'
 			],
 
 			// Check script username.
@@ -5825,77 +5439,63 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
 			],
-			'Test script.update unexpected username for custom script type (empty string)' => [
-				'script' => [
-					'scriptid' => 'update_custom',
-					'username' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
-			],
 			'Test script.update unexpected username for custom script type' => [
 				'script' => [
 					'scriptid' => 'update_custom',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 			'Test script.update unexpected username for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 			'Test script.update unexpected username for Webhook type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 			'Test script.update unexpected username for URL type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
 					'username' => 'John'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+				'expected_error' => 'Invalid parameter "/1/username": value must be empty.'
 			],
 
 			// Check script password.
-			'Test script.update unexpected password for custom script type (empty string)' => [
-				'script' => [
-					'scriptid' => 'update_custom',
-					'password' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
-			],
 			'Test script.update unexpected password for custom script type' => [
 				'script' => [
 					'scriptid' => 'update_custom',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 			'Test script.update unexpected password for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 			'Test script.update unexpected password for Webhook type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 			'Test script.update unexpected password for URL type' => [
 				'script' => [
 					'scriptid' => 'update_url',
 					'password' => 'psswd'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+				'expected_error' => 'Invalid parameter "/1/password": value must be empty.'
 			],
 
 			// Check script public key.
@@ -5909,51 +5509,44 @@ class testScripts extends CAPITest {
 			'Test script.update unexpected "publickey" field for SSH password type' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
-					'publickey' => ''
+					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
-			],
-			'Test script.update unexpected "publickey" field for custom script type (empty string)' => [
-				'script' => [
-					'scriptid' => 'update_custom',
-					'publickey' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.update unexpected "publickey" field for custom script type' => [
 				'script' => [
 					'scriptid' => 'update_custom',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.update unexpected "publickey" field for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.update unexpected "publickey" field for Telnet type' => [
 				'script' => [
 					'scriptid' => 'update_telnet_host',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.update unexpected "publickey" field for Webhook type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.update unexpected "publickey" field for URL type' => [
 				'script' => [
 					'scriptid' => 'update_url',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 
 			// Check script private key.
@@ -5967,51 +5560,51 @@ class testScripts extends CAPITest {
 			'Test script.update unexpected "privatekey" field for SSH password type' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
-					'privatekey' => ''
+					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
-			'Test script.update unexpected "privatekey" field for custom script type (empty string)' => [
+			'Test script.update unexpected "privatekey" field for custom script type (string)' => [
 				'script' => [
 					'scriptid' => 'update_custom',
-					'privatekey' => ''
+					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.update unexpected "privatekey" field for custom script type' => [
 				'script' => [
 					'scriptid' => 'update_custom',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.update unexpected "privatekey" field for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.update unexpected "privatekey" field for Telnet type' => [
 				'script' => [
 					'scriptid' => 'update_telnet_host',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.update unexpected "privatekey" field for Webhook type' => [
 				'script' => [
 					'scriptid' => 'update_webhook',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 			'Test script.update unexpected "privatekey" field for URL type' => [
 				'script' => [
 					'scriptid' => 'update_url',
 					'privatekey' => 'secretprivkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+				'expected_error' => 'Invalid parameter "/1/privatekey": value must be empty.'
 			],
 
 			// Check script timeout.
@@ -6034,42 +5627,42 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_custom',
 					'timeout' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.update unexpected timeout field for custom script type' => [
 				'script' => [
 					'scriptid' => 'update_custom',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.update unexpected timeout field for IPMI type' => [
 				'script' => [
 					'scriptid' => 'update_ipmi_action',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.update unexpected timeout field for SSH type' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.update unexpected timeout field for Telnet type' => [
 				'script' => [
 					'scriptid' => 'update_telnet_host',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 			'Test script.update unexpected timeout field for URL type' => [
 				'script' => [
 					'scriptid' => 'update_url',
-					'timeout' => '30s'
+					'timeout' => '5s'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be "30s".'
 			],
 
 			// Check script parameters.
@@ -6105,26 +5698,19 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "value" is missing.'
 			],
-			'Test script.update unexpected parameters for custom script type (empty array)' => [
-				'script' => [
-					'scriptid' => 'update_custom',
-					'parameters' => []
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
-			],
 			'Test script.update unexpected parameters for custom script type (empty sub-params)' => [
 				'script' => [
 					'scriptid' => 'update_custom',
 					'parameters' => [[]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.update unexpected parameters for custom script type (string)' => [
 				'script' => [
 					'scriptid' => 'update_custom',
 					'parameters' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
 			],
 			'Test script.update unexpected parameters for custom script type' => [
 				'script' => [
@@ -6134,7 +5720,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.update unexpected parameters for IPMI type' => [
 				'script' => [
@@ -6144,7 +5730,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.update unexpected parameters for SSH type' => [
 				'script' => [
@@ -6154,7 +5740,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.update unexpected parameters for Telnet type' => [
 				'script' => [
@@ -6164,7 +5750,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 			'Test script.update unexpected parameters for URL type' => [
 				'script' => [
@@ -6174,7 +5760,7 @@ class testScripts extends CAPITest {
 						'value' => 'value1'
 					]]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+				'expected_error' => 'Invalid parameter "/1/parameters": should be empty.'
 			],
 
 			// Check required fields on type change.
@@ -6184,7 +5770,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_SSH,
 					'command' => 'reboot'
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
 			],
 			'Test script.update custom change to SSH (empty username)' => [
 				'script' => [
@@ -6195,16 +5781,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
 			],
-			'Test script.update custom change to SSH (unexpected publickey, empty)' => [
-				'script' => [
-					'scriptid' => 'update_custom',
-					'type' => ZBX_SCRIPT_TYPE_SSH,
-					'command' => 'reboot',
-					'username' => 'John',
-					'publickey' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
-			],
 			'Test script.update custom change to SSH (unexpected publickey)' => [
 				'script' => [
 					'scriptid' => 'update_custom',
@@ -6213,7 +5789,7 @@ class testScripts extends CAPITest {
 					'username' => 'John',
 					'publickey' => 'secretpubkey'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+				'expected_error' => 'Invalid parameter "/1/publickey": value must be empty.'
 			],
 			'Test script.update custom change to SSH (missing publickey)' => [
 				'script' => [
@@ -6223,7 +5799,7 @@ class testScripts extends CAPITest {
 					'username' => 'John',
 					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "publickey" is missing.'
+				'expected_error' => 'Invalid parameter "/1/publickey": cannot be empty.'
 			],
 			'Test script.update custom change to Telnet (missing username)' => [
 				'script' => [
@@ -6231,7 +5807,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_TELNET,
 					'command' => 'reboot'
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
 			],
 			'Test script.update custom change to URL' => [
 				'script' => [
@@ -6239,7 +5815,7 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_URL,
 					'scope' => ZBX_SCRIPT_SCOPE_HOST
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "url" is missing.'
+				'expected_error' => 'Invalid parameter "/1/url": cannot be empty.'
 			],
 			'Test script.update invalid URL (broken manual input macro)' => [
 				'script' => [
@@ -6259,36 +5835,21 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_url',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
+				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
 			],
 			'Test script.update invalid "manualinput" value' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
 					'manualinput' => 99999
 				],
-				'expected_error' => 'Invalid parameter "/1/manualinput": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]).'.'
-			],
-			'Test script.update unexpected "manualinput_prompt" value' => [
-				'script' => [
-					'scriptid' => 'update_manualinput',
-					'manualinput_prompt' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
+				'expected_error' => 'Invalid parameter "/1/manualinput": value must be one of 0, 1.'
 			],
 			'Test script.update unexpected "manualinput_validator_type" value' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
 					'manualinput_validator_type' => 99999
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
-			],
-			'Test script.update unexpected "manualinput_validator" value' => [
-				'script' => [
-					'scriptid' => 'update_manualinput',
-					'manualinput_validator' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be 0.'
 			],
 			'Test script.update unexpected "manualinput_default_value" value' => [
 				'script' => [
@@ -6303,15 +5864,7 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'manualinput' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
-			],
-			'Test script.update unexpected "manualinput_prompt" value for action scope' => [
-				'script' => [
-					'scriptid' => 'update_manualinput',
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'manualinput_prompt' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
+				'expected_error' => 'Invalid parameter "/1/manualinput": value must be 0.'
 			],
 			'Test script.update unexpected "manualinput_validator_type" value for action scope' => [
 				'script' => [
@@ -6319,15 +5872,7 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'manualinput_validator_type' => 9999
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
-			],
-			'Test script.update unexpected "manualinput_validator" value for action scope' => [
-				'script' => [
-					'scriptid' => 'update_manualinput',
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'manualinput_validator' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be 0.'
 			],
 			'Test script.update unexpected "manualinput_default_value" value for action scope' => [
 				'script' => [
@@ -6349,21 +5894,21 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_manualinput',
 					'manualinput_prompt' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_prompt".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": a character string is expected.'
 			],
 			'Test script.update invalid "manualinput_validator_type" value' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
 					'manualinput_validator_type' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator_type".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": an integer is expected.'
 			],
 			'Test script.update invalid "manualinput_validator" value' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
 					'manualinput_validator' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_validator".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": a character string is expected.'
 			],
 			'Test script.update invalid "manualinput_default_value" value' => [
 				'script' => [
@@ -6384,14 +5929,14 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_manualinput_params',
 					'manualinput_validator' => '1,,2,3,'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": values must be unique.'
 			],
 			'Test script.update invalid "manualinput_default_value" value (with repetitive values)' => [
 				'script' => [
 					'scriptid' => 'update_manualinput_params',
 					'manualinput_validator' => '1,1,2,3'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": values must be unique.'
 			],
 			'Test script.update invalid "manualinput_validator" regular expression value (only opening square brackets)' => [
 				'script' => [
@@ -6400,7 +5945,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '[[[[',
 					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[": "Compilation failed: missing terminating ] for character class at offset 4".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": invalid regular expression.'
 			],
 			'Test script.update invalid "manualinput_validator" regular expression value (missing closing parenthesis)' => [
 				'script' => [
@@ -6409,7 +5954,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => 'ab(',
 					'manualinput_default_value' => ''
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "ab(": "Compilation failed: missing closing parenthesis at offset 3".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": invalid regular expression.'
 			],
 			'Test script.update invalid "manualinput_default_value" value (does not match the pattern)' => [
 				'script' => [
@@ -6418,7 +5963,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '\d',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: \d.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: \d.'
 			],
 			'Test script.update invalid "manualinput_default_value" value (no value provided)' => [
 				'script' => [
@@ -6426,7 +5971,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '\d'
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_default_value" is missing.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: \d.'
 			],
 			'Test script.update invalid scope change with "manualinput" parameters' => [
 				'script' => [
@@ -6434,7 +5979,7 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+				'expected_error' => 'Invalid parameter "/1/manualinput": value must be 0.'
 			],
 			'Test script.update unexpected "manualinput" for action scope' => [
 				'script' => [
@@ -6444,7 +5989,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '1,2,3',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput".'
+				'expected_error' => 'Invalid parameter "/1/manualinput": value must be 0.'
 			],
 			'Test script.update incorrect "manualinput_validator" when changing from event scope to action scope' => [
 				'script' => [
@@ -6455,7 +6000,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '[[[[[',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_prompt" is missing.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.'
 			],
 			'Test script.update missing "manualinput_prompt" when changing scope' => [
 				'script' => [
@@ -6465,7 +6010,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,2,3'
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_prompt" is missing.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.'
 			],
 			'Test script.update unexpected "manualinput_default_value" when changing scope' => [
 				'script' => [
@@ -6489,7 +6034,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '[[[[[',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_validator": Incorrect regular expression "[[[[[": "Compilation failed: missing terminating ] for character class at offset 5".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_validator": invalid regular expression.'
 			],
 			'Test script.update missing "manualinput_prompt" for event scope' => [
 				'script' => [
@@ -6498,7 +6043,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 					'manualinput_validator' => '1,2,3'
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "manualinput_prompt" is missing.'
+				'expected_error' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.'
 			],
 			'Test script.update unexpected "manualinput_default_value" for event scope' => [
 				'script' => [
@@ -6519,7 +6064,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '[A-Za-z]',
 					'manualinput_default_value' => '123'
 				],
-				'expected_error' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: [A-Za-z].'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: [A-Za-z].'
 			],
 			'Test script.update empty "manualinput_prompt"' => [
 				'script' => [
