@@ -256,6 +256,12 @@ const char	*zbx_result_string(int result)
 			return "SIG_ERROR";
 		case SYSINFO_RET_FAIL:
 			return "SYSINFO_RET_FAIL";
+		case CONNECT_ERROR:
+			return "CONNECT_ERROR";
+		case SEND_ERROR:
+			return "SEND_ERROR";
+		case RECV_ERROR:
+			return "RECV_ERROR";
 		default:
 			return "unknown";
 	}

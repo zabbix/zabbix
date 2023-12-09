@@ -249,6 +249,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
 
 void	zbx_socket_clean(zbx_socket_t *s);
+char	*zbx_socket_detach_buffer(zbx_socket_t *s);
 int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout);
 

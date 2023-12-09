@@ -218,5 +218,8 @@ typedef struct zbx_variant zbx_variant_t;
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
 #define	SIG_ERROR	-8
+#define	CONNECT_ERROR	-9
+#define	SEND_ERROR	-10
+#define	RECV_ERROR	-11
 
 #endif

@@ -588,14 +588,28 @@ static void	zbx_set_sender_signal_handlers(void)
 }
 #endif
 
+static char	*connect_callback(void *data)
+{
+	zbx_json_t	*json = (zbx_json_t *)data;
+
+	zbx_timespec_t	ts;
+
+	zbx_timespec(&ts);
+
+	zbx_json_adduint64(json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+	zbx_json_adduint64(json, ZBX_PROTO_TAG_NS, ts.ns);
+
+	return json->buffer;
+}
+
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	zbx_thread_sendval_args		*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
-	int				ret = FAIL;
-	zbx_socket_t			sock;
+	zbx_thread_sendval_args	*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
+	int			ret;
+	char			*data = NULL;
 #if !defined(_WINDOWS)
-	int				i;
-	zbx_addr_t			*last_addr;
+	zbx_addr_t		*last_addr;
+	int			i;
 
 	last_addr = (zbx_addr_t *)sendval_args->addrs->values[0];
 
@@ -608,53 +622,12 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == zbx_connect_to_server(&sock, config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
-			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
-	{
-		if (1 == sendval_args->sync_timestamp)
-		{
-			zbx_timespec_t	ts;
 
-			zbx_timespec(&ts);
+	ret = zbx_comms_exchange_with_redirect(config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
+			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls, sendval_args->json->buffer,
+			connect_callback, sendval_args->json, &data);
 
-			zbx_json_adduint64(sendval_args->json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-			zbx_json_adduint64(sendval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
-		}
 
-		if (SUCCEED == zbx_tcp_send(&sock, sendval_args->json->buffer))
-		{
-			if (SUCCEED == zbx_tcp_recv(&sock))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", sock.buffer);
-
-				if (FAIL == (ret = check_response(sock.buffer,
-						((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-						((zbx_addr_t *)sendval_args->addrs->values[0])->port)))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
-							((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-							((zbx_addr_t *)sendval_args->addrs->values[0])->port,
-							sock.buffer);
-				}
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Unable to receive from [%s]:%d [%s]",
-						((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-						((zbx_addr_t *)sendval_args->addrs->values[0])->port,
-						zbx_socket_strerror());
-			}
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Unable to send to [%s]:%d [%s]",
-					((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-					((zbx_addr_t *)sendval_args->addrs->values[0])->port,
-					zbx_socket_strerror());
-		}
-
-		zbx_tcp_close(&sock);
-	}
 #if !defined(_WINDOWS)
 	for (i = sendval_args->addrs->values_num - 1; i >= 0; i--)
 	{
@@ -1655,11 +1628,12 @@ int	main(int argc, char **argv)
 			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(sendval_args->json, ZBX_PROTO_TAG_DATA);
 
-
 			zbx_json_addobject(sendval_args->json, NULL);
 			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(sendval_args->json);
+
 			zbx_json_close(sendval_args->json);
 
 			succeed_count++;

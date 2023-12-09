@@ -268,6 +268,7 @@ int	sb_parse_line(zbx_send_buffer_t *buf, const char *line, size_t line_alloc, i
 
 	if (ZBX_SEND_IMMEDIATE == send_mode || VALUES_MAX <= batch->values_num)
 	{
+		zbx_json_close(batch->json);
 		*out = batch->json;
 
 		batch->json = NULL;
@@ -301,7 +302,11 @@ struct zbx_json	*sb_pop(zbx_send_buffer_t *buf)
 		zbx_hashset_iter_remove(&iter);
 
 		if (0 != values_num)
+		{
+			zbx_json_close(out);
+
 			return out;
+		}
 	}
 
 	return NULL;
