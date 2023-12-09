@@ -332,7 +332,7 @@ class CScript extends CApiService {
 
 		// Populate name, type and scope.
 		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'scope']);
-		self::addFieldsDataByType($scripts, $db_scripts);
+		self::addDbFieldsByType($scripts, $db_scripts);
 
 		$api_input_rules = self::getValidationRules('update');
 
@@ -357,7 +357,7 @@ class CScript extends CApiService {
 	 * @param array $scripts
 	 * @param array $db_scripts
 	 */
-	private static function addFieldsDataByType(array &$scripts, array $db_scripts): void {
+	private static function addDbFieldsByType(array &$scripts, array $db_scripts): void {
 		foreach ($scripts as &$script) {
 			$db_script = $db_scripts[$script['scriptid']];
 
