@@ -275,7 +275,6 @@ class CScript extends CApiService {
 		}
 
 		$this->validateUpdate($scripts, $db_scripts);
-		self::addFieldDefaultsByType($scripts, $db_scripts);
 
 		$upd_scripts = [];
 
@@ -341,7 +340,9 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkUniqueness($scripts);
+		self::addFieldDefaultsByType($scripts, $db_scripts);
+
+		self::checkUniqueness($scripts, $db_scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
 		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
@@ -1535,20 +1536,26 @@ class CScript extends CApiService {
 	/**
 	 * Check for unique script names within menu path in the input.
 	 *
-	 * @param array  $scripts  Array of scripts.
+	 * @param array  $scripts
+	 * @param array  $db_scripts
 	 *
 	 * $scripts = [[
-	 *     'name' =>      (string)  Script name (optional for update method).
-	 *     'menu_path' => (string)  Script menu path (optional).
+	 *     'name' =>      (string)  Script name.
+	 *     'menu_path' => (string)  Script menu path.
 	 * ]]
 	 *
 	 * @throws APIException if script names within menu paths are not unique.
 	 */
-	private static function checkUniqueness(array $scripts): void {
+	private static function checkUniqueness(array $scripts, array $db_scripts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name', 'menu_path']], 'fields' => [
 			'name' =>		['type' => API_STRING_UTF8],
 			'menu_path' =>	['type' => API_SCRIPT_MENU_PATH]
 		]];
+
+		foreach ($scripts as &$script) {
+			$script += ['menu_path' => $db_scripts !== null ? $db_scripts[$script['scriptid']]['menu_path'] : ''];
+		}
+		unset($script);
 
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $scripts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

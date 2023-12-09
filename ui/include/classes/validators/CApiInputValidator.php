@@ -2338,7 +2338,7 @@ class CApiInputValidator {
 
 						switch ($rule['fields'][$field_name]['type']) {
 							case API_SCRIPT_MENU_PATH:
-								$object_value = trimPath($object[$field_name]);
+								$object_value = trim(trimPath($object[$field_name]), '/');
 								break;
 
 							case API_USER_MACRO:
@@ -2393,7 +2393,12 @@ class CApiInputValidator {
 
 						switch ($rule['fields'][$field_name]['type']) {
 							case API_SCRIPT_MENU_PATH:
-								$object_value = trimPath($object[$field_name]);
+								$object_value = trim(trimPath($object[$field_name]), '/');
+
+								// First or only slash from beginning is trimmed.
+								if (isset($object_value[0]) && $object_value[0] === '/') {
+									$object_value = substr($object_value, 1);
+								}
 								break;
 
 							case API_USER_MACRO:
