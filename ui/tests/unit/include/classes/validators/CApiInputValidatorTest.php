@@ -9001,7 +9001,7 @@ class CApiInputValidatorTest extends TestCase {
 					['scriptid' => 1, 'menu_path' => 'System / Reboot'],
 					['scriptid' => 4, 'menu_path' => 'System / Console'],
 					['scriptid' => 5, 'menu_path' => 'System / Docker / Containers'],
-					['scriptid' => 6, 'menu_path' => 'System / Docker / Images'],
+					['scriptid' => 6, 'menu_path' => 'System / Docker / Images']
 				],
 				'/',
 				true,
@@ -9018,7 +9018,7 @@ class CApiInputValidatorTest extends TestCase {
 					['scriptid' => 1, 'menu_path' => 'System / Reboot'],
 					['scriptid' => 4, 'menu_path' => 'System / Console'],
 					['scriptid' => 5, 'menu_path' => 'System / Docker / Containers'],
-					['scriptid' => 6, 'menu_path' => 'System/Utils/Traceroute'],
+					['scriptid' => 6, 'menu_path' => 'System/Utils/Traceroute']
 				],
 				'/',
 				false,
@@ -9031,7 +9031,7 @@ class CApiInputValidatorTest extends TestCase {
 				]],
 				[
 					['scriptid' => 2, 'menu_path' => 'System/Utils'],
-					['scriptid' => 6, 'menu_path' => 'System/Utils/'],
+					['scriptid' => 6, 'menu_path' => 'System/Utils/']
 				],
 				'/',
 				false,
@@ -9044,7 +9044,7 @@ class CApiInputValidatorTest extends TestCase {
 				]],
 				[
 					['scriptid' => 2, 'menu_path' => '/System/Utils'],
-					['scriptid' => 6, 'menu_path' => 'System/Utils'],
+					['scriptid' => 6, 'menu_path' => 'System/Utils']
 				],
 				'/',
 				false,
