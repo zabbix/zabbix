@@ -526,7 +526,8 @@ retry:
 		goto retry;
 	}
 
-	*out = zbx_socket_detach_buffer(&sock);
+	if (NULL != out)
+		*out = zbx_socket_detach_buffer(&sock);
 
 cleanup:
 	zbx_tcp_close(&sock);

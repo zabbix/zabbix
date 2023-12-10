@@ -48,7 +48,6 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, z
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {
-	zbx_socket_t					sock;
 	zbx_config_tls_t				config_tls;
 	int						ret, i;
 	struct zbx_json					json;
@@ -110,20 +109,8 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	memset(&config_tls, 0, sizeof(config_tls));
 	config_tls.connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
-		0, 0, &config_tls)))
-	{
-		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
-		{
-			if (SUCCEED == (ret = zbx_tcp_recv(&sock)))
-			{
-				if (NULL != result)
-					*result = zbx_strdup(NULL, sock.buffer);
-			}
-		}
-
-		zbx_tcp_close(&sock);
-	}
+	ret = zbx_comms_exchange_with_redirect(source, &zbx_addrs, GET_SENDER_TIMEOUT, 30, 0, 0, &config_tls,
+			json.buffer, NULL, NULL, result);
 
 	if (FAIL == ret && NULL != result)
 		*result = zbx_strdup(NULL, zbx_socket_strerror());
