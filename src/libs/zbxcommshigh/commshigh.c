@@ -456,7 +456,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 
 	addr->ip = host;
 	addr->revision = revision;
-	addr->port = port;
+	addr->port = (0 == port ? ZBX_DEFAULT_SERVER_PORT : port);
 
 	zbx_vector_addr_ptr_insert(addrs, addr, 0);
 

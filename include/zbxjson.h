@@ -338,6 +338,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 void		zbx_json_escape(char **string);
 int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 zbx_json_type_t	zbx_json_valuetype(const char *p);
+struct zbx_json	*zbx_json_clone(const struct zbx_json *src);
 
 /* jsonpath support */
 

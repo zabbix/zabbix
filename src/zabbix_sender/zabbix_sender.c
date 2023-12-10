@@ -686,7 +686,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 
 		if (0 != i)
 		{
-			sendval_args[i].json = sendval_args[0].json;
+			sendval_args[i].json = zbx_json_clone(sendval_args[0].json);
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
 #endif
