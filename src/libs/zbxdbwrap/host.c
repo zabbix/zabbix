@@ -6613,6 +6613,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 				hgset->hgsetid);
 
 		zbx_vector_uint64_sort(&hgset->hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&hgset->hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		ret = zbx_db_prepare_multiple_query(update, "hostid", &hgset->hostids, &sql, &sql_alloc, &sql_offset);
 	}
