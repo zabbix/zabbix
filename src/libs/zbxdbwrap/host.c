@@ -6394,7 +6394,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 		if (0 == hgsets.values_num || hgsetid != hgsets.values[hgsets.values_num - 1]->hgsetid)
 		{
-
 			if (0 != hgsets.values_num)
 				hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
 
