@@ -721,7 +721,7 @@ class testDashboardURLWidget extends CWebTest {
 			if ($state) {
 				$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 				$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
-				$other_form->fill(['Use iframe sandboxing' => !$state]);
+				$other_form->fill(['id:iframe_sandboxing_enabled' => !$state]);
 				$other_form->submit();
 				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 			}
@@ -730,8 +730,8 @@ class testDashboardURLWidget extends CWebTest {
 		// Check that host in widget can be updated via iframe if necessary sandboxing exceptions are set.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$other_form->fill([
-				'Use iframe sandboxing' => true,
-				'Iframe sandboxing exceptions' => 'allow-scripts allow-same-origin allow-forms'
+				'id:iframe_sandboxing_enabled' => true,
+				'id:iframe_sandboxing_exceptions' => 'allow-scripts allow-same-origin allow-forms'
 		]);
 		$other_form->submit();
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
@@ -763,7 +763,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Change valid URI schemes on "Other configuration parameters" page.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
-		$config_form->fill(['Valid URI schemes' => 'dns,message']);
+		$config_form->fill(['id:uri_valid_schemes' => 'dns,message']);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
@@ -792,7 +792,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Disable URI scheme validation.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$config_form->invalidate();
-		$config_form->fill(['Validate URI schemes' => false]);
+		$config_form->fill(['id:validate_uri_schemes' => false]);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
@@ -832,8 +832,7 @@ class testDashboardURLWidget extends CWebTest {
 		return [
 			[
 				[
-					'x_frame_value' => 'DENY',
-					'refused' => true,
+					'x_frame_enabled' => false
 				]
 			],
 			[
@@ -848,17 +847,35 @@ class testDashboardURLWidget extends CWebTest {
 			],
 			[
 				[
-					'x_frame_value' => 'test'
+					'x_frame_value' => "'self'"
 				]
 			],
 			[
 				[
-					"x_frame_value" => "comma,seperated, host.names,  with-different,	spacing"
+					"x_frame_value" => "'self' space seperated host.names  with-different	spacing"
 				]
 			],
 			[
 				[
-					"x_frame_value" => "h0st.nam3.w1th.numb3rs"
+					"x_frame_value" => "'self' h0st.nam3.w1th.numb3rs"
+				]
+			],
+			[
+				[
+					'x_frame_value' => 'DENY',
+					'refused' => true
+				]
+			],
+			[
+				[
+					'x_frame_value' => "'none'",
+					'refused' => true
+				]
+			],
+			[
+				[
+					'x_frame_value' => 'some.other.host',
+					'refused' => true
 				]
 			]
 		];
@@ -873,7 +890,13 @@ class testDashboardURLWidget extends CWebTest {
 		// Change Xframe options.
 		$this->page->login()->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
-		$other_form->fill(['X-Frame-Options HTTP header' => $data['x_frame_value']]);
+
+		$other_form->fill(['id:x_frame_header_enabled' => CTestArrayHelper::get($data, 'x_frame_enabled', true)]);
+
+		if (array_key_exists('x_frame_value', $data)) {
+			$other_form->fill(['id:x_frame_options' => $data['x_frame_value']]);
+		}
+
 		$other_form->submit();
 
 		// Check widget content with changed Xframe options.

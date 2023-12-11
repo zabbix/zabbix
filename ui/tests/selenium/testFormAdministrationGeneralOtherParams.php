@@ -38,11 +38,12 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Login attempts' => 5,
 		'Login blocking interval' => '30s',
 		// Security.
-		'Validate URI schemes' => true,
-		'Valid URI schemes' => 'http,https,ftp,file,mailto,tel,ssh',
-		'X-Frame-Options HTTP header' => 'SAMEORIGIN',
-		'Use iframe sandboxing' => true,
-		'Iframe sandboxing exceptions' => '',
+		'id:validate_uri_schemes' => true,
+		'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
+		'id:x_frame_header_enabled' => true,
+		'id:x_frame_options' => 'SAMEORIGIN',
+		'id:iframe_sandboxing_enabled' => true,
+		'id:iframe_sandboxing_exceptions' => '',
 		// Communication with Zabbix server.
 		'Network timeout' => '3s',
 		'Connection timeout' => '3s',
@@ -84,11 +85,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Login attempts' => 13,
 		'Login blocking interval' => '52s',
 		// Security.
-		'Validate URI schemes' => true,
-		'Valid URI schemes' => 'custom_scheme',
-		'X-Frame-Options HTTP header' => 'SOME_NEW_VALUE',
-		'Use iframe sandboxing' => true,
-		'Iframe sandboxing exceptions' => 'some-new-flag',
+		'id:validate_uri_schemes' => true,
+		'id:uri_valid_schemes' => 'custom_scheme',
+		'id:x_frame_options' => 'SOME-NEW-VALUE',
+		'id:iframe_sandboxing_enabled' => true,
+		'id:iframe_sandboxing_exceptions' => 'some-new-flag',
 		// Communication with Zabbix server.
 		'Network timeout' => '7s',
 		'Connection timeout' => '4s',
@@ -180,9 +181,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => 1,
 						'Login blocking interval' => '30s',
 						// Security.
-						'Validate URI schemes' => false,
-						'X-Frame-Options HTTP header' => 'X',
-						'Use iframe sandboxing' => false,
+						'id:validate_uri_schemes' => false,
+						'id:x_frame_options' => 'X',
+						'id:iframe_sandboxing_enabled' => false,
 						// Communication with Zabbix server.
 						'Network timeout' => '1s',
 						'Connection timeout' => '1s',
@@ -223,10 +224,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '30',
 						// Security.
-						'Validate URI schemes' => true,
-						'Valid URI schemes' => '',
-						'Use iframe sandboxing' => true,
-						'Iframe sandboxing exceptions' => '',
+						'id:validate_uri_schemes' => true,
+						'id:uri_valid_schemes' => '',
+						'id:iframe_sandboxing_enabled' => true,
+						'id:iframe_sandboxing_exceptions' => '',
 						// Communication with Zabbix server.
 						'Network timeout' => '1',
 						'Connection timeout' => '1',
@@ -301,15 +302,15 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => 32,
 						'Login blocking interval' => '3600s',
 						// Security.
-						'Validate URI schemes' => true,
-						'Valid URI schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
+						'id:validate_uri_schemes' => true,
+						'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
 								'https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,'.
 								'tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
-						'X-Frame-Options HTTP header' => 'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SA',
-						'Use iframe sandboxing' => true,
-						'Iframe sandboxing exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
+						'id:x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
+						'id:iframe_sandboxing_enabled' => true,
+						'id:iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
 								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
 								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som',
 						// Communication with Zabbix server.
@@ -328,9 +329,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
 								'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,'.
 						'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
-						'x_frame_options' => 'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SA',
+						'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'iframe_sandboxing_enabled' => 1,
 						'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
 								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
@@ -406,7 +407,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid empty values.
+			// Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -417,7 +418,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => '',
 						'Login blocking interval' => '',
 						// Security.
-						'X-Frame-Options HTTP header' => '',
+						'id:x_frame_options' => '',
 						// Communication with Zabbix server.
 						'Network timeout' => '',
 						'Connection timeout' => '',
@@ -428,7 +429,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					'details' => [
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
 						'Incorrect value for field "login_block": a time unit is expected.',
-						'Incorrect value for field "x_frame_options": cannot be empty.',
 						'Incorrect value for field "socket_timeout": a time unit is expected.',
 						'Incorrect value for field "connect_timeout": a time unit is expected.',
 						'Incorrect value for field "media_type_test_timeout": a time unit is expected.',
