@@ -23,6 +23,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
+#include "zbxtypes.h"
 
 void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, const char *timeout)
 {
@@ -100,6 +101,15 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot parse response: %s", zbx_json_strerror()));
 			*ret = NETWORK_ERROR;
+			return;
+		}
+
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL))
+		{
+			zbx_replace_invalid_utf8(tmp);
+			SET_MSG_RESULT(result, zbx_strdup(NULL, tmp));
+			*ret = NOTSUPPORTED;
 			return;
 		}
 
