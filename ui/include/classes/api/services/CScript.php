@@ -661,11 +661,11 @@ class CScript extends CApiService {
 												['if' => ['field' => 'scope', 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])], 'type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'manualinput', 'in' => ZBX_SCRIPT_MANUALINPUT_ENABLED], 'type' => API_MULTIPLE, 'rules' => [
 														['if' => ['field' => 'manualinput_validator_type', 'in' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
-														['else' => true, 'type' => API_UNEXPECTED]
+														['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_default_value')]
 													]],
-													['else' => true, 'type' => API_UNEXPECTED]
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_default_value')]
 												]],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('scripts', 'manualinput_default_value')]
 			]]
 		]];
 
