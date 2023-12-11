@@ -127,6 +127,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldTextArea('primary_label', _('Text')))
 					->setDefault('{HOST.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+					->prefixLabel(_('Primary label'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('primary_label_size_type', null, [
@@ -135,7 +136,9 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::LABEL_SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('primary_label_size', _('Size'), 1, 100))->setDefault(20)
+				(new CWidgetFieldIntegerBox('primary_label_size', _('Size'), 1, 100))
+					->setDefault(20)
+					->prefixLabel(_('Primary label'))
 			)
 			->addField(
 				new CWidgetFieldCheckBox('primary_label_bold', _('Bold'))
@@ -170,6 +173,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldTextArea('secondary_label', _('Text')))
 					->setDefault('{{ITEM.LASTVALUE}.fmtnum(2)}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+					->prefixLabel(_('Secondary label'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('secondary_label_size_type', null, [
@@ -178,7 +182,9 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::LABEL_SIZE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('secondary_label_size', _('Size'), 1, 100))->setDefault(30)
+				(new CWidgetFieldIntegerBox('secondary_label_size', _('Size'), 1, 100))
+					->setDefault(30)
+					->prefixLabel(_('Secondary label'))
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('secondary_label_bold', _('Bold')))->setDefault(1)

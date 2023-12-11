@@ -290,12 +290,12 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_min', _('Min')))
-					->setFullName(_('Left Y').'/'._('Min'))
+					->prefixLabel(_('Left Y'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_max', _('Max')))
-					->setFullName(_('Left Y').'/'._('Max'))
+					->prefixLabel(_('Left Y'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -316,12 +316,12 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_min', _('Min')))
-					->setFullName(_('Right Y').'/'._('Min'))
+					->prefixLabel(_('Right Y'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_max', _('Max')))
-					->setFullName(_('Right Y').'/'._('Max'))
+					->prefixLabel(_('Right Y'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
