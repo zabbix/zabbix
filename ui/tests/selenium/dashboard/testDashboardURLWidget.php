@@ -883,6 +883,8 @@ class testDashboardURLWidget extends CWebTest {
 
 	/**
 	 * Modify value of 'HTTP X-Frame-options header' and check widget content with changed Xframe options.
+	 *
+	 * @dataProvider getXframOptionsData
 	 */
 	public function testDashboardURLWidget_XframeOptions($data) {
 		// Change Xframe options.
