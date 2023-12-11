@@ -77,6 +77,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 		zbx_free(interface_status->key_orig);
 		interface_status->key_orig = item->key_orig;
 		item->key_orig = NULL;
+		interface_status->version = item->version;
 	}
 
 	if (SUCCEED == item->ret)

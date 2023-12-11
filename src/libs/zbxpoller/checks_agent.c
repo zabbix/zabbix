@@ -51,14 +51,65 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 
 	if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 	{
-		struct zbx_json_parse	jp;
+		struct zbx_json_parse	jp, jp_data, jp_row;
+		const char		*p = NULL;
+		size_t			value_alloc = 0;
+		char			*value = NULL, version_str[MAX_STRING_LEN];
 
 		if (FAIL == zbx_json_open(s->buffer, &jp))
 		{
-			*version = ZBX_COMPONENT_VERSION(2, 0, 0);
+			*version = 0;
 			*ret = FAIL;
 			return;
 		}
+
+		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_VERSION, version_str, sizeof(version_str), NULL))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON"
+					" object.", ZBX_PROTO_TAG_VERSION));
+			*ret = NETWORK_ERROR;
+			return;
+		}
+
+		*version = zbx_get_agent_protocol_version_int(version_str);
+
+		if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON"
+					" object.", ZBX_PROTO_TAG_DATA));
+			*ret = NETWORK_ERROR;
+			return;
+		}
+
+		if (NULL == (p = zbx_json_next(&jp_data, p)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "received empty data response"));
+			*ret = NETWORK_ERROR;
+			return;
+		}
+
+		if (FAIL == zbx_json_brackets_open(p, &jp_row))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot parse response: %s", zbx_json_strerror()));
+			*ret = NETWORK_ERROR;
+			return;
+		}
+
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc,
+				NULL))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot parse response: %s",
+					zbx_json_strerror()));
+			*ret = NETWORK_ERROR;
+			return;
+		}
+
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, value);
+		*ret = SUCCEED;
+
+		zbx_free(value);
+
+		return;
 	}
 
 	if (0 == strcmp(s->buffer, ZBX_NOTSUPPORTED))
@@ -109,7 +160,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	const char	*tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
-	int		version = ZBX_COMPONENT_VERSION(2, 0, 0);
+	int		version = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
 			item->interface.addr, item->key, zbx_tcp_connection_type_name(item->host.tls_connect));

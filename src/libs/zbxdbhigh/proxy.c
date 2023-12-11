@@ -152,6 +152,6 @@ int	zbx_get_agent_protocol_version_int(const char *version_str)
 		return version_int;
 	}
 
-	return ZBX_COMPONENT_VERSION(2, 0, 0);
+	return 0;
 }
 

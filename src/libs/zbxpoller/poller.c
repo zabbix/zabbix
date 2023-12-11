@@ -149,8 +149,8 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interfa
 {
 	zbx_interface_availability_t	in, out;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__func__, interface->interfaceid, itemid, (int)type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d version:%x",
+			__func__, interface->interfaceid, itemid, (int)type, version);
 
 	zbx_interface_availability_init(&in, interface->interfaceid);
 	zbx_interface_availability_init(&out, interface->interfaceid);
