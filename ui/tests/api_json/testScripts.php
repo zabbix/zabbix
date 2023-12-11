@@ -2737,7 +2737,7 @@ class testScripts extends CAPITest {
 					'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
 					'manualinput_default_value' => 'default value'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": value must be empty.'
 			],
 			'Test script.create unexpected "manualinput_validator" field when "manualinput" is disabled' => [
 				'script' => [
@@ -2762,7 +2762,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => 'test',
 					'manualinput_default_value' => 'default value'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": value must be empty.'
 			],
 			'Test script.create invalid "manualinput_prompt" field type when "manualinput" is enabled' => [
 				'script' => [
@@ -3006,7 +3006,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": value must be empty.'
 			],
 			'Test script.create invalid "manualinput" field type for host scope' => [
 				'script' => [
@@ -3056,7 +3056,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'manualinput_default_value' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": a character string is expected.'
 			]
 		];
 	}
@@ -5851,13 +5851,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be 0.'
 			],
-			'Test script.update unexpected "manualinput_default_value" value' => [
-				'script' => [
-					'scriptid' => 'update_manualinput',
-					'manualinput_default_value' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
-			],
 			'Test script.update unexpected "manualinput" value for action scope' => [
 				'script' => [
 					'scriptid' => 'update_manualinput',
@@ -5873,14 +5866,6 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => 9999
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_validator_type": value must be 0.'
-			],
-			'Test script.update unexpected "manualinput_default_value" value for action scope' => [
-				'script' => [
-					'scriptid' => 'update_manualinput',
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'manualinput_default_value' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
 			],
 			'Test script.update invalid "manualinput" value (string)' => [
 				'script' => [
@@ -5915,7 +5900,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_manualinput',
 					'manualinput_default_value' => 123
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": a character string is expected.'
 			],
 			'Test script.update invalid "manualinput_prompt" value (empty string)' => [
 				'script' => [
@@ -6022,7 +6007,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '1,2,3',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": value must be empty.'
 			],
 			'Test script.update incorrect "manualinput_validator" when changing scope' => [
 				'script' => [
@@ -6054,7 +6039,7 @@ class testScripts extends CAPITest {
 					'manualinput_validator' => '1,2,3',
 					'manualinput_default_value' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "manualinput_default_value".'
+				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": value must be empty.'
 			],
 			'Test script.update incorrect "manualinput_default_value" for event scope' => [
 				'script' => [
