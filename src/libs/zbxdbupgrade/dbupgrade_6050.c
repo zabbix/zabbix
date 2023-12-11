@@ -2206,7 +2206,7 @@ static void	get_next_expr_macro_start(const char **expr_start, const char *str, 
 {
 	const char	*search_pos = *expr_start + 2;
 
-	if ((size_t)(search_pos - str) < str_len)
+	if (NULL != *expr_start && NULL != str && (size_t)(search_pos - str) < str_len)
 		*expr_start = strstr(search_pos, "{?");
 	else
 		*expr_start = NULL;
