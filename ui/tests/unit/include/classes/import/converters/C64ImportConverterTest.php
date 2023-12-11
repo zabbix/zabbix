@@ -52,8 +52,29 @@ class C64ImportConverterTest extends CImportConverterTest {
 				$expected_lld_rules[] = $expected_item;
 			}
 
-			$source_items[] = $source_item;
-			$expected_items[] = $expected_item;
+			$source_items[] = $source_item + [
+				'preprocessing' => [
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED
+					],
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED,
+						'parameters' => ''
+					]
+				]
+			];
+			$expected_items[] = $expected_item + [
+				'preprocessing' => [
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED,
+						'parameters' => [(string) ZBX_PREPROC_MATCH_ERROR_ANY]
+					],
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED,
+						'parameters' => [(string) ZBX_PREPROC_MATCH_ERROR_ANY]
+					]
+				]
+			];
 		}
 
 		foreach ($source_lld_rules as &$lld_rule) {

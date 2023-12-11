@@ -77,6 +77,13 @@ abstract class CController {
 	 */
 	private bool $validate_csrf_token = true;
 
+	/**
+	 * Validation rules array set when controller performs validation the first time.
+	 *
+	 * @var array
+	 */
+	private static $validation_rules = [];
+
 	public function __construct() {
 		$this->init();
 		$this->populateRawInput();
@@ -209,9 +216,12 @@ abstract class CController {
 					}
 
 					$input = array_replace($input, $data['form']);
+
+					// Remove these fields, so that they are not passed again in future redirects if any.
+					unset($input['formdata'], $input['data'], $input['sign']);
 				}
 				else {
-					info(_('Operation cannot be performed due to unauthorized request.'));
+					error(_('Operation cannot be performed due to unauthorized request.'));
 				}
 
 				// Replace window.history to avoid resubmission warning dialog.
@@ -237,11 +247,20 @@ abstract class CController {
 				$input += $json_input;
 			}
 			else {
-				info(_('JSON array input is expected.'));
+				error(_('JSON array input is expected.'));
 			}
 		}
 
 		return $input;
+	}
+
+	/**
+	 * Get current controller validation rules. Rules are set when input is being validated.
+	 *
+	 * @return array
+	 */
+	public static function getValidationRules(): array {
+		return self::$validation_rules;
 	}
 
 	/**
@@ -252,6 +271,9 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
+		// Not nice, but beats writing a setValidationRules() in several hundred places.
+		self::$validation_rules = $validation_rules;
+
 		if ($this->raw_input === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
@@ -261,7 +283,7 @@ abstract class CController {
 		$validator = new CNewValidator($this->raw_input, $validation_rules);
 
 		foreach ($validator->getAllErrors() as $error) {
-			info($error);
+			error($error);
 		}
 
 		if ($validator->isErrorFatal()) {
@@ -310,14 +332,14 @@ abstract class CController {
 		$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;
 
 		if ($period < $min_period) {
-			info(_n('Minimum time period to display is %1$s minute.',
+			error(_n('Minimum time period to display is %1$s minute.',
 				'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
 			));
 
 			return false;
 		}
 		elseif ($period > $max_period + 1) {
-			info(_n('Maximum time period to display is %1$s day.',
+			error(_n('Maximum time period to display is %1$s day.',
 				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 			));
 
@@ -452,6 +474,15 @@ abstract class CController {
 			default:
 				$this->raw_input = null;
 		}
+	}
+
+	/**
+	 * Get raw input from controller.
+	 *
+	 * @return array|null
+	 */
+	public function getRawInput(): ?array {
+		return $this->raw_input;
 	}
 
 	/**

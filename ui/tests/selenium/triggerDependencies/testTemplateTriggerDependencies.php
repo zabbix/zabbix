@@ -334,8 +334,8 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						'Template with everything' => ['trigger simple']
 					],
 					'result' => [
-						'Template that linked to host: Trigger that linked',
-						'Template with everything: trigger simple'
+						'Template with everything: trigger simple',
+						'Template that linked to host: Trigger that linked'
 					]
 				]
 			],

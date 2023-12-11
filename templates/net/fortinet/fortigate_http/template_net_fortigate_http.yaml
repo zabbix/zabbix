@@ -3602,6 +3602,9 @@ zabbix_export:
                       name: legend_statistic
                       value: '1'
                     - type: STRING
+                      name: reference
+                      value: DEABC
+                    - type: STRING
                       name: time_period.from
                       value: now-1d
                     - type: INTEGER
