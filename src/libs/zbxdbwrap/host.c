@@ -6411,7 +6411,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_db_free_result(result);
 
 	if (0 == hgsets.values_num)
-		goto del_groups;
+		goto skip_permissions;
 
 	/* calculate hash for last hgset in vector */
 	hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
@@ -6618,29 +6618,17 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		zbx_db_execute("%s", sql);
 	}
 
-	/* delete unused hgsets */
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.hgsetid from hgset h"
-			" left join host_hgset hh on hh.hgsetid=h.hgsetid"
-			" where hh.hgsetid is null and");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.hgsetid", hgsetids.values, hgsetids.values_num);
-
-	zbx_db_select_uint64(sql, &ids);
+	/* delete hgsets */
 
 	sql_offset = 0;
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (0 != ids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", ids.values, ids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
+			hgsetids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	zbx_vector_uint64_clear(&ids);
-del_groups:
+skip_permissions:
 	/* delete sysmaps_elements */
 	DBget_sysmapelements_by_element_type_ids(&ids, SYSMAP_ELEMENT_TYPE_HOST_GROUP, groupids);
 	if (0 != ids.values_num)
@@ -6651,7 +6639,7 @@ del_groups:
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	/* groups */
+	/* delete groups */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hstgrp where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
