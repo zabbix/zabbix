@@ -120,7 +120,7 @@ fail:
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_close(&j);
-	ret = zbx_tcp_send_bytes_to(s, j.buffer, strlen(j.buffer), config_timeout);
+	ret = zbx_tcp_send_bytes_to(s, j.buffer, j.buffer_size, config_timeout);
 
 	zbx_free(key);
 	zbx_json_free(&j);
