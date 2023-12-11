@@ -1235,14 +1235,14 @@ class CHistoryManager {
 	 * Will not return values for non-numeric items with trends source.
 	 *
 	 * @param array    $items      Items to get aggregated values for.
-	 * @param string   $function   Aggregation function (AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT,
+	 * @param int      $function   Aggregation function (AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT,
 	 *                             AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST).
 	 * @param int      $time_from  Start of time period, inclusive (unix time stamp).
 	 * @param int|null $time_to    End of time period, inclusive (unix time stamp).
 	 *
 	 * @return array  Aggregation data of items. Each entry will contain 'value', 'clock' and 'itemid' properties.
 	 */
-	public function getAggregatedValues(array $items, string $function, int $time_from, int $time_to = null): ?array {
+	public function getAggregatedValues(array $items, int $function, int $time_from, int $time_to = null): ?array {
 		$is_numeric_aggregation = in_array($function, [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM]);
 
 		$items_valid = [];
@@ -1279,7 +1279,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getAggregatedValues
 	 */
-	private function getAggregatedValuesFromElasticsearch(array $items, string $function, int $time_from, ?int $time_to)
+	private function getAggregatedValuesFromElasticsearch(array $items, int $function, int $time_from, ?int $time_to)
 			: array {
 		$aggs_value_clock = [
 			'clock' => [
@@ -1385,7 +1385,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getAggregatedValues
 	 */
-	private function getAggregatedValuesFromSql(array $items, string $function, int $time_from, ?int $time_to): array {
+	private function getAggregatedValuesFromSql(array $items, int $function, int $time_from, ?int $time_to): array {
 		$time_from_by_source = ['history' => $time_from, 'trends' => $time_from];
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {

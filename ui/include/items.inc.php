@@ -1017,6 +1017,21 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	return $col;
 }
 
+/**
+ * Prepare aggregated item value for displaying, apply value map and/or convert units if appropriate for the aggregation
+ * function.
+ *
+ * @see formatHistoryValue
+ *
+ * @param int              $function         Aggregation function (AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG,
+ *                                           AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST).
+ * @param int|float|string $value
+ * @param array            $item
+ * @param bool             $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array            $convert_options  Options for unit conversion. See @convertUnitsRaw.
+ *
+ * @return string
+ */
 function formatAggregatedHistoryValue(int $function, $value, array $item, bool $trim = true,
 		array $convert_options = []): string {
 	if (in_array($function, [AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])) {
