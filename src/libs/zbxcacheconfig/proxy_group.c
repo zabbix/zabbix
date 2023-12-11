@@ -391,9 +391,9 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			ZBX_DC_INTERFACE	*interface;
 
-			for (i = 0; i <  hosts.values[i]->interfaces_v.values_num; i++)
+			for (int j = 0; j < hosts.values[i]->interfaces_v.values_num; j++)
 			{
-				interface = (ZBX_DC_INTERFACE *)hosts.values[i]->interfaces_v.values[i];
+				interface = (ZBX_DC_INTERFACE *)hosts.values[i]->interfaces_v.values[j];
 				interface->reset_availability = 1;
 			}
 		}

@@ -447,8 +447,8 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 
 	if (0 != strcmp(buf, ZBX_PROTO_VALUE_FAILED))
 		return FAIL;
-
 	if (SUCCEED != zbx_parse_redirect_response(&jp, &host, &port, &revision))
+
 		return FAIL;
 
 	for (i = 0; i < addrs->values_num; i++)
