@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -48,6 +49,8 @@ const (
 	connStateEstablished
 )
 
+const responseFailed = "failed"
+
 type Connection struct {
 	conn        net.Conn
 	tlsConfig   *tls.Config
@@ -61,6 +64,11 @@ type Connection struct {
 type Listener struct {
 	listener  net.Listener
 	tlsconfig *tls.Config
+}
+
+type redirectResponse struct {
+	Response string   `json:"response"`
+	Redirect *address `json:"redirect,omitempty"`
 }
 
 func open(address string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, timeoutMode int,
@@ -317,9 +325,9 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
+func Exchange(addrpool Address, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
 	data []byte, args ...interface{}) (b []byte, errs []error, errRead error) {
-	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
+	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", addrpool, timeout, connect_timeout)
 
 	var tlsconfig *tls.Config
 	var err error
@@ -345,18 +353,16 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		}
 	}
 
-	for i := 0; i < len(*addresses); i++ {
-		c, err = open((*addresses)[0], localAddr, timeout, connect_timeout, TimeoutModeFixed, tlsconfig)
+	for i := 0; i < addrpool.count(); i++ {
+		c, err = open(addrpool.Get(), localAddr, timeout, connect_timeout, TimeoutModeFixed, tlsconfig)
 		if err == nil {
 			break
 		}
 
-		errs = append(errs, fmt.Errorf("cannot connect to [%s]: %s", (*addresses)[0], err))
+		errs = append(errs, fmt.Errorf("cannot connect to [%s]: %s", addrpool.Get(), err))
 		log.Tracef("%s", errs[len(errs)-1])
 
-		tmp := (*addresses)[0]
-		*addresses = (*addresses)[1:]
-		*addresses = append(*addresses, tmp)
+		addrpool.next()
 	}
 
 	if err != nil {
@@ -365,26 +371,26 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 
 	defer c.Close()
 
-	log.Tracef("sending [%s] to [%s]", string(data), (*addresses)[0])
+	log.Tracef("sending [%s] to [%s]", string(data), addrpool.Get())
 
 	err = c.Write(data)
 	if err != nil {
-		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", (*addresses)[0], err))
+		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", addrpool.Get(), err))
 		log.Tracef("%s", errs[len(errs)-1])
 
 		return nil, errs, nil
 	}
 
-	log.Tracef("receiving data from [%s]", (*addresses)[0])
+	log.Tracef("receiving data from [%s]", addrpool.Get())
 
 	b, err = c.Read()
 	if err != nil {
-		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", (*addresses)[0], err))
+		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", addrpool.Get(), err))
 		log.Tracef("%s", errs[len(errs)-1])
 
 		return nil, errs, errs[len(errs)-1]
 	}
-	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
+	log.Tracef("received [%s] from [%s]", string(b), addrpool.Get())
 
 	if len(b) == 0 && false == no_response {
 		errs = append(errs, fmt.Errorf("connection closed"))
@@ -394,4 +400,27 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	}
 
 	return b, nil, nil
+}
+
+func ExchangeWithRedirect(addrpool Address, localAddr *net.Addr, timeout time.Duration,
+	connectTimeout time.Duration, data []byte, args ...interface{}) ([]byte, []error, error) {
+	b, errs, err := Exchange(addrpool, localAddr, timeout, connectTimeout, data, args...)
+
+	if errs != nil {
+		return b, errs, err
+	}
+
+	var response redirectResponse
+
+	if json.Unmarshal(b, &response) != nil {
+		return b, errs, err
+	}
+
+	if response.Response != responseFailed || nil == response.Redirect || !addrpool.addRedirect(response.Redirect) {
+		return b, errs, err
+	}
+
+	log.Debugf("performing redirect to [%s]", addrpool.Get())
+
+	return Exchange(addrpool, localAddr, timeout, connectTimeout, data, args...)
 }

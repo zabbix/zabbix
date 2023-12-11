@@ -47,7 +47,7 @@ var impl Plugin
 func (p *Plugin) getRemoteZabbixStats(addr string, req []byte, timeout int) ([]byte, error) {
 	var parse response
 
-	resp, errs, _ := zbxcomms.Exchange(&[]string{addr}, &p.localAddr, time.Duration(timeout)*time.Second,
+	resp, errs, _ := zbxcomms.Exchange(zbxcomms.NewAddress(addr), &p.localAddr, time.Duration(timeout)*time.Second,
 		time.Duration(timeout)*time.Second, req)
 
 	if errs != nil {
