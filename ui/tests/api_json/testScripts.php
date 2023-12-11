@@ -1412,7 +1412,7 @@ class testScripts extends CAPITest {
 			// Check script type.
 			'Test script.create missing type' => [
 				'script' => [
-					'scope' => 1,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'name' => 'API create script'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
@@ -1420,7 +1420,7 @@ class testScripts extends CAPITest {
 			'Test script.create invalid type (empty string)' => [
 				'script' => [
 					'name' => 'API create script',
-					'scope' => 1,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'type' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
@@ -1428,7 +1428,7 @@ class testScripts extends CAPITest {
 			'Test script.create invalid type (string)' => [
 				'script' => [
 					'name' => 'API create script',
-					'scope' => 1,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'type' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
@@ -1436,7 +1436,7 @@ class testScripts extends CAPITest {
 			'Test script.create invalid type' => [
 				'script' => [
 					'name' => 'API create script',
-					'scope' => 1,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 					'type' => 999999
 				],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 2, 3, 5.'
