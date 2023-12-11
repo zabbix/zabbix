@@ -9224,6 +9224,10 @@ msgstr "主机资产记录概览"
 msgid "Host label type"
 msgstr "主机标签类型"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14724,6 +14728,10 @@ msgstr "或"
 msgid "Order"
 msgstr "排序"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "列排序"
@@ -15312,6 +15320,10 @@ msgstr "百分比线(左)"
 #: widgets/svggraph/includes/WidgetForm.php:264
 msgid "Percentile line (right)"
 msgstr "百分比线(右)"
+
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -16807,6 +16819,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "返回ICMP ping包丢失的百分数."
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -19932,6 +19948,10 @@ msgstr "模板\"%1$s\"中的触发器依赖模板\"%2$s\"中的触发器"
 msgid "Trigger label type"
 msgstr "触发器标签类型"
 
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
+
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
 msgstr "触发器概览"
@@ -22878,6 +22898,13 @@ msgstr "asin() - 反正弦值，以弧度表示"
 msgid "at least one day of the week must be selected"
 msgstr "至少选择一周中的一天"
 
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
 msgstr "至少选定一个覆盖选项"
@@ -23546,6 +23573,11 @@ msgstr "in() - 检查一个值是否等于列出的值之一（1 - 等于，0 - 
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "包括子组"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

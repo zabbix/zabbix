@@ -39,13 +39,16 @@ $fields = [
 	'outer' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
-	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
+	'resolve_macros' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	session_write_close();
 	exit();
 }
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
+
+$resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 /*
  * Permissions
@@ -54,8 +57,8 @@ $dbGraph = API::Graph()->get([
 	'output' => API_OUTPUT_EXTEND,
 	'selectGraphItems' => API_OUTPUT_EXTEND,
 	'selectHosts' => ['hostid', 'name', 'host'],
-	'selectItems' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
-		'value_type', 'key_'
+	'selectItems' => ['itemid', 'type', 'master_itemid', $resolve_macros ? 'name_resolved' : 'name', 'delay', 'units',
+		'hostid', 'history', 'trends', 'value_type', 'key_'
 	],
 	'graphids' => $_REQUEST['graphid']
 ]);
@@ -63,8 +66,11 @@ $dbGraph = API::Graph()->get([
 if (!$dbGraph) {
 	access_deny();
 }
-else {
-	$dbGraph = reset($dbGraph);
+
+$dbGraph = reset($dbGraph);
+
+if ($resolve_macros) {
+	$dbGraph['items'] = CArrayHelper::renameObjectsKeys($dbGraph['items'], ['name_resolved' => 'name']);
 }
 
 /*

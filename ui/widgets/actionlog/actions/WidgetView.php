@@ -25,7 +25,6 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CArrayHelper,
-	CRangeTimeParser,
 	CSettingsHelper;
 
 class WidgetView extends CControllerDashboardWidgetView {

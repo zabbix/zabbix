@@ -675,29 +675,6 @@ class CConfigurationExportBuilder {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
 			}
 
-			if ($discoveryRule['query_fields']) {
-				$query_fields = [];
-
-				foreach ($discoveryRule['query_fields'] as $query_field) {
-					$query_fields[] = [
-						'name' => key($query_field),
-						'value' => reset($query_field)
-					];
-				}
-
-				$data['query_fields'] = $query_fields;
-			}
-
-			if ($discoveryRule['headers']) {
-				$headers = [];
-
-				foreach ($discoveryRule['headers'] as $name => $value) {
-					$headers[] = compact('name', 'value');
-				}
-
-				$data['headers'] = $headers;
-			}
-
 			$data['master_item'] = ($discoveryRule['type'] == ITEM_TYPE_DEPENDENT)
 				? ['key' => $discoveryRule['master_item']['key_']]
 				: [];
@@ -1244,29 +1221,6 @@ class CConfigurationExportBuilder {
 
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];
-			}
-
-			if ($item['query_fields']) {
-				$query_fields = [];
-
-				foreach ($item['query_fields'] as $query_field) {
-					$query_fields[] = [
-						'name' => key($query_field),
-						'value' => reset($query_field)
-					];
-				}
-
-				$data['query_fields'] = $query_fields;
-			}
-
-			if ($item['headers']) {
-				$headers = [];
-
-				foreach ($item['headers'] as $name => $value) {
-					$headers[] = compact('name', 'value');
-				}
-
-				$data['headers'] = $headers;
 			}
 
 			if ($simple_triggers) {

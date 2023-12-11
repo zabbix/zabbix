@@ -66,7 +66,7 @@ class CControllerPopupTabFilterUpdate extends CController {
 		$ret = !$validator->isError() && !$validator->isErrorFatal();
 
 		foreach ($validator->getAllErrors() as $error) {
-			info($error);
+			error($error);
 		}
 
 		if ($ret) {

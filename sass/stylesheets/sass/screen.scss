@@ -77,7 +77,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-navtree";
 @import "components/dashboard/widget-piechart";
 @import "components/dashboard/widget-problemsbysv";
-@import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
 @import "components/dashboard/widget-url";
@@ -537,12 +536,6 @@ form {
 	word-break: break-word;
 }
 
-.overflow-table {
-	overflow-x: auto;
-	position: relative;
-	@extend %webkit-hor-scrollbar;
-}
-
 // Filters.
 .filter-btn-container {
 	position: relative;
@@ -598,6 +591,10 @@ form {
 
 		button {
 			margin: 0;
+		}
+
+		table {
+			width: auto;
 		}
 	}
 
@@ -1045,9 +1042,10 @@ select {
 	& + label {
 		span {
 			position: relative;
+			box-sizing: border-box;
 			display: inline-block;
-			width: 14px;
-			height: 14px;
+			width: 16px;
+			height: 16px;
 			margin-right: 4px;
 			vertical-align: text-bottom;
 			background-color: $form-bg-color;
@@ -2848,6 +2846,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar {
 		width: 9px;
+		height: 9px;
 	}
 
 	&::-webkit-scrollbar-track {
@@ -2858,15 +2857,6 @@ $browser-logos: (
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color, $scrollbar-thumb-color-darken);
 	}
-}
-
-// TODO: Legacy
-%webkit-hor-scrollbar {
-	&::-webkit-scrollbar {
-		height: 9px;
-	}
-
-	@extend %webkit-scrollbar;
 }
 
 %cursor-drag {

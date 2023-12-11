@@ -240,6 +240,13 @@ class CPrometheusPatternParserTest extends TestCase {
 				]
 			],
 			[
+				'{label1="{{$MACRO}.regsub(\"([0-9]+)\", \\\\1)}"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1="{{$MACRO}.regsub(\"([0-9]+)\", \\\\1)}"}'
+				]
+			],
+			[
 				'{label1="{$MACRO} abc {$MACRO2}"}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -251,6 +258,13 @@ class CPrometheusPatternParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{label1="{$MACRO}"}'
+				]
+			],
+			[
+				'{label1="{{$MACRO}.regsub(\"([0-9]+)\", \\\\1)}"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1="{{$MACRO}.regsub(\"([0-9]+)\", \\\\1)}"}'
 				]
 			],
 			[
@@ -363,6 +377,20 @@ class CPrometheusPatternParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}'
+				]
+			],
+			[
+				'{{$M}.regsub("([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("([0-9]+)", \1)}'
+				]
+			],
+			[
+				'{$M}{label1="value1"}=={{$M}.regsub("([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M}{label1="value1"}=={{$M}.regsub("([0-9]+)", \1)}'
 				]
 			],
 			[

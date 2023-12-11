@@ -263,7 +263,7 @@ static int	variant_to_ui64(zbx_variant_t *value)
 	{
 		double	dbl;
 
-		if (SUCCEED != zbx_is_double(buffer, &dbl))
+		if (SUCCEED != zbx_is_double(buffer, &dbl) || 0 > dbl || dbl >= (double)ZBX_MAX_UINT64)
 			return FAIL;
 
 		value_ui64 = (zbx_uint64_t)dbl;
