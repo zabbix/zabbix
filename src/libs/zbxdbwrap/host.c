@@ -6378,7 +6378,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 				" where h.hgsetid=h2.hgsetid"
 				" and");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "h2.groupid", groupids->values, groupids->values_num);
-	result = zbx_db_select("%s order by h.hgsetid,h.groupid", sql);
+	result = zbx_db_select("%s) order by h.hgsetid,h.groupid", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
