@@ -9224,6 +9224,10 @@ msgstr "主机资产记录概览"
 msgid "Host label type"
 msgstr "主机标签类型"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14724,6 +14728,10 @@ msgstr "或"
 msgid "Order"
 msgstr "排序"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "列排序"
@@ -19939,6 +19947,10 @@ msgstr "模板\"%1$s\"中的触发器依赖模板\"%2$s\"中的触发器"
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "触发器标签类型"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"

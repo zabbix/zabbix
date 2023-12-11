@@ -2819,8 +2819,13 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 			goto unlock;
 		}
 
-		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
-				counterid, datastore->uuid, 1, unit, result)))
+		ds_count++;
+
+		if (0 == strcmp(hv->props[ZBX_VMWARE_HVPROP_MAINTENANCE], "true"))
+			continue;
+
+		if (SYSINFO_RET_OK != vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
+				counterid, datastore->uuid, 1, unit, result))
 		{
 			char	*err, *msg = *ZBX_GET_MSG_RESULT(result);
 
@@ -2832,8 +2837,6 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 			SET_MSG_RESULT(result, err);
 			goto unlock;
 		}
-
-		ds_count++;
 
 		if (0 == ZBX_ISSET_VALUE(result))
 			continue;
@@ -2859,6 +2862,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		value = value / count;
 
 	SET_UI64_RESULT(result, value);
+	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:

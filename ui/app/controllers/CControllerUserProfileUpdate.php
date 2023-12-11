@@ -32,9 +32,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 		$fields = [
 			'userid' =>				'fatal|required|db users.userid',
-			'current_password' =>	'string',
-			'password1' =>			'string',
-			'password2' =>			'string',
+			'current_password' =>	'password',
+			'password1' =>			'password',
+			'password2' =>			'password',
 			'medias' =>				'array',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
 			'timezone' =>			'db users.timezone|in '.implode(',', $this->timezones),

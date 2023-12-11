@@ -96,9 +96,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Host tags',
-				'Show hosts in maintenance', 'Columns', 'Order', 'Order column', 'Host count'], $form->getLabels()->asText()
+				'Show hosts in maintenance', 'Columns', 'Order by', 'Order', 'Host limit'], $form->getLabels()->asText()
 		);
-		$form->getRequiredLabels(['Columns', 'Order column', 'Host count']);
+		$form->getRequiredLabels(['Columns', 'Order by', 'Host limit']);
 
 		// Check default fields.
 		$fields = [
@@ -113,7 +113,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			],
 			'id:tags_0_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255],
 			'Order' => ['value' => 'Top N', 'labels' => ['Top N', 'Bottom N']],
-			'Host count' => ['value' => 10, 'maxlength' => 3]
+			'Host limit' => ['value' => 10, 'maxlength' => 3]
 		];
 		$this->checkFieldsAttributes($fields, $form);
 
@@ -279,7 +279,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'Hosts' => 'ЗАББИКС Сервер',
 						'Show hosts in maintenance' => true,
 						'Order' => 'Bottom N',
-						'Host count' => '99'
+						'Host limit' => '99'
 					],
 					'tags' => [
 						['name' => 'value', 'value' => '12345', 'operator' => 'Contains'],
@@ -303,7 +303,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				[
 					'main_fields' => [
 						'Name' => 'Several item columns',
-						'Order column' => 'duplicated colum name'
+						'Order by' => 'duplicated colum name'
 					],
 					'column_fields' => [
 						[
@@ -630,7 +630,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'main_error' => [
 						'Invalid parameter "Columns": cannot be empty.',
-						'Invalid parameter "Order column": an integer is expected.'
+						'Invalid parameter "Order by": an integer is expected.'
 					]
 				]
 			],
@@ -651,13 +651,13 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #13 Add characters in host count field.
+			// #13 Add characters in host limit field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'main_fields' => [
-						'Name' => 'Host count error with item column',
-						'Host count' => 'zzz'
+						'Name' => 'Host limit error with item column',
+						'Host limit' => 'zzz'
 					],
 					'column_fields' => [
 						[
@@ -667,17 +667,17 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'main_error' => [
-						'Invalid parameter "Host count": value must be one of 1-100.'
+						'Invalid parameter "Host limit": value must be one of 1-100.'
 					]
 				]
 			],
-			// #14 Add incorrect value to host count field without item column.
+			// #14 Add incorrect value to host limit field without item column.
 			[
 				[
 					'expected' => TEST_BAD,
 					'main_fields' => [
-						'Name' => 'Host count error without item column',
-						'Host count' => '333'
+						'Name' => 'Host limit error without item column',
+						'Host limit' => '333'
 					],
 					'column_fields' => [
 						[
@@ -686,7 +686,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'main_error' => [
-						'Invalid parameter "Host count": value must be one of 1-100.'
+						'Invalid parameter "Host limit": value must be one of 1-100.'
 					]
 				]
 			],
@@ -1158,7 +1158,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'trim' => true,
 					'main_fields' => [
 						'Name' => '            Spaces            ',
-						'Host count' => ' 1 '
+						'Host limit' => ' 1 '
 					],
 					'tags' => [
 						['name' => '   tag     ', 'value' => '     value       ', 'operator' => 'Equals']
@@ -1407,15 +1407,15 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #3 Error message when update Host count incorrectly.
+			// #3 Error message when update Host limit incorrectly.
 			[
 				[
 					'expected' => TEST_BAD,
 					'main_fields' => [
-						'Host count' => '0'
+						'Host limit' => '0'
 					],
 					'main_error' => [
-						'Invalid parameter "Host count": value must be one of 1-100.'
+						'Invalid parameter "Host limit": value must be one of 1-100.'
 					]
 				]
 			],
@@ -1651,8 +1651,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'Hosts' => 'ЗАББИКС Сервер',
 						'Show hosts in maintenance' => true,
 						'Order' => 'Bottom N',
-						'Order column' => 'test update column 2',
-						'Host count' => '2'
+						'Order by' => 'test update column 2',
+						'Host limit' => '2'
 					]
 				]
 			],
@@ -1766,7 +1766,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'trim' => true,
 					'main_fields' => [
 						'Name' => '            Updated Spaces            ',
-						'Host count' => ' 1 '
+						'Host limit' => ' 1 '
 					],
 					'tags' => [
 						['name' => '   tag     ', 'value' => '     value       ', 'operator' => 'Equals']

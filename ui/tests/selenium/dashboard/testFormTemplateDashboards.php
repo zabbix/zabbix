@@ -1975,7 +1975,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'default_operator' => 'Contains'
 						],
 						[
-							'field' => 'Trigger count',
+							'field' => 'Trigger limit',
 							'attributes' => [
 								'maxlength' => 3
 							],
@@ -3972,59 +3972,59 @@ class testFormTemplateDashboards extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #83 Top triggers widget with empty Trigger count.
+			// #83 Top triggers widget with empty Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
-						'Name' => 'Top triggers widget with empty Trigger count',
-						'Trigger count' => ''
+						'Name' => 'Top triggers widget with empty Trigger limit',
+						'Trigger limit' => ''
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
-			// #84 Top triggers widget with non-numeric Trigger count.
+			// #84 Top triggers widget with non-numeric Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
-						'Name' => 'Top triggers widget with non-numeric Trigger count',
-						'Trigger count' => 'abc'
+						'Name' => 'Top triggers widget with non-numeric Trigger limit',
+						'Trigger limit' => 'abc'
 					],
 					'swap_expected' => [
-						'Trigger count' => 0
+						'Trigger limit' => 0
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
-			// #85 Top triggers widget with zero Trigger count.
+			// #85 Top triggers widget with zero Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
-						'Name' => 'Top triggers widget with zero Trigger count',
-						'Trigger count' => 0
+						'Name' => 'Top triggers widget with zero Trigger limit',
+						'Trigger limit' => 0
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
-			// #86 Top triggers widget with out of range Trigger count.
+			// #86 Top triggers widget with out of range Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
-						'Name' => 'Top triggers widget with out of range Trigger count',
-						'Trigger count' => 101
+						'Name' => 'Top triggers widget with out of range Trigger limit',
+						'Trigger limit' => 101
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
 			// #87 Top triggers widget with default parameters.
@@ -4050,7 +4050,7 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:tags_0_tag' => 'tag_name',
 						'id:tags_0_operator' => 'Does not contain',
 						'id:tags_0_value' => 'tag_value',
-						'Trigger count' => 100
+						'Trigger limit' => 100
 					],
 					'page' => '2nd page'
 				]
