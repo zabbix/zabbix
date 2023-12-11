@@ -2791,7 +2791,7 @@ static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_servi
 				zbx_vector_ptr_create(&services_diff_local.service_problems);
 				zbx_vector_ptr_create(&services_diff_local.service_problems_recovered);
 
-				services_diff_local.flags |= (ZBX_FLAG_SERVICE_RECALCULATE |
+				services_diff_local.flags = (ZBX_FLAG_SERVICE_RECALCULATE |
 						ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS);
 
 				zbx_hashset_insert(&service_manager->service_diffs, &services_diff_local,
