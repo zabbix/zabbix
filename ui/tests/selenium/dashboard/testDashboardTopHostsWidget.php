@@ -2481,7 +2481,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found."
 				]
 			],
-			// #5 Text item, Threshold - value not displayed.
+			// #5 Text item, Threshold - value is displayed ignoring thresholds.
 			[
 				[
 					'main_fields' => [
@@ -2499,7 +2499,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nText for text item"
 				]
 			],
 			// #6 Log item - value displayed.
@@ -2586,7 +2586,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found."
 				]
 			],
-			// #11 Log item, Threshold - value not displayed.
+			// #11 Log item, Threshold - value is displayed ignoring thresholds.
 			[
 				[
 					'main_fields' => [
@@ -2604,7 +2604,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nLogs for text item"
 				]
 			],
 			// #12 Char item - value displayed.
@@ -2691,7 +2691,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found."
 				]
 			],
-			// #17 Char item, Threshold - value not displayed.
+			// #17 Char item, Threshold - value is displayed ignoring thresholds.
 			[
 				[
 					'main_fields' => [
@@ -2709,7 +2709,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\ncharacters_here"
 				]
 			]
 		];
