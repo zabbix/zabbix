@@ -13431,16 +13431,21 @@ void	zbx_config_clean(zbx_config_t *cfg)
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
 #define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
+#define ZBX_INTERFACE_VERSION_RESET_INTERVAL	(SEC_PER_MIN/6)
 
 	ZBX_DC_HOST			*host;
 	ZBX_DC_INTERFACE		*interface;
 	zbx_hashset_iter_t		iter;
 	zbx_interface_availability_t	*ia = NULL;
 	int				now;
+	static int			last_version_reset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
+
+	if (last_version_reset + ZBX_INTERFACE_VERSION_RESET_INTERVAL < now)
+		last_version_reset = now;
 
 	WRLOCK_CACHE;
 
@@ -13452,6 +13457,12 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
 			continue;
+
+		if (last_version_reset == now)
+		{
+			if (interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+		}
 
 		/* On server skip hosts handled by proxies. They are handled directly */
 		/* when receiving hosts' availability data from proxies.              */
