@@ -6274,7 +6274,6 @@ typedef struct
 {
 	zbx_uint64_t		hgsetid;
 	char			hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	char			*hash_str_new;
 	zbx_vector_uint64_t	hgroupids;
 	zbx_vector_uint64_t	hostids;
 } zbx_hgset_t;
@@ -6282,12 +6281,12 @@ typedef struct
 ZBX_PTR_VECTOR_DECL(hgset_ptr, zbx_hgset_t*)
 ZBX_PTR_VECTOR_IMPL(hgset_ptr, zbx_hgset_t*)
 
-static int	hgset_compare_new_hash(const void *d1, const void *d2)
+static int	hgset_compare_hash(const void *d1, const void *d2)
 {
 	const zbx_hgset_t	*h1 = *((const zbx_hgset_t * const *)d1);
 	const zbx_hgset_t	*h2 = *((const zbx_hgset_t * const *)d2);
 
-	return strcmp(h1->hash_str_new, h2->hash_str_new);
+	return strcmp(h1->hash_str, h2->hash_str);
 }
 
 static void	hgset_free(zbx_hgset_t *hgset)
@@ -6297,12 +6296,12 @@ static void	hgset_free(zbx_hgset_t *hgset)
 	zbx_free(hgset);
 }
 
-static int	hgset_hash_new_search(const void *d1, const void *d2)
+static int	hgset_hash_search(const void *d1, const void *d2)
 {
 	const zbx_hgset_t	*h1 = *((const zbx_hgset_t * const *)d1);
 	const char		*h2 = *((const char * const *)d2);
 
-	return strcmp(h1->hash_str_new, h2);
+	return strcmp(h1->hash_str, h2);
 }
 
 typedef struct
@@ -6328,10 +6327,7 @@ static int	host_permission_compare(const void *d1, const void *d2)
 
 static void	hgset_hash_add(zbx_hgset_t *hgset)
 {
-	char	hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-
-	zbx_hgset_hash_calculate(&hgset->hgroupids, hash_str, sizeof(hgset->hash_str));
-	hgset->hash_str_new = zbx_strdup(NULL, hash_str);
+	zbx_hgset_hash_calculate(&hgset->hgroupids, hgset->hash_str, sizeof(hgset->hash_str));
 }
 
 /******************************************************************************
@@ -6374,46 +6370,37 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	/* get affected hgsets with host groups and host ids */
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct hgsetid"
-			" from hgset_group"
-			" where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
-	zbx_db_select_uint64(sql, &hgsetids);
-
-	if (0 == hgsetids.values_num)
-		goto del_groups;
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hgsetid,groupid,hash"
-			" from hgset_group hg"
-			" join hgset h on hg.hgsetid=h.hgsetid"
-			" where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hgsetid", hgsetids.values, hgsetids.values_num);
-
-	result = zbx_db_select("%s order by hg.hgsetid,hg.groupid", sql);
+			"select h.hgsetid,h.groupid"
+			" from hgset_group h"
+			" where exists ("
+				"select null"
+				" from hgset_group h2"
+				" where h.hgsetid=h2.hgsetid"
+				" and");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "h2.groupid", groupids->values, groupids->values_num);
+	result = zbx_db_select("%s order by h.hgsetid,h.groupid", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	hostgroupid;
 
+		ZBX_STR2UINT64(hgsetid, row[0]);
 		ZBX_STR2UINT64(hostgroupid, row[1]);
+
+		zbx_vector_uint64_append(&hgsetids, hgsetid);
 
 		if (FAIL != zbx_vector_uint64_bsearch(groupids, hostgroupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
-		ZBX_STR2UINT64(hgsetid, row[0]);
-
 		if (0 == hgsets.values_num || hgsetid != hgsets.values[hgsets.values_num - 1]->hgsetid)
 		{
+
 			if (0 != hgsets.values_num)
 				hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
 
 			hgset = zbx_malloc(NULL, sizeof(zbx_hgset_t));
 
 			hgset->hgsetid = hgsetid;
-			hgset->hash_str_new = NULL;
-			zbx_strscpy(hgset->hash_str, row[2]);
 			zbx_vector_uint64_create(&hgset->hostids);
 			zbx_vector_uint64_create(&hgset->hgroupids);
 			zbx_vector_hgset_ptr_append(&hgsets, hgset);
@@ -6424,8 +6411,14 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != hgsets.values_num)
-		hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
+	if (0 == hgsets.values_num)
+		goto del_groups;
+
+	/* calculate hash for last hgset in vector */
+	hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
+
+	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,hgsetid from host_hgset where");
@@ -6451,7 +6444,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	/* find existing hgsets */
 
 	zbx_vector_str_create(&hashes);
-	zbx_vector_hgset_ptr_sort(&hgsets, hgset_compare_new_hash);
+	zbx_vector_hgset_ptr_sort(&hgsets, hgset_compare_hash);
 
 	for (i = 0; i < hgsets.values_num - 1; i++)
 	{
@@ -6459,7 +6452,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 		hgset = hgsets.values[i];
 
-		if (0 == strcmp(hgset->hash_str_new, hgset_next->hash_str_new))
+		if (0 == strcmp(hgset->hash_str, hgset_next->hash_str))
 		{
 			zbx_vector_uint64_append_array(&hgset->hostids, hgset_next->hostids.values,
 					hgset_next->hostids.values_num);
@@ -6469,13 +6462,13 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		}
 		else
 		{
-			zbx_vector_str_append(&hashes, hgset->hash_str_new);
+			zbx_vector_str_append(&hashes, hgset->hash_str);
 			hgset->hgsetid = 0;
 		}
 	}
 
 	hgsets.values[hgsets.values_num - 1]->hgsetid = 0;
-	zbx_vector_str_append(&hashes, hgsets.values[hgsets.values_num - 1]->hash_str_new);
+	zbx_vector_str_append(&hashes, hgsets.values[hgsets.values_num - 1]->hash_str);
 
 	new_hgsets = hgsets.values_num;
 
@@ -6489,7 +6482,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (FAIL != (i = zbx_vector_hgset_ptr_bsearch(&hgsets, (void*)row[1], hgset_hash_new_search)))
+		if (FAIL != (i = zbx_vector_hgset_ptr_bsearch(&hgsets, (void*)row[1], hgset_hash_search)))
 		{
 			ZBX_STR2UINT64(hgsets.values[i]->hgsetid, row[0]);
 			new_hgsets--;
@@ -6503,11 +6496,12 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	{
 		zbx_host_permission_t		prm;
 		zbx_vector_host_permission_t	permissions;
+		zbx_uint64_t			new_permission_hgsetid;
 
 		zbx_db_insert_prepare(&db_insert, "hgset", "hgsetid", "hash", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_group, "hgset_group", "hgsetid", "groupid", (char *)NULL);
 
-		hgsetid = zbx_db_get_maxid_num("hgset", new_hgsets);
+		new_permission_hgsetid = hgsetid = zbx_db_get_maxid_num("hgset", new_hgsets);
 
 		for (i = 0; i < hgsets.values_num; i++)
 		{
@@ -6515,7 +6509,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 				continue;
 
 			hgsets.values[i]->hgsetid = hgsetid++;
-			zbx_db_insert_add_values(&db_insert, hgsets.values[i]->hgsetid, hgsets.values[i]->hash_str_new);
+			zbx_db_insert_add_values(&db_insert, hgsets.values[i]->hgsetid, hgsets.values[i]->hash_str);
 
 			for (int j = 0; j < hgsets.values[i]->hgroupids.values_num; j++)
 			{
@@ -6562,13 +6556,14 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 				hgset = hgsets.values[i];
 
-				if (FAIL == zbx_vector_uint64_bsearch(&hgset->hgroupids, hostgroupid,
+				if (hgset->hgsetid < new_permission_hgsetid ||
+						FAIL == zbx_vector_uint64_bsearch(&hgset->hgroupids, hostgroupid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 				{
 					continue;
 				}
 
-				prm.hgsetid = hgsetid;
+				prm.hgsetid = hgset->hgsetid;
 
 				if (FAIL != (j = zbx_vector_host_permission_search(&permissions, prm,
 						host_permission_compare)))
@@ -6628,7 +6623,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hgsetid from hgset h"
+			"select h.hgsetid from hgset h"
 			" left join host_hgset hh on hh.hgsetid=h.hgsetid"
 			" where hh.hgsetid is null and");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.hgsetid", hgsetids.values, hgsetids.values_num);
