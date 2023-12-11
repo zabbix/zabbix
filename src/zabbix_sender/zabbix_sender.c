@@ -535,9 +535,10 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 static int	check_response(char *response, const char *server, unsigned short port)
 {
 	struct zbx_json_parse	jp;
-	char			value[MAX_STRING_LEN];
-	char			info[MAX_STRING_LEN];
+	char			value[MAX_STRING_LEN], info[MAX_STRING_LEN], *rhost;
 	int			ret;
+	unsigned short		rport;
+	zbx_uint64_t		rrevision;
 
 	ret = zbx_json_open(response, &jp);
 
@@ -556,6 +557,14 @@ static int	check_response(char *response, const char *server, unsigned short por
 
 		if (1 == sscanf(info, "processed: %*d; failed: %d", &failed) && 0 < failed)
 			ret = SUCCEED_PARTIAL;
+	}
+
+	if (FAIL == ret && SUCCEED == zbx_parse_redirect_response(&jp, &rhost, &rport, &rrevision))
+	{
+		printf("Response from \"%s:%hu\": \"Redirect to \"%s:%hu\"\n", server, port, rhost, rport);
+		fflush(stdout);
+
+		zbx_free(rhost);
 	}
 
 	return ret;
@@ -625,8 +634,20 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	ret = zbx_comms_exchange_with_redirect(config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
 			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls, sendval_args->json->buffer,
-			connect_callback, sendval_args->json, &data);
+			connect_callback, sendval_args->json, &data, NULL);
 
+	if (SUCCEED == ret)
+	{
+		if (FAIL == check_response(data, sendval_args->addrs->values[0]->ip,
+				sendval_args->addrs->values[0]->port))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
+					sendval_args->addrs->values[0]->ip, sendval_args->addrs->values[0]->port,
+					data);
+		}
+
+		zbx_free(data);
+	}
 
 #if !defined(_WINDOWS)
 	for (i = sendval_args->addrs->values_num - 1; i >= 0; i--)

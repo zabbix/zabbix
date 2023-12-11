@@ -23,6 +23,7 @@
 #include "zbxjson.h"
 #include "zbxlog.h"
 #include "zbxtime.h"
+#include "zbxip.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "zbxnix.h"
@@ -382,6 +383,38 @@ void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: parse redirect block                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned short *port,
+		zbx_uint64_t *revision)
+{
+	struct zbx_json_parse	jp_redirect;
+	char			buf[MAX_STRING_LEN];
+
+	if (FAIL == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REDIRECT, &jp_redirect))
+		return FAIL;
+
+	if (FAIL == zbx_json_value_by_name(&jp_redirect, ZBX_PROTO_TAG_REVISION, buf, sizeof(buf), NULL))
+		return FAIL;
+
+	if (FAIL == zbx_is_uint64(buf, revision))
+		return FAIL;
+
+	if (FAIL == zbx_json_value_by_name(&jp_redirect, ZBX_PROTO_TAG_ADDRESS, buf, sizeof(buf), NULL))
+		return FAIL;
+
+	if (FAIL == zbx_parse_serveractive_element(buf, host, port, 0))
+		return FAIL;
+
+	if (0 == *port)
+		*port = ZBX_DEFAULT_SERVER_PORT;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: check response for redirect tag                                   *
  *                                                                            *
  * Parameters: data  - [IN] response                                          *
@@ -399,10 +432,10 @@ void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t
  ******************************************************************************/
 static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 {
-	zbx_json_parse_t	jp, jp_redirect;
+	zbx_json_parse_t	jp;
 	char			buf[MAX_STRING_LEN], *host = NULL;
 	zbx_uint64_t		revision;
-	int			i, ret = FAIL;
+	int			i;
 	zbx_addr_t		*addr;
 	unsigned short		port;
 
@@ -415,19 +448,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 	if (0 != strcmp(buf, ZBX_PROTO_VALUE_FAILED))
 		return FAIL;
 
-	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_REDIRECT, &jp_redirect))
-		return FAIL;
-
-	if (FAIL == zbx_json_value_by_name(&jp_redirect, ZBX_PROTO_TAG_REVISION, buf, sizeof(buf), NULL))
-		return FAIL;
-
-	if (FAIL == zbx_is_uint64(buf, &revision))
-		return FAIL;
-
-	if (FAIL == zbx_json_value_by_name(&jp_redirect, ZBX_PROTO_TAG_ADDRESS, buf, sizeof(buf), NULL))
-		return FAIL;
-
-	if (FAIL == zbx_parse_serveractive_element(buf, &host, &port, 0))
+	if (SUCCEED != zbx_parse_redirect_response(&jp, &host, &port, &revision))
 		return FAIL;
 
 	for (i = 0; i < addrs->values_num; i++)
@@ -479,7 +500,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
  ******************************************************************************/
 int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int loglevel, const zbx_config_tls_t *config_tls,
-		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out)
+		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out, char **error)
 {
 	zbx_socket_t		sock;
 	int			ret = FAIL, retries = 0;
@@ -489,7 +510,13 @@ retry:
 	if (SUCCEED != zbx_connect_to_server(&sock, source_ip, addrs, timeout, connect_timeout, retry_interval,
 			loglevel, config_tls))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unable to connect to [%s]:%d: %s",
+				addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
+
+		if (NULL != error)
+			*error = zbx_strdup(NULL, zbx_socket_strerror());
 		ret = CONNECT_ERROR;
+
 		goto out;
 	}
 
@@ -502,7 +529,10 @@ retry:
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "unable to send to [%s]:%d: %s",
 				addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
+		if (NULL != error)
+			*error = zbx_strdup(NULL, zbx_socket_strerror());
 		ret = SEND_ERROR;
+
 		goto cleanup;
 	}
 
@@ -510,8 +540,10 @@ retry:
 	{
 		zabbix_log(loglevel, "unable to receive from [%s]:%d: %s",
 				addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
-
+		if (NULL != error)
+			*error = zbx_strdup(NULL, zbx_socket_strerror());
 		ret = RECV_ERROR;
+
 		goto cleanup;
 	}
 
@@ -528,6 +560,8 @@ retry:
 
 	if (NULL != out)
 		*out = zbx_socket_detach_buffer(&sock);
+
+	ret = SUCCEED;
 
 cleanup:
 	zbx_tcp_close(&sock);
