@@ -1563,7 +1563,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
-static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision)
+void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision)
 {
 	ZBX_DC_PROXY	*proxy;
 	int		i;
@@ -1583,7 +1583,7 @@ static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zb
 	proxy->revision = revision;
 }
 
-static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision)
+void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision)
 {
 	ZBX_DC_PROXY	*proxy;
 
@@ -1772,11 +1772,11 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			}
 		}
 
-		if (0 != found && 0 != host->proxyid && host->proxyid != proxyid)
-		{
+		if (0 != found && 0 != host->proxyid && host->proxyid != proxyid && 0 == host->proxy_groupid)
 			dc_host_deregister_proxy(host, host->proxyid, revision);
-		}
 
+		/* hosts assigned to proxy groups have NULL proxyid in database,              */
+		/* so the proxy updates are done only for hosts directly monitored by proxies */
 		if (0 != proxyid)
 		{
 			if (0 == found || host->proxyid != proxyid)
@@ -1790,7 +1790,10 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			}
 		}
 
-		host->proxyid = proxyid;
+		/* when monitored by proxy group the proxyid in cache is updated */
+		/* during host_proxy table sync                                  */
+		if (0 == proxy_groupid)
+			host->proxyid = proxyid;
 
 		/* update 'hosts_h' indexes using new data, if not done already */
 
@@ -1871,7 +1874,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 			zbx_vector_uint64_append(active_avail_diff, host->hostid);
 
-			if (0 != host->proxyid)
+			if (0 != host->proxyid && 0 == host->proxy_groupid)
 				dc_host_deregister_proxy(host, host->proxyid, revision);
 		}
 
@@ -7632,7 +7635,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	connector_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	dc_sync_host_proxy(&hp_sync);
+	dc_sync_host_proxy(&hp_sync, new_revision);
 	hp_sec2 = zbx_time() - sec;
 
 	FINISH_SYNC;

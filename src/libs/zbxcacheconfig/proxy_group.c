@@ -310,13 +310,14 @@ void	dc_update_host_proxy(const char *host_old, const char *host_new)
  *           5 - host.host (NULL on proxies)                                  *
  *                                                                            *
  ******************************************************************************/
-void	dc_sync_host_proxy(zbx_dbsync_t *sync)
+void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 	zbx_dc_host_proxy_t	*hp;
 	int			ret;
+	ZBX_DC_HOST		*dc_host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -339,7 +340,18 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(hp->revision, row[4]);
 
 		if (SUCCEED != zbx_db_is_null(row[5]))
+		{
 			dc_strpool_replace(found, &hp->host, row[5]);
+
+			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hp->hostid)))
+			{
+				if (0 != dc_host->proxy_groupid)
+				{
+					dc_host_register_proxy(dc_host, hp->proxyid, revision);
+					dc_host->proxyid = hp->proxyid;
+				}
+			}
+		}
 		else
 			dc_strpool_replace(found, &hp->host, row[2]);
 
@@ -350,6 +362,15 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync)
 	{
 		if (NULL == (hp = (zbx_dc_host_proxy_t *)zbx_hashset_search(&config->proxy_groups, &rowid)))
 			continue;
+
+		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hp->hostid)))
+		{
+			if (0 != dc_host->proxy_groupid)
+			{
+				dc_host_deregister_proxy(dc_host, hp->proxyid, revision);
+				dc_host->proxyid = 0;
+			}
+		}
 
 		dc_deregister_host_proxy(hp);
 		zbx_hashset_remove_direct(&config->host_proxy, hp);
