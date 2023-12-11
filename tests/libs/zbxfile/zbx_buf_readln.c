@@ -36,7 +36,7 @@ static void print_line(const char *line, int size)
 		if (isgraph(line[i]))
 			printf("%c", line[i]);
 		else
-			printf("\\x%02X", line[i]);
+			printf("\\x%02X", (unsigned int)line[i]);
 	}
 	printf("\" size: %d\n", size);
 }
