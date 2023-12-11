@@ -54,7 +54,7 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 		struct zbx_json_parse	jp, jp_data, jp_row;
 		const char		*p = NULL;
 		size_t			value_alloc = 0;
-		char			*value = NULL, version_str[MAX_STRING_LEN];
+		char			*value = NULL, tmp[MAX_STRING_LEN];
 
 		if (FAIL == zbx_json_open(s->buffer, &jp))
 		{
@@ -63,7 +63,7 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 			return;
 		}
 
-		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_VERSION, version_str, sizeof(version_str), NULL))
+		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON"
 					" object.", ZBX_PROTO_TAG_VERSION));
@@ -71,7 +71,15 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
 			return;
 		}
 
-		*version = zbx_get_agent_protocol_version_int(version_str);
+		*version = zbx_get_agent_protocol_version_int(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL))
+		{
+			zbx_replace_invalid_utf8(tmp);
+			SET_MSG_RESULT(result, zbx_strdup(NULL, tmp));
+			*ret = NETWORK_ERROR;
+			return;
+		}
 
 		if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 		{
