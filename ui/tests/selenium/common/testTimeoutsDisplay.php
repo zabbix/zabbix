@@ -209,7 +209,7 @@ class testTimeoutsDisplay extends CWebTest {
 			return;
 		}
 
-		// If proxy use Global timeouts values - change parameter to global and Reset global values ot timeouts page.
+		// If proxy uses Global timeouts values - change parameter to global and Reset global values to timeouts page.
 		if ($values === self::GLOBAL_DEFAULT) {
 			$form->fill(['Timeouts for item types' => 'Global']);
 			$form->submit();
@@ -241,9 +241,11 @@ class testTimeoutsDisplay extends CWebTest {
 			// Discovery rule doesn't have overlay.
 			if ($button_name === 'Create discovery rule') {
 				$this->page->waitUntilReady();
+				$selector = 'id:timeout';
 			}
 			else {
 				COverlayDialogElement::find()->waitUntilReady()->one();
+				$selector = 'id:inherited_timeout';
 			}
 
 			$form = $this->query('name:itemForm')->asForm()->one();
@@ -254,12 +256,7 @@ class testTimeoutsDisplay extends CWebTest {
 				: ['Type' => $item_type];
 
 			$form->fill($fill_form_values);
-			$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
-			$this->assertEquals('Global', $radio->getText());
-			$this->assertTrue($radio->isEnabled());
-			$this->assertTrue($form->getField('Timeout')->isVisible());
-			$this->assertFalse($form->getField('Timeout')->isEnabled());
-			$form->checkValue(['Timeout' => $timeout]);
+			$this->checkItemsTimeoutField($form, $selector, $timeout);
 
 			if ($button_name === 'Create discovery rule') {
 				$this->page->open($link)->waitUntilReady();
@@ -292,16 +289,15 @@ class testTimeoutsDisplay extends CWebTest {
 			// Discovery rule doesn't have overlay.
 			if ($table_selector === 'name:discovery') {
 				$this->page->waitUntilReady();
+				$selector = 'id:timeout';
 			}
 			else {
 				COverlayDialogElement::find()->waitUntilReady()->one();
+				$selector = 'id:inherited_timeout';
 			}
 
 			$form = $this->query('name:itemForm')->asForm()->one();
-			$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
-			$this->assertEquals('Global', $radio->getText());
-			$this->assertFalse($radio->isEnabled());
-			$form->checkValue(['Timeout' => $timeout]);
+			$this->checkItemsTimeoutField($form, $selector, $timeout, false);
 
 			if ($table_selector === 'name:discovery') {
 				$this->page->open($link)->waitUntilReady();
@@ -310,5 +306,22 @@ class testTimeoutsDisplay extends CWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
+	}
+
+	/**
+	 * Check timeout radio button and input field for items, item prototypes and LLD.
+	 *
+	 * @param CFormElement $form    items, items prototype, discovery form
+	 * @param string $selector      timeout input field selector
+	 * @param string $value         timeout input field value
+	 * @param boolean $status       is timeout radio button enabled or disabled
+	 */
+	protected function checkItemsTimeoutField($form, $selector, $value, $status = true) {
+		$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
+		$this->assertEquals('Global', $radio->getText());
+		$this->assertTrue($radio->isEnabled($status));
+		$this->assertTrue($form->getField($selector)->isVisible());
+		$this->assertFalse($form->getField($selector)->isEnabled());
+		$form->checkValue([$selector => $value]);
 	}
 }
