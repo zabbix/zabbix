@@ -312,14 +312,17 @@ void	dc_update_host_proxy(const char *host_old, const char *host_new)
  ******************************************************************************/
 void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
-	zbx_dc_host_proxy_t	*hp;
-	int			ret;
-	ZBX_DC_HOST		*dc_host;
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
+	zbx_dc_host_proxy_t		*hp;
+	int				ret;
+	ZBX_DC_HOST			*dc_host;
+	zbx_vector_dc_host_ptr_t	hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_dc_host_ptr_create(&hosts);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -349,6 +352,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				{
 					dc_host_register_proxy(dc_host, hp->proxyid, revision);
 					dc_host->proxyid = hp->proxyid;
+					zbx_vector_dc_host_ptr_append(&hosts, dc_host);
 				}
 			}
 		}
@@ -369,12 +373,37 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			{
 				dc_host_deregister_proxy(dc_host, hp->proxyid, revision);
 				dc_host->proxyid = 0;
+				zbx_vector_dc_host_ptr_append(&hosts, dc_host);
 			}
 		}
 
 		dc_deregister_host_proxy(hp);
 		zbx_hashset_remove_direct(&config->host_proxy, hp);
 	}
+
+	if (0 != hosts.values_num)
+	{
+		zbx_vector_uint64_t	hostids;
+
+		zbx_vector_uint64_create(&hostids);
+
+		for (int i = 0; i < hosts.values_num; i++)
+		{
+			ZBX_DC_INTERFACE	*interface;
+
+			for (i = 0; i <  hosts.values[i]->interfaces_v.values_num; i++)
+			{
+				interface = (ZBX_DC_INTERFACE *)hosts.values[i]->interfaces_v.values[i];
+				interface->reset_availability = 1;
+			}
+		}
+
+		zbx_dbsync_process_active_avail_diff(&hostids);
+
+		zbx_vector_uint64_destroy(&hostids);
+	}
+
+	zbx_vector_dc_host_ptr_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

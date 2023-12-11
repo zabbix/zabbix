@@ -6865,7 +6865,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 	zbx_db_free_result(result);
 }
 
-static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
+void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 {
 	zbx_ipc_message_t	message;
 	unsigned char		*data = NULL;

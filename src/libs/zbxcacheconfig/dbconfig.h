@@ -1124,4 +1124,6 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_
 void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
 void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
 
+void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff);
+
 #endif
