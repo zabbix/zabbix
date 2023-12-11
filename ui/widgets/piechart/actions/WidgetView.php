@@ -492,25 +492,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				continue;
 			}
 
-			$results = Manager::History()->getAggregationByInterval(
-				$metric['items'], $time_period['time_from'], $time_period['time_to'],
-				$metric['options']['aggregate_function'], $time_period['time_to']
+			$values = Manager::History()->getAggregatedValues($metric['items'],
+				$metric['options']['aggregate_function'], $time_period['time_from'], $time_period['time_to']
 			);
 
-			if (!$results) {
+			if (!$values) {
 				continue;
 			}
 
-			$values = [];
-
-			foreach ($results as $result) {
-				if ($metric['options']['aggregate_function'] == AGGREGATE_COUNT) {
-					$values[] = $result['data'][0]['count'];
-				}
-				else {
-					$values[] = $result['data'][0]['value'];
-				}
-			}
+			$values = array_column($values, 'value');
 
 			switch($metric['options']['dataset_aggregation']) {
 				case AGGREGATE_MAX:
