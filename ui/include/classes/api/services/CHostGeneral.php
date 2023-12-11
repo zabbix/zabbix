@@ -1365,10 +1365,18 @@ abstract class CHostGeneral extends CHostBase {
 			return;
 		}
 
+		if (array_key_exists('macro_names', $del_objectids)) {
+			$trimmed_del_macros = [];
+
+			foreach ($del_objectids['macro_names'] as $macro) {
+				$trimmed_del_macros[] = CApiInputValidator::trimMacro($macro);
+			}
+		}
+
 		foreach ($hosts as &$host) {
 			foreach ($db_hosts[$host[$id_field_name]]['macros'] as $db_macro) {
 				if (!array_key_exists('macro_names', $del_objectids)
-						|| !in_array($db_macro['macro'], $del_objectids['macro_names'])) {
+						|| !in_array(CApiInputValidator::trimMacro($db_macro['macro']), $trimmed_del_macros)) {
 					$host['macros'][] = array_intersect_key($db_macro, array_flip(['hostmacroid']));
 				}
 			}

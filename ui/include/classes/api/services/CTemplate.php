@@ -1075,7 +1075,7 @@ class CTemplate extends CHostGeneral {
 			$templates[] = ['templateid' => $templateid];
 		}
 
-		CArrayHelper::renameKeys($data, ['macros' => 'macro_names']);
+		$data = CArrayHelper::renameKeys($data, ['macros' => 'macro_names']);
 
 		$this->addObjectsByData($data, $templates);
 		$this->addAffectedObjects($templates, $db_templates);

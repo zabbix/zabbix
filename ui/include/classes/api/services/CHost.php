@@ -1396,7 +1396,7 @@ class CHost extends CHostGeneral {
 			$hosts[] = ['hostid' => $hostid];
 		}
 
-		CArrayHelper::renameKeys($data, ['macros' => 'macro_names']);
+		$data = CArrayHelper::renameKeys($data, ['macros' => 'macro_names']);
 
 		$this->addObjectsByData($data, $hosts);
 		$this->addAffectedObjects($hosts, $db_hosts);
