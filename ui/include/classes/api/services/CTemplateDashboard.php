@@ -101,7 +101,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 				$db_host_templates = DBselect(
 					'SELECT DISTINCT ht.templateid'.
 					' FROM hosts h'.
-					' JOIN host_hgset hh ON ht.hostid=hh.hostid'.
+					' JOIN host_hgset hh ON h.hostid=hh.hostid'.
 					' JOIN permission p ON hh.hgsetid=p.hgsetid'.
 						' AND p.ugsetid='.self::$userData['ugsetid'].
 					' JOIN hosts_templates ht ON h.hostid=ht.hostid'.
