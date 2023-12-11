@@ -560,7 +560,7 @@ class CApiService {
 	/**
 	 * Unset the NCLOB fields from output of the given options, if SQL query contains DISTINCT statement. Replace the
 	 * API_OUTPUT_EXTEND value in output of the given options to self::OUTPUT_FIELDS (if defined) or to all fields that
-	 * is specified in table schema.
+	 * are specified in table schema.
 	 *
 	 * @param array $options
 	 * @param array $sql_parts

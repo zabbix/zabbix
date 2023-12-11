@@ -91,9 +91,8 @@ class CAlert extends CApiService {
 			$options['output'] = self::OUTPUT_FIELDS;
 		}
 
-		$sql = $this->createSelectQuery($this->tableName, $options);
-		$res = DBselect($sql, $options['limit']);
-		$db_distinct = strpos($sql, 'SELECT DISTINCT') === 0;
+		$sql_parts = $this->createSelectQueryParts($this->tableName, $this->tableAlias(), $options);
+		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_alerts = [];
 
@@ -116,7 +115,7 @@ class CAlert extends CApiService {
 		}
 
 		if ($db_alerts) {
-			if ($db_distinct) {
+			if (self::dbDistinct($sql_parts)) {
 				$db_alerts = $this->addNclobFieldValues($options, $db_alerts);
 			}
 
@@ -156,7 +155,7 @@ class CAlert extends CApiService {
 					'SELECT NULL'.
 					' FROM actions aa'.
 					' WHERE a.actionid=aa.actionid'.
-						' AND aa.eventsource='.zbx_dbstr($options['eventsource']).
+						' AND '.dbConditionInt('aa.eventsource', $options['eventsource']).
 				')';
 			}
 			else {

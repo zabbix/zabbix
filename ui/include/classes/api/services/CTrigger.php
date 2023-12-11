@@ -139,32 +139,31 @@ class CTrigger extends CTriggerGeneral {
 			if (self::$userData['ugsetid'] === null) {
 				return [];
 			}
-			else {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from'][] = 'host_hgset hh';
-				$sqlParts['from'][] = 'permission p';
-				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-				$sqlParts['where'][] = 'i.hostid=hh.hostid';
-				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
-				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-				if ($options['editable']) {
-					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
-				}
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-				$sqlParts['where'][] = 'NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f1'.
-					' JOIN items i1 ON f1.itemid=i1.itemid'.
-					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
-					' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
-						' AND p1.ugsetid=p.ugsetid'.
-					' WHERE t.triggerid=f1.triggerid'.
-						' AND p1.permission IS NULL'.
-				')';
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
 			}
+
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM functions f1'.
+				' JOIN items i1 ON f1.itemid=i1.itemid'.
+				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
+					' AND p1.ugsetid=p.ugsetid'.
+				' WHERE t.triggerid=f1.triggerid'.
+					' AND p1.permission IS NULL'.
+			')';
 		}
 
 		// groupids

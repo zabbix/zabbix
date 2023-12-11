@@ -134,16 +134,15 @@ class CDiscoveryRule extends CItemGeneral {
 			if (self::$userData['ugsetid'] === null) {
 				return [];
 			}
-			else {
-				$sqlParts['from'][] = 'host_hgset hh';
-				$sqlParts['from'][] = 'permission p';
-				$sqlParts['where'][] = 'i.hostid=hh.hostid';
-				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
-				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-				if ($options['editable']) {
-					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
-				}
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
 			}
 		}
 

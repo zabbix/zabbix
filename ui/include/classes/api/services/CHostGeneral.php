@@ -290,7 +290,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	private static function getHgSetHash(array $groupids): string {
-		uasort($groupids, static function (string $a, string $b): int { return bccomp($a, $b); });
+		usort($groupids, static function (string $a, string $b): int { return bccomp($a, $b); });
 
 		return hash('sha256', implode('|', $groupids));
 	}
@@ -1410,10 +1410,9 @@ abstract class CHostGeneral extends CHostBase {
 
 	protected static function deleteHgSets(array $db_hosts): void {
 		$hgsets = [];
+		$hgset_hash = self::getHgSetHash([]);
 
 		foreach ($db_hosts as $hostid => $foo) {
-			$hgset_hash = self::getHgSetHash([]);
-
 			$hgsets[$hgset_hash]['hash'] = $hgset_hash;
 			$hgsets[$hgset_hash]['groupids'] = [];
 			$hgsets[$hgset_hash]['hostids'][] = $hostid;

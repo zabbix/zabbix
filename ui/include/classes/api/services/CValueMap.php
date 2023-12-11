@@ -77,16 +77,15 @@ class CValueMap extends CApiService {
 			if (self::$userData['ugsetid'] === null) {
 				return [];
 			}
-			else {
-				$sql_parts['from'][] = 'host_hgset hh';
-				$sql_parts['from'][] = 'permission p';
-				$sql_parts['where'][] = 'vm.hostid=hh.hostid';
-				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
-				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-				if ($options['editable']) {
-					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
-				}
+			$sql_parts['from'][] = 'host_hgset hh';
+			$sql_parts['from'][] = 'permission p';
+			$sql_parts['where'][] = 'vm.hostid=hh.hostid';
+			$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 			}
 		}
 

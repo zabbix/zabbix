@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-use FFI\CData;
 
 /**
  * Class for generating DB objects or API data for tests.

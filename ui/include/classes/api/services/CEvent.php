@@ -227,51 +227,49 @@ class CEvent extends CApiService {
 			if (self::$userData['ugsetid'] === null) {
 				$sql_parts['where'][] = '1=0';
 			}
-			else {
-				if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-					$sql_parts['from']['f'] = 'functions f';
-					$sql_parts['from']['i'] = 'items i';
-					$sql_parts['from'][] = 'host_hgset hh';
-					$sql_parts['from'][] = 'permission p';
-					$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
-					$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-					$sql_parts['where'][] = 'i.hostid=hh.hostid';
-					$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
-					$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+			elseif ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-					if ($options['editable']) {
-						$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
-					}
-
-					$sql_parts['where'][] = 'NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM functions f1'.
-						' JOIN items i1 ON f1.itemid=i1.itemid'.
-						' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
-						' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
-							' AND p1.ugsetid=p.ugsetid'.
-						' WHERE e.objectid=f1.triggerid'.
-							' AND p1.permission IS NULL'.
-					')';
-
-					if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
-						$sql_parts = self::addTagFilterSqlParts(getUserGroupsByUserId(self::$userData['userid']),
-							$sql_parts, $options['value'][0]
-						);
-					}
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
-				elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-					$sql_parts['from']['i'] = 'items i';
-					$sql_parts['from'][] = 'host_hgset hh';
-					$sql_parts['from'][] = 'permission p';
-					$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
-					$sql_parts['where'][] = 'i.hostid=hh.hostid';
-					$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
-					$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-					if ($options['editable']) {
-						$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
-					}
+				$sql_parts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f1'.
+					' JOIN items i1 ON f1.itemid=i1.itemid'.
+					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+					' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
+						' AND p1.ugsetid=p.ugsetid'.
+					' WHERE e.objectid=f1.triggerid'.
+						' AND p1.permission IS NULL'.
+				')';
+
+				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
+					$sql_parts = self::addTagFilterSqlParts(getUserGroupsByUserId(self::$userData['userid']),
+						$sql_parts, $options['value'][0]
+					);
+				}
+			}
+			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
 			}
 		}

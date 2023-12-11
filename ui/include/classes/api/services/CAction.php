@@ -157,7 +157,6 @@ class CAction extends CApiService {
 				' GROUP BY c.value'.
 				' HAVING MIN(r.permission) IS NULL'.
 					' OR MIN(r.permission)='.PERM_DENY.
-					' OR MAX(r.permission)<'.PERM_READ.
 			')';
 
 			// Check permissions of hosts and templates used in filter conditions.
@@ -217,7 +216,7 @@ class CAction extends CApiService {
 				' WHERE a.actionid=o.actionid'.
 				' GROUP BY s.groupid'.
 				' HAVING MIN(r.permission) IS NULL'.
-					' OR MIN(r.permission)=0'.
+					' OR MIN(r.permission)='.PERM_DENY.
 			')';
 
 			// Check permissions of host groups mentioned for "execute script" operations.
@@ -230,7 +229,7 @@ class CAction extends CApiService {
 				' WHERE a.actionid=o.actionid'.
 				' GROUP BY ocg.groupid'.
 				' HAVING MIN(r.permission) IS NULL'.
-					' OR MIN(r.permission)=0'.
+					' OR MIN(r.permission)='.PERM_DENY.
 			')';
 
 			// Check permissions of hosts mentioned for "execute script" operations.
@@ -255,7 +254,7 @@ class CAction extends CApiService {
 				' WHERE a.actionid=o.actionid'.
 				' GROUP BY og.groupid'.
 				' HAVING MIN(r.permission) IS NULL'.
-					' OR MIN(r.permission)=0'.
+					' OR MIN(r.permission)='.PERM_DENY.
 			')';
 
 			// Check permissions of templates used in discovery and autoregistration operations.

@@ -1250,7 +1250,7 @@ class CUser extends CApiService {
 	}
 
 	private static function getUgSetHash(array $usrgrpids): string {
-		uasort($usrgrpids, static function (string $a, string $b): int { return bccomp($a, $b); });
+		usort($usrgrpids, static function (string $a, string $b): int { return bccomp($a, $b); });
 
 		return hash('sha256', implode('|', $usrgrpids));
 	}
@@ -1298,7 +1298,7 @@ class CUser extends CApiService {
 		$db_user_ugsetids = self::getDbUserUgSetIds($ugsets);
 		$db_ugsetids = array_flip($db_user_ugsetids);
 
-		$empty_ugset_hash = hash('sha256', '');
+		$empty_ugset_hash = self::getUgSetHash([]);
 
 		if (array_key_exists($empty_ugset_hash, $ugsets)) {
 			DB::delete('user_ugset', ['userid' => $ugsets[$empty_ugset_hash]['userids']]);
@@ -1683,12 +1683,11 @@ class CUser extends CApiService {
 
 	private static function deleteUgSets(array $db_users): void {
 		$ugsets = [];
+		$ugset_hash = self::getUgSetHash([]);
 
 		foreach ($db_users as $db_user) {
 			if ($db_user['role'] && $db_user['role']['type'] != USER_TYPE_SUPER_ADMIN
 					&& $db_user['usrgrps']) {
-				$ugset_hash = self::getUgSetHash([]);
-
 				$ugsets[$ugset_hash]['hash'] = $ugset_hash;
 				$ugsets[$ugset_hash]['usrgrpids'] = [];
 				$ugsets[$ugset_hash]['userids'][] = $db_user['userid'];
