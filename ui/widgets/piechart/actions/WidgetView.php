@@ -22,6 +22,7 @@
 namespace Widgets\PieChart\Actions;
 
 use API,
+	CAggFunctionData,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
@@ -569,6 +570,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($units_config['units_show'] == self::SHOW_UNITS_ON && $units_config['units_value'] !== '') {
 					$metric['units'] = $units_config['units_value'];
+				}
+				elseif (!CAggFunctionData::preservesUnits($metric['options']['aggregate_function'])) {
+					$metric['units'] = '';
 				}
 
 				if ($chart_units === null || $is_total) {

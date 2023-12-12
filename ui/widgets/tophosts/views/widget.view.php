@@ -127,8 +127,8 @@ else {
 						$column['value'] = _('binary value');
 					}
 					else {
-						$formatted_value = formatAggregatedHistoryValue($column_config['aggregate_function'],
-							$column['value'], $column['item'], true, [
+						$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
+							$column_config['aggregate_function'], false, true, [
 								'decimals' => $column_config['decimal_places'],
 								'decimals_exact' => true,
 								'small_scientific' => false,

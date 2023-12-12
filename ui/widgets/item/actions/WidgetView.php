@@ -62,7 +62,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			[$data_last, $data_prev] = $this->getItemValues($item, $show_change_indicator);
 
 			$output += [
-				'cells' => $this->arrangeAndConfigure($this->getElements($item, $data_last, $data_prev)),
+				'cells' => $this->arrangeAndConfigure(
+					$this->getElements($item, $data_last, $data_prev, $this->fields_values['aggregate_function'])
+				),
 				'url' => $this->getUrl($item),
 				'bg_color' => $this->getBgColor($item, $data_last)
 			];
@@ -200,7 +202,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $item;
 	}
 
-	private function getElements(array $item, ?array $data_last, ?array $data_prev): array {
+	private function getElements(array $item, ?array $data_last, ?array $data_prev, int $function): array {
 		$elements = [
 			'description' => '',
 			'value_type' => $item['value_type'],
@@ -242,21 +244,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 		switch ($item['value_type']) {
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
+				$force_units = false;
+
 				if ($this->fields_values['units_show'] == 1) {
 					if ($this->fields_values['units'] !== '') {
 						$item['units'] = $this->fields_values['units'];
+						$force_units = true;
 					}
 				}
 				else {
 					$item['units'] = '';
 				}
 
-				$formatted_value = formatHistoryValueRaw($data_last['value'], $item, false, [
-					'decimals' => $this->fields_values['decimal_places'],
-					'decimals_exact' => true,
-					'small_scientific' => false,
-					'zero_as_zero' => false
-				]);
+				$formatted_value = formatAggregatedHistoryValueRaw($data_last['value'], $item, $function, $force_units,
+					false, [
+						'decimals' => $this->fields_values['decimal_places'],
+						'decimals_exact' => true,
+						'small_scientific' => false,
+						'zero_as_zero' => false
+					]
+				);
 
 				$elements['value'] = $formatted_value['value'];
 				$elements['units'] = $formatted_value['units'];
@@ -292,7 +299,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			case ITEM_VALUE_TYPE_BINARY:
 				$elements['value'] = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 					? italic(_('binary value'))
-					: formatHistoryValue($data_last['value'], $item, false);
+					: formatAggregatedHistoryValue($data_last['value'], $item, $function, false, false);
 
 				if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data_prev !== null
 						&& $data_last['value'] !== $data_prev['value']) {

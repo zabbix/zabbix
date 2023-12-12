@@ -1021,28 +1021,54 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
  * Prepare aggregated item value for displaying, apply value map and/or convert units if appropriate for the aggregation
  * function.
  *
- * @see formatHistoryValue
+ * @see formatAggregatedHistoryValueRaw
  *
- * @param int              $function         Aggregation function (AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG,
- *                                           AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST).
  * @param int|float|string $value
  * @param array            $item
+ * @param int              $function         Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX,
+ *                                           AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST,
+ *                                           AGGREGATE_LAST).
+ * @param bool             $force_units      Whether to keep units despite the aggregation function not supporting it.
  * @param bool             $trim             Whether to trim non-numeric value to a length of 20 characters.
  * @param array            $convert_options  Options for unit conversion. See @convertUnitsRaw.
  *
  * @return string
  */
-function formatAggregatedHistoryValue(int $function, $value, array $item, bool $trim = true,
+function formatAggregatedHistoryValue($value, array $item, int $function, bool $force_units = false, bool $trim = true,
 		array $convert_options = []): string {
-	if (in_array($function, [AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])) {
+	$formatted_value = formatAggregatedHistoryValueRaw($value, $item, $function, $force_units, $trim, $convert_options);
+
+	return $formatted_value['value'].($formatted_value['units'] !== '' ? ' '.$formatted_value['units'] : '');
+}
+
+/**
+ * Prepare aggregated item value for displaying, apply value map and/or convert units if appropriate for the aggregation
+ * function.
+ *
+ * @see formatHistoryValueRaw
+ *
+ * @param int|float|string $value
+ * @param array            $item
+ * @param int              $function         Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX,
+ *                                           AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST,
+ *                                           AGGREGATE_LAST).
+ * @param bool             $force_units      Whether to keep units despite the aggregation function not supporting it.
+ * @param bool             $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array            $convert_options  Options for unit conversion. See @convertUnitsRaw.
+ *
+ * @return array
+ */
+function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
+		bool $trim = true, array $convert_options = []): array {
+	if (!CAggFunctionData::preservesValueMapping($function)) {
 		unset($item['valuemap']['mappings']);
 	}
 
-	if ($function == AGGREGATE_COUNT) {
+	if (!$force_units && !CAggFunctionData::preservesUnits($function)) {
 		$item['units'] = '';
 	}
 
-	return formatHistoryValue($value, $item, $trim, $convert_options);
+	return formatHistoryValueRaw($value, $item, $trim, $convert_options);
 }
 
 /**
