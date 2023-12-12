@@ -29,13 +29,15 @@ type AddressSet interface {
 
 	// next cycles the address set by selecting next address
 	next()
+	// reset cyckles addresses if the current is redirected
+	reset()
 	// count returns number of addresses in set
 	count() int
 	// addRedirect adds/updates redirected address in set
-	addRedirect(redirect *address) bool
+	addRedirect(addr string, revision uint64) bool
 }
 
 type address struct {
-	Addr     string `json:"address"`
-	Revision uint64 `json:"revision"`
+	addr     string
+	revision uint64
 }

@@ -36,7 +36,7 @@ func NewAddressPool(addrs []string) AddressSet {
 	}
 
 	for _, s := range addrs {
-		a.pool = append(a.pool, address{Addr: s})
+		a.pool = append(a.pool, address{addr: s})
 	}
 
 	return a
@@ -49,7 +49,7 @@ func (a *addressPool) String() string {
 	var sb strings.Builder
 
 	for _, addr := range a.pool {
-		sb.WriteString(addr.Addr)
+		sb.WriteString(addr.addr)
 		sb.WriteString(",")
 	}
 
@@ -66,24 +66,42 @@ func (a *addressPool) Get() string {
 		return ""
 	}
 
-	return a.pool[0].Addr
+	return a.pool[0].addr
+}
+
+func (a *addressPool) nextAddress() {
+	a.pool = append(a.pool, a.pool[0])
+	a.pool = append(a.pool[:0], a.pool[1:]...)
 }
 
 func (a *addressPool) next() {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	a.pool = append(a.pool, a.pool[0])
-	a.pool = append(a.pool[:0], a.pool[1:]...)
+	a.nextAddress()
 }
 
-func (a *addressPool) addRedirect(redirect *address) bool {
+func (a *addressPool) reset() {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	if 0 == a.pool[0].revision {
+		return
+	}
+
+	a.nextAddress()
+}
+
+func (a *addressPool) addRedirect(addr string, revision uint64) bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
 	for i, addr := range a.pool {
-		if addr.Revision != 0 {
-			if redirect.Revision < addr.Revision {
+		if addr.revision != 0 {
+			if revision < addr.revision {
+				if i == 0 {
+					a.nextAddress()
+				}
 				return false
 			}
 			a.pool = append(a.pool[:i], a.pool[i+1:]...)
@@ -93,11 +111,15 @@ func (a *addressPool) addRedirect(redirect *address) bool {
 	}
 
 	a.pool = append(a.pool[:1], a.pool...)
-	a.pool[0] = *redirect
+	a.pool[0].addr = addr
+	a.pool[0].revision = revision
 
 	return true
 }
 
 func (a *addressPool) count() int {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
 	return len(a.pool)
 }

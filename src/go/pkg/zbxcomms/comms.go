@@ -49,7 +49,9 @@ const (
 	connStateEstablished
 )
 
-const responseFailed = "failed"
+const (
+	responseFailed = "failed"
+)
 
 type Connection struct {
 	conn        net.Conn
@@ -67,8 +69,12 @@ type Listener struct {
 }
 
 type redirectResponse struct {
-	Response string   `json:"response"`
-	Redirect *address `json:"redirect,omitempty"`
+	Response string `json:"response"`
+	Redirect *struct {
+		Addr     string `json:"address"`
+		Revision uint64 `json:"revision"`
+		Reset    bool   `json:"reset"`
+	} `json:"redirect"`
 }
 
 func open(address string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, timeoutMode int,
@@ -404,6 +410,10 @@ func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, c
 
 func ExchangeWithRedirect(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration,
 	connectTimeout time.Duration, data []byte, args ...interface{}) ([]byte, []error, error) {
+	retries := 0
+retry:
+	retries++
+
 	b, errs, err := Exchange(addrpool, localAddr, timeout, connectTimeout, data, args...)
 
 	if errs != nil {
@@ -416,11 +426,26 @@ func ExchangeWithRedirect(addrpool AddressSet, localAddr *net.Addr, timeout time
 		return b, errs, err
 	}
 
-	if response.Response != responseFailed || nil == response.Redirect || !addrpool.addRedirect(response.Redirect) {
+	if response.Response != responseFailed || nil == response.Redirect {
 		return b, errs, err
 	}
 
-	log.Debugf("performing redirect to [%s]", addrpool.Get())
+	if retries > 1 {
+		errs = append(errs, errors.New("sequential redirect responses detected"))
 
-	return Exchange(addrpool, localAddr, timeout, connectTimeout, data, args...)
+		return nil, errs, err
+	}
+
+	if response.Redirect.Reset {
+		addrpool.reset()
+		log.Debugf("performing redirect reset, connecting to [%s]", addrpool.Get())
+
+		goto retry
+	}
+
+	if addrpool.addRedirect(response.Redirect.Addr, response.Redirect.Revision) {
+		log.Debugf("performing redirect to [%s]", addrpool.Get())
+	}
+
+	goto retry
 }

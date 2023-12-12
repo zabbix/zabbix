@@ -9123,7 +9123,11 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 	{
 		UNLOCK_CACHE;
 
-		*error = zbx_dsprintf(NULL, "host \"%s\" is monitored by another proxy", host);
+		if (0 == redirect->reset)
+			*error = zbx_dsprintf(NULL, "host \"%s\" is monitored by another proxy", host);
+		else
+			*error = zbx_dsprintf(NULL, "host \"%s\" redirected address is being reset", host);
+
 		return FAIL;
 	}
 

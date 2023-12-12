@@ -37,7 +37,10 @@ func (a singleAddress) String() string {
 func (a singleAddress) next() {
 }
 
-func (a singleAddress) addRedirect(redirect *address) bool {
+func (a singleAddress) reset() {
+}
+
+func (a singleAddress) addRedirect(addr string, revision uint64) bool {
 	return false
 }
 

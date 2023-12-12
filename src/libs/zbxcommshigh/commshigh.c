@@ -434,9 +434,10 @@ int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned
  *                                                                            *
  * Parameters: data  - [IN] response                                          *
  *             addrs - [IN/OUT] address list                                  *
+ *             retry - [OUT] ZBX_REDIRECT_RETRY - redirection data was        *
+ *                          updated, connection must be retried               *
  *                                                                            *
- * Return value: SUCCEED - response has redirect information with fresh       *
- *                         revision, address list was updated accordingly     *
+ * Return value: SUCCEED - response has redirect information                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: In the case of valid and fresh redirect information either the   *
@@ -445,7 +446,7 @@ int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned
  *           start of address list.                                           *
  *                                                                            *
  ******************************************************************************/
-static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
+static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, int *retry)
 {
 	zbx_json_parse_t	jp;
 	char			buf[MAX_STRING_LEN], *host = NULL;
@@ -477,6 +478,8 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 		zbx_vector_addr_ptr_append(addrs, addrs->values[0]);
 		zbx_vector_addr_ptr_remove(addrs, 0);
 
+		*retry = ZBX_REDIRECT_RETRY;
+
 		return SUCCEED;
 	}
 
@@ -491,6 +494,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 		if (revision < addrs->values[i]->revision)
 		{
 			zbx_free(host);
+			*retry = ZBX_REDIRECT_NONE;
 			return FAIL;
 		}
 
@@ -507,8 +511,9 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 	addr->ip = host;
 	addr->revision = revision;
 	addr->port = (0 == port ? ZBX_DEFAULT_SERVER_PORT : port);
-
 	zbx_vector_addr_ptr_insert(addrs, addr, 0);
+
+	*retry = ZBX_REDIRECT_RETRY;
 
 	return SUCCEED;
 }
@@ -532,7 +537,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out, char **error)
 {
 	zbx_socket_t		sock;
-	int			ret = FAIL, retries = 0;
+	int			ret = FAIL, retries = 0, retry;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 retry:
@@ -578,13 +583,19 @@ retry:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() received: %s", __func__, sock.buffer);
 
-	if (0 == retries && SUCCEED == comms_check_redirect(sock.buffer, addrs))
+	if (SUCCEED == comms_check_redirect(sock.buffer, addrs, &retry))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu", __func__,
-				addrs->values[0]->ip, addrs->values[0]->port);
-		retries++;
+		if (0 == retries && ZBX_REDIRECT_RETRY == retry)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu", __func__,
+					addrs->values[0]->ip, addrs->values[0]->port);
+			retries++;
 
-		goto retry;
+			goto retry;
+		}
+		*error = zbx_strdup(*error, "sequential redirect responses detected");
+
+		goto cleanup;
 	}
 
 	if (NULL != out)
