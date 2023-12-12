@@ -239,7 +239,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 			ptr = item->key;
 			len = strlen(item->key);
 		}
-	
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", ptr);
 
 		if (SUCCEED != zbx_tcp_send_ext(&s, ptr, len, 0, ZBX_TCP_PROTOCOL, 0))

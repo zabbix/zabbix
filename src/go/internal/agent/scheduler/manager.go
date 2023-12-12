@@ -185,7 +185,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 	}
 }
 
-func parseItemTimeout(s string) (seconds int, e error) {
+func ParseItemTimeout(s string) (seconds int, e error) {
 	const invalidTimeoutError = "Unsupported timeout value."
 	const maxTimeout = 600
 
@@ -272,7 +272,7 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 				case int:
 					timeout = v
 				case string:
-					timeout, err = parseItemTimeout(v)
+					timeout, err = ParseItemTimeout(v)
 				default:
 					err = fmt.Errorf("unexpected timeout %q of type %T", r.Timeout, r.Timeout)
 				}
