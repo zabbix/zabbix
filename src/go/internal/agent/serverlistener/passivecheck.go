@@ -32,14 +32,14 @@ import (
 
 const notsupported = "ZBX_NOTSUPPORTED"
 
-type passiveCheckRequest struct {
+type passiveCheckRequestData struct {
 	Key     string `json:"key"`
 	Timeout string `json:"timeout"`
 }
 
 type passiveChecksRequest struct {
-	Request string                `json:"request"`
-	Data    []passiveCheckRequest `json:"data"`
+	Request string                    `json:"request"`
+	Data    []passiveCheckRequestData `json:"data"`
 }
 
 type passiveChecksResponseData struct {
@@ -49,28 +49,10 @@ type passiveChecksResponseData struct {
 
 type passiveChecksResponse struct {
 	Version string                      `json:"version"`
-	Data    []passiveChecksResponseData `json:"data"`
+	Data    []passiveChecksResponseData `json:"data,omitempty"`
+	Error   *string                     `json:"error,omitempty"`
 }
 
-/*
-		type activeChecksResponse struct {
-			Response       string                 `json:"response"`
-			Info           string                 `json:"info"`
-			ConfigRevision uint64                 `json:"config_revision,omitempty"`
-			Data           []*scheduler.Request   `json:"data"`
-			Commands       []*agent.RemoteCommand `json:"commands"`
-			Expressions    []*glexpr.Expression   `json:"regexp"`
-			HistoryUpload  string                 `json:"upload"`
-		}
-		type AgentDataRequest struct {
-		Request  string           `json:"request"`
-		Data     []*AgentData     `json:"data",omitempty"`
-		Commands []*AgentCommands `json:"commands,omitempty"`
-		Session  string           `json:"session"`
-		Host     string           `json:"host"`
-		Version  string           `json:"version"`
-	}
-*/
 type passiveCheck struct {
 	conn      *passiveConnection
 	scheduler scheduler.Scheduler
@@ -101,16 +83,21 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (err error) {
 		}
 	}
 
-	// direct passive check timeout is handled by the scheduler
-	s, err := pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
-
 	var response passiveChecksResponse
 
-	if err != nil {
+	if nil != err {
 		errString := string(err.Error())
-		response = passiveChecksResponse{Version: version.Long(), Data: []passiveChecksResponseData{{Error: &errString}}}
+		response = passiveChecksResponse{Version: version.Long(), Error: &errString}
 	} else {
-		response = passiveChecksResponse{Version: version.Long(), Data: []passiveChecksResponseData{{Value: &s}}}
+		// direct passive check timeout is handled by the scheduler
+		value, err := pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
+
+		if err != nil {
+			errString := string(err.Error())
+			response = passiveChecksResponse{Version: version.Long(), Data: []passiveChecksResponseData{{Error: &errString}}}
+		} else {
+			response = passiveChecksResponse{Version: version.Long(), Data: []passiveChecksResponseData{{Value: &value}}}
+		}
 	}
 
 	out, err := json.Marshal(response)
