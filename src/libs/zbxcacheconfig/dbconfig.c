@@ -15343,7 +15343,7 @@ static void	proxy_discovery_get_timeouts(const ZBX_DC_PROXY *proxy, struct zbx_j
  ******************************************************************************/
 int	zbx_proxy_discovery_get(char **data, char **error)
 {
-	int				i, ret = SUCCEED;
+	int				i, ret = SUCCEED, now;
 	zbx_vector_cached_proxy_ptr_t	proxies;
 	struct zbx_json			json;
 
@@ -15356,6 +15356,8 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_vector_cached_proxy_ptr_create(&proxies);
 	zbx_dc_get_all_proxies(&proxies);
+
+	now = time(NULL);
 
 	RDLOCK_CACHE;
 
@@ -15381,50 +15383,64 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 			ret = FAIL;
 			goto clean;
 		}
+
+		unsigned int	encryption;
+
+		if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
+			encryption = dc_proxy->tls_connect;
 		else
+			encryption = dc_proxy->tls_accept;
+
+		if (0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED))
+			zbx_json_addstring(&json, "unencrypted", "true", ZBX_JSON_TYPE_INT);
+		else
+			zbx_json_addstring(&json, "unencrypted", "false", ZBX_JSON_TYPE_INT);
+
+		if (0 < (encryption & ZBX_TCP_SEC_TLS_PSK))
+			zbx_json_addstring(&json, "psk", "true", ZBX_JSON_TYPE_INT);
+		else
+			zbx_json_addstring(&json, "psk", "false", ZBX_JSON_TYPE_INT);
+
+		if (0 < (encryption & ZBX_TCP_SEC_TLS_CERT))
+			zbx_json_addstring(&json, "cert", "true", ZBX_JSON_TYPE_INT);
+		else
+			zbx_json_addstring(&json, "cert", "false", ZBX_JSON_TYPE_INT);
+
+		zbx_json_adduint64(&json, "items", dc_proxy->items_active_normal +
+				dc_proxy->items_active_notsupported);
+
+		zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
+
+		zbx_json_addstring(&json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_adduint64(&json, "compatibility", dc_proxy->compatibility);
+
+		if (0 < dc_proxy->lastaccess)
+			zbx_json_addint64(&json, "last_seen", time(NULL) - dc_proxy->lastaccess);
+		else
+			zbx_json_addint64(&json, "last_seen", -1);
+
+		zbx_json_adduint64(&json, "hosts", dc_proxy->hosts_monitored);
+
+		zbx_json_addfloat(&json, "requiredperformance", dc_proxy->required_performance);
+
+		proxy_discovery_get_timeouts(dc_proxy, &json);
+
+		if (0 != dc_proxy->proxy_groupid)
 		{
-			unsigned int	encryption;
+			zbx_dc_proxy_group_t	*pg;
+			char			*status;
 
-			if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
-				encryption = dc_proxy->tls_connect;
-			else
-				encryption = dc_proxy->tls_accept;
+			pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups,
+					&dc_proxy->proxy_groupid);
 
-			if (0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED))
-				zbx_json_addstring(&json, "unencrypted", "true", ZBX_JSON_TYPE_INT);
-			else
-				zbx_json_addstring(&json, "unencrypted", "false", ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "proxy_group", pg->name, ZBX_JSON_TYPE_STRING);
 
-			if (0 < (encryption & ZBX_TCP_SEC_TLS_PSK))
-				zbx_json_addstring(&json, "psk", "true", ZBX_JSON_TYPE_INT);
-			else
-				zbx_json_addstring(&json, "psk", "false", ZBX_JSON_TYPE_INT);
+			status = (now - dc_proxy->lastaccess >= pg->failover_delay ? "offline" : "online");
 
-			if (0 < (encryption & ZBX_TCP_SEC_TLS_CERT))
-				zbx_json_addstring(&json, "cert", "true", ZBX_JSON_TYPE_INT);
-			else
-				zbx_json_addstring(&json, "cert", "false", ZBX_JSON_TYPE_INT);
-
-			zbx_json_adduint64(&json, "items", dc_proxy->items_active_normal +
-					dc_proxy->items_active_notsupported);
-
-			zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
-
-			zbx_json_addstring(&json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
-
-			zbx_json_adduint64(&json, "compatibility", dc_proxy->compatibility);
-
-			if (0 < dc_proxy->lastaccess)
-				zbx_json_addint64(&json, "last_seen", time(NULL) - dc_proxy->lastaccess);
-			else
-				zbx_json_addint64(&json, "last_seen", -1);
-
-			zbx_json_adduint64(&json, "hosts", dc_proxy->hosts_monitored);
-
-			zbx_json_addfloat(&json, "requiredperformance", dc_proxy->required_performance);
-
-			proxy_discovery_get_timeouts(dc_proxy, &json);
+			zbx_json_addstring(&json, "status", status, ZBX_JSON_TYPE_STRING);
 		}
+
 		zbx_json_close(&json);
 	}
 clean:
