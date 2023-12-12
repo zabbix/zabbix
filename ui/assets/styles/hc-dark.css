@@ -3448,12 +3448,7 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column: 1; }
 
-.svg-pie-chart path {
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  stroke: #000000; }
 .svg-pie-chart .svg-pie-chart-arc-placeholder {
-  stroke-width: 0;
   fill: transparent; }
 .svg-pie-chart .svg-pie-chart-arc-no-data-outer {
   fill: #111111; }

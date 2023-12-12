@@ -1,12 +1,5 @@
 .svg-pie-chart {
-	path {
-		stroke-linejoin: round;
-		vector-effect: non-scaling-stroke;
-		stroke: $ui-bg-color;
-	}
-
 	.svg-pie-chart-arc-placeholder {
-		stroke-width: 0;
 		fill: transparent;
 	}
 
