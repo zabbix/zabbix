@@ -852,12 +852,7 @@ class testDashboardURLWidget extends CWebTest {
 			],
 			[
 				[
-					"x_frame_value" => "'self' space seperated host.names  with-different	spacing"
-				]
-			],
-			[
-				[
-					"x_frame_value" => "'self' h0st.nam3.w1th.numb3rs"
+					'x_frame_value' => "'self' space separated host.names  with-different   sp4c1.ng"
 				]
 			],
 			[
