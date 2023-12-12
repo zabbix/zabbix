@@ -290,7 +290,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	private static function getHgSetHash(array $groupids): string {
-		usort($groupids, static function (string $a, string $b): int { return bccomp($a, $b); });
+		usort($groupids, 'bccomp');
 
 		return hash('sha256', implode('|', $groupids));
 	}

@@ -1250,7 +1250,7 @@ class CUser extends CApiService {
 	}
 
 	private static function getUgSetHash(array $usrgrpids): string {
-		usort($usrgrpids, static function (string $a, string $b): int { return bccomp($a, $b); });
+		usort($usrgrpids, 'bccomp');
 
 		return hash('sha256', implode('|', $usrgrpids));
 	}
