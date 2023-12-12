@@ -17,15 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "module.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
+#include "zbxjson.h"
+#include "zbxagentget.h"
+#include "zbxversion.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
 #endif
+
+typedef enum
+{
+	ZBX_AUTO_PROTOCOL,
+	ZBX_JSON_PROTOCOL,
+	ZBX_PLAINTEXT_PROTOCOL
+}
+zbx_protocol_t;
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
 static const char	title_message[] = "zabbix_get";
@@ -180,6 +192,7 @@ struct zbx_option	longopts[] =
 	{"tls-psk-file",		1,	NULL,	'9'},
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
+	{"protocol",			1,	NULL,	'C'},
 	{NULL}
 };
 
@@ -223,11 +236,12 @@ static void	get_signal_handler(int sig)
  *             key  - item's key                                              *
  *                                                                            *
  ******************************************************************************/
-static int	get_value(const char *source_ip, const char *host, unsigned short port, const char *key)
+static int	get_value(const char *source_ip, const char *host, unsigned short port, const char *key, int *version,
+		zbx_protocol_t protocol)
 {
 	zbx_socket_t	s;
-	int		ret;
-	ssize_t		bytes_received = -1;
+	int		ret, ret_protocol = SUCCEED;
+	ssize_t		received_len = -1;
 	char		*tls_arg1, *tls_arg2;
 
 	switch (zbx_config_tls->connect_mode)
@@ -254,36 +268,68 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, CONFIG_GET_TIMEOUT + 1,
 			zbx_config_tls->connect_mode, tls_arg1, tls_arg2)))
 	{
-		if (SUCCEED == (ret = zbx_tcp_send_ext(&s, key, strlen(key), (zbx_uint32_t)CONFIG_GET_TIMEOUT,
-				ZBX_TCP_PROTOCOL, 0)))
+		struct zbx_json	j;
+		const char	*ptr;
+		size_t		len;
+
+		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+		zbx_agent_prepare_request(&j, key, CONFIG_GET_TIMEOUT);
+
+		if (ZBX_PLAINTEXT_PROTOCOL == protocol)
+			*version = 0;
+
+		if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 		{
-			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0, 0)))
+			ptr = j.buffer;
+			len = j.buffer_size;
+		}
+		else
+		{
+			ptr = key;
+			len = strlen(key);
+		}
+
+		if (SUCCEED == (ret = zbx_tcp_send_ext(&s, ptr, len, 0, ZBX_TCP_PROTOCOL, 0)))
+		{
+			if (FAIL == (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
+				ret = FAIL;
+		}
+	
+		if (SUCCEED == ret)
+		{
+			AGENT_RESULT	result;
+
+			zbx_init_agent_result(&result)
+
+			if (FAIL != (ret_protocol = zbx_agent_handle_response(&s, received_len, &ret, host,
+					&result, version)))
 			{
-				if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED) && sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
+				if (SUCCEED != ret)
 				{
-					zbx_rtrim(s.buffer + sizeof(ZBX_NOTSUPPORTED), "\r\n");
-					printf("%s: %s\n", s.buffer, s.buffer + sizeof(ZBX_NOTSUPPORTED));
+					zbx_rtrim(result.msg, "\r\n");
+					printf("%s: %s\n", ZBX_NOTSUPPORTED, result.msg);
 				}
 				else
 				{
-					zbx_rtrim(s.buffer, "\r\n");
-					printf("%s\n", s.buffer);
+					zbx_rtrim(result.text, "\r\n");
+					printf("%s\n", result.text);
 				}
 			}
-			else
-			{
-				if (0 == bytes_received)
-					zbx_error("Check access restrictions in Zabbix agent configuration");
-				ret = FAIL;
-			}
+
+			zbx_free_agent_result(&result)
 		}
 
 		zbx_tcp_close(&s);
 
-		if (SUCCEED != ret && 0 != bytes_received)
+		if (FAIL == ret_protocol)
 		{
-			zbx_error("Get value error: %s", zbx_socket_strerror());
-			zbx_error("Check access restrictions in Zabbix agent configuration");
+			if (ZBX_AUTO_PROTOCOL == protocol)
+			{
+				return get_value(source_ip, host, port, key, version, protocol);
+			}
+			else
+				zbx_error("Get value error: JSON protocol requested but received plaintext response");
 		}
 	}
 	else
@@ -294,9 +340,10 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 int	main(int argc, char **argv)
 {
-	int		i, ret = SUCCEED;
+	int		i, ret = SUCCEED, version = ZBX_COMPONENT_VERSION(7, 0, 0);
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
 	unsigned short	opt_count[256] = {0}, port = ZBX_DEFAULT_AGENT_PORT;
+	zbx_protocol_t	protocol = ZBX_AUTO_PROTOCOL;
 #if defined(_WINDOWS)
 	char		*error = NULL;
 #endif
@@ -432,6 +479,26 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 				break;
 #endif
+			case 'C':
+				if (0 == strcmp(zbx_optarg, "json"))
+				{
+					protocol = ZBX_JSON_PROTOCOL;
+				}
+				else if (0 == strcmp(zbx_optarg, "plaintext"))
+				{
+					protocol = ZBX_PLAINTEXT_PROTOCOL;
+				}
+				else if (0 == strcmp(zbx_optarg, "auto"))
+				{
+					protocol = ZBX_AUTO_PROTOCOL;
+				}
+				else
+				{
+					zbx_error("Invalid protocol");
+					exit(EXIT_FAILURE);
+				}
+				
+				break;
 			default:
 				zbx_print_usage(usage_message, zbx_progname);
 				exit(EXIT_FAILURE);
@@ -517,7 +584,7 @@ int	main(int argc, char **argv)
 	signal(SIGALRM, get_signal_handler);
 	signal(SIGPIPE, get_signal_handler);
 #endif
-	ret = get_value(source_ip, host, port, key);
+	ret = get_value(source_ip, host, port, key, &version, protocol);
 out:
 	zbx_free(host);
 	zbx_free(key);

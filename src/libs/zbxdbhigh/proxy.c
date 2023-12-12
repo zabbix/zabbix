@@ -142,16 +142,3 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str)
 	return ZBX_COMPONENT_VERSION(3, 2, 0);
 }
 
-int	zbx_get_agent_protocol_version_int(const char *version_str)
-{
-	int	version_int;
-
-	if (0 != strcmp(ZBX_VERSION_UNDEFINED_STR, version_str) &&
-			FAIL != (version_int = zbx_get_component_version(version_str)))
-	{
-		return version_int;
-	}
-
-	return 0;
-}
-
