@@ -1551,6 +1551,12 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 	}
 	zbx_db_free_result(result);
 
+	for (i = 0; i < permissions->values_num; i++)
+	{
+		if (0 == permissions->values[i].permission)
+			zbx_vector_lld_permission_remove_noorder(permissions, i--);
+	}
+
 	zbx_vector_lld_permission_sort(permissions, lld_permission_compare);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

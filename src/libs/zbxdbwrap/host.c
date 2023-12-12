@@ -6481,11 +6481,14 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (FAIL != (i = zbx_vector_hgset_ptr_bsearch(&hgsets, (void*)row[1], hgset_hash_search)))
+		if (FAIL == (i = zbx_vector_hgset_ptr_search(&hgsets, (void*)row[1], hgset_hash_search)))
 		{
-			ZBX_STR2UINT64(hgsets.values[i]->hgsetid, row[0]);
-			new_hgsets--;
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
 		}
+
+		ZBX_STR2UINT64(hgsets.values[i]->hgsetid, row[0]);
+		new_hgsets--;
 	}
 	zbx_db_free_result(result);
 
@@ -6493,7 +6496,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 	if (0 < new_hgsets)
 	{
-		zbx_host_permission_t		prm;
 		zbx_vector_host_permission_t	permissions;
 		zbx_uint64_t			new_permission_hgsetid;
 
@@ -6514,8 +6516,10 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 			{
 				zbx_db_insert_add_values(&db_insert_group, hgsets.values[i]->hgsetid,
 						hgsets.values[i]->hgroupids.values[j]);
-				zbx_vector_uint64_append(&ids, hgsets.values[i]->hgroupids.values[j]);
 			}
+
+			zbx_vector_uint64_append_array(&ids, hgsets.values[i]->hgroupids.values,
+					hgsets.values[i]->hgroupids.values_num);
 		}
 
 		zbx_db_insert_execute(&db_insert);
@@ -6543,7 +6547,8 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	hostgroupid;
+			zbx_uint64_t		hostgroupid;
+			zbx_host_permission_t	prm;
 
 			ZBX_STR2UINT64(prm.ugsetid, row[0]);
 			ZBX_STR2UINT64(hostgroupid, row[1]);
@@ -6578,12 +6583,17 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		}
 		zbx_db_free_result(result);
 
+		zbx_db_insert_prepare(&db_insert, "permission", "ugsetid", "hgsetid", "permission", (char *)NULL);
+
 		for (i = 0; i < permissions.values_num; i++)
 		{
 			zbx_host_permission_t	*permission = &permissions.values[i];
 
-			zbx_db_insert_add_values(&db_insert, permission->ugsetid, permission->hgsetid,
-					permission->permission);
+			if (0 < permission->permission)
+			{
+				zbx_db_insert_add_values(&db_insert, permission->ugsetid, permission->hgsetid,
+						permission->permission);
+			}
 		}
 
 		zbx_db_insert_execute(&db_insert);
