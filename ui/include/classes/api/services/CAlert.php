@@ -155,7 +155,7 @@ class CAlert extends CApiService {
 					'SELECT NULL'.
 					' FROM actions aa'.
 					' WHERE a.actionid=aa.actionid'.
-						' AND '.dbConditionInt('aa.eventsource', $options['eventsource']).
+						' AND '.dbConditionInt('aa.eventsource', [$options['eventsource']]).
 				')';
 			}
 			else {
