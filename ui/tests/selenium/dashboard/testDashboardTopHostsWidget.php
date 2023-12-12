@@ -1200,7 +1200,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #37 User macros in fields' values.
 			[
 				[
-					'trim' => true,
 					'main_fields' => [
 						'Name' => '{$USERMACRO}'
 					],
@@ -1229,7 +1228,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #38 Global macros in fields' values.
 			[
 				[
-					'trim' => true,
 					'main_fields' => [
 						'Name' => '{HOST.HOST}'
 					],
@@ -1294,7 +1292,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Trim trailing and leading spaces in expected values before comparison.
 		if (CTestArrayHelper::get($data, 'trim', false)) {
-			CTestArrayHelper::trimArray($data);
+			$data = CTestArrayHelper::trim($data);
 		}
 
 		// Check error message in main widget form.
@@ -1810,7 +1808,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #25 User macros in fields' values.
 			[
 				[
-					'trim' => true,
 					'main_fields' => [
 						'Name' => '{$UPDATED_USERMACRO}'
 					],
@@ -1834,7 +1831,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #26 Global macros in fields' values.
 			[
 				[
-					'trim' => true,
 					'main_fields' => [
 						'Name' => '{HOST.HOST} updated'
 					],
@@ -1941,7 +1937,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Trim trailing and leading spaces in expected values before comparison.
 		if (CTestArrayHelper::get($data, 'trim', false)) {
-			CTestArrayHelper::trimArray($data);
+			$data = CTestArrayHelper::trim($data);
 		}
 
 		// Check error message in main widget form.

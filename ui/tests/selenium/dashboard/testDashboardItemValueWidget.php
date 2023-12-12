@@ -1577,7 +1577,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('trim', $data)) {
-			CTestArrayHelper::trimArray($data);
+			$data = CTestArrayHelper::trim($data);
 		}
 
 		if ($expected === TEST_BAD) {

@@ -92,16 +92,20 @@ class CTestArrayHelper {
 	 * Recursive function for trimming all values in multi-level array.
 	 *
 	 * @param array    $array    array to be trimmed
+	 *
+	 * @return  array
 	 */
-	public static function trimArray(&$array) {
+	public static function trim(&$array) {
 		foreach ($array as &$value) {
 			if (!is_array($value)) {
 				$value = trim($value);
 			}
 			else {
-				self::trimArray($value);
+				self::trim($value);
 			}
 		}
 		unset($value);
+
+		return $array;
 	}
 }
