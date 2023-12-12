@@ -1412,8 +1412,8 @@ class testScripts extends CAPITest {
 			// Check script type.
 			'Test script.create missing type' => [
 				'script' => [
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'name' => 'API create script'
+					'name' => 'API create script',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
 			],
@@ -2065,8 +2065,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
-					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
+				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
 			],
 
 			// Check script auth type.
@@ -2384,7 +2383,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'timeout' => '100'
 				],
-				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
 			],
 			'Test script.create unsupported macros in timeout' => [
 				'script' => [
@@ -4383,7 +4382,7 @@ class testScripts extends CAPITest {
 					'output' => 'abc'
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/output": value must be "'.API_OUTPUT_EXTEND.'".'
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
 			],
 			'Test script.get invalid parameter "output"' => [
 				'request' => [
@@ -4399,7 +4398,7 @@ class testScripts extends CAPITest {
 					'selectHostGroups' => 'abc'
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/selectHostGroups": value must be "'.API_OUTPUT_EXTEND.'".'
+				'expected_error' => 'Invalid parameter "/selectHostGroups": value must be "extend".'
 			],
 			'Test script.get invalid parameter "selectHostGroups"' => [
 				'request' => [
@@ -4415,7 +4414,7 @@ class testScripts extends CAPITest {
 					'selectHosts' => 'abc'
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/selectHosts": value must be "'.API_OUTPUT_EXTEND.'".'
+				'expected_error' => 'Invalid parameter "/selectHosts": value must be "extend".'
 			],
 			'Test script.get invalid parameter "selectHosts"' => [
 				'request' => [
@@ -4431,7 +4430,7 @@ class testScripts extends CAPITest {
 					'selectActions' => 'abc'
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/selectActions": value must be "'.API_OUTPUT_EXTEND.'".'
+				'expected_error' => 'Invalid parameter "/selectActions": value must be "extend".'
 			],
 			'Test script.get invalid parameter "selectActions"' => [
 				'request' => [
@@ -4483,7 +4482,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_results' => [],
 				'expected_error' =>
-					'Invalid parameter "/sortorder": value must be one of "'.ZBX_SORT_UP.'", "'.ZBX_SORT_DOWN.'".'
+					'Invalid parameter "/sortorder": value must be one of "ASC", "DESC".'
 			],
 			'Test script.get invalid parameter "limit" (bool)' => [
 				'request' => [
@@ -5327,8 +5326,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ssh_pwd',
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
-					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
+				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
 			],
 			'Test script.update unexpected port field for custom script type (string)' => [
 				'script' => [
@@ -5613,7 +5611,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_webhook',
 					'timeout' => '100'
 				],
-				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
 			],
 			'Test script.update unsupported macros in timeout' => [
 				'script' => [
@@ -7671,7 +7669,9 @@ class testScripts extends CAPITest {
 					$this->assertEmpty($script_upd['confirmation']);
 					$this->assertEquals(DB::getDefault('scripts', 'manualinput'), $script_upd['manualinput']);
 					$this->assertEmpty($script_upd['manualinput_prompt']);
-					$this->assertEquals(DB::getDefault('scripts', 'manualinput_validator_type'), $script_upd['manualinput_validator_type']);
+					$this->assertEquals(DB::getDefault('scripts', 'manualinput_validator_type'),
+						$script_upd['manualinput_validator_type']
+					);
 					$this->assertEmpty($script_upd['manualinput_validator']);
 					$this->assertEmpty($script_upd['manualinput_default_value']);
 				}
@@ -10056,17 +10056,11 @@ class testScripts extends CAPITest {
 				foreach ($result_scripts as $result_script) {
 					foreach ($expected_result['scripts'] as $expected_script) {
 						if (bccomp($result_script['scriptid'], $expected_script['scriptid']) == 0) {
-							$expected_script['url'] = strtr($expected_script['url'],
-								$expected_result['host_macros'][$hostid]
-							);
-
-							$expected_script['confirmation'] = strtr($expected_script['confirmation'],
-								$expected_result['host_macros'][$hostid]
-							);
-
-							$expected_script['manualinput_prompt'] = strtr($expected_script['manualinput_prompt'],
-								$expected_result['host_macros'][$hostid]
-							);
+							foreach (['url', 'confirmation', 'manualinput_prompt'] as $field) {
+								$expected_script[$field] = strtr($expected_script[$field],
+									$expected_result['host_macros'][$hostid]
+								);
+							}
 
 							$this->assertEquals($expected_script, $result_script);
 						}
@@ -10181,39 +10175,17 @@ class testScripts extends CAPITest {
 		return [
 			'Test script.getScriptsByEvents with superadmin' => [
 				'request' => [
-					[
-						'eventid' => 'plain_rw_single_d'
-					],
-					[
-						'eventid' => 'plain_r_single_d'
-					],
-					[
-						'eventid' => 'plain_d_single_d'
-					],
-					[
-						'eventid' => 'plain_rw_r_dual_d'
-					],
-					[
-						'eventid' => 'macros_rw_single_1_h'
-					],
-					[
-						'eventid' => 'macros_rw_r_dual_1_2_h'
-					],
-					[
-						'eventid' => 'macros_rw_dual_1_3_h'
-					],
-					[
-						'eventid' => 'interface_rw_dual_a'
-					],
-					[
-						'eventid' => 'inventory_rw_dual_a'
-					],
-					[
-						'eventid' => 'macros_d_cause'
-					],
-					[
-						'eventid' => 'macros_rw_symptom'
-					]
+					['eventid' => 'plain_rw_single_d'],
+					['eventid' => 'plain_r_single_d'],
+					['eventid' => 'plain_d_single_d'],
+					['eventid' => 'plain_rw_r_dual_d'],
+					['eventid' => 'macros_rw_single_1_h'],
+					['eventid' => 'macros_rw_r_dual_1_2_h'],
+					['eventid' => 'macros_rw_dual_1_3_h'],
+					['eventid' => 'interface_rw_dual_a'],
+					['eventid' => 'inventory_rw_dual_a'],
+					['eventid' => 'macros_d_cause'],
+					['eventid' => 'macros_rw_symptom']
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
@@ -10911,39 +10883,17 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents with admin' => [
 				'request' => [
 					'login' => ['user' => 'api_test_admin', 'password' => '4P1T3$tEr'],
-					[
-						'eventid' => 'plain_rw_single_d'
-					],
-					[
-						'eventid' => 'plain_r_single_d'
-					],
-					[
-						'eventid' => 'plain_d_single_d'
-					],
-					[
-						'eventid' => 'plain_rw_r_dual_d'
-					],
-					[
-						'eventid' => 'macros_rw_single_1_h'
-					],
-					[
-						'eventid' => 'macros_rw_r_dual_1_2_h'
-					],
-					[
-						'eventid' => 'macros_rw_dual_1_3_h'
-					],
-					[
-						'eventid' => 'interface_rw_dual_a'
-					],
-					[
-						'eventid' => 'inventory_rw_dual_a'
-					],
-					[
-						'eventid' => 'macros_d_cause'
-					],
-					[
-						'eventid' => 'macros_rw_symptom'
-					]
+					['eventid' => 'plain_rw_single_d'],
+					['eventid' => 'plain_r_single_d'],
+					['eventid' => 'plain_d_single_d'],
+					['eventid' => 'plain_rw_r_dual_d'],
+					['eventid' => 'macros_rw_single_1_h'],
+					['eventid' => 'macros_rw_r_dual_1_2_h'],
+					['eventid' => 'macros_rw_dual_1_3_h'],
+					['eventid' => 'interface_rw_dual_a'],
+					['eventid' => 'inventory_rw_dual_a'],
+					['eventid' => 'macros_d_cause'],
+					['eventid' => 'macros_rw_symptom']
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
@@ -11539,39 +11489,17 @@ class testScripts extends CAPITest {
 			'Test script.getScriptsByEvents with user' => [
 				'request' => [
 					'login' => ['user' => 'api_test_user', 'password' => '4P1T3$tEr'],
-					[
-						'eventid' => 'plain_rw_single_d'
-					],
-					[
-						'eventid' => 'plain_r_single_d'
-					],
-					[
-						'eventid' => 'plain_d_single_d'
-					],
-					[
-						'eventid' => 'plain_rw_r_dual_d'
-					],
-					[
-						'eventid' => 'macros_rw_single_1_h'
-					],
-					[
-						'eventid' => 'macros_rw_r_dual_1_2_h'
-					],
-					[
-						'eventid' => 'macros_rw_dual_1_3_h'
-					],
-					[
-						'eventid' => 'interface_rw_dual_a'
-					],
-					[
-						'eventid' => 'inventory_rw_dual_a'
-					],
-					[
-						'eventid' => 'macros_d_cause'
-					],
-					[
-						'eventid' => 'macros_rw_symptom'
-					]
+					['eventid' => 'plain_rw_single_d'],
+					['eventid' => 'plain_r_single_d'],
+					['eventid' => 'plain_d_single_d'],
+					['eventid' => 'plain_rw_r_dual_d'],
+					['eventid' => 'macros_rw_single_1_h'],
+					['eventid' => 'macros_rw_r_dual_1_2_h'],
+					['eventid' => 'macros_rw_dual_1_3_h'],
+					['eventid' => 'interface_rw_dual_a'],
+					['eventid' => 'inventory_rw_dual_a'],
+					['eventid' => 'macros_d_cause'],
+					['eventid' => 'macros_rw_symptom']
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
@@ -12689,17 +12617,11 @@ class testScripts extends CAPITest {
 				foreach ($result_scripts as $result_script) {
 					foreach ($expected_result['scripts'] as $expected_script) {
 						if (bccomp($result_script['scriptid'], $expected_script['scriptid']) == 0) {
-							$expected_script['url'] = strtr($expected_script['url'],
-								$expected_result['event_macros'][$eventid]
-							);
-
-							$expected_script['confirmation'] = strtr($expected_script['confirmation'],
-								$expected_result['event_macros'][$eventid]
-							);
-
-							$expected_script['manualinput_prompt'] = strtr($expected_script['manualinput_prompt'],
-								$expected_result['event_macros'][$eventid]
-							);
+							foreach (['url', 'confirmation', 'manualinput_prompt'] as $field) {
+								$expected_script[$field] = strtr($expected_script[$field],
+									$expected_result['event_macros'][$eventid]
+								);
+							}
 
 							$this->assertEquals($expected_script, $result_script);
 						}
@@ -12914,13 +12836,9 @@ class testScripts extends CAPITest {
 	 */
 	private static function resolveMacros(array $request): array {
 		// For script.getScriptsByHosts and script.getScriptsByEvents methods.
-		foreach (['host_macros', 'event_macros'] as $field) {
+		foreach (['host_macros' => 'hostids', 'event_macros' => 'eventids'] as $field => $ids) {
 			if (array_key_exists($field, $request)) {
 				foreach ($request[$field] as $key => $macros) {
-					$new_key = ($field === 'host_macros')
-						? self::$data['hostids'][$key]
-						: self::$data['eventids'][$key];
-
 					// Currently only two ID types are supported.
 					foreach ($macros as $macro => &$id) {
 						if (preg_match('/^\{(HOST|EVENT)\.(CAUSE\.)?ID[1-9]?\}$/', $macro, $match) && $id !== ''
@@ -12930,7 +12848,7 @@ class testScripts extends CAPITest {
 					}
 					unset($id);
 
-					$request[$field][$new_key] = $macros;
+					$request[$field][self::$data[$ids][$key]] = $macros;
 					unset($request[$field][$key]);
 				}
 			}
