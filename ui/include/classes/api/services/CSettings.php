@@ -218,7 +218,7 @@ class CSettings extends CApiService {
 			'url' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'url')],
 			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1'],
-			'auditlog_mode' =>			['type' => API_INT32, 'in' => '0,1'],
+			'auditlog_mode' =>					['type' => API_INT32, 'in' => '0,1'],
 			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders()))],
 			'geomaps_tile_url' =>				['type' => API_URL, 'length' => DB::getFieldLength('config', 'geomaps_tile_url')],
 			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],

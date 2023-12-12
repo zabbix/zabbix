@@ -28,6 +28,8 @@ class testAuditlogSettings extends testAuditlogCommon {
 
 	public function testAuditlogSettings_Update() {
 		$updated = json_encode([
+			'settings.auditlog_enabled' => ['update', '0', '1'],
+			'settings.auditlog_mode' => ['update', '0', '1'],
 			'settings.default_lang' => ['update', 'en_GB', 'en_US'],
 			'settings.default_theme' => ['update', 'dark-theme', 'blue-theme'],
 			'settings.search_limit' => ['update', '500', '1000'],
@@ -74,6 +76,8 @@ class testAuditlogSettings extends testAuditlogCommon {
 		]);
 
 		$this->call('settings.update', [
+			'auditlog_enabled' => '0',
+			'auditlog_mode' => '0',
 			'default_lang' => 'en_GB',
 			'default_theme' => 'dark-theme',
 			'search_limit' => '500',
