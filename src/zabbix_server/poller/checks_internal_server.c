@@ -25,9 +25,57 @@
 #include "zbxconnector.h"
 #include "../ha/ha.h"
 #include "zbxproxybuffer.h"
+#include "zbxpgservice.h"
 
 #include "checks_internal.h"
 #include "../lld/lld_protocol.h"
+
+
+static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option, AGENT_RESULT *result)
+{
+	if (0 == strcmp(option, "status"))
+	{
+		SET_UI64_RESULT(result, stats->status);
+		return SUCCEED;
+	}
+
+	if (0 == strcmp(option, "available"))
+	{
+		SET_UI64_RESULT(result, stats->proxy_online_num);
+		return SUCCEED;
+	}
+
+	if (0 == strcmp(option, "pavailable"))
+	{
+		double	perc;
+
+		if (0 != stats->proxyids.values_num)
+			perc = (double)stats->proxy_online_num / stats->proxyids.values_num * 100;
+		else
+			perc = 0;
+
+		SET_DBL_RESULT(result, perc);
+		return SUCCEED;
+	}
+
+	if (0 == strcmp(option, "proxies"))
+	{
+		char	*out = NULL, *error = NULL;
+
+		if (FAIL == zbx_proxy_proxy_list_discovery_get(&stats->proxyids, &out, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			return NOTSUPPORTED;
+		}
+
+		SET_TEXT_RESULT(result, out);
+		return SUCCEED;
+	}
+
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+
+	return NOTSUPPORTED;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -346,6 +394,37 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
 		}
+	}
+	else if (0 == strcmp(param1, "proxy group"))		/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
+	{							/* zabbix["proxy","discovery"]                        */
+		char		*error = NULL;
+		zbx_pg_stats_t	stats;
+		const char	*param3;
+
+		/* this item is always processed by server */
+
+		if (3 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		param2 = get_rparam(request, 1);
+
+		if (FAIL == zbx_pg_service_get_stats(param2, &stats, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain proxy group statistics: %s", error));
+			zbx_free(error);
+			goto out;
+		}
+
+		param3 = get_rparam(request, 2);
+
+		ret = get_proxy_group_stat(&stats, param3, result);
+		zbx_vector_uint64_destroy(&stats.proxyids);
+
+		goto out;
+
 	}
 	else
 	{

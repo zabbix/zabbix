@@ -165,9 +165,6 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 	zbx_hashset_iter_reset(&cache->proxies, &iter);
 	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
 	{
-		/* WDN: override proxy last access for debugging */
-		proxy->lastaccess = now;
-
 		int	status = ZBX_PG_PROXY_STATUS_UNKNOWN;
 
 		if (now - proxy->lastaccess >= proxy->group->failover_delay)

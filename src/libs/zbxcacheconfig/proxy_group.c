@@ -226,9 +226,6 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vec
 
 		proxy->lastaccess = dc_proxy->lastaccess;
 
-		/* WDN: force online status */
-		proxy->lastaccess = time(NULL);
-
 		old_proxy_groupid = (NULL == proxy->group ? 0 : proxy->group->proxy_groupid);
 
 		if (old_proxy_groupid != dc_proxy->proxy_groupid)

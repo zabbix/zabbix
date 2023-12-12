@@ -27,10 +27,22 @@
 #define ZBX_IPC_PGM_HOST_PGROUP_UPDATE		1
 #define ZBX_IPC_PGM_GET_PROXY_SYNC_DATA		2
 #define ZBX_IPC_PGM_PROXY_SYNC_DATA		3
+#define ZBX_IPC_PGM_GET_STATS			4
+#define ZBX_IPC_PGM_STATS			5
 #define ZBX_IPC_PGM_STOP			100
 
 #define ZBX_PROXY_SYNC_NONE	0
 #define ZBX_PROXY_SYNC_FULL	1
 #define ZBX_PROXY_SYNC_PARTIAL	2
+
+typedef struct
+{
+	int			status;
+	int			proxy_online_num;
+	zbx_vector_uint64_t	proxyids;
+}
+zbx_pg_stats_t;
+
+int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error);
 
 #endif

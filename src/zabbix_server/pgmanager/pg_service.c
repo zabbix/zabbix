@@ -159,6 +159,68 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy group statistics                                        *
+ *                                                                            *
+ * Parameter: pgs     - [IN] proxy group service                              *
+ *            message - [IN] IPC message with host relocation data            *
+ *                                                                            *
+ ******************************************************************************/
+static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+{
+	unsigned char	*ptr, *data;
+	int		status, proxies_online_num = 0;
+	zbx_uint32_t	data_len;
+	zbx_pg_group_t	*pg, *proxy_group = NULL;
+	const char	*name = (const char *)message->data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	pg_cache_lock(pgs->cache);
+
+	zbx_hashset_iter_t	iter;
+
+	zbx_hashset_iter_reset(&pgs->cache->groups, &iter);
+	while (NULL != (pg = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (0 == strcmp(pg->name, name))
+		{
+			proxy_group = pg;
+			break;
+		}
+	}
+
+	if (NULL != proxy_group)
+	{
+		data_len = proxy_group->proxies.values_num * sizeof(zbx_uint64_t) + 3 * sizeof(int);
+		ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+		for (int i = 0; i < proxy_group->proxies.values_num; i++)
+		{
+			if (ZBX_PG_PROXY_STATUS_ONLINE == proxy_group->proxies.values[i]->status)
+				proxies_online_num++;
+		}
+
+		ptr += zbx_serialize_value(ptr, proxy_group->status);
+		ptr += zbx_serialize_value(ptr, proxies_online_num);
+		ptr += zbx_serialize_value(ptr, proxy_group->proxies.values_num);
+
+		for (int i = 0; i < proxy_group->proxies.values_num; i++)
+			ptr += zbx_serialize_value(ptr, proxy_group->proxies.values[i]->proxyid);
+
+		zbx_ipc_client_send(client, ZBX_IPC_PGM_STATS, data, data_len);
+
+		zbx_free(data);
+	}
+	else
+	{
+		status = -1;
+		zbx_ipc_client_send(client, ZBX_IPC_PGM_STATS, (const unsigned char *)&status, sizeof(status));
+	}
+
+	pg_cache_unlock(pgs->cache);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -187,6 +249,9 @@ static void	*pg_service_entry(void *data)
 					break;
 				case ZBX_IPC_PGM_GET_PROXY_SYNC_DATA:
 					pg_get_proxy_sync_data(pgs, client, message);
+					break;
+				case ZBX_IPC_PGM_GET_STATS:
+					pg_get_proxy_group_stats(pgs, client, message);
 					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;
@@ -260,4 +325,67 @@ void	pg_service_destroy(zbx_pg_service_t *pgs)
 	void	*retval;
 
 	pthread_join(pgs->thread, &retval);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy group statistics                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error)
+{
+	zbx_ipc_socket_t	sock;
+	int			ret = FAIL, proxyids_num, status;
+	zbx_ipc_message_t	message = {0};
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PG_MANAGER, SEC_PER_MIN, error))
+		return FAIL;
+
+	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_IPC_PGM_GET_STATS, (const unsigned char *)pg_name,
+			strlen(pg_name) + 1))
+	{
+		*error = zbx_strdup(NULL, "Cannot send request to proxy group manager service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(&sock, &message))
+	{
+		*error = zbx_strdup(NULL, "Cannot read proxy group manager service response");
+		goto out;
+	}
+
+	const unsigned char	*ptr = message.data;
+
+	ptr += zbx_deserialize_value(ptr, &status);
+
+	if (-1 == status)
+	{
+		*error = zbx_dsprintf(NULL, "Unknown proxy group \"%s\"", pg_name);
+		goto out;
+	}
+
+	pg_stats->status = status;
+	ptr += zbx_deserialize_value(ptr, &pg_stats->proxy_online_num);
+	ptr += zbx_deserialize_value(ptr, &proxyids_num);
+
+	zbx_vector_uint64_create(&pg_stats->proxyids);
+	if (0 != proxyids_num)
+	{
+		zbx_vector_uint64_reserve(&pg_stats->proxyids, proxyids_num);
+
+		for (int i = 0; i < proxyids_num; i++)
+		{
+			zbx_uint64_t	proxyid;
+
+			ptr += zbx_deserialize_value(ptr, &proxyid);
+			zbx_vector_uint64_append(&pg_stats->proxyids, proxyid);
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_message_clean(&message);
+	zbx_ipc_socket_close(&sock);
+
+	return ret;
 }

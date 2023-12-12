@@ -624,8 +624,8 @@ void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 	if (NULL != proxy->group)
 		groupid = proxy->group->proxy_groupid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "    status:%d firstaccess:%d groupid:" ZBX_FS_UI64,
-			proxy->status, proxy->firstaccess, groupid);
+	zabbix_log(LOG_LEVEL_DEBUG, "    status:%d lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
+			proxy->status, proxy->lastaccess, proxy->firstaccess, groupid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "    hostids:");
 	for (int i = 0; i < proxy->hosts.values_num; i++)
