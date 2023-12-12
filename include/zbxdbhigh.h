@@ -716,6 +716,8 @@ typedef struct
 	int			severity;
 
 	zbx_vector_ptr_t	tags;
+	int			suppressed;
+	int			mtime;
 }
 zbx_event_t;
 

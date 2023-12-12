@@ -286,6 +286,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pp_cache_t		*cache, *step_cache;
 	zbx_pp_item_preproc_t	preproc;
 
+	pp_context_init(&ctx);
+
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
 
@@ -359,7 +361,7 @@ void	zbx_mock_test_entry(void **state)
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
 				&history_value, &history_ts, get_zbx_config_source_ip())))
 		{
-			pp_error_on_fail(&value, &step);
+			pp_error_on_fail(NULL, 0, &value, &step);
 
 			if (ZBX_VARIANT_ERR != value.type)
 				returned_ret = SUCCEED;
