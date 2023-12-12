@@ -7176,7 +7176,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
 			proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
 			proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
-			proxy->lastaccess = atoi(row[12]);
+			proxy->lastaccess = (SUCCEED != zbx_db_is_null(row[12]) ? atoi(row[12]) : 0);
 			proxy->last_cfg_error_time = 0;
 			proxy->proxy_delay = 0;
 			proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
@@ -8939,8 +8939,9 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	else
 		config->session_token = NULL;
 
-	config->hostname = (NULL != hostname ? dc_strdup(hostname) : NULL);
+	config->proxy_hostname = (NULL != hostname ? dc_strdup(hostname) : NULL);
 	config->proxy_failover_delay = 0;
+	config->proxy_lastonline = 0;
 
 	zbx_dbsync_env_init(config);
 

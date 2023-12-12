@@ -2031,7 +2031,7 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 		return FAIL;
 	}
 
-	zbx_dc_update_proxy_failover_delay(atoi(tmp));
+	zbx_dc_set_proxy_failover_delay(atoi(tmp));
 
 	unsigned char	full_sync = 0;
 
@@ -2255,6 +2255,8 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send message to configuration syncer: %s", error);
 			zbx_free(error);
 		}
+
+		zbx_dc_set_proxy_lastonline((int)time(NULL));
 	}
 	else
 	{

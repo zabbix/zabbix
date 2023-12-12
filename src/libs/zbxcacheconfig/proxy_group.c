@@ -430,21 +430,40 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hpi->host_proxy->proxyid)))
 		return FAIL;
 
-	if (NULL != config->hostname && 0 == strcmp(proxy->name, config->hostname))
-		return FAIL;
+	if (NULL != config->proxy_hostname)
+	{
+		if (0 == strcmp(proxy->name, config->proxy_hostname))
+		{
+			int	now;
+
+			now = time(NULL);
+
+			if (now - config->proxy_lastonline < config->proxy_failover_delay ||
+					now - hpi->lastreset < config->proxy_failover_delay)
+			{
+				return FAIL;
+			}
+
+			hpi->lastreset = now;
+			redirect->reset = ZBX_REDIRECT_RESET;
+
+			return SUCCEED;
+		}
+	}
 
 	zbx_strlcpy(redirect->address, proxy->local_address, sizeof(redirect->address));
 	redirect->revision = hpi->host_proxy->revision;
+	redirect->reset = 0;
 
 	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update proxy failover delay in configuration cache                *
+ * Purpose: set proxy failover delay in configuration cache                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_proxy_failover_delay(int failover_delay)
+void	zbx_dc_set_proxy_failover_delay(int failover_delay)
 {
 	/* failover delay can be updated only by one process at time, */
 	/* so it can be checked without locking before update        */
@@ -454,4 +473,16 @@ void	zbx_dc_update_proxy_failover_delay(int failover_delay)
 		config->proxy_failover_delay = failover_delay;
 		UNLOCK_CACHE;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set proxy last online timestmap in configuration cache            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_set_proxy_lastonline(int lastonline)
+{
+	WRLOCK_CACHE;
+	config->proxy_lastonline = lastonline;
+	UNLOCK_CACHE;
 }

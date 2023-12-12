@@ -4100,7 +4100,7 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts,"
 				"p.proxy_groupid,p.local_address"
 			" from proxy p"
-			" join proxy_rtdata pr"
+			" left join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");
 
 	dbsync_prepare(sync, 25, NULL);

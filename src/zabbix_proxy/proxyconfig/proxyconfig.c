@@ -140,6 +140,8 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 				sock.peer, error);
 		zbx_free(error);
 	}
+
+	zbx_dc_set_proxy_lastonline((int)time(NULL));
 error:
 	zbx_disconnect_from_server(&sock);
 	if (SUCCEED != ret)

@@ -929,6 +929,7 @@ typedef struct
 {
 	const char		*host;
 	zbx_dc_host_proxy_t	*host_proxy;
+	int			lastreset;
 }
 zbx_dc_host_proxy_index_t;
 
@@ -1042,8 +1043,9 @@ typedef struct
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
-	char			*hostname;	/* proxy data */
-	int			proxy_failover_delay;	/* proxy data */
+	char			*proxy_hostname;	/* hostname - proxy only */
+	int			proxy_failover_delay;	/* proxy group failover delay - proxy only */
+	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
 }
 ZBX_DC_CONFIG;
 

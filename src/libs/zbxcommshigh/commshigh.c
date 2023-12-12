@@ -376,8 +376,14 @@ out:
 void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t *redirect)
 {
 	zbx_json_addobject(json, ZBX_PROTO_TAG_REDIRECT);
-	zbx_json_adduint64(json, ZBX_PROTO_TAG_REVISION, redirect->revision);
-	zbx_json_addstring(json, ZBX_PROTO_TAG_ADDRESS, redirect->address, ZBX_JSON_TYPE_STRING);
+	if (ZBX_REDIRECT_RESET != redirect->reset)
+	{
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_REVISION, redirect->revision);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_ADDRESS, redirect->address, ZBX_JSON_TYPE_STRING);
+	}
+	else
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESET, "true", ZBX_JSON_TYPE_TRUE);
+
 	zbx_json_close(json);
 }
 

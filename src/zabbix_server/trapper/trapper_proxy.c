@@ -201,6 +201,8 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		}
 
 		zbx_db_commit();
+
+		zbx_dc_set_proxy_lastonline(ts->sec);
 	}
 	else
 	{
@@ -290,6 +292,8 @@ static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		}
 
 		zbx_db_commit();
+
+		zbx_dc_set_proxy_lastonline(ts->sec);
 	}
 	else
 	{
