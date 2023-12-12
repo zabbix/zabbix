@@ -42,17 +42,17 @@ class CTestDataHelper {
 		], []);
 
 		try {
-			self::createTemplateGroups($objects['template_groups']);
-			self::createHostGroups($objects['host_groups']);
-			self::createProxies($objects['proxies']);
-			self::createTemplates($objects['templates']);
-			self::createHosts($objects['hosts']);
+			self::createTemplateGroups(array_values($objects['template_groups']));
+			self::createHostGroups(array_values($objects['host_groups']));
+			self::createProxies(array_values($objects['proxies']));
+			self::createTemplates(array_values($objects['templates']));
+			self::createHosts(array_values($objects['hosts']));
 			self::createTriggers($objects['triggers']);
-			self::createRoles($objects['roles']);
-			self::createUserGroups($objects['user_groups']);
-			self::createUsers($objects['users']);
-			self::createScripts($objects['scripts']);
-			self::createActions($objects['actions']);
+			self::createRoles(array_values($objects['roles']));
+			self::createUserGroups(array_values($objects['user_groups']));
+			self::createUsers(array_values($objects['users']));
+			self::createScripts(array_values($objects['scripts']));
+			self::createActions(array_values($objects['actions']));
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -181,6 +181,7 @@ class CTestDataHelper {
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
+		$httptests = [];
 
 		foreach ($hosts as &$host) {
 			$host += [
@@ -213,6 +214,14 @@ class CTestDataHelper {
 
 				unset($host['lld_rules']);
 			}
+
+			if (array_key_exists('httptests', $host)) {
+				foreach ($host['httptests'] as $httptest) {
+					$httptests[] = $httptest + ['hostid' => ':host:'.$host['host']];
+				}
+
+				unset($host['httptests']);
+			}
 		}
 		unset($host);
 
@@ -225,6 +234,7 @@ class CTestDataHelper {
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
+		self::createHttptests($httptests);
 	}
 
 	public static function convertHostReferences(array &$hosts): void {
@@ -403,11 +413,40 @@ class CTestDataHelper {
 		self::createItemPrototypes($item_prototypes);
 	}
 
+	private static function createHttptests(array $httptests): void {
+		if (!$httptests) {
+			return;
+		}
+
+		$host_refs = [];
+
+		foreach ($httptests as $i => &$httptest) {
+			$host_refs[$i] = $httptest['hostid'];
+
+			self::convertHttptestReferences($httptest);
+		}
+		unset($httptest);
+
+		$result = CDataHelper::call('httptest.create', $httptests);
+
+		foreach ($httptests as $i => $httptest) {
+			self::$objectids['httptest'][$httptest['name']][$host_refs[$i]] = array_shift($result['httptestids']);
+		}
+	}
+
 	public static function convertLldRuleReferences(array &$lld_rules): void {
 		self::convertPropertyReference($lld_rules, 'itemid');
 		self::convertPropertyReference($lld_rules, 'hostid');
 		self::convertPropertyReference($lld_rules, 'interfaceid');
 		self::convertPropertyReference($lld_rules, 'master_itemid');
+	}
+
+	/**
+	 * @param array $httptest
+	 */
+	public static function convertHttptestReferences(array &$httptest): void {
+		self::convertPropertyReference($httptest, 'httptestid');
+		self::convertPropertyReference($httptest, 'hostid');
 	}
 
 	/**
