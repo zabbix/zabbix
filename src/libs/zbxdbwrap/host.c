@@ -5699,7 +5699,7 @@ void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *hostgroupi
 void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames)
 {
 	int			i;
-	zbx_vector_uint64_t	itemids, httptestids, hgsetids, hgsetids_del, selementids;
+	zbx_vector_uint64_t	itemids, httptestids, hgsetids_keep, hgsetids_del, selementids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 
@@ -5710,7 +5710,7 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 
 	zbx_vector_uint64_create(&httptestids);
 	zbx_vector_uint64_create(&selementids);
-	zbx_vector_uint64_create(&hgsetids);
+	zbx_vector_uint64_create(&hgsetids_keep);
 	zbx_vector_uint64_create(&hgsetids_del);
 
 	/* delete web tests */
@@ -5751,19 +5751,29 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 			" where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	zbx_db_select_uint64(sql, &hgsetids);
+	zbx_db_select_uint64(sql, &hgsetids_del);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hgsetid"
+			"select distinct hgsetid"
 			" from host_hgset"
 			" where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values, hgsetids.values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
+			hgsetids_del.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			" group by hgsetid"
-			" having count(*)=1");
+			" and not");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	zbx_db_select_uint64(sql, &hgsetids_del);
+	zbx_db_select_uint64(sql, &hgsetids_keep);
+
+	for (i = 0; i < hgsetids_del.values_num; i++)
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&hgsetids_keep, hgsetids_del.values[i],
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			zbx_vector_uint64_remove(&hgsetids_del, i--);
+		}
+	}
 
 	sql_offset = 0;
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -5810,7 +5820,7 @@ clean:
 
 	zbx_vector_uint64_destroy(&selementids);
 	zbx_vector_uint64_destroy(&hgsetids_del);
-	zbx_vector_uint64_destroy(&hgsetids);
+	zbx_vector_uint64_destroy(&hgsetids_keep);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
