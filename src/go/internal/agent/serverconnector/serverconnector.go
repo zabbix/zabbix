@@ -48,7 +48,7 @@ const defaultAgentPort = 10050
 type Connector struct {
 	clientID                   uint64
 	input                      chan interface{}
-	address                    zbxcomms.Address
+	address                    zbxcomms.AddressSet
 	hostname                   string
 	session                    string
 	configRevision             uint64

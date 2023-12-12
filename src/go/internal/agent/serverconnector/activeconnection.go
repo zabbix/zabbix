@@ -31,7 +31,7 @@ import (
 )
 
 type activeConnection struct {
-	address   zbxcomms.Address
+	address   zbxcomms.AddressSet
 	hostname  string
 	localAddr net.Addr
 	tlsConfig *tls.Config

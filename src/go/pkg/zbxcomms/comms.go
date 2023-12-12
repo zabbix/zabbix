@@ -325,7 +325,7 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(addrpool Address, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
+func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
 	data []byte, args ...interface{}) (b []byte, errs []error, errRead error) {
 	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", addrpool, timeout, connect_timeout)
 
@@ -402,7 +402,7 @@ func Exchange(addrpool Address, localAddr *net.Addr, timeout time.Duration, conn
 	return b, nil, nil
 }
 
-func ExchangeWithRedirect(addrpool Address, localAddr *net.Addr, timeout time.Duration,
+func ExchangeWithRedirect(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration,
 	connectTimeout time.Duration, data []byte, args ...interface{}) ([]byte, []error, error) {
 	b, errs, err := Exchange(addrpool, localAddr, timeout, connectTimeout, data, args...)
 
