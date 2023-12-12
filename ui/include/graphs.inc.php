@@ -434,7 +434,7 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
  * @param string $graphid
  * @param string $hostid
  *
- * @return array
+ * @return array|bool
  */
 function copyGraphToHost($graphid, $hostid) {
 	$graphs = API::Graph()->get([
@@ -465,7 +465,7 @@ function copyGraphToHost($graphid, $hostid) {
 	if (!$graph['gitems']) {
 		$host = get_host_by_hostid($hostid);
 
-		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
+		error(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
 
 		return false;
 	}

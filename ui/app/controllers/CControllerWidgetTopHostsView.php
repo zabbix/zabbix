@@ -335,13 +335,17 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		]);
 
 		if ($items) {
-			$single_key = reset($items)['key_'];
+			$processed_hostids = [];
 
-			$items = array_filter($items,
-				static function ($item) use ($single_key): bool {
-					return $item['key_'] === $single_key;
+			$items = array_filter($items, static function ($item) use (&$processed_hostids) {
+				if (array_key_exists($item['hostid'], $processed_hostids)) {
+					return false;
 				}
-			);
+
+				$processed_hostids[$item['hostid']] = true;
+
+				return true;
+			});
 		}
 
 		return $items;

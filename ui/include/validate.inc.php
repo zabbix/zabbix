@@ -265,16 +265,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	}
 
 	if ($error) {
-		if ($flags & P_SYS) {
-			error($message);
+		error($message);
 
-			return ZBX_VALID_ERROR;
-		}
-		else {
-			info($message);
-
-			return ZBX_VALID_WARNING;
-		}
+		return $flags & P_SYS ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 
 	return ZBX_VALID_OK;
@@ -317,7 +310,7 @@ function check_field(&$fields, &$field, $checks) {
 
 	if ($opt == O_MAND) {
 		if (!isset($_REQUEST[$field])) {
-			info(_s('Field "%1$s" is mandatory.', $caption));
+			error(_s('Field "%1$s" is mandatory.', $caption));
 
 			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 		}
@@ -329,7 +322,7 @@ function check_field(&$fields, &$field, $checks) {
 
 		unset_request($field);
 
-		info(_s('Field "%1$s" must be missing.', $caption));
+		error(_s('Field "%1$s" must be missing.', $caption));
 
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
@@ -339,7 +332,8 @@ function check_field(&$fields, &$field, $checks) {
 		}
 		elseif ($flags & P_ACT) {
 			if (!hasRequest('sid') || getRequest('sid') != substr(CSessionHelper::getId(), 16, 16)) {
-				info(_('Operation cannot be performed due to unauthorized request.'));
+				error(_('Operation cannot be performed due to unauthorized request.'));
+
 				return ZBX_VALID_ERROR;
 			}
 		}
@@ -361,27 +355,27 @@ function check_field(&$fields, &$field, $checks) {
 
 	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)) {
 		if ($validation == NOT_EMPTY) {
-			info(_s('Incorrect value for field "%1$s": %2$s.', $caption, _('cannot be empty')));
+			error(_s('Incorrect value for field "%1$s": %2$s.', $caption, _('cannot be empty')));
 		}
 		// Check for BETWEEN() or BETWEEN_SCALE function pattern and extract min, max and scale numbers.
 		elseif (preg_match('/\(\{\}>=(?<min>\d+)&&\{\}<=(?<max>\d+)\)&&(\(round\(\{\},(?<scale>\d+)\)==\{\}\)&&)?/',
 				$validation, $matches)) {
 			if (array_key_exists('scale', $matches)) {
-				info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point.',
+				error(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point.',
 					$_REQUEST[$field], $caption, $matches['min'], $matches['max'], $matches['scale']
 				));
 			}
 			else {
-				info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+				error(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
 					$_REQUEST[$field], $caption, $matches['min'], $matches['max']
 				));
 			}
 		}
 		elseif (is_scalar($_REQUEST[$field])) {
-			info(_s('Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
+			error(_s('Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
 		}
 		else {
-			info(_s('Incorrect value for "%1$s" field.', $caption));
+			error(_s('Incorrect value for "%1$s" field.', $caption));
 		}
 
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
