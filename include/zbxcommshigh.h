@@ -50,7 +50,7 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
 
 void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t *redirect);
 int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned short *port,
-		zbx_uint64_t *revision);
+		zbx_uint64_t *revision, unsigned char *reset);
 
 int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int loglevel, const zbx_config_tls_t *config_tls,

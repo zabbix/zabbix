@@ -257,6 +257,8 @@
 #define ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS	"suppress"
 #define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"
 
+#define ZBX_PROTO_VALUE_TRUE			"true"
+
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,

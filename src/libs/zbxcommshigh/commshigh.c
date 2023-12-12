@@ -393,13 +393,22 @@ void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t
  *                                                                            *
  ******************************************************************************/
 int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned short *port,
-		zbx_uint64_t *revision)
+		zbx_uint64_t *revision, unsigned char *reset)
 {
 	struct zbx_json_parse	jp_redirect;
 	char			buf[MAX_STRING_LEN];
 
 	if (FAIL == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REDIRECT, &jp_redirect))
 		return FAIL;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_redirect, ZBX_PROTO_TAG_RESET, buf, sizeof(buf), NULL) &&
+			0 == strcmp(buf, ZBX_PROTO_VALUE_TRUE))
+	{
+		*reset = ZBX_REDIRECT_RESET;
+		return SUCCEED;
+	}
+	else
+		*reset = 0;
 
 	if (FAIL == zbx_json_value_by_name(&jp_redirect, ZBX_PROTO_TAG_REVISION, buf, sizeof(buf), NULL))
 		return FAIL;
@@ -444,6 +453,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 	int			i;
 	zbx_addr_t		*addr;
 	unsigned short		port;
+	unsigned char		reset;
 
 	if (FAIL == zbx_json_open(data, &jp))
 		return FAIL;
@@ -453,9 +463,22 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
 
 	if (0 != strcmp(buf, ZBX_PROTO_VALUE_FAILED))
 		return FAIL;
-	if (SUCCEED != zbx_parse_redirect_response(&jp, &host, &port, &revision))
 
+	if (SUCCEED != zbx_parse_redirect_response(&jp, &host, &port, &revision, &reset))
 		return FAIL;
+
+	if (ZBX_REDIRECT_RESET == reset)
+	{
+		/* can't reset if the current address is not redirected */
+		if (0 == addrs->values[0]->revision)
+			return FAIL;
+
+		/* move redirected address at the end of address list */
+		zbx_vector_addr_ptr_append(addrs, addrs->values[0]);
+		zbx_vector_addr_ptr_remove(addrs, 0);
+
+		return SUCCEED;
+	}
 
 	for (i = 0; i < addrs->values_num; i++)
 	{

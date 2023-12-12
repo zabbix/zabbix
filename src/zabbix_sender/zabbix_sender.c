@@ -535,10 +535,11 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 static int	check_response(char *response, const char *server, unsigned short port)
 {
 	struct zbx_json_parse	jp;
-	char			value[MAX_STRING_LEN], info[MAX_STRING_LEN], *rhost;
+	char			value[MAX_STRING_LEN], info[MAX_STRING_LEN], *rhost = NULL;
 	int			ret;
-	unsigned short		rport;
-	zbx_uint64_t		rrevision;
+	unsigned short		redirect_port;
+	unsigned char		redirect_reset;
+	zbx_uint64_t		redirect_revision;
 
 	ret = zbx_json_open(response, &jp);
 
@@ -559,11 +560,18 @@ static int	check_response(char *response, const char *server, unsigned short por
 			ret = SUCCEED_PARTIAL;
 	}
 
-	if (FAIL == ret && SUCCEED == zbx_parse_redirect_response(&jp, &rhost, &rport, &rrevision))
+	if (FAIL == ret && SUCCEED == zbx_parse_redirect_response(&jp, &rhost, &redirect_port, &redirect_revision,
+			&redirect_reset))
 	{
-		printf("Response from \"%s:%hu\": \"Redirect to \"%s:%hu\"\n", server, port, rhost, rport);
-		fflush(stdout);
+		if (0 == redirect_reset)
+		{
+			printf("Response from \"%s:%hu\": \"Redirect to \"%s:%hu\"\n", server, port, rhost,
+					redirect_port);
+		}
+		else
+			printf("Response from \"%s:%hu\": \"Redirect reset\n", server, port);
 
+		fflush(stdout);
 		zbx_free(rhost);
 	}
 
