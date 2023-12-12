@@ -295,7 +295,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 			if (FAIL == (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
 				ret = FAIL;
 		}
-	
+
 		if (SUCCEED == ret)
 		{
 			AGENT_RESULT	result;
@@ -497,7 +497,6 @@ int	main(int argc, char **argv)
 					zbx_error("Invalid protocol");
 					exit(EXIT_FAILURE);
 				}
-				
 				break;
 			default:
 				zbx_print_usage(usage_message, zbx_progname);
