@@ -445,7 +445,7 @@ class CSVGPie {
 							this.#popOut(sector);
 						}
 
-						d3.select(sector).on('mouseleave', (e) => this.#onMouseLeave(e));
+						d3.select(sector).on('mouseleave', () => this.#onMouseLeave(sector));
 					}
 
 					this.#svg.on('mousemove', (e) => this.#onMouseMove(e));
@@ -780,12 +780,10 @@ class CSVGPie {
 	/**
 	 * Pop in sector if it lost mouse capture.
 	 *
-	 * @param {Event} e  Mouse leave event.
+	 * @param {SVGGElement} sector
 	 */
-	#onMouseLeave(e) {
-		const sector = e.target.closest(`.${CSVGPie.ZBX_STYLE_ARC_CONTAINER}`);
-
-		if (!sector?.dataset.expanded) {
+	#onMouseLeave(sector) {
+		if (!sector.dataset.expanded) {
 			this.#popIn(sector);
 		}
 	}
@@ -793,7 +791,7 @@ class CSVGPie {
 	/**
 	 * Pop out a sector.
 	 *
-	 * @param {SVGPathElement} sector
+	 * @param {SVGGElement} sector
 	 */
 	#popOut(sector) {
 		const sector_d3 = d3.select(sector);
@@ -828,10 +826,10 @@ class CSVGPie {
 	/**
 	 * Pop in a sector.
 	 *
-	 * @param {SVGPathElement} sector
+	 * @param {SVGGElement} sector
 	 */
 	#popIn(sector) {
-		if (!sector?.dataset.expanded) {
+		if (!sector.dataset.expanded) {
 			const sector_d3 = d3.select(sector);
 
 			sector_d3
