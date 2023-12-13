@@ -240,7 +240,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 		zbx_protocol_t protocol)
 {
 	zbx_socket_t	s;
-	int		ret, ret_protocol = SUCCEED;
+	int		ret;
 	ssize_t		received_len = -1;
 	char		*tls_arg1, *tls_arg2;
 

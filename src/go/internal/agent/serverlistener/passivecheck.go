@@ -87,16 +87,16 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (err error) {
 
 	if nil != err {
 		errString := string(err.Error())
-		response = passiveChecksResponse{Version: version.Long(), Error: &errString}
+		response = passiveChecksResponse{Version: version.LongNoRC(), Error: &errString}
 	} else {
 		// direct passive check timeout is handled by the scheduler
 		value, err := pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
 
 		if err != nil {
 			errString := string(err.Error())
-			response = passiveChecksResponse{Version: version.Long(), Data: []passiveChecksResponseData{{Error: &errString}}}
+			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Error: &errString}}}
 		} else {
-			response = passiveChecksResponse{Version: version.Long(), Data: []passiveChecksResponseData{{Value: &value}}}
+			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Value: &value}}}
 		}
 	}
 
