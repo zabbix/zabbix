@@ -1958,6 +1958,117 @@ static int	DBpatch_6050158(void)
 	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
 }
 
+static int	DBpatch_6050160(void)
+{
+	//+AKDBG add mfaid field in usrgrp
+	const zbx_db_field_t	field = {"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6050161(void)
+{
+	//+AKDBG add index 3 in usrgrp
+	return DBcreate_index("usrgrp", "usrgrp_3", "mfaid", 0);
+}
+
+static int	DBpatch_6050162(void)
+{
+	//+AKDBG add mfa_status field in config
+	const zbx_db_field_t	field = {"mfa_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050163(void)
+{
+	//+AKDBG add mfaid field in config
+	const zbx_db_field_t	field = {"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050164(void)
+{
+	//+AKDBG add index 5 in config
+	return DBcreate_index("config", "config_5", "mfaid", 0);
+}
+
+static int	DBpatch_6050165(void)
+{
+	//+AKDBG add table mfa
+	const zbx_db_table_t	table =
+			{"mfa", "mfaid", 0,
+				{
+					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"hash_function", "1", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
+					{"code_length", "6", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
+					{"api_hostname", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, 0, 0},
+					{"clientid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
+					{"client_secret", "", NULL, NULL, 64, ZBX_TYPE_CHAR, 0, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050166(void)
+{
+	//+AKDBG create unique index 1 in table mfa
+	return DBcreate_index("mfa", "mfa_1", "name", 1);
+}
+
+static int	DBpatch_6050167(void)
+{
+	//+AKDBG add table mfa_totp_secret
+	const zbx_db_table_t	table =
+			{"mfa_totp_secret", "mfa_totp_secretid", 0,
+				{
+					{"mfa_totp_secretid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"totp_secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050168(void)
+{
+	//+AKDBG create index 1 in table mfa_totp_secret
+	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_1", "mfaid", 0);
+}
+
+static int	DBpatch_6050169(void)
+{
+	//+AKDBG create FK 1 in table mfa_totp_secret
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("mfa_totp_secret", 1, &field);
+}
+
+static int	DBpatch_6050170(void)
+{
+	//+AKDBG create index 2 in table mfa_totp_secret
+	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_2", "userid", 0);
+}
+
+static int	DBpatch_6050171(void)
+{
+	//AKDBG create FK 2 in table mfa_totp_secret
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("mfa_totp_secret", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -2121,5 +2232,18 @@ DBPATCH_ADD(6050155, 0, 1)
 DBPATCH_ADD(6050156, 0, 1)
 DBPATCH_ADD(6050157, 0, 1)
 DBPATCH_ADD(6050158, 0, 1)
+DBPATCH_ADD(6050159, 0, 1)
+DBPATCH_ADD(6050160, 0, 1)
+DBPATCH_ADD(6050161, 0, 1)
+DBPATCH_ADD(6050162, 0, 1)
+DBPATCH_ADD(6050163, 0, 1)
+DBPATCH_ADD(6050164, 0, 1)
+DBPATCH_ADD(6050165, 0, 1)
+DBPATCH_ADD(6050166, 0, 1)
+DBPATCH_ADD(6050167, 0, 1)
+DBPATCH_ADD(6050168, 0, 1)
+DBPATCH_ADD(6050169, 0, 1)
+DBPATCH_ADD(6050170, 0, 1)
+DBPATCH_ADD(6050170, 0, 1)
 
 DBPATCH_END()
