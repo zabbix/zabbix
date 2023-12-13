@@ -652,7 +652,9 @@ window.widget_pie_chart_form = new class {
 			.querySelector('[name="value_size_type"]:checked').value == <?= WidgetForm::VALUE_SIZE_CUSTOM ?>;
 		const is_units_visible = document.getElementById('units_show').checked;
 
-		for (const element of this.#form.querySelectorAll('#width_label, #width_range, #show_total_fields')) {
+		for (const element of this.#form.querySelectorAll('#width_label, #width_range, #stroke_label, #stroke_range,' +
+			'#show_total_fields'
+		)) {
 			element.style.display = is_doughnut ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
@@ -661,6 +663,7 @@ window.widget_pie_chart_form = new class {
 		}
 
 		jQuery('#width').rangeControl(is_doughnut ? 'enable' : 'disable');
+		jQuery('#stroke').rangeControl(is_doughnut ? 'enable' : 'disable');
 
 		document.getElementById('merge_percent').disabled = !do_merge_sectors;
 		document.getElementById('merge_color').disabled = !do_merge_sectors;

@@ -60,6 +60,10 @@ class WidgetForm extends CWidgetForm {
 	private const MERGE_PERCENT_MAX = 10;
 	private const MERGE_PERCENT_MIN = 1;
 
+	private const STROKE_DEFAULT = 0;
+	private const STROKE_MAX = 10;
+	private const STROKE_MIN = 0;
+
 	private const SPACE_DEFAULT = 1;
 	private const SPACE_MAX = 10;
 	private const SPACE_MIN = 0;
@@ -127,6 +131,12 @@ class WidgetForm extends CWidgetForm {
 					self::WIDTH_MIN, self::WIDTH_DEFAULT, self::WIDTH_STEP
 				))
 					->setDefault(self::WIDTH_DEFAULT)
+			)
+			->addField(
+				(new CWidgetFieldRangeControl('stroke', _('Stroke width'),
+					self::STROKE_MIN, self::STROKE_MAX
+				))
+					->setDefault(self::STROKE_DEFAULT)
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('space', _('Space between sectors'),
