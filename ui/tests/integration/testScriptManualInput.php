@@ -258,7 +258,7 @@ class testScriptManualInput extends CIntegrationTest {
 					'scriptid' => self::$scriptids[0],
 					'manualinput' => 'abcdefghijklmnopqrstuvwxyz'
 				],
-				'expected_result' => 'Your mindmacro has been expanded'
+				'expected_result' => "Your mindmacro has been expanded\n"
 			],
 			[
 				'request_params' => [
@@ -266,7 +266,7 @@ class testScriptManualInput extends CIntegrationTest {
 					'scriptid' => self::$scriptids[1],
 					'manualinput' => 'abcdefghijklmnopqrstuvwxyz'
 				],
-				'expected_result' => 'Your abcdefghijklmnopqrstuvwxyz has been expanded'
+				'expected_result' => "Your abcdefghijklmnopqrstuvwxyz has been expanded\n"
 			],
 			[
 				'request_params' => [
@@ -274,7 +274,7 @@ class testScriptManualInput extends CIntegrationTest {
 					'scriptid' => self::$scriptids[2],
 					'manualinput' => 'macro'
 				],
-				'expected_result' => 'Your macro has been expanded'
+				'expected_result' => "Your macro has been expanded\n"
 			]
 		];
 	}
