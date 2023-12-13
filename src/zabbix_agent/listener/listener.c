@@ -76,12 +76,6 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 		goto fail;
 	}
 
-	if (FAIL == zbx_validate_item_timeout(tmp, &timeout, error_tmp, sizeof(error_tmp)))
-	{
-		error = zbx_dsprintf(NULL, "%s", error_tmp);
-		goto fail;
-	}
-
 	if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY, &key, &key_alloc,
 			NULL))
 	{
@@ -98,15 +92,22 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 	zbx_json_addobject(&j, NULL);
 
-	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
+	if (FAIL == zbx_validate_item_timeout(tmp, &timeout, error_tmp, sizeof(error_tmp)))
 	{
-		if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, error_tmp, ZBX_JSON_TYPE_STRING);
 	}
 	else
 	{
-		value = ZBX_GET_MSG_RESULT(&result);
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, *value, ZBX_JSON_TYPE_STRING);
+		if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
+		{
+			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
+				zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+		}
+		else
+		{
+			value = ZBX_GET_MSG_RESULT(&result);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, *value, ZBX_JSON_TYPE_STRING);
+		}
 	}
 
 	zbx_json_close(&j);
