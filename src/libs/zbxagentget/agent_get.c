@@ -52,7 +52,7 @@ void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, int timeout)
 	zbx_json_close(j);
 }
 
-int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, const char *addr, AGENT_RESULT *result,
+int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
 		int *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
@@ -62,8 +62,7 @@ int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, c
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
 				" Assuming that agent dropped connection because of access permissions.",
 				addr));
-		*ret = NETWORK_ERROR;
-		return SUCCEED;
+		return NETWORK_ERROR;
 	}
 
 	if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
@@ -76,7 +75,6 @@ int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, c
 		if (FAIL == zbx_json_open(s->buffer, &jp))
 		{
 			*version = 0;
-			*ret = FAIL;
 			return FAIL;
 		}
 
@@ -84,7 +82,7 @@ int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, c
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON"
 					" object.", ZBX_PROTO_TAG_VERSION));
-			return SUCCEED;
+			return NETWORK_ERROR;
 		}
 
 		*version = zbx_get_agent_protocol_version_int(tmp);
@@ -93,38 +91,33 @@ int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, c
 		{
 			zbx_replace_invalid_utf8(tmp);
 			SET_MSG_RESULT(result, zbx_strdup(NULL, tmp));
-			*ret = NETWORK_ERROR;
-			return SUCCEED;
+			return NETWORK_ERROR;
 		}
 
 		if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON"
 					" object.", ZBX_PROTO_TAG_DATA));
-			*ret = NETWORK_ERROR;
-			return SUCCEED;
+			return NETWORK_ERROR;
 		}
 
 		if (NULL == (p = zbx_json_next(&jp_data, p)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "received empty data response"));
-			*ret = NETWORK_ERROR;
-			return SUCCEED;
+			return NETWORK_ERROR;
 		}
 
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot parse response: %s", zbx_json_strerror()));
-			*ret = NETWORK_ERROR;
-			return SUCCEED;
+			return NETWORK_ERROR;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL))
 		{
 			zbx_replace_invalid_utf8(tmp);
 			SET_MSG_RESULT(result, zbx_strdup(NULL, tmp));
-			*ret = NOTSUPPORTED;
-			return SUCCEED;
+			return NOTSUPPORTED;
 		}
 
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc,
@@ -132,13 +125,11 @@ int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, c
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot parse response: %s",
 					zbx_json_strerror()));
-			*ret = NETWORK_ERROR;
-			return SUCCEED;
+			return NETWORK_ERROR;
 		}
 
 		zbx_replace_invalid_utf8(value);
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, value));
-		*ret = SUCCEED;
 
 		zbx_free(value);
 
@@ -153,19 +144,17 @@ int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, c
 		else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
 
-		*ret = NOTSUPPORTED;
+		return NOTSUPPORTED;
 	}
 	else if (0 == strcmp(s->buffer, ZBX_ERROR))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
-		*ret = AGENT_ERROR;
+		return AGENT_ERROR;
 	}
 	else
 	{
 		zbx_replace_invalid_utf8(s->buffer);
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, s->buffer));
-		*ret = SUCCEED;
+		return SUCCEED;
 	}
-
-	return SUCCEED;
 }

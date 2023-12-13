@@ -271,6 +271,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 		struct zbx_json	j;
 		const char	*ptr;
 		size_t		len;
+		int		retry = 0;
 
 		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -302,8 +303,12 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 			zbx_init_agent_result(&result)
 
-			if (FAIL != (ret_protocol = zbx_agent_handle_response(&s, received_len, &ret, host,
-					&result, version)))
+			if (FAIL == (ret = zbx_agent_handle_response(&s, received_len, host, &result,
+					version)))
+			{
+				retry = 1;
+			}
+			else
 			{
 				if (SUCCEED != ret)
 				{
@@ -322,7 +327,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 		zbx_tcp_close(&s);
 
-		if (FAIL == ret_protocol)
+		if (1 == retry)
 		{
 			if (ZBX_AUTO_PROTOCOL == protocol)
 			{

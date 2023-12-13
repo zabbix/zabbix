@@ -51,7 +51,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
-	int		ret = SUCCEED, ret_protocol = SUCCEED;
+	int		ret = SUCCEED, retry = 0;
 	ssize_t		received_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
@@ -137,7 +137,10 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	}
 
 	if (SUCCEED == ret)
-		ret_protocol = zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result, version);
+	{
+		if (FAIL == (ret = zbx_agent_handle_response(&s, received_len, item->interface.addr, result, version)))
+			retry = 1;
+	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 
@@ -146,7 +149,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	/* retry with other protocol */
-	if (FAIL == ret_protocol)
+	if (1 == retry)
 		return zbx_agent_get_value(item, config_source_ip, program_type, result, version);
 
 	return ret;

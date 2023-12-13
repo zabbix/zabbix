@@ -23,7 +23,7 @@
 #include "module.h"
 
 void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, int timeout);
-int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, const char *addr, AGENT_RESULT *result,
+int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
 		int *version);
 
 #endif
