@@ -25,9 +25,9 @@ import (
 	"fmt"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
+	"regexp"
 	"strings"
 	"time"
-	"github.com/iancoleman/strcase"
 )
 
 const (
@@ -485,6 +485,16 @@ func parseHeaderClass(header *dns.RR_Header) string {
 	return headerClassNewValue
 }
 
+var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+
+func toSnake(in string) string {
+	snakeCase := matchFirstCap.ReplaceAllString(in, "${1}_${2}")
+	snakeCase = matchAllCap.ReplaceAllString(snakeCase, "${1}_${2}")
+
+	return strings.ToLower(snakeCase)
+}
+
 func parseOptRR(optRR *dns.OPT) (map[string]any, error) {
 	parsedOpts := make([]any, 0, len(optRR.Option))
 
@@ -496,7 +506,7 @@ func parseOptRR(optRR *dns.OPT) (map[string]any, error) {
 
 		for k, v := range oMap {
 			delete(oMap, k)
-			oMap[strcase.ToSnake(k)] = v
+			oMap[toSnake(k)] = v
 		}
 
 		nsid, ok := oMap["nsid"]
@@ -537,7 +547,7 @@ func parseDefaultRR(rr dns.RR) (map[string]any, error) {
 
 	rData2 := map[string]any{}
 	for k, v := range rData {
-		newKey := strcase.ToSnake(k)
+		newKey := toSnake(k)
 		if newKey == "type_covered" {
 			// unmarshalling produces float64 instead of the original uint16
 			// need to cast the value to float64 first and then to uint16
