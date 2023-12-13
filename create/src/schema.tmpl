@@ -2199,18 +2199,18 @@ TABLE|mfa|mfaid|ZBX_DATA
 FIELD		|mfaid				|t_id			|		|NOT NULL	|0
 FIELD		|type				|t_integer		|'0'	|NOT NULL	|0
 FIELD		|name				|t_varchar(128)	|''		|NOT NULL	|0
-FIELD		|hash_function		|t_integer		|NULL	|NULL		|0
-FIELD		|code_length		|t_integer		|NULL	|NULL		|0
-FIELD		|api_hostname		|t_varchar(1024)|NULL	|NULL		|0
-FIELD		|clientid			|t_varchar(32)	|NULL	|NULL		|0
-FIELD		|client_secret		|t_varchar(40)	|NULL	|NULL		|0
+FIELD		|hash_function		|t_integer		|'1'	|NULL		|0
+FIELD		|code_length		|t_integer		|'6'	|NULL		|0
+FIELD		|api_hostname		|t_varchar(1024)|''		|NULL		|0
+FIELD		|clientid			|t_varchar(32)	|''		|NULL		|0
+FIELD		|client_secret		|t_varchar(64)	|''		|NULL		|0
 UNIQUE		|1		|name
 
 TABLE|mfa_totp_secret|mfa_totp_secretid|ZBX_DATA
 FIELD		|mfa_totp_secretid	|t_id			|		|NOT NULL	|0
 FIELD		|mfaid				|t_id			|		|NOT NULL	|0	|1|mfa	|mfaid
 FIELD		|userid				|t_id			|		|NOT NULL	|0	|2|users|userid
-FIELD		|totp_secret		|t_varchar(32)	|NULL	|NULL		|0
+FIELD		|totp_secret		|t_varchar(32)	|''		|NULL		|0
 INDEX		|1		|mfaid
 INDEX		|2		|userid
 
