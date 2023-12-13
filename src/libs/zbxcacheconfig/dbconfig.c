@@ -1680,6 +1680,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 							&config->proxy_groups, &host->proxy_groupid)))
 					{
 						pg->revision = revision;
+						config->revision.proxy_group = revision;
 					}
 				}
 
@@ -7204,7 +7205,10 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			zbx_pg_group_t	*pg;
 
 			if (NULL != (pg = (zbx_pg_group_t *)zbx_hashset_search(&config->proxy_groups, &proxy_groupid)))
+			{
 				pg->revision = revision;
+				config->revision.proxy_group = revision;
+			}
 		}
 		dc_strpool_replace(found, &proxy->local_address, row[24]);
 
