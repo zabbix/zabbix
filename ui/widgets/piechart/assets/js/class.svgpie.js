@@ -414,14 +414,14 @@ class CSVGPie {
 					this.#arcs_container
 						.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_STROKE}`)
 						.style('fill', (d) => {
-							const coefficient = 0.7;
-							const coefficient_saturation = 20;
+							const multiplier = 0.7;
+							const intensity = 20;
 
-							const color_darker = d3.color(d.data.color).darker(coefficient);
+							const color_darker = d3.color(d.data.color).darker(multiplier);
 
 							const {l, c, h} = d3.lch(color_darker);
 
-							return d3.lch(l, c + coefficient_saturation * coefficient, h);
+							return d3.lch(l, c + intensity * multiplier, h);
 						});
 				}
 
@@ -565,9 +565,9 @@ class CSVGPie {
 
 			const text_width = this.#getMeasuredTextWidth(text, default_size, font_weight);
 
-			const coefficient = available_width / text_width;
+			const width_ratio = available_width / text_width;
 
-			const default_height = default_size * coefficient / this.#scale;
+			const default_height = default_size * width_ratio / this.#scale;
 			const max_height = available_width / this.#scale * CSVGPie.TEXT_BASELINE;
 
 			const normal_height = Math.min(default_height, max_height);
