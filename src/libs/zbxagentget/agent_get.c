@@ -51,7 +51,7 @@ void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, int timeout)
 	zbx_json_close(j);
 }
 
-int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
+int	zbx_agent_handle_response(const zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
 		int *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);

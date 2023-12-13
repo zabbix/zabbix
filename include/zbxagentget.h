@@ -26,7 +26,7 @@
 
 int	zbx_get_agent_protocol_version_int(const char *version_str);
 void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, int timeout);
-int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
+int	zbx_agent_handle_response(const zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
 		int *version);
 
 #endif
