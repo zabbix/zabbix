@@ -76,16 +76,16 @@ class testPageApiTokens extends CWebTest {
 		}
 
 		// Check displaying and hiding the filter.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('xpath://a[contains(text(), "Filter")]')->one();
-		$filter = $filter_form->query('id:tab_0')->one();
-		$this->assertTrue($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertFalse($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertTrue($filter->isDisplayed());
+		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
+		$this->assertTrue($filter_tab->isExpanded());
+
+		foreach ([false, true] as $state) {
+			$filter_tab->expand($state);
+			$this->assertTrue($filter_tab->isExpanded($state));
+		}
 
 		// Check that all filter fields are present.
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->assertEquals($filter_fields, $filter_form->getLabels()->asText());
 
 		// Check the count of returned tokens and the count of selected tokens.
@@ -198,6 +198,9 @@ class testPageApiTokens extends CWebTest {
 			$sql = 'SELECT tokenid FROM token WHERE userid=1';
 		}
 		$this->page->login()->open($url);
+
+		// Expand filter if it is collapsed.
+		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
 
 		// Apply and submit the filter from data provider.
 		$form = $this->query('name:zbx_filter')->asForm()->one();

@@ -343,9 +343,9 @@ class DiscoveredHosts {
 		CDataHelper::call('host.update', [
 			'hostid' => self::DISCOVERED_HOSTID,
 			'templates' => [
-				$templates['templateids']['Test of discovered host Template'],
-				$templates['templateids']['Test of discovered host 1 template for unlink'],
-				$templates['templateids']['Test of discovered host 2 template for clear']
+				['templateid' => $templates['templateids']['Test of discovered host Template']],
+				['templateid' => $templates['templateids']['Test of discovered host 1 template for unlink']],
+				['templateid' => $templates['templateids']['Test of discovered host 2 template for clear']]
 			]
 		]);
 
