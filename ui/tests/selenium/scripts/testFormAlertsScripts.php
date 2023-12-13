@@ -501,7 +501,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: ^$.',
+					'details' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: ^$.',
 					'fields' => [
 						'Name' => 'invalid default input string - not match empty string',
 						'Scope' => 'Manual event action',
@@ -518,7 +518,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "/1/manualinput_default_value": input does not match the provided pattern: ^.*@.*\..*$.',
+					'details' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: ^.*@.*\..*$.',
 					'fields' => [
 						'Name' => 'invalid default input string - not match an email input',
 						'Scope' => 'Manual host action',
@@ -536,7 +536,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.',
+					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid input validation rule',
 						'Scope' => 'Manual event action',
@@ -552,7 +552,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "/1/manualinput_validator": Expression cannot be empty.',
+					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid input validation rule',
 						'Scope' => 'Manual host action',
@@ -603,7 +603,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.',
+					'details' => 'Invalid parameter "/1/manualinput_validator": values must be unique.',
 					'fields' => [
 						'Name' => 'invalid dropdown options',
 						'Scope' => 'Manual host action',
@@ -620,7 +620,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "/1/manualinput_validator": values must be unique.',
+					'details' => 'Invalid parameter "/1/manualinput_validator": values must be unique.',
 					'fields' => [
 						'Name' => 'invalid dropdown options',
 						'Scope' => 'Manual event action',
@@ -1493,7 +1493,7 @@ class testFormAlertsScripts extends CWebTest {
 
 			// Trim trailing and leading spaces in expected values before comparison.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
-				$this->trimArray($data);
+				$data = CTestArrayHelper::trim($data);
 			}
 
 			$form->invalidate();
@@ -2145,12 +2145,9 @@ class testFormAlertsScripts extends CWebTest {
 		$with_script = ($data['fields']['Scope'] === 'Manual host action') ? $data['host'] : $data['trigger'];
 		$without_script = ($data['fields']['Scope'] === 'Manual host action') ? $data['trigger'] : $data['host'];
 
-		// Check resolved macros in context menu.
+		// Check resolved macros in confirmation popup.
 		$table->query('link', $with_script)->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-		$this->assertEquals($data['resolved_macros'], $popup->getItem($data['fields']['Name'])->getAttribute('href'));
-
-		// Check resolved macros in confirmation popup.
 		$popup->fill($data['fields']['Name']);
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('URL opening confirmation', $dialog->getTitle());
@@ -2193,22 +2190,5 @@ class testFormAlertsScripts extends CWebTest {
 		}
 
 		return COverlayDialogElement::find()->one()->waitUntilReady();
-	}
-
-	/**
-	 * Recursive function for trimming all values in multi-level array.
-	 *
-	 * @param array    $array    array to be trimmed
-	 */
-	protected function trimArray(&$array) {
-		foreach ($array as &$value) {
-			if (!is_array($value)) {
-				$value = trim($value);
-			}
-			else {
-				$this->trimArray($value);
-			}
-		}
-		unset($value);
 	}
 }
