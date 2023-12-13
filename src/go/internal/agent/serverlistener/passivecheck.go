@@ -65,35 +65,33 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 	return
 }
 
-func (pc *passiveCheck) handleCheckJSON(data []byte) (err error) {
+func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 	var request passiveChecksRequest
 	var timeout int
+	var err error
 
-	err = json.Unmarshal(data, &request)
-	if err != nil {
-		return err
+	errJson = json.Unmarshal(data, &request)
+	if errJson != nil {
+		return errJson
 	}
 
 	if len(request.Data) == 0 {
-		err = fmt.Errorf("cannot find the \"key\" object in the received JSON object")
+		err = fmt.Errorf("Missing passive check in request")
 	} else {
 		timeout, err = scheduler.ParseItemTimeout(request.Data[0].Timeout)
-		if err != nil {
-			err = fmt.Errorf("cannot find the \"Timeout\" object in the received JSON object")
-		}
 	}
 
 	var response passiveChecksResponse
 
 	if nil != err {
-		errString := string(err.Error())
+		errString := err.Error()
 		response = passiveChecksResponse{Version: version.LongNoRC(), Error: &errString}
 	} else {
 		// direct passive check timeout is handled by the scheduler
 		value, err := pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
 
 		if err != nil {
-			errString := string(err.Error())
+			errString := err.Error()
 			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Error: &errString}}}
 		} else {
 			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Value: &value}}}
