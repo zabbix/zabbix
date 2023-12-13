@@ -363,8 +363,10 @@ FIELD		|gui_access	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|0 |2|userdirectory	|	|RESTRICT
+FIELD		|mfaid	|t_id	|NULL	|NULL	|0 |3|mfa	|	|RESTRICT
 UNIQUE		|1		|name
 INDEX		|2	|userdirectoryid
+INDEX		|3	|mfaid
 
 TABLE|users_groups|id|ZBX_DATA
 FIELD		|id		|t_id		|	|NOT NULL	|0
@@ -623,10 +625,13 @@ FIELD		|timeout_http_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|timeout_ssh_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|timeout_telnet_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|timeout_script		|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|mfa_status			|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|mfaid				|t_id			|NULL	|NULL		|0		|5|mfa	|mfaid|	RESTRICT
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
 INDEX		|4		|disabled_usrgrpid
+INDEX		|5		|mfaid
 
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
@@ -2189,6 +2194,25 @@ FIELD		|proxyid	|t_id		|	|NOT NULL	|0		|1|proxy|proxyid
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|version	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compatibility	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+
+TABLE|mfa|mfaid|ZBX_DATA
+FIELD		|mfaid				|t_id			|		|NOT NULL	|0
+FIELD		|type				|t_integer		|'0'	|NOT NULL	|0
+FIELD		|name				|t_varchar(128)	|''		|NOT NULL	|0
+FIELD		|hash_function		|t_integer		|NULL	|NULL		|0
+FIELD		|code_length		|t_integer		|NULL	|NULL		|0
+FIELD		|api_hostname		|t_varchar(1024)|NULL	|NULL		|0
+FIELD		|clientid			|t_varchar(32)	|NULL	|NULL		|0
+FIELD		|client_secret		|t_varchar(40)	|NULL	|NULL		|0
+UNIQUE		|1		|name
+
+TABLE|mfa_totp_secret|mfa_totp_secretid|ZBX_DATA
+FIELD		|mfa_totp_secretid	|t_id			|		|NOT NULL	|0
+FIELD		|mfaid				|t_id			|		|NOT NULL	|0	|1|mfa	|mfaid
+FIELD		|userid				|t_id			|		|NOT NULL	|0	|2|users|userid
+FIELD		|totp_secret		|t_varchar(32)	|NULL	|NULL		|0
+INDEX		|1		|mfaid
+INDEX		|2		|userid
 
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
