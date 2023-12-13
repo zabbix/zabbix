@@ -1542,7 +1542,7 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 			{
 				int	*permission_old = &permissions->values[j].permission;
 
-				if (0 != *permission_old && *permission_old < prm.permission)
+				if (0 != *permission_old && (0 == prm.permission || *permission_old < prm.permission))
 					*permission_old = prm.permission;
 			}
 			else

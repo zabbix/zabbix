@@ -6574,8 +6574,11 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 				{
 					int	*permission_old = &permissions.values[j].permission;
 
-					if (0 != *permission_old && *permission_old < prm.permission)
+					if (0 != *permission_old && (0 == prm.permission ||
+							*permission_old < prm.permission))
+					{
 						*permission_old = prm.permission;
+					}
 				}
 				else
 					zbx_vector_host_permission_append(&permissions, prm);
