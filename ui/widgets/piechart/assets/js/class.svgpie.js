@@ -586,6 +586,7 @@ class CSVGPie {
 				this.#total_value_container
 					.select('div')
 					.text(this.#total_value_text)
+					.attr('title', this.#total_value_text)
 					.style('width', `${available_width}px`);
 
 				if (this.#config.total_value.is_custom_size) {
