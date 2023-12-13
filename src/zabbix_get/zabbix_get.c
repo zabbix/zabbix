@@ -23,7 +23,6 @@
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
-#include "zbxjson.h"
 #include "zbxagentget.h"
 #include "zbxversion.h"
 

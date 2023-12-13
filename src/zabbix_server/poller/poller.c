@@ -693,8 +693,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				if (ZBX_INTERFACE_AVAILABLE_TRUE != last_available)
 				{
 					zbx_activate_item_interface(&timespec, &items[i].interface, items[i].itemid,
-							items[i].type, items[i].host.host,
-							0, &data, &data_alloc,
+							items[i].type, items[i].host.host, 0, &data, &data_alloc,
 							&data_offset);
 					last_available = ZBX_INTERFACE_AVAILABLE_TRUE;
 				}
