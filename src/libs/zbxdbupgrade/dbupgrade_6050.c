@@ -1962,6 +1962,19 @@ static int	DBpatch_6050158(void)
 
 static int	DBpatch_6050159(void)
 {
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("group_discovery", "group_discovery_pkey1", "group_discovery_pkey",
+			"groupdiscoveryid", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6050160(void)
+{
 	const zbx_db_table_t table =
 			{"ugset", "ugsetid", 0,
 				{
@@ -1975,12 +1988,12 @@ static int	DBpatch_6050159(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050160(void)
+static int	DBpatch_6050161(void)
 {
 	return DBcreate_index("ugset", "ugset_1", "hash", 0);
 }
 
-static int	DBpatch_6050161(void)
+static int	DBpatch_6050162(void)
 {
 	const zbx_db_table_t table =
 			{"ugset_group", "ugsetid,usrgrpid", 0,
@@ -1995,12 +2008,12 @@ static int	DBpatch_6050161(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050162(void)
+static int	DBpatch_6050163(void)
 {
 	return DBcreate_index("ugset_group", "ugset_group_1", "usrgrpid", 0);
 }
 
-static int	DBpatch_6050163(void)
+static int	DBpatch_6050164(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2008,14 +2021,14 @@ static int	DBpatch_6050163(void)
 	return DBadd_foreign_key("ugset_group", 1, &field);
 }
 
-static int	DBpatch_6050164(void)
+static int	DBpatch_6050165(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("ugset_group", 2, &field);
 }
 
-static int	DBpatch_6050165(void)
+static int	DBpatch_6050166(void)
 {
 	const zbx_db_table_t table =
 			{"user_ugset", "userid", 0,
@@ -2030,12 +2043,12 @@ static int	DBpatch_6050165(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050166(void)
+static int	DBpatch_6050167(void)
 {
 	return DBcreate_index("user_ugset", "user_ugset_1", "ugsetid", 0);
 }
 
-static int	DBpatch_6050167(void)
+static int	DBpatch_6050168(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2043,14 +2056,14 @@ static int	DBpatch_6050167(void)
 	return DBadd_foreign_key("user_ugset", 1, &field);
 }
 
-static int	DBpatch_6050168(void)
+static int	DBpatch_6050169(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("user_ugset", 2, &field);
 }
 
-static int	DBpatch_6050169(void)
+static int	DBpatch_6050170(void)
 {
 	const zbx_db_table_t table =
 			{"hgset", "hgsetid", 0,
@@ -2065,12 +2078,12 @@ static int	DBpatch_6050169(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050170(void)
+static int	DBpatch_6050171(void)
 {
 	return DBcreate_index("hgset", "hgset_1", "hash", 0);
 }
 
-static int	DBpatch_6050171(void)
+static int	DBpatch_6050172(void)
 {
 	const zbx_db_table_t table =
 			{"hgset_group", "hgsetid,groupid", 0,
@@ -2085,12 +2098,12 @@ static int	DBpatch_6050171(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050172(void)
+static int	DBpatch_6050173(void)
 {
 	return DBcreate_index("hgset_group", "hgset_group_1", "groupid", 0);
 }
 
-static int	DBpatch_6050173(void)
+static int	DBpatch_6050174(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2098,14 +2111,14 @@ static int	DBpatch_6050173(void)
 	return DBadd_foreign_key("hgset_group", 1, &field);
 }
 
-static int	DBpatch_6050174(void)
+static int	DBpatch_6050175(void)
 {
 	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("hgset_group", 2, &field);
 }
 
-static int	DBpatch_6050175(void)
+static int	DBpatch_6050176(void)
 {
 	const zbx_db_table_t table =
 			{"host_hgset", "hostid", 0,
@@ -2120,12 +2133,12 @@ static int	DBpatch_6050175(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050176(void)
+static int	DBpatch_6050177(void)
 {
 	return DBcreate_index("host_hgset", "host_hgset_1", "hgsetid", 0);
 }
 
-static int	DBpatch_6050177(void)
+static int	DBpatch_6050178(void)
 {
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2133,14 +2146,14 @@ static int	DBpatch_6050177(void)
 	return DBadd_foreign_key("host_hgset", 1, &field);
 }
 
-static int	DBpatch_6050178(void)
+static int	DBpatch_6050179(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_hgset", 2, &field);
 }
 
-static int	DBpatch_6050179(void)
+static int	DBpatch_6050180(void)
 {
 	const zbx_db_table_t table =
 			{"permission", "ugsetid,hgsetid", 0,
@@ -2156,12 +2169,12 @@ static int	DBpatch_6050179(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050180(void)
+static int	DBpatch_6050181(void)
 {
 	return DBcreate_index("permission", "permission_1", "hgsetid", 0);
 }
 
-static int	DBpatch_6050181(void)
+static int	DBpatch_6050182(void)
 {
 	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2169,7 +2182,7 @@ static int	DBpatch_6050181(void)
 	return DBadd_foreign_key("permission", 1, &field);
 }
 
-static int	DBpatch_6050182(void)
+static int	DBpatch_6050183(void)
 {
 	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2324,7 +2337,7 @@ static void	dbupgrade_groupsets_destroy(zbx_hashset_t *group_sets)
 	zbx_hashset_destroy(group_sets);
 }
 
-static int	DBpatch_6050183(void)
+static int	DBpatch_6050184(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -2355,7 +2368,7 @@ static int	DBpatch_6050183(void)
 	return ret;
 }
 
-static int	DBpatch_6050184(void)
+static int	DBpatch_6050185(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
@@ -2386,7 +2399,7 @@ static int	DBpatch_6050184(void)
 	return ret;
 }
 
-static int	DBpatch_6050185(void)
+static int	DBpatch_6050186(void)
 {
 	int		ret;
 	zbx_db_result_t	result;
@@ -2620,5 +2633,6 @@ DBPATCH_ADD(6050182, 0, 1)
 DBPATCH_ADD(6050183, 0, 1)
 DBPATCH_ADD(6050184, 0, 1)
 DBPATCH_ADD(6050185, 0, 1)
+DBPATCH_ADD(6050186, 0, 1)
 
 DBPATCH_END()
