@@ -479,7 +479,6 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, 
 		zbx_vector_addr_ptr_remove(addrs, 0);
 
 		*retry = ZBX_REDIRECT_RETRY;
-
 		return SUCCEED;
 	}
 
@@ -494,8 +493,16 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, 
 		if (revision < addrs->values[i]->revision)
 		{
 			zbx_free(host);
-			*retry = ZBX_REDIRECT_NONE;
-			return FAIL;
+
+			if (0 == i)
+			{
+				/* move redirected address at the end of address list */
+				zbx_vector_addr_ptr_append(addrs, addrs->values[0]);
+				zbx_vector_addr_ptr_remove(addrs, 0);
+			}
+
+			*retry = ZBX_REDIRECT_RETRY;
+			return SUCCEED;
 		}
 
 		addr = addrs->values[i];
