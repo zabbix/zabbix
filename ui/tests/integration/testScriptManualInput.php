@@ -195,12 +195,7 @@ class testScriptManualInput extends CIntegrationTest {
 	 * @param string $expected_result  String matching a failed API call error value
 	 */
 	public function testScriptManualInput_InvalidRequests(array $request_params, string $expected_result): void {
-		$response = $this->call('script.execute', $request_params);
-
-		$this->assertArrayHasKey('error', $response);
-
-		$this->assertEquals('Application error.', $response['error']['message']);
-		$this->assertEquals($expected_result, $response['error']['data']);
+		$response = $this->call('script.execute', $request_params, $expected_result);
 	}
 
 	/**
