@@ -514,15 +514,29 @@ var hintBox = {
 
 		jQuery(appendTo).append(box);
 
-		target.observer = new MutationObserver(() => {
-			const element = target instanceof jQuery ? target[0] : target;
+		const element = target instanceof jQuery ? target[0] : target;
 
-			if (!isVisible(element)) {
-				hintBox.deleteHint(target);
+		const target_box_initial = element.getBoundingClientRect();
+		const x_initial = target_box_initial.x;
+		const y_initial = target_box_initial.y;
+
+		element.observer = new MutationObserver(() => {
+			const target_box_new = element.getBoundingClientRect();
+			const x_new = target_box_new.x;
+			const y_new = target_box_new.y;
+
+			if (!isVisible(element) || x_new !== x_initial || y_new !== y_initial) {
+				hintBox.deleteHint(element);
+
+				const closest_dialogue = element.closest('.overlay-dialogue-body');
+				const scroll_parent = closest_dialogue !== null ? closest_dialogue : jQuery(element).scrollParent()[0];
+
+				scroll_parent.removeEventListener('scroll', hintBox.onParentScroll);
+				delete scroll_parent.has_scroll_listener;
 			}
 		});
 
-		target.observer.observe(document.body, {
+		element.observer.observe(document.body, {
 			attributes: true,
 			attributeFilter: ['style', 'class'],
 			subtree: true,
@@ -551,6 +565,25 @@ var hintBox = {
 				});
 			}
 		}
+
+		const closest_dialogue = target.closest('.overlay-dialogue-body');
+		const scroll_parent = closest_dialogue !== null ? closest_dialogue : jQuery(target).scrollParent()[0];
+
+		if (!scroll_parent.has_scroll_listener) {
+			scroll_parent.addEventListener('scroll', hintBox.onParentScroll);
+			scroll_parent.has_scroll_listener = true;
+		}
+	},
+
+	onParentScroll: function(e) {
+		const hints = e.target.querySelectorAll('[data-hintbox-static="1"][data-expanded="true"]');
+
+		for (const hint of hints) {
+			hintBox.deleteHint(hint);
+		}
+
+		e.target.removeEventListener('scroll', hintBox.onParentScroll);
+		delete e.target.has_scroll_listener;
 	},
 
 	showHint: function(e, target, hintText, className, isStatic, styles) {
