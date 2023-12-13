@@ -454,6 +454,20 @@ class CSVGPie {
 			.catch(() => {});
 
 		this.#arcs_container
+			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
+			.data(this.#pieGenerator(this.#sectors_new), key);
+
+		if (this.#config.stroke > 0) {
+			this.#arcs_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_STROKE}`)
+				.data(this.#pieGenerator(this.#sectors_new), key);
+		}
+
+		this.#arcs_container
+			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
+			.data(this.#pieGenerator(this.#sectors_new), key);
+
+		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_CONTAINER}`)
 			.data(this.#pieGenerator(this.#sectors_new), key)
 			.exit()
