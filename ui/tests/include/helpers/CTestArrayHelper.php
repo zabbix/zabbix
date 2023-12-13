@@ -93,7 +93,7 @@ class CTestArrayHelper {
 	 *
 	 * @param array    $array    array to be trimmed
 	 *
-	 * @return  array
+	 * @return array
 	 */
 	public static function trim(&$array) {
 		foreach ($array as &$value) {
