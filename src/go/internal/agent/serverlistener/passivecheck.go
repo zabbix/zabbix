@@ -79,7 +79,9 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 	}
 
 	if len(request.Data) == 0 {
-		err = fmt.Errorf("Cannot process empty data request.")
+		err = fmt.Errorf("received empty \"data\" tag")
+	} else if request.Request != "active checks" {
+		err = fmt.Errorf("unknown request \"%s\"", request.Request)
 	}
 
 	var response passiveChecksResponse

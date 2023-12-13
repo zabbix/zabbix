@@ -50,6 +50,19 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION_SHORT, ZBX_JSON_TYPE_STRING);
 
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_REQUEST, tmp, sizeof(tmp), NULL))
+	{
+		error = zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON object: %s",
+				ZBX_PROTO_TAG_REQUEST, zbx_json_strerror());
+		goto fail;
+	}
+
+	if (0 != strcmp(ZBX_PROTO_VALUE_GET_PASSIVE_CHECKS, tmp))
+	{
+		error = zbx_dsprintf(NULL, "unknown request \"%s\"", tmp);
+		goto fail;
+	}
+
 	if (FAIL == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		error = zbx_dsprintf(NULL, "cannot find the \"%s\" array in the received JSON object: %s",
@@ -113,14 +126,14 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 	zbx_json_close(&j);
 	zbx_json_close(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", j.buffer);
-
 	zbx_free_agent_result(&result);
 fail:
 	if (NULL != error)
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_close(&j);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", j.buffer);
 	ret = zbx_tcp_send_bytes_to(s, j.buffer, j.buffer_size, config_timeout);
 
 	zbx_free(key);
