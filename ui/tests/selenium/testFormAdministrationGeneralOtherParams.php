@@ -87,6 +87,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		// Security.
 		'id:validate_uri_schemes' => true,
 		'id:uri_valid_schemes' => 'custom_scheme',
+		'id:x_frame_header_enabled' => true,
 		'id:x_frame_options' => 'SOME-NEW-VALUE',
 		'id:iframe_sandboxing_enabled' => true,
 		'id:iframe_sandboxing_exceptions' => 'some-new-flag',
@@ -132,16 +133,31 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			$checkboxes = [
 				'snmptrap_logging',
 				'validate_uri_schemes',
+				'x_frame_header_enabled',
 				'iframe_sandboxing_enabled'
 			];
 			foreach ($checkboxes as $checkbox) {
 				$form->getField('id:'.$checkbox)->fill($status);
 			}
 
-			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions'] as $input) {
+			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
 				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
 			}
 		}
+
+		// Check X-Frame-Options hintbox.
+		$form->getLabel('Use X-Frame-Options HTTP header')->query('xpath:./a[@data-hintbox]')->one()->waitUntilClickable()->click();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+
+		$hint_text = "X-Frame-Options HTTP header supported values:\n".
+				"SAMEORIGIN or 'self' - allows the page to be displayed only in a frame on the same origin as the page itself\n".
+				"DENY or 'none' - prevents the page from being displayed in a frame, regardless of the site attempting to do so\n".
+				"a string of space-separated hostnames; adding 'self' to the list allows the page to be displayed in a frame on the same origin as the page itself\n".
+				"\n".
+				"Note that 'self' or 'none' will be regarded as hostnames if used without single quotes.";
+
+		$this->assertEquals($hint_text, $hint->getText());
+		$hint->close();
 
 		foreach (['Update', 'Reset defaults'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
@@ -182,6 +198,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '30s',
 						// Security.
 						'id:validate_uri_schemes' => false,
+						'id:x_frame_header_enabled' => true,
 						'id:x_frame_options' => 'X',
 						'id:iframe_sandboxing_enabled' => false,
 						// Communication with Zabbix server.
@@ -306,6 +323,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
 								'https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,'.
 								'tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
+						'id:x_frame_header_enabled' => true,
 						'id:x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
 								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
 								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
