@@ -258,6 +258,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+	xmlCleanupParser();
+	curl_global_cleanup();
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

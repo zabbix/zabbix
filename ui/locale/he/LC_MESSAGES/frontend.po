@@ -9343,6 +9343,10 @@ msgstr "סקירת מאגר מארח"
 msgid "Host label type"
 msgstr "סוג תווית מארח"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14873,6 +14877,10 @@ msgstr "או"
 msgid "Order"
 msgstr "סדר"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "סידור העמודה"
@@ -20107,6 +20115,10 @@ msgstr "להקפצה בתבנית „%1$s” יש תלות בהקפצה בתבנ
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "סוג תווית הקפצה"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"

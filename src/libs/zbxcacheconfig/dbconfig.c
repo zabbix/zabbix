@@ -2314,6 +2314,7 @@ typedef struct
 	char			*ip;
 	char			*dns;
 	int			modified;
+	int			found;
 }
 zbx_dc_if_update_t;
 
@@ -2505,7 +2506,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			if (SUCCEED == dc_strpool_replace(found, &interface->dns, update->dns))
 				update->modified = 1;
 		}
-
+		update->found = found;
 		zbx_vector_dc_if_update_ptr_append(&updates, update);
 
 		if (0 == found)
@@ -2541,10 +2542,10 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			dc_if_update_substitute_host_macros(update, update->host);
 
-			if (SUCCEED == dc_strpool_replace(found, &update->interface->ip, update->ip))
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->ip, update->ip))
 				update->modified = 1;
 
-			if (SUCCEED == dc_strpool_replace(found, &update->interface->dns, update->dns))
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->dns, update->dns))
 				update->modified = 1;
 		}
 
