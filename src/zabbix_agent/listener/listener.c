@@ -125,6 +125,7 @@ fail:
 
 	zbx_free(key);
 	zbx_json_free(&j);
+	zbx_free(error);
 
 	return ret;
 }
