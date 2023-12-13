@@ -35,10 +35,8 @@ class testScriptManualInput extends CIntegrationTest {
 	private static $hostgroupid;
 	private static $scriptids;
 
-	/**
-	 * @inheritdoc
-	 */
-	public function prepareData(): bool {
+	public function createTestHostData(): bool {
+		static $initialized = false;
 		/*
 		 * First, create host group and a host in that group
 		 *
@@ -48,6 +46,13 @@ class testScriptManualInput extends CIntegrationTest {
 		 * Although a default Zabbix installation already defines a host, the
 		 * server itself, we want the tests to be self-contained.
 		 */
+		if ($initialized)
+			return true;
+
+		global $DB;
+		if (!isset($DB['DB']))
+			DBconnect($error);
+
 		$response = CDataHelper::call('hostgroup.create', ['name' => 'Test Hosts']);
 
 		self::$hostgroupid = $response['groupids'][0];
@@ -62,6 +67,24 @@ class testScriptManualInput extends CIntegrationTest {
 		]);
 
 		self::$hostid = $response['hostids'][0];
+
+		$initialized = true;
+
+		return true;
+	}
+
+	/**
+	 * @depends prepareTestHostData
+	 */
+	public function createTestScriptData(): bool {
+		static $initialized = false;
+
+		if ($initialized)
+			return true;
+
+		global $DB;
+		if (!isset($DB['DB']))
+			DBconnect($error);
 
 		// Create scripts with and without manual input support.
 		$scripts = [
@@ -132,6 +155,8 @@ class testScriptManualInput extends CIntegrationTest {
 
 		self::$scriptids = $response['scriptids'];
 
+		$initialized = true;
+
 		return true;
 	}
 
@@ -182,6 +207,9 @@ class testScriptManualInput extends CIntegrationTest {
 	 * @return array<int, array>
 	 */
 	public function invalidRequestDataProvider(): array {
+		$this->createTestHostData();
+		$this->createTestScriptData();
+
 		return [
 			/*
 			 * In general, there are only two scenarios in which a
@@ -219,6 +247,9 @@ class testScriptManualInput extends CIntegrationTest {
 	 * @return array<int, array>
 	 */
 	public function validRequestDataProvider(): array {
+		$this->createTestHostData();
+		$this->createTestScriptData();
+
 		return [
 			[
 				/*
