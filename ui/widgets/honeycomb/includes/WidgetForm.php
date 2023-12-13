@@ -144,7 +144,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('primary_label_bold', _('Bold'))
 			)
 			->addField(
-				new CWidgetFieldColor('primary_label_color', _('Color'))
+				(new CWidgetFieldColor('primary_label_color', _('Color')))->prefixLabel(_('Primary label'))
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('primary_label_units_show'))->setDefault(1)
@@ -190,7 +190,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('secondary_label_bold', _('Bold')))->setDefault(1)
 			)
 			->addField(
-				new CWidgetFieldColor('secondary_label_color', _('Color'))
+				(new CWidgetFieldColor('secondary_label_color', _('Color')))->prefixLabel(_('Secondary label'))
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('secondary_label_units_show'))->setDefault(1)
