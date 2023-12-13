@@ -80,7 +80,7 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 
 	if len(request.Data) == 0 {
 		err = fmt.Errorf("received empty \"data\" tag")
-	} else if request.Request != "active checks" {
+	} else if request.Request != "passive checks" {
 		err = fmt.Errorf("unknown request \"%s\"", request.Request)
 	}
 
