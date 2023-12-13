@@ -209,7 +209,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000!'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -219,7 +219,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000 '
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -365,7 +365,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 '
 						]
 					],
-					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -919,7 +919,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Overrides' => [
 						[
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
@@ -932,11 +932,11 @@ class testDashboardGraphWidget extends testWidgets {
 						[
 							'color' => '00000!',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -945,11 +945,11 @@ class testDashboardGraphWidget extends testWidgets {
 						[
 							'color' => '00000 ',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -1099,7 +1099,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
@@ -1504,7 +1504,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_units' => 'Static'
 					],
 					'Legend' => [
-						'Number of rows' => '5',
+						'Max number of rows' => '5',
 						'Display min/max/avg' => true
 					],
 					'Problems' => [
@@ -1528,7 +1528,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'time_shift' => '-5s',
 							'color' => '000000',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1545,7 +1545,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'time_shift' => '5s',
 							'color' => 'FFFFFF',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Points'],
 								['Transparency', '2'],
@@ -1797,7 +1797,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Show legend' => true,
-						'Number of rows' => '5',
+						'Max number of rows' => '5',
 						'Display min/max/avg' => true
 					],
 					'Problems' => [
@@ -1821,7 +1821,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'time_shift' => '-5s',
 							'color' => '000000',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1838,7 +1838,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'time_shift' => '5s',
 							'color' => 'FFFFFF',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Bar'],
 								['Transparency', '2'],
@@ -2334,11 +2334,11 @@ class testDashboardGraphWidget extends testWidgets {
 	}
 
 	/*
-	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
+	 * Test enable/disable "Max number of rows" field by check/uncheck "Show legend".
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
 		$this->page->login()->open(self::DASHBOARD_URL);
-		$fields = ['Number of rows', 'Display min/max/avg', 'Number of columns'];
+		$fields = ['Max number of rows', 'Display min/max/avg', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields($fields);
@@ -2352,7 +2352,7 @@ class testDashboardGraphWidget extends testWidgets {
 		}
 
 		$field_attributes = [
-			'Number of rows' => [
+			'Max number of rows' => [
 				'min' => 1,
 				'max' => 10
 			],
@@ -2376,15 +2376,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2392,15 +2392,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 10,
+						'Max number of rows' => 10,
 						'Number of columns' => 4
 					],
 					'expected' => [
-						'Number of rows' => 10,
+						'Max number of rows' => 10,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Number of rows' => 100,
+						'Max number of rows' => 100,
 						'Number of columns' => 100
 					]
 				]
@@ -2408,15 +2408,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 0
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2424,15 +2424,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 11,
+						'Max number of rows' => 11,
 						'Number of columns' => 5
 					],
 					'expected' => [
-						'Number of rows' => 10,
+						'Max number of rows' => 10,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Number of rows' => 100,
+						'Max number of rows' => 100,
 						'Number of columns' => 100
 					]
 				]
@@ -2440,15 +2440,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => -1,
+						'Max number of rows' => -1,
 						'Number of columns' => -1
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2456,15 +2456,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 'a',
+						'Max number of rows' => 'a',
 						'Number of columns' => 'a'
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 100
 					]
 				]
@@ -2472,15 +2472,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 6,
+						'Max number of rows' => 6,
 						'Number of columns' => 3
 					],
 					'expected' => [
-						'Number of rows' => 6,
+						'Max number of rows' => 6,
 						'Number of columns' => 3
 					],
 					'range_percentage' => [
-						'Number of rows' => 55.5556,
+						'Max number of rows' => 55.5556,
 						'Number of columns' => 66.6667
 					]
 				]
