@@ -153,7 +153,6 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			*fd = agent_context->s.socket;
 
 			return ZBX_ASYNC_TASK_WRITE;
-			break;
 		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
 			if (0 == getsockopt(agent_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)

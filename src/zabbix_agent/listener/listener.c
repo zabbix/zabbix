@@ -37,7 +37,6 @@
 #ifndef _WINDOWS
 static volatile sig_atomic_t	need_update_userparam;
 #endif
-
 static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, struct zbx_json_parse *jp)
 {
 	struct zbx_json_parse	jp_data, jp_row;
