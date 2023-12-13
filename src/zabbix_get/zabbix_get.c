@@ -326,7 +326,6 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 		}
 		else
 			zbx_error("Get value error: %s", zbx_socket_strerror());
-		
 
 		zbx_tcp_close(&s);
 
