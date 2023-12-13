@@ -272,12 +272,12 @@ static int	zbx_audit_compare_func(const void *d1, const void *d2)
 	return zbx_strcmp_null((*audit_entry_1)->cuid, (*audit_entry_2)->cuid);
 }
 
-void	zbx_audit_clean(void)
+void	zbx_audit_clean(int audit_context_mode)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
 
@@ -292,11 +292,11 @@ void	zbx_audit_clean(void)
 	zbx_hashset_destroy(&zbx_audit);
 }
 
-void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set)
+void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set, int audit_context_mode)
 {
 	auditlog_enabled = auditlog_enabled_set;
 	auditlog_mode = auditlog_mode_set;
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 #define AUDIT_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&zbx_audit, AUDIT_HASHSET_DEF_SIZE, zbx_audit_hash_func, zbx_audit_compare_func);
 #undef AUDIT_HASHSET_DEF_SIZE
@@ -324,14 +324,14 @@ static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
 	}
 }
 
-void	zbx_audit_flush(void)
+void	zbx_audit_flush(int audit_context_mode)
 {
 	char			recsetid_cuid[CUID_LEN];
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 	zbx_db_insert_t		db_insert_audit;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	zbx_new_cuid(recsetid_cuid);
 	zbx_hashset_iter_reset(&zbx_audit, &iter);

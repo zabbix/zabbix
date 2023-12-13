@@ -45,9 +45,26 @@
 #define AUDIT_DETAILS_ACTION_UPDATE	"update"
 #define AUDIT_DETAILS_ACTION_DELETE	"delete"
 
-#define RETURN_IF_AUDIT_OFF()					\
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())	\
-		return						\
+#define ZBX_AUDIT_ALL_CONTEXT			0x00
+#define ZBX_AUDIT_AUTOREGISTRATION_CONTEXT	0x01
+#define ZBX_AUDIT_NETWORK_DISCOVERY_CONTEXT	0x02
+#define ZBX_AUDIT_LLD_CONTEXT			0x04
+#define ZBX_AUDIT_SCRIPT_CONTEXT		0x08
+#define ZBX_AUDIT_HA_CONTEXT			0x10
+#define ZBX_AUDIT_HISTORY_PUSH _CONTEXT		0x20
+
+#define ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT \
+		ZBX_AUDIT_AUTOREGISTRATION_CONTEXT & \
+		ZBX_AUDIT_NETWORK_DISCOVERY_CONTEXT & \
+		ZBX_AUDIT_LLD_CONTEXT
+
+
+#define RETURN_IF_AUDIT_OFF(context_mode)									\
+	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())					\
+		return										\
+	if ((context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT == 1) && SUCCEED == zbx_get_audit_mode())	   \
+	return											\
+
 
 int	zbx_get_auditlog_enabled(void);
 int	zbx_get_auditlog_mode(void);
@@ -57,10 +74,10 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		zbx_uint64_t proxyid, zbx_uint64_t userid, const char *username, const char *clientip,
 		const char *output, const char *error);
 
-void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set);
+void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set, int audit_context_mode);
 void	zbx_audit_prepare(void);
-void	zbx_audit_clean(void);
-void	zbx_audit_flush(void);
+void	zbx_audit_clean(int audit_context_mode);
+void	zbx_audit_flush(int audit_context_mode);
 int	zbx_audit_flush_once(void);
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,

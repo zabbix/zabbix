@@ -22,6 +22,6 @@
 
 #include "zbxtypes.h"
 
-void	zbx_audit_proxy_config_reload(zbx_uint64_t proxyid, const char *name);
+void	zbx_audit_proxy_config_reload(int audit_context_mode, zbx_uint64_t proxyid, const char *name);
 
 #endif

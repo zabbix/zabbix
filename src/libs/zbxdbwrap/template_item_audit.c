@@ -22,12 +22,12 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 
-void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item,
+void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t itemid, const zbx_template_item_t *item,
 		zbx_uint64_t hostid)
 {
 	int	resource_type;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	resource_type = zbx_audit_item_flag_to_resource_type(item->flags);
 
