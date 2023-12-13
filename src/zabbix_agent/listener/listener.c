@@ -46,6 +46,8 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 	char			tmp[MAX_STRING_LEN], error_tmp[MAX_STRING_LEN], *key = NULL, *error = NULL;
 	int			timeout, ret = SUCCEED;
 	struct zbx_json		j;
+	AGENT_RESULT		result;
+	char			**value;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION_SHORT, ZBX_JSON_TYPE_STRING);
@@ -96,9 +98,6 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 				ZBX_PROTO_TAG_KEY, zbx_json_strerror());
 		goto fail;
 	}
-
-	AGENT_RESULT	result;
-	char		**value = NULL;
 
 	zbx_init_agent_result(&result);
 
