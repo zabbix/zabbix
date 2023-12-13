@@ -27,6 +27,7 @@ import (
 	"github.com/miekg/dns"
 	"strings"
 	"time"
+	"github.com/iancoleman/strcase"
 )
 
 const (
@@ -495,7 +496,7 @@ func parseOptRR(optRR *dns.OPT) (map[string]any, error) {
 
 		for k, v := range oMap {
 			delete(oMap, k)
-			oMap[strings.ToLower(k)] = v
+			oMap[strcase.ToSnake(k)] = v
 		}
 
 		nsid, ok := oMap["nsid"]
@@ -536,8 +537,8 @@ func parseDefaultRR(rr dns.RR) (map[string]any, error) {
 
 	rData2 := map[string]any{}
 	for k, v := range rData {
-		newKey := strings.ToLower(k)
-		if newKey == "typecovered" {
+		newKey := strcase.ToSnake(k)
+		if newKey == "type_covered" {
 			// unmarshalling produces float64 instead of the original uint16
 			// need to cast the value to float64 first and then to uint16
 			if newValue, ok := v.(float64); ok {
