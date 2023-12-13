@@ -1135,12 +1135,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'username' => 'user-for-blocking',
-					'parameters' => [
-						'DB_table' => 'opmessage_usr',
-						'column' => 'operationid',
-						'value' => '19'
-					],
-					'error_details' => 'User "user-for-blocking" is used in "Trigger action 4" action.'
+					'error_details' => 'User "user-for-blocking" is used in "Action with user" action.'
 				]
 			]
 		];

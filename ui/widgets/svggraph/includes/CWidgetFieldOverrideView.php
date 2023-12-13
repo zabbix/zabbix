@@ -334,6 +334,7 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 						'srcfld1' => 'itemid',
 						'real_hosts' => 1,
 						'numeric' => 1,
+						'resolve_macros' => 1,
 						'dstfrm' => $this->form_name,
 						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
 					],

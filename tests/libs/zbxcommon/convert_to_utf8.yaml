@@ -144,7 +144,7 @@ out:
   return: SUCCEED
 
 ---
-test case: utf16 BE noBOM with enconding
+test case: utf16 BE noBOM with encoding
 in:
   encoding: 'UTF-16BE'
   buffer_length: 4

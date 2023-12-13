@@ -399,7 +399,8 @@ window.widget_pie_chart_form = new class {
 				writeonly: 1,
 				multiselect: 1,
 				with_webitems: 1,
-				real_hosts: 1
+				real_hosts: 1,
+				resolve_macros: 1
 			}, {dialogue_class: 'modal-popup-generic'});
 		}
 		else {
@@ -532,6 +533,7 @@ window.widget_pie_chart_form = new class {
 							writeonly: 1,
 							with_webitems: 1,
 							real_hosts: 1,
+							resolve_macros: 1,
 							excludeids: ids
 						}, {dialogue_class: 'modal-popup-generic'});
 					}
