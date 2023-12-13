@@ -65,6 +65,9 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 	return
 }
 
+// handleCheckJSON handles json formatted passive check request.
+// False is returned if the json parsing failed and request must
+// be treated as plain text format request.
 func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 	var request passiveChecksRequest
 	var timeout int
