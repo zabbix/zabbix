@@ -25,6 +25,7 @@
 #include "zbxcrypto.h"
 #include "zbxagentget.h"
 #include "zbxversion.h"
+#include "zbxlog.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
@@ -323,6 +324,9 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 			zbx_free_agent_result(&result)
 		}
+		else
+			zbx_error("Get value error: %s", zbx_socket_strerror());
+		
 
 		zbx_tcp_close(&s);
 
@@ -359,7 +363,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(NULL, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname);
 #endif
