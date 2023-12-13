@@ -182,7 +182,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_show', null, _('Units')))
 			)
 			->addField(
-				(new CWidgetFieldTextBox('units'))
+				(new CWidgetFieldTextBox('units'))->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))
