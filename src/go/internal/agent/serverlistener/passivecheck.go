@@ -76,19 +76,21 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 	}
 
 	if len(request.Data) == 0 {
-		err = fmt.Errorf("Missing passive check in request")
-	} else {
-		timeout, err = scheduler.ParseItemTimeout(request.Data[0].Timeout)
+		err = fmt.Errorf("Cannot process empty data request.")
 	}
 
 	var response passiveChecksResponse
 
-	if nil != err {
+	if err != nil {
 		errString := err.Error()
 		response = passiveChecksResponse{Version: version.LongNoRC(), Error: &errString}
 	} else {
-		// direct passive check timeout is handled by the scheduler
-		value, err := pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
+		var value string
+
+		if timeout, err = scheduler.ParseItemTimeout(request.Data[0].Timeout); err == nil {
+			// direct passive check timeout is handled by the scheduler
+			value, err = pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
+		}
 
 		if err != nil {
 			errString := err.Error()
