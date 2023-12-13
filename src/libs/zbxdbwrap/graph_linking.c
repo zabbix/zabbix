@@ -1025,7 +1025,7 @@ static void	process_graphs(zbx_graph_copy_t *template_graph_copy, zbx_hashset_t 
 }
 
 static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_uint64_t graphid, int graph_flags, zbx_hashset_t *host_graphs_items)
+		zbx_uint64_t graphid, int graph_flags, zbx_hashset_t *host_graphs_items, int audit_context_mode)
 {
 	int			j, res = SUCCEED;
 	graphs_items_entry_t	*graphs_items_host_entry_found, graphs_items_host_entry_temp_t;
@@ -1048,8 +1048,8 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 
 			if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE))
 			{
-				zbx_audit_graph_update_json_update_gitem_create_entry(graphid, graph_flags,
-						host_items_entry->gitemid);
+				zbx_audit_graph_update_json_update_gitem_create_entry(audit_context_mode, graphid,
+						graph_flags, host_items_entry->gitemid);
 
 				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update graphs_items set ");
 
@@ -1059,8 +1059,8 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 							host_items_entry->drawtype_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_drawtype(graphid,
-							graph_flags, host_items_entry->gitemid,
+					zbx_audit_graph_update_json_update_gitem_update_drawtype(audit_context_mode,
+							graphid, graph_flags, host_items_entry->gitemid,
 							host_items_entry->drawtype_orig,
 							host_items_entry->drawtype_new);
 				}
@@ -1071,8 +1071,8 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 							host_items_entry->sortorder_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_sortorder(graphid,
-							graph_flags, host_items_entry->gitemid,
+					zbx_audit_graph_update_json_update_gitem_update_sortorder(audit_context_mode,
+							graphid, graph_flags, host_items_entry->gitemid,
 							host_items_entry->sortorder_orig,
 							host_items_entry->sortorder_new);
 				}
@@ -1086,9 +1086,9 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					zbx_free(color_esc);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_color(graphid, graph_flags,
-							host_items_entry->gitemid, host_items_entry->color_orig,
-							host_items_entry->color_new);
+					zbx_audit_graph_update_json_update_gitem_update_color(audit_context_mode,
+							graphid, graph_flags, host_items_entry->gitemid,
+							host_items_entry->color_orig, host_items_entry->color_new);
 				}
 
 				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_YAXISSIDE))
@@ -1097,8 +1097,8 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 							host_items_entry->yaxisside_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_yaxisside(graphid,
-							graph_flags, host_items_entry->gitemid,
+					zbx_audit_graph_update_json_update_gitem_update_yaxisside(audit_context_mode,
+							graphid, graph_flags, host_items_entry->gitemid,
 							host_items_entry->yaxisside_orig,
 							host_items_entry->yaxisside_new);
 				}
@@ -1109,8 +1109,8 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 							host_items_entry->calc_fnc_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_calc_fnc(graphid,
-							graph_flags, host_items_entry->gitemid,
+					zbx_audit_graph_update_json_update_gitem_update_calc_fnc(audit_context_mode,
+							graphid, graph_flags, host_items_entry->gitemid,
 							host_items_entry->calc_fnc_orig,
 							host_items_entry->calc_fnc_new);
 				}
@@ -1120,9 +1120,9 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stype=%d", d2,
 							host_items_entry->type_new);
 
-					zbx_audit_graph_update_json_update_gitem_update_type(graphid, graph_flags,
-							host_items_entry->gitemid, host_items_entry->type_orig,
-							host_items_entry->type_new);
+					zbx_audit_graph_update_json_update_gitem_update_type(audit_context_mode,
+							graphid, graph_flags, host_items_entry->gitemid,
+							host_items_entry->type_orig, host_items_entry->type_new);
 				}
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where gitemid=" ZBX_FS_UI64 ";\n",
@@ -1139,7 +1139,8 @@ out:
 	return res;
 }
 
-static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hashset_t *host_graphs_items)
+static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hashset_t *host_graphs_items,
+		int audit_context_mode)
 {
 	int			res = SUCCEED;
 	const char		*d;
@@ -1158,8 +1159,8 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set ");
 
-		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_UPDATE, found->graphid, found->name_orig,
-				(int)(found->flags));
+		zbx_audit_graph_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_UPDATE, found->graphid,
+				found->name_orig, (int)(found->flags));
 
 		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_NAME))
 		{
@@ -1168,7 +1169,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			zbx_free(name_esc);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_name(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_name(audit_context_mode, found->graphid, (int)(found->flags),
 					found->name_orig, found->name);
 		}
 
@@ -1177,7 +1178,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%swidth=%d", d, found->width);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_width(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_width(audit_context_mode, found->graphid, (int)(found->flags),
 					found->width_orig, found->width);
 		}
 
@@ -1186,7 +1187,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sheight=%d", d, found->height);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_height(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_height(audit_context_mode, found->graphid, (int)(found->flags),
 					found->height_orig, found->height);
 		}
 
@@ -1196,7 +1197,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->yaxismin);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_yaxismin(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_yaxismin(audit_context_mode, found->graphid, (int)(found->flags),
 					found->yaxismin_orig, found->yaxismin);
 		}
 
@@ -1206,7 +1207,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->yaxismax);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_yaxismax(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_yaxismax(audit_context_mode, found->graphid, (int)(found->flags),
 					found->yaxismax_orig, found->yaxismax);
 		}
 
@@ -1216,7 +1217,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					(int)found->show_work_period);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_show_work_period(found->graphid,
+			zbx_audit_graph_update_json_update_show_work_period(audit_context_mode, found->graphid,
 					(int)(found->flags), found->show_work_period_orig, found->show_work_period);
 		}
 
@@ -1226,7 +1227,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					(int)found->show_triggers);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_show_triggers(found->graphid,
+			zbx_audit_graph_update_json_update_show_triggers(audit_context_mode, found->graphid,
 					(int)(found->flags), found->show_triggers_orig, found->show_triggers);
 		}
 
@@ -1236,7 +1237,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					(int)found->graphtype);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_graphtype(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_graphtype(audit_context_mode, found->graphid, (int)(found->flags),
 					(int)found->graphtype_orig, (int)found->graphtype);
 		}
 
@@ -1246,7 +1247,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					(int)found->show_legend);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_show_legend(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_show_legend(audit_context_mode, found->graphid, (int)(found->flags),
 					(int)found->show_legend_orig, (int)found->show_legend);
 		}
 
@@ -1255,7 +1256,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_3d=%d", d, (int)found->show_3d);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_show_3d(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_show_3d(audit_context_mode, found->graphid, (int)(found->flags),
 					(int)found->show_3d_orig, (int)found->show_3d);
 		}
 
@@ -1265,7 +1266,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->percent_left);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_percent_left(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_percent_left(audit_context_mode, found->graphid, (int)(found->flags),
 					found->percent_left_orig, found->percent_left);
 		}
 
@@ -1275,7 +1276,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->percent_right);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_percent_right(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_percent_right(audit_context_mode, found->graphid, (int)(found->flags),
 					found->percent_right_orig, found->percent_right);
 		}
 
@@ -1285,7 +1286,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					(int)found->ymin_type);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_ymin_type(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_ymin_type(audit_context_mode, found->graphid, (int)(found->flags),
 					found->ymin_type_orig, found->ymin_type);
 		}
 
@@ -1294,7 +1295,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_type=%d", d, (int)found->ymax_type);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_ymax_type(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_ymax_type(audit_context_mode, found->graphid, (int)(found->flags),
 					found->ymax_type_orig, found->ymax_type);
 		}
 
@@ -1304,7 +1305,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					zbx_db_sql_id_ins(found->ymin_itemid));
 			d = ",";
 
-			zbx_audit_graph_update_json_update_ymin_itemid(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_ymin_itemid(audit_context_mode, found->graphid, (int)(found->flags),
 					found->ymin_itemid_orig, found->ymin_itemid);
 		}
 
@@ -1314,7 +1315,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					zbx_db_sql_id_ins(found->ymax_itemid));
 			d = ",";
 
-			zbx_audit_graph_update_json_update_ymax_itemid(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_ymax_itemid(audit_context_mode, found->graphid, (int)(found->flags),
 					found->ymax_itemid_orig, found->ymax_itemid);
 		}
 
@@ -1323,11 +1324,11 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, (int)found->discover);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_discover(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_discover(audit_context_mode, found->graphid, (int)(found->flags),
 					found->discover_orig, found->discover);
 		}
 
-		zbx_audit_graph_update_json_update_templateid(found->graphid, (int)(found->flags),
+		zbx_audit_graph_update_json_update_templateid(audit_context_mode, found->graphid, (int)(found->flags),
 				found->templateid_orig, found->templateid);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
@@ -1341,7 +1342,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 		if (SUCCEED == res)
 		{
 			res = update_graphs_items_updates(&sql2, &sql_alloc2, &sql_offset2, found->graphid,
-					found->flags, host_graphs_items);
+					found->flags, host_graphs_items, audit_context_mode);
 		}
 	}
 
@@ -1372,7 +1373,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 }
 
 static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_insert, int *total_insert_gitems_count,
-		zbx_hashset_t *templates_graphs_items)
+		zbx_hashset_t *templates_graphs_items, int audit_context_mode)
 {
 	int		i, j, res;
 	zbx_db_insert_t	db_insert, db_insert_graphs_items;
@@ -1405,8 +1406,8 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 				graph_copy->ymin_itemid, graph_copy->ymax_itemid,
 				(int)(graph_copy->flags), (int)(graph_copy->discover));
 
-		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_ADD, graphid, graph_copy->name, (int)(graph_copy->flags));
-		zbx_audit_graph_update_json_add_data(graphid, graph_copy->name, graph_copy->width,
+		zbx_audit_graph_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_ADD, graphid, graph_copy->name, (int)(graph_copy->flags));
+		zbx_audit_graph_update_json_add_data(audit_context_mode, graphid, graph_copy->name, graph_copy->width,
 				graph_copy->height, graph_copy->yaxismin, graph_copy->yaxismax, graph_copy->templateid,
 				(int)graph_copy->show_work_period, (int)(graph_copy->show_triggers),
 				(int)(graph_copy->graphtype), (int)(graph_copy->show_legend),
@@ -1436,7 +1437,7 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 						template_entry->type_orig);
 				zbx_free(color_orig_esc);
 
-				zbx_audit_graph_update_json_add_gitems(graphid, (int)(graph_copy->flags),
+				zbx_audit_graph_update_json_add_gitems(audit_context_mode, graphid, (int)(graph_copy->flags),
 						graphs_itemsid, template_entry->drawtype_orig,
 						template_entry->sortorder_orig, template_entry->color_orig,
 						template_entry->yaxisside_orig, template_entry->calc_fnc_orig,
@@ -1472,7 +1473,7 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
+int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, int audit_context_mode)
 {
 	int				i, upd_graphs_or_graphs_items = 0, total_insert_gitems_count = 0,
 					res = SUCCEED;
@@ -1535,13 +1536,13 @@ int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 		}
 
 		if (0 < upd_graphs_or_graphs_items)
-			res = execute_graphs_updates(&host_graphs_main_data, &host_graphs_items);
+		  res = execute_graphs_updates(&host_graphs_main_data, &host_graphs_items, audit_context_mode);
 	}
 
 	if (SUCCEED == res && 0 < graphs_copies_insert.values_num)
 	{
 		res = execute_graphs_inserts(&graphs_copies_insert, &total_insert_gitems_count,
-				&templates_graphs_items);
+					     &templates_graphs_items, audit_context_mode);
 	}
 end:
 	zbx_vector_str_clear_ext(&templates_graphs_names, zbx_str_free);

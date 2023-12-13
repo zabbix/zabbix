@@ -305,7 +305,7 @@ void	zbx_audit_graph_update_json_delete_gitems(int audit_context_mode, zbx_uint6
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
-void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids)
+void	zbx_audit_DBselect_delete_for_graph(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -321,7 +321,7 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 		zbx_vector_uint64_append(ids, id);
 		flags = atoi(row[2]);
 
-		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1], flags);
+		zbx_audit_graph_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, id, row[1], flags);
 	}
 
 	zbx_db_free_result(result);

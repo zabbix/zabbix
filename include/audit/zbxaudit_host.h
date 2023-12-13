@@ -28,7 +28,7 @@ void	zbx_audit_##funcname##_update_json_add_snmp_interface(int audit_context_mod
 		zbx_uint64_t bulk, const char *community, const char *securityname, zbx_uint64_t securitylevel,	\
 		const char *authpassphrase, const char *privpassphrase, zbx_uint64_t authprotocol,		\
 		zbx_uint64_t privprotocol, const char *contextname, zbx_uint64_t interfaceid);			\
-void	zbx_audit_##funcname##_update_json_update_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version_old,	\
+ void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t version_old, \
 		zbx_uint64_t version_new, zbx_uint64_t bulk_old,  zbx_uint64_t bulk_new,			\
 		const char *community_old, const char *community_new, const char *securityname_old,		\
 		const char *securityname_new, zbx_uint64_t securitylevel_old, zbx_uint64_t securitylevel_new,	\
@@ -116,9 +116,9 @@ void	zbx_audit_host_update_json_delete_hostmacro(int audit_context_mode, zbx_uin
 void	zbx_audit_host_update_json_add_tag(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag, const char* value,
 		int automatic);
 
-void	zbx_audit_host_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
+void	zbx_audit_host_update_json_update_tag_tag(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid,
 		const char* tag_old, const char *tag_new);
-void	zbx_audit_host_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
+void	zbx_audit_host_update_json_update_tag_value(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid,
 		const char* value_old, const char *value_new);
 void	zbx_audit_host_update_json_update_tag_type(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid,
 		int automatic_old, int automatic_new);
@@ -131,7 +131,7 @@ void	zbx_audit_hostgroup_update_json_delete_group(int audit_context_mode, zbx_ui
 void	zbx_audit_host_hostgroup_delete(int audit_context_mode, zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids);
 void	zbx_audit_host_del(int audit_context_mode, zbx_uint64_t hostid, const char *hostname);
-void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxyid,
+void	zbx_audit_host_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid, const char *host, zbx_uint64_t proxyid,
 		int ipmi_authtype, int ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
 		int status, int flags, int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
 		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces, int inventory_mode);
@@ -142,7 +142,7 @@ void	zbx_audit_host_prototype_update_json_update_templateid(int audit_context_mo
 		zbx_uint64_t templateid);
 
 #define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(resource, type1)							\
-void	zbx_audit_host_prototype_update_json_update_##resource(zbx_uint64_t hostid, type1 old_##resource,	\
+  void	zbx_audit_host_prototype_update_json_update_##resource(int audit_context_mode, zbx_uint64_t hostid, type1 old_##resource, \
 		type1 new_##resource);										\
 
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(name, const char*)
@@ -154,7 +154,7 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(inventory_mode, int)
 void	zbx_audit_host_prototype_update_json_add_group_details(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
 		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid);
 
-void	zbx_audit_host_prototype_update_json_update_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
+void	zbx_audit_host_prototype_update_json_update_group_details(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
 		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid_old, zbx_uint64_t templateid_new);
 
 #define PREPARE_AUDIT_TEMPLATE_ADD_H(funcname)									\
@@ -188,13 +188,13 @@ void	zbx_audit_host_prototype_update_json_delete_hostmacro(int audit_context_mod
 void	zbx_audit_host_prototype_update_json_add_tag(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
 		const char* value, int automatic);
 void	zbx_audit_host_prototype_update_json_update_tag_create_entry(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid);
-void	zbx_audit_host_update_json_update_tag_create_entry(zbx_uint64_t hostid, zbx_uint64_t tagid);
+void	zbx_audit_host_update_json_update_tag_create_entry(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid);
 void	zbx_audit_host_prototype_update_json_update_tag_tag(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid,
 		const char* tag_old, const char *tag_new);
 void	zbx_audit_host_prototype_update_json_update_tag_value(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid,
 		const char* value_old, const char *value_new);
 
-void	zbx_audit_host_prototype_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid);
+void	zbx_audit_host_prototype_update_json_delete_tag(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t tagid);
 
 void	zbx_audit_host_group_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t groupid, const char *name);
 void	zbx_audit_host_group_del(int audit_context_mode, zbx_uint64_t groupid, const char *name);

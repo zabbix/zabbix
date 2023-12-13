@@ -210,7 +210,7 @@ void	zbx_audit_item_create_entry_for_delete(int audit_context_mode, zbx_uint64_t
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_audit_DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
+int	zbx_audit_DBselect_delete_for_item(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
 {
 	int		ret = FAIL;
 	zbx_db_result_t	result;
@@ -224,7 +224,7 @@ int	zbx_audit_DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids
 	{
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
-		zbx_audit_item_create_entry_for_delete(id, row[1], atoi(row[2]));
+		zbx_audit_item_create_entry_for_delete(audit_context_mode, id, row[1], atoi(row[2]));
 	}
 
 	zbx_db_free_result(result);

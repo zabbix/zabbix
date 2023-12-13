@@ -91,7 +91,7 @@ PREPARE_AUDIT_ITEM_UPDATE_H(discover, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(key, const char*)
 
 void	zbx_audit_item_create_entry_for_delete(int audit_context_mode, zbx_uint64_t id, const char *name, int flag);
-int	zbx_audit_DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids);
+int	zbx_audit_DBselect_delete_for_item(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_audit_discovery_rule_update_json_add_filter_conditions(int audit_context_mode, zbx_uint64_t itemid, zbx_uint64_t rule_conditionid,
 		zbx_uint64_t op, const char *macro, const char *value);

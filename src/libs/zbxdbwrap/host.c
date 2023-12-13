@@ -1070,7 +1070,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids)
  * Parameters: triggerids - [IN] trigger identifiers from database            *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
+static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids, int audit_context_mode)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1090,7 +1090,7 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", triggerids->values,
 			triggerids->values_num);
 
-	zbx_audit_DBselect_delete_for_trigger(sql, &children_triggerids);
+	zbx_audit_DBselect_delete_for_trigger(audit_context_mode, sql, &children_triggerids);
 	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_db_delete_triggers(&children_triggerids);
@@ -1112,7 +1112,7 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
+static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids, int audit_context_mode)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1129,9 +1129,9 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 			"functions f join triggers t on t.triggerid=f.triggerid where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
-	zbx_audit_DBselect_delete_for_trigger(sql, &triggerids);
+	zbx_audit_DBselect_delete_for_trigger(audit_context_mode, sql, &triggerids);
 
-	DBdelete_trigger_hierarchy(&triggerids);
+	DBdelete_trigger_hierarchy(&triggerids, audit_context_mode);
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
 out:
@@ -1347,7 +1347,7 @@ static int	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter,
  * Parameters: itemids - [IN] array of item identifiers from database         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_delete_items(zbx_vector_uint64_t *itemids)
+void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
@@ -1375,7 +1375,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids)
 	zbx_vector_uint64_create(&profileids);
 
 	DBdelete_graphs_by_itemids(itemids);
-	DBdelete_triggers_by_itemids(itemids);
+	DBdelete_triggers_by_itemids(itemids, audit_context_mode);
 
 	zbx_config_get_hk_mode(&history_mode, &trends_mode);
 
@@ -1465,7 +1465,7 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
+static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit_context_mode)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1540,7 +1540,7 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 
 	zbx_db_execute("%s", sql);
 
-	zbx_db_delete_items(&itemids);
+	zbx_db_delete_items(&itemids, audit_context_mode);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest where");
@@ -5380,7 +5380,7 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
-		zbx_host_template_link_type link_type, char **error)
+				      zbx_host_template_link_type link_type, int audit_context_mode, char **error)
 {
 	zbx_vector_uint64_t	templateids;
 	zbx_uint64_t		hosttemplateid;
@@ -5458,7 +5458,7 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 
 	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids, error)))
 	{
-		res = DBcopy_template_graphs(hostid, lnk_templateids);
+		res = DBcopy_template_graphs(hostid, lnk_templateids, audit_context_mode);
 		DBcopy_template_httptests(hostid, lnk_templateids);
 	}
 clean:

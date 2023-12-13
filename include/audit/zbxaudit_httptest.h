@@ -49,7 +49,7 @@ PREPARE_AUDIT_HTTPTEST_UPDATE_H(ssl_key_password, const char*)
 PREPARE_AUDIT_HTTPTEST_UPDATE_H(verify_peer, int)
 PREPARE_AUDIT_HTTPTEST_UPDATE_H(verify_host, int)
 
-int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids);
+int	zbx_audit_DBselect_delete_for_httptest(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_audit_httptest_update_json_add_httptest_tag(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t tagid, const char *tag,
 		const char *value);

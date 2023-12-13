@@ -302,12 +302,12 @@ void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set, int audit_c
 #undef AUDIT_HASHSET_DEF_SIZE
 }
 
-void	zbx_audit_prepare(void)
+void	zbx_audit_prepare(int audit_context_mode)
 {
 	zbx_config_t	cfg;
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
-	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode);
+	zbx_audit_init(audit_context_mode, cfg.auditlog_enabled, cfg.auditlog_mode);
 }
 
 static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
@@ -354,10 +354,10 @@ void	zbx_audit_flush(int audit_context_mode)
 	zbx_db_insert_execute(&db_insert_audit);
 	zbx_db_insert_clean(&db_insert_audit);
 
-	zbx_audit_clean();
+	zbx_audit_clean(audit_context_mode);
 }
 
-int	zbx_audit_flush_once(void)
+int	zbx_audit_flush_once(int audit_context_mode)
 {
 	char			recsetid_cuid[CUID_LEN];
 	int			ret = ZBX_DB_OK;
@@ -407,7 +407,7 @@ int	zbx_audit_flush_once(void)
 			break;
 	}
 
-	zbx_audit_clean();
+	zbx_audit_clean(audit_context_mode);
 
 	return ret;
 }

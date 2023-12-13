@@ -88,7 +88,7 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)								\
 			audit_key_contextname, contextname, "interface_snmp", "contextname");			\
 }														\
 														\
-void	zbx_audit_##funcname##_update_json_update_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version_old,	\
+ void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t version_old, \
 		zbx_uint64_t version_new, zbx_uint64_t bulk_old,  zbx_uint64_t bulk_new,			\
 		const char *community_old, const char *community_new, const char *securityname_old,		\
 		const char *securityname_new, zbx_uint64_t securitylevel_old, zbx_uint64_t securitylevel_new,	\
@@ -319,7 +319,7 @@ PREPARE_AUDIT_HOST_UPDATE(tls_psk, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(custom_interfaces, int, int)
 #undef PREPARE_AUDIT_HOST_UPDATE
 
-void	zbx_audit_host_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid)
+void	zbx_audit_host_update_json_delete_interface(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t interfaceid)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
@@ -444,7 +444,7 @@ void	zbx_audit_host_hostgroup_delete(int audit_context_mode, zbx_uint64_t hostid
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
+	zbx_audit_host_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
 	for (i = 0; i < groupids->values_num; i++)
 	{
@@ -458,7 +458,7 @@ void	zbx_audit_host_del(int audit_context_mode, zbx_uint64_t hostid, const char 
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_DELETE, hostid, hostname);
+	zbx_audit_host_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, hostid, hostname);
 }
 
 void	zbx_audit_host_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid, const char *host, zbx_uint64_t proxyid,
@@ -490,7 +490,7 @@ void	zbx_audit_host_update_json_add_details(int audit_context_mode, zbx_uint64_t
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.tls_subject",
 			tls_subject, AUDIT_TABLE_NAME, "tls_subject");
 
-	zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_connect, tls_accept, tls_psk_identity, tls_psk);
+	zbx_audit_host_update_json_add_tls_and_psk(audit_context_mode, hostid, tls_connect, tls_accept, tls_psk_identity, tls_psk);
 
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.custom_interfaces",
 			custom_interfaces, AUDIT_TABLE_NAME, "custom_interfaces");
@@ -539,7 +539,7 @@ void	zbx_audit_host_update_json_update_tag_tag(int audit_context_mode, zbx_uint6
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
-	RETURN_IF_AUDIT_OFF(audit_create_entry);
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.tags[" ZBX_FS_UI64 "].tag", tagid);
 
@@ -585,7 +585,7 @@ void	zbx_audit_host_prototype_del(int audit_context_mode, zbx_uint64_t hostid, c
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_DELETE, hostid, hostname);
+	zbx_audit_host_prototype_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, hostid, hostname);
 }
 
 void	zbx_audit_host_prototype_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t templateid,
@@ -941,7 +941,7 @@ void	zbx_audit_host_group_del(int audit_context_mode, zbx_uint64_t groupid, cons
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_DELETE, groupid, name);
+	zbx_audit_host_group_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, groupid, name);
 }
 
 void	zbx_audit_host_group_update_json_add_details(int audit_context_mode, zbx_uint64_t groupid, const char *name, int flags)

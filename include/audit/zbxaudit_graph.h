@@ -24,16 +24,16 @@
 
 void	zbx_audit_graph_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t graphid, const char *name, int flags);
 
-void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *name, int width, int height,
+void	zbx_audit_graph_update_json_add_data(int audit_context_mode, zbx_uint64_t graphid, const char *name, int width, int height,
 		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period, int show_triggers,
 		int graphtype, int show_legend, int show_3d, double percent_left, double percent_right, int ymin_type,
 		int ymax_type, zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid, int flags, int discover);
 
-void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid, int drawtype,
+void	zbx_audit_graph_update_json_add_gitems(int audit_context_mode, zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid, int drawtype,
 		int sortorder, const char *color, int yaxisside, int calc_fnc, int type, zbx_uint64_t itemid);
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1)								\
-void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, int flags,				\
+  void	zbx_audit_graph_update_json_update_##resource(int audit_context_mode, zbx_uint64_t graphid, int flags, \
 		type1 resource##_old, type1 resource##_new);							\
 
 PREPARE_AUDIT_GRAPH_UPDATE(name, const char*)
@@ -72,6 +72,6 @@ PREPARE_AUDIT_GRAPH_UPDATE(type, int)
 
 void	zbx_audit_graph_update_json_delete_gitems(int audit_context_mode, zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid);
 
-void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids);
+void	zbx_audit_DBselect_delete_for_graph(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids);
 
 #endif	/* ZABBIX_AUDIT_GRAPH_H */

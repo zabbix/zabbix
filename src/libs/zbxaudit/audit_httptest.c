@@ -150,7 +150,7 @@ PREPARE_AUDIT_HTTPTEST_UPDATE(verify_host, int, int)
 
 #undef PREPARE_AUDIT_HTTPTEST_UPDATE
 
-int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids)
+int	zbx_audit_DBselect_delete_for_httptest(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -165,7 +165,7 @@ int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t 
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
 
-		zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1]);
+		zbx_audit_httptest_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, id, row[1]);
 	}
 
 	zbx_db_free_result(result);

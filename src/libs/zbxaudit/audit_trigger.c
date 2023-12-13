@@ -232,7 +232,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
+void	zbx_audit_DBselect_delete_for_trigger(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -246,7 +246,7 @@ void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t 
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
 
-		zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1], atoi(row[2]));
+		zbx_audit_trigger_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, id, row[1], atoi(row[2]));
 	}
 
 	zbx_db_free_result(result);

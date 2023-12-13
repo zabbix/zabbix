@@ -54,20 +54,24 @@
 #define ZBX_AUDIT_HISTORY_PUSH _CONTEXT		0x20
 
 #define ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT \
-		ZBX_AUDIT_AUTOREGISTRATION_CONTEXT & \
+		(ZBX_AUDIT_AUTOREGISTRATION_CONTEXT &				 \
 		ZBX_AUDIT_NETWORK_DISCOVERY_CONTEXT & \
-		ZBX_AUDIT_LLD_CONTEXT
-
-
-#define RETURN_IF_AUDIT_OFF(context_mode)									\
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())					\
-		return										\
-	if ((context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT == 1) && SUCCEED == zbx_get_audit_mode())	   \
-	return											\
-
+		ZBX_AUDIT_LLD_CONTEXT)
 
 int	zbx_get_auditlog_enabled(void);
 int	zbx_get_auditlog_mode(void);
+
+#define RETURN_IF_AUDIT_OFF(context_mode)				\
+	do {								\
+	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())		\
+	{								\
+		return;							\
+	}								\
+	    								\
+	if (((context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT) == 1) && SUCCEED == zbx_get_auditlog_mode()) \
+		return;							\
+	}								\
+	while (0)							\
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
@@ -75,10 +79,10 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		const char *output, const char *error);
 
 void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set, int audit_context_mode);
-void	zbx_audit_prepare(void);
+void	zbx_audit_prepare(int audit_context_mode);
 void	zbx_audit_clean(int audit_context_mode);
 void	zbx_audit_flush(int audit_context_mode);
-int	zbx_audit_flush_once(void);
+int	zbx_audit_flush_once(int audit_context_mode);
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, uint64_t value, const char *table, const char *field);

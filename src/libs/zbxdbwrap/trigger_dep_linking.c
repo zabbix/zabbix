@@ -284,7 +284,7 @@ clean:
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error                           *
  *                                                                                                        *
  *********************************************************************************************************/
-static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
+static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids, int audit_context_mode,
 		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links_processed,
 		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
@@ -405,7 +405,7 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			{
 				zbx_vector_uint64_append(trigger_dep_ids_del,
 						found->v.values[i]->trigger_dep_id);
-				zbx_audit_trigger_update_json_remove_dependency(found->v.values[i]->flags,
+				zbx_audit_trigger_update_json_remove_dependency(audit_context_mode, found->v.values[i]->flags,
 						found->v.values[i]->trigger_dep_id,
 						found->v.values[i]->trigger_down_id);
 			}
@@ -420,7 +420,8 @@ clean:
 	return res;
 }
 
-static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
+static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags,
+		int audit_context_mode)
 {
 	int	res = SUCCEED;
 
@@ -449,8 +450,8 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 			if (NULL != (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(
 					triggers_flags, &temp_t)))
 			{
-				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid,
-						links->values[i].first, links->values[i].second);
+				zbx_audit_trigger_update_json_add_dependency(audit_context_mode, found->flags,
+						triggerdepid, links->values[i].first, links->values[i].second);
 			}
 			else
 			{
@@ -474,7 +475,7 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 }
 
 static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links,
-		const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
+		const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags, int audit_context_mode)
 {
 	int				res;
 	char				*sql = NULL;
@@ -487,7 +488,7 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links
 	zbx_vector_uint64_create(&trigger_dep_ids_del);
 	zbx_vector_uint64_pair_create(&links_processed);
 
-	if (FAIL == (res = prepare_trigger_dependencies_updates_and_deletes(trids, links, &links_processed,
+	if (FAIL == (res = prepare_trigger_dependencies_updates_and_deletes(trids, audit_context_mode, links, &links_processed,
 			&trigger_dep_ids_del)))
 	{
 		goto clean;
@@ -506,7 +507,7 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links
 		}
 	}
 
-	res = DBadd_trigger_dependencies(&links_processed, triggers_flags);
+	res = DBadd_trigger_dependencies(&links_processed, triggers_flags, audit_context_mode);
 clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&trigger_dep_ids_del);
@@ -535,7 +536,8 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                     *
  *                                                                              *
  ********************************************************************************/
-int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids, int is_update)
+int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids, int is_update,
+		int audit_context_mode)
 {
 	int				res = SUCCEED;
 	zbx_vector_uint64_pair_t	links;
@@ -556,12 +558,12 @@ int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vec
 
 	if (TRIGGER_DEP_SYNC_INSERT_OP == is_update)
 	{
-		if (FAIL == (res = DBadd_trigger_dependencies(&links, &triggers_flags)))
+		if (FAIL == (res = DBadd_trigger_dependencies(&links, &triggers_flags, audit_context_mode)))
 			goto clean;
 	}
 	else if (TRIGGER_DEP_SYNC_UPDATE_OP == is_update)
 	{
-		res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags);
+	  res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags, audit_context_mode);
 	}
 clean:
 	zbx_vector_uint64_pair_destroy(&links);
