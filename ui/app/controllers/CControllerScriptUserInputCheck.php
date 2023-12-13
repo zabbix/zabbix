@@ -74,7 +74,7 @@ class CControllerScriptUserInputCheck extends CController {
 
 		if ($this->getInput('manualinput_validator_type') == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
 			$user_input_values = array_map('trim', explode(',', $manualinput_validator));
-			$manualinput_validator = implode(',', $user_input_values);
+			$manualinput_validator = implode(', ', $user_input_values);
 
 			// Check if provided manualinput value is one of dropdown values when executing the script.
 			if (!in_array($manualinput, $user_input_values)) {
