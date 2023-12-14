@@ -105,10 +105,16 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// so using number of seconds elapsed since last check
 	now := time.Now()
 	var refresh int
-	if data.lastcheck.IsZero() {
-		refresh = 1
+
+	nextcheck, _, nextcheck_err := zbxlib.GetNextcheck(ctx.ItemID(), ctx.Delay(), now)
+	if nextcheck_err == nil {
+		refresh = int(nextcheck.Sub(now).Seconds())
 	} else {
-		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
+		if data.lastcheck.IsZero() {
+			refresh = 1
+		} else {
+			refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
+		}
 	}
 
 	logitem := zbxlib.EventLogItem{Results: make([]*zbxlib.EventLogResult, 0), Output: ctx.Output()}
