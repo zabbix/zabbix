@@ -1971,6 +1971,13 @@ static int	DBpatch_6050159(void)
 #endif
 }
 
+static int	DBpatch_6050160(void)
+{
+	const zbx_db_field_t	field = {"error", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("drules", &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -2135,5 +2142,6 @@ DBPATCH_ADD(6050156, 0, 1)
 DBPATCH_ADD(6050157, 0, 1)
 DBPATCH_ADD(6050158, 0, 1)
 DBPATCH_ADD(6050159, 0, 1)
+DBPATCH_ADD(6050160, 0, 1)
 
 DBPATCH_END()
