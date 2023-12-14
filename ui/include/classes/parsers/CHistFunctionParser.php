@@ -57,13 +57,13 @@ class CHistFunctionParser extends CParser {
 
 	private $query_parser;
 	private $period_parser;
-	private $time_parser;
-	private $size_parser;
 
 	/**
+	 * The list of parsers for unquoted parameters.
+	 *
 	 * @var array
 	 */
-	private $macro_parsers = [];
+	private $unquoted_param_parsers = [];
 
 	/**
 	 * Parsed function name.
@@ -97,14 +97,14 @@ class CHistFunctionParser extends CParser {
 			'usermacros' => $this->options['usermacros'],
 			'lldmacros' => $this->options['lldmacros']
 		]);
-		$this->size_parser = new CNumberParser(['with_size_suffix' => true]);
-		$this->time_parser = new CNumberParser(['with_time_suffix' => true, 'with_year' => true]);
+		$this->unquoted_param_parsers[] = new CNumberParser(['with_size_suffix' => true]);
+		$this->unquoted_param_parsers[] = new CNumberParser(['with_time_suffix' => true, 'with_year' => true]);
 
 		if ($this->options['usermacros']) {
-			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
+			array_push($this->unquoted_param_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($this->options['lldmacros']) {
-			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
+			array_push($this->unquoted_param_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 	}
 
@@ -156,9 +156,6 @@ class CHistFunctionParser extends CParser {
 		$_parameters = [];
 		$state = self::STATE_NEW;
 		$num = 0;
-
-		// The list of parsers for unquoted parameters.
-		$parsers = array_merge([$this->size_parser, $this->time_parser], $this->macro_parsers);
 
 		while (isset($source[$p])) {
 			switch ($state) {
@@ -271,7 +268,7 @@ class CHistFunctionParser extends CParser {
 									$length = 0;
 									$new_p = $p;
 
-									foreach ($parsers as $parser) {
+									foreach ($this->unquoted_param_parsers as $parser) {
 										if ($parser->parse($source, $p) != CParser::PARSE_FAIL
 												&& $parser->getLength() > $length) {
 											$_parameters[$num] = [
