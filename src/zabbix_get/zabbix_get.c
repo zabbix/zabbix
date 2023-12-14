@@ -203,7 +203,7 @@ struct zbx_option	longopts[] =
 	{"tls-psk-file",		1,	NULL,	'9'},
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
-	{"protocol",			1,	NULL,	'C'},
+	{"protocol",			1,	NULL,	'P'},
 	{NULL}
 };
 
@@ -496,7 +496,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 				break;
 #endif
-			case 'C':
+			case 'P':
 				if (0 == strcmp(zbx_optarg, "json"))
 				{
 					protocol = ZBX_JSON_PROTOCOL;
