@@ -113,6 +113,7 @@
 		</exec>
 		<!-- Copy agent2 configuration file -->
 		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
+		<mkdir dir="{basedir}/base_old"/>
 	</target>
 
 	<target name="init-frontend-modules">
@@ -144,7 +145,38 @@
 		</exec>
 	</target>
 
-	<target name="make-binaries-postgresql">
+	<target name="make-legacy-agent-binary">
+		<!-- Build Agent 3.0 for protocol backward compatibility test -->
+                <exec executable="git" outputproperty="git.initial_rev" failonerror="on">
+			<arg value="rev-parse"/>
+			<arg value="--verify"/>
+			<arg value="HEAD"/>
+                </exec>
+		<exec executable="git" failonerror="on">
+			<arg line="checkout"/>
+			<arg line="df9ee823715d4caccf63f402a126d2f039b31057"/>
+		</exec>
+		<copy file="${basedir}/conf/zabbix_agentd.conf" tofile="${basedir}/conf/zabbix_agentd_old.conf"/>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent"/>
+			<arg line="--prefix=${basedir}/base_old"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+		<copy file="${basedir}/base_old/sbin/zabbix_agentd" tofile="${basedir}/sbin/zabbix_agentd_old"/>
+		<chmod file="${basedir}/sbin/zabbix_agentd_old" perm="ugo+rx"/>
+		<exec executable="git" failonerror="on">
+			<arg line="checkout"/>
+			<arg line="${git.initial_rev}"/>
+		</exec>
+	</target>
+
+	<target name="make-binaries-postgresql" depends="make-legacy-agent-binary">
 		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="./configure" failonerror="on">
@@ -337,7 +369,7 @@
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
-	<target name="make-binaries-mysql">
+	<target name="make-binaries-mysql" depends="make-legacy-agent-binary">
 		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="./configure" failonerror="on">
