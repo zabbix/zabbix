@@ -208,7 +208,7 @@ struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "s:p:k:I:t:hV";
+static char	shortopts[] = "s:p:k:I:t:hVP:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -511,7 +511,7 @@ int	main(int argc, char **argv)
 				}
 				else
 				{
-					zbx_error("Invalid protocol");
+					zbx_error("Invalid protocol \"%s\"", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
 				break;
