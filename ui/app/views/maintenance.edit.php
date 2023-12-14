@@ -29,6 +29,7 @@ $form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenance_form')
 	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
+	->addStyle('display: none;')
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.

@@ -60,6 +60,8 @@ window.trigger_edit_popup = new class {
 		if (this.dependencies) {
 			this.#loadDependencyTable(this.dependencies);
 		}
+
+		this.form.removeAttribute('style');
 	}
 
 	#initActions() {

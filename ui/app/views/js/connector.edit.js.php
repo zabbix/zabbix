@@ -47,6 +47,8 @@ window.connector_edit_popup = new class {
 		this._updateForm();
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
+
+		this.form.removeAttribute('style');
 	}
 
 	_updateForm() {

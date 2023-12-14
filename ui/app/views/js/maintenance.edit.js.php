@@ -72,6 +72,8 @@ window.maintenance_edit = new class {
 
 			this._update();
 		}
+
+		this._form.removeAttribute('style');
 	}
 
 	_update () {
