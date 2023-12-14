@@ -33,6 +33,7 @@ class CHistFunctionParser extends CParser {
 	public const PARAM_TYPE_PERIOD = 1;
 	public const PARAM_TYPE_QUOTED = 2;
 	public const PARAM_TYPE_UNQUOTED = 3;
+	public const PARAM_TYPE_EMPTY = 4;
 
 	/**
 	 * An options array.
@@ -186,7 +187,7 @@ class CHistFunctionParser extends CParser {
 							switch ($source[$p]) {
 								case ',':
 									$_parameters[$num++] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
@@ -195,7 +196,7 @@ class CHistFunctionParser extends CParser {
 
 								case ')':
 									$_parameters[$num] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
@@ -237,7 +238,7 @@ class CHistFunctionParser extends CParser {
 							switch ($source[$p]) {
 								case ',':
 									$_parameters[$num++] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
@@ -246,7 +247,7 @@ class CHistFunctionParser extends CParser {
 
 								case ')':
 									$_parameters[$num] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
