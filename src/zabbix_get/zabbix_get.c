@@ -98,7 +98,6 @@ static const char	*help_message[] = {
 	"                                           fallback and retry with",
 	"                                           plaintext protocol (default)",
 	"                               json      - connect using JSON protocol",
-	"                                           key",
 	"                               plaintext - connect using plaintext protocol",
 	"                                           where just item key is sent",
 	"                                           (6.4.x and older releases)",

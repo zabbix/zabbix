@@ -124,7 +124,7 @@ connect using JSON protocol, fallback and retry with plaintext protocol (default
 .RS 12
 .TP 12
 .B json
-connect using JSON protocol key
+connect using JSON protocol
 .RE
 .RS 12
 .TP 12
