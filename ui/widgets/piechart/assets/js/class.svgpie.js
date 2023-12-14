@@ -141,9 +141,9 @@ class CSVGPie {
 	#all_sectorids_new = [];
 
 	/**
-	 * SVG path element that represents a sector that is popped out.
+	 * SVG G element that represents a sector that is popped out.
 	 *
-	 * @type {SVGPathElement}
+	 * @type {SVGGElement}
 	 */
 	#popped_out_sector = null;
 
