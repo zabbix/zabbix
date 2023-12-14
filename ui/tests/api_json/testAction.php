@@ -176,7 +176,7 @@ class testAction extends CAPITest {
 							'opmessage_grp' => [
 								['usrgrpid' => ':user_group:del.ug1']
 							]
-						],
+						]
 					]
 				],
 				[
@@ -189,7 +189,7 @@ class testAction extends CAPITest {
 							'opmessage_grp' => [
 								['usrgrpid' => ':user_group:del.ug1']
 							]
-						],
+						]
 					]
 				],
 				[
@@ -212,13 +212,13 @@ class testAction extends CAPITest {
 							'opmessage_grp' => [
 								['usrgrpid' => ':user_group:del.ug1']
 							]
-						],
+						]
 					],
 					'recovery_operations' => [
 						[
 							'operationtype' => OPERATION_TYPE_RECOVERY_MESSAGE,
 							'opmessage' => []
-						],
+						]
 					]
 				],
 				[
@@ -316,7 +316,7 @@ class testAction extends CAPITest {
 				[
 					'name' => 'full.access.to.perm.trigger.action.1',
 					'templategroup_rights' => [
-						['id' => ':template_group:perm.tg1', 'permission' => PERM_READ],
+						['id' => ':template_group:perm.tg1', 'permission' => PERM_READ]
 					],
 					'hostgroup_rights' => [
 						['id' => ':host_group:perm.filter.condition.hg1', 'permission' => PERM_READ],
@@ -330,7 +330,7 @@ class testAction extends CAPITest {
 				[
 					'name' => 'completely.no.access.to.perm.trigger.action.1',
 					'templategroup_rights' => [
-						['id' => ':template_group:completely.no.access.to.perm.trigger.action.1', 'permission' => PERM_READ],
+						['id' => ':template_group:completely.no.access.to.perm.trigger.action.1', 'permission' => PERM_READ]
 					],
 					'hostgroup_rights' => [
 						['id' => ':host_group:completely.no.access.to.perm.trigger.action.1', 'permission' => PERM_READ]
