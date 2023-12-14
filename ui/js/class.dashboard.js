@@ -42,6 +42,8 @@ class CDashboard {
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
+	static EVENT_READY = 'dashboard-ready';
+
 	static EVENT_FEEDBACK = 'dashboard-feedback';
 
 	#broadcast_options;
@@ -1104,6 +1106,10 @@ class CDashboard {
 	 */
 	#updateReadyState(is_ready) {
 		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, is_ready);
+
+		if (is_ready) {
+			this.fire(CDashboard.EVENT_READY);
+		}
 	}
 
 	save() {
