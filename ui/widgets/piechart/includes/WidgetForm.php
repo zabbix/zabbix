@@ -60,13 +60,13 @@ class WidgetForm extends CWidgetForm {
 	private const MERGE_PERCENT_MAX = 10;
 	private const MERGE_PERCENT_MIN = 1;
 
-	private const STROKE_DEFAULT = 0;
-	private const STROKE_MAX = 10;
-	private const STROKE_MIN = 0;
-
 	private const SPACE_DEFAULT = 1;
 	private const SPACE_MAX = 10;
 	private const SPACE_MIN = 0;
+
+	private const STROKE_DEFAULT = 0;
+	private const STROKE_MAX = 10;
+	private const STROKE_MIN = 0;
 
 	private const VALUE_DECIMALS_DEFAULT = 2;
 	private const VALUE_DECIMALS_MAX = 6;
