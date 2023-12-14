@@ -623,7 +623,7 @@ class CSVGGauge {
 			value_container.style.color = `#${this.#config.value.color}`;
 		}
 
-		this.#elements.value_and_units = {container, value: {container: value_container}};
+		this.#elements.value_and_units = {container, contents, value: {container: value_container}};
 
 		if (this.#config.units.show) {
 			const units_container = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
@@ -784,6 +784,30 @@ class CSVGGauge {
 				}
 			}
 		}
+
+		let tooltip = '';
+
+		if (value_text !== null) {
+			if (this.#config.units.show && units_text !== null) {
+				const parts = this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW
+						|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER
+					? [value_text, units_text]
+					: [units_text, value_text];
+
+				if (this.#config.units.position === CSVGGauge.UNITS_POSITION_ABOVE
+						|| this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW) {
+					tooltip = `${parts[0]}\r\n${parts[1]}`;
+				}
+				else {
+					tooltip = `${parts[0]} ${parts[1]}`;
+				}
+			}
+			else {
+				tooltip = value_text;
+			}
+		}
+
+		this.#elements.value_and_units.contents.setAttribute('title', tooltip);
 	}
 
 	/**
