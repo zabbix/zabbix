@@ -150,7 +150,6 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, config_timeout)))
 	{
-		zbx_uint32_t		timeout;
 		struct zbx_json_parse	jp;
 
 		zbx_rtrim(s->buffer, "\r\n");
@@ -168,9 +167,8 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 
 			zbx_init_agent_result(&result);
 
-			timeout = (zbx_uint32_t)config_timeout;
-
-			if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result, (int)timeout))
+			if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result,
+					config_timeout))
 			{
 				if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 				{
