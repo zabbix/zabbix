@@ -69,6 +69,7 @@ $user_form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-form')
 	->setName('user_form')
+	->setAttribute('autocomplete', 'off')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
