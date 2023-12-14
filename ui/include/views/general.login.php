@@ -62,6 +62,7 @@ global $ZBX_SERVER_NAME;
 			(new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass(ZBX_STYLE_SIGNIN_LOGO),
 			(new CForm())
 				->cleanItems()
+				->setAttribute('autocomplete', 'off')
 				->setAttribute('aria-label', _('Sign in'))
 				->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
 				->addItem(
