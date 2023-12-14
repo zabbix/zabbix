@@ -35,8 +35,8 @@
  *             config_source_ip - [IN]                                        *
  *             program_type     - [IN]                                        *
  *             result           - [OUT]                                       *
- *             version          - [IN/OUT] if 7.0.0 or higher, connect using, *                                   *
- *                                         JSON protocol, fallback and retry  *                                 *
+ *             version          - [IN/OUT] if 7.0.0 or higher, connect using, *
+ *                                         JSON protocol, fallback and retry  *
  *                                         with plaintext protocol            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *

@@ -136,12 +136,13 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
  *                                                                              *
  * Purpose: activate item interface                                             *
  *                                                                              *
- * Parameters: ts         - [IN] the timestamp                                  *
- *             item       - [IN/OUT] the item                                   *
- *             data       - [IN/OUT] the serialized availability data           *
- *             data_alloc - [IN/OUT] the serialized availability data size      *
- *             data_alloc - [IN/OUT] the serialized availability data offset    *
- *             ts         - [IN] the timestamp                                  *
+ * Parameters: ts          - [IN] the timestamp                                 *
+ *             item        - [IN/OUT] the item                                  *
+*              version     - [IN/OUT] interface version                         *
+ *             data        - [IN/OUT] the serialized availability data          *
+ *             data_alloc  - [IN/OUT] the serialized availability data size     *
+ *             data_offset - [IN/OUT] the serialized availability data offset   *
+ *             ts          - [IN] the timestamp                                 *
  *                                                                              *
  *******************************************************************************/
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
