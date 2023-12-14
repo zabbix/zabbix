@@ -338,7 +338,9 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 		agent_context->server_name = NULL;
 #endif
 
-	zbx_agent_prepare_request(&agent_context->j, agent_context->item.key, item->timeout);
+	if (ZBX_COMPONENT_VERSION(7, 0, 0) <= agent_context->item.version)
+		zbx_agent_prepare_request(&agent_context->j, agent_context->item.key, item->timeout);
+
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 
 	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, item->timeout + 1,

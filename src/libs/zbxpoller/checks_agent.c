@@ -100,10 +100,9 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 
 		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-		zbx_agent_prepare_request(&j, item->key, item->timeout);
-
 		if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 		{
+			zbx_agent_prepare_request(&j, item->key, item->timeout);
 			ptr = j.buffer;
 			len = j.buffer_size;
 		}

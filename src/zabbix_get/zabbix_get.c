@@ -286,13 +286,12 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-		zbx_agent_prepare_request(&j, key, CONFIG_GET_TIMEOUT);
-
 		if (ZBX_PLAINTEXT_PROTOCOL == protocol)
 			*version = 0;
 
 		if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 		{
+			zbx_agent_prepare_request(&j, key, CONFIG_GET_TIMEOUT);
 			ptr = j.buffer;
 			len = j.buffer_size;
 		}
