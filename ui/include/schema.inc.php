@@ -9946,31 +9946,31 @@ return [
 				'default' => ''
 			],
 			'hash_function' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1'
 			],
 			'code_length' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '6'
 			],
 			'api_hostname' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 1024,
 				'default' => ''
 			],
 			'clientid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => ''
 			],
 			'client_secret' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => ''
@@ -9978,7 +9978,7 @@ return [
 		]
 	],
 	'mfa_totp_secret' => [
-		'key' => 'mfa_totp_secret',
+		'key' => 'mfa_totp_secretid',
 		'fields' => [
 			'mfa_totp_secretid' => [
 				'null' => false,
@@ -9988,15 +9988,19 @@ return [
 			'mfaid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
+				'length' => 20,
+				'ref_table' => 'mfa',
+				'ref_field' => 'mfaid'
 			],
 			'userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
 			],
 			'totp_secret' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => ''

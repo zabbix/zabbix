@@ -625,8 +625,8 @@ FIELD		|timeout_http_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|timeout_ssh_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|timeout_telnet_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|timeout_script		|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|mfa_status		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|mfaid			|t_id			|NULL	|NULL		|0		|5|mfa	|mfaid|	RESTRICT
+FIELD		|mfa_status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|mfaid			|t_id		|NULL	|NULL		|0		|5|mfa	|mfaid|	RESTRICT
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
@@ -2218,5 +2218,5 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050171	|6050171
+ROW		|1		|6050173	|6050173
 
