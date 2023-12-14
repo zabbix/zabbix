@@ -98,8 +98,9 @@ class CHistFunctionParser extends CParser {
 			'usermacros' => $this->options['usermacros'],
 			'lldmacros' => $this->options['lldmacros']
 		]);
-		$this->unquoted_param_parsers[] = new CNumberParser(['with_size_suffix' => true]);
-		$this->unquoted_param_parsers[] = new CNumberParser(['with_time_suffix' => true, 'with_year' => true]);
+		$this->unquoted_param_parsers[] = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true,
+			'with_year' => true
+		]);
 
 		if ($this->options['usermacros']) {
 			array_push($this->unquoted_param_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
@@ -266,12 +267,8 @@ class CHistFunctionParser extends CParser {
 									break;
 
 								default:
-									$length = 0;
-									$new_p = $p;
-
 									foreach ($this->unquoted_param_parsers as $parser) {
-										if ($parser->parse($source, $p) != CParser::PARSE_FAIL
-												&& $parser->getLength() > $length) {
+										if ($parser->parse($source, $p) != CParser::PARSE_FAIL) {
 											$_parameters[$num] = [
 												'type' => self::PARAM_TYPE_UNQUOTED,
 												'pos' => $p,
@@ -279,17 +276,15 @@ class CHistFunctionParser extends CParser {
 												'length' => $parser->getLength()
 											];
 
-											$new_p = $p + $parser->getLength() - 1;
-											$length = $parser->getLength();
+											$p += $parser->getLength() - 1;
 											$state = self::STATE_END;
+											break;
 										}
 									}
 
 									if ($state != self::STATE_END) {
 										break 3;
 									}
-
-									$p = $new_p;
 							}
 						}
 					}
