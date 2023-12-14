@@ -116,8 +116,10 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 		}
 		else
 		{
-			value = ZBX_GET_MSG_RESULT(&result);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, *value, ZBX_JSON_TYPE_STRING);
+			if (NULL != (value = ZBX_GET_MSG_RESULT(&result)))
+				zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, *value, ZBX_JSON_TYPE_STRING);
+			else
+				zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, ZBX_NOTSUPPORTED, ZBX_JSON_TYPE_STRING);
 		}
 	}
 
