@@ -36,6 +36,9 @@ const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'dashboard-page-reserve-header
 
 class CDashboardPage {
 
+	// Dashboard page ready event: informs the dashboard that the dashboard page has been fully loaded (fired once).
+	static EVENT_READY = 'dashboard-page-ready';
+
 	// Require data source event: informs the dashboard to load the referred data source.
 	static EVENT_REQUIRE_DATA_SOURCE = 'dashboard-page-require-data-source';
 
@@ -116,9 +119,14 @@ class CDashboardPage {
 		for (const widget of this._widgets.keys()) {
 			this.#startWidget(widget);
 		}
+
+		if (this._widgets.size === 0) {
+			this.fire(CDashboardPage.EVENT_READY);
+		}
 	}
 
 	#startWidget(widget) {
+		widget.on(CWidgetBase.EVENT_READY, this._events.widgetReady);
 		widget.on(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, this._events.widgetRequireDataSource);
 
 		widget.start();
@@ -203,6 +211,7 @@ class CDashboardPage {
 	}
 
 	#destroyWidget(widget) {
+		widget.off(CWidgetBase.EVENT_READY, this._events.widgetReady);
 		widget.off(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, this._events.widgetRequireDataSource);
 
 		widget.destroy();
@@ -342,7 +351,7 @@ class CDashboardPage {
 	}
 
 	_doAddWidget(widget) {
-		this._widgets.set(widget, {});
+		this._widgets.set(widget, {is_ready: false});
 
 		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL && widget.getState() === WIDGET_STATE_INITIAL) {
 			widget.start();
@@ -1907,6 +1916,26 @@ class CDashboardPage {
 
 	#registerEvents() {
 		this._events = {
+			widgetReady: (e) => {
+				const data = this._widgets.get(e.detail.target);
+
+				data.is_ready = true;
+
+				let is_ready = true;
+
+				for (const data of this._widgets.values()) {
+					if (!data.is_ready) {
+						is_ready = false;
+
+						break;
+					}
+				}
+
+				if (is_ready) {
+					this.fire(CDashboardPage.EVENT_READY);
+				}
+			},
+
 			widgetRequireDataSource: (e) => {
 				for (const widget of this._widgets.keys()) {
 					if (widget.getFields().reference === e.detail.reference) {

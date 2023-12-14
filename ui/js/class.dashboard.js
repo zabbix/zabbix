@@ -38,6 +38,8 @@ const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated
 
 class CDashboard {
 
+	static ZBX_STYLE_IS_READY = 'is-ready';
+
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
 	static EVENT_FEEDBACK = 'dashboard-feedback';
@@ -513,7 +515,7 @@ class CDashboard {
 			unique_id: this._createUniqueId()
 		});
 
-		this._dashboard_pages.set(dashboard_page, {});
+		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
 			dashboard_page.addWidgetFromData({
@@ -938,6 +940,10 @@ class CDashboard {
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
+				const data = this._dashboard_pages.get(dashboard_page);
+
+				this.#updateReadyState(data.is_ready);
+
 				if (!this._is_edit_mode) {
 					this._keepSteadyConfigurationChecker();
 
@@ -993,6 +999,7 @@ class CDashboard {
 	}
 
 	#startDashboardPage(dashboard_page) {
+		dashboard_page.on(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.start();
@@ -1035,6 +1042,7 @@ class CDashboard {
 	}
 
 	#destroyDashboardPage(dashboard_page) {
+		dashboard_page.off(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.off(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.destroy();
@@ -1085,6 +1093,17 @@ class CDashboard {
 		const data = this._dashboard_pages.get(dashboard_page);
 
 		return tabs.indexOf(data.tab);
+	}
+
+	/**
+	 * Update readiness state of the dashboard.
+	 *
+	 * Readiness state is updated on switching dashboard pages and as soon as the selected page get fully loaded.
+	 *
+	 * @param {boolean} is_ready
+	 */
+	#updateReadyState(is_ready) {
+		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, is_ready);
 	}
 
 	save() {
@@ -2043,6 +2062,16 @@ class CDashboard {
 		let user_interaction_animation_frame = null;
 
 		this._events = {
+			dashboardPageReady: (e) => {
+				const data = this._dashboard_pages.get(e.detail.target);
+
+				data.is_ready = true;
+
+				if (e.detail.target === this._selected_dashboard_page) {
+					this.#updateReadyState(true);
+				}
+			},
+
 			dashboardPageRequireDataSource: (e) => {
 				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
 					return;

@@ -165,6 +165,39 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
+	 * Resolve as soon as the widget is fully rendered (ready for printing).
+	 *
+	 * The method is called once, immediately after the promiseUpdate is resolved.
+	 * Custom implementation must also resolve the promise provided by the default implementation.
+	 *
+	 * @returns {Promise<void>}
+	 */
+	promiseReady() {
+		return new Promise((resolve) => {
+			let incomplete = 0;
+
+			const image_complete = () => {
+				if (--incomplete === 0) {
+					resolve();
+				}
+			};
+
+			for (const img of this._body.querySelectorAll('img')) {
+				if (!img.complete) {
+					img.addEventListener('load', image_complete);
+					img.addEventListener('error', image_complete);
+
+					incomplete++;
+				}
+			}
+
+			if (incomplete === 0) {
+				resolve();
+			}
+		});
+	}
+
+	/**
 	 * Prepare server request data for updating the widget.
 	 *
 	 * Invoked by the default implementation of the "promiseUpdate" method only.
