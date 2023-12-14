@@ -21,6 +21,7 @@
 #define ZABBIX_OPERATIONS_H
 
 #include "zbxcacheconfig.h"
+int	zbx_map_db_event_to_audit_context(const zbx_db_event *event);
 
 void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
 void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids);

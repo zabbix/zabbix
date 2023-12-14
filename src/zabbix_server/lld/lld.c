@@ -1173,7 +1173,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	now = time(NULL);
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
-	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode);
+	zbx_audit_init(ZBX_AUDIT_LLD_CONTEXT, cfg.auditlog_enabled, cfg.auditlog_mode);
 
 	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
 	{
@@ -1204,7 +1204,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
 out:
-	zbx_audit_flush();
+	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 	zbx_dc_config_clean_items(&item, &errcode, 1);
 	zbx_free(info);
 	zbx_free(discovery_key);

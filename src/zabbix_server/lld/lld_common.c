@@ -91,18 +91,18 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 
 				if (0 == strcmp(table, "item_discovery"))
 				{
-					zbx_audit_item_create_entry_for_delete(id, name,
+					zbx_audit_item_create_entry_for_delete(ZBX_AUDIT_LLD_CONTEXT, id, name,
 							(int)ZBX_FLAG_DISCOVERY_CREATED);
 				}
 				else if (0 == strcmp(table, "graph_discovery"))
 				{
-					zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_DELETE, id, name,
-							(int)ZBX_FLAG_DISCOVERY_CREATED);
+					zbx_audit_graph_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_DELETE,
+							id, name, (int)ZBX_FLAG_DISCOVERY_CREATED);
 				}
 				else if (0 == strcmp(table, "trigger_discovery"))
 				{
-					zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_DELETE, id, name,
-							ZBX_FLAG_DISCOVERY_CREATED);
+					zbx_audit_trigger_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_DELETE,
+							id, name, ZBX_FLAG_DISCOVERY_CREATED);
 				}
 			}
 			else if (object_ts_delete != ts_delete)
@@ -179,7 +179,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 	{
 		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		cb(&del_ids);
+		cb(&del_ids, ZBX_AUDIT_LLD_CONTEXT);
 	}
 
 	zbx_db_commit();
