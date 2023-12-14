@@ -1098,7 +1098,7 @@ class CDashboard {
 	/**
 	 * Update readiness state of the dashboard.
 	 *
-	 * Readiness state is updated on switching dashboard pages and as soon as the selected page get fully loaded.
+	 * Readiness state is updated on switching dashboard pages and as soon as the selected page gets fully loaded.
 	 *
 	 * @param {boolean} is_ready
 	 */
