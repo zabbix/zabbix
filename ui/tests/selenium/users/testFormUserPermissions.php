@@ -26,7 +26,10 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup role, users, usrgrp, module
+ *
  * @onBefore prepareUserData
+ *
+ * @dataSource UserPermissions
  */
 class testFormUserPermissions extends CWebTest {
 

@@ -23,7 +23,8 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
  * @backup users
- * @dataSource LoginUsers
+ *
+ * @dataSource LoginUsers, UserPermissions
  */
 class testFormUser extends CWebTest {
 
