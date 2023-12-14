@@ -34,8 +34,6 @@ class testDependentItems extends CAPITest {
 			return;
 		}
 
-		DBconnect($error);
-
 		CTestDataHelper::createObjects([
 			'template_groups' => [
 				['name' => 'dependent.items.tests.template.group']
@@ -974,8 +972,25 @@ class testDependentItems extends CAPITest {
 			self::markTestSkipped('Lower the ZBX_DEPENDENT_ITEM_MAX_COUNT option to run this test.');
 		}
 
-		CTestDataHelper::processReferences($method, $params);
+		$api_object = substr($method, 0, strpos($method, '.'));
+		$request = array_key_exists(0, $params) ? $params : [$params];
 
-		return $this->call($method, $params, $error);
+		foreach ($request as &$object) {
+			if ($api_object === 'host') {
+				CTestDataHelper::convertHostReferences($object);
+			}
+			elseif ($api_object === 'item') {
+				CTestDataHelper::convertItemReferences($object);
+			}
+			elseif ($api_object === 'itemprototype') {
+				CTestDataHelper::convertItemPrototypeReferences($object);
+			}
+			elseif ($api_object === 'discoveryrule') {
+				CTestDataHelper::convertLldRuleReferences($object);
+			}
+		}
+		unset($object);
+
+		return $this->call($method, $request, $error);
 	}
 }

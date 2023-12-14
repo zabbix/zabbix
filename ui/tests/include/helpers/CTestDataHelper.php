@@ -37,8 +37,8 @@ class CTestDataHelper {
 	 * @param array $objects
 	 */
 	public static function createObjects(array $objects): void {
-		$objects += array_fill_keys(['template_groups', 'host_groups', 'proxies', 'templates', 'hosts', 'triggers',
-			'roles', 'user_groups', 'users', 'scripts', 'actions'
+		$objects += array_fill_keys(['actions', 'drules', 'host_groups', 'hosts', 'proxies', 'roles', 'scripts',
+			'template_groups', 'templates', 'triggers', 'user_groups', 'users'
 		], []);
 
 		try {
@@ -52,6 +52,7 @@ class CTestDataHelper {
 			self::createUserGroups(array_values($objects['user_groups']));
 			self::createUsers(array_values($objects['users']));
 			self::createScripts(array_values($objects['scripts']));
+			self::createDrules(array_values($objects['drules']));
 			self::createActions(array_values($objects['actions']));
 		}
 		catch (Exception $e) {
@@ -96,11 +97,27 @@ class CTestDataHelper {
 			return;
 		}
 
+		foreach ($proxies as &$proxy) {
+			$proxy = self::prepareProxy($proxy);
+		}
+		unset($proxy);
+
 		$result = CDataHelper::call('proxy.create', $proxies);
 
 		foreach ($proxies as $proxy) {
 			self::$objectids['proxy'][$proxy['name']] = array_shift($result['proxyids']);
 		}
+	}
+
+	/**
+	 * @param array $proxy
+	 *
+	 * @return array
+	 */
+	public static function prepareProxy(array $proxy): array {
+		$proxy += ['operating_mode' => PROXY_OPERATING_MODE_ACTIVE];
+
+		return $proxy;
 	}
 
 	/**
@@ -110,8 +127,6 @@ class CTestDataHelper {
 		if (!$templates) {
 			return;
 		}
-
-		self::convertTemplateReferences($templates);
 
 		$value_maps = [];
 		$items = [];
@@ -151,6 +166,8 @@ class CTestDataHelper {
 		}
 		unset($template);
 
+		self::convertTemplateReferences($templates);
+
 		$result = CDataHelper::call('template.create', $templates);
 
 		foreach ($templates as $template) {
@@ -175,8 +192,6 @@ class CTestDataHelper {
 		if (!$hosts) {
 			return;
 		}
-
-		self::convertHostReferences($hosts);
 
 		$value_maps = [];
 		$items = [];
@@ -224,6 +239,8 @@ class CTestDataHelper {
 			}
 		}
 		unset($host);
+
+		self::convertHostReferences($hosts);
 
 		$result = CDataHelper::call('host.create', $hosts);
 
@@ -281,8 +298,6 @@ class CTestDataHelper {
 		foreach ($items as $i => &$item) {
 			$host_refs[$i] = $item['hostid'];
 
-			self::convertItemReferences($item);
-
 			$item = self::prepareItem($item);
 
 			$item_indexes[$item['hostid']][':item:'.$item['key_']] = $i;
@@ -307,14 +322,13 @@ class CTestDataHelper {
 		}
 
 		do {
-			self::convertPropertyReference($items, 'master_itemid');
+			self::convertItemReferences($items);
 
 			$result = CDataHelper::call('item.create', array_values($items));
 
 			$_items = [];
 
 			foreach ($items as $i => $item) {
-
 				self::$objectids['item'][$item['key_']][$host_refs[$i]] = array_shift($result['itemids']);
 
 				if (array_key_exists($i, $dep_items)) {
@@ -389,8 +403,6 @@ class CTestDataHelper {
 		foreach ($lld_rules as $i => &$lld_rule) {
 			$host_refs[$i] = $lld_rule['hostid'];
 
-			self::convertLldRuleReferences($lld_rules);
-
 			$lld_rule = self::prepareLldRule($lld_rule);
 
 			if (array_key_exists('item_prototypes', $lld_rule)) {
@@ -403,6 +415,8 @@ class CTestDataHelper {
 			}
 		}
 		unset($lld_rule);
+
+		self::convertLldRuleReferences($lld_rules);
 
 		$result = CDataHelper::call('discoveryrule.create', $lld_rules);
 
@@ -422,10 +436,10 @@ class CTestDataHelper {
 
 		foreach ($httptests as $i => &$httptest) {
 			$host_refs[$i] = $httptest['hostid'];
-
-			self::convertHttptestReferences($httptest);
 		}
 		unset($httptest);
+
+		self::convertHttptestReferences($httptests);
 
 		$result = CDataHelper::call('httptest.create', $httptests);
 
@@ -504,8 +518,6 @@ class CTestDataHelper {
 		foreach ($items as $i => &$item) {
 			$host_refs[$i] = $item['hostid'];
 
-			self::convertItemPrototypeReferences($item);
-
 			$item = self::prepareItemPrototype($item);
 
 			if (array_key_exists('discovered_items', $item)) {
@@ -542,7 +554,7 @@ class CTestDataHelper {
 		}
 
 		do {
-			self::convertPropertyReference($items, 'master_itemid');
+			self::convertItemPrototypeReferences($items);
 
 			$result = CDataHelper::call('itemprototype.create', $items);
 
@@ -627,8 +639,6 @@ class CTestDataHelper {
 		foreach ($discovered_items as $i => &$item) {
 			$host_refs[$i] = $item['hostid'];
 
-			self::convertDiscoveredItemReferences($item);
-
 			$item = self::prepareItem($item);
 
 			$item_indexes[$item['item_prototypeid']][':discovered_item:'.$item['key_']] = $i;
@@ -657,7 +667,7 @@ class CTestDataHelper {
 		unset($item);
 
 		do {
-			self::convertPropertyReference($discovered_items, 'master_itemid');
+			self::convertDiscoveredItemReferences($discovered_items);
 
 			$result = CDataHelper::call('item.create', $discovered_items);
 
@@ -678,6 +688,8 @@ class CTestDataHelper {
 					$_discovered_items += $dep_items[$i];
 				}
 			}
+
+			self::convertPropertyReference($item_discoveries, 'parent_itemid');
 
 			DB::insert('item_discovery', $item_discoveries);
 
@@ -806,12 +818,11 @@ class CTestDataHelper {
 			return;
 		}
 
-		self::convertActionReferences($actions);
-
 		foreach ($actions as &$action) {
 			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
 				$referenced_condition_types = [ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST,
-					ZBX_CONDITION_TYPE_TRIGGER, ZBX_CONDITION_TYPE_TEMPLATE, ZBX_CONDITION_TYPE_PROXY
+					ZBX_CONDITION_TYPE_TRIGGER, ZBX_CONDITION_TYPE_TEMPLATE, ZBX_CONDITION_TYPE_DRULE,
+					ZBX_CONDITION_TYPE_PROXY
 				];
 
 				foreach ($action['filter']['conditions'] as &$condition) {
@@ -824,11 +835,57 @@ class CTestDataHelper {
 		}
 		unset($action);
 
+		self::convertActionReferences($actions);
+
 		$result = CDataHelper::call('action.create', $actions);
 
 		foreach ($actions as $action) {
 			self::$objectids['action'][$action['name']] = array_shift($result['actionids']);
 		}
+	}
+
+	private static function createDrules(array $drules): void {
+		if (!$drules) {
+			return;
+		}
+
+		foreach ($drules as &$drule) {
+			$drule = self::prepareDrule($drule);
+		}
+		unset($drule);
+
+		self::convertDruleReferences($drules);
+
+		$result = CDataHelper::call('drule.create', $drules);
+
+		foreach ($drules as $drule) {
+			self::$objectids['drule'][$drule['name']] = array_shift($result['druleids']);
+		}
+	}
+
+	/**
+	 * @param array $drule
+	 *
+	 * @return array
+	 */
+	public static function prepareDrule(array $drule): array {
+		$drule += [
+			'iprange' => '192.168.1.1-255',
+			'dchecks' => [
+				[
+					'type' => SVC_HTTP,
+					'ports' => '80',
+					'name' => 'HTTP'
+				]
+			]
+		];
+
+		return $drule;
+	}
+
+	public static function convertDruleReferences(array &$drules): void {
+		self::convertPropertyReference($drules, 'druleid');
+		self::convertPropertyReference($drules, 'proxyid');
 	}
 
 	public static function convertActionReferences(array &$actions): void {
@@ -1034,6 +1091,10 @@ class CTestDataHelper {
 
 		if (array_key_exists('host', self::$objectids)) {
 			CDataHelper::call('host.delete', array_values(self::$objectids['host']));
+		}
+
+		if (array_key_exists('drule', self::$objectids)) {
+			CDataHelper::call('drule.delete', array_values(self::$objectids['drule']));
 		}
 
 		if (array_key_exists('proxy', self::$objectids)) {

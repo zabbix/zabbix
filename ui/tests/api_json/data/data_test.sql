@@ -255,6 +255,10 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99004,10084,1,2,1,'127.0.0.1','','161');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004, 2, 1, '{$SNMP_COMMUNITY}');
 
+-- autoregistration action
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '$2a$10$gFL5ORa/Ml0VBDGraHI3tuE1WuiKOX8ef497bAfzNiSXUx4Vrrn.y', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '$2a$10$P8CZ/rs94pLp177hh27KheWKAKa6GXZLFhOE8ymd/QlEKT2FDngZe', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
+
 -- event correlation
 INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
@@ -275,36 +279,6 @@ INSERT INTO correlation (correlationid, name, description, evaltype, status, for
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
 INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
-
--- discovery rules
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99006, 'Api active proxy for discovery', 0, '');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (10,NULL,'API discovery rule for delete 1','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (10,10,4,'','','80','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (11,99006,'API discovery rule for delete with proxy','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (11,11,9,'agent.ping','','10050','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (12,NULL,'API discovery rule for delete 3','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (12,12,15,'','','23','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (13,NULL,'API discovery rule for delete 4','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (13,13,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (14,NULL,'API discovery rule for delete 5','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (14,14,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (15,NULL,'API discovery rule used in action','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (15,15,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (16,15,9,'agent.ping','','10050','',0,'','',0,0,0,'');
-INSERT INTO usrgrp (usrgrpid, name) VALUES (47, 'User group for action delete');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (95, 'API action for Discovery check', 1, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (95, 95, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (95, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (95, 95, 47);
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (95,95,19,0,'16','');
-
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (16,NULL,'API discovery rule used in action 2','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (17,16,0,'','','22','',0,'','',0,0,0,'');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (96, 'API action for Discovery rule', 1, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (96, 96, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (96, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (96, 96, 7);
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (97,96,18,0,'16','');
 
 -- testHostGroup_Delete maintenance constraint
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (62002, 0, 'f40b2a0aa36d404d8971cc6d5232497d', 'maintenance_has_only_group');
