@@ -34,7 +34,7 @@ const notsupported = "ZBX_NOTSUPPORTED"
 
 type passiveCheckRequestData struct {
 	Key     string `json:"key"`
-	Timeout string `json:"timeout"`
+	Timeout any    `json:"timeout"`
 }
 
 type passiveChecksRequest struct {
@@ -92,7 +92,7 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 	} else {
 		var value string
 
-		if timeout, err = scheduler.ParseItemTimeout(request.Data[0].Timeout); err == nil {
+		if timeout, err = scheduler.ParseItemTimeoutAny(request.Data[0].Timeout); err == nil {
 			// direct passive check timeout is handled by the scheduler
 			value, err = pc.scheduler.PerformTask(request.Data[0].Key, time.Second*time.Duration(timeout), agent.PassiveChecksClientID)
 		}

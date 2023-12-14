@@ -47,7 +47,7 @@ void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, int timeout)
 	zbx_json_addobject(j, NULL);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
 	zbx_snprintf(tmp, sizeof(tmp), "%ds", timeout);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_TIMEOUT, tmp, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(j, ZBX_PROTO_TAG_TIMEOUT, (zbx_int64_t)timeout);
 	zbx_json_close(j);
 }
 
