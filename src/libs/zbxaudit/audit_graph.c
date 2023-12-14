@@ -45,7 +45,8 @@ static int	graph_flag_to_resource_type(int flag)
 }
 #define GR_OR_GRP(s) (AUDIT_RESOURCE_GRAPH == resource_type) ? "graph."#s : "graphprototype."#s
 
-void	zbx_audit_graph_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t graphid, const char *name, int flags)
+void	zbx_audit_graph_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t graphid, const char *name,
+		int flags)
 {
 	int			resource_type;
 	zbx_audit_entry_t	local_audit_graph_entry, **found_audit_graph_entry;
@@ -80,10 +81,11 @@ void	zbx_audit_graph_create_entry(int audit_context_mode, int audit_action, zbx_
 	}
 }
 
-void	zbx_audit_graph_update_json_add_data(int audit_context_mode, zbx_uint64_t graphid, const char *name, int width, int height,
-		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period, int show_triggers,
-		int graphtype, int show_legend, int show_3d, double percent_left, double percent_right, int ymin_type,
-		int ymax_type, zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid, int flags, int discover)
+void	zbx_audit_graph_update_json_add_data(int audit_context_mode, zbx_uint64_t graphid, const char *name, int width,
+		int height, double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period,
+		int show_triggers, int graphtype, int show_legend, int show_3d, double percent_left,
+		double percent_right, int ymin_type, int ymax_type, zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid,
+		int flags, int discover)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_width[AUDIT_DETAILS_KEY_LEN], audit_key_height[AUDIT_DETAILS_KEY_LEN],
@@ -161,8 +163,9 @@ void	zbx_audit_graph_update_json_add_data(int audit_context_mode, zbx_uint64_t g
 #undef AUDIT_TABLE_NAME
 }
 
-void	zbx_audit_graph_update_json_add_gitems(int audit_context_mode, zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid, int drawtype,
-		int sortorder, const char *color, int yaxisside, int calc_fnc, int type, zbx_uint64_t itemid)
+void	zbx_audit_graph_update_json_add_gitems(int audit_context_mode, zbx_uint64_t graphid, int flags,
+		zbx_uint64_t gitemid, int drawtype, int sortorder, const char *color, int yaxisside, int calc_fnc,
+		int type, zbx_uint64_t itemid)
 {
 	char	audit_key_[AUDIT_DETAILS_KEY_LEN], audit_key_drawtype[AUDIT_DETAILS_KEY_LEN],
 		audit_key_sortorder[AUDIT_DETAILS_KEY_LEN],
@@ -210,13 +213,13 @@ void	zbx_audit_graph_update_json_add_gitems(int audit_context_mode, zbx_uint64_t
 }
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1, type2)							\
-void	zbx_audit_graph_update_json_update_##resource(int audit_context_mode, zbx_uint64_t graphid, int flags,				\
+void	zbx_audit_graph_update_json_update_##resource(int audit_context_mode, zbx_uint64_t graphid, int flags,	\
 		type1 resource##_old, type1 resource##_new)							\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
 	int	resource_type;											\
 														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);											\
+	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
 	resource_type = graph_flag_to_resource_type(flags);							\
 														\
@@ -247,7 +250,8 @@ PREPARE_AUDIT_GRAPH_UPDATE(templateid, zbx_uint64_t, uint64)
 #undef PREPARE_AUDIT_GRAPH_UPDATE
 #undef GR_OR_GRP
 
-void	zbx_audit_graph_update_json_update_gitem_create_entry(int audit_context_mode, zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid)
+void	zbx_audit_graph_update_json_update_gitem_create_entry(int audit_context_mode, zbx_uint64_t graphid, int flags,
+		zbx_uint64_t gitemid)
 {
 	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -262,13 +266,14 @@ void	zbx_audit_graph_update_json_update_gitem_create_entry(int audit_context_mod
 }
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1, type2)							\
-void	zbx_audit_graph_update_json_update_gitem_update_##resource(int audit_context_mode, zbx_uint64_t graphid, int flags,		\
-		zbx_uint64_t gitemid, type1 resource##_old, type1 resource##_new)				\
+void	zbx_audit_graph_update_json_update_gitem_update_##resource(int audit_context_mode,			\
+		zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid, type1 resource##_old,			\
+		type1 resource##_new)										\
 {														\
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 	int	resource_type;											\
 														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);											\
+	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
 	resource_type = graph_flag_to_resource_type(flags);							\
 														\
@@ -288,7 +293,8 @@ PREPARE_AUDIT_GRAPH_UPDATE(type, int, int)
 #undef PREPARE_AUDIT_GRAPH_UPDATE
 #undef AUDIT_KEY_GITEMS_SNPRINTF
 
-void	zbx_audit_graph_update_json_delete_gitems(int audit_context_mode, zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid)
+void	zbx_audit_graph_update_json_delete_gitems(int audit_context_mode, zbx_uint64_t graphid, int flags,
+		zbx_uint64_t gitemid)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;

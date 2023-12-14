@@ -62,17 +62,21 @@
 int	zbx_get_auditlog_enabled(void);
 int	zbx_get_auditlog_mode(void);
 
-#define RETURN_IF_AUDIT_OFF(context_mode)				\
-	do {								\
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())		\
-	{								\
-		return;							\
-	}								\
-	    								\
-	if (((context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT) == 1) && SUCCEED == zbx_get_auditlog_mode()) \
-		return;							\
-	}								\
-	while (0)							\
+#define RETURN_IF_AUDIT_OFF(context_mode)								\
+	do												\
+	{												\
+		if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())					\
+		{											\
+			return;										\
+		}											\
+													\
+		if (((context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT) == 1) && \
+				SUCCEED == zbx_get_auditlog_mode())					\
+		{											\
+			return;										\
+		}											\
+	}												\
+	while (0)											\
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,

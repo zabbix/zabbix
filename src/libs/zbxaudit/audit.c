@@ -69,8 +69,8 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 	return audit_entry;
 }
 
-zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table, const char *name, int audit_action,
-		int resource_type)
+zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table, const char *name,
+		int audit_action, int resource_type)
 {
 	zbx_audit_entry_t	*audit_entry;
 

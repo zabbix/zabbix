@@ -47,7 +47,8 @@ static int	trigger_flag_to_resource_type(int flag)
 
 #define TR_OR_TRP(s) (AUDIT_RESOURCE_TRIGGER == resource_type) ? "trigger."#s : "triggerprototype."#s
 
-void	zbx_audit_trigger_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t triggerid, const char *name, int flags)
+void	zbx_audit_trigger_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t triggerid,
+		const char *name, int flags)
 {
 	int			resource_type;
 	zbx_audit_entry_t	local_audit_trigger_entry, **found_audit_trigger_entry;
@@ -158,7 +159,8 @@ void	zbx_audit_trigger_update_json_add_data(int audit_context_mode, zbx_uint64_t
 #undef ADD_INT
 }
 
-void	zbx_audit_trigger_update_json_add_expr(int audit_context_mode, zbx_uint64_t triggerid, int flags, const char *expression)
+void	zbx_audit_trigger_update_json_add_expr(int audit_context_mode, zbx_uint64_t triggerid, int flags,
+		const char *expression)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -172,7 +174,8 @@ void	zbx_audit_trigger_update_json_add_expr(int audit_context_mode, zbx_uint64_t
 			"triggers", "expression");
 }
 
-void	zbx_audit_trigger_update_json_add_rexpr(int audit_context_mode, zbx_uint64_t triggerid, int flags, const char *recovery_expression)
+void	zbx_audit_trigger_update_json_add_rexpr(int audit_context_mode, zbx_uint64_t triggerid, int flags,
+		const char *recovery_expression)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -187,13 +190,13 @@ void	zbx_audit_trigger_update_json_add_rexpr(int audit_context_mode, zbx_uint64_
 }
 
 #define PREPARE_AUDIT_TRIGGER_UPDATE(resource, type1, type2)							\
-void	zbx_audit_trigger_update_json_update_##resource(int audit_context_mode, zbx_uint64_t triggerid, int flags,			\
-		type1 resource##_old, type1 resource##_new)							\
+void	zbx_audit_trigger_update_json_update_##resource(int audit_context_mode, zbx_uint64_t triggerid,		\
+		int flags, type1 resource##_old, type1 resource##_new)						\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
 	int	resource_type;											\
 														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);											\
+	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
 	resource_type = trigger_flag_to_resource_type(flags);							\
 														\
@@ -254,8 +257,8 @@ void	zbx_audit_DBselect_delete_for_trigger(int audit_context_mode, const char *s
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-void	zbx_audit_trigger_update_json_add_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid,
-		zbx_uint64_t triggerid_up)
+void	zbx_audit_trigger_update_json_add_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid,
+		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_triggerid_up[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -283,7 +286,8 @@ void	zbx_audit_trigger_update_json_add_dependency(int audit_context_mode, int fl
 			audit_key_triggerid_up, triggerid_up, "trigger_depends", "triggerid_up");
 }
 
-void	zbx_audit_trigger_update_json_remove_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid)
+void	zbx_audit_trigger_update_json_remove_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid,
+		zbx_uint64_t triggerid)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -298,8 +302,8 @@ void	zbx_audit_trigger_update_json_remove_dependency(int audit_context_mode, int
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
-void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
-		const char *tag, const char *value)
+void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, zbx_uint64_t triggerid, int flags,
+		zbx_uint64_t triggertagid, const char *tag, const char *value)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_tag[AUDIT_DETAILS_KEY_LEN],
 		audit_key_value[AUDIT_DETAILS_KEY_LEN];
@@ -340,7 +344,8 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, z
 #undef AUDIT_TABLE_NAME
 }
 
-void	zbx_audit_trigger_update_json_delete_tags(int audit_context_mode, zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid)
+void	zbx_audit_trigger_update_json_delete_tags(int audit_context_mode, zbx_uint64_t triggerid, int flags,
+		zbx_uint64_t triggertagid)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -375,13 +380,13 @@ void	zbx_audit_trigger_update_json_delete_tags(int audit_context_mode, zbx_uint6
 	}
 
 #define PREPARE_AUDIT_TRIGGER_UPDATE_TAG(resource, type1, type2)						\
-void	zbx_audit_trigger_update_json_update_tag_##resource(int audit_context_mode, zbx_uint64_t triggerid, int trigger_flags,		\
-		zbx_uint64_t triggertagid, type1 resource##_old, type1 resource##_new)				\
+void	zbx_audit_trigger_update_json_update_tag_##resource(int audit_context_mode, zbx_uint64_t triggerid,	\
+		int trigger_flags, zbx_uint64_t triggertagid, type1 resource##_old, type1 resource##_new)	\
 {														\
 	int	resource_type;											\
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);											\
+	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 	resource_type = trigger_flag_to_resource_type(trigger_flags);						\
 														\
 	TRIGGER_RESOURCE_KEY_RESOLVE_TAG(resource,.)								\
@@ -395,8 +400,8 @@ PREPARE_AUDIT_TRIGGER_UPDATE_TAG(value, const char*, string)
 
 #undef PREPARE_AUDIT_TRIGGER_UPDATE_TAG
 
-void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(int audit_context_mode, zbx_uint64_t triggerid, int trigger_flags,
-		zbx_uint64_t triggertagid)
+void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(int audit_context_mode, zbx_uint64_t triggerid,
+		int trigger_flags, zbx_uint64_t triggertagid)
 {
 	int	resource_type;
 	char	audit_key_[AUDIT_DETAILS_KEY_LEN];

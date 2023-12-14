@@ -54,11 +54,11 @@ void	zbx_audit_httptest_create_entry(int audit_context_mode, int audit_action, z
 	}
 }
 
-void	zbx_audit_httptest_update_json_add_data(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t templateid, const char *name,
-		const char *delay, unsigned char status, const char *agent, unsigned char authentication,
-		const char *httpuser, const char *httppassword, const char *http_proxy, int retries,
-		const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password, int verify_peer,
-		int verify_host, zbx_uint64_t hostid)
+void	zbx_audit_httptest_update_json_add_data(int audit_context_mode, zbx_uint64_t httptestid,
+		zbx_uint64_t templateid, const char *name, const char *delay, unsigned char status, const char *agent,
+		unsigned char authentication, const char *httpuser, const char *httppassword, const char *http_proxy,
+		int retries, const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password,
+		int verify_peer, int verify_host, zbx_uint64_t hostid)
 {
 	char	audit_key_templateid[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_delay[AUDIT_DETAILS_KEY_LEN], audit_key_status[AUDIT_DETAILS_KEY_LEN],
@@ -120,12 +120,12 @@ void	zbx_audit_httptest_update_json_add_data(int audit_context_mode, zbx_uint64_
 }
 
 #define PREPARE_AUDIT_HTTPTEST_UPDATE(resource, type1, type2)							\
-  void	zbx_audit_httptest_update_json_update_##resource(int audit_context_mode, zbx_uint64_t httptestid, type1 resource##_old, \
-		type1 resource##_new)										\
+void	zbx_audit_httptest_update_json_update_##resource(int audit_context_mode, zbx_uint64_t httptestid,	\
+		type1 resource##_old, type1 resource##_new)							\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
 														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);											\
+	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
 	zbx_snprintf(buf, sizeof(buf), "httptest."#resource);							\
 														\
@@ -175,8 +175,8 @@ int	zbx_audit_DBselect_delete_for_httptest(int audit_context_mode, const char *s
 	return SUCCEED;
 }
 
-void	zbx_audit_httptest_update_json_add_httptest_tag(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t tagid, const char *tag,
-		const char *value)
+void	zbx_audit_httptest_update_json_add_httptest_tag(int audit_context_mode, zbx_uint64_t httptestid,
+		zbx_uint64_t tagid, const char *tag, const char *value)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_tag[AUDIT_DETAILS_KEY_LEN],
 		audit_key_value[AUDIT_DETAILS_KEY_LEN];
@@ -207,9 +207,10 @@ void	zbx_audit_httptest_update_json_delete_tags(int audit_context_mode, zbx_uint
 	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
 
-void	zbx_audit_httptest_update_json_add_httptest_httpstep(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
-		const char *name, int no, const char *url, const char *timeout, const char *posts, const char *required,
-		const char *status_codes, int follow_redirects, int retrieve_mode, int post_type)
+void	zbx_audit_httptest_update_json_add_httptest_httpstep(int audit_context_mode, zbx_uint64_t httptestid,
+		zbx_uint64_t httpstepid, const char *name, int no, const char *url, const char *timeout,
+		const char *posts, const char *required, const char *status_codes, int follow_redirects,
+		int retrieve_mode, int post_type)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_no[AUDIT_DETAILS_KEY_LEN], audit_key_url[AUDIT_DETAILS_KEY_LEN],
@@ -263,12 +264,12 @@ void	zbx_audit_httptest_update_json_add_httptest_httpstep(int audit_context_mode
 }
 
 #define PREPARE_AUDIT_HTTPSTEP_UPDATE(resource, type1, type2)							\
-  void	zbx_audit_httptest_update_json_httpstep_update_##resource(int audit_context_mode, zbx_uint64_t httptestid, \
-		zbx_uint64_t httpstepid, type1 resource##_old, type1 resource##_new)				\
+void	zbx_audit_httptest_update_json_httpstep_update_##resource(int audit_context_mode,			\
+		zbx_uint64_t httptestid, zbx_uint64_t httpstepid, type1 resource##_old, type1 resource##_new)	\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
 														\
-	RETURN_IF_AUDIT_OFF(audit_context_mode);											\
+	RETURN_IF_AUDIT_OFF(audit_context_mode);								\
 														\
 	zbx_snprintf(buf, sizeof(buf), "httptest.steps[" ZBX_FS_UI64 "]."#resource, httpstepid);		\
 														\
@@ -313,8 +314,8 @@ static const char *field_type_to_name(int type)
 	}
 }
 
-void	zbx_audit_httptest_update_json_add_httptest_field(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t httptestfieldid,
-		int type, const char *name, const char *value)
+void	zbx_audit_httptest_update_json_add_httptest_field(int audit_context_mode, zbx_uint64_t httptestid,
+		zbx_uint64_t httptestfieldid, int type, const char *name, const char *value)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN],
 		audit_key_name[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
@@ -337,7 +338,8 @@ void	zbx_audit_httptest_update_json_add_httptest_field(int audit_context_mode, z
 #undef AUDIT_TABLE_NAME
 }
 
-void	zbx_audit_httptest_update_json_delete_httptest_field(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t fieldid, int type)
+void	zbx_audit_httptest_update_json_delete_httptest_field(int audit_context_mode, zbx_uint64_t httptestid,
+		zbx_uint64_t fieldid, int type)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN];
 
@@ -349,8 +351,8 @@ void	zbx_audit_httptest_update_json_delete_httptest_field(int audit_context_mode
 	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
-void	zbx_audit_httptest_update_json_add_httpstep_field(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
-		zbx_uint64_t httpstepfieldid, int type, const char *name, const char *value)
+void	zbx_audit_httptest_update_json_add_httpstep_field(int audit_context_mode, zbx_uint64_t httptestid,
+		zbx_uint64_t httpstepid, zbx_uint64_t httpstepfieldid, int type, const char *name, const char *value)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN],
 		audit_key_name[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
@@ -374,8 +376,8 @@ void	zbx_audit_httptest_update_json_add_httpstep_field(int audit_context_mode, z
 #undef AUDIT_TABLE_NAME
 }
 
-void	zbx_audit_httptest_update_json_delete_httpstep_field(int audit_context_mode, zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
-		zbx_uint64_t fieldid, int type)
+void	zbx_audit_httptest_update_json_delete_httpstep_field(int audit_context_mode, zbx_uint64_t httptestid,
+		zbx_uint64_t httpstepid, zbx_uint64_t fieldid, int type)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN];
 
