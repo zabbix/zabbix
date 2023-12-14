@@ -74,7 +74,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			get_process_type_string(process_type), (sec = zbx_time() - sec),
 			dbconfig_args_in->config_confsyncer_frequency);
 
-	zbx_rtc_notify_config_sync(dbconfig_args_in->config_timeout, &rtc);
+	zbx_rtc_notify_finished_sync(dbconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY,
+			get_process_type_string(process_type), &rtc);
 
 	nextcheck = (int)time(NULL) + dbconfig_args_in->config_confsyncer_frequency;
 

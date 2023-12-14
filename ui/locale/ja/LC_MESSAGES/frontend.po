@@ -9221,6 +9221,10 @@ msgstr "ホストインベントリの概要"
 msgid "Host label type"
 msgstr "ホストのラベルタイプ"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14721,6 +14725,10 @@ msgstr "Or"
 msgid "Order"
 msgstr "表示順序"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "順序用列"
@@ -19936,6 +19944,10 @@ msgstr "テンプレート\"%1$s\"のトリガーはテンプレート\"%2$s\"�
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "トリガーラベルタイプ"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"

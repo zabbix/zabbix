@@ -1,1 +1,0 @@
-.......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware hv maintenance status (MVekslers)

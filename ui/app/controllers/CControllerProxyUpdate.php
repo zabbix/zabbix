@@ -62,7 +62,7 @@ class CControllerProxyUpdate extends CController {
 				case PROXY_OPERATING_MODE_ACTIVE:
 					if (!$this->hasInput('tls_accept_none') && !$this->hasInput('tls_accept_psk')
 							&& !$this->hasInput('tls_accept_certificate')) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'),
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'),
 							_('cannot be empty')
 						));
 
@@ -73,13 +73,13 @@ class CControllerProxyUpdate extends CController {
 
 				case PROXY_OPERATING_MODE_PASSIVE:
 					if ($this->getInput('address', '') === '') {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty')));
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty')));
 
 						$ret = false;
 					}
 
 					if ($this->getInput('port', '') === '') {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
 
 						$ret = false;
 					}
@@ -92,13 +92,13 @@ class CControllerProxyUpdate extends CController {
 						|| ($this->getInput('operating_mode') == PROXY_OPERATING_MODE_PASSIVE
 							&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK)) {
 					if ($this->getInput('tls_psk_identity', '') === '') {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
 
 						$ret = false;
 					}
 
 					if ($this->getInput('tls_psk', '') === '') {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('PSK'), _('cannot be empty')));
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK'), _('cannot be empty')));
 
 						$ret = false;
 					}
@@ -123,7 +123,7 @@ class CControllerProxyUpdate extends CController {
 				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
 				foreach ($validator->getAllErrors() as $error) {
-					error($error);
+					info($error);
 				}
 
 				$ret = !$validator->isErrorFatal() && !$validator->isError();
