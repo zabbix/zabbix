@@ -139,8 +139,11 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 
 	if (SUCCEED == ret)
 	{
-		if (FAIL == (ret = zbx_agent_handle_response(&s, received_len, item->interface.addr, result, version)))
+		if (FAIL == (ret = zbx_agent_handle_response(s.buffer, s.read_bytes, received_len,
+				item->interface.addr, result, version)))
+		{
 			retry = 1;
+		}
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));

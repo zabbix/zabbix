@@ -225,9 +225,10 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
 					&agent_context->tcp_recv_context, agent_context->item.flags, &event_new)))
 			{
-				if (FAIL == (agent_context->item.ret = zbx_agent_handle_response(&agent_context->s,
-						received_len, agent_context->item.interface.addr,
-						&agent_context->item.result, &agent_context->item.version)))
+				if (FAIL == (agent_context->item.ret = zbx_agent_handle_response(
+						agent_context->s.buffer, agent_context->s.read_bytes, received_len,
+						agent_context->item.interface.addr, &agent_context->item.result,
+						&agent_context->item.version)))
 				{
 					/* retry with other protocol */
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;

@@ -20,13 +20,12 @@
 #ifndef ZABBIX_AGENT_GET_H
 #define ZABBIX_AGENT_GET_H
 
-#include "zbxcomms.h"
 #include "zbxjson.h"
 #include "module.h"
 
 int	zbx_get_agent_protocol_version_int(const char *version_str);
 void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, int timeout);
-int	zbx_agent_handle_response(const zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
-		int *version);
+int	zbx_agent_handle_response(char *buffer, size_t read_bytes, ssize_t received_len, const char *addr,
+		AGENT_RESULT *result, int *version);
 
 #endif

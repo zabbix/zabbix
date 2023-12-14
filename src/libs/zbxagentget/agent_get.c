@@ -51,10 +51,10 @@ void	zbx_agent_prepare_request(struct zbx_json *j, const char *key, int timeout)
 	zbx_json_close(j);
 }
 
-int	zbx_agent_handle_response(const zbx_socket_t *s, ssize_t received_len, const char *addr, AGENT_RESULT *result,
-		int *version)
+int	zbx_agent_handle_response(char *buffer, size_t read_bytes, ssize_t received_len, const char *addr,
+		AGENT_RESULT *result, int *version)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", buffer);
 
 	if (0 == received_len)
 	{
@@ -71,7 +71,7 @@ int	zbx_agent_handle_response(const zbx_socket_t *s, ssize_t received_len, const
 		size_t			value_alloc = 0;
 		char			*value = NULL, tmp[MAX_STRING_LEN];
 
-		if (FAIL == zbx_json_open(s->buffer, &jp))
+		if (FAIL == zbx_json_open(buffer, &jp))
 		{
 			*version = 0;
 			return FAIL;
@@ -135,25 +135,25 @@ int	zbx_agent_handle_response(const zbx_socket_t *s, ssize_t received_len, const
 		return SUCCEED;
 	}
 
-	if (0 == strcmp(s->buffer, ZBX_NOTSUPPORTED))
+	if (0 == strcmp(buffer, ZBX_NOTSUPPORTED))
 	{
 		/* 'ZBX_NOTSUPPORTED\0<error message>' */
-		if (sizeof(ZBX_NOTSUPPORTED) < s->read_bytes)
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s->buffer + sizeof(ZBX_NOTSUPPORTED)));
+		if (sizeof(ZBX_NOTSUPPORTED) < read_bytes)
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", buffer + sizeof(ZBX_NOTSUPPORTED)));
 		else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
 
 		return NOTSUPPORTED;
 	}
-	else if (0 == strcmp(s->buffer, ZBX_ERROR))
+	else if (0 == strcmp(buffer, ZBX_ERROR))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
 		return AGENT_ERROR;
 	}
 	else
 	{
-		zbx_replace_invalid_utf8(s->buffer);
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, s->buffer));
+		zbx_replace_invalid_utf8(buffer);
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 		return SUCCEED;
 	}
 }

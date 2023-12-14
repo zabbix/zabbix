@@ -312,8 +312,8 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 			zbx_init_agent_result(&result)
 
-			if (FAIL == (ret = zbx_agent_handle_response(&s, received_len, host, &result,
-					version)))
+			if (FAIL == (ret = zbx_agent_handle_response(s.buffer, s.read_bytes, received_len, host,
+					&result, version)))
 			{
 				retry = 1;
 			}
