@@ -239,6 +239,11 @@ func ParseItemTimeoutAny(timeoutIn any) (timeout int, err error) {
 	default:
 		err = fmt.Errorf("unexpected timeout %q of type %T", timeoutIn, timeoutIn)
 	}
+	if err == nil {
+		if timeout > 600 || timeout < 1 {
+			err = fmt.Errorf("Unsupported timeout value.")
+		}
+	}
 
 	return timeout, err
 }
