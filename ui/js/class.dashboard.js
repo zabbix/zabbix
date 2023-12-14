@@ -942,9 +942,7 @@ class CDashboard {
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
-				const data = this._dashboard_pages.get(dashboard_page);
-
-				this.#updateReadyState(data.is_ready);
+				this.#updateReadyState();
 
 				if (!this._is_edit_mode) {
 					this._keepSteadyConfigurationChecker();
@@ -1101,13 +1099,13 @@ class CDashboard {
 	 * Update readiness state of the dashboard.
 	 *
 	 * Readiness state is updated on switching dashboard pages and as soon as the selected page gets fully loaded.
-	 *
-	 * @param {boolean} is_ready
 	 */
-	#updateReadyState(is_ready) {
-		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, is_ready);
+	#updateReadyState() {
+		const data = this._dashboard_pages.get(this._selected_dashboard_page);
 
-		if (is_ready) {
+		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, data.is_ready);
+
+		if (data.is_ready) {
 			this.fire(CDashboard.EVENT_READY);
 		}
 	}
@@ -2073,9 +2071,7 @@ class CDashboard {
 
 				data.is_ready = true;
 
-				if (e.detail.target === this._selected_dashboard_page) {
-					this.#updateReadyState(true);
-				}
+				this.#updateReadyState();
 			},
 
 			dashboardPageRequireDataSource: (e) => {

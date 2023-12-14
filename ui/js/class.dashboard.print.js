@@ -56,7 +56,7 @@ class CDashboardPrint extends CDashboard {
 			unique_id: this._createUniqueId()
 		});
 
-		this._dashboard_pages.set(dashboard_page, {});
+		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
 			dashboard_page.addWidgetFromData({
@@ -74,5 +74,23 @@ class CDashboardPrint extends CDashboard {
 
 		dashboard_page.start();
 		dashboard_page.activate();
+	}
+
+	#updateReadyState() {
+		let is_ready = true;
+
+		for (const data of this._dashboard_pages.values()) {
+			if (!data.is_ready) {
+				is_ready = false;
+
+				break;
+			}
+		}
+
+		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, is_ready);
+
+		if (is_ready) {
+			this.fire(CDashboard.EVENT_READY);
+		}
 	}
 }
