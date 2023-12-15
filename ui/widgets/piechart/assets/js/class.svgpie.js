@@ -433,23 +433,21 @@ class CSVGPie {
 			.then(() => {
 				const sectors = this.#arcs_container.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_CONTAINER}`).nodes();
 
-				if (sectors.length > 1) {
-					for (const sector of sectors) {
-						this.#sector_observer.observe(sector, {
-							attributeFilter: ['data-expanded'],
-							attributeOldValue: true
-						});
+				for (const sector of sectors) {
+					this.#sector_observer.observe(sector, {
+						attributeFilter: ['data-expanded'],
+						attributeOldValue: true
+					});
 
-						// If mouse was on any sector before/during animation, then pop that sector out again.
-						if (sector.matches(':hover')) {
-							this.#popOut(sector);
-						}
-
-						d3.select(sector).on('mouseleave', () => this.#onMouseLeave(sector));
+					// If mouse was on any sector before/during animation, then pop that sector out again.
+					if (sector.matches(':hover')) {
+						this.#popOut(sector);
 					}
 
-					this.#svg.on('mousemove', (e) => this.#onMouseMove(e));
+					d3.select(sector).on('mouseleave', () => this.#onMouseLeave(sector));
 				}
+
+				this.#svg.on('mousemove', (e) => this.#onMouseMove(e));
 			})
 			.catch(() => {});
 
@@ -796,30 +794,19 @@ class CSVGPie {
 	 */
 	#popOut(sector) {
 		const sector_d3 = d3.select(sector);
-
-		const centroid = this.#arcGenerator.centroid(sector_d3.datum());
-
-		const x = centroid[0];
-		const y = centroid[1];
-
-		const hypotenuse = Math.sqrt(x * x + y * y);
-
-		const offset = 60;
-
-		const x_position = x / hypotenuse * offset;
-		const y_position = y / hypotenuse * offset;
+		const offset = 0.06;
 
 		sector_d3
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
-			.attr('transform', `translate(${x_position}, ${y_position})`);
+			.attr('transform', `scale(${1 + offset})`);
 
 		// Translate placeholder back in its original position to simulate not popping it.
 		sector_d3
 			.select(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
-			.attr('transform', `translate(${-x_position}, ${-y_position})`);
+			.attr('transform', `scale(${1 - offset})`);
 
 		this.#popped_out_sector = sector;
 	}
@@ -836,14 +823,14 @@ class CSVGPie {
 			sector_d3
 				.transition()
 				.duration(CSVGPie.ANIMATE_DURATION_POP_IN)
-				.attr('transform', 'translate(0, 0)');
+				.attr('transform', 'scale(1)');
 
 			// Translate placeholder back in its original position to simulate not popping it.
 			sector_d3
 				.select(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
 				.transition()
 				.duration(CSVGPie.ANIMATE_DURATION_POP_IN)
-				.attr('transform', 'translate(0, 0)');
+				.attr('transform', 'scale(1)');
 		}
 
 		this.#popped_out_sector = null;
