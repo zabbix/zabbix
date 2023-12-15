@@ -201,11 +201,11 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 
 		for (int j = 0; j < group->proxies.values_num; j++)
 		{
-			if (ZBX_PG_PROXY_STATUS_ONLINE == group->proxies.values[i]->status)
+			if (ZBX_PG_PROXY_STATUS_ONLINE == group->proxies.values[j]->status)
 			{
 				online++;
 
-				if (now - group->proxies.values[i]->lastaccess + PGM_STATUS_CHECK_INTERVAL <
+				if (now - group->proxies.values[j]->lastaccess + PGM_STATUS_CHECK_INTERVAL <
 						group->failover_delay)
 				{
 					healthy++;
@@ -225,7 +225,9 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 					status = ZBX_PG_GROUP_STATUS_DECAY;
 				break;
 			case ZBX_PG_GROUP_STATUS_OFFLINE:
-				if (group->min_online <= online)
+				if (0 < online && group->proxies.values_num == online)
+					status = ZBX_PG_GROUP_STATUS_ONLINE;
+				else if (group->min_online <= online)
 					status = ZBX_PG_GROUP_STATUS_RECOVERY;
 				break;
 			case ZBX_PG_GROUP_STATUS_RECOVERY:
@@ -236,7 +238,7 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 				else if (now - group->status_time > group->failover_delay ||
 						group->proxies.values_num == online)
 				{
-					status = ZBX_PG_GROUP_STATUS_RECOVERY;
+					status = ZBX_PG_GROUP_STATUS_ONLINE;
 				}
 				break;
 			case ZBX_PG_GROUP_STATUS_DECAY:

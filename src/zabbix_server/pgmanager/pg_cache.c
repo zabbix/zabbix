@@ -336,6 +336,8 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 
 	int	min_hosts = INT32_MAX, max_hosts = 0, online_num = 0, hosts_num = 0;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", group->name, __func__, cache->group_updates.values_num);
+
 	/* find min/max host number of online proxies and remove hosts from offline proxies */
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
@@ -379,6 +381,8 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 		group->flags |= ZBX_PG_GROUP_UPDATE_HP_MAP;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
 #undef PG_HOSTS_GAP_LIMIT
 }
 
@@ -421,7 +425,19 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 		}
 	}
 
-	zbx_vector_pg_group_ptr_clear(&cache->group_updates);
+	for (int i = 0; i < cache->group_updates.values_num;)
+	{
+		zbx_pg_group_t	*group = cache->group_updates.values[i];
+
+		if (ZBX_PG_GROUP_STATUS_RECOVERY == group->status)
+		{
+			/* recovery status change is also affected by time, not only proxy status changes - */
+			/* leave it in updates to periodically check until it changes status                */
+			i++;
+		}
+		else
+			zbx_vector_pg_group_ptr_remove_noorder(&cache->group_updates, i);
+	}
 
 	if (0 != cache->hostmap_updates.num_data)
 		cache->hostmap_revision++;
@@ -564,10 +580,8 @@ void	pg_cache_update_groups(zbx_pg_cache_t *cache)
 
 		group->flags = ZBX_PG_GROUP_FLAGS_NONE;
 
-		if (old_revision >= group->revision)
-			continue;
-
-		pg_cache_queue_group_update(cache, group);
+		if (old_revision < group->revision)
+			pg_cache_queue_group_update(cache, group);
 	}
 }
 
