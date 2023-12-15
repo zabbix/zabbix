@@ -122,14 +122,14 @@ class CControllerPopupMaintenancePeriod extends CController {
 		$this->getInputs($data, array_keys($rules));
 
 		if ($data['period'] < 300) {
-			error(_('Incorrect maintenance period (minimum 5 minutes)'));
+			info(_('Incorrect maintenance period (minimum 5 minutes)'));
 
 			return false;
 		}
 
 		$validator = new CNewValidator($data, $rules);
 		$errors = $validator->getAllErrors();
-		array_map('error', $errors);
+		array_map('info', $errors);
 
 		return !$errors;
 	}
