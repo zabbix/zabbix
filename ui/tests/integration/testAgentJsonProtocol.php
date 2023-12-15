@@ -486,9 +486,11 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test Zabbix Get functionality
+	 *
 	 * @required-components agent, agent_old, agent2
 	 */
-	public function testAgentJsonProtocol_get() {
+	public function testAgentJsonProtocol_zabbixGet() {
 		$ports = [
 			$this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort'),
 			$this->getConfigurationValue(self::COMPONENT_AGENT_OLD, 'ListenPort'),
