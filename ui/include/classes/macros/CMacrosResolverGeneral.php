@@ -745,8 +745,9 @@ class CMacrosResolverGeneral {
 						$param = strtr($hist_function_parser->getParam($i), $macros);
 
 						if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
-							$param = CExpressionParser::quoteString($param, true,
-								$parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
+							$force = $parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED;
+							$param = CHistFunctionParser::quoteParam($param, $force,
+								['usermacros' => true, 'lldmacros' => true]
 							);
 						}
 

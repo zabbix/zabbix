@@ -101,7 +101,6 @@ class CHistFunctionParser extends CParser {
 		$this->unquoted_param_parsers[] = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true,
 			'with_year' => true
 		]);
-
 		if ($this->options['usermacros']) {
 			array_push($this->unquoted_param_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
@@ -372,7 +371,7 @@ class CHistFunctionParser extends CParser {
 	/*
 	 * Unquotes special symbols in the parameter.
 	 *
-	 * @param string  $param
+	 * @param string $param
 	 *
 	 * @return string
 	 */
@@ -381,11 +380,33 @@ class CHistFunctionParser extends CParser {
 	}
 
 	/*
-	 * @param string  $param
+	 * @param string $param
+	 * @param bool   $force
+	 * @param array  $options
 	 *
 	 * @return string
 	 */
-	public static function quoteParam(string $param): string {
+	public static function quoteParam(string $param, bool $force = false, array $options = []): string {
+		if (!$force) {
+			$options += ['usermacros' => false, 'lldmacros' => false];
+
+			$unquoted_param_parsers = [new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true,
+				'with_year' => true
+			])];
+			if ($options['usermacros']) {
+				array_push($unquoted_param_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
+			}
+			if ($options['lldmacros']) {
+				array_push($unquoted_param_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
+			}
+
+			foreach ($unquoted_param_parsers as $parser) {
+				if ($parser->parse($param) == CParser::PARSE_SUCCESS) {
+					return $param;
+				}
+			}
+		}
+
 		return '"'.strtr($param, ['\\' => '\\\\', '"' => '\\"']).'"';
 	}
 
