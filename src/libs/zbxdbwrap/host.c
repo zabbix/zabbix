@@ -5676,7 +5676,7 @@ void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *hostgroupi
 	size_t		sql_alloc = 0, sql_offset = 0;
 	char		*sql = NULL;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from hosts_groups"
 			" where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostgroupid", hostgroupids->values,
