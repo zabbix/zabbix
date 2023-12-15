@@ -97,6 +97,13 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 				vertical-align: middle;
 				// Remove global defined margin-top for buttons.
 				margin-top: 0;
+
+				&.btn-time-left,
+				&.btn-time-right {
+					&:disabled {
+						opacity: .25;
+					}
+				}
 			}
 		}
 	}

@@ -102,6 +102,10 @@ static ub4	OCI_DBserver_status(void);
 #define ORA_ERR_UNIQ_CONSTRAINT	-1
 
 #elif defined(HAVE_POSTGRESQL)
+#define ZBX_PG_READ_ONLY	"25006"
+#define ZBX_PG_UNIQUE_VIOLATION	"23505"
+#define ZBX_PG_DEADLOCK		"40P01"
+
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
 int			ZBX_TSDB_VERSION = -1;
@@ -157,7 +161,12 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, last_db_strerror);
 			break;
 		case ERR_Z3008:
-			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno, last_db_strerror);
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno,
+					last_db_strerror);
+			break;
+		case ERR_Z3009:
+			s = zbx_dsprintf(NULL, "query failed due to read-only transaction: [%d] %s", db_errno,
+					last_db_strerror);
 			break;
 		default:
 			s = zbx_strdup(NULL, "unknown error");
@@ -354,7 +363,10 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (CONNECTION_OK != PQstatus(pg_conn))
 		return SUCCEED;
 
-	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
+		return SUCCEED;
+
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 		return SUCCEED;
 
 	return FAIL;
@@ -881,6 +893,12 @@ out:
 	sqlite3_busy_timeout(conn, SEC_PER_MIN * 1000);
 
 	if (0 < (ret = zbx_db_execute("pragma synchronous=0")))
+		ret = ZBX_DB_OK;
+
+	if (ZBX_DB_OK != ret)
+		goto out;
+
+	if (0 < (ret = zbx_db_execute("pragma foreign_keys=on")))
 		ret = ZBX_DB_OK;
 
 	if (ZBX_DB_OK != ret)
@@ -1539,8 +1557,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 		zbx_postgresql_error(&error, result);
 
-		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), "23505"))
+		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), ZBX_PG_UNIQUE_VIOLATION))
 			errcode = ERR_Z3008;
+		else if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
 		else
 			errcode = ERR_Z3005;
 

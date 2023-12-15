@@ -26,9 +26,10 @@
 #include "comms.h"
 #include "log.h"
 
-#if !defined(HAVE_SSH_OPTIONS_KEY_EXCHANGE) && !defined(HAVE_SSH_OPTIONS_HOSTKEYS) && \
+#if (!defined(HAVE_SSH_OPTIONS_KEY_EXCHANGE) && !defined(HAVE_SSH_OPTIONS_HOSTKEYS) && \
 		!defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && !defined(HAVE_SSH_OPTIONS_CIPHERS_S_C) && \
-		!defined(HAVE_SSH_OPTIONS_HMAC_C_S) && !defined(HAVE_SSH_OPTIONS_HMAC_S_C)
+		!defined(HAVE_SSH_OPTIONS_HMAC_C_S) && !defined(HAVE_SSH_OPTIONS_HMAC_S_C)) || \
+		!defined(SSH_OPTIONS_PROCESS_CONFIG)
 #define HAVE_NO_SSH_OPTIONS	1
 #endif
 
@@ -57,7 +58,6 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 
 	return ret;
 }
-#endif
 
 static int	ssh_parse_options(ssh_session session, const char *options, char **err_msg)
 {
@@ -75,12 +75,6 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 			*eq_str++ = '\0';
 
 		eq_str = ZBX_NULL2EMPTY_STR(eq_str);
-
-#ifdef HAVE_NO_SSH_OPTIONS
-		ZBX_UNUSED(session);
-		ZBX_UNUSED(eq_str);
-#endif
-
 #ifdef HAVE_SSH_OPTIONS_KEY_EXCHANGE
 		if (0 == strncmp(line, KEY_EXCHANGE_STR, ZBX_CONST_STRLEN(KEY_EXCHANGE_STR)))
 		{
@@ -144,7 +138,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 
 	return ret;
 }
-#undef HAVE_NO_SSH_OPTIONS
+#endif
 
 /* example ssh.run["ls /"] */
 int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
@@ -153,7 +147,10 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 	ssh_channel	channel;
 	ssh_key 	privkey = NULL, pubkey = NULL;
 	int		rc, userauth, ret = NOTSUPPORTED;
-	char		*output, *publickey = NULL, *privatekey = NULL, *buffer = NULL, *err_msg = NULL;
+	char		*output, *publickey = NULL, *privatekey = NULL, *buffer = NULL;
+#ifndef HAVE_NO_SSH_OPTIONS
+	char		*err_msg = NULL;
+#endif
 	char		tmp_buf[DATA_BUFFER_SIZE], userauthlist[64];
 	size_t		offset = 0, buf_size = DATA_BUFFER_SIZE;
 
@@ -181,6 +178,9 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 		goto session_free;
 	}
 
+#ifdef HAVE_NO_SSH_OPTIONS
+	ZBX_UNUSED(options);
+#else
 	if (0 < strlen(options))
 	{
 		int	proc_config = 0;
@@ -198,6 +198,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 			goto session_free;
 		}
 	}
+#endif
 
 	if (SSH_OK != ssh_connect(session))
 	{
@@ -441,3 +442,4 @@ close:
 
 	return ret;
 }
+#undef HAVE_NO_SSH_OPTIONS

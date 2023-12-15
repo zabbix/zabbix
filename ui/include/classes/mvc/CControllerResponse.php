@@ -36,6 +36,15 @@ abstract class CControllerResponse {
 				redirect($this->getLocation());
 			}
 
+			/*
+			 * Having CMessageHelper::restoreScheduleMessages() here will provide only the current controller messages.
+			 * Alternatively when multiple redirects occur, moving CMessageHelper::restoreScheduleMessages() outside
+			 * this block could show error messages from parent controller. Because the last page (controller) user is
+			 * redirected to is not CControllerResponseRedirect, but fatal error controller (CControllerResponseFatal).
+			 * But if code is moved outside the block, it then requires previously generated messages like so:
+			 * CMessageHelper::restoreScheduleMessages(['messages' => ['messages' => CMessageHelper::getMessages()]])
+			 * because otherwise there would be duplicate messages.
+			 */
 			CMessageHelper::restoreScheduleMessages();
 		}
 

@@ -1012,6 +1012,7 @@ zbx_task_t;
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+#define ZBX_RTC_SERVICE_SYNC_NOTIFY		9998
 
 #define ZBX_IPC_RTC_MAX				9999
 
@@ -1355,6 +1356,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+const char	*get_bom_econding(char *in, size_t in_size);
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
@@ -1839,7 +1841,8 @@ typedef enum
 	ERR_Z3005,
 	ERR_Z3006,
 	ERR_Z3007,
-	ERR_Z3008
+	ERR_Z3008,
+	ERR_Z3009
 }
 zbx_err_codes_t;
 

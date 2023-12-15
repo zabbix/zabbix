@@ -155,6 +155,7 @@ $form_list = (new CFormList())
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));
 
 $form = (new CForm())
+	->setId('trigdisplay-form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.update')

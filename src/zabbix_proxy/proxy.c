@@ -1319,7 +1319,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
+				if (FAIL == zbx_rtc_wait_for_sync_finish(&rtc))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:

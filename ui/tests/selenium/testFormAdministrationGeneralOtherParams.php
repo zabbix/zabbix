@@ -166,11 +166,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	 */
 	public function getCheckFormData() {
 		return [
-			// Minimal valid values. In period fields minimal valid time in seconds with 's'.
+			// #0 Minimal valid values. In period fields minimal valid time in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Frontend URL' => 'a',
 						'Group for discovered hosts' => 'Hypervisors',
 						'Default host inventory mode' => 'Manual',
@@ -212,11 +211,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Minimal valid values. In period fields minimal valid time in seconds without 's'.
+			// #1 Minimal valid values. In period fields minimal valid time in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Frontend URL' => 'zabbix.php',
 						'Default host inventory mode' => 'Automatic',
 						'Log unmatched SNMP traps' => true,
@@ -254,11 +252,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal valid time in minutes.
+			// #2 In period fields minimal valid time in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '1m',
 						// Communication with Zabbix server.
@@ -278,11 +275,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal valid time in hours.
+			// #3 In period fields minimal valid time in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '1h'
 					],
@@ -292,11 +288,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal valid values in seconds with "s".
+			// #4 Maximal valid values in seconds with "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login attempts' => 32,
 						'Login blocking interval' => '3600s',
@@ -344,11 +339,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields maximal valid values in seconds without "s".
+			// #5 In period fields maximal valid values in seconds without "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '3600',
 						// Communication with Zabbix server.
@@ -370,11 +364,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields maximal valid values in minutes.
+			// #6 In period fields maximal valid values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '60m',
 						// Communication with Zabbix server.
@@ -394,11 +387,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Symbol trimming in Login attempts.
+			// #7 Symbol trimming in Login attempts.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Login attempts' => '3M'
 					],
 					'db' => [
@@ -406,11 +398,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid empty values.
+			// #8 Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Group for discovered hosts' => '',
 						'User group for database down message' => '',
 						// Authorization.
@@ -437,11 +429,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid string values.
+			// #9 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login attempts' => 'text',
 						'Login blocking interval' => 'text',
@@ -463,11 +455,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid special symbol values.
+			// #10 Invalid special symbol values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login attempts' => '!@#$%^&*()_+',
 						'Login blocking interval' => '!@#$%^&*()_+',
@@ -489,11 +481,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid zero values.
+			// #11 Invalid zero values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login attempts' => 0,
 						'Login blocking interval' => 0,
@@ -515,11 +507,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid zero values in seconds with "s".
+			// #12 Invalid zero values in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '0s',
 						// Communication with Zabbix server.
@@ -539,11 +531,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal invalid time in seconds without "s".
+			// #13 In period fields minimal invalid time in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '29'
 					],
@@ -552,11 +544,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields minimal invalid time in seconds with "s".
+			// #14 In period fields minimal invalid time in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '29s'
 					],
@@ -565,11 +557,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// In period fields maximal invalid time in seconds without "s".
+			// #15 In period fields maximal invalid time in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login attempts' => 33,
 						'Login blocking interval' => '3601',
@@ -591,11 +583,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in seconds with "s".
+			// #16 Maximal invalid time in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '3601s',
 						// Communication with Zabbix server.
@@ -615,11 +607,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in minutes.
+			// #17 Maximal invalid time in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '61m',
 						// Communication with Zabbix server.
@@ -639,11 +631,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in hours.
+			// #18 Maximal invalid time in hours.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '2h',
 						// Communication with Zabbix server.
@@ -663,11 +655,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in weeks.
+			// #19 Maximal invalid time in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '1w',
 						// Communication with Zabbix server.
@@ -687,11 +679,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in Months (Months not supported).
+			// #20 Maximal invalid time in Months (Months not supported).
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '1M',
 						// Communication with Zabbix server.
@@ -711,11 +703,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid time in years (years not supported).
+			// #21 Maximal invalid time in years (years not supported).
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '1y',
 						// Communication with Zabbix server.
@@ -735,11 +727,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Maximal invalid values.
+			// #22 Maximal invalid values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login attempts' => '99',
 						'Login blocking interval' => '99999999999999999999999999999999',
@@ -761,11 +753,11 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Negative values.
+			// #23 Negative values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Authorization.
 						'Login attempts' => '-1',
 						'Login blocking interval' => '-1',
@@ -783,6 +775,46 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Incorrect value for field "media_type_test_timeout": a time unit is expected.',
 						'Incorrect value for field "script_timeout": a time unit is expected.',
 						'Incorrect value for field "item_test_timeout": a time unit is expected.'
+					]
+				]
+			],
+			// #24 Trimming spaces.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Frontend URL' => '    zabbix.php    ',
+						// Authorization.
+						'Login attempts' => ' 5',
+						'Login blocking interval' => '    32s   ',
+						// Security.
+						'Valid URI schemes' => '   mailto,tel,ssh   ',
+						'X-Frame-Options HTTP header' => '    SAMEORIGIN    ',
+						'Iframe sandboxing exceptions' => '   test   ',
+						// Communication with Zabbix server.
+						'Network timeout' => '  1m   ',
+						'Connection timeout' => '   3s    ',
+						'Network timeout for media type test' => '    1m    ',
+						'Network timeout for script execution' => '    1m    ',
+						'Network timeout for item test' => '    1m    ',
+						'Network timeout for scheduled report test' => '    1m    '
+					],
+					'db' => [
+						'url' => 'zabbix.php',
+						// Authorization.
+						'login_attempts' => 5,
+						'login_block' => '32s',
+						// Security.
+						'uri_valid_schemes' => 'mailto,tel,ssh',
+						'x_frame_options' => 'SAMEORIGIN',
+						'iframe_sandboxing_exceptions' => 'test',
+						// Communication with Zabbix server.
+						'socket_timeout' => '1m',
+						'connect_timeout' => '3s',
+						'media_type_test_timeout' => '1m',
+						'script_timeout' => '1m',
+						'item_test_timeout' => '1m',
+						'report_test_timeout' => '1m'
 					]
 				]
 			]

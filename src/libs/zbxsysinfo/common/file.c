@@ -905,9 +905,17 @@ err:
 
 static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 {
+	/* On HP-UX zbx_sha256_finish() requires buffer specified in 2nd argument to */
+	/* be uint32_t-aligned to avoid crash (ZBX-23471). */
+	typedef union	{
+		zbx_uint32_t	ui[ZBX_SHA256_DIGEST_SIZE / sizeof(zbx_uint32_t)];
+		char		ch[ZBX_SHA256_DIGEST_SIZE];
+	} aligned_buf_t;
+
 	int		i, f, ret = SYSINFO_RET_FAIL;
 	char		buf[16 * ZBX_KIBIBYTE];
-	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	aligned_buf_t	hash_res;
+	char		hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	double		ts;
 	ssize_t		nr;
 	sha256_ctx	ctx;
@@ -945,13 +953,13 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	zbx_sha256_finish(&ctx, hash_res);
+	zbx_sha256_finish(&ctx, hash_res.ch);
 
 	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
 	{
 		char z[3];
 
-		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res[i]);
+		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res.ch[i]);
 		hash_res_stringhexes[i * 2] = z[0];
 		hash_res_stringhexes[i * 2 + 1] = z[1];
 	}
