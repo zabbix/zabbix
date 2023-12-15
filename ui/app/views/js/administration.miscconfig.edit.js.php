@@ -34,6 +34,10 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 			$('#uri_valid_schemes').prop('disabled', !this.checked);
 		});
 
+		$('#x_frame_header_enabled').change(function() {
+			$('#x_frame_options').prop('disabled', !this.checked);
+		});
+
 		$('#iframe_sandboxing_enabled').change(function() {
 			$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
 		});
@@ -85,6 +89,11 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 								)
 								.change();
 							$('#uri_valid_schemes').val("<?= DB::getDefault('config', 'uri_valid_schemes') ?>");
+							$('#x_frame_header_enabled')
+								.prop('checked',
+									<?= DB::getDefault('config', 'x_frame_options') === 'null' ? 'false' : 'true' ?>
+								)
+								.change();
 							$('#x_frame_options').val("<?= DB::getDefault('config', 'x_frame_options') ?>");
 							$('#iframe_sandboxing_enabled')
 								.prop('checked',
