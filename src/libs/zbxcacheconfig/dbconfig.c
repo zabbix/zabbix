@@ -13350,6 +13350,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED))
 		cfg->auditlog_enabled = config->config->auditlog_enabled;
 
+	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_MODE))
+		cfg->auditlog_mode = config->config->auditlog_mode;
+
 	UNLOCK_CACHE;
 
 	cfg->flags = flags;
