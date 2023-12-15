@@ -568,7 +568,7 @@ int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vec
 	}
 	else if (TRIGGER_DEP_SYNC_UPDATE_OP == is_update)
 	{
-	  res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags, audit_context_mode);
+		res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags, audit_context_mode);
 	}
 clean:
 	zbx_vector_uint64_pair_destroy(&links);

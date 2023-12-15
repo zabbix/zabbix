@@ -1540,13 +1540,13 @@ int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 		}
 
 		if (0 < upd_graphs_or_graphs_items)
-		  res = execute_graphs_updates(&host_graphs_main_data, &host_graphs_items, audit_context_mode);
+			res = execute_graphs_updates(&host_graphs_main_data, &host_graphs_items, audit_context_mode);
 	}
 
 	if (SUCCEED == res && 0 < graphs_copies_insert.values_num)
 	{
 		res = execute_graphs_inserts(&graphs_copies_insert, &total_insert_gitems_count,
-					     &templates_graphs_items, audit_context_mode);
+				&templates_graphs_items, audit_context_mode);
 	}
 end:
 	zbx_vector_str_clear_ext(&templates_graphs_names, zbx_str_free);

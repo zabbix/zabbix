@@ -36,7 +36,7 @@ void	zbx_audit_graph_update_json_add_gitems(int audit_context_mode, zbx_uint64_t
 		int type, zbx_uint64_t itemid);
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1)								\
-  void	zbx_audit_graph_update_json_update_##resource(int audit_context_mode, zbx_uint64_t graphid, int flags, \
+void	zbx_audit_graph_update_json_update_##resource(int audit_context_mode, zbx_uint64_t graphid, int flags,	\
 		type1 resource##_old, type1 resource##_new);							\
 
 PREPARE_AUDIT_GRAPH_UPDATE(name, const char*)

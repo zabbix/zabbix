@@ -849,8 +849,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					item->flags, (0 == strcmp("", item->field##_orig) ? "" :		\
 					ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->field) ? "" :		\
 					ZBX_MACRO_SECRET_MASK));						\
-		}												
-#define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)									\
+		}												\
+
+#define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)				\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=%d", d, (int)item->field);	\
@@ -858,8 +859,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 														\
 			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
 					item->flags, (int)item->field##_orig, (int)item->field);		\
-		}												
-#define PREPARE_UPDATE_UINT64(FLAG_POSTFIX, field)								\
+		}												\
+
+#define PREPARE_UPDATE_UINT64(FLAG_POSTFIX, field)			\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=" ZBX_FS_UI64, d,		\
@@ -972,7 +974,7 @@ dependent:
 
 		dependent->master_itemid = item->itemid;
 		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, db_insert_irtname,
-				   audit_context_mode, sql, sql_alloc, sql_offset);
+				audit_context_mode, sql, sql_alloc, sql_offset);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1044,7 +1046,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		if (0 == item->master_itemid)
 		{
 			save_template_item(hostid, &itemid, item, &db_insert_items, &db_insert_irtdata,
-					   &db_insert_irtname, audit_context_mode, &sql, &sql_alloc, &sql_offset);
+					&db_insert_irtname, audit_context_mode, &sql, &sql_alloc, &sql_offset);
 		}
 	}
 
@@ -1209,7 +1211,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		/* delete removed rule conditions */
 		for (j = index; j < rule->conditionids.values_num; j++)
 		{
-		  zbx_audit_discovery_rule_update_json_delete_filter_conditions(audit_context_mode, rule->itemid,
+			zbx_audit_discovery_rule_update_json_delete_filter_conditions(audit_context_mode, rule->itemid,
 					rule->conditionids.values[j]);
 			zbx_vector_uint64_append(&item_conditionids, rule->conditionids.values[j]);
 		}

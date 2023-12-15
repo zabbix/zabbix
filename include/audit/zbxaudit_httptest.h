@@ -32,7 +32,7 @@ void	zbx_audit_httptest_update_json_add_data(int audit_context_mode, zbx_uint64_
 		int verify_peer, int verify_host, zbx_uint64_t hostid);
 
 #define PREPARE_AUDIT_HTTPTEST_UPDATE_H(resource, type1)							\
-  void	zbx_audit_httptest_update_json_update_##resource(int audit_context_mode, zbx_uint64_t httptestid,	\
+void	zbx_audit_httptest_update_json_update_##resource(int audit_context_mode, zbx_uint64_t httptestid,	\
 		type1 resource##_old, type1 resource##_new);
 
 PREPARE_AUDIT_HTTPTEST_UPDATE_H(templateid, zbx_uint64_t)
@@ -63,7 +63,7 @@ void	zbx_audit_httptest_update_json_add_httptest_httpstep(int audit_context_mode
 		int retrieve_mode, int post_type);
 
 #define PREPARE_AUDIT_HTTPSTEP_UPDATE_H(resource, type1)							\
-  void	zbx_audit_httptest_update_json_httpstep_update_##resource(int audit_context_mode,			\
+void	zbx_audit_httptest_update_json_httpstep_update_##resource(int audit_context_mode,			\
 		zbx_uint64_t httptestid, zbx_uint64_t httpstepid, type1 resource##_old, type1 resource##_new);
 
 PREPARE_AUDIT_HTTPSTEP_UPDATE_H(url, const char*)

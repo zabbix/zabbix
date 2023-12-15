@@ -29,7 +29,7 @@ void	zbx_audit_##funcname##_update_json_add_snmp_interface(int audit_context_mod
 		zbx_uint64_t securitylevel, const char *authpassphrase, const char *privpassphrase,		\
 		zbx_uint64_t authprotocol, zbx_uint64_t privprotocol, const char *contextname,			\
 		zbx_uint64_t interfaceid);									\
- void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid,	\
+void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid,	\
 		zbx_uint64_t version_old, zbx_uint64_t version_new, zbx_uint64_t bulk_old,			\
 		zbx_uint64_t bulk_new, const char *community_old, const char *community_new,			\
 		const char *securityname_old, const char *securityname_new, zbx_uint64_t securitylevel_old,	\
@@ -150,7 +150,7 @@ void	zbx_audit_host_prototype_update_json_update_templateid(int audit_context_mo
 		zbx_uint64_t templateid_orig, zbx_uint64_t templateid);
 
 #define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(resource, type1)							\
-  void	zbx_audit_host_prototype_update_json_update_##resource(int audit_context_mode, zbx_uint64_t hostid,	\
+void	zbx_audit_host_prototype_update_json_update_##resource(int audit_context_mode, zbx_uint64_t hostid,	\
 		type1 old_##resource, type1 new_##resource);							\
 
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(name, const char*)

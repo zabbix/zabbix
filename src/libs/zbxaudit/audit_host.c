@@ -89,7 +89,7 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)								\
 			audit_key_contextname, contextname, "interface_snmp", "contextname");			\
 }														\
 														\
- void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid,	\
+void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid,	\
 		zbx_uint64_t version_old, zbx_uint64_t version_new, zbx_uint64_t bulk_old,			\
 		zbx_uint64_t bulk_new, const char *community_old, const char *community_new,			\
 		const char *securityname_old, const char *securityname_new, zbx_uint64_t securitylevel_old,	\
@@ -380,7 +380,7 @@ void	zbx_audit_host_update_json_update_hostmacro_create_entry(int audit_context_
 }
 
 #define PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO(resource, type1, type2)						\
-  void	zbx_audit_host_update_json_update_hostmacro_##resource(int audit_context_mode, zbx_uint64_t hostid,	\
+void	zbx_audit_host_update_json_update_hostmacro_##resource(int audit_context_mode, zbx_uint64_t hostid,	\
 		zbx_uint64_t hostmacroid, type1 old_##resource, type1 new_##resource)				\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\

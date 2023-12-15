@@ -170,7 +170,7 @@ PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
 
 /******************************************************************************
  *                                                                            *
- * Parameters:                                                                * 
+ * Parameters:                                                                *
  *             audit_context_mode - [IN]                                      *
  *             id                 - [IN] resource id                          *
  *             name               - [IN] resource name                        *
