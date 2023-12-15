@@ -3291,6 +3291,8 @@ section {
   .status-container [class^="status-"]:not(:last-of-type) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0; }
+  .status-container [class^="status-"][data-hintbox='1'] {
+    cursor: pointer; }
 
 .status-na-bg,
 .status-info-bg,
