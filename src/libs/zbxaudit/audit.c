@@ -307,7 +307,7 @@ void	zbx_audit_prepare(int audit_context_mode)
 	zbx_config_t	cfg;
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
-	zbx_audit_init(audit_context_mode, cfg.auditlog_enabled, cfg.auditlog_mode);
+	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, audit_context_mode);
 }
 
 static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
