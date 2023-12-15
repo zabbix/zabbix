@@ -200,6 +200,16 @@ msgstr[0] "%1$s из %2$s элемента в состоянии проблем�
 msgstr[1] "%1$s из %2$s элементов в состоянии проблемы"
 msgstr[2] "%1$s из %2$s элементов в состоянии проблемы"
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -12831,6 +12841,11 @@ msgstr "Максимальный период отображения истор�
 msgid "Max number of columns and rows in overview tables"
 msgstr "Макс. количество колонок и строк в таблицах обзора"
 
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Макс. период селектора периода времени"
@@ -14504,6 +14519,11 @@ msgstr "Без унаследованных элементов данных"
 #: include/views/configuration.host.discovery.list.php:165
 msgid "Not supported"
 msgstr "Не поддерживается"
+
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -21176,6 +21196,10 @@ msgstr "Доступен/Недоступен"
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr "Используйте %{ref} в фильтре группы для ссылки на значение этого пользовательского атрибута."
 
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
 msgstr "Использование объединенных запросов"
@@ -22592,6 +22616,10 @@ msgstr "Ось X"
 msgid "X-Frame-Options HTTP header"
 msgstr "HTTP заголовок X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
 msgstr "X1"
@@ -23041,6 +23069,11 @@ msgstr "ожидается относительное время"
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
 msgstr "спецсимвол"
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
