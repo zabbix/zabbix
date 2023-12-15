@@ -31,6 +31,7 @@
 #include "libs/zbxpreproc/pp_execute.h"
 #include "libs/zbxpreproc/preproc_snmp.h"
 #include "libs/zbxpreproc/pp_cache.h"
+#include "libs/zbxpreproc/pp_error.h"
 
 #ifdef HAVE_NETSNMP
 #define SNMP_NO_DEBUGGING
@@ -317,6 +318,7 @@ void	zbx_mock_test_entry(void **state)
 	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
 	{
 		preproc_shutdown_snmp();
+		release_step(&step);
 		skip();
 	}
 #endif
