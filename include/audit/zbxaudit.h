@@ -79,8 +79,6 @@ int	zbx_get_auditlog_mode(void);
 		{											\
 			return;										\
 		}											\
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER: %d and %d", context_mode, zbx_get_auditlog_mode()); \
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_X:  %d", (context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT) == 1); \
 		if (((context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT) == 1) && \
 				SUCCEED == zbx_get_auditlog_mode())					\
 		{											\
