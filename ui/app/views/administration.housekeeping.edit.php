@@ -223,7 +223,9 @@ $house_keeper_tab = (new CFormList())
 			: null;
 
 		$compression_status_checkbox = (new CCheckBox('compression_status'))
-			->setChecked($data['compression_status'] == 1)
+			->setChecked($data['compression_availability'] && $data['compression_status'] == 1
+				|| $data['compression_not_detected']
+			)
 			->setEnabled($data['compression_availability']);
 
 		$house_keeper_tab
