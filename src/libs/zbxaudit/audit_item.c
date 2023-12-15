@@ -204,15 +204,17 @@ void	zbx_audit_item_create_entry_for_delete(int audit_context_mode, zbx_uint64_t
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Parameters: sql - [IN] sql statement                                       *
- *             ids - [OUT] sorted list of selected uint64 values              *
- *                                                                            *
- * Return value: SUCCEED - query SUCCEEDED                                    *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Parameters:                                                                  *
+ *             audit_context_mode - [IN]                                        *
+ *             sql                - [IN] sql statement                          *
+ *             ids                - [OUT] sorted list of selected uint64 values *
+ *                                                                              *
+ * Return value: SUCCEED - query SUCCEEDED                                      *
+ *               FAIL    - otherwise                                            *
+ *                                                                              *
+ ********************************************************************************/
 int	zbx_audit_DBselect_delete_for_item(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
 {
 	int		ret = FAIL;

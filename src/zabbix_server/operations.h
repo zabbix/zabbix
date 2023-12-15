@@ -21,7 +21,6 @@
 #define ZABBIX_OPERATIONS_H
 
 #include "zbxcacheconfig.h"
-int	zbx_map_db_event_to_audit_context(const zbx_db_event *event);
 
 void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
 void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids);
@@ -34,5 +33,7 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg);
 void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode);
 void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
 		zbx_vector_uint64_t *del_optagids);
+
+int	zbx_map_db_event_to_audit_context(const zbx_db_event *event);
 
 #endif

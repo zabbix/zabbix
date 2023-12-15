@@ -226,15 +226,17 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 #undef PREPARE_AUDIT_TRIGGER_UPDATE
 #undef TR_OR_TRP
 
-/******************************************************************************
- *                                                                            *
- * Parameters: sql - [IN] sql statement                                       *
- *             ids - [OUT] sorted list of selected uint64 values              *
- *                                                                            *
- * Return value: SUCCEED - query SUCCEEDED                                    *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Parameters:                                                                  *
+ *             audit_context_mode - [IN]                                        *
+ *             sql                - [IN] sql statement                          *
+ *             ids                - [OUT] sorted list of selected uint64 values *
+ *                                                                              *
+ * Return value: SUCCEED - query SUCCEEDED                                      *
+ *               FAIL    - otherwise                                            *
+ *                                                                              *
+ ********************************************************************************/
 void	zbx_audit_DBselect_delete_for_trigger(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
 {
 	zbx_db_result_t	result;

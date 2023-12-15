@@ -772,7 +772,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: saves (insert or update) template item                            *
+ * Purpose: saves (inserts or updates) template item                          *
  *                                                                            *
  * Parameters: hostid             - [IN] parent host id                       *
  *             itemid             - [IN/OUT] item id used for insert          *

@@ -680,20 +680,6 @@ clean:
 	return hostid;
 }
 
-int	zbx_map_db_event_to_audit_context(const zbx_db_event *event)
-{
-	if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
-	{
-		return ZBX_AUDIT_AUTOREGISTRATION_CONTEXT;
-	}
-	else if (EVENT_SOURCE_DISCOVERY == event->source)
-	{
-		return ZBX_AUDIT_NETWORK_DISCOVERY_CONTEXT;
-	}
-
-	return ZBX_AUDIT_ALL_CONTEXT;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if the event is discovery or autoregistration event        *
@@ -1315,4 +1301,18 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 	zbx_vector_db_tag_ptr_destroy(&host_tags);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+int	zbx_map_db_event_to_audit_context(const zbx_db_event *event)
+{
+	if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
+	{
+		return ZBX_AUDIT_AUTOREGISTRATION_CONTEXT;
+	}
+	else if (EVENT_SOURCE_DISCOVERY == event->source)
+	{
+		return ZBX_AUDIT_NETWORK_DISCOVERY_CONTEXT;
+	}
+
+	return ZBX_AUDIT_ALL_CONTEXT;
 }
