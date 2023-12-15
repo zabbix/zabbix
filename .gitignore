@@ -166,6 +166,7 @@ tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
 tests/libs/zbxcommon/zbx_xml_to_json
+tests/libs/zbxcommon/zbx_buf_readln
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext
