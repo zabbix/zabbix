@@ -53,7 +53,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			]);
 
 			foreach ($validator->getAllErrors() as $error) {
-				error($error);
+				info($error);
 			}
 
 			if ($validator->isErrorFatal() || $validator->isError()) {

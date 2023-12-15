@@ -9208,6 +9208,10 @@ msgstr "نمای کلی فهرست هاست"
 msgid "Host label type"
 msgstr "نوع برچسب هاست"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14702,6 +14706,10 @@ msgstr ""
 msgid "Order"
 msgstr ""
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr ""
@@ -19914,6 +19922,10 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "نوع برچسب هشدار"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"

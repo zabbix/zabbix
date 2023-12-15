@@ -5,6 +5,8 @@ New features:
 .........T [ZBXNEXT-8707] updated version check for MongoDB node by Zabbix agent 2 template (atocko)
 
 Bug fixes:
+........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
+.......PS. [ZBX-23145] disabled deprecated automatic reconnection in MySQL (mprihodko)
 .......PS. [ZBX-23799] fixed crash when host interfaces are added and updated at the same time (vso)
 ..F....... [ZBX-23565] fixed filtering by value not working in Latest data for log and text types (agriscenko)
 .......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware HV maintenance status (MVekslers)
@@ -418,6 +420,18 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.11rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.10
+
+6.4.10rc1 was released as 6.4.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.10rc1
@@ -1958,6 +1972,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.26rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.25
+
+6.0.25rc1 was released as 6.0.25 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.25rc1
