@@ -89,6 +89,9 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
+	int		now;
+
+	now = time(NULL);
 
 	result = zbx_db_select("select hostid,proxyid,revision,hostproxyid from host_proxy");
 
@@ -119,8 +122,9 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &host_local, sizeof(host_local));
 		zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
 
-		/* proxies with assigned hosts in most cases were online before restart */
+		/* proxies with assigned hosts are assumed to be online */
 		proxy->status = ZBX_PG_PROXY_STATUS_ONLINE;
+		proxy->lastaccess = now;
 
 		if (NULL != proxy->group && proxy->group->hostmap_revision < revision)
 			proxy->group->hostmap_revision = revision;
@@ -221,7 +225,9 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 				status = ZBX_PG_GROUP_STATUS_ONLINE;
 				ZBX_FALLTHROUGH;
 			case ZBX_PG_GROUP_STATUS_ONLINE:
-				if (group->min_online > healthy)
+				if (group->min_online > online)
+					status = ZBX_PG_GROUP_STATUS_OFFLINE;
+				else if (group->min_online > healthy)
 					status = ZBX_PG_GROUP_STATUS_DECAY;
 				break;
 			case ZBX_PG_GROUP_STATUS_OFFLINE:

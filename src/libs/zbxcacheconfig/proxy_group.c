@@ -483,3 +483,25 @@ void	zbx_dc_set_proxy_lastonline(int lastonline)
 	config->proxy_lastonline = lastonline;
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy group revision                                          *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid)
+{
+	zbx_uint64_t	revision;
+
+	RDLOCK_CACHE;
+	zbx_dc_proxy_group_t	*pg;
+
+	if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups, &proxy_groupid)))
+		revision = pg->revision;
+	else
+		revision = 0;
+
+	UNLOCK_CACHE;
+
+	return revision;
+}

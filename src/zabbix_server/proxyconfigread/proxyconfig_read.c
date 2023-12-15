@@ -1241,6 +1241,8 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 		zbx_dc_get_macro_updates(&hostids, &updated_hostids, proxy_config_revision, &macro_hostids,
 				&global_macros, &del_macro_hostids);
 	}
+	else if (0 != proxy->proxy_groupid)
+		proxy_group_revision = zbx_dc_get_proxy_group_revision(proxy->proxy_groupid);
 
 	if (0 != proxy_config_revision)
 	{
