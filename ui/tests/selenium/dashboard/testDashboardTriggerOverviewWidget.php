@@ -153,6 +153,13 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		// Enable the trigger that other triggers depend on.
 		CDataHelper::call('trigger.update', [['triggerid' => $triggerids[1], 'status' => 0]]);
+
+		// Delete some hosts and problems from previous tests and data source, not to interfere this test.
+		$rows = CDBHelper::getAll('SELECT * FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
+		if ($rows !== []) {
+			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
+			CDataHelper::call('host.delete', [$hostid]);
+		}
 	}
 
 	public function testDashboardTriggerOverviewWidget_Layout() {
