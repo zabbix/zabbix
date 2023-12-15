@@ -20,6 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
+#include "zbxmockdata.h"
+#include "zbxmockdb.h"
 #include "zbxcommon.h"
 
 #include "../../../src/zabbix_server/lld/lld_host.c"
