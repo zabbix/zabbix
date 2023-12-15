@@ -30,7 +30,7 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $form = (new CForm())
-	->setId('housekeeping')
+	->setId('housekeeping-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
