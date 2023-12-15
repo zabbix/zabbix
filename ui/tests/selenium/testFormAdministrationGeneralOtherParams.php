@@ -568,9 +568,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => ' 5',
 						'Login blocking interval' => '    32s   ',
 						// Security.
-						'Valid URI schemes' => '   mailto,tel,ssh   ',
-						'X-Frame-Options HTTP header' => '    SAMEORIGIN    ',
-						'Iframe sandboxing exceptions' => '   test   '
+						'id:uri_valid_schemes' => '   mailto,tel,ssh   ',
+						'id:x_frame_options' => '    SAMEORIGIN    ',
+						'id:iframe_sandboxing_exceptions' => '   test   '
 					],
 					'db' => [
 						'url' => 'zabbix.php',
