@@ -744,7 +744,7 @@ class CHttpTestManager {
 				$db_fieldid = $db_httptests !== null ? key($db_httptests[$httptest['httptestid']]['headers']) : false;
 
 				foreach ($httptest['headers'] as &$header) {
-					if ($db_fieldid !== false
+					if ($db_header !== false && $db_fieldid !== false
 							&& ($header['name'] !== $db_header['name'] || $header['value'] !== $db_header['value'])) {
 						$db_fieldid = false;
 					}
@@ -1147,7 +1147,7 @@ class CHttpTestManager {
 					$db_fieldid = $db_step !== null ? key($db_step['headers']) : false;
 
 					foreach ($step['headers'] as &$header) {
-						if ($db_fieldid !== false
+						if ($db_header !== false && $db_fieldid !== false
 								&& ($header['name'] !== $db_header['name']
 									|| $header['value'] !== $db_header['value'])) {
 							$db_fieldid = false;
@@ -1212,7 +1212,7 @@ class CHttpTestManager {
 							: false;
 
 						foreach ($step['posts'] as &$post) {
-							if ($db_fieldid !== false
+							if ($db_post !== false && $db_fieldid !== false
 									&& ($post['name'] !== $db_post['name'] || $post['value'] !== $db_post['value'])) {
 								$db_fieldid = false;
 							}
@@ -1246,7 +1246,7 @@ class CHttpTestManager {
 					$db_fieldid = $db_step !== null ? key($db_step['query_fields']) : false;
 
 					foreach ($step['query_fields'] as &$query_field) {
-						if ($db_fieldid !== false
+						if ($db_query_field !== false && $db_fieldid !== false
 								&& ($query_field['name'] !== $db_query_field['name']
 									|| $query_field['value'] !== $db_query_field['value'])) {
 							$db_fieldid = false;
