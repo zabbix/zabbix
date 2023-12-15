@@ -1958,6 +1958,19 @@ static int	DBpatch_6050158(void)
 	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
 }
 
+static int	DBpatch_6050159(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("group_discovery", "group_discovery_pkey1", "group_discovery_pkey",
+			"groupdiscoveryid", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -2121,5 +2134,6 @@ DBPATCH_ADD(6050155, 0, 1)
 DBPATCH_ADD(6050156, 0, 1)
 DBPATCH_ADD(6050157, 0, 1)
 DBPATCH_ADD(6050158, 0, 1)
+DBPATCH_ADD(6050159, 0, 1)
 
 DBPATCH_END()

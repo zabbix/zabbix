@@ -674,7 +674,7 @@ $formgrid
 $edit_source_timeouts_link = null;
 $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
-if ($data['can_edit_source_timeouts'] && (($readonly && !$custom_timeout_enabled) || !$readonly)) {
+if ($data['can_edit_source_timeouts'] && (!$readonly || !$custom_timeout_enabled)) {
 	$edit_source_timeouts_link = $data['host']['proxyid']
 		? (new CLink(_('Timeouts')))
 			->setAttribute('data-proxyid', $data['host']['proxyid'])

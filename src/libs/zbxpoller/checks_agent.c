@@ -35,7 +35,9 @@
  *             config_source_ip - [IN]                                        *
  *             program_type     - [IN]                                        *
  *             result           - [OUT]                                       *
- *                                                                            *
+ *             version          - [IN/OUT] if 7.0.0 or higher, connect using, *
+ *                                         JSON protocol, fallback and retry  *
+ *                                         with plaintext protocol            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
  *               NETWORK_ERROR - network related error occurred               *
@@ -98,10 +100,9 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 
 		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-		zbx_agent_prepare_request(&j, item->key, item->timeout);
-
 		if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 		{
+			zbx_agent_prepare_request(&j, item->key, item->timeout);
 			ptr = j.buffer;
 			len = j.buffer_size;
 		}
@@ -138,8 +139,11 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 
 	if (SUCCEED == ret)
 	{
-		if (FAIL == (ret = zbx_agent_handle_response(&s, received_len, item->interface.addr, result, version)))
+		if (FAIL == (ret = zbx_agent_handle_response(s.buffer, s.read_bytes, received_len,
+				item->interface.addr, result, version)))
+		{
 			retry = 1;
+		}
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));

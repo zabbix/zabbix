@@ -25,6 +25,7 @@
 #include "zbxcrypto.h"
 #include "zbxagentget.h"
 #include "zbxversion.h"
+#include "zbxlog.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
@@ -91,6 +92,16 @@ static const char	*help_message[] = {
 	"                             (default: " CONFIG_GET_TIMEOUT_MAX_STR " seconds)",
 	"",
 	"  -k --key item-key          Specify key of the item to retrieve value for",
+	"",
+	"  --protocol value           Protocol used to communicate with agent. Values:",
+	"                               auto      - connect using JSON protocol,",
+	"                                           fallback and retry with",
+	"                                           plaintext protocol (default)",
+	"                               json      - connect using JSON protocol",
+	"                               plaintext - connect using plaintext protocol",
+	"                                           where just item key is sent",
+	"                                           (6.4.x and older releases)",
+	"",
 	"",
 	"  -h --help                  Display this help message",
 	"  -V --version               Display version number",
@@ -191,12 +202,12 @@ struct zbx_option	longopts[] =
 	{"tls-psk-file",		1,	NULL,	'9'},
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
-	{"protocol",			1,	NULL,	'C'},
+	{"protocol",			1,	NULL,	'P'},
 	{NULL}
 };
 
 /* short options */
-static char	shortopts[] = "s:p:k:I:t:hV";
+static char	shortopts[] = "s:p:k:I:t:hVP:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -274,13 +285,12 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-		zbx_agent_prepare_request(&j, key, CONFIG_GET_TIMEOUT);
-
 		if (ZBX_PLAINTEXT_PROTOCOL == protocol)
 			*version = 0;
 
 		if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
 		{
+			zbx_agent_prepare_request(&j, key, CONFIG_GET_TIMEOUT);
 			ptr = j.buffer;
 			len = j.buffer_size;
 		}
@@ -302,8 +312,8 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 			zbx_init_agent_result(&result)
 
-			if (FAIL == (ret = zbx_agent_handle_response(&s, received_len, host, &result,
-					version)))
+			if (FAIL == (ret = zbx_agent_handle_response(s.buffer, s.read_bytes, received_len, host,
+					&result, version)))
 			{
 				retry = 1;
 			}
@@ -323,6 +333,8 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 			zbx_free_agent_result(&result)
 		}
+		else
+			zbx_error("Get value error: %s", zbx_socket_strerror());
 
 		zbx_tcp_close(&s);
 
@@ -359,7 +371,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(NULL, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname);
 #endif
@@ -483,7 +495,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 				break;
 #endif
-			case 'C':
+			case 'P':
 				if (0 == strcmp(zbx_optarg, "json"))
 				{
 					protocol = ZBX_JSON_PROTOCOL;
@@ -498,7 +510,7 @@ int	main(int argc, char **argv)
 				}
 				else
 				{
-					zbx_error("Invalid protocol");
+					zbx_error("Invalid protocol \"%s\"", zbx_optarg);
 					exit(EXIT_FAILURE);
 				}
 				break;

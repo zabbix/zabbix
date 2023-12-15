@@ -18,6 +18,7 @@
 **/
 
 #include "vmware_shmem.h"
+#include "vmware_hv.h"
 #include "vmware_perfcntr.h"
 #include "zbxshmem.h"
 

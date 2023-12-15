@@ -1098,6 +1098,7 @@ class testFormGraphs extends CWebTest {
 	}
 
 	/**
+	 * Function checks available item types in dialog form.
 	 *
 	 * @param CFormElement	$form		form element of widget
 	 * @param string		$button		name of a button

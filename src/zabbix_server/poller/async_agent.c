@@ -153,7 +153,6 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			*fd = agent_context->s.socket;
 
 			return ZBX_ASYNC_TASK_WRITE;
-			break;
 		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
 			if (0 == getsockopt(agent_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)
@@ -226,9 +225,10 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
 					&agent_context->tcp_recv_context, agent_context->item.flags, &event_new)))
 			{
-				if (FAIL == (agent_context->item.ret = zbx_agent_handle_response(&agent_context->s,
-						received_len, agent_context->item.interface.addr,
-						&agent_context->item.result, &agent_context->item.version)))
+				if (FAIL == (agent_context->item.ret = zbx_agent_handle_response(
+						agent_context->s.buffer, agent_context->s.read_bytes, received_len,
+						agent_context->item.interface.addr, &agent_context->item.result,
+						&agent_context->item.version)))
 				{
 					/* retry with other protocol */
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
@@ -339,7 +339,9 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 		agent_context->server_name = NULL;
 #endif
 
-	zbx_agent_prepare_request(&agent_context->j, agent_context->item.key, item->timeout);
+	if (ZBX_COMPONENT_VERSION(7, 0, 0) <= agent_context->item.version)
+		zbx_agent_prepare_request(&agent_context->j, agent_context->item.key, item->timeout);
+
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 
 	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, item->timeout + 1,
