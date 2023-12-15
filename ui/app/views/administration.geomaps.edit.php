@@ -95,9 +95,7 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel([_('Max zoom level'), $hintbox_max_zoom], 'geomaps_max_zoom'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('geomaps_max_zoom', $data['geomaps_max_zoom'], false,
-				DB::getFieldLength('config', 'geomaps_max_zoom'))
-			)
+			(new CNumericBox('geomaps_max_zoom', $data['geomaps_max_zoom'], 2, false, false, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setReadonly($data['geomaps_tile_provider'] !== '')
 				->setAriaRequired()
