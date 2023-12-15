@@ -58,7 +58,7 @@
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('form_row')
-			->addClass('sortable')
+			->addClass(CSortable::ZBX_STYLE_SORTABLE)
 			->toString()
 	?>
 </script>
@@ -84,7 +84,7 @@
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('form_row')
-			->addClass('sortable')
+			->addClass(CSortable::ZBX_STYLE_SORTABLE)
 			->toString()
 	?>
 </script>
@@ -595,7 +595,7 @@
 
 			$table.on('dynamic_rows.beforeadd', function(e) {
 				if (type === 'variables') {
-					e.new_node.classList.remove('sortable');
+					e.new_node.classList.remove('<?= CSortable::ZBX_STYLE_SORTABLE ?>');
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 				}
 
@@ -907,7 +907,7 @@
 
 			if (type === 'variables') {
 				$node.on('dynamic_rows.beforeadd', function(e) {
-					e.new_node.classList.remove('sortable');
+					e.new_node.classList.remove('<?= CSortable::ZBX_STYLE_SORTABLE ?>');
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 				});
 			}
