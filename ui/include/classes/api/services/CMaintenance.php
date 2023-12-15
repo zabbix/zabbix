@@ -133,18 +133,20 @@ class CMaintenance extends CApiService {
 		}
 
 		if ($options['groupids'] !== null) {
-			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM maintenances_groups mg'.
-				' WHERE m.maintenanceid=mg.maintenanceid'.
-					' AND '.dbConditionId('mg.groupid', $options['groupids']).
-			')'.
-			' OR EXISTS ('.
-				'SELECT NULL'.
-				' FROM maintenances_hosts mh,hosts_groups hg'.
-				' WHERE m.maintenanceid=mh.maintenanceid'.
-					' AND mh.hostid=hg.hostid'.
-					' AND '.dbConditionId('hg.groupid', $options['groupids']).
+			$sqlParts['where'][] = '('.
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_groups mg'.
+					' WHERE m.maintenanceid=mg.maintenanceid'.
+						' AND '.dbConditionId('mg.groupid', $options['groupids']).
+				')'.
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_hosts mh,hosts_groups hg'.
+					' WHERE m.maintenanceid=mh.maintenanceid'.
+						' AND mh.hostid=hg.hostid'.
+						' AND '.dbConditionId('hg.groupid', $options['groupids']).
+				')'.
 			')';
 		}
 
