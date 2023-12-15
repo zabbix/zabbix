@@ -43,7 +43,10 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 		});
 
 		$form.on('submit', () => {
-			$form.trimValues(['#x_frame_options']);
+			$form.trimValues(['#url', '#login_block', '#uri_valid_schemes', '#x_frame_options',
+				'#iframe_sandboxing_exceptions', '#socket_timeout', '#connect_timeout', '#media_type_test_timeout',
+				'#script_timeout', '#item_test_timeout', '#report_test_timeout'
+			]);
 		});
 
 		$("#resetDefaults").click(function() {

@@ -574,9 +574,34 @@ class ZBase {
 
 			filter_messages();
 
+			// Add current controller name in error message.
 			CMessageHelper::addError('Controller: '.$router->getAction());
-			ksort($_REQUEST);
-			foreach ($_REQUEST as $key => $value) {
+
+			// Getting information from $_REQUEST is not correct, so instead get data from controller input instead.
+			$reflection_class = new ReflectionClass($router->getController());
+			$controller = $reflection_class->newInstance();
+			$input = $controller->getRawInput();
+
+			ksort($input);
+
+			// Get validation rules from controller and hide sensitive fields.
+			$rules = $controller::getValidationRules();
+			$rule_parser = new CValidationRule();
+
+			foreach ($rules as $field_name => $rule) {
+				$parsed_rules = $rule_parser->parse($rule);
+
+				foreach ($input as $key => $value) {
+					if ($field_name === $key) {
+						if (array_key_exists('password', $parsed_rules)) {
+							// Remove sensitive field from output. Alternatively password can be replaced with *****.
+							unset($input[$key]);
+						}
+					}
+				}
+			}
+
+			foreach ($input as $key => $value) {
 				if ($key !== 'sid') {
 					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}

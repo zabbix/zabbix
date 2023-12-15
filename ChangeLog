@@ -1,3 +1,37 @@
+Changes for 6.0.26rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.25
+
+6.0.25rc1 was released as 6.0.25 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.25rc1
+
+New features:
+........S. [ZBXNEXT-8857] updated max supported TimescaleDB version to 2.13 (mprihodko)
+.......PS. [ZBXNEXT-8800] backported support of additional SSH options for ssh.run[] item as the 5th parameter (dgoloscapov)
+
+Bug fixes:
+........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
+...G...... [ZBX-23471] fixed sha256 sum calculation on AIX, HP-UX and Solaris, fixed crash on HP-UX (Andris)
+...G...PS. [ZBX-23787,ZBX-23755] fixed crash on empty HTTP response; fixed Zabbix agent build on Windows with libcurl (vso)
+.......PS. [ZBX-23683] fixed calculation of vmware.datastore.read/write items taking into account VMware HV maintenance status (MVekslers)
+..F....... [ZBX-21132] fixed Top hosts widget not showing all items by selected item name (Ivo)
+.........T [ZBX-23764] added an additional field for new events in SIGNL4 media type (aiantsen)
+...G...... [ZBX-23342] fixed Zabbix agent 2 MySQL plugin connection not taking into account TLS parameters (esneiders)
+.......PS. [ZBX-23685] added read-only transaction to the list of recoverable errors on PostgreSQL (vso)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.24
+
+6.0.24rc1 was released as 6.0.24 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.24rc1
 
 New features:
@@ -2814,6 +2848,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.41rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.40
+
+5.0.40rc1 was released as 5.0.40 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.40rc1

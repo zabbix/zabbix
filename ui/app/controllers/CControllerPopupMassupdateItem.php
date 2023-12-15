@@ -241,11 +241,11 @@ class CControllerPopupMassupdateItem extends CController {
 						}
 
 						if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['delay']));
+							error(_s('Invalid interval "%1$s".', $interval['delay']));
 							throw new Exception();
 						}
 						elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['period']));
+							error(_s('Invalid interval "%1$s".', $interval['period']));
 							throw new Exception();
 						}
 
@@ -257,7 +257,7 @@ class CControllerPopupMassupdateItem extends CController {
 						}
 
 						if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['schedule']));
+							error(_s('Invalid interval "%1$s".', $interval['schedule']));
 							throw new Exception();
 						}
 
