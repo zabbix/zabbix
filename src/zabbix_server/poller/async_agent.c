@@ -22,9 +22,7 @@
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"
-#include "zbxsysinfo.h"
 #include "async_poller.h"
-#include "zbxpoller.h"
 #include "zbxagentget.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
