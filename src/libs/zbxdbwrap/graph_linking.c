@@ -1468,10 +1468,12 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy graphs from template to host                                 *
+ * Purpose: copies graphs from template to host                               *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Return value: SUCCEED - db operations successful                           *
  *               FAIL    - otherwise                                          *

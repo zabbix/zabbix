@@ -773,9 +773,11 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
  *                                                                            *
  * Purpose: auxiliary function for op_add_del_tags()                          *
  *                                                                            *
- * Parameters: hostid               - [IN] discovered host ID                 *
- *             host_tags            - [IN] the new state of host tags to save *
- *                                         if not saved yet                   *
+ * Parameters:                                                                *
+ *             hostid    - [IN] discovered host id                            *
+ *             host_tags - [IN] New state of host tags to save if not saved   *
+ *                              yet.                                          *
+ *             event     - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags,

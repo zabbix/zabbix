@@ -327,8 +327,10 @@ static void	trigger_tags_free(zbx_trigger_tags_t *trigger_tags)
  *                                                                              *
  * Purpose: copies tags from template triggers to created/linked triggers       *
  *                                                                              *
- * Parameters: new_triggerids - the created trigger ids                         *
- *             cur_triggerids - the linked trigfer ids                          *
+ * Parameters:                                                                  *
+ *             new_triggerids     - [IN] created trigger ids                    *
+ *             cur_triggerids     - [IN] linked trigger ids                     *
+ *             audit_context_mode - [IN]                                        *
  *                                                                              *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
  *                                                                              *
@@ -1557,11 +1559,13 @@ static void	trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
 
 /********************************************************************************
  *                                                                              *
- * Purpose: Copy template triggers to host                                      *
+ * Purpose: copies template triggers to host                                    *
  *                                                                              *
- * Parameters: hostid      - [IN] host identifier from database                 *
- *             templateids - [IN] array of template IDs                         *
- *             error       - [OUT] error message                                *
+ * Parameters:                                                                  *
+ *             hostid             - [IN] host id from database                  *
+ *             templateids        - [IN]                                        *
+ *             audit_context_mode - [IN]                                        *
+ *             error              - [OUT] error message                         *
  *                                                                              *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
  *                                                                              *
