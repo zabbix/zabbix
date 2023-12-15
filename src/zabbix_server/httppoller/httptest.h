@@ -22,6 +22,7 @@
 
 #include "zbxcommon.h"
 
-int	process_httptests(int now, const char *config_source_ip, time_t *nextcheck);
+int	process_httptests(int now, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, time_t *nextcheck);
 
 #endif

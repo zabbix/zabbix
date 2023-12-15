@@ -34,6 +34,7 @@ check_service_test_SOURCES = \
 	../../zbxmockdir.c
 
 parse_item_key_LDADD = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
@@ -155,6 +156,7 @@ endif
 
 if AGENT
 COMMON_LIB_FILES = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \

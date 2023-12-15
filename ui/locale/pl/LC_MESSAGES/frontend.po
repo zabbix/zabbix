@@ -9467,6 +9467,10 @@ msgstr "Przegląd inwentarza hosta"
 msgid "Host label type"
 msgstr "Typ etykiety hosta"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -15027,6 +15031,10 @@ msgstr "Lub"
 msgid "Order"
 msgstr "Kolejność"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "Sortuj według kolumny"
@@ -20280,6 +20288,10 @@ msgstr "Wyzwalacz w szablonie \"%1$s\" jest zależny od wyzwalacza w szablonie \
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "Typ etykiety wyzwalacza"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"

@@ -20,7 +20,6 @@
 #include "dbconfig.h"
 
 #include "zbxtasks.h"
-#include "zbxexpression.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
@@ -1948,7 +1947,8 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 }
 
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1979,7 +1979,8 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 			}
 
 		}
-		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, config_source_ip, &error))
+		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
 					error);
@@ -2319,6 +2320,7 @@ typedef struct
 	char			*ip;
 	char			*dns;
 	int			modified;
+	int			found;
 }
 zbx_dc_if_update_t;
 
@@ -2510,7 +2512,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			if (SUCCEED == dc_strpool_replace(found, &interface->dns, update->dns))
 				update->modified = 1;
 		}
-
+		update->found = found;
 		zbx_vector_dc_if_update_ptr_append(&updates, update);
 
 		if (0 == found)
@@ -2546,10 +2548,10 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			dc_if_update_substitute_host_macros(update, update->host);
 
-			if (SUCCEED == dc_strpool_replace(found, &update->interface->ip, update->ip))
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->ip, update->ip))
 				update->modified = 1;
 
-			if (SUCCEED == dc_strpool_replace(found, &update->interface->dns, update->dns))
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->dns, update->dns))
 				update->modified = 1;
 		}
 

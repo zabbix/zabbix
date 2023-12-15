@@ -40,11 +40,12 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		// Storage of secrets
 		'Vault provider' => 'HashiCorp Vault',
 		// Security.
-		'Validate URI schemes' => true,
-		'Valid URI schemes' => 'http,https,ftp,file,mailto,tel,ssh',
-		'X-Frame-Options HTTP header' => 'SAMEORIGIN',
-		'Use iframe sandboxing' => true,
-		'Iframe sandboxing exceptions' => ''
+		'id:validate_uri_schemes' => true,
+		'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
+		'id:x_frame_header_enabled' => true,
+		'id:x_frame_options' => 'SAMEORIGIN',
+		'id:iframe_sandboxing_enabled' => true,
+		'id:iframe_sandboxing_exceptions' => ''
 	];
 
 	public $db_default_values = [
@@ -78,11 +79,12 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		// Storage of secrets
 		'Vault provider' => 'CyberArk Vault',
 		// Security.
-		'Validate URI schemes' => true,
-		'Valid URI schemes' => 'custom_scheme',
-		'X-Frame-Options HTTP header' => 'SOME_NEW_VALUE',
-		'Use iframe sandboxing' => true,
-		'Iframe sandboxing exceptions' => 'some-new-flag'
+		'id:validate_uri_schemes' => true,
+		'id:uri_valid_schemes' => 'custom_scheme',
+		'id:x_frame_header_enabled' => true,
+		'id:x_frame_options' => 'SOME-NEW-VALUE',
+		'id:iframe_sandboxing_enabled' => true,
+		'id:iframe_sandboxing_exceptions' => 'some-new-flag'
 	];
 
 	/**
@@ -114,16 +116,31 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			$checkboxes = [
 				'snmptrap_logging',
 				'validate_uri_schemes',
+				'x_frame_header_enabled',
 				'iframe_sandboxing_enabled'
 			];
 			foreach ($checkboxes as $checkbox) {
 				$form->getField('id:'.$checkbox)->fill($status);
 			}
 
-			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions'] as $input) {
+			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
 				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
 			}
 		}
+
+		// Check X-Frame-Options hintbox.
+		$form->getLabel('Use X-Frame-Options HTTP header')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+
+		$hint_text = "X-Frame-Options HTTP header supported values:\n".
+				"SAMEORIGIN or 'self' - allows the page to be displayed only in a frame on the same origin as the page itself\n".
+				"DENY or 'none' - prevents the page from being displayed in a frame, regardless of the site attempting to do so\n".
+				"a string of space-separated hostnames; adding 'self' to the list allows the page to be displayed in a frame on the same origin as the page itself\n".
+				"\n".
+				"Note that 'self' or 'none' will be regarded as hostnames if used without single quotes.";
+
+		$this->assertEquals($hint_text, $hint->getText());
+		$hint->close();
 
 		foreach (['Update', 'Reset defaults'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
@@ -163,9 +180,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => 1,
 						'Login blocking interval' => '30s',
 						// Security.
-						'Validate URI schemes' => false,
-						'X-Frame-Options HTTP header' => 'X',
-						'Use iframe sandboxing' => false
+						'id:validate_uri_schemes' => false,
+						'id:x_frame_header_enabled' => true,
+						'id:x_frame_options' => 'X',
+						'id:iframe_sandboxing_enabled' => false
 					],
 					'db' => [
 						'url' => 'a',
@@ -194,10 +212,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '30',
 						// Security.
-						'Validate URI schemes' => true,
-						'Valid URI schemes' => '',
-						'Use iframe sandboxing' => true,
-						'Iframe sandboxing exceptions' => ''
+						'id:validate_uri_schemes' => true,
+						'id:uri_valid_schemes' => '',
+						'id:iframe_sandboxing_enabled' => true,
+						'id:iframe_sandboxing_exceptions' => ''
 					],
 					'db' => [
 						'url' => 'zabbix.php',
@@ -250,15 +268,16 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => 32,
 						'Login blocking interval' => '3600s',
 						// Security.
-						'Validate URI schemes' => true,
-						'Valid URI schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
+						'id:validate_uri_schemes' => true,
+						'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,'.
 								'https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,'.
 								'tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
-						'X-Frame-Options HTTP header' => 'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SA',
-						'Use iframe sandboxing' => true,
-						'Iframe sandboxing exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
+						'id:x_frame_header_enabled' => true,
+						'id:x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
+						'id:iframe_sandboxing_enabled' => true,
+						'id:iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
 								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
 								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som'
 					],
@@ -271,9 +290,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
 								'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,'.
 						'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
-						'x_frame_options' => 'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,'.
-								'SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SAMEORIGIN,SA',
+						'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
+								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'iframe_sandboxing_enabled' => 1,
 						'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
 								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
@@ -332,13 +351,12 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => '',
 						'Login blocking interval' => '',
 						// Security.
-						'X-Frame-Options HTTP header' => ''
+						'id:x_frame_options' => ''
 					],
 					'details' => [
 						'Field "discovery_groupid" is mandatory.',
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
-						'Incorrect value for field "login_block": a time unit is expected.',
-						'Incorrect value for field "x_frame_options": cannot be empty.'
+						'Incorrect value for field "login_block": a time unit is expected.'
 					]
 				]
 			],

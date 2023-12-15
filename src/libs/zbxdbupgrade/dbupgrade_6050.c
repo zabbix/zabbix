@@ -1960,11 +1960,23 @@ static int	DBpatch_6050158(void)
 
 static int	DBpatch_6050159(void)
 {
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("group_discovery", "group_discovery_pkey1", "group_discovery_pkey",
+			"groupdiscoveryid", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6050160(void)
+{
 	const zbx_db_field_t	field = {"auditlog_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
-
 #endif
 
 DBPATCH_START(6050)
@@ -2128,6 +2140,6 @@ DBPATCH_ADD(6050155, 0, 1)
 DBPATCH_ADD(6050156, 0, 1)
 DBPATCH_ADD(6050157, 0, 1)
 DBPATCH_ADD(6050158, 0, 1)
-DBPATCH_ADD(6050159, 0, 1)
+DBPATCH_ADD(6050160, 0, 1)
 
 DBPATCH_END()
