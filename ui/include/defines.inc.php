@@ -104,6 +104,19 @@ define('IDP_TYPE_SAML',	2);
 define('JIT_PROVISIONING_DISABLED',	0);
 define('JIT_PROVISIONING_ENABLED',	1);
 
+define('MFA_DISABLED', 0);
+define('MFA_ENABLED', 1);
+
+define('MFA_TYPE_TOTP', 1);
+define('MFA_TYPE_DUO', 2);
+
+define('TOTP_HASH_SHA1', 1);
+define('TOTP_HASH_SHA256', 2);
+define('TOTP_HASH_SHA512', 3);
+
+define('TOTP_CODE_LENGTH_6', 6);
+define('TOTP_CODE_LENGTH_8', 8);
+
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);

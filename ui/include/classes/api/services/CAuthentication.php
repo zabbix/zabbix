@@ -38,7 +38,7 @@ class CAuthentication extends CApiService {
 	private $output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
 		'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid', 'saml_auth_enabled',
 		'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval', 'saml_jit_status',
-		'ldap_jit_status', 'disabled_usrgrpid'
+		'ldap_jit_status', 'disabled_usrgrpid', 'mfa_status', 'mfaid'
 	];
 
 	/**
@@ -128,7 +128,9 @@ class CAuthentication extends CApiService {
 			'disabled_usrgrpid' =>			['type' => API_ID],
 			'jit_provision_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
 			'saml_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
-			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])]
+			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
+			'mfa_status' =>					['type' => API_INT32, 'in' => implode(',', [MFA_DISABLED, MFA_ENABLED])],
+			'mfaid' =>						['type' => API_ID]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
@@ -201,6 +203,17 @@ class CAuthentication extends CApiService {
 
 			if ($ldap_jit_enabled || $saml_jit_enabled) {
 				static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be empty.'));
+			}
+		}
+
+		// Check if at least one MFA method exists.
+		if ($auth['mfa_status'] == MFA_ENABLED) {
+			$mfa_methods_exists = (bool) API::Mfa()->get([
+				'countOutput' => true
+			]);
+
+			if (!$mfa_methods_exists) {
+				static::exception(ZBX_API_ERROR_PARAMETERS, _('At least one MFA method must exist.'));
 			}
 		}
 
