@@ -1220,13 +1220,11 @@ function isBinaryUnits(string $units): bool {
 }
 
 /**
- * Get item value aggregation.
+ * Get item functional value for use in expression macros. Will return null on errors.
  *
  * @param array  $item
  *               $item['itemid']     Item ID.
  *               $item['value_type'] Item value type (either ITEM_VALUE_TYPE_FLOAT or ITEM_VALUE_TYPE_UINT64).
- *               $item['history']    Item history storage period.
- *               $item['trends']     Item trends storage period.
  * @param string $function           Aggregation function (either 'min', 'max' or 'avg').
  * @param string $parameter          Time shift for aggregation (like '1h' or '2w').
  *
@@ -1255,9 +1253,7 @@ function getItemFunctionalValue(array $item, string $function, string $parameter
 		return null;
 	}
 
-	[$item] = CItemHelper::addDataSource([$item], $time_from);
-
-	$aggregated_data = Manager::History()->getAggregatedValues([$item],
+	$aggregated_data = Manager::History()->getAggregatedValues([['source' => 'history'] + $item],
 		CItemHelper::resolveAggregateFunction($function), $time_from
 	);
 
