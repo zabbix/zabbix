@@ -20,4 +20,5 @@ SUBDIRS = \
 	zbxtrends \
 	zbxtime \
 	zbxeval \
+	zbxfile \
 	zbxhttp

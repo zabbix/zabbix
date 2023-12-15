@@ -1,0 +1,1 @@
+...G...... [ZBX-22933] improved vfs.file.regmatch and vfs.file.regexp items to use buffered file read (askolmeisters)
