@@ -41,7 +41,9 @@
 			});
 
 			$form.on('submit', () => {
-				$form.trimValues(['#x_frame_options']);
+				$form.trimValues(['#url', '#login_block', '#uri_valid_schemes', '#x_frame_options',
+					'#iframe_sandboxing_exceptions'
+				]);
 			});
 
 			$("#resetDefaults").click(function() {

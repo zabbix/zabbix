@@ -34,10 +34,30 @@
 		#default_timeouts = {};
 
 		init({default_timeouts}) {
-			this.#form = document.getElementById('timeouts');
+			this.#form = document.getElementById('timeouts-form');
 			this.#default_timeouts = default_timeouts;
 
+			this.#form.addEventListener('submit', (e) => this.#submit(e));
+
 			document.getElementById('reset-defaults').addEventListener('click', (e) => this.#resetDefaults(e.target));
+		}
+
+		#submit(event) {
+			event.preventDefault();
+
+			const fields_to_trim = ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+				'timeout_telnet_agent', 'timeout_script', 'socket_timeout', 'connect_timeout',
+				'media_type_test_timeout', 'script_timeout', 'item_test_timeout', 'report_test_timeout'
+			];
+
+			for (const id of fields_to_trim) {
+				const field = document.getElementById(id);
+
+				field.value = field.value.trim();
+			}
+
+			this.#form.submit();
 		}
 
 		#resetDefaults(reset_button) {
