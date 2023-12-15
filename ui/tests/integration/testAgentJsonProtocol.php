@@ -248,6 +248,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test 'Item test' on agent, agent2, agent 3.0
 	 *
 	 * @backup history_text
 	 * @required-components server, agent, agent2, agent_old
@@ -283,6 +284,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test execution of script on agent
 	 *
 	 * @required-components server, agent
 	 * @backup alerts, history_uint, interface
@@ -301,6 +303,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test execution of script on agent 3.0
 	 *
 	 * @required-components server, agent_old
 	 * @backup alerts, history_uint, interface
@@ -316,6 +319,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test execution of script on agent2
 	 *
 	 * @required-components server, agent2
 	 * @backup alerts, history_uint, interface
@@ -345,6 +349,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test passive check on agent
 	 *
 	 * @required-components server, agent
 	 */
@@ -355,6 +360,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test passive check on agent 3.0
 	 *
 	 * @backup interface
 	 * @required-components server, agent_old
@@ -368,6 +374,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test passive check on agent2
 	 *
 	 * @required-components server, agent2
 	 */
@@ -443,6 +450,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test discovery check on agent
 	 *
 	 * @backup drules,dchecks,dhosts,dservices,hosts
 	 * @required-components server, agent
@@ -454,6 +462,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test discovery check on agent 3.0
 	 *
 	 * @backup drules,dchecks,dhosts,dservices,hosts
 	 * @required-components server, agent_old
@@ -465,6 +474,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	/**
+	 * Test discovery check on agent2
 	 *
 	 * @backup drules,dchecks,dhosts,dservices,hosts
 	 * @required-components server, agent2
@@ -474,4 +484,25 @@ class testAgentJsonProtocol extends CIntegrationTest {
 
 		return true;
 	}
+
+	/**
+	 * @required-components agent, agent_old, agent2
+	 */
+	public function testAgentJsonProtocol_get() {
+		$ports = [
+			$this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort'),
+			$this->getConfigurationValue(self::COMPONENT_AGENT_OLD, 'ListenPort'),
+			$this->getConfigurationValue(self::COMPONENT_AGENT2, 'ListenPort')
+		];
+
+	foreach ($ports as $port) {
+		$output = shell_exec(PHPUNIT_BASEDIR . '/bin/zabbix_get -s 127.0.0.1 -p ' . $port .
+			' -k "system.run[sleep 5 && echo ok]" -t 7');
+
+		$this->assertNotNull($output);
+		$this->assertNotFalse($output);
+		$this->assertStringContainsString('ok', $output);
+	}
+
+	return true;
 }
