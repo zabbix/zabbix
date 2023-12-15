@@ -23,6 +23,7 @@
 #include "../poller/poller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
+#include "zbxversion.h"
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
 #endif
@@ -241,6 +242,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		ZBX_STR2UINT64(item.interface.interfaceid, tmp);
 	else
 		item.interface.interfaceid = 0;
+
+	item.interface.version = ZBX_COMPONENT_VERSION(7, 0, 0);
 
 	db_uchar_from_json(&jp_interface, ZBX_PROTO_TAG_USEIP, table_interface, "useip", &item.interface.useip);
 
