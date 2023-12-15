@@ -335,6 +335,14 @@ void	zbx_db_rollback(void)
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	}
+	else
+	{
+		if (ZBX_DB_DOWN == zbx_db_txn_end_error() && ERR_Z3009 == zbx_db_last_errcode())
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: waiting for %d seconds", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
 }
 
 /******************************************************************************

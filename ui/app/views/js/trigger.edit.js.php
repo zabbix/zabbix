@@ -331,22 +331,7 @@ window.trigger_edit_popup = new class {
 			});
 		})
 
-		this.#sortDependencies(dependencies);
-
 		return dependencies;
-	}
-
-	#sortDependencies(dependencies) {
-		dependencies.sort((a, b) => {
-			if (a.name.toLowerCase() < b.name.toLowerCase()) {
-				return -1;
-			}
-			if (a.name.toLowerCase() > b.name.toLowerCase()) {
-				return 1;
-			}
-
-			return 0;
-		})
 	}
 
 	#addDependencies(dependencies) {
@@ -849,8 +834,6 @@ window.trigger_edit_popup = new class {
 
 			dependencies.push(new_dependency);
 		})
-
-		this.#sortDependencies(dependencies);
 
 		dependency_table.innerHTML = '';
 

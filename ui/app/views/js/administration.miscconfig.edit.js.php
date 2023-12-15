@@ -32,6 +32,10 @@
 				$('#uri_valid_schemes').prop('disabled', !this.checked);
 			});
 
+			$('#x_frame_header_enabled').change(function() {
+				$('#x_frame_options').prop('disabled', !this.checked);
+			});
+
 			$('#iframe_sandboxing_enabled').change(function() {
 				$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
 			});
@@ -81,6 +85,11 @@
 									.prop('checked', validate_uri_schemes == 0 ? 'false' : 'true')
 									.change();
 								$('#uri_valid_schemes').val(uri_valid_schemes);
+								$('#x_frame_header_enabled')
+									.prop('checked',
+										<?= DB::getDefault('config', 'x_frame_options') === 'null' ? 'false' : 'true' ?>
+									)
+									.change();
 								$('#x_frame_options').val(x_frame_options);
 								$('#iframe_sandboxing_enabled')
 									.prop('checked', iframe_sandboxing_enabled == 0 ? 'false' : 'true')
