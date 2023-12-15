@@ -86,7 +86,7 @@ $from_list = (new CFormList())
 	)
 	->addRow((new CTag('h4', true, _('Authorization')))->addClass('input-section-header'))
 	->addRow((new CLabel(_('Login attempts'), 'login_attempts'))->setAsteriskMark(),
-		(new CNumericBox('login_attempts', $data['login_attempts'], 2))
+		(new CNumericBox('login_attempts', $data['login_attempts'], 2, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)

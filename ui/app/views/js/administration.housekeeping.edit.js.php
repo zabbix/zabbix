@@ -26,9 +26,9 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		var $form = $('form#housekeeping');
+		const $form = jQuery('#housekeeping-form');
 
-		$form.on('submit', function() {
+		$form.on('submit', () => {
 			$form.trimValues(['#hk_events_trigger', '#hk_events_service', '#hk_events_internal', '#hk_events_discovery',
 				'#hk_events_autoreg', '#hk_services', '#hk_sessions', '#hk_history', '#hk_trends'
 			]);

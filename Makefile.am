@@ -169,7 +169,9 @@ WRAP_IO_FUNCS = \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=fgets \
 	-Wl,--wrap=fstat \
-	-Wl,--wrap=open
+	-Wl,--wrap=open \
+	-Wl,--wrap=lseek \
+	-Wl,--wrap=close
 
 WRAP_FS_FUNCS = \
 	-Wl,--wrap=opendir \
