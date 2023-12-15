@@ -550,7 +550,7 @@ class testFormSetup extends CWebTest {
 		// MySQL database error depends on php version.
 		$mapping = [
 			'Error connecting to database. Empty cipher.' => [
-				'8.1.0' => '(trying to connect via (null))'
+				'8.1.0' => 'Cannot connect to MySQL using SSL'
 			],
 			'php_network_getaddresses: getaddrinfo failed: Name or service not known' => [
 				'8.1.0' => 'php_network_getaddresses: getaddrinfo for incorrect_DB_host failed: Name or service not known'
