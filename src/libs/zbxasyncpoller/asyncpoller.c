@@ -86,7 +86,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			async_task_remove(task);
 			break;
 		case ZBX_ASYNC_TASK_READ:
-			if (NULL != task->tx_event)
+			if (fd_in != fd && NULL != task->tx_event)
 			{
 				event_free(task->tx_event);
 				task->tx_event = NULL;
@@ -104,7 +104,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			event_add(task->rx_event, NULL);
 			break;
 		case ZBX_ASYNC_TASK_WRITE:
-			if (NULL != task->rx_event)
+			if (fd_in != fd && NULL != task->rx_event)
 			{
 				event_free(task->rx_event);
 				task->rx_event = NULL;
