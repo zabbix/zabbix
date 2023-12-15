@@ -45,6 +45,7 @@
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
+#	include <libxml/parser.h>
 #endif
 
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
