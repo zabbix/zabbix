@@ -402,8 +402,11 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	if (NULL == (result = ha_db_select(info, "select ha_failover_delay,auditlog_enabled,auditlog_mode from config")))
+	if (NULL == (result = ha_db_select(info, "select ha_failover_delay,auditlog_enabled,auditlog_mode "
+			"from config")))
+	{
 		return FAIL;
+	}
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{

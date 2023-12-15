@@ -1003,16 +1003,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete trigger from database                                      *
+ * Purpose: deletes trigger from database                                     *
  *                                                                            *
- * Parameters: triggerids - [IN] trigger identifiers from database            *
+ * Parameters:                                                                *
+ *             triggerids         - [IN] trigger ids from database            *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_mode)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
-	int			i;
 	zbx_vector_uint64_t	selementids;
 	const char		*event_tables[] = {"events"};
 
@@ -1037,7 +1038,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	for (i = 0; i < triggerids->values_num; i++)
+	for (int i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(ZBX_CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_tag where");
@@ -1073,9 +1074,11 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete parent triggers and auto-created children from database    *
+ * Purpose: deletes parent triggers and auto-created children from database   *
  *                                                                            *
- * Parameters: triggerids - [IN] trigger identifiers from database            *
+ * Parameters:                                                                *
+ *             triggerids         - [IN] trigger ids from database            *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids, int audit_context_mode)
@@ -1113,9 +1116,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete triggers by itemid                                         *
+ * Purpose: deletes triggers by itemid                                        *
  *                                                                            *
- * Parameters: itemids - [IN] item identifiers from database                  *
+ * Parameters:                                                                *
+ *             itemids            - [IN] item ids from database               *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1148,9 +1153,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete graph from database                                        *
+ * Purpose: deletes graph from database                                       *
  *                                                                            *
- * Parameters: graphids - [IN] array of graph id's from database              *
+ * Parameters:                                                                *
+ *             graphids           - [IN] graph ids from database              *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode)
@@ -1201,9 +1208,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete parent graphs and auto-created children from database      *
+ * Purpose: deletes parent graphs and auto-created children from database     *
  *                                                                            *
- * Parameters: graphids - [IN] array of graph id's from database              *
+ * Parameters:                                                                *
+ *             graphids           - [IN] graph ids from database              *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids, int audit_context_mode)
@@ -1241,7 +1250,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Parameters: itemids - [IN] item identifiers from database                  *
+ * Parameters:                                                                *
+ *             itemids            - [IN] item ids from database               *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_graphs_by_itemids(const zbx_vector_uint64_t *itemids, int audit_context_mode)
@@ -1302,7 +1313,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get linked (discovered, dependent, etc) items                     *
+ * Purpose: gets linked (discovered, dependent, etc) items                    *
  *                                                                            *
  ******************************************************************************/
 static int	db_get_linked_items(zbx_vector_uint64_t *itemids, int audit_context_mode, const char *filter,
@@ -1354,9 +1365,11 @@ static int	db_get_linked_items(zbx_vector_uint64_t *itemids, int audit_context_m
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete items from database                                        *
+ * Purpose: deletes items from database                                       *
  *                                                                            *
- * Parameters: itemids - [IN] array of item identifiers from database         *
+ * Parameters:                                                                *
+ *             itemids            - [IN] item ids from database               *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
@@ -1470,9 +1483,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete web tests from database                                    *
+ * Purpose: deletes web tests from database                                   *
  *                                                                            *
- * Parameters: httptestids - [IN] array of httptest id's from database        *
+ * Parameters:                                                                *
+ *             httptestids        - [IN] httptest ids from database           *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1570,7 +1585,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Parameters: del_group_prototypeids - [IN] list of group_prototypeids which *
- *                                      will be deleted                       *
+ *                                           will be deleted                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBgroup_prototypes_delete(const zbx_vector_uint64_t *del_group_prototypeids)
@@ -1612,14 +1627,15 @@ static void	DBgroup_prototypes_delete(const zbx_vector_uint64_t *del_group_proto
  *                                                                            *
  * Purpose: deletes host prototypes from database                             *
  *                                                                            *
- * Parameters: host_prototype_ids   - [IN] list of host prototype ids         *
- *             host_prototype_names - [IN] list of host prototype names       *
+ * Parameters:                                                                *
+ *             host_prototype_ids   - [IN]                                    *
+ *             host_prototype_names - [IN]                                    *
+ *             audit_context_mode   - [IN]                                    *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids,
 		const zbx_vector_str_t *host_prototype_names, int audit_context_mode)
 {
-	int			i;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 	zbx_vector_uint64_t	hostids, group_prototype_ids;
@@ -1678,7 +1694,7 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 
 	zbx_db_execute("%s", sql);
 
-	for (i = 0; i < host_prototype_ids->values_num; i++)
+	for (int i = 0; i < host_prototype_ids->values_num; i++)
 	{
 		zbx_audit_host_prototype_del(audit_context_mode, host_prototype_ids->values[i],
 				host_prototype_names->values[i]);
@@ -1695,10 +1711,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template web scenarios from host                           *
+ * Purpose: deletes template web scenarios from host                          *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
@@ -1736,10 +1754,12 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template graphs from host                                  *
+ * Purpose: deletes template graphs from host                                 *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1779,10 +1799,12 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template triggers from host                                *
+ * Purpose: deletes template triggers from host                               *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1821,10 +1843,12 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template host prototypes from host                         *
+ * Purpose: deletes template host prototypes from host                        *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
@@ -1867,10 +1891,12 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template items from host                                   *
+ * Purpose: deletes template items from host                                  *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1909,10 +1935,10 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Description: Retrieve already linked templates for specified host          *
+ * Description: retrieves already linked templates for specified host         *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN/OUT] array of template IDs                   *
+ * Parameters: hostid      - [IN] host id from database                       *
+ *             templateids - [IN/OUT]                                         *
  *                                                                            *
  ******************************************************************************/
 static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1939,10 +1965,12 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 
 /******************************************************************************
  *                                                                            *
- * Parameters: hostid          - [IN] host identifier from database           *
- *             hostname        - [IN] name of the host                        *
- *             del_templateids - [IN] array of template IDs                   *
- *             error           - [OUT] error message                          *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             hostname           - [IN]                                      *
+ *             del_templateids    - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
+ *             error              - [OUT] error message                       *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1953,7 +1981,7 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 	char			*sql = NULL, err[MAX_STRING_LEN];
 	size_t			sql_alloc = 128, sql_offset = 0;
 	zbx_vector_uint64_t	templateids;
-	int			i, res = SUCCEED;
+	int			res = SUCCEED;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
@@ -1963,7 +1991,7 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 
 	get_templates_by_hostid(hostid, &templateids);
 
-	for (i = 0; i < del_templateids->values_num; i++)
+	for (int i = 0; i < del_templateids->values_num; i++)
 	{
 		int	index;
 
@@ -2414,10 +2442,12 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 /******************************************************************************
  *                                                                            *
- * Parameters: host_prototypes     - [IN/OUT] list of host prototypes         *
- *                                   should be sorted by templateid           *
+ * Parameters:                                                                *
+ *             host_prototypes     - [IN/OUT] list of host prototypes, should *
+ *                                            be sorted by templateid         *
+ *             audit_context_mode  - [IN]                                     *
  *             del_hosttemplateids - [OUT] list of hosttemplateids which      *
- *                                   should be deleted                        *
+ *                                         should be deleted                  *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
@@ -2546,17 +2576,17 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Parameters: host_prototypes        - [IN/OUT] list of host prototypes      *
- *                                      should be sorted by templateid        *
- *             del_group_prototypeids - [OUT] sorted list of                  *
- *                                      group_prototypeid which should be     *
- *                                      deleted                               *
- *                                                                            *
- * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Parameters:                                                                  *
+ *             host_prototypes        - [IN/OUT] list of host prototypes,       *
+ *                                               should be sorted by templateid *
+ *             del_group_prototypeids - [OUT] sorted list of group_prototypeid  *
+ *                                            which should be deleted           *
+ *                                                                              *
+ * Comments: auxiliary function for DBcopy_template_host_prototypes()           *
+ *                                                                              *
+ ********************************************************************************/
 static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 		zbx_vector_uint64_t *del_group_prototypeids)
 {
@@ -2749,10 +2779,12 @@ static int	DBhost_prototypes_macro_make(zbx_vector_macros_t *hostmacros, zbx_uin
 
 /******************************************************************************
  *                                                                            *
- * Parameters: host_prototypes - [IN/OUT] list of host prototypes             *
- *                                   should be sorted by templateid           *
- *             del_macroids    - [OUT] sorted list of host macroids which     *
- *                                   should be deleted                        *
+ * Parameters:                                                                *
+ *             host_prototypes    - [IN/OUT] list of host prototypes,         *
+ *                                           should be sorted by templateid   *
+ *             audit_context_mode - [IN]                                      *
+ *             del_macroids       - [OUT] sorted list of host macroids which  *
+ *                                        should be deleted                   *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
@@ -2901,7 +2933,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, int
 /******************************************************************************
  *                                                                            *
  * Parameters: host_prototypes - [IN/OUT] list of host prototypes             *
- *                                   should be sorted by templateid           *
+ *                                        should be sorted by templateid      *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
@@ -3134,11 +3166,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: prepare interfaces to be added, updated or removed from DB        *
- * Parameters: host_prototypes       - [IN/OUT] list of host prototypes       *
+ * Purpose: prepares interfaces to be added, updated or removed from DB       *
+ *                                                                            *
+ * Parameters: host_prototypes  - [IN/OUT] list of host prototypes,           *
  *                                         should be sorted by templateid     *
- *             del_interfaceids      - [OUT] sorted list of host interface    *
- *                                         ids which should be deleted        *
+ *             del_interfaceids - [OUT] sorted list of host interface         *
+ *                                      ids which should be deleted           *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
@@ -3336,10 +3369,11 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
  *                                                                            *
  * Purpose: auxiliary function for DBcopy_template_host_prototypes()          *
  *                                                                            *
- * Parameters: host_prototypes      - [IN] vector of host prototypes          *
+ * Parameters: host_prototypes      - [IN]                                    *
  *             del_hosttemplateids  - [IN] host template ids for delete       *
  *             del_hostmacroids     - [IN] host macro ids for delete          *
  *             del_interfaceids     - [IN] interface ids for delete           *
+ *             audit_context_mode   - [IN]                                    *
  *             db_insert_htemplates - [IN/OUT] templates insert structure     *
  *                                                                            *
  ******************************************************************************/
@@ -4001,12 +4035,14 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy host prototypes from templates and create links between      *
+ * Purpose: copies host prototypes from templates and creates links between   *
  *          them and discovery rules                                          *
  *                                                                            *
- * Parameters: hostid               - [IN] host id                            *
+ * Parameters: hostid               - [IN]                                    *
  *             templateids          - [IN] host template ids                  *
+ *             audit_context_mode   - [IN]                                    *
  *             db_insert_htemplates - [IN/OUT] templates insert structure     *
+ *                                                                            *
  * Comments: auxiliary function for zbx_db_copy_template_elements()           *
  *                                                                            *
  ******************************************************************************/
@@ -5395,10 +5431,12 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy web scenarios from template to host                          *
+ * Purpose: copies web scenarios from template to host                        *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
@@ -5421,12 +5459,14 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy elements from specified template                             *
+ * Purpose: copies elements from specified template                           *
  *                                                                            *
- * Parameters: hostid          - [IN] host identifier from database           *
- *             lnk_templateids - [IN] array of template IDs                   *
- *             link_type       - [IN] link type 0 - manual, 1 - LLD automatic *
- *             error           - [OUT] error message                          *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             lnk_templateids    - [IN]                                      *
+ *             link_type          - [IN] 0 - manual, 1 - LLD automatic        *
+ *             audit_context_mode - [IN]                                      *
+ *             error              - [OUT] error message                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -5523,10 +5563,12 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete hosts from database with all elements                      *
+ * Purpose: deletes hosts from database with all elements                     *
  *                                                                            *
- * Parameters: hostids   - [IN] host identifiers from database                *
- *             hostnames - [IN] names of hosts                                *
+ * Parameters:                                                                *
+ *             hostids            - [IN] host ids from database               *
+ *             hostnames          - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
@@ -5620,11 +5662,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete hosts from database, check if there are any hosts          *
- *          prototypes and delete them first                                  *
+ * Purpose: Deletes hosts from database, checks if there are any hosts        *
+ *          prototypes and deletes them first.                                *
  *                                                                            *
- * Parameters: hostids   - [IN] host identifiers from database                *
- *             hostnames - [IN] names of hosts                                *
+ * Parameters:                                                                *
+ *             hostids            - [IN] host ids from database               *
+ *             hostnames          - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
@@ -5663,15 +5707,17 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add new interface to specified host                               *
+ * Purpose: adds new interface to specified host                              *
  *                                                                            *
- * Parameters: hostid - [IN] host identifier from database                    *
- *             type   - [IN] new interface type                               *
- *             useip  - [IN] how to connect to the host 0/1 - DNS/IP          *
- *             ip     - [IN] IP address                                       *
- *             dns    - [IN] DNS address                                      *
- *             port   - [IN] port                                             *
- *             flags  - [IN] the used connection type                         *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             type               - [IN] new interface type                   *
+ *             useip              - [IN] how to connect to host 0/1 - DNS/IP  *
+ *             ip                 - [IN]                                      *
+ *             dns                - [IN]                                      *
+ *             port               - [IN]                                      *
+ *             flags              - [IN] used connection type                 *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Return value: upon successful completion return interface identifier       *
  *                                                                            *
@@ -5814,19 +5860,22 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add new or update interface options to specified interface        *
+ * Purpose: adds new or updates interface options to specified interface      *
  *                                                                            *
- * Parameters: interfaceid    - [IN] interface id from database               *
- *             version        - [IN] snmp version                             *
- *             bulk           - [IN] snmp bulk options                        *
- *             community      - [IN] snmp community name                      *
- *             securityname   - [IN] snmp v3 security name                    *
- *             securitylevel  - [IN] snmp v3 security level                   *
- *             authpassphrase - [IN] snmp v3 authentication passphrase        *
- *             privpassphrase - [IN] snmp v3 private passphrase               *
- *             authprotocol   - [IN] snmp v3 authentication protocol          *
- *             privprotocol   - [IN] snmp v3 private protocol                 *
- *             contextname    - [IN] snmp v3 context name                     *
+ * Parameters:                                                                *
+ *             interfaceid        - [IN] interface id from database           *
+ *             version            - [IN] snmp version                         *
+ *             bulk               - [IN] snmp bulk options                    *
+ *             community          - [IN] snmp community name                  *
+ *             securityname       - [IN] snmp v3 security name                *
+ *             securitylevel      - [IN] snmp v3 security level               *
+ *             authpassphrase     - [IN] snmp v3 authentication passphrase    *
+ *             privpassphrase     - [IN] snmp v3 private passphrase           *
+ *             authprotocol       - [IN] snmp v3 authentication protocol      *
+ *             privprotocol       - [IN] snmp v3 private protocol             *
+ *             contextname        - [IN] snmp v3 context name                 *
+ *             hostid             - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
@@ -5955,9 +6004,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes the groupids from the list which cannot be deleted        *
+ * Purpose: Removes the groupids from the list which cannot be deleted        *
  *          (host or template can remain without groups or it's an internal   *
- *          group or it's used by a host prototype)                           *
+ *          group or it's used by a host prototype).                          *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
@@ -6082,9 +6131,9 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete host groups from database                                  *
+ * Purpose: deletes host groups from database                                 *
  *                                                                            *
- * Parameters: groupids - [IN] array of group identifiers from database       *
+ * Parameters: groupids - [IN] array of group ids from database               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
@@ -6138,10 +6187,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds host inventory to the host                                   *
+ * Purpose: adds host inventory to host                                       *
  *                                                                            *
- * Parameters: hostid         - [IN] host identifier                          *
- *             inventory_mode - [IN] the host inventory mode                  *
+ * Parameters:                                                                *
+ *             hostid             - [IN]                                      *
+ *             inventory_mode     - [IN] host inventory mode                  *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode)
@@ -6157,10 +6208,12 @@ void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sets host inventory mode for the specified host                   *
+ * Purpose: sets host inventory mode for specified host                       *
  *                                                                            *
- * Parameters: hostid         - [IN] host identifier                          *
- *             inventory_mode - [IN] the host inventory mode                  *
+ * Parameters:                                                                *
+ *             hostid             - [IN]                                      *
+ *             inventory_mode     - [IN] host inventory mode                  *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  * Comments: The host_inventory table record is created if absent.            *
  *                                                                            *

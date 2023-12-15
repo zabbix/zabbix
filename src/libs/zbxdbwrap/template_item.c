@@ -772,20 +772,21 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: save (insert or update) template item                             *
+ * Purpose: saves (insert or update) template item                            *
  *                                                                            *
- * Parameters: hostid            - [IN] parent host id                        *
- *             itemid            - [IN/OUT] item id used for insert           *
- *                                          operations                        *
- *             item              - [IN] item to be saved                      *
- *             db_insert_items   - [IN] prepared item bulk insert             *
- *             db_insert_irtdata - [IN] prepared item discovery bulk insert   *
- *             sql               - [IN/OUT] sql buffer pointer used for       *
- *                                          update operations                 *
- *             sql_alloc         - [IN/OUT] sql buffer already allocated      *
- *                                          memory                            *
- *             sql_offset        - [IN/OUT] offset for writing within sql     *
- *                                          buffer                            *
+ * Parameters: hostid             - [IN] parent host id                       *
+ *             itemid             - [IN/OUT] item id used for insert          *
+ *                                           operations                       *
+ *             item               - [IN] item to be saved                     *
+ *             db_insert_items    - [IN] prepared item bulk insert            *
+ *             db_insert_irtdata  - [IN] prepared item discovery bulk insert  *
+ *             audit_context_mode - [IN]                                      *
+ *             sql                - [IN/OUT] sql buffer pointer used for      *
+ *                                           update operations                *
+ *             sql_alloc          - [IN/OUT] sql buffer already allocated     *
+ *                                           memory                           *
+ *             sql_offset         - [IN/OUT] offset for writing within sql    *
+ *                                           buffer                           *
  *                                                                            *
  ******************************************************************************/
 static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_template_item_t *item,
@@ -823,6 +824,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
 					item->flags, item->field##_orig, item->field);				\
 		}												\
+
 #define PREPARE_UPDATE_STR(FLAG_POSTFIX, field)									\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
@@ -834,6 +836,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			zbx_audit_item_update_json_update_##field(audit_context_mode, item->itemid,		\
 					item->flags, item->field##_orig, item->field);				\
 		}												\
+
 #define PREPARE_UPDATE_STR_SECRET(FLAG_POSTFIX, field)								\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
@@ -977,10 +980,12 @@ dependent:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: saves template items to the target host in database               *
+ * Purpose: saves template items to target host in database                   *
  *                                                                            *
- * Parameters:  hostid - [IN] the target host                                 *
- *              items  - [IN] the template items                              *
+ * Parameters:                                                                *
+ *              hostid             - [IN] target host                         *
+ *              items              - [IN] template items                      *
+ *              audit_context_mode - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
 static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int audit_context_mode)
@@ -1254,8 +1259,8 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
  *                                                                            *
  * Purpose: saves host item prototypes in database                            *
  *                                                                            *
- * Parameters:  hostid  - [IN] the target host                                *
- *              items   - [IN] the template items                             *
+ * Parameters:  hostid  - [IN] target host                                    *
+ *              items   - [IN] template items                                 *
  *                                                                            *
  ******************************************************************************/
 static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
@@ -1464,7 +1469,7 @@ static void	free_template_item(zbx_template_item_t *item)
  *                                                                            *
  * Purpose: frees lld rule condition                                          *
  *                                                                            *
- * Parameters:  item  - [IN] the lld rule condition                           *
+ * Parameters:  condition  - [IN]                                             *
  *                                                                            *
  ******************************************************************************/
 static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
@@ -1696,9 +1701,11 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items, int audit
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template item tags                                           *
+ * Purpose: copies template item tags                                         *
  *                                                                            *
- * Parameters: items       - [IN] vector of new/updated items                 *
+ * Parameters:                                                                *
+ *             items              - [IN] vector of new/updated items          *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_item_tags(const zbx_vector_ptr_t *items, int audit_context_mode)
@@ -1849,9 +1856,11 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items, int audit_con
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template item script parameters                              *
+ * Purpose: copies template item script parameters                            *
  *                                                                            *
- * Parameters: items       - [IN] vector of new/updated items                 *
+ * Parameters:                                                                *
+ *             items              - [IN] vector of new/updated items          *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_item_script_params(const zbx_vector_ptr_t *items, int audit_context_mode)
@@ -2005,9 +2014,11 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items, int 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template discovery item lld macro paths                      *
+ * Purpose: copies template discovery item lld macro paths                    *
  *                                                                            *
- * Parameters: items       - [IN] vector of new/updated items                 *
+ * Parameters:                                                                *
+ *             items              - [IN] vector of new/updated items          *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items, int audit_context_mode)
@@ -3299,10 +3310,12 @@ static void	prepare_lld_items(const zbx_vector_ptr_t *items, zbx_vector_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy template items to host                                       *
+ * Purpose: copies template items to host                                     *
  *                                                                            *
- * Parameters: hostid      - [IN] host id                                     *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters:                                                                *
+ *             hostid             - [IN]                                      *
+ *             templateids        - [IN]                                      *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, int audit_context_mode)

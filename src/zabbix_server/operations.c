@@ -138,9 +138,11 @@ exit:
  *                                                                            *
  * Parameters: hostid         - [IN]  host identifier                         *
  *             groupids       - [IN]  array of group identifiers              *
+ *             event          - [IN]  (for audit context)                     *
  *                                                                            *
  ******************************************************************************/
-static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids, const zbx_db_event *event)
+static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids,
+		const zbx_db_event *event)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1136,7 +1138,8 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 				" where hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
+				groupids->values_num);
 
 		result2 = zbx_db_select("%s", sql);
 

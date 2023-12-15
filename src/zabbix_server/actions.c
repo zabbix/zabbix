@@ -2689,9 +2689,11 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute host, group, template operations linked to the action     *
+ * Purpose: executes host, group, template operations linked to action        *
  *                                                                            *
- * Parameters: action - action to execute operations for                      *
+ * Parameters:                                                                *
+ *             event    - [IN]                                                *
+ *             actionid - [IN] action to execute operations for               *
  *                                                                            *
  * Comments: for message, command operations see                              *
  *           escalation_execute_operations(),                                 *
@@ -2704,7 +2706,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	zbx_db_row_t		row;
 	zbx_uint64_t		groupid, templateid, optagid;
 	zbx_vector_uint64_t	lnk_templateids, del_templateids, new_groupids, del_groupids, new_optagids,
-			del_optagids;
+				del_optagids;
 	int			i;
 	zbx_config_t		cfg;
 

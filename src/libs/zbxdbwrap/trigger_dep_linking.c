@@ -270,22 +270,24 @@ clean:
 
 /**********************************************************************************************************
  *                                                                                                        *
- * Purpose: takes a list of pending trigger dependencies (links) and excludes entries that are            *
+ * Purpose: Takes a list of pending trigger dependencies (links) and excludes entries that are            *
  *          already present on the target host to generate a new list (links_processed). Also, prepare    *
  *          the list of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the     *
  *          target host, since they are not present on the template trigger.                              *
  *                                                                                                        *
- * Parameters: trids               - [IN] vector of trigger identifiers from database                     *
- *             links               - [OUT] pairs of trigger dependencies, list of links_up and links_down *
- *                                         links that we want to be present on the target host            *
+ * Parameters:                                                                                            *
+ *             trids               - [IN] vector of trigger identifiers from database                     *
+ *             audit_context_mode  - [IN]                                                                 *
+ *             links               - [OUT] Pairs of trigger dependencies, list of links_up and links_down *
+ *                                         links that we want to be present on the target host.           *
  *             links_processed     - [OUT] processed links with entries that are already present excluded *
  *             trigger_dep_ids_del - [OUT] list of triggers dependencies that need to be deleted          *
  *                                                                                                        *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error                           *
  *                                                                                                        *
  *********************************************************************************************************/
-static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids, int audit_context_mode,
-		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links_processed,
+static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
+		int audit_context_mode, zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links_processed,
 		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
 	char			*sql = NULL;
@@ -307,7 +309,8 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			" from trigger_depends td,triggers t "
 			" where t.triggerid=td.triggerid_down"
 			" and");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", trids->values, trids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", trids->values,
+			trids->values_num);
 
 	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
@@ -405,8 +408,8 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			{
 				zbx_vector_uint64_append(trigger_dep_ids_del,
 						found->v.values[i]->trigger_dep_id);
-				zbx_audit_trigger_update_json_remove_dependency(audit_context_mode, found->v.values[i]->flags,
-						found->v.values[i]->trigger_dep_id,
+				zbx_audit_trigger_update_json_remove_dependency(audit_context_mode,
+						found->v.values[i]->flags, found->v.values[i]->trigger_dep_id,
 						found->v.values[i]->trigger_down_id);
 			}
 		}
@@ -488,8 +491,8 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links
 	zbx_vector_uint64_create(&trigger_dep_ids_del);
 	zbx_vector_uint64_pair_create(&links_processed);
 
-	if (FAIL == (res = prepare_trigger_dependencies_updates_and_deletes(trids, audit_context_mode, links, &links_processed,
-			&trigger_dep_ids_del)))
+	if (FAIL == (res = prepare_trigger_dependencies_updates_and_deletes(trids, audit_context_mode, links,
+			&links_processed, &trigger_dep_ids_del)))
 	{
 		goto clean;
 	}
@@ -520,16 +523,18 @@ clean:
 
 /********************************************************************************
  *                                                                              *
- * Purpose: update trigger dependencies for specified host                      *
+ * Purpose: updates trigger dependencies for specified host                     *
  *                                                                              *
- * Parameters: hostid    - [IN] host identifier from database                   *
- *             trids     - [IN] vector of trigger identifiers from database     *
- *             is_update - [IN] flag. Values:                                   *
+ * Parameters:                                                                  *
+ *    hostid             - [IN] host id from database                           *
+ *    trids              - [IN] vector of trigger ids from database             *
+ *    is_update          - [IN] flag. Values:                                   *
  *                              TRIGGER_DEP_SYNC_INSERT_OP - 'trids' contains   *
  *                               identifiers of new triggers,                   *
  *                              TRIGGER_DEP_SYNC_UPDATE_OP - 'trids' contains   *
  *                               identifiers of already present triggers which  *
  *                               need to be updated                             *
+ *    audit_context_mode - [IN]                                                 *
  *                                                                              *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
  *                                                                              *

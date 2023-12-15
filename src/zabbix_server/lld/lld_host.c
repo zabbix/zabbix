@@ -1350,7 +1350,8 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 		zbx_vector_uint64_sort(&discoveryids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct groupid from group_discovery where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values, groupids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
+				groupids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid", discoveryids.values,
 				discoveryids.values_num);
@@ -1976,8 +1977,8 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 				" where r.id=g.groupid"
 				" and");
 
-	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name", (const char * const *)group_names.values,
-			group_names.values_num);
+	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
+			(const char * const *)group_names.values, group_names.values_num);
 	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -2200,8 +2201,8 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 					" where type=%d"
 						" and",
 				HOSTGROUP_TYPE_HOST);
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name", (const char * const *)names.values,
-				names.values_num);
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
+				(const char * const *)names.values, names.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FOR_UPDATE);
 
 		result = zbx_db_select("%s", sql);
@@ -3258,7 +3259,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
 					(int)host->custom_interfaces);
 
-			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, host->hostid, host->host);
+			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, host->hostid,
+					host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
@@ -3324,7 +3326,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					d = ",";
 
 					zbx_audit_host_update_json_update_ipmi_authtype(ZBX_AUDIT_LLD_CONTEXT,
-							host->hostid, (int)host->ipmi_authtype_orig, (int)ipmi_authtype);
+							host->hostid, (int)host->ipmi_authtype_orig,
+							(int)ipmi_authtype);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV))
 				{
