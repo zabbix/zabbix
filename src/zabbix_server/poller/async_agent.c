@@ -147,7 +147,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				agent_context->item.ret = NETWORK_ERROR;
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed"
 						" during %s", get_agent_step_string(agent_context->step)));
-				goto stop;
+				goto out;
 			}
 
 			*fd = agent_context->s.socket;
@@ -246,9 +246,9 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			break;
 	}
 stop:
-	zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
 	zbx_tcp_close(&agent_context->s);
-
+out:
+	zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
 	if (ZABBIX_AGENT_STEP_CONNECT_INIT == agent_context->step)
 		return agent_task_process(0, data, fd, addr, dnserr);
 
