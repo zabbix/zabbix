@@ -9347,6 +9347,10 @@ msgstr "Visão geral do inventário de host"
 msgid "Host label type"
 msgstr "Tipo do rótulo do host"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14878,6 +14882,10 @@ msgstr "Ou"
 msgid "Order"
 msgstr "Pedido"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "Coluna de pedidos"
@@ -16967,6 +16975,10 @@ msgstr "Retorna o número de alterações de estado do modo disco/memória desde
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Retorna o percentual de perda de pacotes ICMP."
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -20108,6 +20120,10 @@ msgstr "Existe trigger no template \"%1$s\" que possui dependência com trigger 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "Tipo de rótulo de trigger"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
@@ -23742,6 +23758,11 @@ msgstr "in() - Verifica se um valor é igual a um dos valores listados (1 - igua
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "incluindo subgrupos"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

@@ -751,6 +751,13 @@ class CSchedulingIntervalParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M}.regsub("^([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
 				'{$M: "context"}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

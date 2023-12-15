@@ -23,14 +23,17 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
  * @backup widget, profiles
  *
+ * @dataSource AllItemValueTypes
+ *
  * @onBefore prepareClockWidgetData
  */
 
-class testDashboardClockWidget extends CWebTest {
+class testDashboardClockWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -232,7 +235,7 @@ class testDashboardClockWidget extends CWebTest {
 			/**
 			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
 			 * which requires to select item of the "Host", in this case array_splice function allows us to put
-			 * this fields name into the array. Positive offset (4) starts from the beginning of the array,
+			 * this fields name into the array. Positive offset (5) starts from the beginning of the array,
 			 * while - (0) length parameter - specifies how many elements will be removed.
 			 */
 			if ($type === 'Host time') {
@@ -1209,5 +1212,13 @@ class testDashboardClockWidget extends CWebTest {
 			' ON w.widgetid=wf.widgetid'.
 			' WHERE w.name='.zbx_dbstr('DeleteClock')
 		));
+	}
+
+	/**
+	 * Check if binary items are not available for Clock widget.
+	 */
+	public function testDashboardClockWidget_CheckAvailableItems() {
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for updating clock widgets'];
+		$this->checkAvailableItems($url, 'Clock');
 	}
 }

@@ -9213,6 +9213,10 @@ msgstr "Tổng quan về host lưu trữ"
 msgid "Host label type"
 msgstr "Kiểu nhãn host"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -14713,6 +14717,10 @@ msgstr "Hoặc"
 msgid "Order"
 msgstr ""
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr ""
@@ -16800,6 +16808,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Trả về tỉ lệ mất gói tin ping ICMP."
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -19925,6 +19937,10 @@ msgstr "Trigger trong template \"%1$s\" phụ thuộc vào trigger trong templ
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "Kiểu nhãn trigger"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
@@ -23544,6 +23560,11 @@ msgstr ""
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "bao gồm các nhóm nhỏ"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

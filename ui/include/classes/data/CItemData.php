@@ -397,7 +397,7 @@ final class CItemData {
 			'zabbix[proxy_buffer,buffer,<mode>]',
 			'zabbix[proxy_buffer,state,current]',
 			'zabbix[proxy_buffer,state,changes]',
-			'zabbix[vps,written]',
+			'zabbix[vps,written]'
 		],
 		ITEM_TYPE_DB_MONITOR => [
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',

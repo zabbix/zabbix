@@ -596,6 +596,7 @@ typedef struct
 	zbx_uint64_t		connectorid;
 	int			tags_evaltype;
 	zbx_vector_match_tags_t	connector_tags;
+	int			item_value_type;
 }
 zbx_connector_filter_t;
 
@@ -714,6 +715,8 @@ typedef struct
 	int			severity;
 
 	zbx_vector_ptr_t	tags;
+	int			suppressed;
+	int			mtime;
 }
 zbx_event_t;
 

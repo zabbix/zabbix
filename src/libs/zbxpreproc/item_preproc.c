@@ -287,13 +287,25 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 
 		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->type)
 		{
-			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_DBL) ||
-					FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_DBL))
+			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_DBL))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "Failed to convert value to float from '%s'",
-						zbx_variant_type_desc(value));
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
-				zbx_variant_clear(value);
+				return FAIL;
+			}
+
+			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_DBL))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(history_value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
 
@@ -301,15 +313,28 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 		}
 		else
 		{
-			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_UI64) ||
-					FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_UI64))
+			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_UI64))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "Failed to convert value to ui64 from '%s'",
-						zbx_variant_type_desc(value));
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
-				zbx_variant_clear(value);
 				return FAIL;
 			}
+
+			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_UI64))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(history_value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
 			ret = item_preproc_delta_uint64(value, ts, op_type, history_value, history_ts);
 		}
 

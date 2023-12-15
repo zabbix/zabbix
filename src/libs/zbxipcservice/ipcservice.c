@@ -117,7 +117,8 @@ static size_t		ipc_path_prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_NONE)
  ******************************************************************************/
 static const char	*ipc_make_path(const char *service_name, char **error)
 {
-	size_t		path_len, offset;
+	size_t				path_len, offset;
+	static ZBX_THREAD_LOCAL char	ipc_path_full[ZBX_IPC_PATH_MAX];
 
 	path_len = strlen(service_name);
 
@@ -130,16 +131,17 @@ static const char	*ipc_make_path(const char *service_name, char **error)
 		return NULL;
 	}
 
+	memcpy(ipc_path_full, ipc_path, ipc_path_root_len);
 	offset = ipc_path_root_len;
-	memcpy(ipc_path + offset , ZBX_IPC_SOCKET_PREFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX));
+	memcpy(ipc_path_full + offset, ZBX_IPC_SOCKET_PREFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX));
 	offset += ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX);
-	memcpy(ipc_path + offset, ipc_path_prefix, ipc_path_prefix_len);
+	memcpy(ipc_path_full + offset, ipc_path_prefix, ipc_path_prefix_len);
 	offset += ipc_path_prefix_len;
-	memcpy(ipc_path + offset, service_name, path_len);
+	memcpy(ipc_path_full + offset, service_name, path_len);
 	offset += path_len;
-	memcpy(ipc_path + offset, ZBX_IPC_SOCKET_SUFFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + 1);
+	memcpy(ipc_path_full + offset, ZBX_IPC_SOCKET_SUFFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + 1);
 
-	return ipc_path;
+	return ipc_path_full;
 }
 
 /******************************************************************************

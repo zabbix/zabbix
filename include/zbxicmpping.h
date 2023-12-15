@@ -28,6 +28,7 @@ typedef struct
 	zbx_get_config_str_f	get_fping_location;
 	zbx_get_config_str_f	get_fping6_location;
 	zbx_get_config_str_f	get_tmpdir;
+	zbx_get_progname_f	get_progname;
 }
 zbx_config_icmpping_t;
 

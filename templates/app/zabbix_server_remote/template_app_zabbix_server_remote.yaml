@@ -1537,6 +1537,26 @@ zabbix_export:
                   value: capacity
                 - tag: scope
                   value: performance
+        - uuid: 850743f411d9458cbf5d6de410d15edc
+          name: 'Remote Zabbix server: Number of values synchronized with the database per second.'
+          type: DEPENDENT
+          key: vps.written
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Average quantity of values written to the database, recalculated once per minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.vps.written_total
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: system
         - uuid: 98f47a07e2ba4294a9eb2aa1df2ba9f3
           name: 'Remote Zabbix server: History write cache, % used'
           type: DEPENDENT
