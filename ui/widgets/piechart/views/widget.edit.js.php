@@ -190,7 +190,7 @@ window.widget_pie_chart_form = new class {
 		const merge_color_set = document.getElementById('merge_color').value !== '';
 
 		if (!merge_color_set) {
-			const merge_color = colorPalette.getNextColor(used_colors);
+			const merge_color = '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>';
 			$.colorpicker('set_color_by_id', 'merge_color', merge_color);
 		}
 	}

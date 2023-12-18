@@ -57,6 +57,7 @@ class WidgetForm extends CWidgetForm {
 	private const LEGEND_LINES_MAX = 10;
 	private const LEGEND_LINES_MIN = 1;
 
+	public const MERGE_COLOR_DEFAULT = '768D99';
 	private const MERGE_PERCENT_MAX = 10;
 	private const MERGE_PERCENT_MIN = 1;
 
