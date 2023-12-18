@@ -102,13 +102,6 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 
 		ZBX_DBROW2UINT64(proxyid, row[1]);
 		ZBX_DBROW2UINT64(hostid, row[0]);
-
-		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)))
-		{
-			pg_cache_set_host_proxy(cache, hostid, 0);
-			continue;
-		}
-
 		ZBX_STR2UINT64(revision, row[2]);
 		ZBX_STR2UINT64(hostproxyid, row[3]);
 
@@ -120,6 +113,16 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 			}, *host;
 
 		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &host_local, sizeof(host_local));
+
+		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)) ||
+				NULL == proxy->group ||
+				FAIL == zbx_vector_uint64_search(&proxy->group->hostids, hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			pg_cache_set_host_proxy(cache, hostid, 0);
+			continue;
+		}
+
 		zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
 
 		/* proxies with assigned hosts are assumed to be online */
@@ -128,7 +131,6 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 
 		if (NULL != proxy->group && proxy->group->hostmap_revision < revision)
 			proxy->group->hostmap_revision = revision;
-
 	}
 	zbx_db_free_result(result);
 
