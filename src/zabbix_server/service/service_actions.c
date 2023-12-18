@@ -66,7 +66,8 @@ static int	condition_match_service_name(const zbx_service_action_condition_t *co
  *           value - the tag name will be always matched as 'equal'           *
  *                                                                            *
  ******************************************************************************/
-static int	match_tags(const zbx_vector_ptr_t *tags, const char *name, const char *value, unsigned char op)
+static int	match_tags(const zbx_vector_service_tag_ptr_t *tags, const char *name, const char *value,
+		unsigned char op)
 {
 	int	i, ret, expected_ret;
 
