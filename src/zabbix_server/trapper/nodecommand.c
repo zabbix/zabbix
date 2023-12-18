@@ -479,6 +479,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	user_timezone = zbx_db_get_user_timezone(user->userid);
 
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+	{
+		if (SUCCEED != zbx_db_fetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+			goto fail;
+	}
+
 	/* substitute macros in script body and webhook parameters */
 
 	if (ZBX_SCRIPT_MANUALINPUT_YES == script.manualinput)
@@ -503,6 +509,29 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		script.command = zbx_strdup(script.command, expanded_cmd);
 
 		zbx_free(expanded_cmd);
+
+		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
+		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
+		{
+			int i;
+
+			for (i = 0; i < webhook_params.values_num; i++)
+			{
+				char *expanded_value = NULL;
+				size_t expanded_value_size;
+
+				/* avoid unnecessary mem (re)allocation in case the macro isn't present */
+				if (NULL == strstr(webhook_params.values[i].second, "{MANUALINPUT}"))
+					continue;
+
+				substitute_macro(webhook_params.values[i].second, "{MANUALINPUT}", manualinput,
+						&expanded_value, &expanded_value_size);
+
+				webhook_params.values[i].second = zbx_strdup(webhook_params.values[i].second, expanded_value);
+
+				zbx_free(expanded_value);
+			}
+		}
 	}
 	else if (NULL != manualinput) /* script does not take additional input yet we've received a value anyway */
 	{
@@ -537,9 +566,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
-		if (SUCCEED != zbx_db_fetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
-			goto fail;
-
 		for (i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
