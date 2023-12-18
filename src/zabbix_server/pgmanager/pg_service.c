@@ -333,6 +333,7 @@ int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char
 	zbx_ipc_socket_t	sock;
 	int			ret = FAIL, proxyids_num, status;
 	zbx_ipc_message_t	message = {0};
+	const unsigned char	*ptr = NULL;
 
 	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PG_MANAGER, SEC_PER_MIN, error))
 		return FAIL;
@@ -350,8 +351,7 @@ int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char
 		goto out;
 	}
 
-	const unsigned char	*ptr = message.data;
-
+	ptr = message.data;
 	ptr += zbx_deserialize_value(ptr, &status);
 
 	if (-1 == status)

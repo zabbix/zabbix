@@ -1568,6 +1568,7 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 	char			*token = NULL;
 	zbx_session_t		*session;
 	zbx_history_recv_host_t	host;
+	size_t			token_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1578,8 +1579,6 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 		ret = SUCCEED;
 		goto out;
 	}
-
-	size_t	token_alloc = 0;
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc, NULL))
 	{
