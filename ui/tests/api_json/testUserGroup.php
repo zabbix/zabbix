@@ -910,9 +910,105 @@ class testUserGroup extends CAPITest {
 		$this->call('usergroup.update', self::resolveIds($groups), $expected_error);
 	}
 
+	public static function crateValidMfaDataProvider(): array {
+		return [
+			'Create group with a specific MFA method' => [
+				'group' => [
+					[
+						'name' => 'API group mfa #1',
+						'mfaid' => 'MFA TOTP method'
+					]
+				],
+				'expected_error' => null
+			],
+			'Create group with default MFA method' => [
+				'group' => [
+					[
+						'name' => 'API group mfa #2',
+						'mfaid' => 0
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public static function crateInvalidMfaDataProvider(): array {
+		return [
+			'Create group with invalid MFA method' => [
+				'group' => [
+					[
+						'name' => 'API group mfa #3',
+						'mfaid' => 999
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mfaid": referred object does not exist.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider crateValidMfaDataProvider
+	 * @dataProvider crateInvalidMfaDataProvider
+	 */
+	public function testCreateWithMfaMethod(array $groups, $expected_error): void {
+		$response = $this->call('usergroup.create', self::resolveIds($groups), $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertArrayHasKey('usrgrpids', $response['result']);
+			self::$data['mfaid'] += array_combine(array_column($groups, 'name'), $response['result']['usrgrpids']);
+		}
+	}
+
+	public static function updateValidMfaDataProvider(): array {
+		return [
+			'Update group to specific mfa method ' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #1',
+						'mfaid' => 'MFA TOTP method'
+					]
+				],
+				'expected_error' => null
+			],
+			'Update group to default mfa method ' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #2',
+						'mfaid' => 0
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public static function updateInvalidMfaDataProvider(): array {
+		return [
+			'Update group with invalid mfaid' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #3',
+						'mfaid' => 999
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mfaid": referred object does not exist.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider updateValidMfaDataProvider
+	 * @dataProvider updateInvalidMfaDataProvider
+	 */
+	public function testUpdateWithMfaMethod(array $groups, $expected_error): void {
+		$this->call('usergroup.update', self::resolveIds($groups), $expected_error);
+	}
+
 	public static $data = [
 		'usrgrpid' => [],
-		'userdirectoryid' => []
+		'userdirectoryid' => [],
+		'mfaid' => []
 	];
 
 	/**
@@ -939,7 +1035,7 @@ class testUserGroup extends CAPITest {
 	/**
 	 * Create data to be used in tests.
 	 */
-	public function prepareTestData() {
+	public function prepareTestData(): void {
 		$response = CDataHelper::call('userdirectory.create', [[
 			'name' => 'API LDAP #1',
 			'idp_type' => IDP_TYPE_LDAP,
@@ -951,5 +1047,15 @@ class testUserGroup extends CAPITest {
 
 		$this->assertArrayHasKey('userdirectoryids', $response);
 		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
+
+		$mfa = CDataHelper::call('mfa.create', [[
+			'type' => MFA_TYPE_TOTP,
+			'name' => 'MFA TOTP method',
+			'hash_function' => TOTP_HASH_SHA1,
+			'code_length' => TOTP_CODE_LENGTH_8
+		]]);
+
+		$this->assertArrayHasKey('mfaids', $mfa);
+		self::$data['mfaid'] = array_combine(['MFA TOTP method'], $mfa['mfaids']);
 	}
 }

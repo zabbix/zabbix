@@ -64,6 +64,7 @@ class CUserGroup extends CApiService {
 		$defOptions = [
 			'usrgrpids'					=> null,
 			'userids'					=> null,
+			'mfaids'					=> null,
 			'status'					=> null,
 			// filter
 			'filter'					=> null,
@@ -119,6 +120,12 @@ class CUserGroup extends CApiService {
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
 			$sqlParts['where'][] = dbConditionInt('ug.userid', $options['userids']);
 			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
+		}
+
+		if (!is_null($options['mfaids'])) {
+			zbx_value2array($options['userids']);
+
+			$sqlParts['where'][] = dbConditionInt('ug.mfaid', $options['mfaids']);
 		}
 
 		// status
@@ -242,7 +249,8 @@ class CUserGroup extends CApiService {
 			'userids' =>				['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
+			]],
+			'mfaid' =>					['type' => API_ID, 'flags' => API_NORMALIZE]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -267,6 +275,7 @@ class CUserGroup extends CApiService {
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
+		$this->checkMfa($usrgrps);
 	}
 
 	/**
@@ -353,7 +362,8 @@ class CUserGroup extends CApiService {
 			'userids' =>				['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
+			]],
+			'mfaid' =>					['type' => API_ID, 'flags' => API_NORMALIZE]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
@@ -396,6 +406,7 @@ class CUserGroup extends CApiService {
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
+		$this->checkMfa($usrgrps);
 	}
 
 	/**
@@ -1329,6 +1340,39 @@ class CUserGroup extends CApiService {
 					&& !array_key_exists($usrgrp['userdirectoryid'], $db_userdirectories)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/userdirectoryid',
+						_('referred object does not exist')
+					)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Check for valid MFA method.
+	 *
+	 * @param array  $usrgrps
+	 * @param string $usrgrps['mfaid']
+	 *
+	 * @throws APIException
+	 */
+	private function checkMfa(array $usrgrps) {
+		$mfaids =  array_filter(array_column($usrgrps, 'mfaid'));
+
+		if (!$mfaids) {
+			return;
+		}
+
+		$db_mfas = DB::select('mfa', [
+			'output' => [],
+			'mfaids' => $mfaids,
+			'preservekeys' => true
+		]);
+
+		foreach ($usrgrps as $i => $usrgrp) {
+			if (array_key_exists('mfaid', $usrgrp) && $usrgrp['mfaid'] != 0
+				&& !array_key_exists($usrgrp['mfaid'], $db_mfas)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/mfaid',
 						_('referred object does not exist')
 					)
 				);
