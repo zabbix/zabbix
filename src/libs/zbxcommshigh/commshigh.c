@@ -600,7 +600,9 @@ retry:
 
 			goto retry;
 		}
-		*error = zbx_strdup(*error, "sequential redirect responses detected");
+
+		if (NULL != error)
+			*error = zbx_strdup(NULL, "sequential redirect responses detected");
 
 		goto cleanup;
 	}
