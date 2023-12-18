@@ -179,19 +179,8 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#displayingOptionsTabInit() {
-		const used_colors = [];
-
-		for (const color of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
-			}
-		}
-
-		const merge_color_set = document.getElementById('merge_color').value !== '';
-
-		if (!merge_color_set) {
-			const merge_color = '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>';
-			$.colorpicker('set_color_by_id', 'merge_color', merge_color);
+		if (document.getElementById('merge_color').value === '') {
+			$.colorpicker('set_color_by_id', 'merge_color', '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>');
 		}
 	}
 
