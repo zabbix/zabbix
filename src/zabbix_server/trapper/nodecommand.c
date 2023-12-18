@@ -513,7 +513,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
 		{
-			int i;
+			int	i;
 
 			for (i = 0; i < webhook_params.values_num; i++)
 			{
