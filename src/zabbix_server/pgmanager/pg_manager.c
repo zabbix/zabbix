@@ -479,8 +479,15 @@ static void	pgm_db_flush_host_proxy_revision(zbx_uint64_t revision)
 	}
 	else
 	{
-		zbx_db_execute("update ids set nextid=" ZBX_FS_UI64
-				" where table_name='host_proxy' and field_name='revision'", revision);
+		zbx_uint64_t	nextid;
+
+		ZBX_DBROW2UINT64(nextid, row[0]);
+
+		if (nextid != revision)
+		{
+			zbx_db_execute("update ids set nextid=" ZBX_FS_UI64
+					" where table_name='host_proxy' and field_name='revision'", revision);
+		}
 	}
 
 	zbx_db_free_result(result);

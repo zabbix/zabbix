@@ -94,49 +94,44 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 
 	pg_cache_lock(pgs->cache);
 
-	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + sizeof(int);
-
 	/* if proxy is not cached or registered to proxy group return 'no sync' mode */
 	/* with 0 hostmap_revision, forcing full sync next time                      */
-	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)))
+	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)) &&
+			NULL != proxy->group)
 	{
-		if (NULL != proxy->group)
-		{
-			hostmap_revision = proxy->group->hostmap_revision;
-			failover_delay = proxy->group->failover_delay;
+		now = time(NULL);
 
-			if (0 == proxy_hostmap_revision || proxy_hostmap_revision > hostmap_revision)
-			{
-				/* either proxy or server has been restarted, process with full sync */
-				mode = ZBX_PROXY_SYNC_FULL;
-			}
-			else if (proxy_hostmap_revision < hostmap_revision)
-			{
-				/* host mapping was changed since last sync, process with partial sync */
-				if (SEC_PER_DAY <= now - proxy->sync_time)
-				{
-					zbx_vector_pg_host_clear(&proxy->deleted_group_hosts);
-					mode = ZBX_PROXY_SYNC_FULL;
-				}
-				else
-				{
-					for (int i = 0; i < proxy->deleted_group_hosts.values_num;)
-					{
-						if (proxy->deleted_group_hosts.values[i].revision <= proxy_hostmap_revision)
-							zbx_vector_pg_host_remove_noorder(&proxy->deleted_group_hosts, i);
-						else
-							i++;
-					}
-
-					data_len += sizeof(int) + proxy->deleted_group_hosts.values_num * sizeof(zbx_uint64_t);
-					mode = ZBX_PROXY_SYNC_PARTIAL;
-				}
-			}
-		}
-
-		if (proxy->remote_hostmap_revision != proxy_hostmap_revision)
+		if (proxy->remote_hostmap_revision != hostmap_revision)
 			proxy->sync_time = now;
+
+		hostmap_revision = proxy->group->hostmap_revision;
+		failover_delay = proxy->group->failover_delay;
+
+		if (0 == proxy_hostmap_revision || proxy_hostmap_revision > hostmap_revision ||
+				SEC_PER_DAY <= now - proxy->sync_time)
+		{
+			/* either proxy or server has been restarted or too much time has passed - */
+			/* process with full sync                                                  */
+			mode = ZBX_PROXY_SYNC_FULL;
+		}
+		else if (proxy_hostmap_revision < hostmap_revision)
+		{
+			for (int i = 0; i < proxy->deleted_group_hosts.values_num;)
+			{
+				if (proxy->deleted_group_hosts.values[i].revision <= proxy_hostmap_revision)
+					zbx_vector_pg_host_remove_noorder(&proxy->deleted_group_hosts, i);
+				else
+					i++;
+			}
+
+			mode = ZBX_PROXY_SYNC_PARTIAL;
+		}
 	}
+
+	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + sizeof(int);
+
+	if (ZBX_PROXY_SYNC_PARTIAL == mode)
+		data_len += sizeof(int) + proxy->deleted_group_hosts.values_num * sizeof(zbx_uint64_t);
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, mode);
