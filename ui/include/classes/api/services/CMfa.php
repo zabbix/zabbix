@@ -121,9 +121,7 @@ class CMfa extends CApiService {
 	public function create(array $mfas): array {
 		$this->validateCreate($mfas);
 
-//		$db_mfa_method_count = DB::select('mfa', [		// TODO do we need this?
-//			'countOutput' => true
-//		]);
+		$db_mfa_method_count = DB::select('mfa', ['countOutput' => true]);
 
 		$mfaids = DB::insert('mfa', $mfas);
 
@@ -134,10 +132,11 @@ class CMfa extends CApiService {
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MFA, $mfas);
 
-//		if ($db_mfa_method_count == 0 && $mfaids) {			// TODO updates default, is it the right method?
-//			$mfaid = reset($mfaids);
-//			API::Authentication()->update(['mfaid' => $mfaid]);
-//		}
+		if ($db_mfa_method_count == 0 && $mfaids) {
+			$mfaid = reset($mfaids);
+
+			API::Authentication()->update(['mfaid' => $mfaid]);
+		}
 
 		return ['mfaids' => $mfaids];
 	}
@@ -326,6 +325,25 @@ class CMfa extends CApiService {
 		// Cannot remove the last remaining MFA method if MFA authentication is enabled.
 		if ($auth['mfa_status'] == MFA_ENABLED && $mfas_left == 0) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
+		}
+
+		$db_groups = API::UserGroup()->get([
+			'output' => ['mfaid'],
+			'mfaids' => $mfaids,
+			'limit' => 1
+		]);
+
+		if ($db_groups) {
+			$db_group = reset($db_groups);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete MFA method "%1$s".',
+					$db_mfas[$db_group['mfaid']]['name'])
+			);
+		}
+
+		if (in_array($auth['mfaid'], $mfaids)) {
+			// If last (default) is removed, reset default mfaid to prevent from foreign key constraint.
+			API::Authentication()->update(['mfaid' => 0]);
 		}
 	}
 

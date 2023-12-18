@@ -125,7 +125,7 @@ class CUserGroup extends CApiService {
 		if (!is_null($options['mfaids'])) {
 			zbx_value2array($options['userids']);
 
-			$sqlParts['where'][] = dbConditionInt('ug.mfaid', $options['mfaids']);
+			$sqlParts['where'][] = dbConditionInt('g.mfaid', $options['mfaids']);
 		}
 
 		// status

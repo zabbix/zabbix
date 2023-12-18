@@ -43,20 +43,35 @@ class testMfa extends CAPITest {
 				'api_hostname' => 'api-999a9a99.duosecurity.com',
 				'clientid' => 'AAA58NOODEGUA6ST7AAA',
 				'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult'
+			],
+			'DUO test case 2' => [
+				'type' => MFA_TYPE_DUO,
+				'name' => 'DUO test case 2',
+				'api_hostname' => 'api-999a9a99.duosecurity.com',
+				'clientid' => 'AAA58NOODEGUA6ST7AAA',
+				'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult'
 			]
-		]
+		],
+		'usrgrpids' => []
 	];
 
 	public function prepareTestData() {
-		$response = CDataHelper::call('mfa.create', array_values(self::$data['mfas']));
+		$mfaids = CDataHelper::call('mfa.create', array_values(self::$data['mfas']));
 
-		$this->assertArrayHasKey('mfaids', $response);
-		self::$data['mfaids'] = array_combine(array_keys(self::$data['mfas']), $response['mfaids']);
+		$this->assertArrayHasKey('mfaids', $mfaids);
+		self::$data['mfaids'] = array_combine(array_keys(self::$data['mfas']), $mfaids['mfaids']);
 
 		CDataHelper::call('authentication.update', [
 			'mfaid' => self::$data['mfaids']['DUO test case 1'],
 			'mfa_status' => MFA_ENABLED
 		]);
+
+		$usrgrpids = CDataHelper::call('usergroup.create', [
+			'name' => 'User group with MFA',
+			'mfaid' => self::$data['mfaids']['DUO test case 2']
+		]);
+		$this->assertArrayHasKey('usrgrpids', $usrgrpids);
+		self::$data['usrgrpids'] = array_combine(['User group with MFA'], $usrgrpids['usrgrpids']);
 	}
 
 	public function resolveids($mfas) {
@@ -327,10 +342,10 @@ class testMfa extends CAPITest {
 	 * @dataProvider updateValidDataProvider
 	 * @dataProvider updateInvalidDataProvider
 	 */
-//	public function testUpdate(array $mfas, $expected_error) {
-//		$mfas = $this->resolveids($mfas);
-//		$this->call('mfa.update', $mfas, $expected_error);
-//	}
+	public function testUpdate(array $mfas, $expected_error) {
+		$mfas = $this->resolveids($mfas);
+		$this->call('mfa.update', $mfas, $expected_error);
+	}
 
 	public static function deleteValidDataProvider(): array {
 		return [
@@ -345,12 +360,12 @@ class testMfa extends CAPITest {
 
 	public static function deleteInvalidDataProvider(): array {
 		return [
-//			'Test delete MFA with user group' => [
-//				'mfas' => [
-//					'mfaids' => ['mfa #1']
-//				],
-//				'expected_error' => 'Cannot delete mfa "mfa #1".'
-//			],
+			'Test delete MFA with user group' => [
+				'mfas' => [
+					'mfaids' => ['DUO test case 2']
+				],
+				'expected_error' => 'Cannot delete MFA method "DUO test case 2".'
+			],
 			'Test delete default MFA method' => [
 				'mfas' => [
 					'mfaids' => ['DUO test case 1']
@@ -370,22 +385,23 @@ class testMfa extends CAPITest {
 	 * @dataProvider deleteValidDataProvider
 	 * @dataProvider deleteInvalidDataProvider
 	 */
-//	public function testDelete(array $mfas, $expected_error): void {
-//		$mfas = $this->resolveids($mfas);
-//
-//		$this->assertNotEmpty($mfas, 'No user directories to test delete');
-//		$this->call('mfa.delete', $mfas['mfaids'], $expected_error);
-//
-//		if ($expected_error === null) {
-//			self::$data['mfaids'] = array_diff(self::$data['mfaids'], $mfas['mfaids']);
-//		}
-//	}
+	public function testDelete(array $mfas, $expected_error): void {
+		$mfas = $this->resolveids($mfas);
+
+		$this->assertNotEmpty($mfas, 'No user directories to test delete');
+		$this->call('mfa.delete', $mfas['mfaids'], $expected_error);
+
+		if ($expected_error === null) {
+			self::$data['mfaids'] = array_diff(self::$data['mfaids'], $mfas['mfaids']);
+		}
+	}
 
 	/**
 	 * Remove data created for tests.
 	 */
 	public static function cleanTestData(): void {
 		CDataHelper::call('authentication.update', ['mfaid' => 0, 'mfa_status' => MFA_DISABLED]);
+		CDataHelper::call('usergroup.delete', array_values(self::$data['usrgrpids']));
 		CDataHelper::call('mfa.delete', array_values(self::$data['mfaids']));
 	}
 }
