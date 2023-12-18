@@ -49,7 +49,7 @@ class CControllerTokenCreate extends CController {
 				$validator = new CNewValidator($this->getInputAll(), $fields);
 
 				foreach ($validator->getAllErrors() as $error) {
-					error($error);
+					info($error);
 				}
 
 				if ($validator->isErrorFatal() || $validator->isError()) {
