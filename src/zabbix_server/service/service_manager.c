@@ -52,10 +52,6 @@ void	zbx_status_update_free(zbx_status_update_t *status_update)
 	zbx_free(status_update);
 }
 
-/* keep deleted problem eventids up to 2 hours in case problem deletion arrived before problem or before recovery */
-#define ZBX_PROBLEM_CLEANUP_AGE		(SEC_PER_HOUR * 2)
-#define ZBX_PROBLEM_CLEANUP_FREQUENCY	SEC_PER_HOUR
-
 ZBX_PTR_VECTOR_IMPL(service_ptr, zbx_service_t *)
 ZBX_PTR_VECTOR_IMPL(service_problem_ptr, zbx_service_problem_t *)
 
@@ -999,7 +995,6 @@ static void	update_action_formula(zbx_service_action_t *action)
 
 	char				*formula = NULL;
 	size_t				formula_alloc = 0, formula_offset = 0;
-	int				i;
 	zbx_service_action_condition_t	*condition;
 	unsigned char			last_type = ZBX_CONDITION_TYPE_NONE;
 	char				*ops[] = {NULL, "and", "or"};
@@ -1009,7 +1004,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 	if (0 == action->conditions.values_num || ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		goto out;
 
-	for (i = 0; i < action->conditions.values_num; i++)
+	for (int i = 0; i < action->conditions.values_num; i++)
 	{
 		condition = (zbx_service_action_condition_t *)action->conditions.values[i];
 
@@ -1187,7 +1182,6 @@ static void	service_clean(zbx_service_t *service)
 	zbx_vector_service_problem_tag_ptr_destroy(&service->service_problem_tags);
 	zbx_vector_service_problem_ptr_clear_ext(&service->service_problems, free_service_problem);
 	zbx_vector_service_problem_ptr_destroy(&service->service_problems);
-
 }
 
 static void	service_tag_clean(zbx_service_tag_t *tag)
@@ -3390,6 +3384,10 @@ static void	recalculate_services(zbx_service_manager_t *service_manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/* keep deleted problem eventids up to 2 hours in case problem deletion arrived before problem or before recovery */
+#define ZBX_PROBLEM_CLEANUP_AGE		(SEC_PER_HOUR * 2)
+#define ZBX_PROBLEM_CLEANUP_FREQUENCY	SEC_PER_HOUR
+
 static void	cleanup_deleted_problems(zbx_service_manager_t *service_manager, int now)
 {
 	zbx_hashset_iter_t	iter;
@@ -3414,14 +3412,13 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_ipc_client_t		*client;
 	zbx_ipc_message_t		*message;
 	int				ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0,
-					service_update_num = 0;
+					service_update_num = 0,service_cache_reload_requested = 0,
+					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t		service_manager;
 	zbx_timespec_t			timeout = {1, 0};
-	int				service_cache_reload_requested = 0;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_ipc_async_socket_t		rtc;
 	zbx_thread_service_manager_args *service_manager_args_in = (zbx_thread_service_manager_args *)
@@ -3626,3 +3623,5 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
+#undef ZBX_PROBLEM_CLEANUP_AGE
+#undef ZBX_PROBLEM_CLEANUP_FREQUENCY
