@@ -1125,12 +1125,10 @@ static void	sync_action_conditions(zbx_service_manager_t *service_manager, int r
 
 	if (0 != actions.values_num)
 	{
-		int	i;
-
 		zbx_vector_service_action_ptr_sort(&actions, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 		zbx_vector_service_action_ptr_uniq(&actions, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
-		for (i = 0; i < actions.values_num; i++)
+		for (int i = 0; i < actions.values_num; i++)
 		{
 			action = (zbx_service_action_t *)actions.values[i];
 			zbx_vector_service_action_condition_ptr_sort(&action->conditions, condition_type_compare);
@@ -1256,13 +1254,13 @@ static void	service_problems_index_clean(void *data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get service status when calculating parent service status         *
+ * Purpose: gets service status when calculating parent service status        *
  *                                                                            *
- * Parameters: service - [IN] the service                                     *
- *             status  - [OUT] the service status                             *
+ * Parameters: service - [IN]                                                 *
+ *             status  - [OUT] service status                                 *
  *                                                                            *
- * Return value: SUCCEED - the status is returned                             *
- *               FAIL    - the service must be ignored                        *
+ * Return value: SUCCEED - status is returned                                 *
+ *               FAIL    - service must be ignored                            *
  *                                                                            *
  ******************************************************************************/
 int	service_get_status(const zbx_service_t	*service, int *status)
@@ -1305,14 +1303,14 @@ int	service_get_status(const zbx_service_t	*service, int *status)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds an update to the queue                                       *
+ * Purpose: adds update to queue                                              *
  *                                                                            *
- * Parameters: updates   - [OUT] the update queue                             *
- *             sourceid  - [IN] the update source id                          *
- *             status    - [IN] the update status                             *
- *             clock     - [IN] the update timestamp                          *
+ * Parameters: updates   - [OUT] update queue                                 *
+ *             sourceid  - [IN] update source id                              *
+ *             status    - [IN] update status                                 *
+ *             clock     - [IN] update timestamp                              *
  *                                                                            *
- * Return value: The created status update.                                   *
+ * Return value: created status update                                        *
  *                                                                            *
  ******************************************************************************/
 static zbx_status_update_t	*its_updates_append(zbx_vector_status_update_ptr_t *updates, zbx_uint64_t sourceid,
@@ -1351,7 +1349,7 @@ static zbx_service_update_t	*update_service(zbx_hashset_t *service_updates, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: used to sort service updates by source id                         *
+ * Purpose: sorts service updates by source id                                *
  *                                                                            *
  ******************************************************************************/
 static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
@@ -1363,15 +1361,15 @@ static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_st
 
 /******************************************************************************
  *                                                                            *
- * Purpose: writes service status changes, generated service alarms, service  *
- *          problem changes into database                                     *
+ * Purpose: Writes service status changes, generated service alarms and       *
+ *          service problem changes into database.                            *
  *                                                                            *
- * Parameters: alarms               - [IN] the service alarms update queue    *
- *             service_updates      - [IN] the service status updates         *
- *             service_problems_new - [IN] the service problems               *
- *             service_problemids   - [IN] the service problems to delete     *
+ * Parameters: alarms               - [IN] service alarms update queue        *
+ *             service_updates      - [IN] service status updates             *
+ *             service_problems_new - [IN]                                    *
+ *             service_problemids   - [IN] service problems to delete         *
  *                                                                            *
- * Return value: SUCCEED - the data was written successfully                  *
+ * Return value: SUCCEED - data was written successfully                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -1611,13 +1609,13 @@ int	service_get_main_status(const zbx_service_t *service)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get children with status greater or equal to the specified        *
+ * Purpose: gets children with status greater or equal to specified           *
  *                                                                            *
- * Parameters: service      - [IN] the service                                *
- *             status       - [IN] the target status                          *
- *             children     - [OUT] the children having the required status   *
- *             total_weight - [OUT] the weight of all not ignored children    *
- *             total_num    - [OUT] the number of all not ignored children    *
+ * Parameters: service      - [IN]                                            *
+ *             status       - [IN] target status                              *
+ *             children     - [OUT] children having required status           *
+ *             total_weight - [OUT] weight of all not ignored children        *
+ *             total_num    - [OUT] number of all not ignored children        *
  *                                                                            *
  ******************************************************************************/
 static void	service_get_children_by_status(const zbx_service_t *service, int status,
@@ -1645,7 +1643,7 @@ static void	service_get_children_by_status(const zbx_service_t *service, int sta
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get total weight of all specified services                        *
+ * Purpose: gets total weight of all specified services                       *
  *                                                                            *
  ******************************************************************************/
 static int	services_get_weight(const zbx_vector_service_ptr_t *services)
@@ -1664,12 +1662,12 @@ static int	services_get_weight(const zbx_vector_service_ptr_t *services)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get service status according to the specified rule                *
+ * Purpose: gets service status according to specified rule                   *
  *                                                                            *
- * Parameters: service - [IN] the service                                     *
- *             rule    - [IN] the service status rule                         *
+ * Parameters: service - [IN]                                                 *
+ *             rule    - [IN] service status rule                             *
  *                                                                            *
- *  Return value: The service status.                                         *
+ *  Return value: service status                                              *
  *                                                                            *
  ******************************************************************************/
 int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule_t *rule)
@@ -1797,15 +1795,15 @@ static void	service_add_cause(zbx_vector_service_severity_ptr_t *causes, zbx_ser
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get services that caused the target service to be in the          *
- *          specified severity state                                          *
+ * Purpose: Gets services that caused the target service to be in the         *
+ *          specified severity state.                                         *
  *                                                                            *
- * Parameters: service   - [IN] the service                                   *
- *             severity  - [IN] the required severity (-1 if there is no      *
- *                              minimum severity required)                    *
- *             eventids  - [OUT] the root cause events                        *
+ * Parameters: service   - [IN]                                               *
+ *             severity  - [IN] required severity (-1 if there is no minimum  *
+ *                              severity required)                            *
+ *             eventids  - [OUT] root cause events                            *
  *                                                                            *
- * Comments: The returned list includes children, grandchildren etc           *
+ * Comments: The returned list includes children, grandchildren etc.          *
  *                                                                            *
  ******************************************************************************/
 static void	service_get_causes(const zbx_service_t *service, int severity, zbx_vector_uint64_t *eventids)
@@ -1961,10 +1959,10 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get root cause eventids for the service                           *
+ * Purpose: gets root cause eventids for service                              *
  *                                                                            *
- * Parameters: parent   - [IN] the service                                    *
- *             eventids - [OUT] the event identifierse                        *
+ * Parameters: parent   - [IN] service                                        *
+ *             eventids - [OUT] event identifiers                             *
  *                                                                            *
  ******************************************************************************/
 void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint64_t *eventids)
@@ -1979,9 +1977,12 @@ void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint
  *                                                                            *
  * Purpose: updates service and its parents statuses                          *
  *                                                                            *
- * Parameters: service    - [IN] the service to update                        *
- *             ts         - [IN] the update timestamp                         *
- *             alarms     - [OUT] the alarms update queue                     *
+ * Parameters: itservice       - [IN] service to update                       *
+ *             ts              - [IN] update timestamp                        *
+ *             alarms          - [OUT] alarms update queue                    *
+ *             service_updates - [IN/OUT]                                     *
+ *             flags           - [IN]                                         *
+ *                                                                            *
  *                                                                            *
  * Comments: This function recalculates service status according to the       *
  *           algorithm and status of the children services. If the status     *
@@ -2061,7 +2062,7 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 #define SERVICE_VALUE_PROBLEM		1
 /******************************************************************************
  *                                                                            *
- * Purpose: create service events based on service updates                    *
+ * Purpose: creates service events based on service updates                   *
  *                                                                            *
  * Parameters: manager - [IN] service manager                                 *
  *             updates - [IN] service updates                                 *
@@ -2187,10 +2188,10 @@ static const zbx_service_update_t	*get_update_by_serviceid(const zbx_vector_serv
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get open problems for the specified services                      *
+ * Purpose: gets open problems for specified services                         *
  *                                                                            *
- * Parameters: manager         - [IN] the service manager                     *
- *             problem_service - [IN] a vector of eventid, serviceid pairs    *
+ * Parameters: manager         - [IN] service manager                         *
+ *             problem_service - [IN] vector of eventid, serviceid pairs      *
  *                                                                            *
  ******************************************************************************/
 static void	db_get_service_problems(zbx_vector_uint64_t *serviceids, zbx_vector_uint64_pair_t *problem_service)
@@ -2248,10 +2249,10 @@ void	zbx_service_recovery_free(zbx_service_recovery_t *service_recovery)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolve service events based on service updates                   *
+ * Purpose: resolves service events based on service updates                  *
  *                                                                            *
- * Parameters: manager - [IN] the service manager                             *
- *             updates - [IN] the service updates                             *
+ * Parameters: manager - [IN] service manager                                 *
+ *             updates - [IN] service updates                                 *
  *                                                                            *
  ******************************************************************************/
 static void	db_resolve_service_events(zbx_service_manager_t *manager,
@@ -2316,7 +2317,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager,
 		{
 			for (int j = 0; j < update->service->tags.values_num; j++)
 			{
-				zbx_service_tag_t	*tag = (zbx_service_tag_t *)update->service->tags.values[j];
+				zbx_service_tag_t	*tag = update->service->tags.values[j];
 
 				zbx_db_insert_add_values(&db_insert_event_tag, __UINT64_C(0), eventid, tag->name,
 						tag->value);
@@ -2487,7 +2488,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: generate and process service events in response to service        *
+ * Purpose: generates and processes service events in response to service     *
  *          updates                                                           *
  *                                                                            *
  ******************************************************************************/
@@ -2589,7 +2590,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 						{.eventid = service_problem->eventid};
 				int			index;
 
-				service_problem = (zbx_service_problem_t *)service->service_problems.values[i];
+				service_problem = service->service_problems.values[i];
 
 				if (FAIL == (index = zbx_vector_service_problem_ptr_search(
 						&service_diff->service_problems, &service_problem_cmp,
@@ -2619,10 +2620,9 @@ static void	db_update_services(zbx_service_manager_t *manager)
 
 		for (int i = 0; i < service_diff->service_problems_recovered.values_num; i++)
 		{
-			zbx_service_problem_t	*service_problem, service_problem_cmp;
+			zbx_service_problem_t	*service_problem, service_problem_cmp =
+					{.eventid = service_problem->eventid};
 			int			index;
-
-			service_problem_cmp.eventid = service_problem->eventid;
 
 			service_problem = service_diff->service_problems_recovered.values[i];
 
@@ -3051,7 +3051,7 @@ static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_man
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update cached service problem and queue service for update        *
+ * Purpose: updates cached service problem and queues service for update      *
  *                                                                            *
  ******************************************************************************/
 static void	service_update_event_severity(zbx_service_manager_t *service_manager, zbx_service_t *service,
@@ -3067,7 +3067,7 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
 		return;
 	}
 
-	service_problem = (zbx_service_problem_t *)service->service_problems.values[index];
+	service_problem = service->service_problems.values[index];
 	service_problem->severity = severity;
 
 	services_diff_local.serviceid = service->serviceid;
@@ -3083,7 +3083,7 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update service_problem table with the changed event severities    *
+ * Purpose: updates service_problem table with changed event severities       *
  *                                                                            *
  ******************************************************************************/
 static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *event_severities)
@@ -3123,8 +3123,8 @@ static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *eve
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update event severities, service statuses in cache and database   *
- *          according to the event severity changes during acknowledgment     *
+ * Purpose: Updates event severities, service statuses in cache and database  *
+ *          according to the event severity changes during acknowledgment.    *
  *                                                                            *
  ******************************************************************************/
 static void	process_event_severities(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager)
@@ -3293,7 +3293,7 @@ static void	dump_actions(zbx_hashset_t *actions)
 
 		for (int i = 0; i < action->conditions.values_num; i++)
 		{
-			condition = (zbx_service_action_condition_t *)action->conditions.values[i];
+			condition = action->conditions.values[i];
 
 			zabbix_log(LOG_LEVEL_TRACE, "    conditionid:" ZBX_FS_UI64 " type:%d op:%d value:%s value2:%s",
 					condition->conditionid, condition->conditiontype, condition->op,
