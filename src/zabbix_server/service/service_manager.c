@@ -2550,7 +2550,6 @@ static void	db_update_services(zbx_service_manager_t *manager)
 				zbx_service_problem_t	*service_problem, service_problem_cmp =
 						{.eventid = service_problem->eventid};
 				int			index;
-				zbx_service_problem_t	service_problem_cmp;
 
 				service_problem = (zbx_service_problem_t *)service->service_problems.values[i];
 
