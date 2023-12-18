@@ -42,6 +42,7 @@
 #define ZBX_PROTO_TAG_KEY_ORIG			"key_orig"
 #define ZBX_PROTO_TAG_KEYS			"keys"
 #define ZBX_PROTO_TAG_LASTLOGSIZE		"lastlogsize"
+#define ZBX_PROTO_TAG_MANUALINPUT		"manualinput"
 #define ZBX_PROTO_TAG_MTIME			"mtime"
 #define ZBX_PROTO_TAG_LOGTIMESTAMP		"timestamp"
 #define ZBX_PROTO_TAG_LOGSOURCE			"source"
