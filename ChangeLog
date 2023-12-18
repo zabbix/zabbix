@@ -1,10 +1,28 @@
 Changes for 7.0.0alpha9
 
 New features:
+...G...PS. [ZBXNEXT-8854] improved passive checks to use JSON protocol and fallback to plaintext protocol (vso)
 ........S. [ZBXNEXT-8857] updated max supported TimescaleDB version to 2.13 (mprihodko)
 .........T [ZBXNEXT-8707] updated version check for MongoDB node by Zabbix agent 2 template (atocko)
 
 Bug fixes:
+..F....... [ZBX-22055] fixed map image of map widget not being updated on apply button press (agriscenko)
+..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
+..F....... [ZBX-23320] fixed Graph widget legend "Number of rows" behavior (apoga)
+...G...... [ZBX-23471] fixed sha256 sum calculation on AIX, HP-UX and Solaris, fixed crash on HP-UX (Andris)
+...G...... [ZBX-22933] improved vfs.file.regmatch and vfs.file.regexp items to use buffered file read (askolmeisters)
+..F....... [ZBX-21973] changed deprecated X-Frame option allow-from to Content-Security-Policy frame-ancestors (dfofanovs)
+.......PS. [ZBX-23738] fixed Zabbix backend sources for libxml2 2.12.0 version changes (akozlovs)
+........S. [ZBX-23633] fixed service alarms to be recovered with problem time in case of negative problem duration (vso)
+.........T [ZBX-23746] fixed creation of tickets during escalation for Zammad media type (akotsegubov)
+..F....... [ZBX-23561] fixed spacing between filter and results table (ashubin)
+..F....... [ZBX-23636] fixed some fields in Administration section not being trimmed on form submit (agriscenko)
+........S. [ZBX-23730] fixed long Server shutdown when a lot of values are enqueued to be flushed via connectors (dgoloscapov)
+.......PS. [ZBX-23631] removed tag 'tags' in case of an error collecting tags from *discovery items (MVekslers)
+..F....... [ZBX-23439] fixed sorting of numeric items with/without aggregation enabled in Top hosts widget (dfofanovs)
+.........T [ZBX-23825] fixed query_fields values Acronis and Nomand templates (abiba)
+..F....... [ZBX-23590] fixed discovery rule form custom timeout link opens proxy form only when proxy item type timeouts override is enabled (gcalenko)
+..F....... [ZBX-23623] fixed sorting order of dependent triggers in trigger configuration being different from sorting order in trigger list (agriscenko)
 ........S. [ZBX-23559] fixed SLI dropping when maintenance is set with pre-existing problem (dgoloscapov)
 .......PS. [ZBX-23145] disabled deprecated automatic reconnection in MySQL (mprihodko)
 .......PS. [ZBX-23799] fixed crash when host interfaces are added and updated at the same time (vso)
@@ -420,6 +438,32 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.11rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-22055] fixed map image of map widget not being updated on apply button press (agriscenko, apoga)
+..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
+.......PS. [ZBX-23145] disabled deprecated automatic reconnection in MySQL (mprihodko)
+...G...... [ZBX-22933] improved vfs.file.regmatch and vfs.file.regexp items to use buffered file read (askolmeisters)
+...G...... [ZBX-23471] fixed sha256 sum calculation on AIX, HP-UX and Solaris, fixed crash on HP-UX (Andris)
+..F....... [ZBX-21973] changed deprecated X-Frame option allow-from to Content-Security-Policy frame-ancestors (dfofanovs)
+..F....... [ZBX-23439] fixed sorting of numeric items with/without aggregation enabled in Top hosts widget (dfofanovs)
+........S. [ZBX-23633] fixed service alarms to be recovered with problem time in case of negative problem duration (vso)
+.......PS. [ZBX-23738] fixed Zabbix backend sources for libxml2 2.12.0 version changes (akozlovs)
+.........T [ZBX-23746] fixed creation of tickets during escalation for Zammad media type (akotsegubov)
+..F....... [ZBX-23561] fixed spacing between filter and results table (ashubin)
+..F....... [ZBX-18873] fixed disabled chevrons color in problem view (ashubin)
+..F....... [ZBX-23636] fixed some fields in Administration section not being trimmed on form submit (agriscenko)
+..F....... [ZBX-22983] fixed ellipsed dropdown options in items mass update and items configuration in preprocessing section (ddauksa, kkuzmina, vmurzins)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.10
+
+6.4.10rc1 was released as 6.4.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.10rc1
@@ -1960,6 +2004,31 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.26rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-22055] fixed map image of map widget not being updated on apply button press (agriscenko, apoga)
+..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
+A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
+.......PS. [ZBX-23145] disabled deprecated automatic reconnection in MySQL (mprihodko)
+...G...... [ZBX-22933] improved vfs.file.regmatch and vfs.file.regexp items to use buffered file read (askolmeisters)
+..F....... [ZBX-23439] fixed sorting of numeric items with/without aggregation enabled in Top hosts widget (dfofanovs)
+..F....... [ZBX-21973] changed deprecated X-Frame option allow-from to Content-Security-Policy frame-ancestors (dfofanovs)
+........S. [ZBX-23633] fixed service alarms to be recovered with problem time in case of negative problem duration (vso)
+.......PS. [ZBX-23738] fixed Zabbix backend sources for libxml2 2.12.0 version changes (akozlovs)
+.........T [ZBX-23746] fixed creation of tickets during escalation for Zammad media type (akotsegubov)
+..F....... [ZBX-23561] fixed spacing between filter and results table (ashubin)
+..F....... [ZBX-18873] fixed disabled chevrons color in problem view (ashubin)
+..F....... [ZBX-23636] fixed some fields in Administration section not being trimmed on form submit (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.25
+
+6.0.25rc1 was released as 6.0.25 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.25rc1

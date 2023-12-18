@@ -72,14 +72,14 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
-	int	res = FAIL;
+	int	res = FAIL, version = item->interface.version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key_orig);
 
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = zbx_agent_get_value(item, config_comms->config_source_ip, program_type, result);
+			res = zbx_agent_get_value(item, config_comms->config_source_ip, program_type, result, &version);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -693,7 +693,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				if (ZBX_INTERFACE_AVAILABLE_TRUE != last_available)
 				{
 					zbx_activate_item_interface(&timespec, &items[i].interface, items[i].itemid,
-							items[i].type, items[i].host.host, &data, &data_alloc,
+							items[i].type, items[i].host.host, 0, &data, &data_alloc,
 							&data_offset);
 					last_available = ZBX_INTERFACE_AVAILABLE_TRUE;
 				}

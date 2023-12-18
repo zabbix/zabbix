@@ -435,6 +435,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	AGENT_RESULT	agent_result;
 	char		*param = NULL, *port = NULL;
 	zbx_dc_item_t	item;
+	int		version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -471,7 +472,8 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = zbx_agent_get_value(&item, config_source_ip, program_type, &agent_result)))
+	version = item.interface.version;
+	if (SUCCEED != (ret = zbx_agent_get_value(&item, config_source_ip, program_type, &agent_result, &version)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -483,6 +485,9 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	zbx_free_agent_result(&agent_result);
 
 	zbx_free(item.key);
+
+	if (version != item.interface.version)
+		zbx_dc_set_interface_version(item.interface.interfaceid, version);
 fail:
 	zbx_free(port);
 	zbx_free(param);

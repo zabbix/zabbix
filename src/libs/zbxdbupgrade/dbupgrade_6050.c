@@ -1960,33 +1960,46 @@ static int	DBpatch_6050158(void)
 
 static int	DBpatch_6050159(void)
 {
-	const zbx_db_field_t	field = {"manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_pkey1"))
+		return SUCCEED;
 
-	return DBadd_field("scripts", &field);
+	return DBrename_index("group_discovery", "group_discovery_pkey1", "group_discovery_pkey",
+			"groupdiscoveryid", 1);
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_6050160(void)
 {
-	const zbx_db_field_t	field = {"manualinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_6050161(void)
 {
-	const zbx_db_field_t	field = {"manualinput_validator", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_6050162(void)
 {
-	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput_validator", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_6050163(void)
+{
+	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050164(void)
 {
 	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -2161,5 +2174,6 @@ DBPATCH_ADD(6050160, 0, 1)
 DBPATCH_ADD(6050161, 0, 1)
 DBPATCH_ADD(6050162, 0, 1)
 DBPATCH_ADD(6050163, 0, 1)
+DBPATCH_ADD(6050164, 0, 1)
 
 DBPATCH_END()
