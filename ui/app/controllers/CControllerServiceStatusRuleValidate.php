@@ -67,7 +67,7 @@ class CControllerServiceStatusRuleValidate extends CController {
 			]);
 
 			foreach ($validator->getAllErrors() as $error) {
-				error($error);
+				info($error);
 			}
 
 			$ret = !$validator->isErrorFatal() && !$validator->isError();

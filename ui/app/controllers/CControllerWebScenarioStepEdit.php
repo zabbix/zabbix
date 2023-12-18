@@ -58,7 +58,7 @@ class CControllerWebScenarioStepEdit extends CController {
 			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
 			foreach ($validator->getAllErrors() as $error) {
-				error($error);
+				info($error);
 			}
 
 			$ret = !$validator->isErrorFatal() && !$validator->isError();

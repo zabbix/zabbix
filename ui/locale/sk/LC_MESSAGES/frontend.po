@@ -201,6 +201,16 @@ msgstr[0] "%1$s z %2$s prvku v problémovom stave"
 msgstr[1] "%1$s z %2$s prvkov v problémovom stave"
 msgstr[2] "%1$s z %2$s prvkov v problémovom stave "
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -12848,6 +12858,11 @@ msgstr "Maximálna doba zobrazenia histórie"
 msgid "Max number of columns and rows in overview tables"
 msgstr "Maximálny počet stĺpcov a riadkov v prehľadových tabuľkách"
 
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Maximálne obdobie pre výber času"
@@ -14521,6 +14536,11 @@ msgstr "Nededené itemy"
 #: include/views/configuration.host.discovery.list.php:165
 msgid "Not supported"
 msgstr "Nepodporované"
+
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -21193,6 +21213,10 @@ msgstr "Doba dostupnosti/nedostupnosti"
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr "Použite %{ref} v skupinovom filtri na referenčnú hodnotu tohto používateľského atribútu."
 
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
 msgstr "Použite kombinované žiadosti"
@@ -22609,6 +22633,10 @@ msgstr "Os X"
 msgid "X-Frame-Options HTTP header"
 msgstr "Hlavička HTTP X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
 msgstr "X1"
@@ -23058,6 +23086,11 @@ msgstr "očakáva sa relatívny čas"
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
 msgstr "špeciálna postava"
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"

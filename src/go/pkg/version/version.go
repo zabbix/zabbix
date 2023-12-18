@@ -84,6 +84,10 @@ func Long() string {
 	}
 	return ver
 }
+func LongNoRC() string {
+	var ver string = fmt.Sprintf("%d.%d.%d", Major(), Minor(), Patch())
+	return ver
+}
 
 func Short() string {
 	return fmt.Sprintf("%d.%d", Major(), Minor())

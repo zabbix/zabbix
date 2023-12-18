@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-08 08:25+0000\n"
+"PO-Revision-Date: 2023-12-08 21:18+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -188,6 +188,16 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s de %2$s element en estat problemàtic"
 msgstr[1] "%1$s de %2$s element en estat problemàtic"
+
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
 
 #: jsLoader.php:341
 #, c-format
@@ -9326,7 +9336,7 @@ msgstr "Tipus d'etiqueta d'equips"
 
 #: widgets/tophosts/includes/WidgetForm.php:159
 msgid "Host limit"
-msgstr ""
+msgstr "Límit d'equip"
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -12680,6 +12690,11 @@ msgstr "Període màxim de visualització de l'historial"
 msgid "Max number of columns and rows in overview tables"
 msgstr "Nombre màxim de columnes i fileres a les taules generals"
 
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Període màxim per al selector de temps"
@@ -14343,6 +14358,11 @@ msgstr "Elements no heretats"
 msgid "Not supported"
 msgstr "No compatible"
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "Notes"
@@ -14854,7 +14874,7 @@ msgstr "Ordre"
 
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order by"
-msgstr ""
+msgstr "Ordenat per"
 
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
@@ -20090,7 +20110,7 @@ msgstr "Tipus d'etiqueta del trigger"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger limit"
-msgstr ""
+msgstr "Límit de trigger"
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
@@ -20984,6 +21004,10 @@ msgstr "Temps d'activitat/temps d'inactivitat"
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr "Empreu %{ref} al filtre de grup per referenciar el valor de l'atribut de l'usuari."
+
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -22392,6 +22416,10 @@ msgstr "Eix X"
 msgid "X-Frame-Options HTTP header"
 msgstr "Capçalera HTTP X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
 msgstr "X1"
@@ -22841,6 +22869,11 @@ msgstr "s'espera un temps relatiu"
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
 msgstr "un caracter especial"
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
