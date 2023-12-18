@@ -1400,7 +1400,7 @@ class testFormAlertsScripts extends CWebTest {
 		$modal->close();
 		$this->page->open('zabbix.php?action=miscconfig.edit');
 		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
-		$config_form->fill(['Valid URI schemes' => 'dns,message']);
+		$config_form->fill(['id:validate_uri_schemes' => true, 'id:uri_valid_schemes' => 'dns,message']);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
@@ -1411,7 +1411,7 @@ class testFormAlertsScripts extends CWebTest {
 		// Disable URI scheme validation.
 		$modal->close();
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-		$config_form->fill(['Validate URI schemes' => false]);
+		$config_form->fill(['id:validate_uri_schemes' => false]);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 

@@ -22,6 +22,12 @@
 
 #include "zbxthreads.h"
 
+typedef struct
+{
+	int	config_timeout;
+}
+zbx_thread_service_manager_args;
+
 ZBX_THREAD_ENTRY(service_manager_thread, args);
 
 #endif

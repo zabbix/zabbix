@@ -86,7 +86,8 @@ static void	poller_update_interfaces(zbx_vector_interface_status_t *interfaces,
 			case AGENT_ERROR:
 				zbx_activate_item_interface(&timespec, &interface_status->interface,
 						interface_status->itemid, type,
-						interface_status->host, &data, &data_alloc, &data_offset);
+						interface_status->host, interface_status->version, &data, &data_alloc,
+						&data_offset);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:

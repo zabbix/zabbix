@@ -31,7 +31,7 @@ $html_page = (new CHtmlPage())
 
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('housekeeping')))->removeId())
-	->setId('housekeeping')
+	->setId('housekeeping-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
