@@ -731,7 +731,7 @@ class CHistoryManager {
 		];
 
 		// Clock value is divided by 1000 as it is stored as milliseconds.
-		$formula = '((doc[\'clock\'].date.getMillis()/1000) - ((doc[\'clock\'].date.getMillis()/1000)%params.interval))';
+		$formula = "doc['clock'].value.getMillis()/1000-doc['clock'].value.getMillis()/1000%params.interval";
 
 		$query['aggs']['group_by_itemid']['aggs'] = [
 			'group_by_script' => [
