@@ -91,7 +91,7 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 
 	pthread_mutex_init(&cache->lock, NULL);
 
-	cache->startup_time = time(NULL);
+	cache->startup_time = (int)time(NULL);
 	cache->hostmap_revision = map_revision;
 }
 
@@ -612,7 +612,7 @@ void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t
 
 /* WDN: change to trace log level */
 
-void	pg_cache_dump_group(zbx_pg_group_t *group)
+static void	pg_cache_dump_group(zbx_pg_group_t *group)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "proxy group:" ZBX_FS_UI64 " %s", group->proxy_groupid, group->name);
 	zabbix_log(LOG_LEVEL_DEBUG, "    status:%d failover_delay:%d min_online:%d revision:" ZBX_FS_UI64
@@ -633,7 +633,7 @@ void	pg_cache_dump_group(zbx_pg_group_t *group)
 		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, group->proxies.values[i]->proxyid);
 }
 
-void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
+static void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 {
 	zbx_uint64_t	groupid = 0;
 
@@ -655,7 +655,7 @@ void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 
 }
 
-void	pg_cache_dump_host(zbx_pg_host_t *host)
+static void	pg_cache_dump_host(zbx_pg_host_t *host)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64 " -> " ZBX_FS_UI64 " :" ZBX_FS_UI64,
 			host->hostid, host->proxyid, host->revision);

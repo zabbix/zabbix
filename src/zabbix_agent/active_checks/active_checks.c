@@ -1198,8 +1198,8 @@ static char	*connect_callback(void *data)
 
 	zbx_timespec(&ts);
 
-	zbx_json_adduint64(json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-	zbx_json_adduint64(json, ZBX_PROTO_TAG_NS, ts.ns);
+	zbx_json_addint64(json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+	zbx_json_addint64(json, ZBX_PROTO_TAG_NS, ts.ns);
 
 	return json->buffer;
 }

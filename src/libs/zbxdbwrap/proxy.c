@@ -1519,7 +1519,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
  *                          or history records have invalid format            *
  *                                                                            *
  ******************************************************************************/
-int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, size_t host_len, char **error)
+static int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, size_t host_len, char **error)
 {
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_row;

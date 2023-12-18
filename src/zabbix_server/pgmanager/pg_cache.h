@@ -63,6 +63,7 @@ zbx_pg_update_t;
 
 ZBX_VECTOR_DECL(pg_update, zbx_pg_update_t)
 
+void	pg_proxy_clear(zbx_pg_proxy_t *proxy);
 void	pg_group_clear(zbx_pg_group_t *group);
 
 void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision);
@@ -84,8 +85,6 @@ void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t
 void	pg_cache_lock(zbx_pg_cache_t *cache);
 void	pg_cache_unlock(zbx_pg_cache_t *cache);
 
-void	pg_cache_dump_group(zbx_pg_group_t *group);
 void	pg_cache_dump(zbx_pg_cache_t *cache);
-
 
 #endif

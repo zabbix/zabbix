@@ -1103,7 +1103,7 @@ static void	proxyconfig_get_proxy_group_updates(const zbx_dc_proxy_t *proxy, zbx
 		{
 			zbx_uint64_t	hostproxyid;
 
-			zbx_vector_uint64_reserve(del_hostproxyids, hostproxyids_num);
+			zbx_vector_uint64_reserve(del_hostproxyids, (size_t)hostproxyids_num);
 
 			for (int i = 0; i < hostproxyids_num; i++)
 			{
@@ -1398,7 +1398,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 		if (ZBX_PROXY_SYNC_FULL == hostmap_sync)
 			zbx_json_addint64(j, ZBX_PROTO_TAG_FULL_SYNC, 1);
 
-		zbx_json_addint64(j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
 		zbx_json_addint64(j, ZBX_PROTO_TAG_FAILOVER_DELAY, failover_delay);
 
 		zbx_json_close(j);

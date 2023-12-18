@@ -90,7 +90,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	ptr += zbx_deserialize_value(ptr, &proxyid);
 	(void)zbx_deserialize_value(ptr, &proxy_hostmap_revision);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	pg_cache_lock(pgs->cache);
 
@@ -99,8 +99,6 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)) &&
 			NULL != proxy->group)
 	{
-		now = time(NULL);
-
 		hostmap_revision = proxy->group->hostmap_revision;
 		failover_delay = proxy->group->failover_delay;
 
@@ -130,7 +128,10 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + sizeof(int);
 
 	if (ZBX_PROXY_SYNC_PARTIAL == mode)
-		data_len += sizeof(int) + proxy->deleted_group_hosts.values_num * sizeof(zbx_uint64_t);
+	{
+		data_len += (zbx_uint32_t)(sizeof(int) + (size_t)proxy->deleted_group_hosts.values_num *
+				sizeof(zbx_uint64_t));
+	}
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, mode);
@@ -187,7 +188,8 @@ static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
 
 	if (NULL != proxy_group)
 	{
-		data_len = proxy_group->proxies.values_num * sizeof(zbx_uint64_t) + 3 * sizeof(int);
+		data_len = (zbx_uint32_t)((size_t)proxy_group->proxies.values_num * sizeof(zbx_uint64_t) +
+				3 * sizeof(int));
 		ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 		for (int i = 0; i < proxy_group->proxies.values_num; i++)
@@ -336,7 +338,7 @@ int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char
 		return FAIL;
 
 	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_IPC_PGM_GET_STATS, (const unsigned char *)pg_name,
-			strlen(pg_name) + 1))
+			(zbx_uint32_t)strlen(pg_name) + 1))
 	{
 		*error = zbx_strdup(NULL, "Cannot send request to proxy group manager service");
 		goto out;
@@ -365,7 +367,7 @@ int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char
 	zbx_vector_uint64_create(&pg_stats->proxyids);
 	if (0 != proxyids_num)
 	{
-		zbx_vector_uint64_reserve(&pg_stats->proxyids, proxyids_num);
+		zbx_vector_uint64_reserve(&pg_stats->proxyids, (size_t)proxyids_num);
 
 		for (int i = 0; i < proxyids_num; i++)
 		{

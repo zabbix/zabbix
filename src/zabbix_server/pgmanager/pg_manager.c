@@ -91,7 +91,7 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 	zbx_db_result_t	result;
 	int		now;
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	result = zbx_db_select("select hostid,proxyid,revision,hostproxyid from host_proxy");
 
@@ -166,7 +166,7 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 
 	pg_cache_lock(cache);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	zbx_hashset_iter_reset(&cache->proxies, &iter);
 	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
@@ -391,8 +391,10 @@ static void	pgm_db_flush_host_proxy_insert_batch(zbx_pg_host_t *hosts, int hosts
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&proxyids);
 
-	zbx_hashset_create(&host_index, hosts_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_hashset_create(&proxy_index, hosts_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&host_index, (size_t)hosts_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&proxy_index, (size_t)hosts_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (int i = 0; i < hosts_num; i++)
 	{

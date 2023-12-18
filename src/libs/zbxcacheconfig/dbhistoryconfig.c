@@ -1047,7 +1047,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
  *               FAIL            - host not found                             *
  *                                                                            *
  ******************************************************************************/
-static int	dc_config_get_host_by_name(const char *host, int mode, zbx_history_recv_host_t *recv_host,
+static int	dc_config_get_host_by_name(const char *host, unsigned int mode, zbx_history_recv_host_t *recv_host,
 		zbx_comms_redirect_t *redirect)
 {
 	const ZBX_DC_HOST	*dc_host;

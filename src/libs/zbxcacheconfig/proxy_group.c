@@ -438,7 +438,7 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 		{
 			int	now;
 
-			now = time(NULL);
+			now = (int)time(NULL);
 
 			if (now - config->proxy_lastonline < config->proxy_failover_delay ||
 					now - hpi->lastreset < config->proxy_failover_delay)

@@ -1930,7 +1930,7 @@ static int	proxyconfig_delete_globalmacros(char **error)
 }
 
 static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tables, struct zbx_json_parse *jp,
-		unsigned char full_sync, char **error)
+		int full_sync, char **error)
 {
 	zbx_table_data_t	*td;
 
@@ -2033,7 +2033,7 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 
 	zbx_dc_set_proxy_failover_delay(atoi(tmp));
 
-	unsigned char	full_sync = 0;
+	int	full_sync = 0;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_FULL_SYNC, tmp, sizeof(tmp), NULL))
 		full_sync = atoi(tmp);

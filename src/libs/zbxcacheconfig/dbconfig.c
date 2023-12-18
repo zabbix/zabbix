@@ -7293,7 +7293,7 @@ static void	dc_notify_proxy_group_manager(zbx_uint32_t code, zbx_vector_objmove_
 
 	unsigned char	*data, *ptr;
 
-	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)(sizeof(zbx_uint64_t) * 3 * updates->values_num));
+	ptr = data = (unsigned char *)zbx_malloc(NULL, sizeof(zbx_uint64_t) * 3 * (size_t)updates->values_num);
 
 	for (int i = 0; i < updates->values_num; i++)
 	{
@@ -15512,7 +15512,7 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 	zbx_vector_cached_proxy_ptr_create(&proxies);
 	zbx_dc_get_all_proxies(&proxies);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	RDLOCK_CACHE;
 
@@ -15571,7 +15571,7 @@ int	zbx_proxy_proxy_list_discovery_get(const zbx_vector_uint64_t *proxyids, char
 	struct zbx_json			json;
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	RDLOCK_CACHE;
 

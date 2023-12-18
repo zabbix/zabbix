@@ -117,7 +117,7 @@ static zbx_send_batch_t	*sb_add_value(zbx_send_buffer_t *buf, const char *host, 
 	if (ZBX_SEND_GROUP_NONE == buf->group_mode)
 		batch_local.host = "";
 	else
-		batch_local.host = (char *)host;
+		batch_local.host = (char *)(uintptr_t)host;
 
 	if (NULL == (batch = (zbx_send_batch_t *)zbx_hashset_search(&buf->batches, &batch_local)))
 	{
@@ -145,10 +145,10 @@ static zbx_send_batch_t	*sb_add_value(zbx_send_buffer_t *buf, const char *host, 
 
 	if (1 == buf->with_clock)
 	{
-		zbx_json_adduint64(batch->json, ZBX_PROTO_TAG_CLOCK, clock);
+		zbx_json_addint64(batch->json, ZBX_PROTO_TAG_CLOCK, clock);
 
 		if (1 == buf->with_ns)
-			zbx_json_adduint64(batch->json, ZBX_PROTO_TAG_NS, ns);
+			zbx_json_addint64(batch->json, ZBX_PROTO_TAG_NS, ns);
 	}
 
 	zbx_json_close(batch->json);
