@@ -4178,7 +4178,7 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync)
 			" left join hosts h"
 				" on hp.hostid=h.hostid");
 
-	dbsync_prepare(sync, 5, NULL);
+	dbsync_prepare(sync, 6, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -4188,7 +4188,7 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync)
 	}
 
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostproxyid", "where", NULL,
-			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_PROXY_GROUP)]);
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST_PROXY)]);
 out:
 	zbx_free(sql);
 

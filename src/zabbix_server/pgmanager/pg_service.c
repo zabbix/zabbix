@@ -101,9 +101,6 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	{
 		now = time(NULL);
 
-		if (proxy->remote_hostmap_revision != hostmap_revision)
-			proxy->sync_time = now;
-
 		hostmap_revision = proxy->group->hostmap_revision;
 		failover_delay = proxy->group->failover_delay;
 
@@ -126,6 +123,8 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 
 			mode = ZBX_PROXY_SYNC_PARTIAL;
 		}
+
+		proxy->sync_time = now;
 	}
 
 	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + sizeof(int);

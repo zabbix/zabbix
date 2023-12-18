@@ -265,11 +265,12 @@ void	pg_cache_group_add_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_u
  *                                                                            *
  * Purpose: remove hosts from group proxies exceeding host limit              *
  *                                                                            *
- * Parameters: group - [IN] target group                                      *
- *             limit - [IN] maximum number of hosts per proxy                 *
+ * Parameters: group   - [IN] target group                                    *
+ *             limit   - [IN] maximum number of hosts per proxy               *
+ *             pad_num - [IN] number of proxies with limit padded by 1        *
  *                                                                            *
  ******************************************************************************/
-static void	pg_cache_group_unassign_excess_hosts(zbx_pg_group_t *group, int limit)
+static void	pg_cache_group_unassign_excess_hosts(zbx_pg_group_t *group, int limit, int pad_num)
 {
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
@@ -287,20 +288,23 @@ static void	pg_cache_group_unassign_excess_hosts(zbx_pg_group_t *group, int limi
 				zbx_vector_pg_host_ptr_remove_noorder(&proxy->hosts, last);
 			}
 		}
-	}
 
+		if (0 == --pad_num)
+			limit--;
+	}
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: distribute unassigned hosts between proxies                       *
  *                                                                            *
- * Parameters: cache - [IN] proxy group cache                                 *
- *             group - [IN] target group                                      *
- *             limit - [IN] maximum number of hosts per proxy                 *
+ * Parameters: cache     - [IN] proxy group cache                             *
+ *             group     - [IN] target group                                  *
+ *             limit     - [IN] maximum number of hosts per proxy             *
+ *             hosts_num - [IN] number of hosts per proxy to assign           *
  *                                                                            *
  ******************************************************************************/
-static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group, int limit)
+static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group, int limit, int hosts_num)
 {
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
@@ -309,7 +313,7 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
 		if (ZBX_PG_PROXY_STATUS_ONLINE != proxy->status)
 			continue;
 
-		for (int j = 0; j < limit - proxy->hosts.values_num; j++)
+		for (int j = 0; j < limit - proxy->hosts.values_num && j < hosts_num; j++)
 		{
 			if (0 == group->new_hostids.values_num)
 				break;
@@ -370,13 +374,13 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 
 		int	hosts_num_avg = (hosts_num + online_num - 1) / online_num;
 
-		pg_cache_group_unassign_excess_hosts(group, hosts_num_avg);
+		pg_cache_group_unassign_excess_hosts(group, hosts_num_avg, hosts_num % online_num);
 
 		/* first distribute hosts with lower limit to have even distribution */
 		if (0 != hosts_num_avg)
-			pg_cache_group_distribute_hosts(cache, group, hosts_num_avg - 1);
+			pg_cache_group_distribute_hosts(cache, group, hosts_num_avg - 1, hosts_num_avg - 1);
 
-		pg_cache_group_distribute_hosts(cache, group, hosts_num_avg);
+		pg_cache_group_distribute_hosts(cache, group, hosts_num_avg, 1);
 
 		group->flags |= ZBX_PG_GROUP_UPDATE_HP_MAP;
 	}

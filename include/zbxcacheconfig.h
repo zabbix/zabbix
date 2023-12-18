@@ -1383,8 +1383,10 @@ typedef struct
 	int				status;
 	int				lastaccess;
 	int				firstaccess;
-	int				sync_time;
-	zbx_uint64_t			remote_hostmap_revision;
+	int				sync_time;	/* sync_time is used to stop collecting potentially infinite */
+							/* host changes into deleted_group_hosts if the proxy was    */
+							/* offline for day+. In this case full proxy group data      */
+							/* resync will be forced                                     */
 	struct zbx_pg_group		*group;
 	zbx_vector_pg_host_ptr_t	hosts;
 	zbx_vector_pg_host_t		deleted_group_hosts;

@@ -339,7 +339,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(hp->proxyid, row[3]);
 		ZBX_STR2UINT64(hp->revision, row[4]);
 
-		if (SUCCEED != zbx_db_is_null(row[5]))
+		if (SUCCEED != zbx_db_is_null(row[5]))	/* server */
 		{
 			dc_strpool_replace(found, &hp->host, row[5]);
 
@@ -347,13 +347,17 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			{
 				if (0 != dc_host->proxy_groupid)
 				{
+					if (0 != dc_host->proxyid)
+						dc_host_deregister_proxy(dc_host, dc_host->proxyid, revision);
+
 					dc_host_register_proxy(dc_host, hp->proxyid, revision);
 					dc_host->proxyid = hp->proxyid;
+					dc_host->revision = revision;
 					zbx_vector_dc_host_ptr_append(&hosts, dc_host);
 				}
 			}
 		}
-		else
+		else	/* proxy */
 			dc_strpool_replace(found, &hp->host, row[2]);
 
 		dc_register_host_proxy(hp);
@@ -370,6 +374,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			{
 				dc_host_deregister_proxy(dc_host, hp->proxyid, revision);
 				dc_host->proxyid = 0;
+				dc_host->revision = revision;
 				zbx_vector_dc_host_ptr_append(&hosts, dc_host);
 			}
 		}

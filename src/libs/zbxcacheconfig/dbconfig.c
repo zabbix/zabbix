@@ -1575,12 +1575,12 @@ void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint6
 	rev.hostid = host->hostid;
 	rev.revision = revision;
 	zbx_vector_host_rev_append(&proxy->removed_hosts, rev);
+	proxy->revision = revision;
 
 	if (FAIL == (i = zbx_vector_dc_host_ptr_search(&proxy->hosts, host, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 		return;
 
 	zbx_vector_dc_host_ptr_remove_noorder(&proxy->hosts, i);
-	proxy->revision = revision;
 }
 
 void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision)
