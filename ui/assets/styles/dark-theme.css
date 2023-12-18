@@ -3498,6 +3498,10 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column: 1; }
 
+.svg-pie-chart .svg-pie-chart-arc-stroke,
+.svg-pie-chart .svg-pie-chart-arc {
+  stroke: #2b2b2b;
+  stroke-linejoin: round; }
 .svg-pie-chart .svg-pie-chart-arc-placeholder {
   fill: transparent; }
 .svg-pie-chart .svg-pie-chart-arc-no-data-outer {

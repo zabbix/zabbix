@@ -1,4 +1,10 @@
 .svg-pie-chart {
+	.svg-pie-chart-arc-stroke,
+	.svg-pie-chart-arc {
+		stroke: $ui-bg-color;
+		stroke-linejoin: round;
+	}
+
 	.svg-pie-chart-arc-placeholder {
 		fill: transparent;
 	}

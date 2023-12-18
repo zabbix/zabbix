@@ -233,14 +233,12 @@ class CSVGPie {
 			? 0
 			: this.#radius_outer - this.#config.width * 10;
 
-		const pie_pad_angle = this.#config.space * 0.01;
-
-		this.#pieGenerator = d3.pie().sort(null).value(d => d.percent_of_total).padAngle(pie_pad_angle);
+		this.#pieGenerator = d3.pie().sort(null).value(d => d.percent_of_total);
 		this.#arcGenerator = d3.arc().innerRadius(this.#radius_inner).outerRadius(this.#radius_outer);
 		this.#arcGeneratorWithPadding = d3.arc()
-			.innerRadius(this.#radius_inner + this.#config.stroke * 10 / 2)
-			.outerRadius(this.#radius_outer - this.#config.stroke * 10 / 2)
-			.padAngle(this.#config.stroke * 0.01 + pie_pad_angle);
+			.innerRadius(this.#radius_inner + this.#config.stroke * 10 / 2 + this.#config.space * 10 / 2)
+			.outerRadius(this.#radius_outer - this.#config.stroke * 10 / 2 - this.#config.space * 10 / 2)
+			.padAngle(this.#config.stroke * 0.01 + this.#config.space * 0.01);
 
 		this.#svg = d3.create('svg:svg').attr('class', CSVGPie.ZBX_STYLE_CLASS);
 
@@ -351,8 +349,10 @@ class CSVGPie {
 						.data((d) => [d])
 						.join('svg:path')
 						.attr('class', CSVGPie.ZBX_STYLE_ARC_STROKE)
+						.style('stroke-width', this.#config.space * 10)
 						.style('transition', this.#sectors_old.length > 0
-							? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
+							? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear,
+								stroke ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
 							: ''
 						)
 						.each((d, index, nodes) => nodes[index]._current = d);
@@ -363,8 +363,10 @@ class CSVGPie {
 					.data((d) => [d])
 					.join('svg:path')
 					.attr('class', CSVGPie.ZBX_STYLE_ARC)
+					.style('stroke-width', this.#config.stroke > 0 ? 0 : this.#config.space * 10)
 					.style('transition', this.#sectors_old.length > 0
-						? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
+						? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear,
+							stroke ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
 						: ''
 					)
 					.each((d, index, nodes) => nodes[index]._current = d);
