@@ -517,8 +517,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 			for (i = 0; i < webhook_params.values_num; i++)
 			{
-				char *expanded_value = NULL;
-				size_t expanded_value_size;
+				char	*expanded_value = NULL;
+				size_t	expanded_value_size;
 
 				/* avoid unnecessary mem (re)allocation in case the macro isn't present */
 				if (NULL == strstr(webhook_params.values[i].second, "{MANUALINPUT}"))
