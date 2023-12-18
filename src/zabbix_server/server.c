@@ -358,7 +358,6 @@ static int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 static char	*zbx_config_webservice_url	= NULL;
 
-//int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 static int	config_serviceman_sync_frequency = 60;
 
 static int	config_vps_limit		= 0;

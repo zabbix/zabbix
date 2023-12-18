@@ -96,9 +96,6 @@ typedef struct
 zbx_service_problem_tag_t;
 
 ZBX_PTR_VECTOR_DECL(service_problem_tag_ptr, zbx_service_problem_tag_t *)
-
-
-//ZBX_PTR_VECTOR_DECL(service_ptr, struct zbx_service *)
 ZBX_VECTOR_STRUCT_DECL(service_ptr, zbx_service_t *)
 
 struct zbx_service_s
@@ -118,7 +115,6 @@ struct zbx_service_s
 	int					propagation_rule;
 	int					propagation_value;
 };
-
 
 ZBX_PTR_VECTOR_FUNC_DECL(service_ptr, zbx_service_t *)
 
