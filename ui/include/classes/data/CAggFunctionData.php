@@ -33,7 +33,9 @@ class CAggFunctionData {
 	 * @return bool
 	 */
 	public static function preservesValueMapping(int $function): bool {
-		return in_array($function, [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_FIRST, AGGREGATE_LAST]);
+		return in_array($function, [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_FIRST,
+			AGGREGATE_LAST
+		]);
 	}
 
 	/**
