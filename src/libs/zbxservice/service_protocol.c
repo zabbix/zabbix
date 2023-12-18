@@ -84,7 +84,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 	zbx_free(len);
 }
 
-void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events)
+void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_events_ptr_t *events)
 {
 	const unsigned char	*end = data + size;
 
@@ -94,8 +94,8 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 		int		values_num, i;
 
 		event = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
-		zbx_vector_ptr_create(&event->tags);
-		zbx_vector_ptr_append(events, event);
+		zbx_vector_tags_create(&event->tags);
+		zbx_vector_events_ptr_append(events, event);
 
 		data += zbx_deserialize_value(data, &event->eventid);
 		data += zbx_deserialize_value(data, &event->clock);
@@ -106,7 +106,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 
 		if (0 != values_num)
 		{
-			zbx_vector_ptr_reserve(&event->tags, (size_t)values_num);
+			zbx_vector_tags_reserve(&event->tags, (size_t)values_num);
 
 			for (i = 0; i < values_num; i++)
 			{
@@ -117,7 +117,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 				data += zbx_deserialize_str(data, &tag->tag, len);
 				data += zbx_deserialize_str(data, &tag->value, len);
 
-				zbx_vector_ptr_append(&event->tags, tag);
+				zbx_vector_tags_append(&event->tags, tag);
 			}
 		}
 
@@ -176,7 +176,8 @@ void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc
 	zbx_free(len);
 }
 
-void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events)
+void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_events_ptr_t *events)
 {
 	const unsigned char	*end = data + size;
 
@@ -186,15 +187,15 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 		int		values_num, i;
 
 		event = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
-		zbx_vector_ptr_create(&event->tags);
-		zbx_vector_ptr_append(events, event);
+		zbx_vector_tags_create(&event->tags);
+		zbx_vector_events_ptr_append(events, event);
 
 		data += zbx_deserialize_value(data, &event->eventid);
 		data += zbx_deserialize_value(data, &values_num);
 
 		if (0 != values_num)
 		{
-			zbx_vector_ptr_reserve(&event->tags, (size_t)values_num);
+			zbx_vector_tags_reserve(&event->tags, (size_t)values_num);
 
 			for (i = 0; i < values_num; i++)
 			{
@@ -205,7 +206,7 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 				data += zbx_deserialize_str(data, &tag->tag, len);
 				data += zbx_deserialize_str(data, &tag->value, len);
 
-				zbx_vector_ptr_append(&event->tags, tag);
+				zbx_vector_tags_append(&event->tags, tag);
 			}
 		}
 	}

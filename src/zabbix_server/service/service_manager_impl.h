@@ -52,6 +52,8 @@ zbx_service_problem_t;
 
 ZBX_PTR_VECTOR_DECL(service_problem_ptr, zbx_service_problem_t *)
 
+void    zbx_service_problem_free(zbx_service_problem_t *service_problem);
+
 typedef struct
 {
 	zbx_uint64_t	servicetagid;
@@ -77,6 +79,7 @@ zbx_service_rule_t;
 
 ZBX_PTR_VECTOR_DECL(service_rule_ptr, zbx_service_rule_t *)
 
+void    zbx_service_rule_free(zbx_service_rule_t *service_rule);
 
 typedef struct zbx_service_s zbx_service_t;
 
@@ -119,7 +122,6 @@ struct zbx_service_s
 
 ZBX_PTR_VECTOR_FUNC_DECL(service_ptr, zbx_service_t *)
 
-
 /* status update queue items */
 typedef struct
 {
@@ -134,6 +136,10 @@ typedef struct
 }
 zbx_status_update_t;
 
+ZBX_PTR_VECTOR_DECL(status_update_ptr, zbx_status_update_t *)
+
+void    zbx_status_update_free(zbx_status_update_t *status_update);
+
 /* service update queue items */
 typedef struct
 {
@@ -146,16 +152,7 @@ typedef struct
 }
 zbx_service_update_t;
 
-typedef struct
-{
-	zbx_uint64_t		actionid;
-	unsigned char		evaltype;
-	char			*formula;
-	zbx_vector_ptr_t	conditions;
-
-	int			revision;
-}
-zbx_service_action_t;
+ZBX_PTR_VECTOR_DECL(service_update_ptr, zbx_service_update_t *)
 
 typedef struct
 {
@@ -170,6 +167,21 @@ typedef struct
 	int		revision;
 }
 zbx_service_action_condition_t;
+
+ZBX_PTR_VECTOR_DECL(service_action_condition_ptr, zbx_service_action_condition_t *)
+
+typedef struct
+{
+	zbx_uint64_t					actionid;
+	unsigned char					evaltype;
+	char						*formula;
+	zbx_vector_service_action_condition_ptr_t	conditions;
+
+	int						revision;
+}
+zbx_service_action_t;
+
+ZBX_PTR_VECTOR_DECL(service_action_ptr, zbx_service_action_t *)
 
 int	service_get_status(const zbx_service_t	*service, int *status);
 int	service_get_main_status(const zbx_service_t *service);

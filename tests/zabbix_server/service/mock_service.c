@@ -122,12 +122,12 @@ void	mock_init_service_cache(const char *path)
 		service_local.name = zbx_strdup(NULL, zbx_mock_get_object_member_string(hservice, "name"));
 		service = (zbx_service_t *)zbx_hashset_insert(&cache.services, &service_local, sizeof(service_local));
 
-		zbx_vector_ptr_create(&service->children);
-		zbx_vector_ptr_create(&service->parents);
-		zbx_vector_ptr_create(&service->service_problem_tags);
-		zbx_vector_ptr_create(&service->service_problems);
-		zbx_vector_ptr_create(&service->status_rules);
-		zbx_vector_ptr_create(&service->tags);
+		zbx_vector_service_ptr_create(&service->children);
+		zbx_vector_service_ptr_create(&service->parents);
+		zbx_vector_service_problem_tag_ptr_create(&service->service_problem_tags);
+		zbx_vector_service_problem_ptr_create(&service->service_problems);
+		zbx_vector_service_rule_ptr_create(&service->status_rules);
+		zbx_vector_service_tag_ptr_create(&service->tags);
 
 		service->status = zbx_mock_get_object_member_int(hservice, "status");
 
@@ -216,7 +216,7 @@ void	mock_init_service_cache(const char *path)
 				rule->limit_status = zbx_mock_get_object_member_int(hrule, "limit");
 				rule->limit_value = zbx_mock_get_object_member_int(hrule, "value");
 				rule->new_status = zbx_mock_get_object_member_int(hrule, "status");
-				zbx_vector_ptr_append(&service->status_rules, rule);
+				zbx_vector_service_rule_ptr_append(&service->status_rules, rule);
 			}
 		}
 
@@ -233,7 +233,7 @@ void	mock_init_service_cache(const char *path)
 				memset(problem, 0, sizeof(zbx_service_problem_t));
 				problem->eventid = zbx_mock_get_object_member_uint64(hevent, "id");
 				problem->severity = zbx_mock_get_object_member_int(hevent, "severity");
-				zbx_vector_ptr_append(&service->service_problems, problem);
+				zbx_vector_service_problem_ptr_append(&service->service_problems, problem);
 			}
 		}
 
@@ -264,8 +264,8 @@ void	mock_init_service_cache(const char *path)
 							value);
 				}
 
-				zbx_vector_ptr_append(&service->children, child);
-				zbx_vector_ptr_append(&child->parents, service);
+				zbx_vector_service_ptr_append(&service->children, child);
+				zbx_vector_service_ptr_append(&child->parents, service);
 			}
 		}
 
@@ -282,8 +282,8 @@ void	mock_init_service_cache(const char *path)
 							value);
 				}
 
-				zbx_vector_ptr_append(&service->parents, parent);
-				zbx_vector_ptr_append(&parent->children, service);
+				zbx_vector_service_ptr_append(&service->parents, parent);
+				zbx_vector_service_ptr_append(&parent->children, service);
 			}
 		}
 
@@ -295,11 +295,11 @@ void	mock_init_service_cache(const char *path)
 	/* remove duplicate parent/children references */
 	while (NULL != (service = (zbx_service_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_sort(&service->parents, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-		zbx_vector_ptr_uniq(&service->parents, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_service_ptr_sort(&service->parents, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_service_ptr_uniq(&service->parents, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
-		zbx_vector_ptr_sort(&service->children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-		zbx_vector_ptr_uniq(&service->children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_service_ptr_sort(&service->children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_service_ptr_uniq(&service->children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 	}
 }
 
@@ -312,12 +312,12 @@ void	mock_destroy_service_cache(void)
 
 	while (NULL != (service = (zbx_service_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_destroy(&service->children);
-		zbx_vector_ptr_destroy(&service->parents);
-		zbx_vector_ptr_destroy(&service->service_problem_tags);
-		zbx_vector_ptr_destroy(&service->tags);
-		zbx_vector_ptr_clear_ext(&service->service_problems, zbx_ptr_free);
-		zbx_vector_ptr_destroy(&service->service_problems);
+		zbx_vector_service_ptr_destroy(&service->children);
+		zbx_vector_service_ptr_destroy(&service->parents);
+		zbx_vector_service_problem_tag_ptr_destroy(&service->service_problem_tags);
+		zbx_vector_service_tag_ptr_destroy(&service->tags);
+		zbx_vector_service_problem_ptr_clear_ext(&service->service_problems, zbx_service_problem_free);
+		zbx_vector_service_problem_ptr_destroy(&service->service_problems);
 		zbx_vector_ptr_clear_ext(&service->status_rules, zbx_ptr_free);
 		zbx_vector_ptr_destroy(&service->status_rules);
 

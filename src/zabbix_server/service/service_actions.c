@@ -185,8 +185,11 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 				{
 					zbx_strncpy_alloc(&expr, &expr_alloc, &expr_offset,
 							action->formula + last_pos, token.loc.l - last_pos);
+					zbx_service_action_condition_t	zbx_service_action_condition_local =
+							{.conditionid = id};
 
-					if (FAIL != (index = zbx_vector_ptr_search(&action->conditions, &id,
+					if (FAIL != (index = zbx_vector_service_action_condition_ptr_search(
+							&action->conditions, &zbx_service_action_condition_local,
 							ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 					{
 						value = service_update_match_condition(update,
