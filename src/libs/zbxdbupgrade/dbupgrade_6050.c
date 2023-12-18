@@ -23,6 +23,8 @@
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxregexp.h"
+#include "zbxeval.h"
+#include "zbx_host_constants.h"
 
 /*
  * 7.0 development database patches
@@ -1768,6 +1770,245 @@ static int	DBpatch_6050148(void)
 
 static int	DBpatch_6050149(void)
 {
+/* -------------------------------------------------------*/
+/* Formula:                                               */
+/* aggregate_function(last_foreach(filter))               */
+/* aggregate_function(last_foreach(filter,time))          */
+/*--------------------------------------------------------*/
+/* Relative positioning of tokens on a stack              */
+/*----------------------------+---------------------------*/
+/* Time is present in formula | Time is absent in formula */
+/*----------------------------+---------------------------*/
+/* [i-2] filter               |                           */
+/* [i-1] time                 | [i-1] filter              */
+/*   [i] last_foreach         |   [i] last_foreach        */
+/* [i+2] aggregate function   | [i+2]                     */
+/*----------------------------+---------------------------*/
+
+/* Offset in stack of tokens is relative to last_foreach() history function token, */
+/* assuming that time is present in formula. */
+#define OFFSET_TIME	(-1)
+#define TOKEN_LEN(loc)	(loc->r - loc->l + 1)
+#define LAST_FOREACH	"last_foreach"
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	int			ret = SUCCEED;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql = NULL, *params = NULL;
+	zbx_eval_context_t	ctx;
+	zbx_vector_uint32_t	del_idx;
+
+	zbx_eval_init(&ctx);
+	zbx_vector_uint32_create(&del_idx);
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* ITEM_TYPE_CALCULATED = 15 */
+	result = zbx_db_select("select itemid,params from items where type=15 and params like '%%%s%%'", LAST_FOREACH);
+
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	{
+		int	i;
+		char	*esc, *error = NULL;
+
+		zbx_eval_clear(&ctx);
+
+		if (FAIL == zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: error parsing calculated item formula '%s' for itemid %s",
+					__func__, row[1], row[0]);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_vector_uint32_clear(&del_idx);
+
+		for (i = 0; i < ctx.stack.values_num; i++)
+		{
+			zbx_strloc_t	*loc;
+
+			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i].type)
+				continue;
+
+			loc = &ctx.stack.values[i].loc;
+
+			if (0 != strncmp(LAST_FOREACH, &ctx.expression[loc->l], TOKEN_LEN(loc)))
+				continue;
+
+			/* if time is absent in formula */
+			if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			if (ZBX_EVAL_TOKEN_ARG_NULL == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			zbx_vector_uint32_append(&del_idx, (zbx_uint32_t)(i + OFFSET_TIME));
+		}
+
+		if (0 == del_idx.values_num)
+			continue;
+
+		params = zbx_strdup(params, ctx.expression);
+
+		for (i = del_idx.values_num - 1; i >= 0; i--)
+		{
+			size_t		l, r;
+			zbx_strloc_t	*loc = &ctx.stack.values[(int)del_idx.values[i]].loc;
+
+			for (l = loc->l - 1; ',' != params[l]; l--) {}
+			for (r = loc->r + 1; ')' != params[r]; r++) {}
+
+			memmove(&params[l], &params[r], strlen(params) - r + 1);
+		}
+
+		esc = zbx_db_dyn_escape_string(params);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items set params='%s' where itemid=%s;\n", esc, row[0]);
+		zbx_free(esc);
+
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_eval_clear(&ctx);
+	zbx_vector_uint32_destroy(&del_idx);
+
+	zbx_free(sql);
+	zbx_free(params);
+
+	return ret;
+#undef OFFSET_TIME
+#undef TOKEN_LEN
+#undef LAST_FOREACH
+}
+
+static int	DBpatch_6050150(void)
+{
+	const zbx_db_table_t	table =
+			{"item_rtname", "itemid", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name_resolved", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"name_resolved_upper", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050151(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_rtname", 1, &field);
+}
+
+static int	DBpatch_6050152(void)
+{
+	if (ZBX_DB_OK <= zbx_db_execute("insert into item_rtname (itemid,name_resolved,name_resolved_upper)"
+			" select i.itemid,i.name,i.name_upper from"
+			" items i,hosts h"
+			" where i.hostid=h.hostid and (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_6050153(void)
+{
+	return DBdrop_index("items", "items_9");
+}
+
+static int	DBpatch_6050154(void)
+{
+	return DBdrop_field("items", "name_upper");
+}
+
+static int	DBpatch_6050155(void)
+{
+	return zbx_dbupgrade_drop_trigger_on_insert("items", "name_upper");
+}
+
+static int	DBpatch_6050156(void)
+{
+	return zbx_dbupgrade_drop_trigger_on_update("items", "name_upper");
+}
+
+static int	DBpatch_6050157(void)
+{
+	return zbx_dbupgrade_drop_trigger_function_on_insert("items", "name_upper", "upper");
+}
+
+static int	DBpatch_6050158(void)
+{
+	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
+}
+
+static int	DBpatch_6050159(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("group_discovery", "group_discovery_pkey1", "group_discovery_pkey",
+			"groupdiscoveryid", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6050160(void)
+{
+	const zbx_db_field_t	field = {"manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050161(void)
+{
+	const zbx_db_field_t	field = {"manualinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050162(void)
+{
+	const zbx_db_field_t	field = {"manualinput_validator", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050163(void)
+{
+	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050164(void)
+{
+	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+
+static int	DBpatch_6050165(void)
+{
 	const zbx_db_table_t	table = {"proxy_group", "proxy_groupid", 0,
 			{
 				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1784,22 +2025,22 @@ static int	DBpatch_6050149(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050150(void)
+static int	DBpatch_6050166(void)
 {
 	return DBcreate_changelog_insert_trigger("proxy_group", "proxy_groupid");
 }
 
-static int	DBpatch_6050151(void)
+static int	DBpatch_6050167(void)
 {
 	return DBcreate_changelog_update_trigger("proxy_group", "proxy_groupid");
 }
 
-static int	DBpatch_6050152(void)
+static int	DBpatch_6050168(void)
 {
 	return DBcreate_changelog_delete_trigger("proxy_group", "proxy_groupid");
 }
 
-static int	DBpatch_6050153(void)
+static int	DBpatch_6050169(void)
 {
 	const zbx_db_table_t	table = {"host_proxy", "hostproxyid", 0,
 			{
@@ -1816,89 +2057,89 @@ static int	DBpatch_6050153(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050154(void)
+static int	DBpatch_6050170(void)
 {
 	return DBcreate_index("host_proxy", "host_proxy_1", "hostid", 1);
 }
 
-static int	DBpatch_6050155(void)
+static int	DBpatch_6050171(void)
 {
 	return DBcreate_index("host_proxy", "host_proxy_2", "proxyid", 0);
 }
 
-static int	DBpatch_6050156(void)
+static int	DBpatch_6050172(void)
 {
 	return DBcreate_index("host_proxy", "host_proxy_3", "revision", 0);
 }
 
-static int	DBpatch_6050157(void)
+static int	DBpatch_6050173(void)
 {
 	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_proxy", 1, &field);
 }
 
-static int	DBpatch_6050158(void)
+static int	DBpatch_6050174(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_proxy", 2, &field);
 }
 
-static int	DBpatch_6050159(void)
+static int	DBpatch_6050175(void)
 {
 	return DBcreate_changelog_insert_trigger("host_proxy", "hostproxyid");
 }
 
-static int	DBpatch_6050160(void)
+static int	DBpatch_6050176(void)
 {
 	return DBcreate_changelog_update_trigger("host_proxy", "hostproxyid");
 }
 
-static int	DBpatch_6050161(void)
+static int	DBpatch_6050177(void)
 {
 	return DBcreate_changelog_delete_trigger("host_proxy", "hostproxyid");
 }
 
-static int	DBpatch_6050162(void)
+static int	DBpatch_6050178(void)
 {
 	const zbx_db_field_t	field = {"local_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050163(void)
+static int	DBpatch_6050179(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050164(void)
+static int	DBpatch_6050180(void)
 {
 	return DBcreate_index("proxy", "proxy_2", "proxy_groupid", 0);
 }
 
-static int	DBpatch_6050165(void)
+static int	DBpatch_6050181(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("proxy", 1, &field);
 }
 
-static int	DBpatch_6050166(void)
+static int	DBpatch_6050182(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_6050167(void)
+static int	DBpatch_6050183(void)
 {
 	return DBcreate_index("hosts", "hosts_8", "proxy_groupid", 0);
 }
 
-static int	DBpatch_6050168(void)
+static int	DBpatch_6050184(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
 
@@ -2078,5 +2319,25 @@ DBPATCH_ADD(6050165, 0, 1)
 DBPATCH_ADD(6050166, 0, 1)
 DBPATCH_ADD(6050167, 0, 1)
 DBPATCH_ADD(6050168, 0, 1)
+DBPATCH_ADD(6050166, 0, 1)
+DBPATCH_ADD(6050167, 0, 1)
+DBPATCH_ADD(6050169, 0, 1)
+DBPATCH_ADD(6050170, 0, 1)
+DBPATCH_ADD(6050171, 0, 1)
+DBPATCH_ADD(6050172, 0, 1)
+DBPATCH_ADD(6050173, 0, 1)
+DBPATCH_ADD(6050174, 0, 1)
+DBPATCH_ADD(6050175, 0, 1)
+DBPATCH_ADD(6050176, 0, 1)
+DBPATCH_ADD(6050177, 0, 1)
+DBPATCH_ADD(6050178, 0, 1)
+DBPATCH_ADD(6050176, 0, 1)
+DBPATCH_ADD(6050177, 0, 1)
+DBPATCH_ADD(6050179, 0, 1)
+DBPATCH_ADD(6050180, 0, 1)
+DBPATCH_ADD(6050181, 0, 1)
+DBPATCH_ADD(6050182, 0, 1)
+DBPATCH_ADD(6050183, 0, 1)
+DBPATCH_ADD(6050184, 0, 1)
 
 DBPATCH_END()

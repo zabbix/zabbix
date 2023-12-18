@@ -52,8 +52,6 @@
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
-extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
-
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size, short *events);
@@ -1342,13 +1340,14 @@ static int	tcp_err_in_use(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create socket for listening                                       *
+ * Purpose: creates socket for listening                                      *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
- *               FAIL - an error occurred                                     *
+ *               FAIL - error occurred                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout)
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,
+		int config_tcp_max_backlog_size)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[8], *ip, *ips, *delim;
@@ -1505,7 +1504,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					goto out;
 			}
 
-			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], CONFIG_TCP_MAX_BACKLOG_SIZE))
+			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], config_tcp_max_backlog_size))
 			{
 				zbx_set_socket_strerror("listen() for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,
@@ -2084,11 +2083,6 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 				memcpy(&len32_le, s->buf_stat + context->offset, sizeof(len32_le));
 				context->offset += sizeof(len32_le);
 				context->reserved = zbx_letoh_uint32(len32_le);
-
-				if (0 == flags && ZBX_TCP_PROTOCOL == context->protocol_version)
-					s->reserved_payload = context->reserved;
-				else
-					s->reserved_payload = 0;
 			}
 
 			if (context->max_len < context->expected_len)

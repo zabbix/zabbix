@@ -35,11 +35,11 @@
 #	include "zbxnix.h"
 #endif
 
-const char	*progname = NULL;
-const char	title_message[] = "zabbix_sender";
-const char	syslog_app_name[] = "zabbix_sender";
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
+static const char	title_message[] = "zabbix_sender";
+static const char	syslog_app_name[] = "zabbix_sender";
 
-const char	*usage_message[] = {
+static const char	*usage_message[] = {
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]", "[-N]", "[-r]",
 	"[-b]", "-i input-file", NULL,
@@ -132,12 +132,11 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
-
+static unsigned char	zbx_program_type = ZBX_PROGRAM_TYPE_SENDER;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-static unsigned char	get_program_type(void)
+static unsigned char	get_zbx_program_type(void)
 {
-	return program_type;
+	return zbx_program_type;
 }
 #endif
 
@@ -150,7 +149,7 @@ static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 #define CONFIG_SENDER_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MIN)
 #define CONFIG_SENDER_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MAX)
 
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
 	"General options:",
@@ -928,10 +927,10 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_help(NULL);
+				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
 				exit(EXIT_SUCCESS);
 			case 'V':
-				zbx_version();
+				zbx_print_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
@@ -1053,7 +1052,7 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_usage();
+				zbx_print_usage(usage_message, zbx_progname);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -1291,8 +1290,8 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
-		zbx_usage();
-		printf("Try '%s --help' for more information.\n", progname);
+		zbx_print_usage(usage_message, zbx_progname);
+		printf("Try '%s --help' for more information.\n", zbx_progname);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1345,7 +1344,7 @@ static void	parse_commandline(int argc, char **argv)
 					)
 	{
 		zbx_error("too few or mutually exclusive options used");
-		zbx_usage();
+		zbx_print_usage(usage_message, zbx_progname);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1434,16 +1433,19 @@ int	main(int argc, char **argv)
 	struct zbx_json		*out;
 
 
-	zbx_init_library_common(zbx_log_impl);
-	zbx_config_tls = zbx_config_tls_new();
+	zbx_progname = get_program_name(argv[0]);
 
-	progname = get_program_name(argv[0]);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+#ifndef _WINDOWS
+	zbx_init_library_nix(get_zbx_progname);
+#endif
+	zbx_config_tls = zbx_config_tls_new();
 
 	parse_commandline(argc, argv);
 
 	if (NULL != config_file)
 	{
-		zbx_init_library_cfg(program_type, config_file);
+		zbx_init_library_cfg(zbx_program_type, config_file);
 		zbx_load_config(config_file);
 	}
 
@@ -1455,7 +1457,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, syslog_app_name, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1506,14 +1508,14 @@ int	main(int argc, char **argv)
 			NULL != zbx_config_tls->cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_program_type);
+		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_zbx_program_type);
 
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		{
 #if defined(_WINDOWS)
-			zbx_tls_init_parent(get_program_type);
+			zbx_tls_init_parent(get_zbx_program_type);
 #endif
-			zbx_tls_init_child(zbx_config_tls, get_program_type);
+			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type);
 		}
 #else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"

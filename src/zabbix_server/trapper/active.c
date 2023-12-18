@@ -19,6 +19,8 @@
 
 #include "active.h"
 
+#include "trapper.h"
+
 #include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
@@ -33,8 +35,6 @@
 #include "zbxautoreg.h"
 #include "zbxscripts.h"
 #include "zbxcommshigh.h"
-
-extern unsigned char	program_type;
 
 /**********************************************************************************
  *                                                                                *
@@ -197,7 +197,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
 
-		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != zbx_dc_get_auto_registration_action_count())
+		if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
+				0 != zbx_dc_get_auto_registration_action_count())
 		{
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
@@ -213,12 +214,13 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		goto out;
 	}
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
 		heartbeat = AUTO_REGISTRATION_HEARTBEAT;
 	else
 		heartbeat = 0;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != zbx_dc_get_auto_registration_action_count())
+	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
+			0 != zbx_dc_get_auto_registration_action_count())
 	{
 		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
 				heartbeat))

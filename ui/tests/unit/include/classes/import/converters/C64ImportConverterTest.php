@@ -52,8 +52,29 @@ class C64ImportConverterTest extends CImportConverterTest {
 				$expected_lld_rules[] = $expected_item;
 			}
 
-			$source_items[] = $source_item;
-			$expected_items[] = $expected_item;
+			$source_items[] = $source_item + [
+				'preprocessing' => [
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED
+					],
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED,
+						'parameters' => ''
+					]
+				]
+			];
+			$expected_items[] = $expected_item + [
+				'preprocessing' => [
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED,
+						'parameters' => [(string) ZBX_PREPROC_MATCH_ERROR_ANY]
+					],
+					[
+						'type' => CXmlConstantName::CHECK_NOT_SUPPORTED,
+						'parameters' => [(string) ZBX_PREPROC_MATCH_ERROR_ANY]
+					]
+				]
+			];
 		}
 
 		foreach ($source_lld_rules as &$lld_rule) {
@@ -104,8 +125,113 @@ class C64ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
+	public function importConverterDataProviderCalcItemFormula(): array {
+		$formulas = [
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],0s))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], 15s))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], {$MACRO}))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], "{$MACRO: context}"))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 1h ))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],{#LLD}))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'prototype' => true
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],  {#LLD}))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'prototype' => true
+			]
+		];
+
+		$source_items = [];
+		$expected_items = [];
+		$source_item_prototypes = [];
+		$expected_item_prototypes = [];
+
+		foreach ($formulas as $formula) {
+			if (!$formula['prototype']) {
+				$source_items[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['source']];
+				$expected_items[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['expected']];
+			}
+			$source_item_prototypes[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['source']];
+			$expected_item_prototypes[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['expected']];
+		}
+
+		return [
+			[
+				[
+					'templates' => [
+						[
+							'items' => $source_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $source_item_prototypes
+								]
+							]
+						]
+					],
+					'hosts' => [
+						[
+							'items' => $source_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $source_item_prototypes
+								]
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
+						[
+							'items' => $expected_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $expected_item_prototypes
+								]
+							]
+						]
+					],
+					'hosts' => [
+						[
+							'items' => $expected_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $expected_item_prototypes
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider importConverterDataProvider
+	 * @dataProvider importConverterDataProviderCalcItemFormula
 	 *
 	 * @param array $data
 	 * @param array $expected
@@ -117,8 +243,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 	protected function createSource(array $data = []): array {
 		return [
 			'zabbix_export' => array_merge([
-				'version' => '6.4',
-				'date' => '2023-09-04T18:00:00:00Z'
+				'version' => '6.4'
 			], $data)
 		];
 	}
@@ -126,8 +251,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 	protected function createExpectedResult(array $data = []): array {
 		return [
 			'zabbix_export' => array_merge([
-				'version' => '7.0',
-				'date' => '2023-09-04T18:00:00:00Z'
+				'version' => '7.0'
 			], $data)
 		];
 	}

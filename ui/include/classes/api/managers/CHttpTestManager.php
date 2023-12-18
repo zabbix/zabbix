@@ -644,7 +644,8 @@ class CHttpTestManager {
 				if ($httptest['name'] != $db_httptest['name']) {
 					$item += [
 						'name' => self::getTestName($db_item['test_type'], $httptest['name']),
-						'key_' => self::getTestKey($db_item['test_type'], $httptest['name'])
+						'key_' => self::getTestKey($db_item['test_type'], $httptest['name']),
+						'host_status' => $db_httptest['host_status']
 					];
 				}
 
@@ -687,7 +688,8 @@ class CHttpTestManager {
 					if ($httptest['name'] != $db_httptest['name']) {
 						$item += [
 							'name' => self::getStepName($db_item['test_type'], $httptest['name'], $db_step['name']),
-							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $db_step['name'])
+							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $db_step['name']),
+							'host_status' => $db_httptest['host_status']
 						];
 					}
 
@@ -969,7 +971,8 @@ class CHttpTestManager {
 					if ($httptest['name'] != $db_httptest['name'] || $step['name'] !== $db_step['name']) {
 						$item += [
 							'name' => self::getStepName($db_item['test_type'], $httptest['name'], $step['name']),
-							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $step['name'])
+							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $step['name']),
+							'host_status' => $db_httptest['host_status']
 						];
 					}
 

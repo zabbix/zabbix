@@ -83,6 +83,7 @@ typedef struct
 	int		disable_until;
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
+	int		version;
 }
 zbx_dc_interface_t;
 
@@ -112,6 +113,7 @@ typedef struct
 	char			host[ZBX_HOSTNAME_BUF_LEN];
 	zbx_dc_interface_t	interface;
 	int			ret;
+	int			version;
 	AGENT_RESULT		result;
 }
 zbx_dc_item_context_t;
@@ -738,11 +740,13 @@ zbx_synced_new_config_t;
 typedef struct zbx_dc_um_shared_handle zbx_dc_um_shared_handle_t;
 typedef struct zbx_um_cache zbx_um_cache_t;
 
-void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
+zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip);
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location);
+void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
 void	zbx_free_configuration_cache(void);
@@ -883,6 +887,7 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 int	zbx_dc_interface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
 		int unreachable_period, int unreachable_delay, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out, const char *error_msg);
+void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */

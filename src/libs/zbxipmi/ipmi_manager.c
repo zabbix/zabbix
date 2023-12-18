@@ -641,7 +641,7 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 
 	if (SUCCEED == errcode)
 	{
-		zbx_activate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host, &data,
+		zbx_activate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host, 0, &data,
 				&data_alloc, &data_offset);
 		ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 	}
