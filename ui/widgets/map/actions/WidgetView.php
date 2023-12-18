@@ -50,8 +50,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($previous_maps) {
 				$previous_map = API::Map()->get([
-					'sysmapids' => [array_pop($previous_maps)],
-					'output' => ['sysmapid', 'name']
+					'output' => ['sysmapid', 'name'],
+					'sysmapids' => [array_pop($previous_maps)]
 				]);
 
 				$previous_map = reset($previous_map);

@@ -192,6 +192,16 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -9316,6 +9326,10 @@ msgstr ""
 msgid "Host label type"
 msgstr ""
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -12668,6 +12682,11 @@ msgstr ""
 msgid "Max number of columns and rows in overview tables"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr ""
@@ -14331,6 +14350,11 @@ msgstr ""
 msgid "Not supported"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr ""
@@ -14838,6 +14862,10 @@ msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order"
+msgstr ""
+
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
 msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:150
@@ -20072,6 +20100,10 @@ msgstr ""
 msgid "Trigger label type"
 msgstr ""
 
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
+
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
 msgstr ""
@@ -20963,6 +20995,10 @@ msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
 msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:222
@@ -22372,6 +22408,10 @@ msgstr ""
 msgid "X-Frame-Options HTTP header"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
 msgstr ""
@@ -22817,6 +22857,11 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2989

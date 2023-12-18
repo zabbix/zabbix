@@ -1962,9 +1962,57 @@ static int	DBpatch_6050158(void)
 	return zbx_dbupgrade_drop_trigger_function_on_update("items", "name_upper", "upper");
 }
 
+static int	DBpatch_6050159(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("group_discovery", "group_discovery_pkey1", "group_discovery_pkey",
+			"groupdiscoveryid", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6050160(void)
+{
+	const zbx_db_field_t	field = {"manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050161(void)
+{
+	const zbx_db_field_t	field = {"manualinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050162(void)
+{
+	const zbx_db_field_t	field = {"manualinput_validator", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050163(void)
+{
+	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6050164(void)
+{
+	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
 #define BACKSLASH_MATCH_PATTERN	"\\\\"
 
-static int	DBpatch_6050159(void)
+static int	DBpatch_6050165(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -2122,9 +2170,9 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 	return SUCCEED;
 }
 
-static int	DBpatch_6050160(void)
+static int	DBpatch_6050166(void)
 {
-	int			ret = SUCCEED;
+int			ret = SUCCEED;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	char			*sql = NULL, *error = NULL, *like_condition;
@@ -2339,47 +2387,47 @@ clean:
 
 #undef BACKSLASH_MATCH_PATTERN
 
-static int	DBpatch_6050161(void)
+static int	DBpatch_6050167(void)
 {
 	return fix_expression_macro_escaping("scripts", "scriptid", "command");
 }
 
-static int	DBpatch_6050162(void)
+static int	DBpatch_6050168(void)
 {
 	return fix_expression_macro_escaping("script_param", "script_paramid", "value");
 }
 
-static int	DBpatch_6050163(void)
+static int	DBpatch_6050169(void)
 {
 	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "message");
 }
 
-static int	DBpatch_6050164(void)
+static int	DBpatch_6050170(void)
 {
 	return fix_expression_macro_escaping("media_type_message", "mediatype_messageid", "subject");
 }
 
-static int	DBpatch_6050165(void)
+static int	DBpatch_6050171(void)
 {
 	return fix_expression_macro_escaping("opmessage", "operationid", "message");
 }
 
-static int	DBpatch_6050166(void)
+static int	DBpatch_6050172(void)
 {
 	return fix_expression_macro_escaping("opmessage", "operationid", "subject");
 }
 
-static int	DBpatch_6050167(void)
+static int	DBpatch_6050173(void)
 {
 	return fix_expression_macro_escaping("triggers", "triggerid", "event_name");
 }
 
-static int	DBpatch_6050168(void)
+static int	DBpatch_6050174(void)
 {
 	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "value");
 }
 
-static int	DBpatch_6050169(void)
+static int	DBpatch_6050175(void)
 {
 	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "name");
 }
@@ -2558,5 +2606,11 @@ DBPATCH_ADD(6050166, 0, 1)
 DBPATCH_ADD(6050167, 0, 1)
 DBPATCH_ADD(6050168, 0, 1)
 DBPATCH_ADD(6050169, 0, 1)
+DBPATCH_ADD(6050170, 0, 1)
+DBPATCH_ADD(6050171, 0, 1)
+DBPATCH_ADD(6050172, 0, 1)
+DBPATCH_ADD(6050173, 0, 1)
+DBPATCH_ADD(6050174, 0, 1)
+DBPATCH_ADD(6050175, 0, 1)
 
 DBPATCH_END()
