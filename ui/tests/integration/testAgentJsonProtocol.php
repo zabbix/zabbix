@@ -497,14 +497,16 @@ class testAgentJsonProtocol extends CIntegrationTest {
 			$this->getConfigurationValue(self::COMPONENT_AGENT2, 'ListenPort')
 		];
 
-	foreach ($ports as $port) {
-		$output = shell_exec(PHPUNIT_BASEDIR . '/bin/zabbix_get -s 127.0.0.1 -p ' . $port .
-			' -k "system.run[sleep 5 && echo ok]" -t 7');
+		foreach ($ports as $port) {
+			$output = shell_exec(PHPUNIT_BASEDIR . '/bin/zabbix_get -s 127.0.0.1 -p ' . $port .
+				' -k "system.run[sleep 5 && echo ok]" -t 7');
 
-		$this->assertNotNull($output);
-		$this->assertNotFalse($output);
-		$this->assertStringContainsString('ok', $output);
+			$this->assertNotNull($output);
+			$this->assertNotFalse($output);
+			$this->assertStringContainsString('ok', $output);
+
+		}
+
+		return true;
 	}
-
-	return true;
 }
