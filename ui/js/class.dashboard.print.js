@@ -28,7 +28,9 @@ class CDashboardPrint extends CDashboard {
 		this._state = DASHBOARD_STATE_ACTIVE;
 
 		for (const dashboard_page of this.getDashboardPages()) {
-			this.#activateDashboardPage(dashboard_page);
+			this._startDashboardPage(dashboard_page);
+
+			dashboard_page.activate();
 		}
 	}
 
@@ -69,14 +71,7 @@ class CDashboardPrint extends CDashboard {
 		return dashboard_page;
 	}
 
-	#activateDashboardPage(dashboard_page) {
-		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
-
-		dashboard_page.start();
-		dashboard_page.activate();
-	}
-
-	#updateReadyState() {
+	_updateReadyState() {
 		let is_ready = true;
 
 		for (const data of this._dashboard_pages.values()) {
@@ -88,9 +83,5 @@ class CDashboardPrint extends CDashboard {
 		}
 
 		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, is_ready);
-
-		if (is_ready) {
-			this.fire(CDashboard.EVENT_READY);
-		}
 	}
 }

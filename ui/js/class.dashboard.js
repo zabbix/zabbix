@@ -42,8 +42,6 @@ class CDashboard {
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
-	static EVENT_READY = 'dashboard-ready';
-
 	static EVENT_FEEDBACK = 'dashboard-feedback';
 
 	#broadcast_options;
@@ -942,7 +940,7 @@ class CDashboard {
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
-				this.#updateReadyState();
+				this._updateReadyState();
 
 				if (!this._is_edit_mode) {
 					this._keepSteadyConfigurationChecker();
@@ -988,7 +986,7 @@ class CDashboard {
 		this._selected_dashboard_page = dashboard_page;
 
 		if (this._selected_dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
-			this.#startDashboardPage(this._selected_dashboard_page);
+			this._startDashboardPage(this._selected_dashboard_page);
 		}
 
 		this._activateDashboardPage(this._selected_dashboard_page);
@@ -998,7 +996,7 @@ class CDashboard {
 		}
 	}
 
-	#startDashboardPage(dashboard_page) {
+	_startDashboardPage(dashboard_page) {
 		dashboard_page.on(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
@@ -1100,14 +1098,10 @@ class CDashboard {
 	 *
 	 * Readiness state is updated on switching dashboard pages and as soon as the selected page gets fully loaded.
 	 */
-	#updateReadyState() {
+	_updateReadyState() {
 		const data = this._dashboard_pages.get(this._selected_dashboard_page);
 
 		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, data.is_ready);
-
-		if (data.is_ready) {
-			this.fire(CDashboard.EVENT_READY);
-		}
 	}
 
 	save() {
@@ -2071,7 +2065,7 @@ class CDashboard {
 
 				data.is_ready = true;
 
-				this.#updateReadyState();
+				this._updateReadyState();
 			},
 
 			dashboardPageRequireDataSource: (e) => {
