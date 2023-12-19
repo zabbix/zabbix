@@ -340,6 +340,22 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'proxy_group' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'host_proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -726,6 +742,22 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' =>
 				'0'
 			]
+		],
+		[
+			'proxy_group' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'host_proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -1095,6 +1127,22 @@ class testInitialConfSync extends CIntegrationTest
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '2'
+			]
+		],
+		[
+			'proxy_group' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'host_proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
 			]
 		]
 	];
