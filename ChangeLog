@@ -445,6 +445,10 @@ Changes for 6.4.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
+...G...... [ZBX-23715] fixed persistent directory path not following symlinks upon creation (kprutkovs)
+...G...... [ZBX-22678] fixed parsing failures for deb packages without an Installed-Size field (jxl)
+.........T [ZBX-23825] fixed query_fields values Acronis and Nomand templates (abiba)
 ..F....... [ZBX-22055] fixed map image of map widget not being updated on apply button press (agriscenko, apoga)
 ..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
 .......PS. [ZBX-23145] disabled deprecated automatic reconnection in MySQL (mprihodko)
