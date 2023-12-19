@@ -106,19 +106,9 @@ $item_tab
 	]);
 
 // Prepare ITEM_TYPE_HTTPAGENT query fields.
-$query_fields_data = [];
+$query_fields_data = $data['query_fields'];
 
-if (is_array($data['query_fields']) && $data['query_fields']) {
-	$i = 0;
-	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = [
-			'name' => key($pair),
-			'value' => reset($pair),
-			'sortorder' => $i++
-		];
-	}
-}
-elseif (!$data['limited']) {
+if (!$query_fields_data && !$data['limited']) {
 	$query_fields_data[] = [
 		'name' => '',
 		'value' => '',
@@ -197,13 +187,13 @@ $item_tab
 					->addItem(new CRow([
 						(new CCol([
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+							new CVar('query_fields[#{index}][sortorder]', '#{sortorder}')
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
+						(new CTextBox('query_fields[#{index}][name]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
+						(new CTextBox('query_fields[#{index}][value]', '#{value}', $data['limited']))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -298,19 +288,9 @@ $item_tab
 	]);
 
 // Append ITEM_TYPE_HTTPAGENT Headers fields to form list.
-$headers_data = [];
+$headers_data = $data['headers'];
 
-if (is_array($data['headers']) && $data['headers']) {
-	$i = 0;
-	foreach ($data['headers'] as $pair) {
-		$headers_data[] = [
-			'name' => key($pair),
-			'value' => reset($pair),
-			'sortorder' => $i++
-		];
-	}
-}
-elseif (!$data['limited']) {
+if (!$headers_data && !$data['limited']) {
 	$headers_data[] = [
 		'name' => '',
 		'value' => '',
@@ -340,13 +320,13 @@ $item_tab
 					->addItem(new CRow([
 						(new CCol([
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							new CVar('headers[#{index}][sortorder]', '#{sortorder}')
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
+						(new CTextBox('headers[#{index}][name]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 2000))
+						(new CTextBox('headers[#{index}][value]', '#{value}', $data['limited'], 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -715,10 +695,10 @@ $item_tab->addItem([
 $edit_source_timeouts_link = null;
 
 if ($data['can_edit_source_timeouts']
-		&& (($data['limited'] && $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) || !$data['limited'])) {
-	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
+		&& (!$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)) {
+	$edit_source_timeouts_link = $data['host']['proxyid']
 		? (new CLink(_('Timeouts')))
-			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
+			->setAttribute('data-proxyid', $data['host']['proxyid'])
 			->onClick('view.editProxy(event, this.dataset.proxyid);')
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')

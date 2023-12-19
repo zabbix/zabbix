@@ -42,6 +42,9 @@ typedef struct
 	int			config_max_concurrent_checks_per_poller;
 	int			config_timeout;
 	const char		*config_source_ip;
+	const char		*config_ssl_ca_location;
+	const char		*config_ssl_cert_location;
+	const char		*config_ssl_key_location;
 	struct event		*async_wake_timer;
 	struct event		*async_timer;
 	struct event_base	*base;

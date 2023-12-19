@@ -32,6 +32,7 @@ if ($data['success']) {
 			->addClass('monospace-font')
 			->addClass('active-readonly')
 			->disableSpellcheck()
+			->setId('execution-output')
 			->setReadonly(true)
 	];
 

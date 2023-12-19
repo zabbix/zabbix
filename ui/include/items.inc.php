@@ -734,8 +734,8 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 		$hostids = array_keys($db_hosts);
 	}
 
-	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'value_type', 'units', 'valuemapid'],
+	$db_items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
 		'selectValueMap' => ['mappings'],
 		'hostids' => $hostids,
@@ -745,7 +745,7 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 		'monitored' => true,
 		'webitems' => true,
 		'preservekeys' => true
-	]);
+	]), ['name_resolved' => 'name']);
 
 	CArrayHelper::sort($db_items, [
 		['field' => 'name', 'order' => ZBX_SORT_UP],
@@ -2186,23 +2186,15 @@ function prepareLldOverrides(array $overrides, ?array $db_item): array {
  * @return array
  */
 function prepareItemQueryFields(array $query_fields): array {
-	if ($query_fields) {
-		$_query_fields = [];
+	foreach ($query_fields as $i => $query_field) {
+		unset($query_fields[$i]['sortorder']);
 
-		foreach ($query_fields['name'] as $index => $key) {
-			$value = $query_fields['value'][$index];
-			$sortorder = $query_fields['sortorder'][$index];
-
-			if ($key !== '' || $value !== '') {
-				$_query_fields[$sortorder] = [$key => $value];
-			}
+		if ($query_field['name'] === '' && $query_field['value'] === '') {
+			unset($query_fields[$i]);
 		}
-
-		ksort($_query_fields);
-		$query_fields = array_values($_query_fields);
 	}
 
-	return $query_fields;
+	return array_values($query_fields);
 }
 
 /**
@@ -2213,23 +2205,15 @@ function prepareItemQueryFields(array $query_fields): array {
  * @return array
  */
 function prepareItemHeaders(array $headers): array {
-	if ($headers) {
-		$_headers = [];
+	foreach ($headers as $i => $header) {
+		unset($headers[$i]['sortorder']);
 
-		foreach ($headers['name'] as $i => $name) {
-			$value = $headers['value'][$i];
-
-			if ($name === '' && $value === '') {
-				continue;
-			}
-
-			$_headers[$name] = $value;
+		if ($header['name'] === '' && $header['value'] === '') {
+			unset($headers[$i]);
 		}
-
-		$headers = $_headers;
 	}
 
-	return $headers;
+	return array_values($headers);
 }
 
 /**

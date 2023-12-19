@@ -200,6 +200,16 @@ msgstr[0] "%1$s z %2$s prvků v hlásí problém"
 msgstr[1] "%1$s z %2$s prvků v hlásí problém"
 msgstr[2] "%1$s z %2$s prvků v hlásí problém"
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -9467,6 +9477,10 @@ msgstr "Přehled inventáře hosta"
 msgid "Host label type"
 msgstr "Typ popisu hosta"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -12843,6 +12857,11 @@ msgstr "Maximální doba zobrazení historie"
 msgid "Max number of columns and rows in overview tables"
 msgstr "Maximální počet sloupců a řádků v přehledových tabulkách"
 
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Maximální perioda pro volič času"
@@ -14517,6 +14536,11 @@ msgstr "Žádné zděděné položky"
 msgid "Not supported"
 msgstr "Nepodporováno"
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "Poznámky"
@@ -15026,6 +15050,10 @@ msgstr "Nebo"
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order"
 msgstr "Pořadí"
+
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
@@ -15615,6 +15643,10 @@ msgstr "Procentuální čára (vlevo)"
 #: widgets/svggraph/includes/WidgetForm.php:264
 msgid "Percentile line (right)"
 msgstr "Procentuální čára (vpravo)"
+
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -17114,6 +17146,10 @@ msgstr "Vrátí počet změn stavu z režimu disku/paměti od spuštění. Čast
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Vrátí procento ztracených ICMP ping paketů."
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -20273,6 +20309,10 @@ msgstr "Spouštěč v šabloně \"%1$s\" má závislost na spouštěči v šablo
 msgid "Trigger label type"
 msgstr "Typ popisku spouštěče"
 
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
+
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
 msgstr "Přehled spouštěčů"
@@ -21171,6 +21211,10 @@ msgstr "Doba dostupnosti/nedostupnosti"
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr "Use %{ref} ve skupinovém filtru k referenční hodnotě tohoto uživatelského atributu."
+
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -22588,6 +22632,10 @@ msgstr "Osa X"
 msgid "X-Frame-Options HTTP header"
 msgstr "HTTP hlavička X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
 msgstr "X1"
@@ -23038,6 +23086,11 @@ msgstr "je očekáván relativní čas"
 msgid "a special character"
 msgstr "speciální znak"
 
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
 msgstr "očekává se řetězec, číslo nebo prázdná hodnota"
@@ -23242,6 +23295,13 @@ msgstr "asin() – Arkussínus hodnoty jako úhel vyjadře ný v radiánech"
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
 msgstr "musí byť vybraný aspoň jeden den v týdnu"
+
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
@@ -23911,6 +23971,11 @@ msgstr "in() - Zkontroluje zda hodnota se rovná jedné z uvedených hodnot (1 -
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "včetně podskupin"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

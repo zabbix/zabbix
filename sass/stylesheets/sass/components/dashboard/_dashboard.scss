@@ -37,8 +37,8 @@
 
 .dashboard-navigation {
 	display: flex;
-	margin-top: 10px;
-	padding-bottom: 2px;
+	margin-top: 2px;
+	margin-bottom: 6px;
 
 	&.is-scrollable {
 		.dashboard-navigation-controls {
@@ -181,7 +181,7 @@
 
 .dashboard-grid {
 	position: relative;
-	margin: 0 -4px -4px -4px;
+	margin: -4px;
 
 	// For widget sliding headers to appear over the breadcrumbs.
 	z-index: 3;
@@ -1056,8 +1056,7 @@
 	}
 }
 
-.dashboard-grid-widget-body,
-.dashboard-grid-iterator-body {
+.dashboard-grid-iterator-contents {
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}

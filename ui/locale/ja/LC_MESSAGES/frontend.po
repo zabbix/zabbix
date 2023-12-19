@@ -180,6 +180,16 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%2$s台中%1$s台の要素で障害発生中"
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -9221,6 +9231,10 @@ msgstr "ホストインベントリの概要"
 msgid "Host label type"
 msgstr "ホストのラベルタイプ"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -12559,6 +12573,11 @@ msgstr "ヒストリの最大表示期間"
 msgid "Max number of columns and rows in overview tables"
 msgstr "概要テーブル内の列と行の最大数"
 
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "タイムセレクターの最大期間"
@@ -14213,6 +14232,11 @@ msgstr "継承していないアイテム"
 msgid "Not supported"
 msgstr "取得不可"
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "備考"
@@ -14720,6 +14744,10 @@ msgstr "Or"
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order"
 msgstr "表示順序"
+
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
@@ -15309,6 +15337,10 @@ msgstr "パーセンタイルライン (左)"
 #: widgets/svggraph/includes/WidgetForm.php:264
 msgid "Percentile line (right)"
 msgstr "パーセンタイルライン (右)"
+
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -16804,6 +16836,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "ICMP pingパケットのロスト率を返す。"
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -19929,6 +19965,10 @@ msgstr "テンプレート\"%1$s\"のトリガーはテンプレート\"%2$s\"�
 msgid "Trigger label type"
 msgstr "トリガーラベルタイプ"
 
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
+
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
 msgstr "トリガーの概要"
@@ -20819,6 +20859,10 @@ msgstr "アップタイム/ダウンタイム"
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr "このユーザー属性の値を参照するには、グループフィルターで%{ref}を使用します。"
+
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -22220,6 +22264,10 @@ msgstr "X軸"
 msgid "X-Frame-Options HTTP header"
 msgstr "X-Frame-Options HTTPヘッダ"
 
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
 msgstr "X1"
@@ -22670,6 +22718,11 @@ msgstr "相対的な時間で指定してください"
 msgid "a special character"
 msgstr "特殊記号"
 
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
 msgstr "文字列か数字か空文字列で指定してください"
@@ -22874,6 +22927,13 @@ msgstr "asin() - 角度の値のアークサイン、ラジアンで示す"
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
 msgstr "少なくとも1つの曜日を選択する必要があります"
+
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
@@ -23543,6 +23603,11 @@ msgstr "in() - 値がリストアップされた値と同じかチェック (1 -
 #: app/views/administration.user.edit.php:504
 msgid "including subgroups"
 msgstr "サブグループを含む"
+
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"

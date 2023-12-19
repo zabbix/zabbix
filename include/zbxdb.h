@@ -100,7 +100,8 @@ typedef enum
 	ERR_Z3005,
 	ERR_Z3006,
 	ERR_Z3007,
-	ERR_Z3008
+	ERR_Z3008,
+	ERR_Z3009
 }
 zbx_err_codes_t;
 
