@@ -1,11 +1,16 @@
 Changes for 7.0.0alpha9
 
 New features:
+...G...... [ZBXNEXT-8721] added new net.dns.get[] item (arimdjonoks)
+A.F.I...S. [ZBXNEXT-8121] implemented ability to add custom user input when executing scripts (averza, esekace, Ivo, jxl)
 ...G...PS. [ZBXNEXT-8854] improved passive checks to use JSON protocol and fallback to plaintext protocol (vso)
 ........S. [ZBXNEXT-8857] updated max supported TimescaleDB version to 2.13 (mprihodko)
 .........T [ZBXNEXT-8707] updated version check for MongoDB node by Zabbix agent 2 template (atocko)
 
 Bug fixes:
+A...I...S. [ZBX-21898] added escaping of backslashes in history function string parameters (agriscenko, epulke, kprutkovs, vso, wiper)
+..F....... [ZBX-22983] fixed ellipsed dropdown options in items mass update and items configuration in preprocessing section (ddauksa)
+...G...... [ZBX-22678] fixed parsing failures for deb packages without an Installed-Size field (jxl)
 ..F....... [ZBX-22055] fixed map image of map widget not being updated on apply button press (agriscenko)
 ..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
 ..F....... [ZBX-23320] fixed Graph widget legend "Number of rows" behavior (apoga)
