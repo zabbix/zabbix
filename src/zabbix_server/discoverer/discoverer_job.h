@@ -48,13 +48,13 @@ typedef struct
 {
 	struct
 	{
-		int	ipaddress[8];
-		int	index_ip;
-		int	port;
-		int	index_port;
-		int	dcheck_index;
-		int	count;
-		int	checks_per_ip;
+		int		ipaddress[8];
+		int		index_ip;
+		int		port;
+		int		index_port;
+		int		dcheck_index;
+		int		count;
+		unsigned int	checks_per_ip;
 	}
 	state;
 	zbx_vector_iprange_t	*ipranges;

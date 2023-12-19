@@ -84,7 +84,7 @@ typedef struct
 	char					*dnsname;
 	int					now;
 	zbx_uint64_t				unique_dcheckid;
-	int					processed_checks_per_ip;
+	unsigned int					processed_checks_per_ip;
 }
 zbx_discoverer_results_t;
 

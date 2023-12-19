@@ -2255,16 +2255,16 @@ ssize_t	zbx_tcp_recv_context_raw(zbx_socket_t *s, zbx_tcp_recv_context_t *contex
 			context->buf_stat_bytes += (size_t)nbytes;
 		else
 		{
-			if (context->buf_dyn_bytes + nbytes >= context->allocated)
+			if (context->buf_dyn_bytes + (size_t)nbytes >= context->allocated)
 			{
-				while (context->buf_dyn_bytes + nbytes >= context->allocated)
+				while (context->buf_dyn_bytes + (size_t)nbytes >= context->allocated)
 					context->allocated *= 2;
 
 				s->buffer = (char *)zbx_realloc(s->buffer, context->allocated);
 			}
 
 			memcpy(s->buffer + context->buf_dyn_bytes, s->buf_stat, (size_t)nbytes);
-			context->buf_dyn_bytes += nbytes;
+			context->buf_dyn_bytes += (size_t)nbytes;
 		}
 
 		if (context->buf_stat_bytes + context->buf_dyn_bytes >= context->expected_len)

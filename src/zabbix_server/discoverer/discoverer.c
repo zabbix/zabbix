@@ -875,7 +875,8 @@ static int	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t
 		const int dcheck_idx, int worker_max, zbx_vector_discoverer_results_ptr_t *results, char **error)
 {
 	char				err[ZBX_ITEM_ERROR_LEN_MAX], ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int				i, count = 0, ret = SUCCEED;
+	int				i, ret = SUCCEED;
+	zbx_uint64_t			count = 0;
 	zbx_vector_fping_host_t		hosts;
 	const zbx_dc_dcheck_t		*dcheck = task->dchecks.values[dcheck_idx];
 
@@ -890,11 +891,9 @@ static int	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t
 		worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
 
 	for (i = 0; i < task->addr.range->ipranges->values_num; i++)
-	{
 		count += zbx_iprange_volume(&task->addr.range->ipranges->values[i]);
-	}
 
-	zbx_vector_fping_host_reserve(&hosts, hosts.values_num + count);
+	zbx_vector_fping_host_reserve(&hosts, (size_t)hosts.values_num + (size_t)count);
 	*ip = '\0';
 
 	while (SUCCEED == zbx_iprange_uniq_next(task->addr.range->ipranges->values,
@@ -1114,7 +1113,7 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	int					i, ret = SUCCEED;
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	zbx_vector_discoverer_services_ptr_t	services;
-	zbx_discoverer_results_t		*result = NULL, result_cmp;
+	zbx_discoverer_results_t		*result = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ip:%s resolve_dns:%d dchecks:%d key[0]:%s", log_worker_id, __func__,
 			DISCOVERY_ADDR_IP == task->addr_type ? task->addr.ip : "ipranges",
@@ -1144,9 +1143,6 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 		service->status = DOBJECT_STATUS_UP;
 		zbx_vector_discoverer_services_ptr_append(&services, service);
 	}
-
-	result_cmp.druleid = druleid;
-	result_cmp.ip = task->addr.ip;
 
 	pthread_mutex_lock(&dmanager.results_lock);
 

@@ -221,7 +221,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 				if (ZBX_ASYNC_TASK_STOP != (
 						state = zbx_async_poller_get_task_state_for_event(event_new)))
 				{
-					return state;
+					return (int)state;
 				}
 
 				SET_RESULT_FAIL("unknown");
@@ -238,7 +238,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 				if (ZBX_ASYNC_TASK_STOP != (
 						state = zbx_async_poller_get_task_state_for_event(event_new)))
 				{
-					return state;
+					return (int)state;
 				}
 
 				SET_RESULT_FAIL("send");

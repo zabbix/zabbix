@@ -129,7 +129,8 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	zbx_discoverer_task_t	task_local, *task;
 	zbx_vector_portrange_t	port_ranges;
 	zbx_task_range_t	range_cmp = {.id = 0 };
-	int			port = 0, checks_count = 0;
+	int			port = 0;
+	unsigned int		checks_count = 0;
 
 	if (SVC_ICMPPING != dcheck->type)
 	{
