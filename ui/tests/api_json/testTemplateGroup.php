@@ -607,7 +607,7 @@ class testTemplateGroup extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/groups/1": unexpected parameter "name".'
 			],
-			// Check missig parameters.
+			// Check missing parameters.
 			[
 				'templategroup' => [
 					'templates' => [

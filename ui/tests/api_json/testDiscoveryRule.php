@@ -2076,7 +2076,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful update of lld_macro_paths by replaceing them with exact values' => [
+			'Test successful update of lld_macro_paths by replacing them with exact values' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [

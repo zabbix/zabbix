@@ -155,15 +155,15 @@ abstract class CControllerItemPrototype extends CController {
 			$ret = false;
 		}
 
-		return $ret && $this->validateRefferedObjects();
+		return $ret && $this->validateReferredObjects();
 	}
 
 	/**
-	 * Validate for reffered objects exists and user have access.
+	 * Validate for referred objects exists and user have access.
 	 *
 	 * @return bool
 	 */
-	protected function validateRefferedObjects(): bool {
+	protected function validateReferredObjects(): bool {
 		$ret = true;
 
 		if ($this->hasInput('itemid')) {

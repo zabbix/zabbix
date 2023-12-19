@@ -30,7 +30,7 @@ abstract class CBaseElement extends RemoteWebElement {
 	/**
 	 * Option that allows to disable auto reload of staled elements.
 	 *
-	 * @var boolead
+	 * @var boolean
 	 */
 	protected $reload_staled = true;
 

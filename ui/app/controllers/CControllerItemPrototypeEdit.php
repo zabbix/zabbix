@@ -32,7 +32,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'clone' => 'in 1'
 		] + static::getValidationFields();
 
-		$ret = $this->validateInput($fields) && $this->validateRefferedObjects();
+		$ret = $this->validateInput($fields) && $this->validateReferredObjects();
 
 		if ($ret) {
 			if ($this->hasInput('clone') && !$this->hasInput('itemid')) {

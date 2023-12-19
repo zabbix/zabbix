@@ -67,8 +67,8 @@
 		}
 
 		/**
-		 * Opens media type edit popup and and listens to submit and delete actions from edit form. If gets a
-		 * successful response, reloads the page.
+		 * Opens media type edit popup and listens to submit and delete actions from edit form. If gets a successful
+		 * response, reloads the page.
 		 *
 		 * @param {object} parameters  Parameters to pass to the edit form.
 		 */

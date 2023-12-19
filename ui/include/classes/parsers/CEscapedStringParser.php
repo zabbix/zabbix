@@ -20,7 +20,7 @@
 
 
 /**
- * Parser is meant to check and extract the string with all backslases escaped.
+ * Parser is meant to check and extract the string with all backslashes escaped.
  */
 class CEscapedStringParser extends CParser {
 
