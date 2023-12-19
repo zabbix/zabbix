@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../common/testTimeoutsDisplay.php';
 class testTimeoutsTemplates extends testTimeoutsDisplay {
 
 	protected static $templateid;
-	protected static $template_druleids;
+	protected static $template_druleid;
 
 	public static function prepareTimeoutsData() {
 		$template_result = CDataHelper::createTemplates([
@@ -47,7 +47,7 @@ class testTimeoutsTemplates extends testTimeoutsDisplay {
 			]
 		]);
 		self::$templateid = $template_result['templateids']['Template for timeouts check'];
-		self::$template_druleids = $template_result['discoveryruleids']['Template for timeouts check:zabbix_agent_drule'];
+		self::$template_druleid = $template_result['discoveryruleids']['Template for timeouts check:zabbix_agent_drule'];
 	}
 
 	public function testTimeoutsTemplates_CheckItemsMacros() {
@@ -61,7 +61,7 @@ class testTimeoutsTemplates extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsTemplates_CheckPrototypeMacros() {
-		$link = 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='.self::$template_druleids;
+		$link = 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='.self::$template_druleid;
 		$this->checkGlobal('global_macros', $link, 'Create item prototype');
 	}
 
@@ -76,7 +76,7 @@ class testTimeoutsTemplates extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsTemplates_CheckPrototypeCustom() {
-		$link = 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='.self::$template_druleids;
+		$link = 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='.self::$template_druleid;
 		$this->checkGlobal('global_custom', $link, 'Create item prototype');
 	}
 
@@ -91,7 +91,7 @@ class testTimeoutsTemplates extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsTemplates_CheckPrototypeDefault() {
-		$link = 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='.self::$template_druleids;
+		$link = 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='.self::$template_druleid;
 		$this->checkGlobal('global_default', $link, 'Create item prototype');
 	}
 }
