@@ -98,11 +98,11 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Change global or proxy timeouts values and check them.
 	 *
-	 * @param string $timeout_values    reset default, macros values or custom values with/without proxy
-	 * @param string $link    			link to table with items, items prototype, LLD
-	 * @param string $activity			button name or table selector
-	 * @param boolean $proxy			fill proxy or global timeouts
-	 * @param boolean $linked			timeouts from linked template should be checked
+	 * @param string  $timeout_values    reset default, macros values or custom values with/without proxy
+	 * @param string  $link    			 link to table with items, items prototype, LLD
+	 * @param string  $activity			 button name or table selector
+	 * @param boolean $proxy			 true if proxy timeouts, false if global
+	 * @param boolean $linked			 true for timeouts from linked template, false if not
 	 */
 	public function checkGlobal($timeout_values, $link, $activity, $proxy = false, $linked = false) {
 		// Global Zabbix agent timeout used in active and passive agents. Add this value to array.
@@ -229,7 +229,7 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Check timeouts in items/item prototypes/LLD after timeout changes.
 	 *
-	 * @param array $values			 values to check
+	 * @param array  $values		 values to check
 	 * @param string $link			 link to page where to check timeouts
 	 * @param string $button_name    button name to add new item, item prototype, LLD
 	 */
@@ -270,7 +270,7 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Check timeouts in templated items/item prototypes/LLD after timeout changes.
 	 *
-	 * @param array $values				values to check
+	 * @param array  $values			values to check
 	 * @param string $link				link to page where to check timeouts
 	 * @param string $table_selector    table selector for items, item prototypes and LLD
 	 */
@@ -311,10 +311,10 @@ class testTimeoutsDisplay extends CWebTest {
 	/**
 	 * Check timeout radio button and input field for items, item prototypes and LLD.
 	 *
-	 * @param CFormElement $form    items, items prototype, discovery form
-	 * @param string $selector      timeout input field selector
-	 * @param string $value         timeout input field value
-	 * @param boolean $status       is timeout radio button enabled or disabled
+	 * @param CFormElement $form        items, items prototype, discovery form
+	 * @param string       $selector    timeout input field selector
+	 * @param string       $value       timeout input field value
+	 * @param boolean      $status      true if timeout radio button enabled, false if disabled
 	 */
 	protected function checkItemsTimeoutField($form, $selector, $value, $status = true) {
 		$radio = $form->query('id:custom_timeout')->asSegmentedRadio()->one();
