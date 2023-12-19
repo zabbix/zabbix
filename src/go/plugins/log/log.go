@@ -102,7 +102,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	nextcheck, _, nextcheck_err := zbxlib.GetNextcheck(ctx.ItemID(), ctx.Delay(), now)
 	if nextcheck_err == nil {
-		refresh = int(nextcheck.Sub(now).Seconds())
+		refresh = int((nextcheck.Sub(now) + time.Second/2) / time.Second)
 	} else {
 		if data.lastcheck.IsZero() {
 			refresh = 1
