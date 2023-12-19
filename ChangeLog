@@ -2868,6 +2868,7 @@ Changes for 5.0.41rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.40
