@@ -126,21 +126,8 @@ function getItemFormData(array $item = []) {
 	}
 
 	if ($data['type'] == ITEM_TYPE_SCRIPT) {
-		$values = [];
-
-		if (is_array($data['parameters']) && array_key_exists('name', $data['parameters'])
-				&& array_key_exists('value', $data['parameters'])) {
-			foreach ($data['parameters']['name'] as $index => $key) {
-				if (array_key_exists($index, $data['parameters']['value'])) {
-					$values[] = [
-						'name' => $key,
-						'value' => $data['parameters']['value'][$index]
-					];
-				}
-			}
-		}
-
-		$data['parameters'] = $values;
+		CArrayHelper::sort($data['parameters'], ['name', 'value']);
+		$data['parameters'] = array_values($data['parameters']);
 	}
 	else {
 		$data['parameters'] = [];

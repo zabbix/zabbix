@@ -246,6 +246,11 @@ class CItemGeneralHelper {
 			$item['custom_timeout'] = ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 		}
 
+		if ($item['parameters']) {
+			CArrayHelper::sort($item['parameters'], ['name', 'value']);
+			$item['parameters'] = array_values($item['parameters']);
+		}
+
 		if ($item['tags']) {
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
 		}
