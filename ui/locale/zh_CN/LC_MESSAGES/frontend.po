@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-11 13:30+0000\n"
+"PO-Revision-Date: 2023-12-18 01:15+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -3449,6 +3449,10 @@ msgstr "无法大量更新主机名称。"
 msgid "Cannot mass update visible host name."
 msgstr "无法大量更新可见主机名称。"
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -4235,19 +4239,19 @@ msgstr "清除历史和趋势"
 
 #: include/views/configuration.item.list.php:315
 msgid "Clear history and trends of selected item?"
-msgstr ""
+msgstr "清除所选监控项的历史和趋势？"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "清除所选监控项的历史和趋势？"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
-msgstr ""
+msgstr "清除所选web场景的历史和趋势？"
 
 #: include/views/configuration.httpconf.list.php:239
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "清除所选web场景的历史记录和趋势？"
 
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
@@ -4893,6 +4897,10 @@ msgstr "内容菜单"
 #: app/views/popup.itemtestedit.view.php:167 include/items.inc.php:931
 msgid "Context name"
 msgstr "上下文名称"
+
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5795,6 +5803,10 @@ msgstr "默认认证方式"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "默认主机资产记录模式"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7015,6 +7027,14 @@ msgstr "绘制"
 msgid "Draw style"
 msgstr "绘图风格"
 
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
 #, c-format
@@ -7412,6 +7432,10 @@ msgstr "启用所选定的web场景?"
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
 msgstr "启用trapping"
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr ""
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -10709,6 +10733,18 @@ msgstr "初始视图"
 msgid "Initial view is ignored if the default view is set."
 msgstr "如果设置了默认视图，则忽略初始视图。"
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "插入"
@@ -10881,6 +10917,11 @@ msgstr "SAML准时(JIT)服务开通媒介类型映射配置无效。"
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr "SAML准时(JIT)服务开通用户组映射配置无效。"
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "无效的YAML 文件内容"
@@ -10908,6 +10949,10 @@ msgstr "无效 email 地址 \"%1$s\"。"
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "媒介类型 ID: \"%1$s\" 的 email 地址无效。"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -12329,6 +12374,10 @@ msgstr "手动执行事件操作"
 #: app/views/administration.script.list.php:159
 msgid "Manual host action"
 msgstr "手动执行主机操作"
+
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -14584,6 +14633,10 @@ msgstr "只允许超级管理员可以设置报告所有者。"
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
+
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -19223,6 +19276,10 @@ msgstr "测试字符串"
 msgid "Test subject"
 msgstr "测试主题"
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -20267,6 +20324,10 @@ msgstr "网址未正确编码。"
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "URL名称应该是拓扑图 \"%1$s\" 中唯一的。"
 
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
+
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
 msgstr "URL 参数不能为数组."
@@ -21064,6 +21125,10 @@ msgstr "ID为\"%1$s\" 的用户组不可用。"
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "用户群组"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -23623,6 +23688,12 @@ msgstr "\"%1$s\"附近语法错误"
 msgid "incorrect usage of function \"%1$s\""
 msgstr "函数“%1$s”使用不正确"
 
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - 将指定的字符或空格插入到字符串中，从字符串中的指定位置开始"
@@ -24996,6 +25067,10 @@ msgstr "值必须在 %1$s 的范围内"
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
 msgstr "新事件的标签值"
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"
