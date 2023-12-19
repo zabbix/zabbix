@@ -3,6 +3,10 @@ Changes for 6.0.26rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
+..F....... [ZBX-22983] fixed ellipsed dropdown options in items mass update in preprocessing (ddauksa)
+...G...... [ZBX-23715] fixed persistent directory path not following symlinks upon creation (kprutkovs)
+.........T [ZBX-23825] fixed query_fields values for Acronis and Nomand templates (abiba)
 ..F....... [ZBX-22055] fixed map image of map widget not being updated on apply button press (agriscenko, apoga)
 ..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
 A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
