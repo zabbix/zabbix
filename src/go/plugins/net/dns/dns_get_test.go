@@ -37,49 +37,56 @@ func Test_dnsGetOptions_setFlags(t *testing.T) {
 		{
 			"basic_scenario",
 			"cdflag,rdflag,dnssec,nsid,edns0,aaflag,adflag",
-			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": true, "nsid": true, "edns0": true, "aaflag": true, "adflag": true},
+			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": true, "nsid": true, "edns0": true,
+				"aaflag": true, "adflag": true},
 			nil,
 		},
 
 		{
 			"empty_flags",
 			"",
-			map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true,
+				"aaflag": false, "adflag": false},
 			nil,
 		},
 
 		{
 			"single_flag1",
 			"cdflag",
-			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true,
+				"aaflag": false, "adflag": false},
 			nil,
 		},
 
 		{
 			"single_flag2",
 			"rdflag",
-			map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			map[string]bool{"cdflag": false, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true,
+				"aaflag": false, "adflag": false},
 			nil,
 		},
 
 		{
 			"two_flags",
 			"cdflag,rdflag",
-			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true, "aaflag": false, "adflag": false},
+			map[string]bool{"cdflag": true, "rdflag": true, "dnssec": false, "nsid": false, "edns0": true,
+				"aaflag": false, "adflag": false},
 			nil,
 		},
 
 		{
 			"many_negative_flags",
 			"nocdflag,nordflag,nodnssec,nonsid,noedns0,noaaflag,noadflag",
-			map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false, "edns0": false, "aaflag": false, "adflag": false},
+			map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false,
+				"edns0": false, "aaflag": false, "adflag": false},
 			nil,
 		},
 
 		{
 			"many_negative_flags_reordered",
 			"noadflag,noaaflag,noedns0,nonsid,nodnssec,nordflag,nocdflag",
-			map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false, "edns0": false, "aaflag": false, "adflag": false},
+			map[string]bool{"cdflag": false, "rdflag": false, "dnssec": false, "nsid": false,
+				"edns0": false, "aaflag": false, "adflag": false},
 			nil,
 		},
 
@@ -209,8 +216,8 @@ func Test_dnsGetOptions_setFlags(t *testing.T) {
 				return
 			}
 			if fmt.Sprint(tt.flagsOut) != fmt.Sprint(o.flags) {
-				t.Errorf("\nExpected options: ->%v<-\nFor input flags: ->%s<-\nBut received: ->%v<-\n", tt.flagsOut,
-					tt.flagsInArgs, o.flags)
+				t.Errorf("\nExpected options: ->%v<-\nFor input flags: ->%s<-\nBut received: ->%v<-\n",
+					tt.flagsOut, tt.flagsInArgs, o.flags)
 			}
 		})
 	}
