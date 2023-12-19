@@ -637,7 +637,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(config_server,
 			&ch_error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "unexpected Server parameter \"%s\"; for passive proxy, please specify"
+		zabbix_log(LOG_LEVEL_CRIT, "unexpected Server parameter %s; for passive proxy, please specify"
 				" address or list of comma delimited addresses", ch_error);
 		zbx_free(ch_error);
 		err = 1;
