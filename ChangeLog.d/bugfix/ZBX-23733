@@ -1,1 +1,0 @@
-..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
