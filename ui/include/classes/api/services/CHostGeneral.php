@@ -612,7 +612,7 @@ abstract class CHostGeneral extends CHostBase {
 		];
 
 		foreach ($templateids as $templateid) {
-			// Fist link web items, so that later regular items can use web item as their master item.
+			// First link web items, so that later regular items can use web item as their master item.
 			Manager::HttpTest()->link($templateid, $hostids);
 		}
 
@@ -814,7 +814,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($templates_hostids as $templateid => $hostids) {
-			// Fist link web items, so that later regular items can use web item as their master item.
+			// First link web items, so that later regular items can use web item as their master item.
 			Manager::HttpTest()->link($templateid, $hostids);
 		}
 
