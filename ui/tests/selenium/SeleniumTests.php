@@ -238,12 +238,12 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 require_once dirname(__FILE__).'/templates/testFormTemplate.php';
 require_once dirname(__FILE__).'/templates/testPageTemplates.php';
 
-// Timeout.
+// Timeouts.
 require_once dirname(__FILE__) . '/timeouts/testTimeoutsHosts.php';
 require_once dirname(__FILE__) . '/timeouts/testTimeoutsLinkedTemplates.php';
 require_once dirname(__FILE__) . '/timeouts/testTimeoutsTemplates.php';
 
-// Trigger dependence
+// Trigger dependencies.
 require_once dirname(__FILE__).'/triggerDependencies/testHostTriggerDependencies.php';
 require_once dirname(__FILE__).'/triggerDependencies/testTemplateTriggerDependencies.php';
 
@@ -536,12 +536,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageTemplates');
 
-		// Timeout.
+		// Timeouts.
 		$suite->addTestSuite('testTimeoutsHosts');
 		$suite->addTestSuite('testTimeoutsLinkedTemplates');
 		$suite->addTestSuite('testTimeoutsTemplates');
 
-		// Trigger dependence
+		// Trigger dependencies.
 		$suite->addTestSuite('testHostTriggerDependencies');
 		$suite->addTestSuite('testTemplateTriggerDependencies');
 
