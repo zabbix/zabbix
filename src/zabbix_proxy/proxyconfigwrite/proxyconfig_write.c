@@ -2009,6 +2009,8 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 
 			return FAIL;
 		}
+
+		return SUCCEED;
 	}
 
 	char	tmp[ZBX_MAX_UINT64_LEN + 1];
