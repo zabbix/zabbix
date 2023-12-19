@@ -2001,8 +2001,8 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 		if (0 != cfg_hostmap_revision)
 		{
 			*hostmap_revision = 0;
-			if (ZBX_DB_OK <= zbx_db_execute("truncate table proxy") &&
-					ZBX_DB_OK <= zbx_db_execute("truncate table host_proxy"))
+			if (ZBX_DB_OK <= zbx_db_execute("delete from host_proxy") &&
+					ZBX_DB_OK <= zbx_db_execute("delete from proxy"))
 			{
 				return SUCCEED;
 			}

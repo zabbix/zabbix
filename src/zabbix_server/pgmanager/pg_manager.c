@@ -574,8 +574,7 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 			pg_cache_unlock(cache);
 		}
 
-		/* WDN: change to trace loglevel */
-		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			pg_cache_dump(cache);
 	}
 
@@ -677,8 +676,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 	pgm_db_get_hosts(&cache);
 	pgm_db_get_hpmap(&cache);
 
-	/* WDN: change to trace loglevel */
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		pg_cache_dump(&cache);
 
 	time_update = zbx_time();

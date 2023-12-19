@@ -610,54 +610,52 @@ void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t
 	}
 }
 
-/* WDN: change to trace log level */
-
 static void	pg_cache_dump_group(zbx_pg_group_t *group)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "proxy group:" ZBX_FS_UI64 " %s", group->proxy_groupid, group->name);
-	zabbix_log(LOG_LEVEL_DEBUG, "    status:%d failover_delay:%d min_online:%d revision:" ZBX_FS_UI64
+	zabbix_log(LOG_LEVEL_TRACE, "proxy group:" ZBX_FS_UI64 " %s", group->proxy_groupid, group->name);
+	zabbix_log(LOG_LEVEL_TRACE, "    status:%d failover_delay:%d min_online:%d revision:" ZBX_FS_UI64
 			" hostmap_revision:" ZBX_FS_UI64,
 			group->status, group->failover_delay, group->min_online, group->revision,
 			group->hostmap_revision);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "    hostids:");
+	zabbix_log(LOG_LEVEL_TRACE, "    hostids:");
 	for (int i = 0; i < group->hostids.values_num; i++)
-		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, group->hostids.values[i]);
+		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, group->hostids.values[i]);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "    new hostids:");
+	zabbix_log(LOG_LEVEL_TRACE, "    new hostids:");
 	for (int i = 0; i < group->new_hostids.values_num; i++)
-		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, group->new_hostids.values[i]);
+		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, group->new_hostids.values[i]);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "    proxies:");
+	zabbix_log(LOG_LEVEL_TRACE, "    proxies:");
 	for (int i = 0; i < group->proxies.values_num; i++)
-		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, group->proxies.values[i]->proxyid);
+		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, group->proxies.values[i]->proxyid);
 }
 
 static void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 {
 	zbx_uint64_t	groupid = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "proxy:" ZBX_FS_UI64 " %s", proxy->proxyid, proxy->name);
+	zabbix_log(LOG_LEVEL_TRACE, "proxy:" ZBX_FS_UI64 " %s", proxy->proxyid, proxy->name);
 
 	if (NULL != proxy->group)
 		groupid = proxy->group->proxy_groupid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "    status:%d lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_TRACE, "    status:%d lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
 			proxy->status, proxy->lastaccess, proxy->firstaccess, groupid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "    hostids:");
+	zabbix_log(LOG_LEVEL_TRACE, "    hostids:");
 	for (int i = 0; i < proxy->hosts.values_num; i++)
-		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, proxy->hosts.values[i]->hostid);
+		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, proxy->hosts.values[i]->hostid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "    deleted group hostproxyids:");
+	zabbix_log(LOG_LEVEL_TRACE, "    deleted group hostproxyids:");
 	for (int i = 0; i < proxy->deleted_group_hosts.values_num; i++)
-		zabbix_log(LOG_LEVEL_DEBUG, "        " ZBX_FS_UI64, proxy->deleted_group_hosts.values[i].hostproxyid);
+		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, proxy->deleted_group_hosts.values[i].hostproxyid);
 
 }
 
 static void	pg_cache_dump_host(zbx_pg_host_t *host)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64 " -> " ZBX_FS_UI64 " :" ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_TRACE, ZBX_FS_UI64 " -> " ZBX_FS_UI64 " :" ZBX_FS_UI64,
 			host->hostid, host->proxyid, host->revision);
 }
 
@@ -668,25 +666,25 @@ void	pg_cache_dump(zbx_pg_cache_t *cache)
 	zbx_pg_proxy_t		*proxy;
 	zbx_pg_host_t		*host;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "GROUPS:");
+	zabbix_log(LOG_LEVEL_TRACE, "groups:");
 
 	zbx_hashset_iter_reset(&cache->groups, &iter);
 	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 		pg_cache_dump_group(group);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "PROXIES:");
+	zabbix_log(LOG_LEVEL_TRACE, "proxies:");
 
 	zbx_hashset_iter_reset(&cache->proxies, &iter);
 	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
 		pg_cache_dump_proxy(proxy);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "MAP:");
+	zabbix_log(LOG_LEVEL_TRACE, "hostmap:");
 
 	zbx_hashset_iter_reset(&cache->hostmap, &iter);
 	while (NULL != (host = (zbx_pg_host_t *)zbx_hashset_iter_next(&iter)))
 		pg_cache_dump_host(host);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "MAP UPDATES:");
+	zabbix_log(LOG_LEVEL_TRACE, "hostmap updates:");
 
 	zbx_hashset_iter_reset(&cache->hostmap_updates, &iter);
 	while (NULL != (host = (zbx_pg_host_t *)zbx_hashset_iter_next(&iter)))
