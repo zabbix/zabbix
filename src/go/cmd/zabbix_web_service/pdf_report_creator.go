@@ -236,7 +236,7 @@ func waitForDashboardReady(ctx context.Context) error {
 			&isReady,
 			chromedp.WithPollingTimeout(time.Duration(options.Timeout)*time.Second)),
 	); err != nil {
-		if err == chromedp.ErrPollingTimeout {
+		if errors.Is(err, chromedp.ErrPollingTimeout) {
 			return errors.New("timeout occurred while dashboard was getting ready")
 		}
 
