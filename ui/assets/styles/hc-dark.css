@@ -3291,6 +3291,8 @@ section {
   .status-container [class^="status-"]:not(:last-of-type) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0; }
+  .status-container [class^="status-"][data-hintbox='1'] {
+    cursor: pointer; }
 
 .status-na-bg,
 .status-info-bg,
@@ -3821,6 +3823,9 @@ z-select {
     display: none;
     z-index: 20000;
     max-height: 362px;
+    max-width: 453px;
+    box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
     border: 1px solid;
     box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5); }
@@ -3830,6 +3835,7 @@ z-select {
       height: inherit;
       box-sizing: border-box;
       min-height: 24px;
+      max-width: 453px;
       padding: 5px;
       line-height: normal;
       color: #ffffff;
@@ -3858,9 +3864,12 @@ z-select {
         font-weight: bold; }
     .z-select .list > li > ul,
     z-select .list > li > ul {
+      display: grid;
+      grid-template-columns: minmax(max-content, 1fr);
       margin: 5px -5px -5px; }
       .z-select .list > li > ul li,
       z-select .list > li > ul li {
+        padding-right: 15px;
         padding-left: 15px; }
     .z-select .list.fall-upwards,
     z-select .list.fall-upwards {
