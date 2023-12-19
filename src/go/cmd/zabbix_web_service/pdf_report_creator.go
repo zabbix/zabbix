@@ -185,7 +185,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	if err = chromedp.Run(ctx, chromedp.Tasks{
 		network.SetCookies(cookieParams),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
-		navigateAndWaitFor(u.String(), "networkIdle"),
+		prepareDashboard(u.String()),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
 			defer cancel()
@@ -217,48 +217,37 @@ func pixels2inches(value int64) float64 {
 	return float64(value) * 0.0104166667
 }
 
-func navigateAndWaitFor(url string, eventName string) chromedp.ActionFunc {
+func prepareDashboard(url string) chromedp.ActionFunc {
 	return func(ctx context.Context) error {
 		_, _, _, err := page.Navigate(url).Do(ctx)
 		if err != nil {
 			return err
 		}
 
-		return waitFor(ctx, eventName)
+		return waitForDashboardReady(ctx)
 	}
 }
 
-// This comment is taken from the proof of concept example
-//
-// waitFor blocks until eventName is received.
-// Examples of events you can wait for:
-//
-//	init, DOMContentLoaded, firstPaint,
-//	firstContentfulPaint, firstImagePaint,
-//	firstMeaningfulPaintCandidate,
-//	load, networkAlmostIdle, firstMeaningfulPaint, networkIdle
-//
-// This is not super reliable, I've already found incidental cases where
-// networkIdle was sent before load. It's probably smart to see how
-// puppeteer implements this exactly.
-func waitFor(ctx context.Context, eventName string) error {
-	ch := make(chan struct{})
-	cctx, cancel := context.WithCancel(ctx)
-	chromedp.ListenTarget(cctx, func(ev interface{}) {
-		switch e := ev.(type) {
-		case *page.EventLifecycleEvent:
-			if e.Name == eventName {
-				cancel()
-				close(ch)
-			}
+func waitForDashboardReady(ctx context.Context) error {
+	var isReady bool
+
+	if err := chromedp.Run(ctx,
+		chromedp.Poll("document.querySelector('.wrapper.is-ready') !== null",
+			&isReady,
+			chromedp.WithPollingTimeout(time.Duration(options.Timeout)*time.Second)),
+	); err != nil {
+		if err == chromedp.ErrPollingTimeout {
+			return errors.New("timeout occurred while dashboard was getting ready")
 		}
-	})
-	select {
-	case <-ch:
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
+
+		return err
 	}
+
+	if !isReady {
+		return errors.New("unknown error while dashboard was getting ready")
+	}
+
+	return nil
 }
 
 func parseUrl(u string) (*url.URL, error) {
