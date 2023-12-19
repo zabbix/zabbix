@@ -26,10 +26,11 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		var $form = $('form');
-		$form.on('submit', function() {
-			$form.trimValues(['#severity_name_0', '#severity_name_1', '#severity_name_2', '#severity_name_3',
-				'#severity_name_4', '#severity_name_5'
+		const $form = jQuery('#trigdisplay-form');
+
+		$form.on('submit', () => {
+			$form.trimValues(['#ok_period', '#blink_period', '#severity_name_0', '#severity_name_1', '#severity_name_2',
+				'#severity_name_3', '#severity_name_4', '#severity_name_5'
 			]);
 		});
 
