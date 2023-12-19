@@ -4333,7 +4333,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Check "manualinput_validator_type" in search.
-			'Test script.get unexcpected parameter "manualinput_validator_type" in search' => [
+			'Test script.get unexpected parameter "manualinput_validator_type" in search' => [
 				'request' => [
 					'search' => [
 						'manualinput_validator_type' => false
