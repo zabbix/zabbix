@@ -308,6 +308,9 @@ static void	pgm_db_flush_host_proxy_updates(char **sql, size_t *sql_alloc, size_
 				hosts->values[i].proxyid, hosts->values[i].revision, hosts->values[i].hostid);
 
 		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "re-assigned hostid " ZBX_FS_UI64 " to proxyid " ZBX_FS_UI64,
+				hosts->values[i].hostid, hosts->values[i].proxyid);
 	}
 }
 
@@ -327,7 +330,12 @@ static void	pgm_db_flush_host_proxy_deletes(char **sql, size_t *sql_alloc, size_
 	zbx_vector_uint64_create(&hostids);
 
 	for (int i = 0; i < hosts->values_num; i++)
+	{
 		zbx_vector_uint64_append(&hostids, hosts->values[i].hostid);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "unassigned hostid " ZBX_FS_UI64 " from proxyid " ZBX_FS_UI64,
+				hosts->values[i].hostid, hosts->values[i].proxyid);
+	}
 
 	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -451,6 +459,9 @@ static void	pgm_db_flush_host_proxy_inserts(zbx_vector_pg_host_t *hosts)
 			size = PGM_INSERT_BATCH_SIZE;
 
 		pgm_db_flush_host_proxy_insert_batch(hosts->values + i, size);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "assigned hostid " ZBX_FS_UI64 " to proxyid " ZBX_FS_UI64,
+				hosts->values[i].hostid, hosts->values[i].proxyid);
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "hostproxyid");

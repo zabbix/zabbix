@@ -1774,7 +1774,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			}
 		}
 
-		if (0 != found && 0 != host->proxyid && host->proxyid != proxyid && 0 == host->proxy_groupid)
+		if (0 != found && 0 != host->proxyid && host->proxyid != proxyid && 0 == proxy_groupid)
 			dc_host_deregister_proxy(host, host->proxyid, revision);
 
 		/* hosts assigned to proxy groups have NULL proxyid in database,              */
