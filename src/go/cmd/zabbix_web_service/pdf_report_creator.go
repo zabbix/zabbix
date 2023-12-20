@@ -229,11 +229,13 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 }
 
 func waitForDashboardReady(ctx context.Context) error {
+	const wrapperIsReady = ".wrapper.is-ready"
+
+	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
 	var isReady bool
 
 	if err := chromedp.Run(ctx,
-		chromedp.Poll("document.querySelector('.wrapper.is-ready') !== null",
-			&isReady,
+		chromedp.Poll(expression, &isReady,
 			chromedp.WithPollingTimeout(time.Duration(options.Timeout)*time.Second)),
 	); err != nil {
 		if errors.Is(err, chromedp.ErrPollingTimeout) {
