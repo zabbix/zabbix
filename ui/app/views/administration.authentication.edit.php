@@ -178,7 +178,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Port'), 'ldap_port'))->setAsteriskMark(),
-		(new CNumericBox('ldap_port', $data['ldap_port'], 5))
+		(new CNumericBox('ldap_port', $data['ldap_port'], 5, false, false, false))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
