@@ -235,9 +235,7 @@ func waitForDashboardReady(ctx context.Context, url string) error {
 	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
 	var isReady bool
 
-	err := chromedp.Run(ctx,
-		chromedp.Poll(expression, &isReady,
-			chromedp.WithPollingTimeout(timeout)))
+	err := chromedp.Run(ctx, chromedp.Poll(expression, &isReady, chromedp.WithPollingTimeout(timeout)))
 
 	if errors.Is(err, chromedp.ErrPollingTimeout) {
 		log.Warningf("timeout occurred while dashboard was getting ready, url: '%s'", url)
