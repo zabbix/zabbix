@@ -56,7 +56,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 
 	/* don't try activating interface if there were no errors detected */
 	if (SUCCEED != item->ret || ZBX_INTERFACE_AVAILABLE_TRUE != item->interface.available ||
-			0 != item->interface.errors_from)
+			0 != item->interface.errors_from || item->version != item->interface.version)
 	{
 		if (NULL == (interface_status = zbx_hashset_search(&poller_config->interfaces,
 				&item->interface.interfaceid)))
@@ -77,6 +77,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 		zbx_free(interface_status->key_orig);
 		interface_status->key_orig = item->key_orig;
 		item->key_orig = NULL;
+		interface_status->version = item->version;
 	}
 
 	if (SUCCEED == item->ret)

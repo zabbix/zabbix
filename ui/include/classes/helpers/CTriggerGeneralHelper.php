@@ -399,6 +399,8 @@ class CTriggerGeneralHelper {
 		unset($dependency);
 
 		order_result($data['db_dependencies'], 'description');
+
+		$data['db_dependencies'] = array_values($data['db_dependencies']);
 	}
 
 	/**

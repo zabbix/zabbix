@@ -80,6 +80,7 @@ OBJS = \
 	..\..\..\src\libs\zbxhttp\http.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
+	..\..\..\src\libs\zbxhttp\charset.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\agent\modbus.o \
 	..\..\..\src\libs\zbxsysinfo\common\zbxsysinfo_common.o \

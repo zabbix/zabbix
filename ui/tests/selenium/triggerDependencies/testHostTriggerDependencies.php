@@ -270,8 +270,8 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 						'Host with everything' => ['Host trigger everything']
 					],
 					'result' => [
-						'Host with everything: Host trigger everything',
-						'Host with linked template: Host trigger 2'
+						'Host with linked template: Host trigger 2',
+						'Host with everything: Host trigger everything'
 					]
 				]
 			],

@@ -113,6 +113,25 @@ Specify source IP address.
 Specify timeout. Valid range: 1\-30 seconds (default: 30)
 .IP "\fB\-k\fR, \fB\-\-key\fR \fIitem\-key\fR"
 Specify key of item to retrieve value for.
+.IP "\fB\-P\fR, \fB\-\-protocol\fR \fIvalue\fR"
+Protocol used to communicate with agent. Values:\fR
+.SS
+.RS 12
+.TP 12
+.B auto
+connect using JSON protocol, fallback and retry with plaintext protocol (default)
+.RE
+.RS 12
+.TP 12
+.B json
+connect using JSON protocol
+.RE
+.RS 12
+.TP 12
+.B plaintext
+connect using plaintext protocol where just item key is sent (6.4.x and older releases)
+.RE
+.RE
 .IP "\fB\-\-tls\-connect\fR \fIvalue\fR"
 How to connect to agent. Values:\fR
 .SS

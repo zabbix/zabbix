@@ -26,6 +26,12 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		const $form = jQuery('#gui-form');
+
+		$form.on('submit', () => {
+			$form.trimValues(['#work_period', '#history_period', '#period_default', '#max_period']);
+		});
+
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
