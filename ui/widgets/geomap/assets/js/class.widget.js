@@ -35,6 +35,19 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels = new Map();
 	}
 
+	promiseReady() {
+		return new Promise((resolve) => {
+			if (this._map === null) {
+				return resolve(super.promiseReady());
+			}
+
+			this._map.whenReady(() => {
+				super.promiseReady()
+					.then(() => setTimeout(resolve, 200));
+			});
+		});
+	}
+
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
