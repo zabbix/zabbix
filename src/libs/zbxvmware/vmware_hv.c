@@ -28,6 +28,8 @@
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxxml.h"
+#include "zbxnum.h"
+
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif

@@ -26,6 +26,8 @@
 #include "zbxvmware.h"
 #include "vmware_internal.h"
 
+#include "zbxalgo.h"
+
 int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_alarms_data_t *alarms_data, zbx_vector_str_t *hvs, zbx_vector_str_t *dss,
 		zbx_vector_vmware_datacenter_t *datacenters, zbx_vector_vmware_dvswitch_t *dvswitches,

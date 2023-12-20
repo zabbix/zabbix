@@ -26,6 +26,8 @@
 #include "zbxvmware.h"
 #include "vmware_internal.h"
 
+#include "zbxalgo.h"
+
 zbx_hash_t	vmware_hv_hash(const void *data);
 int	vmware_hv_compare(const void *d1, const void *d2);
 void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv);

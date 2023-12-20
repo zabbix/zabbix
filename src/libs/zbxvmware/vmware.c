@@ -23,7 +23,6 @@
 #include "vmware_perfcntr.h"
 #include "vmware_shmem.h"
 #include "vmware_service_cfglists.h"
-#include "vmware_vm.h"
 #include "vmware_hv.h"
 #include "vmware_ds.h"
 #include "vmware_event.h"
@@ -36,9 +35,8 @@
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxstr.h"
-#include "zbxnum.h"
-#include "zbxjson.h"
 #include "zbxsysinc.h"
+#include "zbxalgo.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
