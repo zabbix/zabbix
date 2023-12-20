@@ -16,24 +16,22 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ZABBIX_VMWARE_SERVICE_CFGLISTS_H
-#define ZABBIX_VMWARE_SERVICE_CFGLISTS_H
+#ifndef ZABBIX_VMWARE_VM_H
+#define ZABBIX_VMWARE_VM_H
 
 #include "config.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "vmware.h"
+#include "zbxvmware.h"
 #include "vmware_internal.h"
 
-int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vmware_alarms_data_t *alarms_data, zbx_vector_str_t *hvs, zbx_vector_str_t *dss,
-		zbx_vector_vmware_datacenter_t *datacenters, zbx_vector_vmware_dvswitch_t *dvswitches,
-		zbx_vector_str_t *vc_alarm_ids, char **error);
-
-
-int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_t *diskextents);
+void	vmware_vm_shared_free(zbx_vmware_vm_t *vm);
+void	vmware_vm_free(zbx_vmware_vm_t *vm);
+zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *easyhandle,
+		const char *id, zbx_vector_vmware_resourcepool_t *rpools, zbx_vector_cq_value_t *cq_values,
+		zbx_vmware_alarms_data_t *alarms_data, char **error);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
-#endif	/* ZABBIX_VMWARE_SERVICE_CFGLISTS_H */
+#endif	/* ZABBIX_VMWARE_VM_H */

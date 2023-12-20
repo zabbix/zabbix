@@ -23,7 +23,7 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "vmware.h"
+#include "zbxvmware.h"
 
 #include "zbxalgo.h"
 

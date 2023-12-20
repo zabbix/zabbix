@@ -18,7 +18,8 @@
 **/
 
 #include "vmware_service_cfglists.h"
-#include "vmware.h"
+#include "zbxvmware.h"
+
 #include "vmware_internal.h"
 
 #include "zbxxml.h"

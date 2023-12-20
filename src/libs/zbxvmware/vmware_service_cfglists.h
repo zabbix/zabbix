@@ -16,24 +16,24 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ZABBIX_VMWARE_EVENT_H
-#define ZABBIX_VMWARE_EVENT_H
+#ifndef ZABBIX_VMWARE_SERVICE_CFGLISTS_H
+#define ZABBIX_VMWARE_SERVICE_CFGLISTS_H
 
 #include "config.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "vmware.h"
+#include "zbxvmware.h"
 #include "vmware_internal.h"
 
-void	vmware_event_free(zbx_vmware_event_t *event);
-int	vmware_service_get_evt_severity(zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_vmware_key_value_t *evt_severities, char **error);
-int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_uint64_t last_key, zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error);
-int	vmware_service_get_last_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error);
+int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vmware_alarms_data_t *alarms_data, zbx_vector_str_t *hvs, zbx_vector_str_t *dss,
+		zbx_vector_vmware_datacenter_t *datacenters, zbx_vector_vmware_dvswitch_t *dvswitches,
+		zbx_vector_str_t *vc_alarm_ids, char **error);
+
+
+int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_t *diskextents);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
-#endif	/* ZABBIX_VMWARE_EVENT_H */
+#endif	/* ZABBIX_VMWARE_SERVICE_CFGLISTS_H */

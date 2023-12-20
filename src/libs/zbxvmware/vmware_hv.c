@@ -18,11 +18,12 @@
 **/
 
 #include "vmware_hv.h"
+#include "vmware_internal.h"
+#include "zbxvmware.h"
+
 #include "vmware_ds.h"
 #include "vmware_vm.h"
 #include "vmware_shmem.h"
-#include "vmware_internal.h"
-#include "vmware.h"
 
 #include "zbxstr.h"
 #include "zbxip.h"
