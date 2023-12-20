@@ -82,7 +82,7 @@ zabbix_export:
           url: '{$NOMAD.ENDPOINT.API.URL}/v1/nodes'
           query_fields:
             - name: os
-              value: '1'
+              value: 'true'
           status_codes: ''
           http_proxy: '{$NOMAD.HTTP.PROXY}'
           headers:
@@ -1199,8 +1199,9 @@ zabbix_export:
           url: '{$NOMAD.CLIENT.API.SCHEME}://{HOST.IP}:{$NOMAD.CLIENT.API.PORT}/v1/allocations'
           query_fields:
             - name: reverse
-              value: '1'
+              value: 'true'
             - name: task_states
+              value: 'false'
             - name: filter
               value: 'NodeID == "{HOST.HOST}" and DesiredStatus == "run" and ClientStatus == "running"'
           status_codes: ''
