@@ -1504,7 +1504,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_units' => 'Static'
 					],
 					'Legend' => [
-						'Number of rows' => '5',
+						'Max number of rows' => '5',
 						'Display min/max/avg' => true
 					],
 					'Problems' => [
@@ -1797,7 +1797,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Show legend' => true,
-						'Number of rows' => '5',
+						'Max number of rows' => '5',
 						'Display min/max/avg' => true
 					],
 					'Problems' => [
@@ -2334,11 +2334,11 @@ class testDashboardGraphWidget extends testWidgets {
 	}
 
 	/*
-	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
+	 * Test enable/disable "Max number of rows" field by check/uncheck "Show legend".
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
 		$this->page->login()->open(self::DASHBOARD_URL);
-		$fields = ['Number of rows', 'Display min/max/avg', 'Number of columns'];
+		$fields = ['Max number of rows', 'Display min/max/avg', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields($fields);
@@ -2352,7 +2352,7 @@ class testDashboardGraphWidget extends testWidgets {
 		}
 
 		$field_attributes = [
-			'Number of rows' => [
+			'Max number of rows' => [
 				'min' => 1,
 				'max' => 10
 			],
@@ -2376,15 +2376,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 1,
-						'Number of columns' => 1
+						'id:legend_lines' => 1,
+						'id:legend_columns' => 1
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2392,15 +2392,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 10,
-						'Number of columns' => 4
+						'id:legend_lines' => 10,
+						'id:legend_columns' => 4
 					],
 					'expected' => [
-						'Number of rows' => 10,
+						'Max number of rows' => 10,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Number of rows' => 100,
+						'Max number of rows' => 100,
 						'Number of columns' => 100
 					]
 				]
@@ -2408,15 +2408,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 0,
-						'Number of columns' => 0
+						'id:legend_lines' => 0,
+						'id:legend_columns' => 0
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2424,15 +2424,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 11,
-						'Number of columns' => 5
+						'id:legend_lines' => 11,
+						'id:legend_columns' => 5
 					],
 					'expected' => [
-						'Number of rows' => 10,
+						'Max number of rows' => 10,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Number of rows' => 100,
+						'Max number of rows' => 100,
 						'Number of columns' => 100
 					]
 				]
@@ -2440,15 +2440,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => -1,
-						'Number of columns' => -1
+						'id:legend_lines' => -1,
+						'id:legend_columns' => -1
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2456,15 +2456,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 'a',
-						'Number of columns' => 'a'
+						'id:legend_lines' => 'a',
+						'id:legend_columns' => 'a'
 					],
 					'expected' => [
-						'Number of rows' => 1,
+						'Max number of rows' => 1,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Number of rows' => 0,
+						'Max number of rows' => 0,
 						'Number of columns' => 100
 					]
 				]
@@ -2472,15 +2472,15 @@ class testDashboardGraphWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Number of rows' => 6,
+						'id:legend_lines' => 6,
+						'id:legend_columns' => 3
+					],
+					'expected' => [
+						'Max number of rows' => 6,
 						'Number of columns' => 3
 					],
-					'expected' => [
-						'Number of rows' => 6,
-						'Number of columns' => 3
-					],
 					'range_percentage' => [
-						'Number of rows' => 55.5556,
+						'Max number of rows' => 55.5556,
 						'Number of columns' => 66.6667
 					]
 				]
@@ -2493,23 +2493,29 @@ class testDashboardGraphWidget extends testWidgets {
 	 *
 	 * @dataProvider getSlidebarData
 	 */
-	// TODO: Uncomment the below scenario when DEV-2709 will be fixed.
-//	public function testDashboardGraphWidget_LegendRangeControlsValidation($data) {
-//		$this->page->login()->open(self::DASHBOARD_URL);
-//		$form = $this->openGraphWidgetConfiguration();
-//		$form->selectTab('Legend');
-//		$form->fill($data['fields']);
-//
-//		// Check the resulting value in input element and check positioning of the range control thumb element.
-//		foreach ($data['expected'] as $field_name => $value) {
-//			$field = $form->getField($field_name);
-//			$this->assertEquals($value, $field->query('xpath:.//input[@type="text"]')->one()->getValue());
-//
-//			$this->assertEquals('left: '.$data['range_percentage'][$field_name].'%;', $field->query('class:range-control-thumb')
-//					->one()->getAttribute('style')
-//			);
-//		}
-//	}
+	public function testDashboardGraphWidget_LegendRangeControlsValidation($data) {
+		$this->page->login()->open(self::DASHBOARD_URL);
+		$form = $this->openGraphWidgetConfiguration();
+		$form->selectTab('Legend');
+
+		foreach ($data['fields'] as $field_selector => $value) {
+			$field = $form->getField($field_selector);
+			$field->fill($value);
+
+			// JS should trigger a change action for the input, so that these changes would apply to the range control.
+			CElementQuery::getDriver()->executeScript('return jQuery(arguments[0]).trigger("change");', [$field]);
+		}
+
+		// Check the resulting value in input element and check positioning of the range control thumb element.
+		foreach ($data['expected'] as $field_name => $value) {
+			$field = $form->getField($field_name);
+			$this->assertEquals($value, $field->query('xpath:.//input[@type="text"]')->one()->getValue());
+
+			$this->assertEquals('left: '.$data['range_percentage'][$field_name].'%;', $field->query('class:range-control-thumb')
+					->one()->getAttribute('style')
+			);
+		}
+	}
 
 	/**
 	 * Check "Displaying options" tab layout.

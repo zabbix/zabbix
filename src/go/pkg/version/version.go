@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	ZABBIX_REVDATE          = "24 November 2023"
+	ZABBIX_REVDATE          = "19 December 2023"
 	ZABBIX_VERSION_MAJOR    = 7
 	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 0
@@ -82,6 +82,10 @@ func Long() string {
 	if len(RC()) != 0 {
 		ver += RC()
 	}
+	return ver
+}
+func LongNoRC() string {
+	var ver string = fmt.Sprintf("%d.%d.%d", Major(), Minor(), Patch())
 	return ver
 }
 

@@ -21,7 +21,6 @@ package oracle
 
 import (
 	"context"
-	"encoding/json"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -36,6 +35,7 @@ func versionHandler(
 	if err != nil {
 		return nil, zbxerr.New("failed to query version").Wrap(err)
 	}
+
 	var version string
 
 	err = row.Scan(&version)
@@ -48,10 +48,5 @@ func versionHandler(
 		return nil, zbxerr.New("failed to get version").Wrap(err)
 	}
 
-	b, err := json.Marshal(version)
-	if err != nil {
-		return nil, zbxerr.New("failed to marshal version").Wrap(err)
-	}
-
-	return string(b), nil
+	return version, nil
 }
