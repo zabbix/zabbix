@@ -27,6 +27,8 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 
+$this->includeJsFile('monitoring.discovery.view.js.php');
+
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
@@ -79,3 +81,7 @@ $discovery_table = CScreenBuilder::getScreen([
 ])->get();
 
 $html_page->addItem($discovery_table)->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

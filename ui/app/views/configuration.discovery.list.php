@@ -84,7 +84,8 @@ $discoveryTable = (new CTableInfo())
 		_('Proxy'),
 		_('Interval'),
 		_('Checks'),
-		_('Status')
+		_('Status'),
+		_('Info')
 	]);
 
 foreach ($data['drules'] as $drule) {
@@ -100,6 +101,11 @@ foreach ($data['drules'] as $drule) {
 			->addClass('js-enable-drule')
 			->setAttribute('data-druleid', (int) $drule['druleid']);
 
+	$drule_icons = [];
+	if ($drule['status'] == DRULE_STATUS_ACTIVE && $drule['error'] !== '') {
+		$drule_icons[] = makeErrorIcon($drule['error']);
+	}
+
 	$discoveryTable->addRow([
 		new CCheckBox('druleids['.$drule['druleid'].']', $drule['druleid']),
 		(new CLink($drule['name']))
@@ -109,7 +115,8 @@ foreach ($data['drules'] as $drule) {
 		$drule['proxy'],
 		$drule['delay'],
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
-		$status
+		$status,
+		makeInformationList($drule_icons)
 	]);
 }
 

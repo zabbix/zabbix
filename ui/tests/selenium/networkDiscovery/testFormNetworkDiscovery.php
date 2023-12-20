@@ -72,10 +72,10 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Check that all labels present and visible.
-		$this->assertEquals(['Name', 'Discovery by proxy', 'IP range', 'Update interval', 'Maximum concurrent checks',
-				'Checks', 'Device uniqueness criteria', 'Host name', 'Visible name', 'Enabled'],
-				$form->getLabels(CElementFilter::VISIBLE)->asText()
-		);
+		$this->assertEquals(['Name', 'Discovery by proxy', 'IP range', 'Update interval',
+			'Maximum concurrent checks per type', 'Checks', 'Device uniqueness criteria', 'Host name',
+			'Visible name', 'Enabled'
+		], $form->getLabels(CElementFilter::VISIBLE)->asText());
 
 		// Check required fields.
 		$this->assertEquals(['Name', 'IP range', 'Update interval', 'Checks'], $form->getRequiredLabels());
@@ -91,7 +91,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			'id:concurrency_max' => 0
 		]);
 
-		// Check Maximum concurrent checks segmented radio field.
+		// Check Maximum concurrent checks per type segmented radio field.
 		$labels = ['One', 'Unlimited', 'Custom'];
 		$max_concurrent_field = $form->getField('id:concurrency_max_type')->asSegmentedRadio();
 		$this->assertEquals($labels, $max_concurrent_field->getLabels()->asText());
