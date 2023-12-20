@@ -1,1 +1,0 @@
-........S. [ZBX-23730] fixed long Server shutdown when a lot of values are enqueued to be flushed via connectors (dgoloscapov)
