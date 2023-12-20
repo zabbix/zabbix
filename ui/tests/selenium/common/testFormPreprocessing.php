@@ -190,39 +190,13 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public function getItemPreprocessingValidationData() {
 		return array_merge($this->getCommonPreprocessingValidationData(), [
-			// Text. Trim.
+			// Text - Trim.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Right trim',
-						'Key' => 'empty-right-trim[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Right trim']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Left trim',
-						'Key' => 'empty-left-trim[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Left trim']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Trim',
-						'Key' => 'empty-trim[{#KEY}]'
+						'Name' => 'Trim - missing list of characters',
+						'Key' => 'trim-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Trim']
@@ -230,13 +204,41 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// Arithmetic. Custom multiplier.
+			// Text - Right trim.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty multiplier',
-						'Key' => 'empty-multiplier[{#KEY}]'
+						'Name' => 'Right trim - missing list of characters',
+						'Key' => 'right-trim-empty[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Right trim']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Text - Left trim.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Left trim - missing list of characters',
+						'Key' => 'left-trim-empty[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Left trim']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Arithmetic - Custom multiplier.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Custom multiplier - missing multiplier',
+						'Key' => 'custom-multiplier-missing-multiplier[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier']
@@ -248,8 +250,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'String multiplier',
-						'Key' => 'string-multiplier[{#KEY}]'
+						'Name' => 'Custom multiplier - string multiplier',
+						'Key' => 'custom-multiplier-string-multiplier[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
@@ -261,8 +263,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Multiplier comma',
-						'Key' => 'comma-multiplier[{#KEY}]'
+						'Name' => 'Custom multiplier - comma as decimal point',
+						'Key' => 'custom-multiplier-comma[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'parameter_1' => '0,0']
@@ -274,22 +276,22 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Multiplier symbols',
+						'Name' => 'Custom multiplier - invalid scientific notation',
 						'Key' => 'symbols-multiplier[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Custom multiplier', 'parameter_1' => '1a!@#$%^&*()-=']
+						['type' => 'Custom multiplier', 'parameter_1' => '3.2e+12<$@✨']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
-			// Change. Simple change, Change per second
+			// Change - Simple change.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Two delta',
-						'Key' => 'two-delta[{#KEY}]'
+						'Name' => 'Simple change - duplicate',
+						'Key' => 'simple-change-duplicate[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Simple change'],
@@ -299,12 +301,13 @@ abstract class testFormPreprocessing extends CWebTest {
 							'the combinations of (type)=((9, 10)).'
 				]
 			],
+			// Change - Change per second.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Two delta per second',
-						'Key' => 'two-delta-per-second[{#KEY}]'
+						'Name' => 'Change per second - duplicate',
+						'Key' => 'change-per-second-duplicate[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Change per second'],
@@ -318,8 +321,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Two different delta',
-						'Key' => 'two-different-delta[{#KEY}]'
+						'Name' => 'Change per second - conflict with simple change',
+						'Key' => 'change-per-second-conflict[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Simple change'],
@@ -329,13 +332,13 @@ abstract class testFormPreprocessing extends CWebTest {
 							'the combinations of (type)=((9, 10)).'
 				]
 			],
-			// Validation. In range.
+			// Validation - In range.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'In range empty',
-						'Key' => 'in-range-empty[{#KEY}]'
+						'Name' => 'In range - missing all',
+						'Key' => 'in-range-missing-all[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range']
@@ -347,8 +350,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'In range letters string',
-						'Key' => 'in-range-letters-string[{#KEY}]'
+						'Name' => 'In range - strings',
+						'Key' => 'in-range-strings[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => 'abc', 'parameter_2' => 'def']
@@ -360,11 +363,11 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'In range symbols',
+						'Name' => 'In range - symbols',
 						'Key' => 'in-range-symbols[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'In range', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '2b!@#$%^&*()-=']
+						['type' => 'In range', 'parameter_1' => '1a!@#$%^&*()-=✨', 'parameter_2' => '2b!@#$%^&*()-=✨']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
@@ -373,7 +376,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'In range comma',
+						'Name' => 'In range - comma for decimal point',
 						'Key' => 'in-range-comma[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -386,8 +389,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'In range wrong interval',
-						'Key' => 'in-range-wrong-interval[{#KEY}]'
+						'Name' => 'In range - invalid interval',
+						'Key' => 'in-range-invalid-interval[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
@@ -396,13 +399,13 @@ abstract class testFormPreprocessing extends CWebTest {
 							'to the value of parameter "/1/preprocessing/1/params/1".'
 				]
 			],
-			// Validation. Matches regular expression.
+			// Validation - Matches regular expression.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Matches regular expression empty',
-						'Key' => 'matches-regular-expression-empty[{#KEY}]'
+						'Name' => 'Matches regular expression - missing parameter',
+						'Key' => 'matches-regular-expression-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Matches regular expression']
@@ -410,13 +413,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// Validation. Check for error in XML.
+			// Validation - Check for error in XML.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item error XML empty',
-						'Key' => 'item-error-xml-empty[{#KEY}]'
+						'Name' => 'Check for error in XML - missing parameter',
+						'Key' => 'check-for-error-in-xml-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error in XML']
@@ -424,13 +427,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// Validation. Check for error using regular expression.
+			// Validation - Check for error using regular expression.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item error REGEXP both params empty',
-						'Key' => 'item-error-regexp-both-empty[{#KEY}]'
+						'Name' => 'Check for error using regular expression - missing all',
+						'Key' => 'check-for-error-using-regex-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error using regular expression']
@@ -442,8 +445,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item error REGEXP first parameter empty',
-						'Key' => 'item-error-regexp-first-empty[{#KEY}]'
+						'Name' => 'Check for error using regular expression - missing pattern',
+						'Key' => 'check-for-error-using-regex-missing-pattern[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error using regular expression', 'parameter_2' => 'test']
@@ -455,8 +458,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item error REGEXP second parameter empty',
-						'Key' => 'item-error-regexp-second-empty[{#KEY}]'
+						'Name' => 'Check for error using regular expression - missing output',
+						'Key' => 'check-for-error-using-regex-missing-output[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
@@ -464,35 +467,51 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
 				]
 			],
-			// Throttling. Discard unchanged.
+			// Throttling - Discard unchanged.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item two discard unchanged',
-						'Key' => 'item-two-discard-unchanged[{#KEY}]'
+						'Name' => 'Discard unchanged - duplicate',
+						'Key' => 'discard-unchanged-duplicate[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((19, 20)).'
+						'the combinations of (type)=((19, 20)).'
+				]
+			],
+			// Throttling - Discard unchanged with heartbeat.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - duplicate',
+						'Key' => 'discard-unchanged-with-heartbeat-duplicate[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+						'the combinations of (type)=((19, 20)).'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item two different throttlings',
-						'Key' => 'item-two-different-throttlings[{#KEY}]'
+						'Name' => 'Discard unchanged with heartbeat - conflict',
+						'Key' => 'discard-unchanged-with-heartbeat-conflict[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((19, 20)).'
+						'the combinations of (type)=((19, 20)).'
 				]
 			]
 		]);
@@ -503,13 +522,13 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public static function getCommonPreprocessingValidationData() {
 		return [
-			// #0 Text. Regular expression.
+			// Text - Regular expression.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty regular expression',
-						'Key' => 'Empty-both-parameters[{#KEY}]'
+						'Name' => 'Regular expression - missing both parameters',
+						'Key' => 'regex-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression']
@@ -517,27 +536,25 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #1
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty pattern of regular expression',
-						'Key' => 'empty-first-parameter[{#KEY}]'
+						'Name' => 'Regular expression - missing pattern',
+						'Key' => 'regex-missing-pattern[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_2' => 'test output']
+						['type' => 'Regular expression', 'parameter_2' => 'output']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #2
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty output of regular expression',
-						'Key' => 'empty-second-parameter[{#KEY}]'
+						'Name' => 'Regular expression - missing output',
+						'Key' => 'regex-missing-output[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression']
@@ -545,13 +562,27 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
 				]
 			],
-			// #3 Structured data. XML XPath.
+			// Text - Replace.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'XML XPath',
-						'Key' => 'empty-xpath[{#KEY}]'
+						'Name' => 'Replace - missing search string',
+						'Key' => 'replace-missing-search-string[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Replace', 'parameter_2' => 'replacement']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Structured data - XML XPath.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'XML XPath missing',
+						'Key' => 'xpath-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'XML XPath']
@@ -559,13 +590,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #4 Structured data. JSONPath.
+			// Structured data - JSONPath.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'JSONPath empty',
-						'Key' => 'empty-jsonpath[{#KEY}]'
+						'Name' => 'JSONPath missing',
+						'Key' => 'jsonpath-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'JSONPath']
@@ -573,13 +604,67 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #5 Custom scripts. JavaScript.
+			// SNMP - SNMP walk value.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty JavaScript',
-						'Key' => 'item-empty-javascript[{#KEY}]'
+						'Name' => 'SNMP walk value - missing OID',
+						'Key' => 'snmp-walk-value-missing-oid[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk value']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// SNMP - SNMP walk to JSON.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - missing all fields',
+						'Key' => 'snmp-walk-to-json-missing-all[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk to JSON']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - missing Field name',
+						'Key' => 'snmp-walk-to-json-missing-name[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_2' => '1.3.6.1.2.1.1.1']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - missing OID',
+						'Key' => 'snmp-walk-to-json-missing-oid[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'test']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+				]
+			],
+			// Custom scripts - JavaScript.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JavaScript missing',
+						'Key' => 'javascript-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'JavaScript']
@@ -587,13 +672,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #6 Validation. Does not match regular expression
+			// #6 Validation - Does not match regular expression.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Does not match regular expression empty',
-						'Key' => 'does-not-match-regular-expression-empty[{#KEY}]'
+						'Name' => 'Does not match regular expression - missing parameter',
+						'Key' => 'does-not-match-regular-expression-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Does not match regular expression']
@@ -601,13 +686,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #7 Validation. Check for error in JSON.
+			// Validation - Check for error in JSON.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Error JSON empty',
-						'Key' => 'error-json-empty[{#KEY}]'
+						'Name' => 'Check for error in JSON - missing parameter',
+						'Key' => 'check-for-error-in-json-missing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error in JSON']
@@ -615,29 +700,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #8 Throttling. Discard unchanged with heartbeat
+			// Throttling - Discard unchanged with heartbeat.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Two equal discard unchanged with heartbeat',
-						'Key' => 'two-equal-discard-unchanged-with-heartbeat[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist '.
-							'within the combinations of (type)=((19, 20)).'
-				]
-			],
-			// #9
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Two different discard unchanged with heartbeat',
-						'Key' => 'two-different-discard-unchanged-with-heartbeat[{#KEY}]'
+						'Name' => 'Discard unchanged with heartbeat - conflict with different values',
+						'Key' => 'discard-unchanged-with-heartbeat-conflict-different[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
@@ -647,13 +716,12 @@ abstract class testFormPreprocessing extends CWebTest {
 							'within the combinations of (type)=((19, 20)).'
 				]
 			],
-			// #10
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat empty',
-						'Key' => 'discard-unchanged-with-heartbeat-empty[{#KEY}]'
+						'Name' => 'Discard unchanged with heartbeat - missing seconds',
+						'Key' => 'discard-unchanged-with-heartbeat-missing-seconds[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat']
@@ -661,27 +729,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #11
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat symbols',
-						'Key' => 'discard-unchanged-with-heartbeat-symbols[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '3g!@#$%^&*()-=']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
-				]
-			],
-			// #12
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discardunchanged with heartbeat letters string',
-						'Key' => 'discard-unchanged-with-heartbeat-letters-string[{#KEY}]'
+						'Name' => 'Discard unchanged with heartbeat - string',
+						'Key' => 'discard-unchanged-with-heartbeat-string[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => 'abc']
@@ -689,12 +742,37 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
 				]
 			],
-			// #13
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat comma',
+						'Name' => 'Discard unchanged with heartbeat - string with symbols',
+						'Key' => 'discard-unchanged-with-heartbeat-string-symbols[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '3g!@#$%^&*()-=✨']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - decimal seconds',
+						'Key' => 'discard-unchanged-with-heartbeat-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - comma as decimal point',
 						'Key' => 'discard-unchanged-with-heartbeat-comma[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -703,26 +781,11 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
 				]
 			],
-			// #14
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat dot',
-						'Key' => 'discard-unchanged-with-heartbeat-dot[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
-				]
-			],
-			// #15
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat negative',
+						'Name' => 'Discard unchanged with heartbeat - negative value',
 						'Key' => 'discard-unchanged-with-heartbeat-negative[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -731,12 +794,11 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
 				]
 			],
-			// #16
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat zero',
+						'Name' => 'Discard unchanged with heartbeat - value zero',
 						'Key' => 'discard-unchanged-with-heartbeat-zero[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -745,13 +807,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
 				]
 			],
-			// #17
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat maximum',
-						'Key' => 'unchanged-with-heartbeat-max[{#KEY}]'
+						'Name' => 'Discard unchanged with heartbeat - value over maximum',
+						'Key' => 'discard-unchanged-with-heartbeat-max[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
@@ -805,7 +866,19 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'replace[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => 'old string ', 'parameter_2' => 'NEW👍string ']
+						['type' => 'Replace', 'parameter_1' => 'old string ', 'parameter_2' => 'NEW👍string ']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Replace - empty replacement',
+						'Key' => 'replace-empty-replacement[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'replacement']
 					]
 				]
 			],
@@ -1089,6 +1162,18 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'parameter_1' => '1.23']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Custom multiplier - scientific notation',
+						'Key' => 'custom-multiplier-scientific[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '1.5617497e+07']
 					]
 				]
 			],
@@ -1407,22 +1492,22 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'unicode-symbols[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_2' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Replace', 'parameter_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_2' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Trim', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Right trim', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Left trim', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'XML XPath', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'JSONPath', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Regular expression', 'parameter_1' => '01_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '02_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Replace', 'parameter_1' => '03_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '04_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Trim', 'parameter_1' => '05_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Right trim', 'parameter_1' => '06_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Left trim', 'parameter_1' => '07_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'XML XPath', 'parameter_1' => '08_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'JSONPath', 'parameter_1' => '09_<!@"\'&nbsp;🙂🙃'],
 						['type' => 'CSV to JSON','parameter_1' => '<', 'parameter_2' => '<'],
-						['type' => 'SNMP walk value', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_table_1_2' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'JavaScript', 'parameter_1' => '5d!@#$%^&*()-='],
-						['type' => 'Matches regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Does not match regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Check for error in XML', 'parameter_1' => '<!@"\'&nbsp;🙂🙃'],
-						['type' => 'Check for error using regular expression', 'parameter_1' => '<!@"\'&nbsp;🙂🙃', 'parameter_2' => '<!@"\'&nbsp;🙂🙃']
+						['type' => 'SNMP walk value', 'parameter_1' => '10_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => '11_<!@"\'&nbsp;🙂🙃', 'parameter_table_1_2' => '12_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'JavaScript', 'parameter_1' => '13_5d!@#$%^&*()-='],
+						['type' => 'Matches regular expression', 'parameter_1' => '14_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Does not match regular expression', 'parameter_1' => '15_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in JSON', 'parameter_1' => '16_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in XML', 'parameter_1' => '17_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => '18_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '19_<!@"\'&nbsp;🙂🙃']
 					]
 				]
 			],
@@ -1484,6 +1569,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// User macros.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1512,6 +1598,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// Whitespace.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2800,20 +2887,20 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public function checkRepeatedNotSupported() {
 		// TODO: rewrite this check accordingly to DEV-2667 (1).
-//		$this->page->login()->open($this->link);
-//		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
-//
-//		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-//		$form->fill(['Key' => 'test.key']);
-//		$form->selectTab('Preprocessing');
-//
-//		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
-//		$this->query('id:param_add')->one()->click();
-//
-//		$this->assertTrue($this->query('xpath://z-select[@id="preprocessing_0_type"]'.
-//				'//li[text()="Check for not supported value"]')->one()->isEnabled());
-//		$this->assertFalse($this->query('xpath://z-select[@id="preprocessing_1_type"]'.
-//				'//li[text()="Check for not supported value"]')->one()->isEnabled());
+		/*$this->page->login()->open($this->link);
+		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
+
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill(['Key' => 'test.key']);
+		$form->selectTab('Preprocessing');
+
+		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
+		$this->query('id:param_add')->one()->click();
+
+		$this->assertTrue($this->query('xpath://z-select[@id="preprocessing_0_type"]'.
+				'//li[text()="Check for not supported value"]')->one()->isEnabled());
+		$this->assertFalse($this->query('xpath://z-select[@id="preprocessing_1_type"]'.
+				'//li[text()="Check for not supported value"]')->one()->isEnabled());*/
 	}
 
 	/*
