@@ -578,8 +578,8 @@ static void	zbx_set_defaults(void)
 	}
 	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "NOTE: ServerPort parameter is deprecated and ignored for passive proxy"
-				", please specify port in Server parameter (e.g. 127.0.0.1:10052)");
+		zabbix_log(LOG_LEVEL_WARNING, "NOTE: ServerPort parameter is ignored for passive proxy"
+				" and is also deprecated");
 	}
 	else if (ZBX_PROXYMODE_ACTIVE == config_proxymode)
 	{
