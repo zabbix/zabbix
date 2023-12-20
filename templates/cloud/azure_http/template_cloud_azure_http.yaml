@@ -2664,7 +2664,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var AzureCosmoDB = {
+            var AzureCosmosDB = {
                 params: {},
                 token: null,
             
@@ -2675,18 +2675,18 @@ zabbix_export:
                         }
                     });
             
-                    AzureCosmoDB.params = params;
+                    AzureCosmosDB.params = params;
                 },
             
                 login: function () {
                     var response, login = new HttpRequest();
-                    if (typeof AzureCosmoDB.params.proxy !== 'undefined' && AzureCosmoDB.params.proxy !== '') {
-                        login.setProxy(AzureCosmoDB.params.proxy);
+                    if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
+                        login.setProxy(AzureCosmosDB.params.proxy);
                     }
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     response = login.post(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmoDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmoDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmoDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmosDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmosDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmosDB.params.password)
                     );
             
                     if (login.getStatus() !== 200) {
@@ -2701,20 +2701,20 @@ zabbix_export:
                     if (!response.hasOwnProperty('access_token')) {
                         throw 'Authentication response does not contain access token.';
                     }
-                    AzureCosmoDB.token = response['access_token'];
+                    AzureCosmosDB.token = response['access_token'];
                 },
             
                 request: function (url) {
                     var response, request = new HttpRequest();
-                    if (typeof AzureCosmoDB.params.proxy !== 'undefined' && AzureCosmoDB.params.proxy !== '') {
-                        request.setProxy(AzureCosmoDB.params.proxy);
+                    if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
+                        request.setProxy(AzureCosmosDB.params.proxy);
                     }
-                    if (!AzureCosmoDB.token) {
+                    if (!AzureCosmosDB.token) {
                         throw 'Request does not contain access token.';
                     }
                     request.addHeader('Accept: application/json');
-                    request.addHeader('Authorization: Bearer ' + AzureCosmoDB.token);
-                    Zabbix.log(4, '[ AzureCosmoDB ] request url: ' + url);
+                    request.addHeader('Authorization: Bearer ' + AzureCosmosDB.token);
+                    Zabbix.log(4, '[ AzureCosmosDB ] request url: ' + url);
                     response = request.get(url);
             
                     if (request.getStatus() !== 200) {
@@ -2754,17 +2754,17 @@ zabbix_export:
                     Object.keys(endpoints).forEach(function (field) {
                         data[field] = {};
                         try {
-                            metrics = AzureCosmoDB.request('https://management.azure.com' + AzureCosmoDB.params.resource_id + endpoints[field]);
+                            metrics = AzureCosmosDB.request('https://management.azure.com' + AzureCosmosDB.params.resource_id + endpoints[field]);
                             if (!metrics.hasOwnProperty('value')) {
                                 throw 'Failed getting required field. Check debug log for more information.';
                             }
             
                             for (k in metrics.value) {
-                                key = AzureCosmoDB.getField(metrics.value[k], 'name.value')
+                                key = AzureCosmosDB.getField(metrics.value[k], 'name.value')
                                 if (metrics.value[k].timeseries.length === 0) {
                                     metrics.value[k].timeseries.push({ 'data': ['nodata'] })
                                 }
-                                data[field][key] = AzureCosmoDB.getField(metrics.value[k], 'timeseries.0.data.0');
+                                data[field][key] = AzureCosmosDB.getField(metrics.value[k], 'timeseries.0.data.0');
                             }
                         }
                         catch (error) {
@@ -2777,13 +2777,13 @@ zabbix_export:
             };
             
             try {
-                AzureCosmoDB.setParams(JSON.parse(value));
-                AzureCosmoDB.login();
-                return JSON.stringify(AzureCosmoDB.getMetricsData());
+                AzureCosmosDB.setParams(JSON.parse(value));
+                AzureCosmosDB.login();
+                return JSON.stringify(AzureCosmosDB.getMetricsData());
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AzureCosmoDB ] ERROR: ' + error);
+                Zabbix.log(3, '[ AzureCosmosDB ] ERROR: ' + error);
                 return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
