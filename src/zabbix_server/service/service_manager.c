@@ -2614,11 +2614,11 @@ static void	db_update_services(zbx_service_manager_t *manager)
 
 		for (int i = 0; i < service_diff->service_problems_recovered.values_num; i++)
 		{
-			zbx_service_problem_t	*service_problem, service_problem_cmp =
-					{.eventid = service_problem->eventid};
+			zbx_service_problem_t	*service_problem, service_problem_cmp;
 			int			index;
 
 			service_problem = service_diff->service_problems_recovered.values[i];
+			service_problem_cmp.eventid = service_problem->eventid;
 
 			if (FAIL == (index = zbx_vector_service_problem_ptr_search(&service->service_problems,
 					&service_problem_cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -3052,7 +3052,7 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
 		zbx_uint64_t eventid, int severity)
 {
 	int			index;
-	zbx_service_problem_t	*service_problem, service_problem_cmp = {.eventid=eventid};
+	zbx_service_problem_t	*service_problem, service_problem_cmp = {.eventid = eventid};
 	zbx_services_diff_t	services_diff_local;
 
 	if (FAIL == (index = zbx_vector_service_problem_ptr_search(&service->service_problems, &service_problem_cmp,
