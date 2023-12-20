@@ -287,6 +287,8 @@ class CRouter {
 		'script.edit'								=> ['CControllerScriptEdit',							'layout.json',			'administration.script.edit'],
 		'script.list'								=> ['CControllerScriptList',							'layout.htmlpage',		'administration.script.list'],
 		'script.update'								=> ['CControllerScriptUpdate',							'layout.json',			null],
+		'script.userinput.edit'						=> ['CControllerScriptUserInputEdit',					'layout.json',			'script.userinput.edit'],
+		'script.userinput.check'					=> ['CControllerScriptUserInputCheck',					'layout.json',			null],
 		'search'									=> ['CControllerSearch',								'layout.htmlpage',		'search'],
 		'service.create'							=> ['CControllerServiceCreate',							'layout.json',			null],
 		'service.delete'							=> ['CControllerServiceDelete',							'layout.json',			null],

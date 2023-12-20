@@ -439,7 +439,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				return;
 			}
 
-			$param = CHistFunctionParser::quoteParam($param);
+			$param = CHistFunctionParser::quoteParam($param, true, ['escape_backslashes' => false]);
 		});
 
 		// Remove empty parameters from the end of the parameters array.
