@@ -126,7 +126,7 @@ function getItemFormData(array $item = []) {
 	}
 
 	if ($data['type'] == ITEM_TYPE_SCRIPT) {
-		CArrayHelper::sort($data['parameters'], ['name', 'value']);
+		CArrayHelper::sort($data['parameters'], ['name']);
 		$data['parameters'] = array_values($data['parameters']);
 	}
 	else {
@@ -234,6 +234,7 @@ function getItemFormData(array $item = []) {
 
 		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
+			$data['parameters'] = array_values($data['parameters']);
 		}
 
 		$data['preprocessing'] = $data['item']['preprocessing'];

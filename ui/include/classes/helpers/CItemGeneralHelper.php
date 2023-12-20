@@ -247,7 +247,7 @@ class CItemGeneralHelper {
 		}
 
 		if ($item['parameters']) {
-			CArrayHelper::sort($item['parameters'], ['name', 'value']);
+			CArrayHelper::sort($item['parameters'], ['name']);
 			$item['parameters'] = array_values($item['parameters']);
 		}
 
