@@ -89,9 +89,6 @@ void	vmware_service_update_perf_entities(zbx_vmware_service_t *service);
 
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout);
-int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid, const char *instance);
-
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 #endif	/* ZABBIX_VMWARE_PERFCNTR_H */
