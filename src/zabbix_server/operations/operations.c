@@ -225,11 +225,10 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 {
 	zbx_db_result_t		result, result2;
 	zbx_db_row_t		row, row2;
-	zbx_uint64_t		dhostid, hostid = 0, proxyid, druleid;
-	char			*host, *host_esc, *host_unique, *host_visible, *hostname = NULL;
+	zbx_uint64_t		hostid = 0, proxyid;
+	char			*host_visible, *hostname = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
-	unsigned char		svc_type, interface_type;
 	zbx_db_insert_t		db_insert, db_insert_host_rtdata;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, event->eventid);
@@ -280,7 +279,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	interfaceid;
+			zbx_uint64_t	interfaceid, dhostid, druleid;
+			unsigned char	svc_type, interface_type;
 
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_STR2UINT64(druleid, row[8]);
@@ -372,6 +372,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					}
 				}
 
+				char	*host;
+
 				if (ZBX_DISCOVERY_VALUE == host_source)
 					host = zbx_strdup(NULL, row3[0]);
 				else if (ZBX_DISCOVERY_IP == host_source || '\0' == *row[3])
@@ -380,6 +382,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					host = zbx_strdup(NULL, row[3]);
 
 				zbx_db_free_result(result3);
+
+				char	*host_unique;
 
 				/* for host uniqueness purposes */
 				zbx_make_hostname(host);	/* replace not-allowed symbols */
@@ -513,7 +517,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
-			char			*sql = NULL;
+			char			*host_esc, *sql = NULL;
 			zbx_uint64_t		host_proxyid;
 			zbx_conn_flags_t	flags;
 			int			flags_int, tls_accepted;

@@ -113,7 +113,7 @@ static const char	*convert_historical_macro(int macro)
  ******************************************************************************/
 static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 {
-	int		pos = 0, macro_len, macro_type;
+	int		pos = 0, macro_len;
 	zbx_token_t	token;
 	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset, r, l;
 	char		*replace;
@@ -143,6 +143,8 @@ static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 			}
 
 			macro = trigger->description + l;
+
+			int	macro_type;
 
 			if (ZBX_HIST_MACRO_NONE != (macro_type = is_historical_macro(macro)))
 			{
@@ -354,8 +356,7 @@ static int	update_event_names(void)
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_db_trigger		trigger;
-	int			ret = SUCCEED, historical, triggers_num, processed_num = 0, completed,
-				last_completed = 0;
+	int			ret = SUCCEED, triggers_num, processed_num = 0, last_completed = 0;
 	char			*sql;
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	zbx_dc_um_handle_t	*um_handle;
@@ -391,6 +392,8 @@ static int	update_event_names(void)
 		ZBX_STR2UCHAR(trigger.recovery_mode, row[8]);
 		ZBX_STR2UCHAR(trigger.value, row[9]);
 
+		int	historical;
+
 		preprocess_trigger_name(&trigger, &historical);
 
 		if (FAIL == historical)
@@ -401,6 +404,8 @@ static int	update_event_names(void)
 		zbx_db_trigger_clean(&trigger);
 
 		processed_num++;
+
+		int	completed;
 
 		if (last_completed != (completed = (int)(100.0 * processed_num / triggers_num)))
 		{
