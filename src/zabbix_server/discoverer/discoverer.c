@@ -269,7 +269,7 @@ void	results_free(zbx_discoverer_results_t *result)
 
 void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 {
-	const char		*start;
+	const char	*start;
 
 	for (start = ports; '\0' != *start;)
 	{
@@ -1172,10 +1172,10 @@ out:
 
 static void	*discoverer_worker_entry(void *net_check_worker)
 {
-	int				err;
-	sigset_t			mask;
-	zbx_discoverer_worker_t		*worker = (zbx_discoverer_worker_t*)net_check_worker;
-	zbx_discoverer_queue_t		*queue = worker->queue;
+	int			err;
+	sigset_t		mask;
+	zbx_discoverer_worker_t	*worker = (zbx_discoverer_worker_t*)net_check_worker;
+	zbx_discoverer_queue_t	*queue = worker->queue;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
@@ -1588,7 +1588,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	{
 		int		processing_rules_num, i, more_results, is_drules_rev_updated;
 		zbx_uint64_t	queue_used, unsaved_checks;
-		char		msg[255];
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -1634,12 +1633,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks,
 				discoverer_args_in->events_cbs);
 
-		zbx_snprintf(msg, sizeof(msg), "%s #%d [processing %d rules, " ZBX_FS_DBL "%% of queue used, "
-				ZBX_FS_UI64 " unsaved checks]", get_process_type_string(process_type), process_num,
+		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_DBL "%% of queue used, " ZBX_FS_UI64
+				" unsaved checks]", get_process_type_string(process_type), process_num,
 				processing_rules_num, 100 * ((double)queue_used / DISCOVERER_QUEUE_MAX_SIZE),
 				unsaved_checks);
-		zbx_setproctitle("%s",msg);
-		zabbix_log(LOG_LEVEL_DEBUG, msg);
 
 		/* process discovery rules and create net check jobs */
 
