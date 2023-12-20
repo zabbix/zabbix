@@ -37,6 +37,20 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 )
 
+func GetCheckInterval(itemid uint64, delay string, from time.Time, prev time.Time) time.Duration {
+	nextcheck, _, nextcheck_err := GetNextcheck(itemid, delay, from)
+
+	if nextcheck_err == nil {
+		return nextcheck.Sub(from)
+	}
+
+	if prev.IsZero() {
+		return time.Second
+	}
+
+	return from.Sub(prev)
+}
+
 func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {
 	var cnextcheck, cscheduling C.int
 	var cerr *C.char
