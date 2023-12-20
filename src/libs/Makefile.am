@@ -53,6 +53,7 @@ DIST_SUBDIRS = \
 	zbxodbc \
 	zbxparam \
 	zbxpoller \
+	zbxagentget \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
@@ -236,6 +237,7 @@ SUBDIRS = \
 	zbxvariant \
 	zbxversion \
 	zbxxml \
+	zbxagentget \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

@@ -1,0 +1,91 @@
+---
+test case: Buffered read of an empty file
+in:
+  fragments: 
+    - ''
+  encoding: ''
+  bufsz: 10
+out:
+  line_count: 0
+  result: 0
+---
+test case: Buffered read of one line without line-end
+in:
+  fragments: 
+    - 'abc'
+  encoding: ''
+  bufsz: 3
+out:
+  line_count: 1
+  result: 0
+---
+test case: Not big enough buffer
+in:
+  fragments: 
+    - 'abca'
+  encoding: ''
+  bufsz: 3
+out:
+  line_count: 2
+  result: 0
+---
+test case: Buffered one read of one line
+in:
+  fragments: 
+    - 'abc\x0A'
+  encoding: ''
+  bufsz: 4
+out:
+  line_count: 1
+  result: 0
+---
+test case: Multiple lines (1)
+in:
+  fragments: 
+    - 'abc\x0Adef\x0Aghi\x0Ajkl\x0Amno'
+  encoding: ''
+  bufsz: 9
+out:
+  line_count: 5
+  result: 0
+---
+test case: Multiple lines (2)
+in:
+  fragments: 
+    - 'abc\x0Aabc\x0Aabc\x0A'
+  encoding: ''
+  bufsz: 4
+out:
+  line_count: 3
+  result: 0
+---
+test case: Multiple lines (3)
+in:
+  fragments: 
+    - 'abc\x0Aabc\x0Aabc\x0A'
+  encoding: ''
+  bufsz: 3
+out:
+  line_count: 6
+  result: 0
+---
+test case: Infinite loop fix (1)
+in:
+  fragments:
+    - '\xff\xfe\x61\x00\x62\x00\x63\x00\x64\x00\x00\x00\x34\x00'
+  encoding: ''
+  bufsz: 3
+out:
+  line_count: 5
+  result: 0
+---
+test case: Infinite loop fix (2)
+in:
+  fragments:
+    - '\xff\xfe\x61\x00\x62\x00\x63\x00\x64\x00\x00\x00\x34\x00'
+  encoding: 'UTF-16'
+  bufsz: 4
+out:
+  line_count: 4
+  result: 0
+...
