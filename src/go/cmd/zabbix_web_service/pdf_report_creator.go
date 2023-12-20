@@ -224,29 +224,27 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 			return err
 		}
 
-		return waitForDashboardReady(ctx)
+		return waitForDashboardReady(ctx, url)
 	}
 }
 
-func waitForDashboardReady(ctx context.Context) error {
+func waitForDashboardReady(ctx context.Context, url string) error {
 	const wrapperIsReady = ".wrapper.is-ready"
+	const timeout = time.Minute
 
 	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
 	var isReady bool
 
-	if err := chromedp.Run(ctx,
+	err := chromedp.Run(ctx,
 		chromedp.Poll(expression, &isReady,
-			chromedp.WithPollingTimeout(time.Duration(options.Timeout)*time.Second)),
-	); err != nil {
-		if errors.Is(err, chromedp.ErrPollingTimeout) {
-			return errors.New("timeout occurred while dashboard was getting ready")
-		}
+			chromedp.WithPollingTimeout(timeout)))
 
-		return err
-	}
-
-	if !isReady {
-		return errors.New("unknown error while dashboard was getting ready")
+	if errors.Is(err, chromedp.ErrPollingTimeout) {
+		log.Warningf("timeout occurred while dashboard was getting ready, url: '%s'", url)
+	} else if err != nil {
+		log.Warningf("error while dashboard was getting ready: %s, url: '%s'", err.Error(), url)
+	} else if !isReady {
+		log.Warningf("should never happen, dashboard failed to get ready with no error, url: '%s'", url)
 	}
 
 	return nil
