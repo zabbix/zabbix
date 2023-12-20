@@ -36,6 +36,7 @@ require_once dirname(__FILE__).'/testPageApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDashboardList.php';
 require_once dirname(__FILE__).'/eventCorrelation/testPageEventCorrelation.php';
+require_once dirname(__FILE__).'/graphs/testDataDisplayInGraphs.php';
 require_once dirname(__FILE__).'/graphs/testFormGraph.php';
 require_once dirname(__FILE__).'/graphs/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
@@ -436,6 +437,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardURLWidget');
 		$suite->addTestSuite('testDashboardViewMode');
+		$suite->addTestSuite('testDataDisplayInGraphs');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageTemplateDashboards');
 		$suite->addTestSuite('testPageHostDashboards');
