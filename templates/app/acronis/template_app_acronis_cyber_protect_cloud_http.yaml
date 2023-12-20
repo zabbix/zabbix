@@ -1225,7 +1225,7 @@ zabbix_export:
                 - name: resource_id
                   value: '{#ID}'
                 - name: include_attributes
-                  value: '1'
+                  value: 'true'
               status_codes: ''
               http_proxy: '{$ACRONIS.CPC.HTTP.PROXY}'
               headers:
