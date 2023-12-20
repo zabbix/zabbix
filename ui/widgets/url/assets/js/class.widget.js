@@ -28,7 +28,7 @@ class CWidgetUrl extends CWidget {
 				return resolve(super.promiseReady());
 			}
 
-			iframe.addEventListener('load', () => setTimeout(() => resolve(), 200));
+			iframe.addEventListener('load', () => setTimeout(() => resolve(super.promiseReady()), 200));
 		});
 	}
 
