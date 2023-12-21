@@ -20,8 +20,8 @@
 package empty
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 var impl Plugin
@@ -34,7 +34,7 @@ type Plugin struct {
 func init() {
 	err := plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.empty", "Returns empty value.")
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

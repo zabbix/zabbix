@@ -20,8 +20,8 @@
 package uname
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 var impl Plugin
@@ -36,9 +36,10 @@ func init() {
 		&impl, "Uname",
 		"system.uname", "Returns system uname.",
 		"system.hostname", "Returns system host name.",
-		"system.sw.arch", "Software architecture information.")
+		"system.sw.arch", "Software architecture information.",
+	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

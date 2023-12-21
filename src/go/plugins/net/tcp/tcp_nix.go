@@ -25,8 +25,8 @@ package tcpudp
 import (
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func init() {
@@ -38,7 +38,7 @@ func init() {
 		"net.tcp.socket.count", "Returns number of TCP sockets that match parameters.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

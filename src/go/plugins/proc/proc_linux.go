@@ -37,9 +37,9 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/procfs"
 )
 
@@ -73,7 +73,7 @@ type historyIndex int
 func init() {
 	err := plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
 	err = plugin.RegisterMetrics(
@@ -82,7 +82,7 @@ func init() {
 		"proc.num", "The number of processes.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

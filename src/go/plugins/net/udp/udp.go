@@ -28,9 +28,9 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (
@@ -75,7 +75,7 @@ func init() {
 		"net.udp.socket.count", "Returns number of TCP sockets that match parameters.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

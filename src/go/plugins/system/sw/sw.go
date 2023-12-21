@@ -30,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxcmd"
@@ -62,7 +63,7 @@ func init() {
 		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

@@ -35,7 +35,8 @@ type Plugin struct {
 func init() {
 	err := plugin.RegisterMetrics(&impl, "ZabbixSync", getMetrics()...)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(zbxerr.New("failed to register metrics").Wrap(
+			err))
 	}
 
 	impl.SetCapacity(1)

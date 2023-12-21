@@ -20,6 +20,7 @@
 package memory
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -36,7 +37,7 @@ func init() {
 		"vm.memory.size", "Returns memory size in bytes or in percentage from total.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

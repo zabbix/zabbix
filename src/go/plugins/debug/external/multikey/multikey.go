@@ -20,8 +20,7 @@
 package main
 
 import (
-	"errors"
-
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -40,7 +39,7 @@ func init() {
 		"debug.external.multikeyTwo", "Returns second test value.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 
@@ -51,6 +50,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "debug.external.multikeyTwo":
 		return "debug second test response", nil
 	default:
-		return "", errors.New("Unsupported metric")
+		return "", zbxerr.ErrorUnsupportedMetric
 	}
 }

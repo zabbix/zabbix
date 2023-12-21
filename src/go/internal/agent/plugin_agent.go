@@ -25,9 +25,9 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/version"
 )
 
@@ -55,7 +55,7 @@ func init() {
 		"agent.version", "Version of Zabbix agent.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

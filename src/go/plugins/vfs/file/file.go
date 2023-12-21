@@ -21,9 +21,9 @@ package file
 
 import (
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 var (
@@ -61,7 +61,7 @@ func init() {
 		"vfs.file.get", "Return json object with information about a file.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

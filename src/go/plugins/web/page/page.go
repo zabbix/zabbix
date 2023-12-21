@@ -28,8 +28,8 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/web"
 	"zabbix.com/pkg/zbxregexp"
@@ -55,7 +55,7 @@ func init() {
 		"web.page.regexp", "Find string on a web page.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

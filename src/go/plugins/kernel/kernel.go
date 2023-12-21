@@ -20,6 +20,7 @@
 package kernel
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
@@ -44,7 +45,7 @@ func init() {
 		"kernel.openfiles", "Returns number of currently open file descriptors.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

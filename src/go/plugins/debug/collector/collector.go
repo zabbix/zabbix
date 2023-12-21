@@ -21,8 +21,8 @@ package empty
 
 import (
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 var impl Plugin
@@ -43,7 +43,7 @@ func init() {
 	impl.options.Interval = 1
 	err := plugin.RegisterMetrics(&impl, "DebugCollector", "debug.collector", "Returns empty value.")
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

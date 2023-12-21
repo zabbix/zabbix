@@ -26,8 +26,8 @@ import (
 	"time"
 	"unicode"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxcmd"
 )
@@ -205,7 +205,7 @@ func InitUserParameterPlugin(
 			fmt.Sprintf("User parameter: %s.", param.cmd),
 		)
 		if err != nil {
-			return nil, zbxerr.New("failed to register user parameter metrics").Wrap(err)
+			return nil, errs.Wrap(err, "failed to register user parameter metrics")
 		}
 	}
 

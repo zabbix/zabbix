@@ -22,9 +22,9 @@ package uptime
 import (
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 var (
@@ -42,7 +42,7 @@ func init() {
 
 	err := plugin.RegisterMetrics(&impl, "Uptime", "system.uptime", "Returns system uptime in seconds.")
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

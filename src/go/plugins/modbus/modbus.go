@@ -31,8 +31,8 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	named "github.com/BurntSushi/locker"
 	"github.com/goburrow/modbus"
 	mblib "github.com/goburrow/modbus"
@@ -152,7 +152,7 @@ func init() {
 			"modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

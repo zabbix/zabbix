@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/fsnotify/fsnotify"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"
@@ -58,7 +58,7 @@ func init() {
 
 	err := plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

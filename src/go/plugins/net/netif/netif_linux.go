@@ -27,9 +27,9 @@ import (
 	"strconv"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (
@@ -73,7 +73,7 @@ func init() {
 		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

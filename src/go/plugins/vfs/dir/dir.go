@@ -25,6 +25,7 @@ import (
 	"regexp"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -48,7 +49,7 @@ func init() {
 		"vfs.dir.size", "All directory entry size.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

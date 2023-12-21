@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
@@ -93,7 +94,7 @@ func init() {
 		"net.dns.record", "Performs a DNS query.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metric").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metric"))
 	}
 }
 
