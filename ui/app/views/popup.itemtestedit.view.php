@@ -260,13 +260,7 @@ if ($data['is_item_testable']) {
 }
 
 $form_grid->addItem([
-	new CLabel([
-		_('Value'),
-		' ',
-		makeWarningIcon('#{warning}')
-			->setId('value_warning')
-			->addStyle('display: none;')
-	], 'value'),
+	new CLabel(_('Value'), 'value'),
 	new CFormField(
 		(new CMultilineInput('value', '', [
 			'disabled' => false,

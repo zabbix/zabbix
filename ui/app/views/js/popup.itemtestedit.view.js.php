@@ -206,11 +206,6 @@ function itemGetValueTest(overlay) {
 				<?php endif ?>
 
 				jQuery('#value', $form).multilineInput('value', ret.value);
-				jQuery('#value_warning', $form)
-					.toggle('warning' in ret)
-					.toggleClass('js-retrieved', 'warning' in ret)
-					.next('.hint-box')
-						.text(ret.warning);
 
 				if (typeof ret.eol !== 'undefined') {
 					jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -301,11 +296,6 @@ function itemCompleteTest(overlay) {
 			<?php endif ?>
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
-			jQuery('#value_warning', $form)
-				.toggle('warning' in ret)
-				.toggleClass('js-retrieved', 'warning' in ret)
-				.next('.hint-box')
-					.text(ret.warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -374,7 +364,7 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
-					]) ?>, {failed: step.result})));
+					]) ?>, {failed: step.result === '' ? <?= json_encode(_('<empty string>')) ?> : step.result})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
@@ -492,8 +482,6 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
-				$('#value_warning.js-retrieved').show();
-
 				$not_supported.prop('disabled', true);
 
 				<?php if ($data['show_prev']): ?>
@@ -561,8 +549,6 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				$('#value_warning').hide();
-
 				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
 				$not_supported.prop('disabled', false);
 

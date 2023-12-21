@@ -367,13 +367,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$preproc_test_data['value'] = $result['result'];
 					$output['value'] = $result['result'];
 					$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
-
-					if (array_key_exists('truncated', $result) && $result['truncated']) {
-						$output['warning'] = _s('First %1$s of %2$s shown.',
-							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
-							convertUnits(['value' => $result['original_size'], 'units' => 'B'])
-						);
-					}
 				}
 
 				if (array_key_exists('error', $result) && $result['error'] !== '') {
@@ -434,16 +427,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							}
 						}
 						elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-							$step['result'] = $preproc_test_data['value'];
+							unset($step['result']);
 						}
-						else {
-							if (array_key_exists('truncated', $step) && $step['truncated']) {
-								$step['warning'] = _s('First %1$s of %2$s shown.',
-									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
-									convertUnits(['value' => $step['original_size'], 'units' => 'B'])
-								);
-							}
-
+						elseif (array_key_exists('truncated', $step) && $step['truncated']) {
+							$step['warning'] = _s('First %1$s of %2$s shown.',
+								convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
+								convertUnits(['value' => $step['original_size'], 'units' => 'B'])
+							);
 						}
 					}
 
