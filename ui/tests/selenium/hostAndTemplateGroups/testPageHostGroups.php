@@ -169,20 +169,20 @@ class testPageHostGroups extends testPageGroups {
 					[
 						'Name' => '1st LLD, ..., sixth LLD: グループプロトタイプ番号 1 KEY',
 						'Count' => '6',
-						'Hosts' => 'KEY HP number 0, KEY HP number 1, KEY HP number 2, KEY HP number 3, KEY HP number 4,'.
-								' KEY HP number 5',
+						'Hosts' => 'KEY host prototype number 0, KEY host prototype number 1, KEY host prototype number 2,'.
+								' KEY host prototype number 3, KEY host prototype number 4, KEY host prototype number 5',
 						'Info' => ''
 					],
 					[
 						'Name' => 'LLD number 8, ..., sevenths LLD: Trešais grupu prototips KEY',
 						'Count' => '3',
-						'Hosts' => 'KEY HP number 6, KEY HP number 7, KEY HP number 8',
+						'Hosts' => 'KEY host prototype number 6, KEY host prototype number 7, KEY host prototype number 8',
 						'Info' => ''
 					],
 					[
 						'Name' => '15th LLD 🙃^天!, 16th LLD: Two prototype group KEY',
 						'Count' => '2',
-						'Hosts' => 'KEY HP number 14, KEY HP number 15',
+						'Hosts' => 'KEY host prototype number 14, KEY host prototype number 15',
 						'Info' => ''
 					]
 				]
@@ -542,8 +542,8 @@ class testPageHostGroups extends testPageGroups {
 	/**
 	 * @dataProvider getLLDLinksData
 	 */
-	public function testPageHostGroups_checkLLDLinks($data) {
-		$link_ids = CDataHelper::get('HostTemplateGroups.LLD_HP_ids');
+	public function testPageHostGroups_CheckLLDLinks($data) {
+		$link_ids = CDataHelper::get('HostTemplateGroups.lld_host_prototype_ids');
 		$this->page->login()->open($this->link)->waitUntilReady();
 
 		// Locate the table cell that corresponds to the desired hostgroup name.
@@ -554,7 +554,7 @@ class testPageHostGroups extends testPageGroups {
 			$this->assertTrue($link->isClickable());
 
 			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['LLD id'].'&hostid='.
-					$link_ids[$lld_name]['HP id'].'&context=host';
+					$link_ids[$lld_name]['Host prototype id'].'&context=host';
 			$this->assertEquals($link_url, $link->getAttribute('href'));
 		}
 

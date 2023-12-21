@@ -85,6 +85,9 @@ class HostTemplateGroups {
 			],
 			[
 				'name' => 'Group for Correlation'
+			],
+			[
+				'name' => 'Group for hostgroup discovery'
 			]
 		]);
 		$host_groupids = CDataHelper::getIds('name');
@@ -190,151 +193,127 @@ class HostTemplateGroups {
 		]);
 
 		// Create host groups that are discovered by multiple LLDs.
-		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for hostgroup discovery']]);
-		$hostgroupid = $hostgroups['groupids'][0];
-
-		$host = CDataHelper::call('host.create', [
+		$lld_host = CDataHelper::call('host.create', [
 			'host' => 'Host for hostgroup discovery',
-			'groups' => [['groupid' => $hostgroupid]]
+			'groups' => [['groupid' => $host_groupids['Group for hostgroup discovery']]]
 		]);
 
+		$group_names = ['グループプロトタイプ番号 1', 'Trešais grupu prototips', '5 prototype group', 'Two prototype group',
+				'Single prototype group'
+		];
+
 		// Create LLDs.
-		$lld_list = [
-			'1st LLD' => 'trap1',
-			'2nd LLD' => 'trap2',
-			'3rd LLD' => 'trap3',
-			'forth LLD' => 'trap4',
-			'fifth LLD' => 'trap5',
-			'sixth LLD' => 'trap6',
-			'sevenths LLD' => 'trap7',
-			'LLD number 8' => 'trap8',
-			'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快' => 'trap9',
-			'Mūsu desmitais LLD' => 'trap10',
-			'Eleventh LLD' => 'trap11',
-			'12th LLD' => 'trap12',
-			'Trīspadsmitais LLD' => 'trap13',
-			'Četrpadsmitais LLD' => 'trap14',
-			'15th LLD 🙃^天!' => 'trap15',
-			'16th LLD' => 'trap16',
-			'17th LLD' => 'trap17'
+		$lld_discovered_groups = [
+			'1st LLD' => $group_names[0],
+			'2nd LLD' => $group_names[0],
+			'3rd LLD' => $group_names[0],
+			'forth LLD' => $group_names[0],
+			'fifth LLD' => $group_names[0],
+			'sixth LLD' => $group_names[0],
+			'sevenths LLD' => $group_names[1],
+			'LLD number 8' => $group_names[1],
+			'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快' => $group_names[1],
+			'Mūsu desmitais LLD' => $group_names[2],
+			'Eleventh LLD' => $group_names[2],
+			'12th LLD' => $group_names[2],
+			'Trīspadsmitais LLD' => $group_names[2],
+			'Četrpadsmitais LLD' => $group_names[2],
+			'15th LLD 🙃^天!' => $group_names[3],
+			'16th LLD' => $group_names[3],
+			'17th LLD' => $group_names[4]
 		];
 
 		$lld_array = [];
-		foreach ($lld_list as $lld_name => $lld_key) {
+		$lld_list = array_keys($lld_discovered_groups);
+		foreach ($lld_list as $i => $lld_name) {
 			$lld_array[] = [
 				'name' => $lld_name,
-				'key_' => $lld_key,
-				'hostid' => $host['hostids'][0],
+				'key_' => 'trap'.$i,
+				'hostid' => $lld_host['hostids'][0],
 				'type' => ITEM_TYPE_TRAPPER
 			];
 		}
 
-		$llds = CDataHelper::call('discoveryrule.create', $lld_array);
+		CDataHelper::call('discoveryrule.create', $lld_array);
+		$lldids = CDataHelper::getIds('name');
 
-		$group_patterns = ['グループプロトタイプ番号 1', 'Trešais grupu prototips', '5 prototype group', 'Two prototype group',
-				'Single prototype group'
-		];
-		$group_prototypes = [];
+		$group_prototypeids = [];
 		$discovered_hostids = [];
 		$return_ids = [];
+		$host_prototype_api = [];
 
 		// Create host prototypes.
-		foreach ($llds['itemids'] as $i => $lldid) {
-			$hostgroup_index = self::getHostgroupIndex($i);
-
-			$host_prototype = CDataHelper::call('hostprototype.create', [
-				'host' => '{#KEY} HP number '.$i,
+		foreach ($lldids as $lld_name => $lldid) {
+			$host_prototype_api[] = [
+				'host' => '{#KEY} host prototype of LLD '.$lldid,
 				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => $hostgroupid]],
-				'groupPrototypes' => [['name' => $group_patterns[$hostgroup_index].' {#KEY}']]
-			]);
+				'groupLinks' => [['groupid' => $host_groupids['Group for hostgroup discovery']]],
+				'groupPrototypes' => [['name' => $lld_discovered_groups[$lld_name].' {#KEY}']]
+			];
+		}
 
-			$host_prototypeid = $host_prototype['hostids'][0];
+		CDataHelper::call('hostprototype.create', $host_prototype_api);
+		$host_prototype_ids = CDataHelper::getIds('host');
 
-			// Collect LLD id and corresponding host ptototype id for tests that check LLD links for host groups.
-			$return_ids[array_keys($lld_list)[$i]] = [
+		$i = 0;
+		foreach ($lldids as $lld_name => $lldid) {
+			$host_prototypeid = $host_prototype_ids['{#KEY} host prototype of LLD '.$lldid];
+
+			// Collect LLD id and corresponding host prototype id for tests that check LLD links for host groups.
+			$return_ids[$lld_name] = [
 				'LLD id' => $lldid,
-				'HP id' => $host_prototypeid
+				'Host prototype id' => $host_prototypeid
 			];
 
 			// Insert a discovered host the ID of which is by 1000 more than of the corresponding host prototype.
 			$discovered_hostids[$i] = $host_prototypeid + 1000;
 			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES ('.
-					zbx_dbstr($discovered_hostids[$i]).','.zbx_dbstr('KEY HP number '.$i).','.
-					zbx_dbstr('KEY HP number '.$i).', 0, 4, \'\')'
+					zbx_dbstr($discovered_hostids[$i]).','.zbx_dbstr('KEY host prototype number '.$i).','.
+					zbx_dbstr('KEY host prototype number '.$i).', 0, 4, \'\')'
 			);
 
 			DBexecute('INSERT INTO host_discovery (hostid, parent_hostid) VALUES ('.zbx_dbstr($discovered_hostids[$i]).
 					', '.zbx_dbstr($host_prototypeid).')'
 			);
 
-			$group_prototypes[$i] = CDBHelper::getValue('SELECT group_prototypeid FROM'.' group_prototype WHERE hostid='.
+			$group_prototypeids[$i] = CDBHelper::getValue('SELECT group_prototypeid FROM'.' group_prototype WHERE hostid='.
 					zbx_dbstr($host_prototypeid)
 			);
+
+			$i++;
 		}
 
 		// Create discovered host groups.
 		$hostgroup_names = [];
-		for ($k = 0; $k <= count($group_patterns) - 1; $k++) {
-			$hostgroup_names[$k] = ['name' => $group_patterns[$k].' KEY'];
+		foreach ($group_names as $k => $group_name) {
+			$hostgroup_names[$k] = ['name' => $group_name.' KEY'];
 		}
 
 		$discovered_hostgroups = CDataHelper::call('hostgroup.create', $hostgroup_names);
 
 		// Mark the created groups as discovered.
-		foreach ($discovered_hostgroups['groupids'] as $discovered_hostgroup) {
-			DBexecute('UPDATE hstgrp SET flags=4 WHERE groupid='.zbx_dbstr($discovered_hostgroup));
-		}
+		DBexecute('UPDATE hstgrp SET flags=4 WHERE groupid IN ('.implode(', ', $discovered_hostgroups['groupids']).')');
+		$discovered_hostgroupids = CDataHelper::getIds('name');
 
 		// Link the corresponding host groups with their hostgroup prototypes and their discovered hosts.
-		foreach ($group_prototypes as $i => $group_prototypeid) {
-			$index = self::getHostgroupIndex($i);
+		foreach ($group_prototypeids as $i => $group_prototypeid) {
+			$discovered_hostgroup = array_values($lld_discovered_groups)[$i];
 
 			DBexecute('INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name, lastcheck, ts_delete)'.
-					' VALUES ('.zbx_dbstr($group_prototypeid + 1000).', '.zbx_dbstr($discovered_hostgroups['groupids'][$index]).', '.
-					$group_prototypeid.', '.zbx_dbstr($group_patterns[$index].' {#KEY}').', '.zbx_dbstr(time() - $i).', 0)'
+					' VALUES ('.zbx_dbstr($group_prototypeid + 1000).', '.zbx_dbstr($discovered_hostgroupids[$discovered_hostgroup.' KEY']).
+					', '.$group_prototypeid.', '.zbx_dbstr($discovered_hostgroup.' {#KEY}').', '.zbx_dbstr(time() - $i).', 0)'
 			);
 
 			DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid)'.
 					' VALUES ('.zbx_dbstr($discovered_hostids[$i].$i).', '.zbx_dbstr($discovered_hostids[$i]).', '.
-					zbx_dbstr($discovered_hostgroups['groupids'][$index]).')'
+					zbx_dbstr($discovered_hostgroupids[$discovered_hostgroup.' KEY']).')'
 			);
 		}
 
 		return [
 			'templategroups' => $template_groupids,
 			'hostgroups' => $host_groupids,
-			'LLD_HP_ids' => $return_ids
+			'lld_host_prototype_ids' => $return_ids
 		];
-	}
-
-	/**
-	 * Get the index of the discovered host group based on the LLD or group prototype index.
-	 *
-	 * @param int $index	index of the LLD or of the group prototype
-	 *
-	 * @return int
-	 */
-	protected static function getHostgroupIndex($index) {
-		if ($index < 6) {
-			// Discovered hostgroup 'グループプロトタイプ番号 1' has 6 LLD group prototypes with indexes from 0 to 5 in LLD list.
-			return 0;
-		}
-		elseif ($index <= 8) {
-			// Discovered hostgroup 'Trešais grupu prototips' corresponds to indexes from 6 to 8 in LLD list.
-			return 1;
-		}
-		elseif ($index <= 13) {
-			// Discovered hostgroup '5 prototype group' corresponds to indexes from 9 to 13 in LLD list.
-			return 2;
-		}
-		elseif ($index <= 15) {
-			// Discovered hostgroup 'Two prototype group' corresponds to indexes 14 and 15 in LLD list.
-			return 3;
-		}
-		else {
-			// Discovered hostgroup 'Single prototype group' corresponds to the last index in LLD list.
-			return 4;
-		}
 	}
 }
