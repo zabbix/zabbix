@@ -216,7 +216,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 				'Hostname' => self::HOSTNAME,
 				'AllowKey' => 'system.run[*]'
 			],
-			self::COMPONENT_AGENT_OLD => [
+			self::COMPONENT_AGENT_3_0 => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 20,
 				'Timeout' => 10,
@@ -251,13 +251,13 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	 * Test 'Item test' on agent, agent2, agent 3.0
 	 *
 	 * @backup history_text
-	 * @required-components server, agent, agent2, agent_old
+	 * @required-components server, agent, agent2, agent_3.0
 	 */
 	public function testAgentJsonProtocol_testItem() {
 		self::$sid = CAPIHelper::getSessionId();
 		$this->checkItemTest(self::COMPONENT_AGENT, 4);
 		$this->checkItemTest(self::COMPONENT_AGENT2, 4);
-		$this->checkItemTest(self::COMPONENT_AGENT_OLD, 2);
+		$this->checkItemTest(self::COMPONENT_AGENT_3_0, 2);
 
 		return true;
 	}
@@ -305,12 +305,12 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	/**
 	 * Test execution of script on agent 3.0
 	 *
-	 * @required-components server, agent_old
+	 * @required-components server, agent_3.0
 	 * @backup alerts, history_uint, interface
 	 */
 	public function testAgentJsonProtocol_testActionScriptOnAgentOld() {
 		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->setInterfacePort($this->getConfigurationValue(self::COMPONENT_AGENT_OLD, 'ListenPort'));
+		$this->setInterfacePort($this->getConfigurationValue(self::COMPONENT_AGENT_3_0, 'ListenPort'));
 		$this->startComponent(self::COMPONENT_SERVER);
 
 		$this->checkActionScriptOnAgent();
@@ -363,10 +363,10 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	 * Test passive check on agent 3.0
 	 *
 	 * @backup interface
-	 * @required-components server, agent_old
+	 * @required-components server, agent_3.0
 	 */
 	public function testAgentJsonProtocol_passiveCheckOld() {
-		$this->setInterfacePort($this->getConfigurationValue(self::COMPONENT_AGENT_OLD, 'ListenPort'));
+		$this->setInterfacePort($this->getConfigurationValue(self::COMPONENT_AGENT_3_0, 'ListenPort'));
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->checkPassiveCheck();
 
@@ -465,10 +465,10 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	 * Test discovery check on agent 3.0
 	 *
 	 * @backup drules,dchecks,dhosts,dservices,hosts
-	 * @required-components server, agent_old
+	 * @required-components server, agent_3.0
 	 */
 	public function testAgentJsonProtocol_discoveryAgentOld() {
-		$this->checkDiscovery(self::COMPONENT_AGENT_OLD);
+		$this->checkDiscovery(self::COMPONENT_AGENT_3_0);
 
 		return true;
 	}
@@ -488,12 +488,12 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	/**
 	 * Test Zabbix Get functionality
 	 *
-	 * @required-components agent, agent_old, agent2
+	 * @required-components agent, agent_3.0, agent2
 	 */
 	public function testAgentJsonProtocol_zabbixGet() {
 		$ports = [
 			$this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort'),
-			$this->getConfigurationValue(self::COMPONENT_AGENT_OLD, 'ListenPort'),
+			$this->getConfigurationValue(self::COMPONENT_AGENT_3_0, 'ListenPort'),
 			$this->getConfigurationValue(self::COMPONENT_AGENT2, 'ListenPort')
 		];
 
