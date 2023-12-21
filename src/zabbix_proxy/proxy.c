@@ -286,8 +286,8 @@ static char	*config_hostname_item	= NULL;
 
 char	*zbx_config_snmptrap_file	= NULL;
 
-char	*CONFIG_JAVA_GATEWAY		= NULL;
-int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
+char	*config_java_gateway		= NULL;
+int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
@@ -618,7 +618,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) &&
+	if ((NULL == config_java_gateway || '\0' == *config_java_gateway) &&
 			0 < CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
@@ -855,9 +855,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartJavaPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"JavaGateway",			&CONFIG_JAVA_GATEWAY,			TYPE_STRING,
+		{"JavaGateway",			&config_java_gateway,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"JavaGatewayPort",		&CONFIG_JAVA_GATEWAY_PORT,		TYPE_INT,
+		{"JavaGatewayPort",		&config_java_gateway_port,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"SNMPTrapperFile",		&zbx_config_snmptrap_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1404,7 +1404,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								ZBX_NO_POLLER, config_startup_time,
 								config_unavailable_delay, config_unreachable_period,
 								config_unreachable_delay,
-								config_max_concurrent_checks_per_poller};
+								config_max_concurrent_checks_per_poller, get_config_forks};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1418,7 +1418,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_zbx_program_type, zbx_progname,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname,
-								get_config_forks};
+								get_config_forks, config_java_gateway,
+								config_java_gateway_port};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
