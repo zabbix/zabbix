@@ -41,8 +41,6 @@ zbx_vmcheck_t;
 #	define VMCHECK_FUNC(func)	NULL
 #endif
 
-//extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 static zbx_vmcheck_t	vmchecks[] =
 {
 	{"alarms.get", VMCHECK_FUNC(check_vcenter_alarms_get)},
@@ -172,13 +170,13 @@ static zbx_vmcheck_t	vmchecks[] =
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieves a handler of the item key                               *
+ * Purpose: retrieves handler of item key                                     *
  *                                                                            *
- * Parameters: key    - [IN] an item key (without parameters)                 *
- *             vmfunc - [OUT] a handler of the item key; can be NULL if       *
+ * Parameters: key    - [IN] item key (without parameters)                    *
+ *             vmfunc - [OUT] handler of the item key; can be NULL if         *
  *                            libxml2 or libcurl is not compiled in           *
  *                                                                            *
- * Return value: SUCCEED if key is a valid VMware key, FAIL - otherwise       *
+ * Return value: SUCCEED if key is valid VMware key, FAIL - otherwise         *
  *                                                                            *
  ******************************************************************************/
 static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)

@@ -63,25 +63,24 @@ static int	compare_interfaces(const void *p1, const void *p2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get data of all network interfaces for a host from configuration  *
- *          cache and pack into JSON for LLD                                  *
+ * Purpose: Gets data of all network interfaces for a host from configuration *
+ *          cache and packs it into JSON for LLD.                             *
  *                                                                            *
- * Parameter: hostid - [IN] the host identifier                               *
+ * Parameter: hostid - [IN]                                                   *
  *            j      - [OUT] JSON with interface data                         *
  *            error  - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - interface data in JSON                             *
  *               FAIL    - host not found, 'error' message allocated          *
  *                                                                            *
- * Comments: if host is found but has no interfaces (should not happen) an    *
- *           empty JSON {"data":[]} is returned                               *
+ * Comments: If host is found but has no interfaces (should not happen) an    *
+ *           empty JSON {"data":[]} is returned.                              *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j, char **error)
 {
 	zbx_dc_interface2_t	*interfaces = NULL;
 	int			n = 0;			/* number of interfaces */
-	int			i;
 
 	/* get interface data from configuration cache */
 
@@ -99,14 +98,14 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 
 	/* repair 'addr' pointers broken by sorting */
 
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
 		interfaces[i].addr = (1 == interfaces[i].useip ? interfaces[i].ip_orig : interfaces[i].dns_orig);
 
 	/* pack results into JSON */
 
 	zbx_json_initarray(j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
 	{
 		const char	*p;
 		char		buf[16];
@@ -239,10 +238,10 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: retrieve data from Zabbix server (internally supported items)        *
+ * Purpose: retrieves data from Zabbix server (internally supported items)       *
  *                                                                               *
  * Parameters: item                     - [IN] item we are interested in         *
- *             result                   - [OUT] value of the requested item      *
+ *             result                   - [OUT] value of requested item          *
  *             config_comms             - [IN] Zabbix server/proxy configuration *
  *                                             for communication                 *
  *             config_startup_time      - [IN] program startup time              *

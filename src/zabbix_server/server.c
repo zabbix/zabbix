@@ -310,7 +310,7 @@ static int	config_unreachable_period		= 45;
 static int	config_unreachable_delay		= 15;
 static int	config_max_concurrent_checks_per_poller	= 1000;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-char	*CONFIG_EXTERNALSCRIPTS		= NULL;
+char	*config_externalscripts		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
@@ -319,8 +319,6 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
 char	*zbx_config_snmptrap_file	= NULL;
 
-/* char	*CONFIG_JAVA_GATEWAY		= NULL; */
-/* int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT; */
 char	*config_java_gateway		= NULL;
 int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
 
@@ -630,8 +628,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == zbx_config_fping6_location)
 		zbx_config_fping6_location = zbx_strdup(zbx_config_fping6_location, "/usr/sbin/fping6");
 #endif
-	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
+	if (NULL == config_externalscripts)
+		config_externalscripts = zbx_strdup(config_externalscripts, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 #ifdef HAVE_LIBCURL
 	if (NULL == config_ssl_cert_location)
 		config_ssl_cert_location = zbx_strdup(config_ssl_cert_location, DEFAULT_SSL_CERT_LOCATION);
@@ -904,7 +902,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1024},
 		{"AlertScriptsPath",		&zbx_config_alert_scripts_path,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		TYPE_STRING,
+		{"ExternalScripts",		&config_externalscripts,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBHost",			&(zbx_config_dbhigh->config_dbhost),	TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1445,7 +1443,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, get_zbx_progname,
 							ZBX_NO_POLLER, config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
-							config_max_concurrent_checks_per_poller, get_config_forks};
+							config_max_concurrent_checks_per_poller, get_config_forks,
+							config_java_gateway, config_java_gateway_port, config_externalscripts};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency, get_config_forks,

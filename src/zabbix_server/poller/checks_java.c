@@ -147,7 +147,6 @@ void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RE
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	//	if (NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY)
 	if (NULL == config_java_gateway || '\0' == *config_java_gateway)
 	{
 		err = GATEWAY_ERROR;

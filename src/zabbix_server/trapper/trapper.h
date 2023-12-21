@@ -44,6 +44,7 @@ typedef struct
 	const char			*config_stats_allowed_ip;
 	const char			*config_java_gateway;
 	int				config_java_gateway_port;
+	const char			*config_externalscripts;
 }
 zbx_thread_trapper_args;
 

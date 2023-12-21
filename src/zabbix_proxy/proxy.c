@@ -272,7 +272,7 @@ static int	config_max_concurrent_checks_per_poller	= 1000;
 
 static int	config_log_level		= LOG_LEVEL_WARNING;
 
-char	*CONFIG_EXTERNALSCRIPTS		= NULL;
+char	*config_externalscripts	= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
@@ -540,8 +540,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == zbx_config_fping6_location)
 		zbx_config_fping6_location = zbx_strdup(zbx_config_fping6_location, "/usr/sbin/fping6");
 #endif
-	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
+	if (NULL == config_externalscripts)
+		config_externalscripts = zbx_strdup(config_externalscripts, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 
 	if (NULL == config_load_module_path)
 		config_load_module_path = zbx_strdup(config_load_module_path, DEFAULT_LOAD_MODULE_PATH);
@@ -915,7 +915,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
-		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		TYPE_STRING,
+		{"ExternalScripts",		&config_externalscripts,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBHost",			&(zbx_config_dbhigh->config_dbhost),	TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1404,7 +1404,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								ZBX_NO_POLLER, config_startup_time,
 								config_unavailable_delay, config_unreachable_period,
 								config_unreachable_delay,
-								config_max_concurrent_checks_per_poller, get_config_forks};
+								config_max_concurrent_checks_per_poller,
+								get_config_forks, config_java_gateway,
+								config_java_gateway_port, config_externalscripts};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1419,7 +1421,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname,
 								get_config_forks, config_java_gateway,
-								config_java_gateway_port};
+								config_java_gateway_port, config_externalscripts};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
@@ -1429,7 +1431,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 								zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency,
-								get_config_forks, config_stats_allowed_ip};
+								get_config_forks, config_stats_allowed_ip,
+								config_externalscripts};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
