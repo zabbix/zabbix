@@ -308,7 +308,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	 * @required-components server, agent_3.0
 	 * @backup alerts, history_uint, interface
 	 */
-	public function testAgentJsonProtocol_testActionScriptOnAgentOld() {
+	public function testAgentJsonProtocol_testActionScriptOnAgent3_0() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->setInterfacePort($this->getConfigurationValue(self::COMPONENT_AGENT_3_0, 'ListenPort'));
 		$this->startComponent(self::COMPONENT_SERVER);
@@ -467,7 +467,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	 * @backup drules,dchecks,dhosts,dservices,hosts
 	 * @required-components server, agent_3.0
 	 */
-	public function testAgentJsonProtocol_discoveryAgentOld() {
+	public function testAgentJsonProtocol_discoveryAgent3_0() {
 		$this->checkDiscovery(self::COMPONENT_AGENT_3_0);
 
 		return true;
