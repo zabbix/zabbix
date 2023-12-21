@@ -516,7 +516,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 
 			dcheck_port_ranges_get(dcheck->ports, &port_ranges);
 
-			if (0 == task->addr.range->state.port)
+			if (ZBX_PORTRANGE_INIT_PORT == task->addr.range->state.port)
 			{
 				task->addr.range->state.index_port = 0;
 				task->addr.range->state.port = port_ranges.values->from;
@@ -573,7 +573,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 					&task->addr.range->state.index_port, &task->addr.range->state.port) &&
 					0 != task->addr.range->state.count && 0 == *stop);
 
-			task->addr.range->state.port = 0;
+			task->addr.range->state.port = ZBX_PORTRANGE_INIT_PORT;
 			zbx_vector_portrange_clear(&port_ranges);
 		}
 

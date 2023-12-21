@@ -39,6 +39,8 @@ int	zbx_parse_serveractive_element(const char *str, char **host, unsigned short 
 #define ZBX_IPRANGE_GROUPS_V4	4
 #define ZBX_IPRANGE_GROUPS_V6	8
 
+#define ZBX_PORTRANGE_INIT_PORT	65535 + 1
+
 typedef struct
 {
 	int	from;

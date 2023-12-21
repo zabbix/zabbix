@@ -129,7 +129,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	zbx_discoverer_task_t	task_local, *task;
 	zbx_vector_portrange_t	port_ranges;
 	zbx_task_range_t	range_cmp = {.id = 0 };
-	int			port = 0;
+	int			port = ZBX_PORTRANGE_INIT_PORT;
 	unsigned int		checks_count = 0;
 
 	if (SVC_ICMPPING != dcheck->type)
@@ -185,7 +185,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck, char *ip,
 		unsigned char *need_resolve, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
 {
-	int			port = 0;
+	int			port = ZBX_PORTRANGE_INIT_PORT;
 	zbx_uint64_t		checks_count = 0;
 	zbx_vector_portrange_t	port_ranges;
 
@@ -305,9 +305,7 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 		while (SUCCEED == zbx_iprange_uniq_iter(task->addr.range->ipranges->values,
 				task->addr.range->ipranges->values_num, &task->addr.range->state.index_ip,
 				task->addr.range->state.ipaddress))
-
 		{
-
 			for (; task->addr.range->state.dcheck_index < task->dchecks.values_num;
 					task->addr.range->state.dcheck_index++)
 			{
@@ -328,7 +326,7 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 					total++;
 				}
 
-				task->addr.range->state.port = 0;
+				task->addr.range->state.port = ZBX_PORTRANGE_INIT_PORT;
 				zbx_vector_portrange_clear(&port_ranges);
 			}
 
@@ -462,4 +460,3 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() tasks:%d check_counts(ip):%d", __func__, tasks->num_data,
 			check_counts->num_data);
 }
-

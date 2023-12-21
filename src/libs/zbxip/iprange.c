@@ -674,7 +674,7 @@ int	zbx_portrange_uniq_iter(const zbx_range_t *ranges, const int num, int *idx, 
 	if (0 == num)
 		return FAIL;
 
-	if (0 == *port)
+	if (ZBX_PORTRANGE_INIT_PORT == *port)
 	{
 		*idx = 0;
 		*port = ranges->from;
