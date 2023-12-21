@@ -589,14 +589,14 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 #undef DISCOVERER_BATCH_RESULTS_NUM
 }
 
-static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_druleids,
+static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts)
 {
 	int				rule_count = 0, delay, i, k, tmt_simple = 0, tmt_agent = 0, tmt_snmp = 0;
 	char				*delay_str = NULL;
 	zbx_uint64_t			queue_checks_count = 0;
 	zbx_dc_um_handle_t		*um_handle;
-	time_t				now;
+	time_t				now, nextcheck_loc;
 
 	zbx_vector_dc_drule_ptr_t	drules;
 
@@ -605,7 +605,8 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 	now = time(NULL);
 
 	zbx_vector_dc_drule_ptr_create(&drules);
-	zbx_dc_drules_get(now, &drules, nextcheck);
+	zbx_dc_drules_get(now, &drules, &nextcheck_loc);
+	*nextcheck = 0 == nextcheck_loc ? FAIL : (int)nextcheck_loc;
 
 	um_handle = zbx_dc_open_user_macros();
 
@@ -635,8 +636,6 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 			delay = ZBX_DEFAULT_INTERVAL;
 			goto next;
 		}
-
-		drule->delay = delay;
 
 		cmp.druleid = drule->druleid;
 		discoverer_queue_lock(&dmanager.queue);
@@ -1533,7 +1532,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
 	double				sec;
-	time_t				nextcheck = 0;
+	int				nextcheck = 0;
 	zbx_ipc_service_t		ipc_service;
 	zbx_ipc_client_t		*client;
 	zbx_ipc_message_t		*message;
@@ -1698,9 +1697,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		sleeptime.sec = 0 != more_results ? 0 : zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		if (0 == processing_rules_num && 0 == sleeptime.sec)
-			sleeptime.sec = DISCOVERER_DELAY;
-
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		(void)zbx_ipc_service_recv(&ipc_service, &sleeptime, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -1751,4 +1747,3 @@ out:
 
 	exit(EXIT_SUCCESS);
 }
-
