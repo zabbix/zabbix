@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-20T13:57:58Z'
+  date: '2023-12-21T13:50:53Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -158,7 +158,7 @@ zabbix_export:
           host_prototypes:
             - uuid: 1a7ec22ad5ad41e0bcb04c01c2c45e4e
               host: '{#CLUSTER.ID}'
-              name: 'YugabyteDB Cluster ''{#CLUSTER.NAME}'''
+              name: 'YugabyteDB Cluster [{#CLUSTER.NAME}]'
               group_links:
                 - group:
                     name: Templates/Databases
@@ -167,8 +167,10 @@ zabbix_export:
               macros:
                 - macro: '{$CLUSTER.ID}'
                   value: '{#CLUSTER.ID}'
+                  description: 'ID of cluster.'
                 - macro: '{$CLUSTER.NAME}'
                   value: '{#CLUSTER.NAME}'
+                  description: 'Name of cluster.'
               tags:
                 - tag: cluster
                   value: '{#CLUSTER.NAME}'
@@ -205,13 +207,13 @@ zabbix_export:
       macros:
         - macro: '{$ACCESS.TOKEN}'
           value: '<Put your Access token here>'
-          description: 'Access token for YugabyteDB API'
+          description: 'Access token for YugabyteDB API.'
         - macro: '{$ACCOUNT.ID}'
           value: '<Put your Account ID here>'
-          description: 'YugabyteDB account ID'
+          description: 'YugabyteDB account ID.'
         - macro: '{$PROJECT.ID}'
           value: '<Put your Project ID here>'
-          description: 'YugabyteDB project ID'
+          description: 'YugabyteDB project ID.'
     - uuid: f5fff9a83f774f4688692ad58aa35d45
       template: 'YugabyteDB Cluster by HTTP'
       name: 'YugabyteDB Cluster by HTTP'
@@ -299,22 +301,22 @@ zabbix_export:
               name: 'YugabyteDB Cluster: Average number of connections is critically high'
               opdata: 'Current connections utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Cluster ''{#CLUSTER.NAME}'' uses more then {$CONNECTION.UTILIZATION.CRIT}% of connection limit.'
+              description: 'Cluster [{#CLUSTER.NAME}] uses more then {$CONNECTION.UTILIZATION.CRIT}% of connection limit.'
               tags:
                 - tag: scope
-                  value: connection
+                  value: performance
             - uuid: 5caf42a5309a4f0f834b6058f4741a44
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$CONNECTION.UTILIZATION.WARN}'
               name: 'YugabyteDB Cluster: Average number of connections is too high'
               opdata: 'Current connections utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Cluster ''{#CLUSTER.NAME}'' uses more then {$CONNECTION.UTILIZATION.WARN}% of connection limit.'
+              description: 'Cluster [{#CLUSTER.NAME}] uses more then {$CONNECTION.UTILIZATION.WARN}% of connection limit.'
               dependencies:
                 - name: 'YugabyteDB Cluster: Average number of connections is critically high'
                   expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$CONNECTION.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
-                  value: connection
+                  value: performance
         - uuid: 8065a31bd61b494a9edf94692c4846ff
           name: 'YugabyteDB Cluster: CPU usage'
           type: DEPENDENT
@@ -391,22 +393,22 @@ zabbix_export:
               name: 'YugabyteDB Cluster: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Node ''{#CLUSTER.NAME}'' uses more then {$DISK.UTILIZATION.CRIT}% of disk space.'
+              description: 'Node [{#CLUSTER.NAME}] uses more then {$DISK.UTILIZATION.CRIT}% of disk space.'
               tags:
                 - tag: scope
-                  value: storage
+                  value: capacity
             - uuid: 21623809368a43b0bdfb127f2fdea22c
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$DISK.UTILIZATION.WARN}'
               name: 'YugabyteDB Cluster: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Node ''{#CLUSTER.NAME}'' uses more then {$DISK.UTILIZATION.WARN}% of disk space.'
+              description: 'Node [{#CLUSTER.NAME}] uses more then {$DISK.UTILIZATION.WARN}% of disk space.'
               dependencies:
                 - name: 'YugabyteDB Cluster: Storage space is critically low'
                   expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$DISK.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
-                  value: storage
+                  value: capacity
         - uuid: 2e59d947823e4e6b8a3eb9cd28cb8602
           name: 'YugabyteDB Cluster: Disk read, Bps'
           type: DEPENDENT
@@ -627,10 +629,10 @@ zabbix_export:
               name: 'YugabyteDB Cluster: Cluster is not healthy'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'YugabyteDB Cluster is not healthy'
+              description: 'YugabyteDB Cluster is not healthy.'
               tags:
                 - tag: scope
-                  value: health
+                  value: availability
         - uuid: 18e6de024a7a4ae48901f455dbd0a373
           name: 'YugabyteDB Cluster: Usage memory, percent'
           type: CALCULATED
@@ -654,7 +656,7 @@ zabbix_export:
               description: 'Cluster uses more then {$MEMORY.CLUSTER.UTILIZATION.CRIT}% of memory.'
               tags:
                 - tag: scope
-                  value: memory
+                  value: performance
             - uuid: 5614204dbeca4b799989a13717824f07
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$MEMORY.CLUSTER.UTILIZATION.WARN}'
               name: 'YugabyteDB Cluster: Memory utilization is too high'
@@ -666,7 +668,7 @@ zabbix_export:
                   expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$MEMORY.CLUSTER.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
-                  value: memory
+                  value: performance
         - uuid: 955291127a4e483693c1db6690a1beab
           name: 'YugabyteDB Cluster: Total memory'
           type: DEPENDENT
@@ -840,7 +842,7 @@ zabbix_export:
             }
             
             return JSON.stringify({'metrics': YugabyteDB.metrics, 'error': YugabyteDB.error_msg});
-          description: 'Getting metrics for cluster'
+          description: 'Getting metrics for cluster.'
           timeout: 5s
           parameters:
             - name: account_id
@@ -966,7 +968,7 @@ zabbix_export:
           key: yugabytedb.cluster.node.number
           delay: '0'
           history: 7d
-          description: 'How many nodes are in the cluster'
+          description: 'How many nodes are in the cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1129,7 +1131,7 @@ zabbix_export:
             }
             
             return JSON.stringify({'metrics': YugabyteDB.metrics, 'error': YugabyteDB.error_msg});
-          description: 'Getting sql statistic for cluster'
+          description: 'Getting sql statistic for cluster.'
           timeout: 5s
           parameters:
             - name: account_id
@@ -1218,7 +1220,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The current version of YugabyteDB installed on the cluster'
+          description: 'The current version of YugabyteDB installed on the cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1379,7 +1381,7 @@ zabbix_export:
           key: yugabytedb.cluster.type
           delay: '0'
           history: 7d
-          description: 'The kind of cluster deployment: SYNCHRONOUS or GEO_PARTITIONED'
+          description: 'The kind of cluster deployment: SYNCHRONOUS or GEO_PARTITIONED.'
           valuemap:
             name: 'YugabyteDB Cluster type'
           preprocessing:
@@ -1455,7 +1457,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The current version of YB controller installed on the cluster'
+          description: 'The current version of YB controller installed on the cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2270,38 +2272,59 @@ zabbix_export:
           delay: '0'
           description: 'Discovery of the available keyspaces.'
           item_prototypes:
-            - uuid: 18ca22e5976741c595854de8fbf12d1e
-              name: 'YugabyteDB Keyspace ''{#KEYSPACE.NAME}'': SST size'
+            - uuid: c1e48062d9ee4bbebd170370216d477a
+              name: 'YugabyteDB Keyspace [{#KEYSPACE.NAME}]: Get keyspace info'
               type: DEPENDENT
-              key: 'yugabytedb.keyspace.sst.size.[{#KEYSPACE.NAME}]'
+              key: 'yugabytedb.keyspace.get[{#KEYSPACE.NAME}]'
               delay: '0'
-              history: 7d
-              units: B
-              description: 'The size of the table''s SST'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get raw data about the keyspace [{#KEYSPACE.NAME}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.keyspaces.[?(@.keyspace_name==''{#KEYSPACE.NAME}'')].size_bytes.first()'
+                    - '$.keyspaces.[?(@.keyspace_name==''{#KEYSPACE.NAME}'')].first()'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: yugabytedb.keyspace.get
+              tags:
+                - tag: component
+                  value: raw
+                - tag: keyspace
+                  value: '{#KEYSPACE.NAME}'
+            - uuid: 18ca22e5976741c595854de8fbf12d1e
+              name: 'YugabyteDB Keyspace [{#KEYSPACE.NAME}]: SST size'
+              type: DEPENDENT
+              key: 'yugabytedb.keyspace.sst.size[{#KEYSPACE.NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The size of the table''s SST.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.size_bytes
+              master_item:
+                key: 'yugabytedb.keyspace.get[{#KEYSPACE.NAME}]'
               tags:
                 - tag: component
                   value: keyspace
                 - tag: keyspace
                   value: '{#KEYSPACE.NAME}'
             - uuid: 8dbbdc125336426d9c8fcb7909a7ab89
-              name: 'YugabyteDB Keyspace ''{#KEYSPACE.NAME}'': Type'
+              name: 'YugabyteDB Keyspace [{#KEYSPACE.NAME}]: Type'
               type: DEPENDENT
-              key: 'yugabytedb.keyspace.type.[{#KEYSPACE.NAME}]'
+              key: 'yugabytedb.keyspace.type[{#KEYSPACE.NAME}]'
               delay: '0'
               history: 7d
-              description: 'The type of keyspace: YSQL or YCQL'
+              description: 'The type of keyspace: YSQL or YCQL.'
               valuemap:
                 name: 'YugabyteDB Keyspace type'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.keyspaces.[?(@.keyspace_name==''{#KEYSPACE.NAME}'')].type.first()'
+                    - $.type
                 - type: STR_REPLACE
                   parameters:
                     - YSQL
@@ -2314,26 +2337,26 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: yugabytedb.keyspace.get
+                key: 'yugabytedb.keyspace.get[{#KEYSPACE.NAME}]'
               tags:
                 - tag: component
                   value: keyspace
                 - tag: keyspace
                   value: '{#KEYSPACE.NAME}'
             - uuid: 9c23b2c7fe4b4aad8ab32ead6af179e7
-              name: 'YugabyteDB Keyspace ''{#KEYSPACE.NAME}'': Wal size'
+              name: 'YugabyteDB Keyspace [{#KEYSPACE.NAME}]: Wal size'
               type: DEPENDENT
-              key: 'yugabytedb.keyspace.wal.size.[{#KEYSPACE.NAME}]'
+              key: 'yugabytedb.keyspace.wal.size[{#KEYSPACE.NAME}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'The size of the table''s WAL'
+              description: 'The size of the table''s WAL.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.keyspaces.[?(@.keyspace_name==''{#KEYSPACE.NAME}'')].wal_size_bytes.first()'
+                    - $.wal_size_bytes
               master_item:
-                key: yugabytedb.keyspace.get
+                key: 'yugabytedb.keyspace.get[{#KEYSPACE.NAME}]'
               tags:
                 - tag: component
                   value: keyspace
@@ -2341,19 +2364,19 @@ zabbix_export:
                   value: '{#KEYSPACE.NAME}'
           graph_prototypes:
             - uuid: 193792ab844947e88ca58c20292d6666
-              name: 'YugabyteDB Keyspace ''{#KEYSPACE.NAME}'': Keyspace size'
+              name: 'YugabyteDB Keyspace [{#KEYSPACE.NAME}]: Keyspace size'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.keyspace.wal.size.[{#KEYSPACE.NAME}]'
+                    key: 'yugabytedb.keyspace.wal.size[{#KEYSPACE.NAME}]'
                 - sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.keyspace.sst.size.[{#KEYSPACE.NAME}]'
+                    key: 'yugabytedb.keyspace.sst.size[{#KEYSPACE.NAME}]'
           master_item:
             key: yugabytedb.keyspace.get
           lld_macro_paths:
@@ -2381,16 +2404,16 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.node.discovery
           delay: '0'
-          description: 'Discovery of the nodes for all clusters'
+          description: 'Discovery of the nodes for all clusters.'
           item_prototypes:
             - uuid: a7b100dd55e6406cb481762f2fb7c421
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Total CPU cores'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Total CPU cores'
               type: DEPENDENT
-              key: 'yugabytedb.node.cpu.num.cores.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.cpu.num.cores[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               units: Cores
-              description: 'The number of cores for the node ''{#NODE.NAME}'''
+              description: 'The number of cores for the node [{#NODE.NAME}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2406,13 +2429,13 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 9fa8a6a8476e485c8eebeeaa5763c3c5
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Limit disk IOPS'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Limit disk IOPS'
               type: DEPENDENT
-              key: 'yugabytedb.node.disk.iops.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.disk.iops[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               units: '!IOPS'
-              description: 'The IOPS to provision for the node ''{#NODE.NAME}'' for each disk'
+              description: 'The IOPS to provision for the node [{#NODE.NAME}] for each disk.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2428,13 +2451,13 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 0a540fa45f33410fb93fd750717ae431
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Total disk size'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Total disk size'
               type: DEPENDENT
-              key: 'yugabytedb.node.disk.size.total.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.disk.size.total[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               units: '!GB'
-              description: 'The size of disk (GB) for the node ''{#NODE.NAME}'''
+              description: 'The size of disk (GB) for the node [{#NODE.NAME}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2449,14 +2472,35 @@ zabbix_export:
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
-            - uuid: cec0b919572a4dc8bec57f7da073b18f
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Node is master'
+            - uuid: f2c813fba0394826abcb35a50b773a41
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Get node info'
               type: DEPENDENT
-              key: 'yugabytedb.node.master.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.get[{#NODE.NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get raw data about the node [{#NODE.NAME}].'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: yugabytedb.node.get
+              tags:
+                - tag: component
+                  value: raw
+                - tag: node
+                  value: '{#NODE.NAME}'
+            - uuid: cec0b919572a4dc8bec57f7da073b18f
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Node is master'
+              type: DEPENDENT
+              key: 'yugabytedb.node.master[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               description: |
-                The current role of the node '{#NODE.NAME}':
+                The current role of the node [{#NODE.NAME}]:
                 0 = False
                 1 = True
               valuemap:
@@ -2464,7 +2508,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].is_master.first()'
+                    - $.is_master
                 - type: STR_REPLACE
                   parameters:
                     - 'true'
@@ -2477,20 +2521,20 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: a75c7247ac654dc6b62ea88c9f609804
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Total memory, bytes'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Total memory, bytes'
               type: DEPENDENT
-              key: 'yugabytedb.node.memory.total.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.memory.total[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'The amount of RAM for the node ''{#NODE.NAME}'''
+              description: 'The amount of RAM for the node [{#NODE.NAME}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2509,13 +2553,13 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 27e087e59b0f425584f57fda13398ea0
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Disk IOPS utilization, percent'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Disk IOPS utilization, percent'
               type: CALCULATED
-              key: 'yugabytedb.node.ops.pused.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.ops.pused[{#NODE.NAME}]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: '((last(//yugabytedb.node.read.ops.per.sec.[{#NODE.NAME}]) + last(//yugabytedb.node.write.ops.per.sec.[{#NODE.NAME}]))/last(//yugabytedb.node.disk.iops.[{#NODE.NAME}]))*100'
+              params: '((last(//yugabytedb.node.read.ops.per.sec[{#NODE.NAME}]) + last(//yugabytedb.node.write.ops.per.sec[{#NODE.NAME}]))/last(//yugabytedb.node.disk.iops[{#NODE.NAME}]))*100'
               description: 'Shows the utilization of provisioned IOPS.'
               tags:
                 - tag: component
@@ -2524,54 +2568,54 @@ zabbix_export:
                   value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 27f43e701e4e47c4aad2fa6c9a118fb1
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused.[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.CRIT}'
-                  name: 'YugabyteDB Node ''{#NODE.NAME}'': High node disk IOPS utilization'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.CRIT}'
+                  name: 'YugabyteDB Node [{#NODE.NAME}]: High node disk IOPS utilization'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'IOPS utilization on the node ''{#NODE.NAME}'' more then {$IOPS.UTILIZATION.CRIT}% of provisioned IOPS.'
+                  description: 'IOPS utilization on the node [{#NODE.NAME}] more then {$IOPS.UTILIZATION.CRIT}% of provisioned IOPS.'
                   tags:
                     - tag: scope
                       value: performance
                 - uuid: c19790737c854c8e8848781b5ccf5b1f
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused.[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.WARN}'
-                  name: 'YugabyteDB Node ''{#NODE.NAME}'': High node disk IOPS utilization'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.WARN}'
+                  name: 'YugabyteDB Node [{#NODE.NAME}]: High node disk IOPS utilization'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'IOPS utilization on the node ''{#NODE.NAME}'' more then {$IOPS.UTILIZATION.WARN}% of provisioned IOPS.'
+                  description: 'IOPS utilization on the node [{#NODE.NAME}] more then {$IOPS.UTILIZATION.WARN}% of provisioned IOPS.'
                   dependencies:
-                    - name: 'YugabyteDB Node ''{#NODE.NAME}'': High node disk IOPS utilization'
-                      expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused.[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.CRIT}'
+                    - name: 'YugabyteDB Node [{#NODE.NAME}]: High node disk IOPS utilization'
+                      expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.CRIT}'
                   tags:
                     - tag: scope
                       value: performance
             - uuid: 03a684fb8e824ae2a21af206f03c06e3
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Read OPS'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Read OPS'
               type: DEPENDENT
-              key: 'yugabytedb.node.read.ops.per.sec.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.read.ops.per.sec[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '!OPS'
-              description: 'The amount of read operations per seconds for the node ''{#NODE.NAME}'''
+              description: 'The amount of read operations per seconds for the node [{#NODE.NAME}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].metrics.read_ops_per_sec.first()'
+                    - $.metrics.read_ops_per_sec
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: fc64e30fea8349b2b4d4de3c23ea8fd7
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Node is read replica'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Node is read replica'
               type: DEPENDENT
-              key: 'yugabytedb.node.read.replica.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.read.replica[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               description: |
-                This items indicates if the node '{#NODE.NAME}' is a read replica:
+                This items indicates if the node [{#NODE.NAME}] is a read replica:
                 0 = False
                 1 = True
               valuemap:
@@ -2579,7 +2623,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].is_read_replica.first()'
+                    - $.is_read_replica
                 - type: STR_REPLACE
                   parameters:
                     - 'true'
@@ -2592,81 +2636,81 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: d77f37a386514286ac3fd4a37ad0e21e
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Region'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Region'
               type: DEPENDENT
-              key: 'yugabytedb.node.region.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.region[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The cloud information for for the node ''{#NODE.NAME}'' about the region'
+              description: 'The cloud information for for the node [{#NODE.NAME}] about the region.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].cloud_info.region.first()'
+                    - $.cloud_info.region
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 71b0a67ae775473eaaed77349b781ace
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Total SST file size'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Total SST file size'
               type: DEPENDENT
-              key: 'yugabytedb.node.sst.file.size.total.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.sst.file.size.total[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'The size of all SST files'
+              description: 'The size of all SST files.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].metrics.total_sst_file_size_bytes.first()'
+                    - $.metrics.total_sst_file_size_bytes
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: ec3598775f434cc88c0880fd2f944a14
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Uncompressed SST file size'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Uncompressed SST file size'
               type: DEPENDENT
-              key: 'yugabytedb.node.sst.file.size.uncompressed.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.sst.file.size.uncompressed[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'The size of uncompressed SST files'
+              description: 'The size of uncompressed SST files.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].metrics.uncompressed_sst_file_size_bytes.first()'
+                    - $.metrics.uncompressed_sst_file_size_bytes
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: bfc6070e65d041ca83ab1290aa0654aa
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Node status'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Node status'
               type: DEPENDENT
-              key: 'yugabytedb.node.status.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.status[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               description: |
-                The current status of the node '{#NODE.NAME}':
+                The current status of the node [{#NODE.NAME}]:
                 0 = Down
                 1 = Up
               valuemap:
@@ -2674,7 +2718,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].is_node_up.first()'
+                    - $.is_node_up
                 - type: STR_REPLACE
                   parameters:
                     - 'true'
@@ -2687,7 +2731,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
@@ -2695,21 +2739,21 @@ zabbix_export:
                   value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 3bdaff0934564a809dc565357c50486d
-                  expression: 'max(/YugabyteDB Cluster by HTTP/yugabytedb.node.status.[{#NODE.NAME}],3m) = 0'
-                  name: 'YugabyteDB Node ''{#NODE.NAME}'': Node is down'
+                  expression: 'max(/YugabyteDB Cluster by HTTP/yugabytedb.node.status[{#NODE.NAME}],3m) = 0'
+                  name: 'YugabyteDB Node [{#NODE.NAME}]: Node is down'
                   priority: AVERAGE
-                  description: 'The node ''{#NODE.NAME}'' is down.'
+                  description: 'The node [{#NODE.NAME}] is down.'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 488ef7da37704fc690109350dfb04f06
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Node is TServer'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Node is TServer'
               type: DEPENDENT
-              key: 'yugabytedb.node.tserver.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.tserver[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               description: |
-                This items indicates if the node '{#NODE.NAME}' is a TServer node:
+                This items indicates if the node [{#NODE.NAME}] is a TServer node:
                 0 = False
                 1 = True
               valuemap:
@@ -2717,7 +2761,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].is_tserver.first()'
+                    - $.is_tserver
                 - type: STR_REPLACE
                   parameters:
                     - 'true'
@@ -2730,50 +2774,50 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: f11fcb4fd9184a74bfd1081c10124735
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Write OPS'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Write OPS'
               type: DEPENDENT
-              key: 'yugabytedb.node.write.ops.per.sec.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.write.ops.per.sec[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '!OPS'
-              description: 'The amount of write operations per seconds for the node ''{#NODE.NAME}'''
+              description: 'The amount of write operations per seconds for the node [{#NODE.NAME}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].metrics.write_ops_per_sec.first()'
+                    - $.metrics.write_ops_per_sec
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
             - uuid: 899786037cb24cd3a0378592e3096131
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Zone'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Zone'
               type: DEPENDENT
-              key: 'yugabytedb.node.zone.[{#NODE.NAME}]'
+              key: 'yugabytedb.node.zone[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The cloud information for the node ''{#NODE.NAME}'' about the region'
+              description: 'The cloud information for the node [{#NODE.NAME}] about the region.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.nodes.[?(@.name==''{#NODE.NAME}'')].cloud_info.zone.first()'
+                    - $.cloud_info.zone
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: yugabytedb.node.get
+                key: 'yugabytedb.node.get[{#NODE.NAME}]'
               tags:
                 - tag: component
                   value: node
@@ -2781,37 +2825,37 @@ zabbix_export:
                   value: '{#NODE.NAME}'
           graph_prototypes:
             - uuid: d8c91639bca24d709bcdd8d788ba940c
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': Disk IOPS'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Disk IOPS'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
                   yaxisside: RIGHT
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.ops.pused.[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.ops.pused[{#NODE.NAME}]'
                 - sortorder: '1'
                   color: F63100
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.read.ops.per.sec.[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.read.ops.per.sec[{#NODE.NAME}]'
                 - sortorder: '2'
                   color: 00611C
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.write.ops.per.sec.[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.write.ops.per.sec[{#NODE.NAME}]'
             - uuid: e8020fae71e54c98bc3c5ed9b585fead
-              name: 'YugabyteDB Node ''{#NODE.NAME}'': SST size'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: SST size'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.sst.file.size.uncompressed.[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.sst.file.size.uncompressed[{#NODE.NAME}]'
                 - sortorder: '1'
                   color: F63100
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.sst.file.size.total.[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.sst.file.size.total[{#NODE.NAME}]'
           master_item:
             key: yugabytedb.node.get
           lld_macro_paths:
@@ -2842,10 +2886,10 @@ zabbix_export:
       macros:
         - macro: '{$CLUSTER.ID}'
           value: '<Put your Cluster ID here>'
-          description: 'ID of cluster'
+          description: 'ID of cluster.'
         - macro: '{$CLUSTER.NAME}'
           value: '<Put your Cluster name here>'
-          description: 'Name of cluster'
+          description: 'Name of cluster.'
         - macro: '{$CONNECTION.UTILIZATION.CRIT}'
           value: '90'
           description: 'The percentage of using connection in the cluster - for the High trigger expression.'
@@ -3372,7 +3416,7 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: decimal_size
-                      value: '45'
+                      value: '40'
                     - type: STRING
                       name: description
                       value: 'Disk size usage, percent'
@@ -3396,6 +3440,9 @@ zabbix_export:
                     - type: INTEGER
                       name: show
                       value: '4'
+                    - type: INTEGER
+                      name: value_size
+                      value: '40'
                 - type: ITEM
                   name: 'Disk size provisioned'
                   x: '12'
@@ -3409,7 +3456,7 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: decimal_size
-                      value: '45'
+                      value: '40'
                     - type: STRING
                       name: description
                       value: 'Disk size provisioned'
@@ -3436,6 +3483,9 @@ zabbix_export:
                     - type: INTEGER
                       name: units_size
                       value: '25'
+                    - type: INTEGER
+                      name: value_size
+                      value: '40'
                 - type: GRAPH_CLASSIC
                   name: 'YugabyteDB Cluster: Disk space'
                   x: '16'
@@ -3635,7 +3685,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'YugabyteDB Cluster by HTTP'
-                        name: 'YugabyteDB Node ''{#NODE.NAME}'': Disk IOPS'
+                        name: 'YugabyteDB Node [{#NODE.NAME}]: Disk IOPS'
                     - type: INTEGER
                       name: rows
                       value: '2'
@@ -3652,7 +3702,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'YugabyteDB Cluster by HTTP'
-                        name: 'YugabyteDB Node ''{#NODE.NAME}'': SST size'
+                        name: 'YugabyteDB Node [{#NODE.NAME}]: SST size'
                     - type: INTEGER
                       name: rows
                       value: '2'
@@ -3667,7 +3717,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'YugabyteDB Cluster by HTTP'
-                        name: 'YugabyteDB Keyspace ''{#KEYSPACE.NAME}'': Keyspace size'
+                        name: 'YugabyteDB Keyspace [{#KEYSPACE.NAME}]: Keyspace size'
                     - type: INTEGER
                       name: rows
                       value: '2'
