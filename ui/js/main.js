@@ -514,10 +514,14 @@ var hintBox = {
 
 		jQuery(appendTo).append(box);
 
-		const element = target instanceof jQuery ? target[0] : target;
-
 		target.observer = new MutationObserver(() => {
-			if (!isVisible(element)) {
+			const element = target instanceof jQuery ? target[0] : target;
+			const element_rect_current = element.getBoundingClientRect();
+			const is_element_position_changed = target.scrollObserver !== undefined
+				&& (element_rect_current.x !== target.scrollObserver?.x
+					|| element_rect_current.y !== target.scrollObserver?.y);
+
+			if (!isVisible(element) || is_element_position_changed) {
 				hintBox.deleteHint(target);
 			}
 		});
@@ -564,7 +568,7 @@ var hintBox = {
 		}
 	},
 
-	onScroll(target, e) {
+	onScroll: function(target, e) {
 		const element = target instanceof jQuery ? target[0] : target;
 		const element_rect_current = element.getBoundingClientRect();
 
