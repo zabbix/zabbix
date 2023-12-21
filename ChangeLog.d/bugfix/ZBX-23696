@@ -1,0 +1,1 @@
+..F....... [ZBX-23696] fixed script item parameters and HTTP agent item query fields and headers not being passed to Zabbix server when testing items (agriscenko)
