@@ -145,11 +145,11 @@
 	</target>
 
 	<target name="make-binary-agent-3.0">
-                <exec executable="git" outputproperty="git.initial_rev" failonerror="on">
+		<exec executable="git" outputproperty="git.initial_rev" failonerror="on">
 			<arg value="rev-parse"/>
 			<arg value="--verify"/>
 			<arg value="HEAD"/>
-                </exec>
+		</exec>
 		<exec executable="git" failonerror="on">
 			<arg line="checkout"/>
 			<arg line="df9ee823715d4caccf63f402a126d2f039b31057"/>
