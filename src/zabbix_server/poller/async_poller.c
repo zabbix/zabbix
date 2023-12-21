@@ -218,9 +218,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 {
 	zbx_dc_item_t			*items = NULL;
 	AGENT_RESULT			*results;
-	int				*errcodes;
+	int				*errcodes, total = 0;
 	zbx_timespec_t			timespec;
-	int				i, total = 0;
 	zbx_vector_poller_item_t	poller_items;
 
 	zbx_vector_poller_item_create(&poller_items);
@@ -259,7 +258,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 		total += num;
 
-		for (i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 				continue;
@@ -304,7 +303,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 		zbx_timespec(&timespec);
 
 		/* process item values */
-		for (i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
@@ -473,19 +472,18 @@ static void	socket_read_event_cb(evutil_socket_t fd, short what, void *arg)
 
 ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
-	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
+	zbx_thread_poller_args		*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
 	time_t				last_stat_time;
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	unsigned char			poller_type = poller_args_in->poller_type;
+	int				msgs_num, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type,
+					poller_type = poller_args_in->poller_type;
 	zbx_poller_config_t		poller_config = {.queued = 0, .processed = 0};
 	struct event			*rtc_event;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
-	int				msgs_num;
 #ifdef HAVE_LIBCURL
 	zbx_asynchttppoller_config	*asynchttppoller_config;
 #endif
@@ -524,7 +522,8 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	{
 		async_poller_dns_init(&poller_config, poller_args_in);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
+		zbx_tls_init_child(poller_args_in->config_comms->config_tls,
+				poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	}
 	else

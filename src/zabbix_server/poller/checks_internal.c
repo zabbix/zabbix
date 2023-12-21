@@ -34,8 +34,6 @@
 #include "zbx_host_constants.h"
 #include "zbxpreproc.h"
 
-extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 static int	compare_interfaces(const void *p1, const void *p2)
 {
 	const zbx_dc_interface2_t	*i1 = (const zbx_dc_interface2_t *)p1, *i2 = (const zbx_dc_interface2_t *)p2;
@@ -247,13 +245,15 @@ out:
  *             config_startup_time      - [IN] program startup time              *
  *             config_java_gateway      - [IN]                                   *
  *             config_java_gateway_port - [IN]                                   *
+ *             get_config_forks         - [IN]                                   *
  *                                                                               *
  * Return value: SUCCEED - data successfully retrieved and stored in result      *
  *               NOTSUPPORTED - requested item is not supported                  *
  *                                                                               *
  *********************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port)
+		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
+		zbx_get_config_forks_f get_config_forks)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -544,7 +544,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			goto out;
 		}
 
-		process_forks = ZBX_PROCESS_TYPE_COUNT > process_type ? CONFIG_FORKS[process_type] : 0;
+		process_forks = ZBX_PROCESS_TYPE_COUNT > process_type ? get_config_forks(process_type) : 0;
 
 		if (NULL == (tmp = get_rparam(&request, 2)))
 			tmp = "";

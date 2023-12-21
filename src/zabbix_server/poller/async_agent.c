@@ -143,8 +143,9 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					agent_context->config_timeout))
 			{
 				agent_context->item.ret = NETWORK_ERROR;
-				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed"
-						" during %s", get_agent_step_string(agent_context->step)));
+				SET_MSG_RESULT(&agent_context->item.result,
+						zbx_dsprintf(NULL, "Get value from agent failed during %s",
+						get_agent_step_string(agent_context->step)));
 				goto out;
 			}
 
