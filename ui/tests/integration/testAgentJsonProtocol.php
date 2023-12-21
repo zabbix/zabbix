@@ -365,7 +365,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	 * @backup interface
 	 * @required-components server, agent_3.0
 	 */
-	public function testAgentJsonProtocol_passiveCheckOld() {
+	public function testAgentJsonProtocol_passiveCheckAgent3_0() {
 		$this->setInterfacePort($this->getConfigurationValue(self::COMPONENT_AGENT_3_0, 'ListenPort'));
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->checkPassiveCheck();
