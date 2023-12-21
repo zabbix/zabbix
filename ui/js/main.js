@@ -516,13 +516,17 @@ var hintBox = {
 
 		target.observer = new MutationObserver(() => {
 			const element = target instanceof jQuery ? target[0] : target;
-			const element_rect_current = element.getBoundingClientRect();
-			const is_element_position_changed = target.scrollObserver !== undefined
-				&& (element_rect_current.x !== target.scrollObserver?.x
-					|| element_rect_current.y !== target.scrollObserver?.y);
 
-			if (!isVisible(element) || is_element_position_changed) {
+			if (!isVisible(element)) {
 				hintBox.deleteHint(target);
+			}
+			else if (target.scrollObserver !== undefined) {
+				const element_rect_current = element.getBoundingClientRect();
+
+				if (element_rect_current.x !== target.scrollObserver.x
+						|| element_rect_current.y !== target.scrollObserver.y) {
+					hintBox.deleteHint(target);
+				}
 			}
 		});
 
