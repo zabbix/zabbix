@@ -105,9 +105,7 @@ abstract class CControllerLatest extends CController {
 					'status' => [ITEM_STATUS_ACTIVE],
 					'state' => $filter['state'] == -1 ? null : $filter['state']
 				],
-				'search' => ($filter['name'] === '') ? null : [
-					'name' => $filter['name']
-				],
+				'search' => $filter['name'] === '' ? null : ['name_resolved' => $filter['name']],
 				'preservekeys' => true
 			]);
 
@@ -115,16 +113,16 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if ($select_items) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-					'value_type', 'units', 'description', 'state', 'error'
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'type', 'hostid', 'name_resolved', 'key_', 'delay', 'history', 'trends',
+					'status', 'value_type', 'units', 'description', 'state', 'error'
 				],
 				'selectTags' => ['tag', 'value'],
 				'selectValueMap' => ['mappings'],
 				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
 			$items_rw = $items;

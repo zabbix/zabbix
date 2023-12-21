@@ -242,6 +242,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  *             N_functionid - [OUT] index of the macro in string (if valid)   *
  *                                                                            *
  * Return value: unindexed macro  or NULL.                                    *
+ * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
 char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
@@ -321,7 +322,7 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		}
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-		params[nparam++] = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+		params[nparam++] = zbx_function_param_unquote_dyn_compat(ptr + param_pos, param_len, &quoted);
 	}
 
 	ret = macrofunc(params, nparam, out);

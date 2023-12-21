@@ -26,11 +26,11 @@ import (
 )
 
 const (
-	ZABBIX_REVDATE          = "26 October 2023"
+	ZABBIX_REVDATE          = "19 December 2023"
 	ZABBIX_VERSION_MAJOR    = 7
 	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = "alpha8"
+	ZABBIX_VERSION_RC       = "alpha9"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2023 Zabbix SIA\n" +
@@ -82,6 +82,10 @@ func Long() string {
 	if len(RC()) != 0 {
 		ver += RC()
 	}
+	return ver
+}
+func LongNoRC() string {
+	var ver string = fmt.Sprintf("%d.%d.%d", Major(), Minor(), Patch())
 	return ver
 }
 

@@ -922,7 +922,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'state', 'description'],
+			'output' => ['itemid', 'hostid', 'name', 'name_resolved', 'key_', 'value_type', 'state', 'description'],
 			'itemids' => array_keys($macros),
 			'webitems' => true,
 			'preservekeys' => true
@@ -937,8 +937,9 @@ class CMacrosResolverGeneral {
 		unset($db_item);
 
 		$item_macros = ['ITEM.DESCRIPTION' => 'description_expanded', 'ITEM.DESCRIPTION.ORIG' => 'description',
-			'ITEM.ID' => 'itemid', 'ITEM.KEY' => 'key_expanded', 'ITEM.KEY.ORIG' => 'key_', 'ITEM.NAME' => 'name',
-			'ITEM.NAME.ORIG' => 'name', 'ITEM.STATE' => 'state', 'ITEM.VALUETYPE' => 'value_type'
+			'ITEM.ID' => 'itemid', 'ITEM.KEY' => 'key_expanded', 'ITEM.KEY.ORIG' => 'key_',
+			'ITEM.NAME' => 'name_resolved', 'ITEM.NAME.ORIG' => 'name', 'ITEM.STATE' => 'state',
+			'ITEM.VALUETYPE' => 'value_type'
 		];
 
 		foreach ($db_items as $itemid => $db_item) {
@@ -2909,5 +2910,38 @@ class CMacrosResolverGeneral {
 		}
 
 		return $new_array;
+	}
+
+	/**
+	 * Get manualinput macros.
+	 *
+	 * @param array  $macros
+	 * @param array  $macros[<id>]
+	 * @param array  $macros[<id>][<macro>]
+	 * @param array  $macro_values
+	 * @param array  $macro_values[<id>]
+	 * @param string $macro_values[<id>][<token>]
+	 * @param array  $manualinput_values
+	 * @param string $manualinput_values[<id>]
+	 *
+	 * @return array
+	 */
+	protected static function getManualInputMacros(array $macros, array $macro_values,
+			array $manualinput_values): array {
+		foreach ($macros as $id => $macro_tokens) {
+			if (array_key_exists($id, $manualinput_values)) {
+				$value = $manualinput_values[$id];
+
+				foreach ($macro_tokens as $macro => $tokens) {
+					foreach ($tokens as $token) {
+						$macro_values[$id][$token['token']] = array_key_exists('macrofunc', $token)
+							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
+							: $value;
+					}
+				}
+			}
+		}
+
+		return $macro_values;
 	}
 }

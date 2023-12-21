@@ -147,14 +147,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$master_column = $configuration[$master_column_index];
 		$master_entities = $hosts;
 		$master_entity_values = [];
-		$master_items_only_numeric_allowed = false;
+		$master_items_can_be_numeric = false;
 
 		switch ($master_column['data']) {
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-				$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
+				$master_items_can_be_numeric = true;
 				$master_entities = array_key_exists($master_column_index, $items)
 					? $items[$master_column_index]
-					: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
+					: self::getItems($master_column['item'], self::isNumericOnlyColumn($master_column), $groupids,
+						$hostids
+					);
 				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
 				break;
 
@@ -176,7 +178,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				break;
 		}
 
-		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_entities,
+		$master_items_only_numeric_present = $master_items_can_be_numeric && !array_filter($master_entities,
 			static function(array $item): bool {
 				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
@@ -413,7 +415,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'monitored' => true,
 			'webitems' => true,
 			'filter' => [
-				'name' => $name,
+				'name_resolved' => $name,
 				'status' => ITEM_STATUS_ACTIVE,
 				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null
 			],
@@ -422,13 +424,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		if ($items) {
-			$single_key = reset($items)['key_'];
+			$processed_hostids = [];
 
-			$items = array_filter($items,
-				static function ($item) use ($single_key): bool {
-					return $item['key_'] === $single_key;
+			$items = array_filter($items, static function ($item) use (&$processed_hostids) {
+				if (array_key_exists($item['hostid'], $processed_hostids)) {
+					return false;
 				}
-			);
+
+				$processed_hostids[$item['hostid']] = true;
+
+				return true;
+			});
 		}
 
 		return $items;
