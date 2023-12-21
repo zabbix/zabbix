@@ -28,9 +28,9 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/plugin/comms"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/internal/agent"
 	"zabbix.com/plugins/external"
 )
@@ -84,7 +84,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 
 		err = plugin.RegisterMetrics(accessor, name, accessor.Params...)
 		if err != nil {
-			return "", zbxerr.New("failed to register metrics").Wrap(err)
+			return "", errs.Wrap(err, "failed to register metrics")
 		}
 	}
 
