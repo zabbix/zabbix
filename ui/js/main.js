@@ -521,10 +521,9 @@ var hintBox = {
 				hintBox.deleteHint(target);
 			}
 			else if (target.scrollObserver !== undefined) {
-				const element_rect_current = element.getBoundingClientRect();
+				const element_rect = element.getBoundingClientRect();
 
-				if (element_rect_current.x !== target.scrollObserver.x
-						|| element_rect_current.y !== target.scrollObserver.y) {
+				if (element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y) {
 					hintBox.deleteHint(target);
 				}
 			}
@@ -574,16 +573,16 @@ var hintBox = {
 
 	onScroll: function(target, e) {
 		const element = target instanceof jQuery ? target[0] : target;
-		const element_rect_current = element.getBoundingClientRect();
+		const element_rect = element.getBoundingClientRect();
 
 		if (e.target.classList.contains('wrapper')) {
-			target.scrollObserver.x = element_rect_current.x;
-			target.scrollObserver.y = element_rect_current.y;
+			target.scrollObserver.x = element_rect.x;
+			target.scrollObserver.y = element_rect.y;
 
 			return;
 		}
 
-		if (element_rect_current.x !== target.scrollObserver.x || element_rect_current.y !== target.scrollObserver.y) {
+		if (element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y) {
 			hintBox.deleteHint(target);
 		}
 	},
