@@ -28,8 +28,8 @@ $this->includeJsFile('administration.timeouts.edit.js.php');
 
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('timeouts')))->removeId())
-	->setId('timeouts')
-	->setName('timeouts')
+	->setId('timeouts-form')
+	->setName('timeouts_form')
 	->setAction(
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'timeouts.update')
