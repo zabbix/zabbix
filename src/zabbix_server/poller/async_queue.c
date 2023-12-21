@@ -90,7 +90,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: lock task queue                                                   *
+ * Purpose: locks task queue                                                  *
  *                                                                            *
  ******************************************************************************/
 void	async_task_queue_lock(zbx_async_queue_t *queue)
@@ -100,7 +100,7 @@ void	async_task_queue_lock(zbx_async_queue_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unlock task queue                                                 *
+ * Purpose: unlocks task queue                                                *
  *                                                                            *
  ******************************************************************************/
 void	async_task_queue_unlock(zbx_async_queue_t *queue)
@@ -110,7 +110,7 @@ void	async_task_queue_unlock(zbx_async_queue_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register a new worker                                             *
+ * Purpose: registers new worker                                              *
  *                                                                            *
  ******************************************************************************/
 void	async_task_queue_register_worker(zbx_async_queue_t *queue)
@@ -120,7 +120,7 @@ void	async_task_queue_register_worker(zbx_async_queue_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: deregister a worker                                               *
+ * Purpose: deregisters worker                                                *
  *                                                                            *
  ******************************************************************************/
 void	async_task_queue_deregister_worker(zbx_async_queue_t *queue)

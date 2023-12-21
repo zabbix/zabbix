@@ -33,13 +33,13 @@
  *                                                                            *
  * Purpose: processes program type (server) specific internal checks          *
  *                                                                            *
- * Parameters: param1  - [IN] the first parameter                             *
- *             request - [IN] the request                                     *
- *             result  - [OUT] the result                                     *
+ * Parameters: param1  - [IN] first parameter                                 *
+ *             request - [IN]                                                 *
+ *             result  - [OUT]                                                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
- *               FAIL - not a server specific internal check                  *
+ *               FAIL - not server specific internal check                    *
  *                                                                            *
  * Comments: This function is used to process server specific internal checks *
  *           before generic internal checks are processed.                    *
@@ -114,8 +114,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 				param2 = get_rparam(request, 1);
 
 				if (SUCCEED == (res = zbx_dc_get_proxy_delay_by_name(param2, &tmp, &error)) &&
-						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2, &lastaccess,
-						&error)))
+						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2,
+						&lastaccess, &error)))
 				{
 					value = tmp + time(NULL) - lastaccess;
 				}
@@ -372,4 +372,3 @@ void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)
 {
 	memset(info, 0, sizeof(zbx_pb_state_info_t));
 }
-

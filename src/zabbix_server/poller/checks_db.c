@@ -27,7 +27,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve data from database                                       *
+ * Purpose: retrieves data from database                                      *
  *                                                                            *
  * Parameters: item           - [IN] item we are interested in                *
  *             result         - [OUT] check result                            *

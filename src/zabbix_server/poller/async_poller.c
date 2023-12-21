@@ -140,9 +140,8 @@ static void	process_snmp_result(void *data)
 static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 {
 	long				response_code;
-	char				*error, *out = NULL;
+	char				*status_codes, *error, *out = NULL;
 	AGENT_RESULT			result;
-	char				*status_codes;
 	zbx_httpagent_context		*httpagent_context;
 	zbx_dc_httpitem_context_t	*item_context;
 	zbx_timespec_t			timespec;

@@ -89,7 +89,7 @@
  * This is zbx_snmp_walk() callback function prototype.                       *
  *                                                                            *
  * Parameters: arg      - [IN] user argument passed to zbx_snmp_walk()        *
- *             snmp_oid - [IN] OID the walk function is looking for           *
+ *             snmp_oid - [IN] OID walk function is looking for               *
  *             index    - [IN] index of found OID                             *
  *             value    - [IN] OID value                                      *
  *                                                                            *
@@ -309,9 +309,9 @@ static char	*get_item_security_name(const zbx_dc_item_t *item)
  *                                                                            *
  * Purpose: retrieves index that matches value from relevant index cache      *
  *                                                                            *
- * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ * Parameters: item      - [IN] Configuration of Zabbix item, contains        *
  *                              IP address, port, community string, context,  *
- *                              security name                                 *
+ *                              security name.                                *
  *             snmp_oid  - [IN] OID of table which contains indexes           *
  *             value     - [IN] value for which to look up index              *
  *             idx       - [IN/OUT] destination pointer for                   *
@@ -319,9 +319,9 @@ static char	*get_item_security_name(const zbx_dc_item_t *item)
  *             idx_alloc - [IN/OUT] size of (re)allocated index               *
  *                                                                            *
  * Return value: FAIL    - dynamic index cache is empty or cache does not     *
- *                         contain index matching the value                   *
+ *                         contain index matching value                       *
  *               SUCCEED - idx contains found index,                          *
- *                         idx_alloc contains the current size of the         *
+ *                         idx_alloc contains current size of                 *
  *                         heap-(re)allocated idx                             *
  *                                                                            *
  ******************************************************************************/
@@ -364,15 +364,16 @@ end:
  *                                                                            *
  * Purpose: stores index-value pair in relevant index cache                   *
  *                                                                            *
- * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ * Parameters: item      - [IN] Configuration of Zabbix item, contains        *
  *                              IP address, port, community string, context,  *
- *                              security name                                 *
+ *                              security name.                                *
  *             snmp_oid  - [IN] OID of table which contains indexes           *
  *             index     - [IN] index part of index-value pair                *
  *             value     - [IN] value part of index-value pair                *
  *                                                                            *
  ******************************************************************************/
-static void	cache_put_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid, const char *index, const char *value)
+static void	cache_put_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid, const char *index,
+		const char *value)
 {
 	zbx_snmpidx_main_key_t	*main_key, main_key_local;
 	zbx_snmpidx_mapping_t	*mapping, mapping_local;
@@ -430,10 +431,10 @@ static void	cache_put_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid
  *                                                                            *
  * Purpose: deletes index-value mappings from specified index cache           *
  *                                                                            *
- * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ * Parameters: item      - [IN] Configuration of Zabbix item, contains        *
  *                              IP address, port, community string, context,  *
- *                              security name                                 *
- *             snmp_oid  - [IN] OID of table which contains the indexes       *
+ *                              security name.                                *
+ *             snmp_oid  - [IN] OID of table which contains indexes           *
  *                                                                            *
  * Comments: Does nothing if the index cache is empty or if it does not       *
  *           contain the cache for the specified OID.                         *
@@ -1166,7 +1167,7 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
  * Parameters: ssp           - [IN] SNMP session handle                       *
  *             item          - [IN] configuration of Zabbix item              *
  *             snmp_oid      - [IN] OID of table with values of interest      *
- *             error         - [OUT] a buffer to store error message          *
+ *             error         - [OUT] buffer to store error message            *
  *             max_error_len - [IN] maximum error message length              *
  *             max_succeed   - [OUT] value of "max_repetitions" that succeeded*
  *             min_fail      - [OUT] value of "max_repetitions" that failed   *
@@ -1174,7 +1175,7 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
  *             bulk          - [IN] whether GetBulkRequest-PDU should be used *
  *             walk_cb_func  - [IN] callback function to process discovered   *
  *                                  OIDs and their values                     *
- *             walk_cb_arg   - [IN] argument to pass to the callback function *
+ *             walk_cb_arg   - [IN] argument to pass to callback function     *
  *                                                                            *
  * Return value: NOTSUPPORTED - OID does not exist, any other critical error  *
  *               NETWORK_ERROR - recoverable network error                    *
@@ -1300,7 +1301,8 @@ reduce_max_vars:
 			if (1 >= level && 1 < max_vars)
 				goto reduce_max_vars;
 
-			ret = zbx_get_snmp_response_error(ssp, &item->interface, status, response, error, max_error_len);
+			ret = zbx_get_snmp_response_error(ssp, &item->interface, status, response, error,
+					max_error_len);
 			running = 0;
 			goto next;
 		}
@@ -1505,9 +1507,9 @@ static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 retry:
 	status = snmp_sess_synch_response(ssp, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_sess_synch_response() status:%d s_snmp_errno:%d errstat:%ld mapping_num:%d",
-			__func__, status, ss->s_snmp_errno, NULL == response ? (long)-1 : response->errstat,
-			mapping_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_sess_synch_response() status:%d s_snmp_errno:%d errstat:%ld "
+			"mapping_num:%d", __func__, status, ss->s_snmp_errno, NULL == response ? (long)-1 :
+			response->errstat, mapping_num);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -2631,7 +2633,8 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 				snmp_context->config_timeout, snmp_context->config_source_ip)))
 		{
 			snmp_context->item.ret = NOTSUPPORTED;
-			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "zbx_snmp_open_session() failed"));
+			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
+					"zbx_snmp_open_session() failed"));
 			goto stop;
 		}
 	}
