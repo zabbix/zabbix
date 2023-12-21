@@ -2816,9 +2816,8 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk,
 		unsigned char poller_type)
 {
-	int		j, k, ret;
-	int		to_walk[ZBX_MAX_SNMP_ITEMS], to_walk_num = 0;
-	int		to_verify[ZBX_MAX_SNMP_ITEMS], to_verify_num = 0;
+	int		j, k, ret, to_walk[ZBX_MAX_SNMP_ITEMS], to_walk_num = 0, to_verify[ZBX_MAX_SNMP_ITEMS],
+			to_verify_num = 0;
 	unsigned char	query_and_ignore_type[ZBX_MAX_SNMP_ITEMS];
 	char		to_verify_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX],
 			index_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX],
@@ -3322,8 +3321,8 @@ out:
  * Purpose: clears snmpv3 user authentication cache                           *
  *                                                                            *
  * Parameters: process_type - [IN]                                            *
- *             process_num  - [IN]                                            *
- *                 progname - [IN]                                            *
+ *             process_num  - [IN] unique id of process                       *
+ *             progname     - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname)
