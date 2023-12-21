@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts
@@ -29,12 +30,15 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 class testPageHostPrototypes extends CWebTest {
 
 	/**
-	 * Attach TableBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CTableBehavior::class];
+		return [
+			CTableBehavior::class,
+			CMessageBehavior::class
+		];
 	}
 
 	protected static $hostids;
@@ -161,9 +165,11 @@ class testPageHostPrototypes extends CWebTest {
 
 	public static function getSortingData() {
 		return [
+			// #0 Sort by Name.
 			[
 				[
 					'sort_by' => 'Name',
+					'sort' => 'name',
 					'result' => [
 						'1 Host prototype monitored discovered {#H}',
 						'2 Host prototype not monitored discovered {#H}',
@@ -172,9 +178,11 @@ class testPageHostPrototypes extends CWebTest {
 					]
 				]
 			],
+			// #1 Sort by Create enabled.
 			[
 				[
 					'sort_by' => 'Create enabled',
+					'sort' => 'status',
 					'result' => [
 						'Yes',
 						'Yes',
@@ -183,9 +191,11 @@ class testPageHostPrototypes extends CWebTest {
 					]
 				]
 			],
+			// #2 Sort by Discover.
 			[
 				[
 					'sort_by' => 'Discover',
+					'sort' => 'discover',
 					'result' => [
 						'Yes',
 						'Yes',
@@ -198,13 +208,159 @@ class testPageHostPrototypes extends CWebTest {
 	}
 
 	/**
+	 * Sort host prototypes by Name, Create enabled and Discover column.
+	 *
 	 * @dataProvider getSortingData
 	 */
-	public function testPageHostPrototypes_Sorting() {
-		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
+	public function testPageHostPrototypes_Sorting($data) {
+		$this->page->login()->open('host_prototypes.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
 
+		$table = $this->query('class:list-table')->asTable()->one();
+		foreach (['desc', 'asc'] as $sorting) {
+			$table->query('link', $data['sort_by'])->one()->click();
+			$expected = ($sorting === 'asc') ? $data['result'] : array_reverse($data['result']);
+			$this->assertEquals($expected, $this->getTableColumnData($data['sort_by']));
+		}
+	}
 
+	public static function getButtonLinkData() {
+		return [
+			// #0 Click on Create disabled button.
+			[
+				[
+					'name' => '1 Host prototype monitored discovered {#H}',
+					'button' => 'Create disabled',
+					'column_check' => 'Create enabled',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			],
+			// #1 Click on Create enabled button.
+			[
+				[
+					'name' => '2 Host prototype not monitored discovered {#H}',
+					'button' => 'Create enabled',
+					'column_check' => 'Create enabled',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #2 Enabled clicking on link in Create enabled column.
+			[
+				[
+					'name' => '3 Host prototype not monitored not discovered {#H}',
+					'column_check' => 'Create enabled',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #3 Disabled clicking on link in Create enabled column.
+			[
+				[
+					'name' => '4 Host prototype monitored not discovered {#H}',
+					'column_check' => 'Create enabled',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			],
+			// #4 Enable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => '3 Host prototype not monitored not discovered {#H}',
+					'column_check' => 'Discover',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #5 Disable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => '2 Host prototype not monitored discovered {#H}',
+					'column_check' => 'Discover',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			],
+			// #6 Enable all host prototypes clicking on Create enabled button.
+			[
+				[
+					'button' => 'Create enabled',
+					'column_check' => 'Create enabled',
+					'after' => ['Yes', 'Yes', 'Yes', 'Yes']
+				]
+			],
+			// #7 Disable all host prototypes clicking on Create disabled button.
+			[
+				[
+					'button' => 'Create disabled',
+					'column_check' => 'Create enabled',
+					'after' => ['No', 'No', 'No', 'No']
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
+	 *
+	 * @dataProvider getButtonLinkData
+	 */
+	public function testPageHostPrototypes_ButtonLink($data) {
+		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
+				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Find host prototype in table by name and check column data before update.
+		if (array_key_exists('name', $data)) {
+			$row = $table->findRow('Name', $data['name']);
+			$this->assertEquals($data['before'], $row->getColumn($data['column_check'])->getText());
+		}
+
+		// Click on button or on link in column (Create enabled or Discover).
+		if (array_key_exists('button', $data)) {
+			// If no Host prototype name in data provider, then select all existing in table host prototypes.
+			$selected = (array_key_exists('name', $data)) ? $data['name'] : null;
+			$this->selectTableRows($selected);
+			$this->query('button', $data['button'])->one()->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+		}
+		else {
+			// Click on link in table.
+			$row->getColumn($data['column_check'])->query('link', $data['before'])->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+
+		// Check column value for one host prototypes or for them all.
+		if (array_key_exists('name', $data)) {
+			$this->assertMessage(TEST_GOOD, 'Host prototype updated');
+			$this->assertEquals($data['after'], $row->getColumn($data['column_check'])->getText());
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'Host prototypes updated');
+			$this->assertTableDataColumn($data['after'], $data['column_check']);
+		}
+	}
+
+	public function testPageHostPrototypes_SimpleDelete() {
+		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
+				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
+		$sql = 'SELECT null FROM hosts WHERE hostid='.self::$prototype_hostids['1 Host prototype monitored discovered {#H}'];
+
+		// Check that host prototype exists in DB and displayed in Host prototype table.
+		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertTrue(in_array('1 Host prototype monitored discovered {#H}', $this->getTableColumnData('Name')));
+
+		// Select host prototype and delete it.
+		$this->selectTableRows('1 Host prototype monitored discovered {#H}');
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+
+		// Check that host prototype doesn't exist in DB and not displayed in Host prototype table.
+		$this->assertFalse(in_array('1 Host prototype monitored discovered {#H}', $this->getTableColumnData('Name')));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 //	const DICROVERY_RULE_ID = 90001;
