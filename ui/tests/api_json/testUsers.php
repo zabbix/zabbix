@@ -52,6 +52,10 @@ class testUsers extends CAPITest {
 			'disabled' => null,
 			'valid' => null,
 			'valid_for_user_with_disabled_usergroup' => null
+		],
+		'mfaids' => [
+			'mfa_totp_1' => null,
+			'mfa_duo_1' => null
 		]
 	];
 
@@ -266,6 +270,26 @@ class testUsers extends CAPITest {
 		self::$data['tokens']['disabled'] = $tokens[1]['token'];
 		self::$data['tokens']['valid'] = $tokens[2]['token'];
 		self::$data['tokens']['valid_for_user_with_disabled_usergroup'] = $tokens[3]['token'];
+
+		$mfaids = CDataHelper::call('mfa.create', [
+			[
+				'type' => MFA_TYPE_TOTP,
+				'name' => 'TOTP test case 1',
+				'hash_function' => TOTP_HASH_SHA1,
+				'code_length' => TOTP_CODE_LENGTH_8
+			],
+			[
+				'type' => MFA_TYPE_DUO,
+				'name' => 'DUO test case 1',
+				'api_hostname' => 'api-999a9a99.duosecurity.com',
+				'clientid' => 'AAA58NOODEGUA6ST7AAA',
+				'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult'
+			]
+		]);
+		$this->assertArrayHasKey('mfaids', $mfaids, 'prepareUsersData() failed: Could not create MFA method.');
+
+		self::$data['mfaids']['mfa_totp_1'] = $mfaids['mfaids'][0];
+		self::$data['mfaids']['mfa_duo_1'] = $mfaids['mfaids'][1];
 	}
 
 	public static function user_create() {
@@ -497,6 +521,63 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'User directory with ID "1234" is not available.'
+			],
+			[
+				'user' => [
+					[
+						'username' => 'API user creat with MFA TOTP method',
+						'roleid' => 1,
+						'passwd' => 'Z@bb1x1234',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						],
+						'mfa_totp_secrets' => [
+							[
+								'mfaid' => 'mfa_totp_1',
+								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'username' => 'API user creat with non-existing MFA TOTP method',
+						'roleid' => 1,
+						'passwd' => 'Z@bb1x1234',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						],
+						'mfa_totp_secrets' => [
+							[
+								'mfaid' => 999,
+								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
+							]
+						]
+					]
+				],
+				'expected_error' => 'MFA method with ID "999" is not available.'
+			],
+			[
+				'user' => [
+					[
+						'username' => 'API user creat with MFA DUO method',
+						'roleid' => 1,
+						'passwd' => 'Z@bb1x1234',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						],
+						'mfa_totp_secrets' => [
+							[
+								'mfaid' => 'mfa_duo_1',
+								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Incorrect MFA method type "DUO Universal Prompt" is not available for TOTP secret.'
 			]
 		];
 	}
@@ -505,6 +586,8 @@ class testUsers extends CAPITest {
 	 * @dataProvider user_create
 	 */
 	public function testUsers_Create($user, $expected_error) {
+		$this->resolveMfaids($user);
+
 		$result = $this->call('user.create', $user, $expected_error);
 
 		if ($expected_error === null) {
@@ -841,6 +924,24 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'userid' => '16',
+						'username' => 'api-user-for-password-super-admin',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						],
+						'mfa_totp_secrets' => [
+							[
+								'mfaid' => 'mfa_totp_1',
+								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
+							]
+						],
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -856,6 +957,8 @@ class testUsers extends CAPITest {
 				$oldHashUser = CDBHelper::getHash($sqlUser);
 			}
 		}
+
+		$this->resolveMfaids($users);
 
 		$result = $this->call('user.update', $users, $expected_error);
 
@@ -2711,5 +2814,19 @@ class testUsers extends CAPITest {
 
 	public function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
+	}
+
+	public function resolveMfaids(array &$users): void {
+		foreach ($users as &$user) {
+			if (is_array($user) && array_key_exists('mfa_totp_secrets', $user)) {
+				foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
+					if (array_key_exists($mfa_totp_secret['mfaid'], self::$data['mfaids'])) {
+						$mfa_totp_secret['mfaid'] = self::$data['mfaids'][$mfa_totp_secret['mfaid']];
+					}
+				}
+				unset($mfa_totp_secret);
+			}
+		}
+		unset($user);
 	}
 }

@@ -95,6 +95,7 @@ class CUser extends CApiService {
 			'selectMediatypes'			=> null,
 			'selectRole'				=> null,
 			'getAccess'					=> null,
+			'getTotpSecret'				=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
 			'sortfield'					=> '',
@@ -229,6 +230,33 @@ class CUser extends CApiService {
 			}
 		}
 
+		if ($options['getTotpSecret'] !== null) {
+			$sessionid = self::$userData['sessionid'];
+
+			$db_userid = DB::select('sessions', [
+				'output' => ['userid'],
+				'filter' => [
+					'sessionid' => $sessionid,
+					'status' => ZBX_SESSION_ACTIVE
+				],
+				'limit' => 1
+			]);
+
+			foreach ($result as $userid => $user) {
+				if ($sessionid && $db_userid && $userid == $db_userid) {
+					$mfa_totp_secrets = DB::select('mfa_totp_secret', [
+						'output' => ['mfaid', 'totp_secret'],
+						'filter' => ['userid' => $db_userid]
+					]);
+
+					$result[$userid]['mfa_totp_secrets'] = $mfa_totp_secrets;
+				}
+				else {
+					$result[$userid]['mfa_totp_secrets'] = [];
+				}
+			}
+		}
+
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 		}
@@ -278,6 +306,7 @@ class CUser extends CApiService {
 
 		self::updateGroups($users);
 		self::updateMedias($users);
+		self::updateMfaTotpSecret($users);
 
 		if (array_key_exists('ts_provisioned', $users[0])) {
 			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
@@ -323,7 +352,11 @@ class CUser extends CApiService {
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]],
-			'userdirectoryid' =>	['type' => API_ID, 'default' => 0]
+			'userdirectoryid' =>	['type' => API_ID, 'default' => 0],
+			'mfa_totp_secrets' =>	['type' => API_OBJECTS, 'uniq' => [['mfaid']], 'fields' => [
+				'mfaid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'totp_secret' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('mfa_totp_secret', 'totp_secret')]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -365,6 +398,7 @@ class CUser extends CApiService {
 
 		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, []);
+		$this->checkMfaMethods($users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 	}
@@ -418,7 +452,11 @@ class CUser extends CApiService {
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]],
-			'userdirectoryid' =>	['type' => API_ID]
+			'userdirectoryid' =>	['type' => API_ID],
+			'mfa_totp_secrets' =>	['type' => API_OBJECTS, 'uniq' => [['mfaid']], 'fields' => [
+				'mfaid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'totp_secret' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('mfa_totp_secret', 'totp_secret')]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -561,6 +599,7 @@ class CUser extends CApiService {
 		}
 
 		$this->checkUserdirectories($users);
+		$this->checkMfaMethods($users);
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -592,6 +631,7 @@ class CUser extends CApiService {
 		self::terminateActiveSessionsOnPasswordUpdate($users);
 		self::updateGroups($users, $db_users);
 		self::updateMedias($users, $db_users);
+		self::updateMfaTotpSecret($users);
 
 		if (array_key_exists('ts_provisioned', $users[0])) {
 			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
@@ -696,6 +736,47 @@ class CUser extends CApiService {
 		if ($ids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('User directory with ID "%1$s" is not available.', reset($ids))
+			);
+		}
+	}
+
+	/**
+	 * Check if MFA method, used in users data, exist.
+	 *
+	 * @param array $users
+	 * @param int   $users[]['mfa_totp_secrets']['mfaid']  (optional)
+	 *
+	 * @throws APIException  if mfa method does not exist.
+	 */
+	private function checkMfaMethods(array $users): void {
+		$mfaids = [];
+		foreach ($users as $user) {
+			if (array_key_exists('mfa_totp_secrets', $user)) {
+				$mfaids += array_column($user['mfa_totp_secrets'], 'mfaid', 'mfaid');
+			}
+		}
+
+		if (!$mfaids) {
+			return;
+		}
+
+		$db_mfaids = API::Mfa()->get([
+			'output' => ['type'],
+			'mfaids' => $mfaids,
+			'preservekeys' => true
+		]);
+		$ids = array_diff_key($mfaids, $db_mfaids);
+		$types = array_column($db_mfaids, 'type');
+
+		if ($ids) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('MFA method with ID "%1$s" is not available.', reset($ids))
+			);
+		}
+
+		if (in_array(MFA_TYPE_DUO, $types)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_('Incorrect MFA method type "DUO Universal Prompt" is not available for TOTP secret.')
 			);
 		}
 	}
@@ -1198,6 +1279,35 @@ class CUser extends CApiService {
 	}
 
 	/**
+	 * @param array $users
+	 */
+	private static function updateMfaTotpSecret(array &$users): void {
+		$ins_mfa_totp_secrets = [];
+
+		foreach ($users as $user) {
+			if (array_key_exists('mfa_totp_secrets', $user)) {
+				foreach ($user['mfa_totp_secrets'] as $mfa_totp_secret) {
+					$ins_mfa_totp_secrets[] = ['userid' => $user['userid']] + $mfa_totp_secret;
+				}
+			}
+		}
+
+		if ($ins_mfa_totp_secrets) {
+			$mfa_totp_secretids = DB::insert('mfa_totp_secret', $ins_mfa_totp_secrets);
+
+			foreach ($users as &$user) {
+				if (array_key_exists('mfa_totp_secrets', $user)) {
+					foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
+						$mfa_totp_secret['mfa_totp_secretid'] = array_shift($mfa_totp_secretids);
+					}
+					unset($mfa_totp_secret);
+				}
+			}
+			unset($user);
+		}
+	}
+
+	/**
 	 * @param array $userids
 	 *
 	 * @return array
@@ -1220,6 +1330,7 @@ class CUser extends CApiService {
 		DB::delete('media', ['userid' => $userids]);
 		DB::delete('profiles', ['userid' => $userids]);
 		DB::delete('users_groups', ['userid' => $userids]);
+		DB::delete('mfa_totp_secret', ['userid' => $userids]);
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
