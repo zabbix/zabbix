@@ -254,7 +254,8 @@ class CSVGPie {
 		this.#arcGenerator = d3.arc().innerRadius(this.#radius_inner).outerRadius(this.#radius_outer);
 		this.#arcGeneratorWithPadding = d3.arc()
 			.innerRadius(this.#radius_inner + this.#config.stroke * 10 / 2)
-			.outerRadius(this.#radius_outer - this.#config.stroke * 10 / 2);
+			.outerRadius(this.#radius_outer - this.#config.stroke * 10 / 2)
+			.padAngle(this.#config.stroke * 0.01);
 
 		this.#svg = d3.create('svg:svg').attr('class', CSVGPie.ZBX_STYLE_CLASS);
 
@@ -321,6 +322,12 @@ class CSVGPie {
 			}
 		}
 
+		if (this.#config.space > 0 && sectors.length > 1) {
+			this.#space_container.style('display', '');
+
+			this.#arcGeneratorWithPadding.padAngle(this.#config.stroke * 0.01 + this.#config.space * 0.01 / 3);
+		}
+
 		if (sectors.length > 0) {
 			all_sectorids = this.#prepareAllSectorids(all_sectorids);
 			sectors = this.#sortByReference(sectors, all_sectorids);
@@ -328,16 +335,6 @@ class CSVGPie {
 			this.#container
 				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 				.style('display', 'none');
-		}
-
-		if (this.#config.space > 0 && sectors.length < 2) {
-			this.#space_container.style('display', 'none');
-
-			this.#arcGeneratorWithPadding.padAngle(this.#config.stroke * 0.01);
-		}
-		else {
-			this.#arcGeneratorWithPadding.padAngle(this.#config.stroke * 0.01 + this.#config.space * 0.01 / 3);
-
 		}
 
 		this.#sectors_old = this.#sectors_new;
@@ -543,6 +540,10 @@ class CSVGPie {
 						.style('display', '');
 
 					this.#no_data_container.style('display', '');
+				}
+
+				if (this.#config.space > 0 && sectors.length < 2) {
+					this.#space_container.style('display', 'none');
 				}
 			})
 			.catch(() => {});
