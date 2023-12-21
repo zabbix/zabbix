@@ -49,4 +49,16 @@ class CAggFunctionData {
 	public static function preservesUnits(int $function): bool {
 		return $function != AGGREGATE_COUNT;
 	}
+
+	/**
+	 * Check whether the aggregation result of the specified function is always numeric.
+	 *
+	 * @param int $function   Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG,
+	 *                        AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST).
+	 *
+	 * @return bool
+	 */
+	public static function isNumericResult(int $function): bool {
+		return in_array($function, [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM]);
+	}
 }

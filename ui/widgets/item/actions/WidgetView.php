@@ -22,6 +22,7 @@
 namespace Widgets\Item\Actions;
 
 use API,
+	CAggFunctionData,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
@@ -66,7 +67,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$this->getElements($item, $data_last, $data_prev, $this->fields_values['aggregate_function'])
 				),
 				'url' => $this->getUrl($item),
-				'bg_color' => $this->getBgColor($item, $data_last)
+				'bg_color' => $this->getBgColor($item, $data_last, $this->fields_values['aggregate_function'])
 			];
 		}
 		else {
@@ -482,10 +483,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			->getUrl();
 	}
 
-	public function getBgColor(array $item, ?array $data_last): string {
+	public function getBgColor(array $item, ?array $data_last, int $function): string {
 		$bg_color = $this->fields_values['bg_color'];
 
-		if ($data_last === null || !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+		$is_numeric_data = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+			|| CAggFunctionData::isNumericResult($function);
+
+		if ($data_last === null || !$is_numeric_data) {
 			return $bg_color;
 		}
 

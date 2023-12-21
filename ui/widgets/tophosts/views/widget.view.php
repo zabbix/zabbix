@@ -77,13 +77,9 @@ else {
 			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
 					&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
 					&& array_key_exists('thresholds', $column_config)) {
-				$is_numeric_value_type = in_array($column['item']['value_type'],
+				$is_numeric_data = in_array($column['item']['value_type'],
 					[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
-				);
-				$is_numeric_aggregation_result = in_array($column_config['aggregate_function'],
-					[AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM]
-				);
-				$is_numeric_data = $is_numeric_value_type || $is_numeric_aggregation_result;
+				) || CAggFunctionData::isNumericResult($column_config['aggregate_function']);
 
 				if ($is_numeric_data) {
 					foreach ($column_config['thresholds'] as $threshold) {
