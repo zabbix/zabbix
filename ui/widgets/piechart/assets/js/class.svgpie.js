@@ -358,7 +358,6 @@ class CSVGPie {
 			.attr('data-hintbox-track-mouse', 1)
 			.attr('data-hintbox-delay', 0)
 			.attr('data-hintbox-contents', (d) => this.#setHint(d))
-			.attr('transform', 'translate(0, 0)')
 			.each((d, index, nodes) => {
 				d3.select(nodes[index])
 					.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
@@ -366,7 +365,6 @@ class CSVGPie {
 					.join('svg:path')
 					.attr('class', CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)
 					.attr('d', (d) => this.#arcGenerator(d))
-					.attr('transform', 'translate(0, 0)')
 					.each((d, index, nodes) => nodes[index]._current = d);
 
 				if (this.#config.stroke > 0) {
