@@ -485,7 +485,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	public function getBgColor(array $item, ?array $data_last): string {
 		$bg_color = $this->fields_values['bg_color'];
 
-		if ($data_last === null) {
+		if ($data_last === null || !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 			return $bg_color;
 		}
 
