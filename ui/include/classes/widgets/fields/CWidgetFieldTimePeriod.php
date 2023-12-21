@@ -199,7 +199,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 						'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
 					);
 				}
-				elseif ($max_period !== null && $period > $max_period) {
+				elseif ($max_period !== null && $period > $max_period + 1) {
 					$errors[] = _n('Maximum time period to display is %1$s day.',
 						'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 					);

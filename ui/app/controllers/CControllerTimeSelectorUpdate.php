@@ -132,7 +132,7 @@ class CControllerTimeSelectorUpdate extends CController {
 					'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
 				);
 			}
-			elseif ($period > $max_period) {
+			elseif ($period > $max_period + 1) {
 				$fields_errors['from'] = _n('Maximum time period to display is %1$s day.',
 					'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 				);

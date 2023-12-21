@@ -43,7 +43,7 @@ class CTimePeriodHelper {
 		if ($max_period === null) {
 			$range_time_parser = new CRangeTimeParser();
 			$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-			$max_period = 1 + time() - $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
+			$max_period = time() - $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
 		}
 
 		return $max_period;
