@@ -3444,12 +3444,11 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column: 1; }
 
-.svg-pie-chart .svg-pie-chart-arc-stroke,
-.svg-pie-chart .svg-pie-chart-arc {
-  stroke: #ffffff;
-  stroke-linejoin: round; }
 .svg-pie-chart .svg-pie-chart-arc-placeholder {
   fill: transparent; }
+.svg-pie-chart .svg-pie-chart-space {
+  stroke: #ffffff;
+  stroke-linecap: round; }
 .svg-pie-chart .svg-pie-chart-arc-no-data-outer {
   fill: #f3f3f3; }
 .svg-pie-chart .svg-pie-chart-arc-no-data-inner {

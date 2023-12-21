@@ -26,6 +26,8 @@ class CSVGPie {
 	static ZBX_STYLE_ARC_PLACEHOLDER =		'svg-pie-chart-arc-placeholder';
 	static ZBX_STYLE_ARC_STROKE =			'svg-pie-chart-arc-stroke';
 	static ZBX_STYLE_ARC =					'svg-pie-chart-arc';
+	static ZBX_STYLE_SPACE_CONTAINER =		'svg-pie-chart-space-container';
+	static ZBX_STYLE_SPACE =				'svg-pie-chart-space';
 	static ZBX_STYLE_ARC_NO_DATA_OUTER =	'svg-pie-chart-arc-no-data-outer';
 	static ZBX_STYLE_ARC_NO_DATA_INNER =	'svg-pie-chart-arc-no-data-inner';
 	static ZBX_STYLE_TOTAL_VALUE =			'svg-pie-chart-total-value';
@@ -81,6 +83,14 @@ class CSVGPie {
 	 * @member {Selection}
 	 */
 	#arcs_container;
+
+	/**
+	 * SVG group element that contains all the space elements between sectors.
+	 *
+	 * @type {SVGGElement}
+	 * @member {Selection}
+	 */
+	#space_container;
 
 	/**
 	 * SVG foreignObject element that contains total value and units.
@@ -146,6 +156,13 @@ class CSVGPie {
 	 * @type {SVGGElement}
 	 */
 	#popped_out_sector = null;
+
+	/**
+	 * Distance how much sector is popped out.
+	 *
+	 * @type {number}
+	 */
+	#pop_out_distance = 0.06;
 
 	/**
 	 * Outer radius of pie chart.
@@ -236,9 +253,8 @@ class CSVGPie {
 		this.#pieGenerator = d3.pie().sort(null).value(d => d.percent_of_total);
 		this.#arcGenerator = d3.arc().innerRadius(this.#radius_inner).outerRadius(this.#radius_outer);
 		this.#arcGeneratorWithPadding = d3.arc()
-			.innerRadius(this.#radius_inner + this.#config.stroke * 10 / 2 + this.#config.space * 10 / 2)
-			.outerRadius(this.#radius_outer - this.#config.stroke * 10 / 2 - this.#config.space * 10 / 2)
-			.padAngle(this.#config.stroke * 0.01 + this.#config.space * 0.01);
+			.innerRadius(this.#radius_inner + this.#config.stroke * 10 / 2)
+			.outerRadius(this.#radius_outer - this.#config.stroke * 10 / 2);
 
 		this.#svg = d3.create('svg:svg').attr('class', CSVGPie.ZBX_STYLE_CLASS);
 
@@ -314,6 +330,16 @@ class CSVGPie {
 				.style('display', 'none');
 		}
 
+		if (this.#config.space > 0 && sectors.length < 2) {
+			this.#space_container.style('display', 'none');
+
+			this.#arcGeneratorWithPadding.padAngle(this.#config.stroke * 0.01);
+		}
+		else {
+			this.#arcGeneratorWithPadding.padAngle(this.#config.stroke * 0.01 + this.#config.space * 0.01 / 3);
+
+		}
+
 		this.#sectors_old = this.#sectors_new;
 		this.#sectors_new = sectors;
 
@@ -349,10 +375,8 @@ class CSVGPie {
 						.data((d) => [d])
 						.join('svg:path')
 						.attr('class', CSVGPie.ZBX_STYLE_ARC_STROKE)
-						.style('stroke-width', this.#config.space * 10)
 						.style('transition', this.#sectors_old.length > 0
-							? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear,
-								stroke ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
+							? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
 							: ''
 						)
 						.each((d, index, nodes) => nodes[index]._current = d);
@@ -363,15 +387,27 @@ class CSVGPie {
 					.data((d) => [d])
 					.join('svg:path')
 					.attr('class', CSVGPie.ZBX_STYLE_ARC)
-					.style('stroke-width', this.#config.stroke > 0 ? 0 : this.#config.space * 10)
 					.style('transition', this.#sectors_old.length > 0
-						? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear,
-							stroke ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
+						? `fill ${CSVGPie.ANIMATE_DURATION_WHOLE}ms linear`
 						: ''
 					)
 					.each((d, index, nodes) => nodes[index]._current = d);
 			})
 			.on('mouseleave', null);
+
+		if (this.#config.space > 0) {
+			this.#space_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_SPACE}`)
+				.data(this.#pieGenerator(was), key)
+				.join('svg:line')
+				.attr('class', CSVGPie.ZBX_STYLE_SPACE)
+				.attr('x1', 0)
+				.attr('x2', 0)
+				.attr('y1', `${-this.#radius_inner}`)
+				.attr('y2', `${-(this.#radius_outer + this.#radius_outer * this.#pop_out_distance)}`)
+				.style('stroke-width', this.#config.space * 10 / 2)
+				.each((d, index, nodes) => nodes[index]._current = d);
+		}
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_CONTAINER}`)
@@ -390,6 +426,12 @@ class CSVGPie {
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
 			.data(this.#pieGenerator(is), key);
+
+		if (this.#config.space > 0) {
+			this.#space_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_SPACE}`)
+				.data(this.#pieGenerator(is), key);
+		}
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}, .${CSVGPie.ZBX_STYLE_ARC_STROKE}, .${CSVGPie.ZBX_STYLE_ARC}`)
@@ -453,6 +495,24 @@ class CSVGPie {
 			})
 			.catch(() => {});
 
+		if (this.#config.space > 0) {
+			this.#space_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_SPACE}`)
+				.transition()
+				.duration(CSVGPie.ANIMATE_DURATION_WHOLE)
+				.styleTween('transform', (d, index, nodes) => {
+					const _this = nodes[index];
+
+					const interpolate = d3.interpolate(_this._current, d);
+
+					return t => {
+						_this._current = interpolate(t);
+
+						return `rotate(${_this._current.startAngle}rad)`;
+					};
+				});
+		}
+
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
 			.data(this.#pieGenerator(this.#sectors_new), key);
@@ -489,6 +549,17 @@ class CSVGPie {
 			})
 			.catch(() => {});
 
+		if (this.#config.space > 0) {
+			this.#space_container
+				.selectAll(`.${CSVGPie.ZBX_STYLE_SPACE}`)
+				.data(this.#pieGenerator(this.#sectors_new), key)
+				.exit()
+				.transition()
+				.delay(CSVGPie.ANIMATE_DURATION_WHOLE)
+				.duration(0)
+				.remove();
+		}
+
 		this.#positionValue();
 	}
 
@@ -522,6 +593,12 @@ class CSVGPie {
 		this.#arcs_container = this.#container
 			.append('svg:g')
 			.attr('class', CSVGPie.ZBX_STYLE_ARCS);
+
+		if (this.#config.space > 0) {
+			this.#space_container = this.#container
+				.append('svg:g')
+				.attr('class', CSVGPie.ZBX_STYLE_SPACE_CONTAINER);
+		}
 
 		this.#container
 			.append('svg:circle')
@@ -796,19 +873,18 @@ class CSVGPie {
 	 */
 	#popOut(sector) {
 		const sector_d3 = d3.select(sector);
-		const offset = 0.06;
 
 		sector_d3
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
-			.attr('transform', `scale(${1 + offset})`);
+			.attr('transform', `scale(${1 + this.#pop_out_distance})`);
 
 		// Translate placeholder back in its original position to simulate not popping it.
 		sector_d3
 			.select(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
-			.attr('transform', `scale(${1 - offset})`);
+			.attr('transform', `scale(${1 - this.#pop_out_distance})`);
 
 		this.#popped_out_sector = sector;
 	}
