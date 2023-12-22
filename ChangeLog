@@ -1,8 +1,15 @@
 Changes for 6.0.26rc1
 
 New features:
+.........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
+.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
+.........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
+.........T [ZBX-23835] updated Meraki templates (egordymov)
+.........T [ZBX-23723] fixed proxy params in JavaScript AWS templates (egordymov)
 ..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
 ..F....... [ZBX-22983] fixed ellipsed dropdown options in items mass update in preprocessing (ddauksa)
 ...G...... [ZBX-23715] fixed persistent directory path not following symlinks upon creation (kprutkovs)

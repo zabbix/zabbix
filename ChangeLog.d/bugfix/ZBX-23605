@@ -1,1 +1,0 @@
-.........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
