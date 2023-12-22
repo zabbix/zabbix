@@ -309,7 +309,8 @@ zabbix_export:
                 Zammad.createTicket(params.alert_subject, params.alert_message, priority, params.event_tags);
             }
             // Create ticket for trigger-based events.
-            else if (params.event_value === '1' && params_update.status === '0') {
+            else if (params.event_value === '1' && params_update.status === '0'
+                     && Number.isInteger(parseInt(Zammad.params.ticket_id)) === false) {
                 var ticket_id = Zammad.createTicket(params.alert_subject,
                     params.alert_subject + '\n' + params.alert_message + '\n' +
                     params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') +

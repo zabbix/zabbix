@@ -543,10 +543,11 @@ form {
 }
 
 .filter-container {
+	position: relative;
+	padding: 10px 0;
+	margin-bottom: 8px;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	padding: 10px 0;
-	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -1042,9 +1043,10 @@ select {
 	& + label {
 		span {
 			position: relative;
+			box-sizing: border-box;
 			display: inline-block;
-			width: 14px;
-			height: 14px;
+			width: 16px;
+			height: 16px;
 			margin-right: 4px;
 			vertical-align: text-bottom;
 			background-color: $form-bg-color;

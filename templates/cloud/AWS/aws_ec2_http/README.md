@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.  
+The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
@@ -33,9 +33,9 @@ This template has been tested on:
 
 The template get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.  
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
-Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.  
+Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.
 ```json
 {
     "Version":"2012-10-17",
@@ -104,7 +104,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`role_base`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
