@@ -231,29 +231,17 @@ class CUser extends CApiService {
 		}
 
 		if ($options['getTotpSecret'] !== null) {
-			$sessionid = self::$userData['sessionid'];
-
-			$db_userid = DB::select('sessions', [
-				'output' => ['userid'],
-				'filter' => [
-					'sessionid' => $sessionid,
-					'status' => ZBX_SESSION_ACTIVE
-				],
-				'limit' => 1
-			]);
-
 			foreach ($result as $userid => $user) {
-				if ($sessionid && $db_userid && $userid == $db_userid) {
-					$mfa_totp_secrets = DB::select('mfa_totp_secret', [
-						'output' => ['mfaid', 'totp_secret'],
-						'filter' => ['userid' => $db_userid]
-					]);
+				$result[$userid]['mfa_totp_secrets'] = [];
+			}
 
-					$result[$userid]['mfa_totp_secrets'] = $mfa_totp_secrets;
-				}
-				else {
-					$result[$userid]['mfa_totp_secrets'] = [];
-				}
+			if (array_key_exists(self::$userData['userid'], $result)) {
+				$mfa_totp_secrets = DB::select('mfa_totp_secret', [
+					'output' => ['mfaid', 'totp_secret'],
+					'filter' => ['userid' => self::$userData['userid']]
+				]);
+
+				$result[self::$userData['userid']]['mfa_totp_secrets'] = $mfa_totp_secrets;
 			}
 		}
 
