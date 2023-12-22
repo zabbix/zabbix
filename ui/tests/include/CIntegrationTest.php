@@ -516,7 +516,7 @@ class CIntegrationTest extends CAPITest {
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.pid',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_3_0_PORT_SUFFIX
-			],
+			]
 		];
 
 		$configuration[self::COMPONENT_PROXY]['DBName'] .= '_proxy';
