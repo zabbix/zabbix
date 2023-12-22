@@ -361,8 +361,6 @@ class CIntegrationTest extends CAPITest {
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
-		var_dump(file_get_contents(self::getLogPath(self::COMPONENT_SERVER)));
-
 		throw new Exception('Failed to wait for component "'.$component.'" to start.');
 	}
 
