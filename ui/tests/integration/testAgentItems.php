@@ -906,7 +906,6 @@ class testAgentItems extends CIntegrationTest {
 	 * @dataProvider getItems
 	 */
 	public function testAgentItems_checkData($item) {
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$data = $this->getItemData();
 
 		if (!array_key_exists($item['component'].':'.$item['key'], $data)) {
