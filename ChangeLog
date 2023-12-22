@@ -20,7 +20,6 @@ A...I...S. [ZBX-21898] added escaping of backslashes in history function string 
 ...G...... [ZBX-22678] fixed parsing failures for deb packages without an Installed-Size field (jxl)
 ..F....... [ZBX-22055] fixed map image of Map widget not being updated on pressing "Apply" button (agriscenko)
 ..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
-..F....... [ZBX-23320] fixed Graph widget legend "Number of rows" behavior (apoga)
 ...G...... [ZBX-23471] fixed sha256 sum calculation on AIX, HP-UX and Solaris, fixed crash on HP-UX (Andris)
 ...G...... [ZBX-22933] improved vfs.file.regmatch and vfs.file.regexp items to use buffered file read (askolmeisters)
 ..F....... [ZBX-21973] changed deprecated X-Frame option allow-from to Content-Security-Policy frame-ancestors (dfofanovs)
