@@ -70,7 +70,11 @@ class CControllerAuthenticationEdit extends CController {
 			'saml_provision_media' =>			'array',
 			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
 			'passwd_min_length' =>				'int32',
-			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
+			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE),
+			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
+			'mfa_methods' =>					'array',
+			'mfa_default_row_index' =>			'int32',
+			'mfa_removed_mfaids' =>				'array_id'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -119,7 +123,9 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::SAML_JIT_STATUS,
 			CAuthenticationHelper::SAML_CASE_SENSITIVE,
 			CAuthenticationHelper::PASSWD_MIN_LENGTH,
-			CAuthenticationHelper::PASSWD_CHECK_RULES
+			CAuthenticationHelper::PASSWD_CHECK_RULES,
+			CAuthenticationHelper::MFA_STATUS,
+			CAuthenticationHelper::MFAID
 		];
 		$auth = [];
 		foreach ($auth_params as $param) {
@@ -159,7 +165,8 @@ class CControllerAuthenticationEdit extends CController {
 				'saml_user_lastname' => '',
 				'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
 				'passwd_min_length' => '',
-				'passwd_check_rules' => 0
+				'passwd_check_rules' => 0,
+				'mfa_status' => MFA_DISABLED
 			];
 			$this->getInputs($data, array_keys($config_fields));
 			$data += $config_fields;
@@ -174,6 +181,8 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
 			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
 			$data['ldap_removed_userdirectoryids'] = $this->getInput('ldap_removed_userdirectoryids', []);
+
+			$data['mfa_methods'] = $this->getMfaMethodUserGroupCount($this->getInput('mfa_methods', []));
 
 			$data += $auth;
 		}
@@ -244,6 +253,16 @@ class CControllerAuthenticationEdit extends CController {
 				array_column($data['ldap_servers'], 'userdirectoryid')
 			);
 			$data['ldap_removed_userdirectoryids'] = [];
+
+			$data['mfa_methods'] = API::Mfa()->get([
+				'output' => API_OUTPUT_EXTEND,
+				'selectUsrgrps' => API_OUTPUT_COUNT,
+				'sortfield' => ['name']
+			]);
+			// Cast false to 0 when no mfa method is found as default.
+			$data['mfa_default_row_index'] = (int) array_search($data[CAuthenticationHelper::MFAID],
+				array_column($data['mfa_methods'], 'mfaid')
+			);
 		}
 
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
@@ -295,6 +314,30 @@ class CControllerAuthenticationEdit extends CController {
 		unset($ldap_server);
 
 		return $ldap_servers;
+	}
+
+	private function getMfaMethodUserGroupCount(array $mfa_methods): array {
+		$mfaids = array_column($mfa_methods, 'mfaid');
+
+		$db_mfa_methods = $mfaids
+			? API::Mfa()->get([
+				'output' => [],
+				'selectUsrgrps' => API_OUTPUT_COUNT,
+				'preservekeys' => true
+			])
+			: [];
+
+		foreach ($mfa_methods as &$mfa_method) {
+			$mfa_method['usrgrps'] = 0;
+
+			if (array_key_exists('mfaid', $mfa_method)
+				&& array_key_exists($mfa_method['mfaid'], $db_mfa_methods)) {
+				$mfa_method['usrgrps'] = $db_mfa_methods[$mfa_method['mfaid']]['usrgrps'];
+			}
+		}
+		unset($mfa_method);
+
+		return $mfa_methods;
 	}
 
 	/**

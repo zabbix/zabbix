@@ -557,12 +557,50 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-provision-status')
 	]);
 
+$mfa_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Enable multi-factor authentication'), 'mfa_status'),
+		new CFormField(
+			(new CCheckBox('mfa_status', MFA_ENABLED))
+				->setChecked($data['mfa_status'] === MFA_ENABLED)
+				->setUncheckedValue(MFA_DISABLED)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Methods')))->setAsteriskMark(),
+		new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setHeader(
+						(new CRowHeader([
+							new CColHeader(_('Name')),
+							new CColHeader(_('Type')),
+							(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
+							_('Default'),
+							_('Action')
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CButtonLink(_('Add')))->addClass('js-add')		// TODO rename class?
+								))->setColSpan(5)
+							)
+					)->addStyle('width: 100%')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+	]);
+
 	$form->addItem((new CTabView())
 		->setSelected($data['form_refresh'] != 0 ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab)
 		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
 		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
 		->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
+		->addTab('mfa', _('MFA settings'), $mfa_tab, TAB_INDICATOR_AUTH_MFA)
 		->setFooter(makeFormFooter(
 			(new CSubmit('update', _('Update')))
 		))

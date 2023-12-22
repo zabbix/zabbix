@@ -1825,6 +1825,7 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
+define('TAB_INDICATOR_AUTH_MFA', 'mfa');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
