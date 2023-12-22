@@ -34,4 +34,10 @@
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
 #define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
+#define ZBX_SCRIPT_MANUALINPUT_NO	0
+#define ZBX_SCRIPT_MANUALINPUT_YES	1
+
+#define ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_REGEX	0
+#define ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_LIST	1
+
 #endif

@@ -292,11 +292,15 @@ zabbix_export:
                 },
             
                 setParams: function (params) {
+                    AWS.params['proxy'] = params.proxy;
                     switch (AWS.getField(params, 'auth_type')) {
                         case 'role_base':
                             AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                            var request = new HttpRequest();
+                            if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                                request.setProxy(AWS.params.proxy);
+                            }
+                            var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
                             if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                                 throw 'Error getting security credentials from instance metadata. Role not found.';
@@ -545,11 +549,15 @@ zabbix_export:
                 },
             
                 setParams: function (params) {
+                    AWS.params['proxy'] = params.proxy;
                     switch (AWS.getField(params, 'auth_type')) {
                         case 'role_base':
                             AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                            var request = new HttpRequest();
+                            if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                                request.setProxy(AWS.params.proxy);
+                            }
+                            var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
                             if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                                 throw 'Error getting security credentials from instance metadata. Role not found.';
@@ -700,7 +708,7 @@ zabbix_export:
                             var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
                                 signed_headers = 'content-encoding;host;x-amz-date';
                         }
-                
+            
                         var canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(request_data),
                             credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                         request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
@@ -724,7 +732,7 @@ zabbix_export:
                     request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                    
+            
                     Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
             
                     response = request.post(url, request_data);

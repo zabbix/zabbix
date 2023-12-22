@@ -45,6 +45,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	char			host[ZBX_HOSTNAME_BUF_LEN];
 	char			*key_orig;
+	int			version;
 }
 zbx_interface_status_t;
 

@@ -32,11 +32,15 @@ typedef struct
 	char		*password;
 	char		*publickey;
 	char		*privatekey;
+	char		*name;
 	char		*command;
 	char		*command_orig;
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
 	int		timeout;
+	unsigned char	manualinput;
+	char		*manualinput_validator;
+	unsigned char	manualinput_validator_type;
 }
 zbx_script_t;
 
