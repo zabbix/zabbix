@@ -52,7 +52,8 @@ class testMfa extends CAPITest {
 				'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult'
 			]
 		],
-		'usrgrpids' => []
+		'usrgrpids' => [],
+		'userids' => []
 	];
 
 	public function prepareTestData() {
@@ -72,6 +73,23 @@ class testMfa extends CAPITest {
 		]);
 		$this->assertArrayHasKey('usrgrpids', $usrgrpids);
 		self::$data['usrgrpids'] = array_combine(['User group with MFA'], $usrgrpids['usrgrpids']);
+
+		$userids = CDataHelper::call('user.create', [
+			'username' => 'User with MFA TOTP method',
+			'roleid' => 1,
+			'passwd' => 'Z@bb1x1234',
+			'usrgrps' => [
+				['usrgrpid' => 7]
+			],
+			'mfa_totp_secrets' => [
+				[
+					'mfaid' => self::$data['mfaids']['TOTP test case 1'],
+					'totp_secret' => '123asdf123asdf13asdf123asdf123as'
+				]
+			]
+		]);
+		$this->assertArrayHasKey('userids', $userids);
+		self::$data['userids'] = array_combine(['User with MFA TOTP method'], $userids['userids']);
 	}
 
 	public function resolveids($mfas) {
@@ -392,6 +410,11 @@ class testMfa extends CAPITest {
 		$this->call('mfa.delete', $mfas['mfaids'], $expected_error);
 
 		if ($expected_error === null) {
+			$mfa_totp_secrets = DB::select('mfa_totp_secret', [
+				'output' => ['userid'],
+				'filter' => ['userid' => self::$data['userids']['User with MFA TOTP method']]
+			]);
+			$this->assertEmpty($mfa_totp_secrets, 'The entry in mfa_totp_secret has not been deleted.');
 			self::$data['mfaids'] = array_diff(self::$data['mfaids'], $mfas['mfaids']);
 		}
 	}
@@ -403,5 +426,6 @@ class testMfa extends CAPITest {
 		CDataHelper::call('authentication.update', ['mfaid' => 0, 'mfa_status' => MFA_DISABLED]);
 		CDataHelper::call('usergroup.delete', array_values(self::$data['usrgrpids']));
 		CDataHelper::call('mfa.delete', array_values(self::$data['mfaids']));
+		CDataHelper::call('user.delete', array_values(self::$data['userids']));
 	}
 }

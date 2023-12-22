@@ -279,6 +279,7 @@ class CMfa extends CApiService {
 	public function delete(array $mfaids): array {
 		self::validateDelete($mfaids, $db_mfaids);
 
+		DB::delete('mfa_totp_secret', ['mfaid' => $mfaids]);
 		DB::delete('mfa', ['mfaid' => $mfaids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfaids);
