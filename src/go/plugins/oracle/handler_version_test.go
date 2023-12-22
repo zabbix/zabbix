@@ -65,7 +65,7 @@ func Test_versionHandler(t *testing.T) {
 		{
 			"+valid",
 			db{resp: "1.2.3"},
-			`"1.2.3"`,
+			`1.2.3`,
 			false,
 		},
 		{

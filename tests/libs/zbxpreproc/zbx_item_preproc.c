@@ -286,6 +286,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pp_cache_t		*cache, *step_cache;
 	zbx_pp_item_preproc_t	preproc;
 
+	pp_context_init(&ctx);
+
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
 
