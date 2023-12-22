@@ -39,7 +39,7 @@ dnl *                     Checks for programs                       *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_PROG_CC([cc c99 gcc clang])
+AC_PROG_CC([clang gcc c99 cc])
 AM_PROG_CC_C_O
 
 dnl *****************************************************************
