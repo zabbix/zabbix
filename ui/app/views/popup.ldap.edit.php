@@ -58,7 +58,7 @@ $form
 		->addItem([
 			(new CLabel(_('Port'), 'port'))->setAsteriskMark(),
 			new CFormField(
-				(new CNumericBox('port', $data['port'], 5))
+				(new CNumericBox('port', $data['port'], 5, false, false, false))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 					->setAriaRequired()
 			)
