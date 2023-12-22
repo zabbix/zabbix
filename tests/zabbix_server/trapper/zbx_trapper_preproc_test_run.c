@@ -131,7 +131,7 @@ void	__wrap_free_result(AGENT_RESULT *result)
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*request, *response = NULL, *value_append = NULL;
+	const char		*request, *response = NULL, *value_append = NULL, *expected_truncation = NULL;
 	char			*error = NULL, *value_override = NULL,
 				*request_override = NULL, *response_override = NULL;
 	struct zbx_json_parse	jp;
@@ -144,21 +144,43 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	zbx_json_init(&out, 1024);
-
-	request = zbx_mock_get_parameter_string("in.request");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-
-	if (SUCCEED == expected_ret)
-		response = zbx_mock_get_parameter_string("out.response");
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.value_rand_gen_len", &handle) &&
 			ZBX_MOCK_SUCCESS == zbx_mock_uint64(handle, &random_gen_length))
 	{
+		#define RANG_GEN_REQUEST "{\
+			\"data\": {\
+				\"steps\": [],\
+				\"value_type\": 1,\
+				\"value\": \"%s\"\
+			},\
+			\"request\": \"preprocessing.test\",\
+			\"sid\": \"6ed71f17963a881bd010e63b01c39484\"\
+		}"
+		#define RANG_GEN_RESPONSE_TRUNCATED "{\
+			\"response\": \"success\",\
+			\"data\": {\
+				\"steps\": [],\
+				\"truncated\": %s,\
+				\"result\": \"%s\",\
+				\"original_size\": %llu\
+			}\
+		}"
+		#define RANG_GEN_RESPONSE_UNTRUNCATED "{\
+			\"response\": \"success\",\
+			\"data\": {\
+				\"steps\": [],\
+				\"result\": \"%s\"\
+			}\
+		}"
+
 		size_t append_len, required_length;
 
 		required_length = random_gen_length;
 		value_append = zbx_mock_get_parameter_string("in.value_append");
 		expected_data_len = zbx_mock_get_parameter_uint64("out.expected_len");
+		expected_truncation = zbx_mock_get_parameter_string("out.expected_truncated");
 
 		required_length += append_len = strlen(value_append);
 		value_override = (char *)malloc((required_length + 1) * sizeof(char));
@@ -169,19 +191,36 @@ void	zbx_mock_test_entry(void **state)
 			value_override[i + random_gen_length] = value_append[i];
 
 		value_override[required_length] = '\0';
-		zbx_snprintf_alloc(&request_override, &tmp_alloc, &tmp_offset, request, value_override);
+		zbx_snprintf_alloc(&request_override, &tmp_alloc, &tmp_offset, RANG_GEN_REQUEST, value_override);
 		request = request_override;
 
-		if (response != NULL)
-		{
-			tmp_alloc = 0;
-			tmp_offset = 0;
-			value_override[expected_data_len] = '\0';
-			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, response, value_override,
-					required_length);
+		tmp_alloc = 0;
+		tmp_offset = 0;
+		value_override[expected_data_len] = '\0';
 
-			response = response_override;
+		if (0 == strcmp("true", expected_truncation))
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_TRUNCATED,
+					expected_truncation, value_override, required_length);
 		}
+		else
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_UNTRUNCATED,
+					value_override);
+		}
+
+		response = response_override;
+
+		#undef RANG_GEN_REQUEST
+		#undef RANG_GEN_RESPONSE_TRUNCATED
+		#undef RANG_GEN_RESPONSE_UNTRUNCATED
+	}
+	else
+	{
+		request = zbx_mock_get_parameter_string("in.request");
+
+		if (SUCCEED == expected_ret)
+			response = zbx_mock_get_parameter_string("out.response");
 	}
 
 	if (FAIL == zbx_json_open(request, &jp))

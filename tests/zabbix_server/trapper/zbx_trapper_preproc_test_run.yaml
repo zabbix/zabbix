@@ -1248,225 +1248,75 @@ out:
       }
     }
 ---
-test case: 'Check no cutoff' 
+test case: 'Check no cutoff'
 in:
   value_rand_gen_len: 524288
   value_append: ""
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524288
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "result": "%s"
-      }
-    }
+  expected_truncated: false
 ---
-test case: 'Check cutoff' 
+test case: 'Check cutoff'
 in:
   value_rand_gen_len: 524290
   value_append: ""
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524288
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "truncated": true,
-        "result": "%s",
-        "original_size": %llu
-      }
-    }
+  expected_truncated: true
 ---
-test case: 'Check cutoff before 2 byte' 
+test case: 'Check cutoff before 2 byte'
 in:
   value_rand_gen_len: 524288
   value_append: "Ä"
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524288
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "truncated": true,
-        "result": "%s",
-        "original_size": %llu
-      }
-    }
+  expected_truncated: true
 ---
-test case: 'Check cutoff middle 2 byte' 
+test case: 'Check cutoff middle 2 byte'
 in:
   value_rand_gen_len: 524287
   value_append: "Ä"
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524287
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "truncated": true,
-        "result": "%s",
-        "original_size": %llu
-      }
-    }
+  expected_truncated: true
 ---
-test case: 'Check cutoff before 3 byte' 
+test case: 'Check cutoff before 3 byte'
 in:
   value_rand_gen_len: 524288
   value_append: "ế"
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524288
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "truncated": true,
-        "result": "%s",
-        "original_size": %llu
-      }
-    }
+  expected_truncated: true
 ---
-test case: 'Check cutoff middle 3 byte' 
+test case: 'Check cutoff middle 3 byte'
 in:
   value_rand_gen_len: 524286
   value_append: "ế"
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524286
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "truncated": true,
-        "result": "%s",
-        "original_size": %llu
-      }
-    }
+  expected_truncated: true
 ---
-test case: 'Check cutoff before 4 byte' 
+test case: 'Check cutoff before 4 byte'
 in:
   value_rand_gen_len: 524288
   value_append: "𨉟"
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524288
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "truncated": true,
-        "result": "%s",
-        "original_size": %llu
-      }
-    }
+  expected_truncated: true
 ---
-test case: 'Check cutoff middle 4 byte' 
+test case: 'Check cutoff middle 4 byte'
 in:
   value_rand_gen_len: 524285
   value_append: "𨉟"
-  request: |
-    {
-      "data": {
-        "steps": [],
-        "value_type": 1,
-        "value": "%s"
-      },
-      "request": "preprocessing.test",
-      "sid": "6ed71f17963a881bd010e63b01c39484"
-    }
 out:
   return: SUCCEED
   expected_len: 524285
-  response: |
-    {
-      "response": "success",
-      "data": {
-        "steps": [],
-        "truncated": true,
-        "result": "%s",
-        "original_size": %llu
-      }
-    }
+  expected_truncated: true
 ...
