@@ -1919,7 +1919,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$old_hash = $this->getHash().CDBHelper::getHash('SELECT * FROM actions');
 		$new_name = microtime(true).' Cancel '.self::CANCEL_RULE;
 
-		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$this->page->login()->open('zabbix.php?action=discovery.list')->waitUntilReady();
 		$selector = ($data['action'] === 'Add') ? 'button:Create discovery rule' : ('link:'.self::CANCEL_RULE);
 		$this->query($selector)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:discoveryForm')->waitUntilPresent()->one()->asForm();
