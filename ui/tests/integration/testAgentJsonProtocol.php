@@ -222,7 +222,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 				'Timeout' => 10,
 				'Hostname' => self::HOSTNAME,
 				'EnableRemoteCommands' => 1
-			],
+			]
 		];
 	}
 
@@ -235,7 +235,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 			'interface' => [
 				'address' => '127.0.0.1',
 				'port' => $this->getConfigurationValue($agent_component, 'ListenPort'),
-				'type' => 0,
+				'type' => 0
 			],
 			'host' => ['tls_connect' => '1']
 		];
