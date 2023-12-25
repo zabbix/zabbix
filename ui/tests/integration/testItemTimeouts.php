@@ -166,7 +166,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
-				'timeout' => '10s'
+				'timeout' => '20s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT2],
@@ -176,7 +176,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
-				'timeout' => '10s'
+				'timeout' => '20s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT],
@@ -186,7 +186,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
-				'timeout' => '10s'
+				'timeout' => '20s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT2],
@@ -196,7 +196,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
-				'timeout' => '10s'
+				'timeout' => '20s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT],
@@ -206,7 +206,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
-				'timeout' => '10s'
+				'timeout' => '20s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT2],
@@ -216,7 +216,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
-				'timeout' => '10s'
+				'timeout' => '20s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT],
@@ -226,7 +226,7 @@ class testItemTimeouts extends CIntegrationTest {
 				'type' => ITEM_TYPE_EXTERNAL,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
-				'timeout' => '10s'
+				'timeout' => '20s'
 			],
 			[
 				'hostid' => self::$hostids[self::HOSTNAME_SNMP],
