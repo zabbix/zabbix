@@ -75,8 +75,8 @@ typedef struct
 	zbx_uint64_t			unique_dcheckid;
 	unsigned char			resolve_dns;
 
-#define	DISCOVERY_ADDR_IP		0
-#define	DISCOVERY_ADDR_RANGE		1
+#define DISCOVERY_ADDR_IP		0
+#define DISCOVERY_ADDR_RANGE		1
 	unsigned char			addr_type;
 }
 zbx_discoverer_task_t;

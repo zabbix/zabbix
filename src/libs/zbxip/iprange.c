@@ -363,13 +363,12 @@ int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip,
 				(unsigned int)ipaddress[7]);
 	}
 	else
-	{
 #endif
+	{
 		zbx_snprintf(ip, len, "%u.%u.%u.%u", (unsigned int)ipaddress[0], (unsigned int)ipaddress[1],
 				(unsigned int)ipaddress[2], (unsigned int)ipaddress[3]);
-#ifdef HAVE_IPV6
 	}
-#endif
+
 	return SUCCEED;
 }
 /******************************************************************************
@@ -634,7 +633,7 @@ int	zbx_portrange_uniq_next(const zbx_range_t *ranges, const int num, int *port)
 	if (0 == num)
 		return FAIL;
 
-	if (0 == *port)
+	if (ZBX_PORTRANGE_INIT_PORT == *port)
 	{
 		idx = 0;
 		current_port = ranges[idx].from;

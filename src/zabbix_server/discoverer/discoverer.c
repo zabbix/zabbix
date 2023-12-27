@@ -1093,9 +1093,7 @@ static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t
 	zbx_vector_discoverer_results_ptr_create(&results);
 
 	for (i = 0; i < task->dchecks.values_num && SUCCEED == ret; i++)
-	{
 		ret = discover_icmp(druleid, task, i, worker_max, &results, error);
-	}
 
 	pthread_mutex_lock(&dmanager.results_lock);
 	discover_results_merge(&dmanager.results, &results, task);
