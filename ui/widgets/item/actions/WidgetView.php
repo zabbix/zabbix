@@ -154,7 +154,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$time_to_prev = $data_last['clock'] - 1;
 				$time_from_prev = $time_to_prev - $history_period;
 
-				$data_prev = $history->getAggregatedValues($item, AGGREGATE_LAST, $time_from_prev, $time_to_prev);
+				$data_prev = $history->getAggregatedValues([$item], AGGREGATE_LAST, $time_from_prev, $time_to_prev);
 				$data_prev = $data_prev ? reset($data_prev) : null;
 			}
 			else {
