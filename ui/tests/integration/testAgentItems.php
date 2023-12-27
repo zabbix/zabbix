@@ -997,7 +997,10 @@ class testAgentItems extends CIntegrationTest {
 					self::fail('Wrong element type in '.$key);
 				}
 
-				self::assertEquals($array_value, $cmpr[$array_key], 'Value (array key: '.$array_key.') is not expected for '.$key);
+				self::assertEquals($array_value, $cmpr[$array_key],
+						'Value (array key: '.$array_key.') is not expected for '.
+						$key."\n Received: ".json.encode($cmpr[$array_key]).
+						".\n But expected: ".json_encode($array_value)."\n");
 			}
 		}
 	}
