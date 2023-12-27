@@ -54,576 +54,576 @@ class testAgentItems extends CIntegrationTest {
 
 	// List of items to check.
 	private static $items = [
-		/* [ */
-		/* 	'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result_exec' => 'stat -c %U '.self::TEST_FILE_NAME */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.',group,id]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result_exec' => 'stat -c %g '.self::TEST_FILE_NAME */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result_exec' => 'stat -c %U '.self::TEST_FILE_NAME */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.',group,id]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result_exec' => 'stat -c %g '.self::TEST_FILE_NAME */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'kernel.openfiles', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result_exec' => 'cat /proc/sys/fs/file-nr | cut -f 1', */
-		/* 	'threshold' => 2000 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'kernel.openfiles', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result_exec' => 'cat /proc/sys/fs/file-nr | cut -f 1', */
-		/* 	'threshold' => 2000 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.size['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 27 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.size['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 27 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.size['.self::TEST_FILE_NAME.',lines]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 3 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.size['.self::TEST_FILE_NAME.',lines]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 3 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.permissions['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.permissions['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'agent.hostmetadata', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result' => self::AGENT_METADATA */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'agent.hostmetadata', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result' => self::AGENT_METADATA */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 892864536 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',md5]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result' => 'f58f72c7ef71556254f409fd7411567d' */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',sha256]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result' => 'b73a96d498012c84fc2ffa1df3c4461689cb90456ee300654723205c26ec4988' */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 892864536 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',md5]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result' => 'f58f72c7ef71556254f409fd7411567d' */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',sha256]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'result' => 'b73a96d498012c84fc2ffa1df3c4461689cb90456ee300654723205c26ec4988' */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.get['.self::TEST_FILE_NAME_ACCESS.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'], */
-		/* 	'result' => [ */
-		/* 			'type' => 'file', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'user' => 'stat -c %U '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'group' => 'stat -c %G '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'size' => 27, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_FILE_NAME_ACCESS */
-		/* 			] */
-		/* 		] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.get['.self::TEST_FILE_NAME_ACCESS.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'], */
-		/* 	'result' => [ */
-		/* 			'type' => 'file', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'user' => 'stat -c %U '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'group' => 'stat -c %G '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_FILE_NAME_ACCESS, */
-		/* 			'size' => 27, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+03:00' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_FILE_NAME_ACCESS */
-		/* 			] */
-		/* 		] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.get['.self::TEST_LINK_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'], */
-		/* 	'result' => [ */
-		/* 			'type' => 'sym', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME, */
-		/* 			'user' => 'stat -c %U '.self::TEST_LINK_NAME, */
-		/* 			'group' => 'stat -c %G '.self::TEST_LINK_NAME, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_LINK_NAME, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_LINK_NAME, */
-		/* 			'size' => 14, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_LINK_NAME, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_LINK_NAME */
-		/* 			] */
-		/* 		] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.file.get['.self::TEST_LINK_NAME2.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'], */
-		/* 	'result' => [ */
-		/* 			'type' => 'sym', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME2, */
-		/* 			'user' => 'stat -c %U '.self::TEST_LINK_NAME2, */
-		/* 			'group' => 'stat -c %G '.self::TEST_LINK_NAME2, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_LINK_NAME2, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_LINK_NAME2, */
-		/* 			'size' => 14, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+03:00' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_LINK_NAME2, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_LINK_NAME2 */
-		/* 			] */
-		/* 		] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 1 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'net.tcp.socket.count[,,127.127.127.127]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 0 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'net.udp.socket.count[]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l' */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 1 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'net.tcp.socket.count[,,127.127.127.127]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 0 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'net.udp.socket.count[]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l' */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_ARRAY_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'basename' => self::TEST_FILE_BASE_NAME, */
-		/* 			'pathname' =>  self::TEST_DIR_FILE_NAME, */
-		/* 			'dirname' => self::TEST_DIR_NAME, */
-		/* 			'type' => 'file', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME, */
-		/* 			'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME, */
-		/* 			'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_DIR_FILE_NAME, */
-		/* 			'size' => 27, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_DIR_FILE_NAME, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_DIR_FILE_NAME */
-		/* 			] */
-		/* 		], */
-		/* 		[ */
-		/* 			'basename' => self::TEST_DIR1_NAME, */
-		/* 			'pathname' =>  self::TEST_DIR_DIR1_NAME, */
-		/* 			'dirname' => self::TEST_DIR_NAME, */
-		/* 			'type' => 'dir', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'size' => 4096, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_DIR_DIR1_NAME, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_DIR_DIR1_NAME */
-		/* 			] */
-		/* 		], */
-		/* 		[ */
-		/* 			'basename' => self::TEST_LINK_BASE_NAME, */
-		/* 			'pathname' =>  self::TEST_DIR_LINK_NAME, */
-		/* 			'dirname' => self::TEST_DIR_DIR1_NAME, */
-		/* 			'type' => 'sym', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME, */
-		/* 			'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME, */
-		/* 			'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_DIR_LINK_NAME, */
-		/* 			'size' => 18, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_DIR_LINK_NAME, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_DIR_LINK_NAME */
-		/* 			] */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_ARRAY_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'basename' => self::TEST_FILE_BASE_NAME, */
-		/* 			'pathname' =>  self::TEST_DIR_FILE_NAME, */
-		/* 			'dirname' => self::TEST_DIR_NAME, */
-		/* 			'type' => 'file', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME, */
-		/* 			'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME, */
-		/* 			'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_DIR_FILE_NAME, */
-		/* 			'size' => 27, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_DIR_FILE_NAME, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_DIR_FILE_NAME */
-		/* 			] */
-		/* 		], */
-		/* 		[ */
-		/* 			'basename' => self::TEST_DIR1_NAME, */
-		/* 			'pathname' =>  self::TEST_DIR_DIR1_NAME, */
-		/* 			'dirname' => self::TEST_DIR_NAME, */
-		/* 			'type' => 'dir', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_DIR_DIR1_NAME, */
-		/* 			'size' => 4096, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_DIR_DIR1_NAME, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_DIR_DIR1_NAME */
-		/* 			] */
-		/* 		], */
-		/* 		[ */
-		/* 			'basename' => self::TEST_LINK_BASE_NAME, */
-		/* 			'pathname' =>  self::TEST_DIR_LINK_NAME, */
-		/* 			'dirname' => self::TEST_DIR_DIR1_NAME, */
-		/* 			'type' => 'sym', */
-		/* 			'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME, */
-		/* 			'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME, */
-		/* 			'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME, */
-		/* 			'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME, */
-		/* 			'gid' => 'stat -c %g '.self::TEST_DIR_LINK_NAME, */
-		/* 			'size' => 18, */
-		/* 			'time' => [ */
-		/* 				'modify' => '2021-03-29T14:59:09+0300' */
-		/* 			], */
-		/* 			'timestamp' => [ */
-		/* 				'access' => 'stat -c %X '.self::TEST_DIR_LINK_NAME, */
-		/* 				'modify' => self::TEST_MOD_TIMESTAMP, */
-		/* 				'change' => 'stat -c %Z '.self::TEST_DIR_LINK_NAME */
-		/* 			] */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'agent.variant', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 1 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'agent.variant', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 2 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agentd]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd', */
-		/* 			'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd', */
-		/* 			'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd', */
-		/* 			'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd', */
-		/* 			'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd' */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agentd]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd', */
-		/* 			'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd', */
-		/* 			'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd', */
-		/* 			'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd', */
-		/* 			'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd' */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agent2]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'pid' => 'pgrep zabbix_agent2', */
-		/* 			'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2', */
-		/* 			'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2', */
-		/* 			'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2', */
-		/* 			'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2', */
-		/* 			'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2', */
-		/* 			'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2' */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agent2]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'pid' => 'pgrep zabbix_agent2', */
-		/* 			'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2', */
-		/* 			'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2', */
-		/* 			'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2', */
-		/* 			'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2', */
-		/* 			'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2', */
-		/* 			'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2' */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agent2,,,thread]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['tid'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'name' => 'zabbix_agent2', */
-		/* 			'tname' => 'zabbix_agent2', */
-		/* 			'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2' */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agent2,,,thread]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['tid'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'name' => 'zabbix_agent2', */
-		/* 			'tname' => 'zabbix_agent2', */
-		/* 			'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2' */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agentd,,,summary]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['processes', 'threads'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'name' => 'zabbix_agentd', */
-		/* 			'processes' => 'ps --no-headers -C zabbix_agentd | wc -l', */
-		/* 			'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l' */
-		/* 		] */
-		/* 	] */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'proc.get[zabbix_agentd,,,summary]', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_TEXT, */
-		/* 	'json' => JSON_COMPARE_LEFT, */
-		/* 	'fields_exec' => ['processes', 'threads'], */
-		/* 	'result' => [ */
-		/* 		[ */
-		/* 			'name' => 'zabbix_agentd', */
-		/* 			'processes' => 'ps --no-headers -C zabbix_agentd | wc -l', */
-		/* 			'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l' */
-		/* 		] */
-		/* 	] */
-		/* ], */
+		[
+			'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result_exec' => 'stat -c %U '.self::TEST_FILE_NAME
+		],
+		[
+			'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.',group,id]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result_exec' => 'stat -c %g '.self::TEST_FILE_NAME
+		],
+		[
+			'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result_exec' => 'stat -c %U '.self::TEST_FILE_NAME
+		],
+		[
+			'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.',group,id]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result_exec' => 'stat -c %g '.self::TEST_FILE_NAME
+		],
+		[
+			'key' => 'kernel.openfiles',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result_exec' => 'cat /proc/sys/fs/file-nr | cut -f 1',
+			'threshold' => 2000
+		],
+		[
+			'key' => 'kernel.openfiles',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result_exec' => 'cat /proc/sys/fs/file-nr | cut -f 1',
+			'threshold' => 2000
+		],
+		[
+			'key' => 'vfs.file.size['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 27
+		],
+		[
+			'key' => 'vfs.file.size['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 27
+		],
+		[
+			'key' => 'vfs.file.size['.self::TEST_FILE_NAME.',lines]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 3
+		],
+		[
+			'key' => 'vfs.file.size['.self::TEST_FILE_NAME.',lines]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 3
+		],
+		[
+			'key' => 'vfs.file.permissions['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME
+		],
+		[
+			'key' => 'vfs.file.permissions['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME
+		],
+		[
+			'key' => 'agent.hostmetadata',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => self::AGENT_METADATA
+		],
+		[
+			'key' => 'agent.hostmetadata',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => self::AGENT_METADATA
+		],
+		[
+			'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 892864536
+		],
+		[
+			'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',md5]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => 'f58f72c7ef71556254f409fd7411567d'
+		],
+		[
+			'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',sha256]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => 'b73a96d498012c84fc2ffa1df3c4461689cb90456ee300654723205c26ec4988'
+		],
+		[
+			'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 892864536
+		],
+		[
+			'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',md5]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => 'f58f72c7ef71556254f409fd7411567d'
+		],
+		[
+			'key' => 'vfs.file.cksum['.self::TEST_FILE_NAME.',sha256]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => 'b73a96d498012c84fc2ffa1df3c4461689cb90456ee300654723205c26ec4988'
+		],
+		[
+			'key' => 'vfs.file.get['.self::TEST_FILE_NAME_ACCESS.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
+			'result' => [
+					'type' => 'file',
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME_ACCESS,
+					'user' => 'stat -c %U '.self::TEST_FILE_NAME_ACCESS,
+					'group' => 'stat -c %G '.self::TEST_FILE_NAME_ACCESS,
+					'uid' => 'stat -c %u '.self::TEST_FILE_NAME_ACCESS,
+					'gid' => 'stat -c %g '.self::TEST_FILE_NAME_ACCESS,
+					'size' => 27,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_FILE_NAME_ACCESS
+					]
+				]
+		],
+		[
+			'key' => 'vfs.file.get['.self::TEST_FILE_NAME_ACCESS.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
+			'result' => [
+					'type' => 'file',
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME_ACCESS,
+					'user' => 'stat -c %U '.self::TEST_FILE_NAME_ACCESS,
+					'group' => 'stat -c %G '.self::TEST_FILE_NAME_ACCESS,
+					'uid' => 'stat -c %u '.self::TEST_FILE_NAME_ACCESS,
+					'gid' => 'stat -c %g '.self::TEST_FILE_NAME_ACCESS,
+					'size' => 27,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+03:00'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_FILE_NAME_ACCESS
+					]
+				]
+		],
+		[
+			'key' => 'vfs.file.get['.self::TEST_LINK_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
+			'result' => [
+					'type' => 'sym',
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME,
+					'user' => 'stat -c %U '.self::TEST_LINK_NAME,
+					'group' => 'stat -c %G '.self::TEST_LINK_NAME,
+					'uid' => 'stat -c %u '.self::TEST_LINK_NAME,
+					'gid' => 'stat -c %g '.self::TEST_LINK_NAME,
+					'size' => 14,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_LINK_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_LINK_NAME
+					]
+				]
+		],
+		[
+			'key' => 'vfs.file.get['.self::TEST_LINK_NAME2.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
+			'result' => [
+					'type' => 'sym',
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME2,
+					'user' => 'stat -c %U '.self::TEST_LINK_NAME2,
+					'group' => 'stat -c %G '.self::TEST_LINK_NAME2,
+					'uid' => 'stat -c %u '.self::TEST_LINK_NAME2,
+					'gid' => 'stat -c %g '.self::TEST_LINK_NAME2,
+					'size' => 14,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+03:00'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_LINK_NAME2,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_LINK_NAME2
+					]
+				]
+		],
+		[
+			'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
+		],
+		[
+			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 0
+		],
+		[
+			'key' => 'net.udp.socket.count[]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
+		],
+		[
+			'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
+		],
+		[
+			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 0
+		],
+		[
+			'key' => 'net.udp.socket.count[]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
+		],
+		[
+			'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_ARRAY_COMPARE_LEFT,
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
+			'result' => [
+				[
+					'basename' => self::TEST_FILE_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_FILE_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'file',
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME,
+					'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME,
+					'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME,
+					'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME,
+					'gid' => 'stat -c %g '.self::TEST_DIR_FILE_NAME,
+					'size' => 27,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_DIR_FILE_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_DIR_FILE_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_DIR1_NAME,
+					'pathname' =>  self::TEST_DIR_DIR1_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'dir',
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME,
+					'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME,
+					'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME,
+					'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME,
+					'gid' => 'stat -c %g '.self::TEST_DIR_DIR1_NAME,
+					'size' => 4096,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_DIR_DIR1_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_DIR_DIR1_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_LINK_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_LINK_NAME,
+					'dirname' => self::TEST_DIR_DIR1_NAME,
+					'type' => 'sym',
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
+					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
+					'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME,
+					'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME,
+					'gid' => 'stat -c %g '.self::TEST_DIR_LINK_NAME,
+					'size' => 18,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_DIR_LINK_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_DIR_LINK_NAME
+					]
+				]
+			]
+		],
+		[
+			'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_ARRAY_COMPARE_LEFT,
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
+			'result' => [
+				[
+					'basename' => self::TEST_FILE_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_FILE_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'file',
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME,
+					'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME,
+					'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME,
+					'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME,
+					'gid' => 'stat -c %g '.self::TEST_DIR_FILE_NAME,
+					'size' => 27,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_DIR_FILE_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_DIR_FILE_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_DIR1_NAME,
+					'pathname' =>  self::TEST_DIR_DIR1_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'dir',
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME,
+					'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME,
+					'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME,
+					'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME,
+					'gid' => 'stat -c %g '.self::TEST_DIR_DIR1_NAME,
+					'size' => 4096,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_DIR_DIR1_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_DIR_DIR1_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_LINK_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_LINK_NAME,
+					'dirname' => self::TEST_DIR_DIR1_NAME,
+					'type' => 'sym',
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
+					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
+					'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME,
+					'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME,
+					'gid' => 'stat -c %g '.self::TEST_DIR_LINK_NAME,
+					'size' => 18,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c %X '.self::TEST_DIR_LINK_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c %Z '.self::TEST_DIR_LINK_NAME
+					]
+				]
+			]
+		],
+		[
+			'key' => 'agent.variant',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
+		],
+		[
+			'key' => 'agent.variant',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 2
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
+			'result' => [
+				[
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
+					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
+			'result' => [
+				[
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
+					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agent2',
+					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agent2',
+					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2,,,thread]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['tid'],
+			'result' => [
+				[
+					'name' => 'zabbix_agent2',
+					'tname' => 'zabbix_agent2',
+					'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2,,,thread]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['tid'],
+			'result' => [
+				[
+					'name' => 'zabbix_agent2',
+					'tname' => 'zabbix_agent2',
+					'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['processes', 'threads'],
+			'result' => [
+				[
+					'name' => 'zabbix_agentd',
+					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['processes', 'threads'],
+			'result' => [
+				[
+					'name' => 'zabbix_agentd',
+					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
+				]
+			]
+		],
 		[
 			'key' => 'net.tcp.port[123.123.123.123,111]',
 			'type' => ITEM_TYPE_ZABBIX,
@@ -640,20 +640,20 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 0,
 			'timeout' => '1s'
 		],
-		/* [ */
-		/* 	'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 1 */
-		/* ], */
-		/* [ */
-		/* 	'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']', */
-		/* 	'type' => ITEM_TYPE_ZABBIX, */
-		/* 	'component' => self::COMPONENT_AGENT2, */
-		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
-		/* 	'result' => 1 */
-		/* ] */
+		[
+			'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
+		],
+		[
+			'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
+		]
 	];
 
 	/**
