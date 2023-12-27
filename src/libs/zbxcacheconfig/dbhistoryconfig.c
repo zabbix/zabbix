@@ -19,7 +19,6 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
-#include "zbxexpression.h"
 #include "actions.h"
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"
@@ -102,10 +101,11 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
  ******************************************************************************/
 static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_history_sync_item_t *item)
 {
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+
 	if (NULL != item->trends_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_dc_expand_user_and_func_macros(um_handle, &item->trends_period, &item->host.hostid, 1, NULL);
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
@@ -118,8 +118,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 
 	if (NULL != item->history_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_dc_expand_user_and_func_macros(um_handle, &item->history_period, &item->host.hostid, 1, NULL);
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
@@ -129,6 +128,8 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 
 		item->history = (0 != item->history_sec);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************
@@ -876,22 +877,30 @@ void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 
 static void	substitute_orig_unmasked(const char *orig, char **data)
 {
-	if (NULL == strstr(orig, "{$"))
-		return;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
 
-	*data = zbx_strdup(*data, orig);
-	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			data, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	if (NULL != strstr(orig, "{$"))
+	{
+		*data = zbx_strdup(*data, orig);
+
+		zbx_dc_expand_user_and_func_macros(um_handle, data, NULL, 0, NULL);
+	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 static void	substitute_orig(const char *orig, char **data)
 {
-	if (NULL == strstr(orig, "{$"))
-		return;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-	*data = zbx_strdup(*data, orig);
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, data,
-			ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	if (NULL != strstr(orig, "{$"))
+	{
+		*data = zbx_strdup(*data, orig);
+
+		zbx_dc_expand_user_and_func_macros(um_handle, data, NULL, 0, NULL);
+	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,

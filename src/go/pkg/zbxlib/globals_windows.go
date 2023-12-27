@@ -83,11 +83,6 @@ package zbxlib
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-const char	*progname = NULL;
-const char	title_message[] = "agent";
-const char	*usage_message[] = {};
-const char	*help_message[] = {};
-
 zbx_metric_t	parameters_common[] = {NULL};
 zbx_metric_t	*get_parameters_common(void)
 {

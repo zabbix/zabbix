@@ -677,7 +677,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		else
 			zbx_substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
-		if (SUCCEED != zbx_function_param_quote(&param, quoted))
+		if (SUCCEED != zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON))
 		{
 			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
 			ret = FAIL;

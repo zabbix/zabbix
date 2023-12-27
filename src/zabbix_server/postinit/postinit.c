@@ -18,13 +18,18 @@
 **/
 
 #include "postinit.h"
-#include "zbxexpression.h"
 
-#include "db_lengths.h"
+#include "../db_lengths.h"
+
+#include "zbxexpression.h"
 #include "zbxtasks.h"
-#include "zbxnum.h"
 #include "zbxcachevalue.h"
 #include "zbxdbwrap.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0
@@ -32,11 +37,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets the total number of triggers on system                       *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: The total number of triggers on system.                      *
+ * Purpose: gets total number of triggers on system                           *
  *                                                                            *
  ******************************************************************************/
 static int	get_trigger_count(void)
@@ -60,7 +61,7 @@ static int	get_trigger_count(void)
  * Purpose: checks if this is historical macro that cannot be expanded for    *
  *          bulk event name update                                            *
  *                                                                            *
- * Parameters: macro      - [IN] the macro name                               *
+ * Parameters: macro - [IN]                                                   *
  *                                                                            *
  * Return value: ZBX_HIST_MACRO_* defines                                     *
  *                                                                            *
@@ -80,9 +81,9 @@ static int	is_historical_macro(const char *macro)
  *                                                                            *
  * Purpose: translates historical macro to lld macro format                   *
  *                                                                            *
- * Parameters: macro - [IN] the macro type (see ZBX_HIST_MACRO_* defines)     *
+ * Parameters: macro - [IN] macro type (see ZBX_HIST_MACRO_* defines)         *
  *                                                                            *
- * Return value: the macro                                                    *
+ * Return value: macro                                                        *
  *                                                                            *
  * Comments: Some of the macros can be converted to different name.           *
  *                                                                            *
@@ -102,7 +103,7 @@ static const char	*convert_historical_macro(int macro)
  * Purpose: pre-process trigger name(description) by expanding non historical *
  *          macros                                                            *
  *                                                                            *
- * Parameters: trigger    - [IN] the trigger                                  *
+ * Parameters: trigger    - [IN]                                              *
  *             historical - [OUT] 1 - trigger name contains historical macros *
  *                                0 - otherwise                               *
  *                                                                            *
@@ -112,7 +113,7 @@ static const char	*convert_historical_macro(int macro)
  ******************************************************************************/
 static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 {
-	int		pos = 0, macro_len, macro_type;
+	int		pos = 0, macro_len;
 	zbx_token_t	token;
 	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset, r, l;
 	char		*replace;
@@ -142,6 +143,8 @@ static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 			}
 
 			macro = trigger->description + l;
+
+			int	macro_type;
 
 			if (ZBX_HIST_MACRO_NONE != (macro_type = is_historical_macro(macro)))
 			{
@@ -209,14 +212,14 @@ static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update event/problem names for a trigger with bulk request        *
+ * Purpose: updates event/problem names for trigger with bulk request         *
  *                                                                            *
- * Parameters: trigger    - [IN] the trigger                                  *
- *             sql        - [IN/OUT] the sql query                            *
- *             sql_alloc  - [IN/OUT] the sql query size                       *
- *             sql_offset - [IN/OUT] the sql query length                     *
+ * Parameters: trigger    - [IN]                                              *
+ *             sql        - [IN/OUT] sql query                                *
+ *             sql_alloc  - [IN/OUT] sql query size                           *
+ *             sql_offset - [IN/OUT] sql query length                         *
  *                                                                            *
- * Return value: SUCCEED - the update was successful                          *
+ * Return value: SUCCEED - update was successful                              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: Event names for triggers without historical macros will be the   *
@@ -259,15 +262,15 @@ static int	process_event_bulk_update(const zbx_db_trigger *trigger, char **sql, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update event/problem names for a trigger with separate requests   *
- *          for each event                                                    *
+ * Purpose: Updates event/problem names for a trigger with separate requests  *
+ *          for each event.                                                   *
  *                                                                            *
- * Parameters: trigger    - [IN] the trigger                                  *
- *             sql        - [IN/OUT] the sql query                            *
- *             sql_alloc  - [IN/OUT] the sql query size                       *
- *             sql_offset - [IN/OUT] the sql query length                     *
+ * Parameters: trigger    - [IN]                                              *
+ *             sql        - [IN/OUT] sql query                                *
+ *             sql_alloc  - [IN/OUT] sql query size                           *
+ *             sql_offset - [IN/OUT] sql query length                         *
  *                                                                            *
- * Return value: SUCCEED - the update was successful                          *
+ * Return value: SUCCEED - update was successful                              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: Event names for triggers with historical macros might differ and *
@@ -342,9 +345,9 @@ static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update event names in events and problem tables                   *
+ * Purpose: updates event names in events and problem tables                  *
  *                                                                            *
- * Return value: SUCCEED - the update was successful                          *
+ * Return value: SUCCEED - update was successful                              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -353,8 +356,7 @@ static int	update_event_names(void)
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_db_trigger		trigger;
-	int			ret = SUCCEED, historical, triggers_num, processed_num = 0, completed,
-				last_completed = 0;
+	int			ret = SUCCEED, triggers_num, processed_num = 0, last_completed = 0;
 	char			*sql;
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	zbx_dc_um_handle_t	*um_handle;
@@ -390,6 +392,8 @@ static int	update_event_names(void)
 		ZBX_STR2UCHAR(trigger.recovery_mode, row[8]);
 		ZBX_STR2UCHAR(trigger.value, row[9]);
 
+		int	historical;
+
 		preprocess_trigger_name(&trigger, &historical);
 
 		if (FAIL == historical)
@@ -400,6 +404,8 @@ static int	update_event_names(void)
 		zbx_db_trigger_clean(&trigger);
 
 		processed_num++;
+
+		int	completed;
 
 		if (last_completed != (completed = (int)(100.0 * processed_num / triggers_num)))
 		{
@@ -432,9 +438,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process post initialization tasks                                 *
+ * Purpose: processes post initialization tasks                               *
  *                                                                            *
- * Return value: SUCCEED - the update was successful                          *
+ * Return value: SUCCEED - update was successful                              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/

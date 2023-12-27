@@ -20,7 +20,6 @@
 #include "dbconfig.h"
 
 #include "zbxtasks.h"
-#include "zbxexpression.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
@@ -1942,7 +1941,8 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 }
 
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1973,7 +1973,8 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 			}
 
 		}
-		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, config_source_ip, &error))
+		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
 					error);
@@ -2313,6 +2314,7 @@ typedef struct
 	char			*ip;
 	char			*dns;
 	int			modified;
+	int			found;
 }
 zbx_dc_if_update_t;
 
@@ -2467,6 +2469,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			interface->reset_availability = 0;
 			interface->items_num = 0;
 			dc_strpool_replace(found, &interface->error, row[10]);
+			interface->version = 0;
 		}
 
 		/* update interfaces_ht index using new data, if not done already */
@@ -2504,7 +2507,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			if (SUCCEED == dc_strpool_replace(found, &interface->dns, update->dns))
 				update->modified = 1;
 		}
-
+		update->found = found;
 		zbx_vector_dc_if_update_ptr_append(&updates, update);
 
 		if (0 == found)
@@ -2540,15 +2543,21 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			dc_if_update_substitute_host_macros(update, update->host);
 
-			if (SUCCEED == dc_strpool_replace(found, &update->interface->ip, update->ip))
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->ip, update->ip))
 				update->modified = 1;
 
-			if (SUCCEED == dc_strpool_replace(found, &update->interface->dns, update->dns))
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->dns, update->dns))
 				update->modified = 1;
 		}
 
 		if (0 != update->modified)
 		{
+			if (INTERFACE_TYPE_AGENT == interface->type &&
+					interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+			{
+				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+			}
+
 			dc_host_update_revision(update->host, revision);
 
 			if (NULL != update->snmp)
@@ -9257,6 +9266,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->disable_until = src_interface->disable_until;
 		dst_interface->errors_from = src_interface->errors_from;
 		zbx_strscpy(dst_interface->error, src_interface->error);
+		dst_interface->version = src_interface->version;
 	}
 	else
 	{
@@ -9271,6 +9281,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->disable_until = 0;
 		dst_interface->errors_from = 0;
 		*dst_interface->error = '\0';
+		dst_interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
 	}
 
 	dst_interface->addr = (1 == dst_interface->useip ? dst_interface->ip_orig : dst_interface->dns_orig);
@@ -11864,6 +11875,18 @@ out:
 	return ret;
 }
 
+void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version)
+{
+	ZBX_DC_INTERFACE	*dc_interface;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid)))
+		dc_interface->version = version;
+
+	UNLOCK_CACHE;
+}
+
 /***************************************************************************************
  *                                                                                     *
  * Purpose: attempt to set interface as unavailable based on agent availability        *
@@ -13412,16 +13435,21 @@ void	zbx_config_clean(zbx_config_t *cfg)
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
 #define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
+#define ZBX_INTERFACE_VERSION_RESET_INTERVAL	(SEC_PER_HOUR)
 
 	ZBX_DC_HOST			*host;
 	ZBX_DC_INTERFACE		*interface;
 	zbx_hashset_iter_t		iter;
 	zbx_interface_availability_t	*ia = NULL;
 	int				now;
+	static int			last_version_reset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
+
+	if (last_version_reset + ZBX_INTERFACE_VERSION_RESET_INTERVAL < now)
+		last_version_reset = now;
 
 	WRLOCK_CACHE;
 
@@ -13433,6 +13461,12 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
 			continue;
+
+		if (last_version_reset == now)
+		{
+			if (interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+		}
 
 		/* On server skip hosts handled by proxies. They are handled directly */
 		/* when receiving hosts' availability data from proxies.              */
@@ -13487,6 +13521,7 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
 	return 0 == interfaces->values_num ? FAIL : SUCCEED;
+#undef ZBX_INTERFACE_VERSION_RESET_INTERVAL
 #undef ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL
 }
 
@@ -15351,7 +15386,7 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
 		(void)zbx_dc_expand_user_and_func_macros(um_handle, &param, &hostid, 1, NULL);
 
-		if (SUCCEED == zbx_function_param_quote(&param, quoted))
+		if (SUCCEED == zbx_function_param_quote(&param, quoted, 1))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 		else
 			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos, param_len);
