@@ -1045,8 +1045,6 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
  * Prepare aggregated item value for displaying, apply value map and/or convert units if appropriate for the aggregation
  * function.
  *
- * @see formatHistoryValueRaw
- *
  * @param int|float|string $value
  * @param array            $item
  * @param int              $function         Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX,
@@ -1060,15 +1058,62 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
  */
 function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
 		bool $trim = true, array $convert_options = []): array {
-	if (!CAggFunctionData::preservesValueMapping($function)) {
-		unset($item['valuemap']['mappings']);
+	$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+	$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
+
+	if ($is_numeric_data) {
+		$display_value = $value;
+	}
+	else {
+		switch ($item['value_type']) {
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_LOG:
+				$display_value = $trim && mb_strlen($value) > 20 ? mb_substr($value, 0, 20).'...' : $value;
+				break;
+
+			case ITEM_VALUE_TYPE_BINARY:
+				$display_value = _('binary value');
+				break;
+
+			default:
+				$display_value = _('Unknown value type');
+		}
 	}
 
-	if (!$force_units && !CAggFunctionData::preservesUnits($function)) {
-		$item['units'] = '';
+	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR])
+			&& CAggFunctionData::preservesValueMapping($function)) {
+		$mapped_value = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
+
+		if ($mapped_value !== false) {
+			return [
+				'value' => $mapped_value.' ('.$display_value.')',
+				'units' => '',
+				'is_mapped' => true
+			];
+		}
 	}
 
-	return formatHistoryValueRaw($value, $item, $trim, $convert_options);
+	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
+
+	if ($is_numeric_data) {
+		$converted_value = convertUnitsRaw([
+			'value' => $value,
+			'units' => $units
+		] + $convert_options);
+
+		return [
+			'value' => $converted_value['value'],
+			'units' => $converted_value['units'],
+			'is_mapped' => false
+		];
+	}
+
+	return [
+		'value' => $display_value,
+		'units' => $units,
+		'is_mapped' => false
+	];
 }
 
 /**

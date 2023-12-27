@@ -206,12 +206,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getElements(array $item, ?array $data_last, ?array $data_prev, int $function): array {
 		$elements = [
 			'description' => '',
-			'value_type' => $item['value_type'],
 			'units' => '',
 			'value' => null,
 			'decimals' => null,
 			'change_indicator' => null,
-			'time' => ''
+			'time' => '',
+			'is_numeric' => false
 		];
 
 		$show = array_flip($this->fields_values['show']);
@@ -229,8 +229,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($data_last === null) {
-			$elements['value_type'] = ITEM_VALUE_TYPE_TEXT;
-
 			if (array_key_exists(Widget::SHOW_TIME, $show)) {
 				$elements['time'] = date(DATE_TIME_FORMAT_SECONDS);
 			}
@@ -242,71 +240,66 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$elements['time'] = date(DATE_TIME_FORMAT_SECONDS, (int) $data_last['clock']);
 		}
 
-		switch ($item['value_type']) {
-			case ITEM_VALUE_TYPE_FLOAT:
-			case ITEM_VALUE_TYPE_UINT64:
-				$force_units = false;
+		$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+		$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
 
-				if ($this->fields_values['units_show'] == 1) {
-					if ($this->fields_values['units'] !== '') {
-						$item['units'] = $this->fields_values['units'];
-						$force_units = true;
+		$force_units = false;
+
+		if ($this->fields_values['units_show'] == 1) {
+			if ($this->fields_values['units'] !== '') {
+				$item['units'] = $this->fields_values['units'];
+				$force_units = true;
+			}
+		}
+		else {
+			$item['units'] = '';
+		}
+
+		$formatted_value = formatAggregatedHistoryValueRaw($data_last['value'], $item, $function, $force_units, false,
+				$is_numeric_data
+			? [
+				'decimals' => $this->fields_values['decimal_places'],
+				'decimals_exact' => true,
+				'small_scientific' => false,
+				'zero_as_zero' => false
+			]
+			: []
+		);
+
+		$elements['value'] = $formatted_value['value'];
+		$elements['units'] = $formatted_value['units'];
+
+		if ($is_numeric_data && !$formatted_value['is_mapped']) {
+			$numeric_formatting = getNumericFormatting();
+			$decimal_pos = strrpos($elements['value'], $numeric_formatting['decimal_point']);
+
+			if ($decimal_pos !== false) {
+				$elements['decimals'] = substr($elements['value'], $decimal_pos);
+				$elements['value'] = substr($elements['value'], 0, $decimal_pos);
+			}
+
+			$elements['is_numeric'] = true;
+		}
+
+		if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data_prev !== null) {
+			if ($is_numeric_data) {
+				if ($formatted_value['is_mapped']) {
+					if ($data_last['value'] != $data_prev['value']) {
+						$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP_DOWN;
 					}
 				}
-				else {
-					$item['units'] = '';
+				elseif ($data_last['value'] > $data_prev['value']) {
+					$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP;
 				}
-
-				$formatted_value = formatAggregatedHistoryValueRaw($data_last['value'], $item, $function, $force_units,
-					false, [
-						'decimals' => $this->fields_values['decimal_places'],
-						'decimals_exact' => true,
-						'small_scientific' => false,
-						'zero_as_zero' => false
-					]
-				);
-
-				$elements['value'] = $formatted_value['value'];
-				$elements['units'] = $formatted_value['units'];
-
-				if (!$formatted_value['is_mapped']) {
-					$numeric_formatting = getNumericFormatting();
-					$decimal_pos = strrpos($elements['value'], $numeric_formatting['decimal_point']);
-
-					if ($decimal_pos !== false) {
-						$elements['decimals'] = substr($elements['value'], $decimal_pos);
-						$elements['value'] = substr($elements['value'], 0, $decimal_pos);
-					}
+				elseif ($data_last['value'] < $data_prev['value']) {
+					$elements['change_indicator'] = Widget::CHANGE_INDICATOR_DOWN;
 				}
-
-				if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data_prev !== null) {
-					if ($formatted_value['is_mapped']) {
-						if ($data_last['value'] != $data_prev['value']) {
-							$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP_DOWN;
-						}
-					}
-					elseif ($data_last['value'] > $data_prev['value']) {
-						$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP;
-					}
-					elseif ($data_last['value'] < $data_prev['value']) {
-						$elements['change_indicator'] = Widget::CHANGE_INDICATOR_DOWN;
-					}
-				}
-				break;
-
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-			case ITEM_VALUE_TYPE_LOG:
-			case ITEM_VALUE_TYPE_BINARY:
-				$elements['value'] = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
-					? italic(_('binary value'))
-					: formatAggregatedHistoryValue($data_last['value'], $item, $function, false, false);
-
-				if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data_prev !== null
-						&& $data_last['value'] !== $data_prev['value']) {
+			}
+			else {
+				if ($data_last['value'] !== $data_prev['value']) {
 					$elements['change_indicator'] = Widget::CHANGE_INDICATOR_UP_DOWN;
 				}
-				break;
+			}
 		}
 
 		return $elements;
@@ -315,9 +308,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	/**
 	 * Arrange and configure widget elements as defined in widget configuration.
 	 *
-	 * @param array       $elements  Pre-processed elements for displaying.
+	 * @param array       $elements                      Pre-processed elements for displaying.
 	 *        string      $elements['description']       Item description with all macros resolved.
-	 *        string      $elements['value_type']        Item value type.
 	 *        string      $elements['units']             Item units.
 	 *        string|null $elements['value']             Item value without decimal part.
 	 *        string|null $elements['decimals']          Decimal part of item value.
@@ -346,7 +338,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (array_key_exists(Widget::SHOW_VALUE, $show)) {
 			$item_value_cell = [
-				'value_type' => $elements['value_type']
+				'is_numeric' => $elements['is_numeric']
 			];
 
 			if ($config['units_show'] == 1 && $elements['units'] !== '') {
