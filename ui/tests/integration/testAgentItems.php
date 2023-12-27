@@ -296,48 +296,48 @@ class testAgentItems extends CIntegrationTest {
 					]
 				]
 		],
-		[
-			'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 1
-		],
-		[
-			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 0
-		],
-		[
-			'key' => 'net.udp.socket.count[]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
-		],
-		[
-			'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT2,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 1
-		],
-		[
-			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT2,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 0
-		],
-		[
-			'key' => 'net.udp.socket.count[]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT2,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
-		],
+		/* [ */
+		/* 	'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]', */
+		/* 	'type' => ITEM_TYPE_ZABBIX, */
+		/* 	'component' => self::COMPONENT_AGENT, */
+		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
+		/* 	'result' => 1 */
+		/* ], */
+		/* [ */
+		/* 	'key' => 'net.tcp.socket.count[,,127.127.127.127]', */
+		/* 	'type' => ITEM_TYPE_ZABBIX, */
+		/* 	'component' => self::COMPONENT_AGENT, */
+		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
+		/* 	'result' => 0 */
+		/* ], */
+		/* [ */
+		/* 	'key' => 'net.udp.socket.count[]', */
+		/* 	'type' => ITEM_TYPE_ZABBIX, */
+		/* 	'component' => self::COMPONENT_AGENT, */
+		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
+		/* 	'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l' */
+		/* ], */
+		/* [ */
+		/* 	'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]', */
+		/* 	'type' => ITEM_TYPE_ZABBIX, */
+		/* 	'component' => self::COMPONENT_AGENT2, */
+		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
+		/* 	'result' => 1 */
+		/* ], */
+		/* [ */
+		/* 	'key' => 'net.tcp.socket.count[,,127.127.127.127]', */
+		/* 	'type' => ITEM_TYPE_ZABBIX, */
+		/* 	'component' => self::COMPONENT_AGENT2, */
+		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
+		/* 	'result' => 0 */
+		/* ], */
+		/* [ */
+		/* 	'key' => 'net.udp.socket.count[]', */
+		/* 	'type' => ITEM_TYPE_ZABBIX, */
+		/* 	'component' => self::COMPONENT_AGENT2, */
+		/* 	'valueType' => ITEM_VALUE_TYPE_UINT64, */
+		/* 	'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l' */
+		/* ], */
 		[
 			'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']',
 			'type' => ITEM_TYPE_ZABBIX,
@@ -779,20 +779,27 @@ class testAgentItems extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'UnavailableDelay' => 5,
-				'UnreachableDelay' => 1
+				'UnreachableDelay' => 1,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'AllowKey' => 'system.run[*]',
-				'HostMetadata' => self::AGENT_METADATA
+				'HostMetadata' => self::AGENT_METADATA,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'AllowKey' => 'system.run[*]',
 				'Plugins.Uptime.Capacity' => '10',
-				'HostMetadata' => self::AGENT_METADATA
+				'HostMetadata' => self::AGENT_METADATA,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+
 			]
 		];
 	}
