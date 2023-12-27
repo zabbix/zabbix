@@ -935,6 +935,19 @@ class CHistoryManager {
 					$result[$row['itemid']]['data'][] = $row;
 				}
 
+				if ($function == AGGREGATE_AVG && $value_type == ITEM_VALUE_TYPE_UINT64) {
+					// Fix PostgreSQL number formatting (remove trailing zeros) in AVG aggregation on *_uint tables.
+
+					foreach ($itemids as $itemid) {
+						if (array_key_exists($itemid, $result)) {
+							foreach ($result[$itemid]['data'] as &$row) {
+								$row['value'] = (string) (float) $row['value'];
+							}
+							unset($row);
+						}
+					}
+				}
+
 				if ($function == AGGREGATE_COUNT) {
 					foreach ($itemids as $itemid) {
 						if (!array_key_exists($itemid, $result)) {
@@ -1497,11 +1510,17 @@ class CHistoryManager {
 				$sql_result = DBselect($sql);
 
 				while (($row = DBfetch($sql_result)) !== false) {
-					$result[$row['itemid']] = [
-						'itemid' => $row['itemid'],
-						'value' => $row['value'],
-						'clock' => $row['clock']
-					];
+					$result[$row['itemid']] = $row;
+				}
+
+				if ($function == AGGREGATE_AVG && $value_type == ITEM_VALUE_TYPE_UINT64) {
+					// Fix PostgreSQL number formatting (remove trailing zeros) in AVG aggregation on *_uint tables.
+
+					foreach ($itemids as $itemid) {
+						if (array_key_exists($itemid, $result)) {
+							$result[$itemid]['value'] = (string) (float) $result[$itemid]['value'];
+						}
+					}
 				}
 
 				if ($function == AGGREGATE_COUNT) {
