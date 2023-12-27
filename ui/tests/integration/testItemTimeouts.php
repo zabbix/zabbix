@@ -349,9 +349,19 @@ class testItemTimeouts extends CIntegrationTest {
 		$pid = strtok(array_values($sync)[0], ':');
 		$sync_idx = array_keys($sync)[0];
 		$lines_expected = count($initial_timeouts);
-		$k_lines_after_item_timeout = array_slice($data, $sync_idx + 1, 1000);
-		$matches = preg_grep('/^'.$pid.'/',$k_lines_after_item_timeout);
-		$synced_timeouts = array_slice($k_lines_after_item_timeout, 0, $lines_expected);
+
+		$lines_after_item_timeout = array();
+		for ($x = $sync_idx; $x<count($data); $x++) {
+			if (count($lines_after_item_timeout) == $lines_expected) {
+				break;
+			}
+			if (preg_match('/^'.$pid.'/', $data[$x])) {
+				array_push($lines_after_item_timeout, $data[$x]);
+			}
+		}
+
+		$matches = preg_grep('/^'.$pid.'/',$lines_after_item_timeout);
+		$synced_timeouts = array_slice($lines_after_item_timeout, 0, $lines_expected);
 		$synced_timeouts2 = preg_replace("/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/", "", $synced_timeouts);
 
 		$pairs = [];
