@@ -144,11 +144,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$master_column = $configuration[$master_column_index];
 		$master_entities = $hosts;
 		$master_entity_values = [];
-		$master_items_can_be_numeric = false;
 
 		switch ($master_column['data']) {
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-				$master_items_can_be_numeric = true;
 				$master_entities = array_key_exists($master_column_index, $items)
 					? $items[$master_column_index]
 					: self::getItems($master_column['item'], self::isNumericOnlyColumn($master_column), $groupids,
@@ -175,11 +173,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				break;
 		}
 
-		$master_items_only_numeric_present = $master_items_can_be_numeric && !array_filter($master_entities,
-			static function(array $item): bool {
-				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
-			}
-		);
+		$master_items_only_numeric_present = $master_column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+			&& ($master_column['aggregate_function'] == AGGREGATE_COUNT
+				|| !array_filter($master_entities,
+					static function(array $item): bool {
+						return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+					}
+				)
+			);
 
 		if ($this->fields_values['order'] == Widget::ORDER_TOP_N) {
 			if ($master_items_only_numeric_present) {
@@ -406,7 +407,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	private static function isNumericOnlyColumn(array $column): bool {
 		return $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
-			|| in_array($column['aggregate_function'], [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM]);
+			&& $column['aggregate_function'] != AGGREGATE_COUNT;
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {

@@ -127,7 +127,7 @@ $form_grid->addItem([
 	new CLabel(
 		[
 			_('Display'),
-			(makeWarningIcon(_('With this setting only numeric items will be displayed.')))
+			(makeWarningIcon(_('With this setting only numeric data will be displayed.')))
 				->setId('tophosts-column-display-warning')
 		],
 		'display'
