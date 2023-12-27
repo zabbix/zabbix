@@ -1006,7 +1006,7 @@ class testAgentItems extends CIntegrationTest {
 
 				self::assertEquals($array_value, $cmpr[$array_key],
 						'Value (array key: '.$array_key.') is not expected for '.
-						$key."\n Received: ".json.encode($cmpr[$array_key]).
+						$key."\n Received: ".json_encode($cmpr[$array_key]).
 						".\n But expected: ".json_encode($array_value)."\n");
 			}
 		}
