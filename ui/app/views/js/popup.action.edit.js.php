@@ -50,6 +50,8 @@ window.action_edit_popup = new class {
 				this._loadOperationTable();
 			});
 		}
+
+		this.form.removeAttribute('style');
 	}
 
 	_loadOperationTable(new_operation = {}) {

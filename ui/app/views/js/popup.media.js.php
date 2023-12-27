@@ -48,6 +48,10 @@ jQuery(document).ready(function($) {
 		.trigger("change");
 
 	overlays_stack.end().centerDialog();
+
+	const form = document.getElementById('media_form');
+
+	form.removeAttribute('style');
 });
 
 /**

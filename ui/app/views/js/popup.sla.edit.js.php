@@ -76,6 +76,8 @@ window.sla_edit_popup = new class {
 			});
 
 		this._update();
+
+		this.form.removeAttribute('style');
 	}
 
 	_initTemplates() {
@@ -125,7 +127,7 @@ window.sla_edit_popup = new class {
 				row_index,
 				name: row.querySelector(`[name="excluded_downtimes[${row_index}][name]"`).value,
 				period_from: row.querySelector(`[name="excluded_downtimes[${row_index}][period_from]"`).value,
-				period_to: row.querySelector(`[name="excluded_downtimes[${row_index}][period_to]"`).value,
+				period_to: row.querySelector(`[name="excluded_downtimes[${row_index}][period_to]"`).value
 			};
 		}
 		else {
