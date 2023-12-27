@@ -97,6 +97,7 @@ window.item_edit_form = new class {
 
 		this.initial_form_fields = this.#getFormFields(this.form);
 		this.form.removeAttribute('style');
+		this.overlay.recoverFocus();
 	}
 
 	initForm(field_switches) {

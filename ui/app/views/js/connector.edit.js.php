@@ -49,6 +49,7 @@ window.connector_edit_popup = new class {
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 
 		this.form.removeAttribute('style');
+		this.overlay.recoverFocus();
 	}
 
 	_updateForm() {
@@ -89,6 +90,8 @@ window.connector_edit_popup = new class {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {

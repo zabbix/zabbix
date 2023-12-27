@@ -62,6 +62,7 @@ window.trigger_edit_popup = new class {
 		}
 
 		this.form.removeAttribute('style');
+		this.overlay.recoverFocus();
 	}
 
 	#initActions() {

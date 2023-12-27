@@ -41,6 +41,7 @@ window.mediatype_edit_popup = new class {
 		this.#loadView(mediatype);
 		this.#initActions();
 		this.form.removeAttribute('style');
+		this.overlay.recoverFocus();
 
 		this.form.querySelector('#type').dispatchEvent(new CustomEvent('change', {detail: {init: true}}));
 	}

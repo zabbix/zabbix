@@ -78,6 +78,7 @@ window.sla_edit_popup = new class {
 		this._update();
 
 		this.form.removeAttribute('style');
+		this.overlay.recoverFocus();
 	}
 
 	_initTemplates() {
@@ -171,6 +172,8 @@ window.sla_edit_popup = new class {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {

@@ -33,6 +33,7 @@ window.check_popup = new class {
 
 		this._loadViews();
 		this.form.removeAttribute('style');
+		this.overlay.recoverFocus();
 	}
 
 	_loadViews() {

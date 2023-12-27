@@ -47,11 +47,10 @@ jQuery(document).ready(function($) {
 		})
 		.trigger("change");
 
+	document.getElementById('media_form').removeAttribute('style');
+
 	overlays_stack.end().centerDialog();
-
-	const form = document.getElementById('media_form');
-
-	form.removeAttribute('style');
+	overlays_stack.end().recoverFocus();
 });
 
 /**
