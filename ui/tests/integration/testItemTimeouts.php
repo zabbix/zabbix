@@ -346,12 +346,14 @@ class testItemTimeouts extends CIntegrationTest {
 		$sync = preg_grep('/item timeouts:/', $data);
 		$this->assertTrue(count($sync) > 0);
 
+		/* We cannot just take $lines_expected number of lines after 'item timeouts' in log. */
+		/* Another process may start writing into log here. So, we must filter lines by pid. */
 		$pid = strtok(array_values($sync)[0], ':');
 		$sync_idx = array_keys($sync)[0];
 		$lines_expected = count($initial_timeouts);
 
 		$lines_after_item_timeout = array();
-		for ($x = $sync_idx; $x<count($data); $x++) {
+		for ($x = $sync_idx + 1; $x < count($data); $x++) {
 			if (count($lines_after_item_timeout) == $lines_expected) {
 				break;
 			}
@@ -359,8 +361,8 @@ class testItemTimeouts extends CIntegrationTest {
 				array_push($lines_after_item_timeout, $data[$x]);
 			}
 		}
+		$matches = preg_grep('/^'.$pid.'/', $lines_after_item_timeout);
 
-		$matches = preg_grep('/^'.$pid.'/',$lines_after_item_timeout);
 		$synced_timeouts = array_slice($lines_after_item_timeout, 0, $lines_expected);
 		$synced_timeouts2 = preg_replace("/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/", "", $synced_timeouts);
 
