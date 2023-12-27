@@ -562,7 +562,7 @@ $mfa_tab = (new CFormGrid())
 		new CLabel(_('Enable multi-factor authentication'), 'mfa_status'),
 		new CFormField(
 			(new CCheckBox('mfa_status', MFA_ENABLED))
-				->setChecked($data['mfa_status'] === MFA_ENABLED)
+				->setChecked($data['mfa_status'] == MFA_ENABLED)
 				->setUncheckedValue(MFA_DISABLED)
 		)
 	])
@@ -571,6 +571,7 @@ $mfa_tab = (new CFormGrid())
 		new CFormField(
 			(new CDiv(
 				(new CTable())
+					->setId('mfa-methods')
 					->setHeader(
 						(new CRowHeader([
 							new CColHeader(_('Name')),
@@ -677,6 +678,31 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 
+$templates['mfa_methods_row'] = (string) (new CRow([
+	[
+		(new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addClass('js-edit'),
+		(new CVar('mfa_methods[#{row_index}][mfaid]', '#{mfaid}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][type]', '#{type}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][name]', '#{name}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][hash_function]', '#{hash_function}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][code_length]', '#{code_length}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][api_hostname]', '#{api_hostname}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][clientid]', '#{clientid}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][client_secret]', '#{client_secret}'))->removeId()
+	],
+	(new CCol('#{type_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CCol('#{usrgrps}'))->addClass('js-mfa-usergroups'),
+	[
+		(new CInput('radio', 'mfa_default_row_index', '#{row_index}'))
+			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setId('mfa_default_row_index_#{row_index}'),
+		(new CLabel(new CSpan(), 'mfa_default_row_index_#{row_index}'))->addClass(ZBX_STYLE_WORDWRAP)
+	],
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
+]))->setAttribute('data-row_index', '#{row_index}');
+
 (new CScriptTag(
 	'view.init('.json_encode([
 		'ldap_servers' => $data['ldap_servers'],
@@ -684,7 +710,9 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		'db_authentication_type' => $data['db_authentication_type'],
 		'saml_provision_groups' => $data['saml_provision_groups'],
 		'saml_provision_media' => $data['saml_provision_media'],
-		'templates' => $templates
+		'templates' => $templates,
+		'mfa_methods' => $data['mfa_methods'],
+		'mfa_default_row_index' => $data['mfa_default_row_index']
 	]).');'
 ))
 	->setOnDocumentReady()

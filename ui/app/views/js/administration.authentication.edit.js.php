@@ -34,7 +34,7 @@
 		}
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media, templates
+				saml_provision_media, templates, mfa_methods, mfa_default_row_index
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -48,8 +48,10 @@
 				'[name="ldap_jit_status"],[name="ldap_case_sensitive"],[name="jit_provision_interval"]'
 			);
 			this.jit_provision_interval = this.form.querySelector('[name="jit_provision_interval"]');
+			this.mfa_table = document.getElementById('mfa-methods');
 			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
 			const ldap_readonly = !this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').checked;
+			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
@@ -58,7 +60,9 @@
 			this._renderProvisionGroups(saml_provision_groups);
 			this._setTableVisiblityState(this.saml_provision_groups_table, saml_readonly);
 			this._renderProvisionMedia(saml_provision_media);
-			this._setTableVisiblityState(this.saml_media_type_mapping_table, saml_readonly);
+			this._setTableVisiblityState(this.saml_media_type_mapping_table, saml_readonly)
+			this._addMfaMethods(mfa_methods, mfa_default_row_index);
+			this._setTableVisiblityState(this.mfa_table, mfa_readonly);
 
 			this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').dispatchEvent(new Event('change'));
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
@@ -223,6 +227,55 @@
 			this.form.addEventListener('submit', (e) => {
 				if (!this._authFormSubmit()) {
 					e.preventDefault();
+				}
+			});
+
+			this.mfa_table.addEventListener('click', (e) => {
+				if (e.target.classList.contains('disabled')) {
+					return;
+				}
+				else if (e.target.classList.contains('js-add')) {
+					this.editMfaMethod();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this.editMfaMethod(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					const table = e.target.closest('table');
+					const mfaid_input = e.target.closest('tr')
+						.querySelector('input[name$="[mfaid]"]');
+
+					if (mfaid_input !== null) {
+						const input = document.createElement('input');
+						input.type = 'hidden';
+						input.name = 'mfa_removed_mfaids[]';
+						input.value = mfaid_input.value;
+						this.form.appendChild(input);
+					}
+
+					e.target.closest('tr').remove();
+
+					if (table.querySelector('input[name="mfa_default_row_index"]:checked') === null) {
+						const default_mfa = table.querySelector('input[name="mfa_default_row_index"]');
+
+						if (default_mfa !== null) {
+							default_mfa.checked = true;
+						}
+					}
+				}
+			});
+
+			this.form.querySelector('[type="checkbox"][name="mfa_status"]').addEventListener('change', (e) => {
+				const is_readonly = !e.target.checked;
+				const default_index = this.form.querySelector('input[name="mfa_default_row_index"]:checked');
+				const default_index_hidden = this.form.querySelector('[type="hidden"][name="mfa_default_row_index"]');
+
+				this._setTableVisiblityState(this.mfa_table, is_readonly);
+
+				this.form.querySelectorAll('[data-disable_remove] .js-remove').forEach(field => field.disabled = true);
+
+				if (is_readonly && default_index && mfa_default_row_index) {
+					default_index_hidden.value = default_index.value;
 				}
 			});
 		}
@@ -611,6 +664,105 @@
 			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media).trim();
 
 			return template.content.firstChild;
+		}
+
+		_addMfaMethods(mfa_methods, mfa_default_row_index) {
+			for (const [row_index, mfa] of Object.entries(mfa_methods)) {
+				mfa.row_index = row_index;
+				mfa.is_default = (mfa.row_index == mfa_default_row_index) ? 'checked' : '';
+
+				this.mfa_table
+					.querySelector('tbody')
+					.appendChild(this._prepareMfaRow(mfa));
+			}
+		}
+
+		_prepareMfaRow(mfa) {
+			const template_mfa_methods_row = new Template(this.templates.mfa_methods_row);
+			const template = document.createElement('template');
+			template.innerHTML = template_mfa_methods_row.evaluate(mfa).trim();
+			const row = template.content.firstChild;
+
+			row.querySelector('[name="mfa_default_row_index"]').toggleAttribute('checked', mfa.is_default);
+
+			const optional_fields = ['mfaid', 'hash_function', 'code_length', 'api_hostname', 'clientid',
+				'client_secret'
+			];
+
+			for (const field of optional_fields) {
+				if (!(field in mfa)) {
+					row.querySelector('input[name="mfa_methods[' + mfa.row_index + '][' + field + ']"]').remove();
+				}
+			}
+
+			if (mfa.usrgrps > 0) {
+				row.querySelector('.js-remove').disabled = true;
+				row.dataset.disable_remove = true;
+			}
+
+			return row;
+		}
+
+		editMfaMethod(row = null) {
+			let popup_params;
+			let row_index = 0;
+
+			if (row !== null) {
+				row_index = row.dataset.row_index;
+
+				popup_params = {
+					row_index,
+					add_mfa_method: 0,
+					type: row.querySelector(`[name="mfa_methods[${row_index}][type]"`).value,
+					name: row.querySelector(`[name="mfa_methods[${row_index}][name]"`).value,
+					hash_function: row.querySelector(`[name="mfa_methods[${row_index}][hash_function]"`).value,
+					code_length: row.querySelector(`[name="mfa_methods[${row_index}][code_length]"`).value,
+					api_hostname: row.querySelector(`[name="mfa_methods[${row_index}][api_hostname]"`).value,
+					clientid: row.querySelector(`[name="mfa_methods[${row_index}][clientid]"`).value,
+					client_secret: row.querySelector(`[name="mfa_methods[${row_index}][client_secret]"`).value
+				};
+
+				const mfaid_input = row.querySelector(`[name="mfa_methods[${row_index}][mfaid]"`);
+
+				if (mfaid_input !== null) {
+					popup_params['mfaid'] = mfaid_input.value;
+				}
+			}
+			else {
+				while (document.querySelector(`#mfa-methods [data-row_index="${row_index}"]`) !== null) {
+					row_index++;
+				}
+
+				popup_params = {
+					row_index,
+					add_mfa_method: 1
+				};
+			}
+
+			const overlay = PopUp('mfa.edit', popup_params,
+				{dialogueid: 'mfa_edit', dialogue_class: 'modal-popup-small'}
+			);
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				const mfa = {...e.detail, ...{row_index: row_index}};
+
+				if (row === null) {
+					mfa.is_default = document.getElementById('mfa-methods')
+						.querySelector('input[name="mfa_default_row_index"]:checked') === null;
+					mfa.usrgrps = 0;
+
+					this.mfa_table
+						.querySelector('tbody')
+						.appendChild(this._prepareMfaRow(mfa));
+				}
+				else {
+					mfa.is_default = row.querySelector('input[name="mfa_default_row_index"]').checked === true;
+					mfa.usrgrps = row.querySelector('.js-mfa-usergroups').textContent;
+
+					row.parentNode.insertBefore(this._prepareMfaRow(mfa), row);
+					row.remove();
+				}
+			});
 		}
 	};
 </script>

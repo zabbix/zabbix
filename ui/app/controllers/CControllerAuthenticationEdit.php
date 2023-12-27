@@ -183,6 +183,8 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_removed_userdirectoryids'] = $this->getInput('ldap_removed_userdirectoryids', []);
 
 			$data['mfa_methods'] = $this->getMfaMethodUserGroupCount($this->getInput('mfa_methods', []));
+			$data['mfa_default_row_index'] = $this->getInput('mfa_default_row_index', 0);
+			$data['mfa_removed_mfaids'] = $this->getInput('mfa_removed_mfaids', []);
 
 			$data += $auth;
 		}
@@ -254,11 +256,8 @@ class CControllerAuthenticationEdit extends CController {
 			);
 			$data['ldap_removed_userdirectoryids'] = [];
 
-			$data['mfa_methods'] = API::Mfa()->get([
-				'output' => API_OUTPUT_EXTEND,
-				'selectUsrgrps' => API_OUTPUT_COUNT,
-				'sortfield' => ['name']
-			]);
+			$data['mfa_methods'] = $this->getMfaMethods();
+
 			// Cast false to 0 when no mfa method is found as default.
 			$data['mfa_default_row_index'] = (int) array_search($data[CAuthenticationHelper::MFAID],
 				array_column($data['mfa_methods'], 'mfaid')
@@ -266,6 +265,8 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
+		unset($data[CAuthenticationHelper::MFAID]);
+
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED
 		);
@@ -334,6 +335,8 @@ class CControllerAuthenticationEdit extends CController {
 				&& array_key_exists($mfa_method['mfaid'], $db_mfa_methods)) {
 				$mfa_method['usrgrps'] = $db_mfa_methods[$mfa_method['mfaid']]['usrgrps'];
 			}
+
+			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');
 		}
 		unset($mfa_method);
 
@@ -428,5 +431,30 @@ class CControllerAuthenticationEdit extends CController {
 
 			$provision_media[$index]['mediatype_name'] = $db_media[$media['mediatypeid']]['name'];
 		}
+	}
+
+	private function getMfaMethods(): array {
+		$totp_methods = API::Mfa()->get([
+			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length'],
+			'selectUsrgrps' => API_OUTPUT_COUNT,
+			'filter' => ['type' => MFA_TYPE_TOTP],
+			'sortfield' => ['name']
+		]);
+
+		$duo_methods = API::Mfa()->get([
+			'output' => ['mfaid', 'type', 'name', 'api_hostname', 'clientid', 'client_secret'],
+			'selectUsrgrps' => API_OUTPUT_COUNT,
+			'filter' => ['type' => MFA_TYPE_DUO],
+			'sortfield' => ['name']
+		]);
+
+		$mfa_methods = array_merge($totp_methods, $duo_methods);
+
+		foreach ($mfa_methods as &$mfa_method) {
+			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');
+		}
+		unset($mfa_method);
+
+		return $mfa_methods;
 	}
 }

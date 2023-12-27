@@ -190,6 +190,8 @@ class CRouter {
 		'mediatype.test.send'						=> ['CControllerMediatypeTestSend',						'layout.json',			null],
 		'mediatype.update'							=> ['CControllerMediatypeUpdate',						'layout.json',			null],
 		'menu.popup'								=> ['CControllerMenuPopup',								'layout.json',			null],
+		'mfa.edit'									=> ['CControllerMfaEdit',								'layout.json',			'mfa.edit'],
+		'mfa.check'									=> ['CControllerMfaCheck',								'layout.json',			null],
 		'miscconfig.edit'							=> ['CControllerMiscConfigEdit',						'layout.htmlpage',		'administration.miscconfig.edit'],
 		'miscconfig.update'							=> ['CControllerMiscConfigUpdate',						null,					null],
 		'module.disable'							=> ['CControllerModuleDisable',							'layout.json',			null],

@@ -112,6 +112,62 @@ class CMfa extends CApiService {
 	}
 
 	/**
+	 * @param array $options
+	 * @param array $result
+	 *
+	 * @return array
+	 */
+	protected function addRelatedObjects(array $options, array $result): array {
+		$result = parent::addRelatedObjects($options, $result);
+
+		self::addRelatedUserGroups($options, $result);
+
+		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private static function addRelatedUserGroups(array $options, array &$result): void {
+		if ($options['selectUsrgrps'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['usrgrps'] = [];
+		}
+		unset($row);
+
+		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
+			$output = ['mfaid'];
+		}
+		elseif ($options['selectUsrgrps'] === API_OUTPUT_EXTEND) {
+			$output = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'mfaid'];
+		}
+		else {
+			$output = array_unique(array_merge(['mfaid'], $options['selectUsrgrps']));
+		}
+
+		$db_usergroups = API::UserGroup()->get([
+			'output' => $output,
+			'mfaids' => array_keys($result)
+		]);
+
+		foreach ($db_usergroups as $db_usergroup) {
+			$result[$db_usergroup['mfaid']]['usrgrps'][] =
+				array_diff_key($db_usergroup, array_flip(['mfaid']));
+		}
+
+		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['usrgrps'] = (string) count($row['usrgrps']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
 	 * @param array $mfas
 	 *
 	 * @throws APIException
