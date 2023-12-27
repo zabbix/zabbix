@@ -347,10 +347,11 @@ class testItemTimeouts extends CIntegrationTest {
 		$this->assertTrue(count($sync) > 0);
 
 		$pid = strtok(array_values($sync)[0], ':');
-		$matches = preg_grep('/^'.$pid.'/',$data);
-
+		$sync_idx = array_keys($sync)[0];
 		$lines_expected = count($initial_timeouts);
-		$synced_timeouts = array_slice($matches, 1, $lines_expected);
+		$k_lines_after_item_timeout = array_slice($data, $sync_idx + 1, 1000);
+		$matches = preg_grep('/^'.$pid.'/',$k_lines_after_item_timeout);
+		$synced_timeouts = array_slice($k_lines_after_item_timeout, 0, $lines_expected);
 		$synced_timeouts2 = preg_replace("/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/", "", $synced_timeouts);
 
 		$pairs = [];
