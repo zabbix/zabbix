@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:51:28Z'
+  date: '2023-12-28T10:12:19Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -439,6 +439,7 @@ zabbix_export:
           key: sd_wan.devices.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$SDWAN.DEVICE.NAME.MATCHES}'
