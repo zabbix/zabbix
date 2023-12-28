@@ -1589,6 +1589,12 @@ return [
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
 			],
+			'mfa_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
 			'mfaid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
