@@ -20,6 +20,8 @@
 #ifndef ZABBIX_OPERATIONS_H
 #define ZABBIX_OPERATIONS_H
 
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 
 void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
