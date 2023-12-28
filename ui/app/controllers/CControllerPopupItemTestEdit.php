@@ -280,6 +280,12 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					continue;
 				}
 
+				foreach ($inputs[$field] as $num => $row) {
+					if ($row['name'] === '') {
+						unset($inputs[$field][$num]);
+					}
+				}
+
 				$texts_having_macros = array_merge(
 					array_column($inputs[$field], 'name'),
 					array_column($inputs[$field], 'value')

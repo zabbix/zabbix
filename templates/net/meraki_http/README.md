@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Setup
 
-You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros. 
+You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros.
 
 Create the token in the Meraki dashboard (see Meraki [documentation](https://developer.cisco.com/meraki/api-latest/#!authorization/authorization) for instructions). Set this token as {$MERAKI.TOKEN} macro value in Zabbix.
 
@@ -35,6 +35,7 @@ Set filters with macros if you want to override default filter parameters.
 |----|-----------|-------|
 |{$MERAKI.TOKEN}|<p>Cisco Meraki dashboard API token.</p>||
 |{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
+|{$MERAKI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`60`|
 |{$MERAKI.ORGANIZATION.NAME.MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`.+`|
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.DEVICE.NAME.MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`.+`|
@@ -76,6 +77,7 @@ Set filters with macros if you want to override default filter parameters.
 |----|-----------|-------|
 |{$MERAKI.TOKEN}|<p>Cisco Meraki dashboard API token.</p>||
 |{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
+|{$MERAKI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`60`|
 |{$MERAKI.LICENSE.EXPIRE}|<p>Time in seconds for license to expire.</p>|`86400`|
 |{$MERAKI.VPN.LOSS.PERCENTILE}|<p>Average VPN connection loss percentage. Used in the trigger expression</p>|`90`|
 |{$MERAKI.CONFIG.CHANGE.TIMESPAN}|<p>Timespan in seconds for gathering configuration change log. Used in the metric configuration and in the URL query.</p>|`1200`|
@@ -194,9 +196,9 @@ Set filters with macros if you want to override default filter parameters.
 |----|-----------|----|-----------------------|
 |VPN [{#NETWORK.NAME}]: statuses raw|<p>VPN statuses raw.</p>|Dependent item|meraki.vpn.statuses.raw[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |VPN [{#NETWORK.NAME}]: mode|<p>VPN network mode.</p>|Dependent item|meraki.vpn.statuses.mode[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vpnMode`</p></li></ul>|
-|VPN [{#NETWORK.NAME}]: peers network name|<p>VPN network name Meraki VPN peers.</p>|Dependent item|meraki.vpn.statuses.peers.network.name[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..networkName.first()`</p></li></ul>|
-|VPN [{#NETWORK.NAME}]: peers network ID|<p>VPN network ID.</p>|Dependent item|meraki.vpn.statuses.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..networkId.first()`</p></li></ul>|
-|VPN [{#NETWORK.NAME}]: peers network reachability|<p>VPN network Meraki VPN peers reachability.</p>|Dependent item|meraki.vpn.statuses.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..reachability.first()`</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: peers network name|<p>VPN network name Meraki VPN peers.</p>|Dependent item|meraki.vpn.statuses.peers.network.name[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..networkName.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: peers network ID|<p>VPN network ID.</p>|Dependent item|meraki.vpn.statuses.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..networkId.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: peers network reachability|<p>VPN network Meraki VPN peers reachability.</p>|Dependent item|meraki.vpn.statuses.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..reachability.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |VPN [{#NETWORK.NAME}]: third-party peers network name|<p>Return network name of the third-party VPN peers for the organization.</p>|Dependent item|meraki.vpn.statuses.third.party.peers.network.name[{#NETWORK.ID},  {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.thirdPartyVpnPeers..networkName.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |VPN [{#NETWORK.NAME}]: third-party peers network ID|<p>Return network ID of the third-party VPN peers for the organization.</p>|Dependent item|meraki.vpn.statuses.third.party.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.thirdPartyVpnPeers..networkId.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |VPN [{#NETWORK.NAME}]: third-party peers network reachability|<p>Return network reachability of the third-party VPN peers for the organization.</p>|Dependent item|meraki.vpn.statuses.third.party.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.thirdPartyVpnPeers..reachability.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -291,6 +293,8 @@ Set filters with macros if you want to override default filter parameters.
 |{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
 |{$MERAKI.DEVICE.LOSS}|<p>Devices uplink loss threshold, in percent.</p>|`15`|
 |{$MERAKI.DEVICE.LATENCY}|<p>Devices uplink latency threshold, in seconds.</p>|`0.15`|
+|{$MERAKI.GET.STATUS.INTERVAL}|<p>Update interval for get status item.</p>|`300`|
+|{$MERAKI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`60`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p>||
 |{$MERAKI.UPLINK.LL.TIMESPAN}|<p>Timespan in seconds for getting device uplinks loss and quality stats. Used in the metric configuration and in the JavaScript API query. Must be between 1 and 86400 seconds.</p>|`180`|
 |{$MERAKI.DEVICE.UPLINK.MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
@@ -304,8 +308,9 @@ Set filters with macros if you want to override default filter parameters.
 |----|-----------|----|-----------------------|
 |Meraki: Get device data|<p>Item for gathering device data from Meraki API.</p>|Script|meraki.get.device|
 |Meraki: Device data item errors|<p>Item for gathering errors of the device item.</p>|Dependent item|meraki.get.device.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Meraki: status|<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.device[0].status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Meraki: public IP|<p>Device public IP</p><p>Network: {$NETWORK.ID}</p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.device[0].publicIp`</p></li></ul>|
+|Meraki: Get status|<p>Item for gathering device status from Meraki API.</p>|HTTP agent|meraki.device.get.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[0]`</p></li></ul>|
+|Meraki: status|<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Meraki: public IP|<p>Device public IP</p><p>Network: {$NETWORK.ID}</p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.publicIp`</p></li></ul>|
 
 ### Triggers
 
