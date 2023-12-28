@@ -73,9 +73,16 @@
 				}
 			});
 
+			document.getElementById('user-group-form').addEventListener('change', event => {
+				if (event.target.name === 'gui_access') {
+					this.#toggleUserdirectory(event.target.value);
+				}
+			})
+
 			this.#setMultiselectDisabling('userids', true);
 			this.#setMultiselectDisabling('ms_hostgroup');
 			this.#setMultiselectDisabling('ms_templategroup');
+			this.#toggleUserdirectory(document.querySelector('[name="gui_access"]').value);
 		}
 
 		/**
@@ -267,30 +274,26 @@
 					document.dispatchEvent(new Event('tab-indicator-update'));
 			});
 		}
-	};
 
-	jQuery(function($) {
-		const $form = $('form[name="user_group_form"]'),
-			$userdirectory = $form.find('[name="userdirectoryid"]'),
-			$gui_access = $form.find('[name="gui_access"]');
+		#toggleUserdirectory(gui_access) {
+			const userdirectory = document.querySelector('[name="userdirectoryid"]');
+			const mfa = document.querySelector('[name="mfaid"]');
 
-		$gui_access.on('change', onFrontendAccessChange);
-		onFrontendAccessChange.apply($gui_access);
+			switch (parseInt(gui_access)) {
+				case <?= GROUP_GUI_ACCESS_DISABLED ?>:
+					userdirectory.disabled = true;
+					mfa.disabled = true;
+					break;
 
-		$form.submit(function() {
-			$form.trimValues(['#name']);
-		});
+				case <?= GROUP_GUI_ACCESS_INTERNAL ?>:
+					userdirectory.disabled = true;
+					mfa.disabled = false;
+					break;
 
-		// Handle "Frontend access" selector change.
-		function onFrontendAccessChange() {
-			const gui_access = $(this).val();
-
-			if (gui_access == <?= GROUP_GUI_ACCESS_INTERNAL ?> || gui_access == <?= GROUP_GUI_ACCESS_DISABLED ?>) {
-				$userdirectory.attr('disabled', 'disabled');
-			}
-			else {
-				$userdirectory.removeAttr('disabled');
+				default:
+					userdirectory.disabled = false;
+					mfa.disabled = false;
 			}
 		}
-	});
+	};
 </script>

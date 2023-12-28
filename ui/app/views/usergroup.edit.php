@@ -93,6 +93,40 @@ if ($data['can_update_group']) {
 		->addOptions(CSelect::createOptionsFromArray($data['userdirectories']))
 		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
+	if ($data['usrgrpid']) {
+		if ($data['group_mfa_status'] == GROUP_MFA_ENABLED) {
+			$mfa = $data['mfaid'] ?: 0;
+		}
+		else {
+			$mfa = -1;
+		}
+	}
+	else {
+		$mfa = $data['mfa_config_status'] == MFA_ENABLED ? 0 : -1;
+	}
+
+	$mfa_error = null;
+	if ($data['mfa_config_status'] == MFA_DISABLED && $mfa != -1) {
+		$mfa_error = makeWarningIcon(_('Multi-factor authentication is disabled system-wide'));
+	}
+
+	$mfas = (new CSelect('mfaid'))
+		->setValue($mfa)
+		->setFocusableElementId('mfaid')
+		->addOptions(CSelect::createOptionsFromArray($data['mfas']))
+		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+	if ($data['mfa_config_status'] == MFA_ENABLED && !$data['usrgrpid']) {
+		$mfas
+			->addOption((new CSelectOption(-1, _('Disabled'))))
+			->addOption((new CSelectOption(0, _('Default')))->addClass(ZBX_STYLE_DEFAULT_OPTION));
+	}
+	else {
+		$mfas
+			->addOption((new CSelectOption(-1, _('Disabled')))->addClass(ZBX_STYLE_DEFAULT_OPTION))
+			->addOption((new CSelectOption(0, _('Default'))));
+	}
+
 	$form_grid
 		->addItem([
 			(new CLabel(_('Frontend access'), $select_gui_access->getFocusableElementId())),
@@ -101,6 +135,10 @@ if ($data['can_update_group']) {
 		->addItem([
 			(new CLabel(_('LDAP Server'), $userdirectory->getFocusableElementId())),
 			new CFormField($userdirectory)
+		])
+		->addItem([
+			(new CLabel([_('Multi-factor authentication'), $mfa_error], $mfas->getFocusableElementId())),
+			new CFormField($mfas)
 		])
 		->addItem([
 			new CLabel(_('Enabled'), 'users_status'),
