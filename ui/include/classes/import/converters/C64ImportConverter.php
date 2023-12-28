@@ -420,7 +420,9 @@ class C64ImportConverter extends CConverter {
 		}
 
 		foreach (array_reverse($convert_parameters) as $parameter) {
-			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'], false);
+			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'],
+				['unescape_backslashes' => false]
+			);
 			$parameter['match'] = CHistFunctionParser::quoteParam($parameter['match']);
 
 			$expression = substr_replace($expression, $parameter['match'], $parameter['pos'], $parameter['length']);

@@ -92,7 +92,7 @@ class C52AggregateItemKeyConverter extends CConverter {
 			$timeperiod = trim($timeperiod);
 
 			if ($this->isQuotableTimeperiod($timeperiod)) {
-				$timeperiod = CHistFunctionParser::quoteParam($timeperiod, false);
+				$timeperiod = CHistFunctionParser::quoteParam($timeperiod, true, ['escape_backslashes' => false]);
 			}
 
 			$new_value .= ','.$timeperiod;

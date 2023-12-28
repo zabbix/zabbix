@@ -1,3 +1,21 @@
+Changes for 7.0.0beta1
+
+New features:
+.......P.. [ZBXNEXT-8724] improved error messages when proxy is starting up (dimir)
+.........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
+.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
+.........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
+
+Bug fixes:
+.........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23497] fixed user edit form fields validation for user without user group (dpetra)
+..F....... [ZBX-23696] fixed script item parameters and HTTP agent item query fields and headers not being passed to Zabbix server when testing items (agriscenko)
+..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
+.........T [ZBX-23835] updated Meraki templates (egordymov)
+.........T [ZBX-23723] fixed proxy params in JavaScript AWS templates (egordymov)
+A.F....... [ZBX-23846] fixed quoting of empty parameters while resolving macros in the trigger expressions (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0alpha9
 
 New features:
@@ -13,7 +31,6 @@ A...I...S. [ZBX-21898] added escaping of backslashes in history function string 
 ...G...... [ZBX-22678] fixed parsing failures for deb packages without an Installed-Size field (jxl)
 ..F....... [ZBX-22055] fixed map image of Map widget not being updated on pressing "Apply" button (agriscenko)
 ..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
-..F....... [ZBX-23320] fixed Graph widget legend "Number of rows" behavior (apoga)
 ...G...... [ZBX-23471] fixed sha256 sum calculation on AIX, HP-UX and Solaris, fixed crash on HP-UX (Andris)
 ...G...... [ZBX-22933] improved vfs.file.regmatch and vfs.file.regexp items to use buffered file read (askolmeisters)
 ..F....... [ZBX-21973] changed deprecated X-Frame option allow-from to Content-Security-Policy frame-ancestors (dfofanovs)
@@ -448,8 +465,16 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.11rc1
 
 New features:
+.........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
+.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
+.........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23497] fixed user edit form fields validation for user without user group (dpetra)
+..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
+.........T [ZBX-23835] updated Meraki templates (egordymov)
+.........T [ZBX-23723] fixed proxy params in JavaScript AWS templates (egordymov)
 ..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
 ...G...... [ZBX-23715] fixed persistent directory path not following symlinks upon creation (kprutkovs)
 ...G...... [ZBX-22678] fixed parsing failures for deb packages without an Installed-Size field (jxl)
@@ -2018,8 +2043,15 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.26rc1
 
 New features:
+.........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
+.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
+.........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
+.........T [ZBX-23835] updated Meraki templates (egordymov)
+.........T [ZBX-23723] fixed proxy params in JavaScript AWS templates (egordymov)
 ..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
 ..F....... [ZBX-22983] fixed ellipsed dropdown options in items mass update in preprocessing (ddauksa)
 ...G...... [ZBX-23715] fixed persistent directory path not following symlinks upon creation (kprutkovs)
