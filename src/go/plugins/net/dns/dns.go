@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
@@ -73,6 +74,7 @@ var dnsTypes = map[string]uint16{
 	"SRV":   dns.TypeSRV,
 }
 
+<<<<<<< HEAD
 type options struct {
 	ip       string
 	name     string
@@ -85,6 +87,17 @@ type options struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
+=======
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "DNS",
+		"net.dns", "Checks if DNS service is up.",
+		"net.dns.record", "Performs a DNS query.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metric"))
+	}
+>>>>>>> d0bd6456ffb (...G...... [ZBX-23540] added error checks for RegisterMetrics calls)
 }
 
 // Export -
@@ -286,7 +299,6 @@ func getNULLString(in *dns.NULL) string {
 
 func getHINFOString(in *dns.HINFO) string {
 	return parseTXT(in.Cpu, in.Os)
-
 }
 
 func getMINFOString(in *dns.MINFO) string {
@@ -535,6 +547,7 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 
 	return r, nil
 }
+<<<<<<< HEAD
 
 func init() {
 	plugin.RegisterMetrics(&impl, "DNS",
@@ -544,3 +557,5 @@ func init() {
 		"net.dns.get", "Performs a DNS query. (Returns verbose response in JSON).",
 	)
 }
+=======
+>>>>>>> d0bd6456ffb (...G...... [ZBX-23540] added error checks for RegisterMetrics calls)
