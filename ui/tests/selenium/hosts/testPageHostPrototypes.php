@@ -21,13 +21,14 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts
  *
  * @onBefore prepareHostPrototypeData
  */
-class testPageHostPrototypes extends CWebTest {
+class testPageHostPrototypes extends testPagePrototypes {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -41,9 +42,14 @@ class testPageHostPrototypes extends CWebTest {
 		];
 	}
 
+	public $single_success = 'Host prototype updated';
+	public $several_success = 'Host prototypes updated';
+	public $sql = 'SELECT null FROM hosts WHERE hostid=';
+
+	protected static $prototype_hostids;
 	protected static $hostids;
 	protected static $host_druleids;
-	protected static $prototype_hostids;
+
 
 	public function prepareHostPrototypeData() {
 		$host_result = CDataHelper::createHosts([
@@ -215,13 +221,7 @@ class testPageHostPrototypes extends CWebTest {
 	public function testPageHostPrototypes_Sorting($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
-
-		$table = $this->query('class:list-table')->asTable()->one();
-		foreach (['desc', 'asc'] as $sorting) {
-			$table->query('link', $data['sort_by'])->one()->click();
-			$expected = ($sorting === 'asc') ? $data['result'] : array_reverse($data['result']);
-			$this->assertEquals($expected, $this->getTableColumnData($data['sort_by']));
-		}
+		$this->executeSorting($data);
 	}
 
 	public static function getButtonLinkData() {
@@ -309,38 +309,7 @@ class testPageHostPrototypes extends CWebTest {
 	public function testPageHostPrototypes_ButtonLink($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-
-		// Find host prototype in table by name and check column data before update.
-		if (array_key_exists('name', $data)) {
-			$row = $table->findRow('Name', $data['name']);
-			$this->assertEquals($data['before'], $row->getColumn($data['column_check'])->getText());
-		}
-
-		// Click on button or on link in column (Create enabled or Discover).
-		if (array_key_exists('button', $data)) {
-			// If no Host prototype name in data provider, then select all existing in table host prototypes.
-			$selected = (array_key_exists('name', $data)) ? $data['name'] : null;
-			$this->selectTableRows($selected);
-			$this->query('button', $data['button'])->one()->click();
-			$this->page->acceptAlert();
-			$this->page->waitUntilReady();
-		}
-		else {
-			// Click on link in table.
-			$row->getColumn($data['column_check'])->query('link', $data['before'])->waitUntilClickable()->one()->click();
-			$this->page->waitUntilReady();
-		}
-
-		// Check column value for one host prototypes or for them all.
-		if (array_key_exists('name', $data)) {
-			$this->assertMessage(TEST_GOOD, 'Host prototype updated');
-			$this->assertEquals($data['after'], $row->getColumn($data['column_check'])->getText());
-		}
-		else {
-			$this->assertMessage(TEST_GOOD, 'Host prototypes updated');
-			$this->assertTableDataColumn($data['after'], $data['column_check']);
-		}
+		$this->executeDiscoverEnable($data);
 	}
 
 	public static function getDeleteData() {
@@ -373,41 +342,24 @@ class testPageHostPrototypes extends CWebTest {
 	}
 
 	/**
+	 * Check delete scenarios.
+	 *
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageHostPrototypes_Delete($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
-		$sql = 'SELECT null FROM hosts WHERE hostid=';
 
-		// Check that host prototype exists in DB and displayed in Host prototype table.
 		foreach ($data['name'] as $name) {
-			$this->assertTrue(in_array($name, $this->getTableColumnData('Name')));
-			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_hostids[$name]));
+			$this->assertEquals(1, CDBHelper::getCount($this->sql.self::$prototype_hostids[$name]));
 		}
 
-		// Select host prototype and click on Delete button.
-		$this->selectTableRows($data['name']);
-		$this->query('button:Delete')->one()->click();
+		$this->executeDelete($data);
 
-		// Check that after canceling Delete, host prototype still exists in DB nad displayed in table.
-		if (array_key_exists('cancel', $data)) {
-			$this->page->dismissAlert();
-			foreach ($data['name'] as $name) {
-				$this->assertTrue(in_array($name, $this->getTableColumnData('Name')));
-				$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_hostids[$name]));
-			}
-		}
-		else {
-			$this->page->acceptAlert();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, $data['message']);
+		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
 
-			// Check that host prototype doesn't exist in DB and not displayed in Host prototype table.
-			foreach ($data['name'] as $name) {
-				$this->assertFalse(in_array($name, $this->getTableColumnData('Name')));
-				$this->assertEquals(0, CDBHelper::getCount($sql.self::$prototype_hostids[$name]));
-			}
+		foreach ($data['name'] as $name) {
+			$this->assertEquals($count, CDBHelper::getCount($this->sql.self::$prototype_hostids[$name]));
 		}
 	}
 }
