@@ -197,9 +197,15 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Check warning and hintbox message, as well as Aggregation function, Min/Max and Thresholds fields visibility.
 		foreach ($warning_visibility as $warning_label => $options) {
-			$hint_text = ($warning_label === 'History data')
-				? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
-				: 'With this setting only numeric items will be displayed.';
+			if ($warning_label === 'History data' || $warning_label === 'Display') {
+				$hint_text = ($warning_label === 'History data')
+					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+					: 'With this setting only numeric data will be displayed.';
+			}
+			else {
+				$hint_text = 'With this setting only numeric items will be displayed.';
+			}
+
 			$warning_button = $column_form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
 
 			foreach ($options as $option => $visible) {
