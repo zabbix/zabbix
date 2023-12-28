@@ -228,7 +228,7 @@ ZBX_GET_CONFIG_VAR(ZBX_THREAD_HANDLE*, zbx_threads, NULL)
 static int			*threads_flags;
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_AGENTD)
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
-ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 1)
+ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 

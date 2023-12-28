@@ -102,7 +102,6 @@ int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER TIMEOUT: %d", request->timeout);
 	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, request->timeout, NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
 
