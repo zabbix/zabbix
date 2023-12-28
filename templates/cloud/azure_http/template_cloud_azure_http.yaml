@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-20T15:40:52Z'
+  date: '2023-12-28T08:16:20Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -814,7 +814,7 @@ zabbix_export:
         - uuid: 3b9bde32dd6b4e3aa2dd8d7949f655e9
           name: 'Storage accounts discovery'
           type: DEPENDENT
-          key: azure.starage.acc.discovery
+          key: azure.storage.acc.discovery
           delay: '0'
           filter:
             evaltype: AND
