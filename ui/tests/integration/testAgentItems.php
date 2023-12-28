@@ -630,7 +630,7 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 0,
-			'timeout' => '1s'
+			'timeout' => '5s'
 		],
 		[
 			'key' => 'net.tcp.port[123.123.123.123,111]',
@@ -638,7 +638,7 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 0,
-			'timeout' => '1s'
+			'timeout' => '5s'
 		],
 		[
 			'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
