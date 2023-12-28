@@ -22,6 +22,7 @@
 namespace Widgets\TopHosts\Actions;
 
 use API,
+	CAggFunctionData,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
@@ -406,8 +407,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * @return bool
 	 */
 	private static function isNumericOnlyColumn(array $column): bool {
-		return $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
-			&& $column['aggregate_function'] != AGGREGATE_COUNT;
+		if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+			return CAggFunctionData::requiresNumericItem($column['aggregate_function']);
+		}
+
+		return $column['aggregate_function'] != AGGREGATE_COUNT;
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {

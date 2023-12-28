@@ -51,6 +51,18 @@ class CAggFunctionData {
 	}
 
 	/**
+	 * Check whether only numeric item values can be aggregated using the specified function.
+	 *
+	 * @param int $function   Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG,
+	 *                        AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST).
+	 *
+	 * @return bool
+	 */
+	public static function requiresNumericItem(int $function): bool {
+		return in_array($function, [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM]);
+	}
+
+	/**
 	 * Check whether the aggregation result of the specified function is always numeric.
 	 *
 	 * @param int $function   Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG,
