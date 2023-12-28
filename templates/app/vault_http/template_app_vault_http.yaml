@@ -1826,7 +1826,7 @@ zabbix_export:
           key: vault.metrics.token.by_auth
           delay: '0'
           history: 7d
-          description: 'Total number of service tokens that were created by a auth method.'
+          description: 'Total number of service tokens that were created by an auth method.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:

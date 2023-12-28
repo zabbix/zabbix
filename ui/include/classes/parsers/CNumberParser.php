@@ -69,7 +69,7 @@ class CNumberParser extends CParser {
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
 
-		if ($this->options['with_size_suffix'] && $this->options['with_year']) {
+		if (!$this->options['with_time_suffix'] && $this->options['with_year']) {
 			throw new Exception('Ambiguous options.');
 		}
 
