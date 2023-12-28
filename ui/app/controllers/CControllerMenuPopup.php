@@ -273,21 +273,26 @@ class CControllerMenuPopup extends CController {
 				];
 			}
 
-			foreach (array_values($urls) as $url) {
-				$menu_data['urls'][] = [
+			foreach (array_values($urls) as $index => $url) {
+				$menu_data['urls'][$index] = [
 					'label' => $url['name'],
 					'menu_path' => $url['menu_path'],
 					'url' => $url['url'],
 					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
 					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : ''),
-					'manualinput' => $url['manualinput'],
-					'manualinput_prompt' => $url['manualinput_prompt'],
-					'manualinput_validator_type' => $url['manualinput_validator_type'],
-					'manualinput_validator' => $url['manualinput_validator'],
-					'manualinput_default_value' => $url['manualinput_default_value'],
-					'scriptid' => $url['scriptid']
+					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 				];
+
+				if (array_key_exists('manualinput', $url)) {
+					$menu_data['urls'][$index] = array_merge($menu_data['urls'][$index], [
+						'manualinput' => $url['manualinput'],
+						'manualinput_prompt' => $url['manualinput_prompt'],
+						'manualinput_validator' => $url['manualinput_validator'],
+						'manualinput_validator_type' => $url['manualinput_validator_type'],
+						'manualinput_default_value' => $url['manualinput_default_value'],
+						'scriptid' => $url['scriptid']
+					]);
+				}
 			}
 
 			if (array_key_exists('urls', $menu_data)) {
