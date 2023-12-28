@@ -541,7 +541,7 @@ zabbix_export:
           key: redis.persistence.aof_rewrite_in_progress
           delay: '0'
           history: 7d
-          description: 'Flag indicating a AOF rewrite operation is on-going'
+          description: 'Flag indicating an AOF rewrite operation is on-going'
           preprocessing:
             - type: JSONPATH
               parameters:
