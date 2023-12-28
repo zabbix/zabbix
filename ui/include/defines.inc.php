@@ -1026,6 +1026,9 @@ define('USER_TYPE_SUPER_ADMIN',		3);
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 
+define('GROUP_MFA_DISABLED', 0);
+define('GROUP_MFA_ENABLED', 1);
+
 define('LINE_TYPE_NORMAL',	0);
 define('LINE_TYPE_BOLD',	1);
 

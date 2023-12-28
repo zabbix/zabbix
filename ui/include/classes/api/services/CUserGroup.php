@@ -66,6 +66,7 @@ class CUserGroup extends CApiService {
 			'userids'					=> null,
 			'mfaids'					=> null,
 			'status'					=> null,
+			'mfa_status'				=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -131,6 +132,10 @@ class CUserGroup extends CApiService {
 		// status
 		if (!is_null($options['status'])) {
 			$sqlParts['where'][] = 'g.users_status='.zbx_dbstr($options['status']);
+		}
+
+		if (!is_null($options['mfa_status'])) {
+			$sqlParts['where'][] = 'g.mfa_status='.zbx_dbstr($options['mfa_status']);
 		}
 
 		// filter
@@ -250,7 +255,8 @@ class CUserGroup extends CApiService {
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'mfaid' =>					['type' => API_ID, 'flags' => API_NORMALIZE]
+			'mfaid' =>					['type' => API_ID, 'flags' => API_NORMALIZE],
+			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED])]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -363,7 +369,8 @@ class CUserGroup extends CApiService {
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'mfaid' =>					['type' => API_ID, 'flags' => API_NORMALIZE]
+			'mfaid' =>					['type' => API_ID, 'flags' => API_NORMALIZE],
+			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
