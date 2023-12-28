@@ -715,11 +715,11 @@
 					add_mfa_method: 0,
 					type: row.querySelector(`[name="mfa_methods[${row_index}][type]"`).value,
 					name: row.querySelector(`[name="mfa_methods[${row_index}][name]"`).value,
-					hash_function: row.querySelector(`[name="mfa_methods[${row_index}][hash_function]"`).value,
-					code_length: row.querySelector(`[name="mfa_methods[${row_index}][code_length]"`).value,
-					api_hostname: row.querySelector(`[name="mfa_methods[${row_index}][api_hostname]"`).value,
-					clientid: row.querySelector(`[name="mfa_methods[${row_index}][clientid]"`).value,
-					client_secret: row.querySelector(`[name="mfa_methods[${row_index}][client_secret]"`).value
+					hash_function: row.querySelector(`[name="mfa_methods[${row_index}][hash_function]"`)?.value,
+					code_length: row.querySelector(`[name="mfa_methods[${row_index}][code_length]"`)?.value,
+					api_hostname: row.querySelector(`[name="mfa_methods[${row_index}][api_hostname]"`)?.value,
+					clientid: row.querySelector(`[name="mfa_methods[${row_index}][clientid]"`)?.value,
+					client_secret: row.querySelector(`[name="mfa_methods[${row_index}][client_secret]"`)?.value
 				};
 
 				const mfaid_input = row.querySelector(`[name="mfa_methods[${row_index}][mfaid]"`);
