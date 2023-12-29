@@ -179,6 +179,16 @@ class CControllerUserList extends CController {
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 		];
 
+		$data['mfa_totp_enabled'] = false;
+		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
+			$mfas = API::Mfa()->get([
+				'filter' => ['type' => MFA_TYPE_TOTP],
+				'countOutput' => true
+			]);
+
+			$data['mfa_totp_enabled'] = $mfas > 0;
+		}
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));
 		$this->setResponse($response);

@@ -363,6 +363,7 @@ class CRouter {
 		'user.unblock'								=> ['CControllerUserUnblock',							null,					null],
 		'user.update'								=> ['CControllerUserUpdate',							null,					null],
 		'user.provision'							=> ['CControllerUserProvision',							null,					null],
+		'user.reset.totp'							=> ['CControllerUserResetTotp',							null,					null],
 		'usergroup.create'							=> ['CControllerUsergroupCreate',						null,					null],
 		'usergroup.delete'							=> ['CControllerUsergroupDelete',						null,					null],
 		'usergroup.edit'							=> ['CControllerUsergroupEdit',							'layout.htmlpage',		'usergroup.edit'],

@@ -220,6 +220,10 @@ foreach ($data['users'] as $user) {
 		$checkbox->setAttribute('data-actions', 'ldap');
 	}
 
+	if ($data['mfa_totp_enabled']) {
+		$checkbox->setAttribute('data-actions', 'mfa_totp_enabled');
+	}
+
 	if ($user['userdirectoryid']) {
 		$idp = $data['idp_names'][$user['userdirectoryid']];
 		$provisioned->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
@@ -303,6 +307,13 @@ $form->addItem([
 			'attributes' => ['data-required' => 'ldap'],
 			'confirm_singular' => _('Provision selected LDAP user?'),
 			'confirm_plural' => _('Provision selected LDAP users?'),
+			'csrf_token' => $csrf_token
+		],
+		'user.reset.totp' => [
+			'name' => _('Reset TOTP secret'),
+			'attributes' => ['data-required' => 'mfa_totp_enabled'],
+			'confirm_singular' => _('Multi-factor TOTP secret will be deleted.'),
+			'confirm_plural' => _('Multi-factor TOTP secrets will be deleted.'),
 			'csrf_token' => $csrf_token
 		],
 		'user.unblock' => [
