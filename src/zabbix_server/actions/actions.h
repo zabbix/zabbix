@@ -21,6 +21,7 @@
 #define ZABBIX_ACTIONS_H
 
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 
 #define ZBX_ACTION_RECOVERY_NONE	0
 #define ZBX_ACTION_RECOVERY_OPERATIONS	1
@@ -47,18 +48,6 @@ typedef struct
 	zbx_uint64_t	acknowledgeid;
 }
 zbx_ack_escalation_t;
-
-typedef struct
-{
-	zbx_uint64_t			conditionid;
-	zbx_uint64_t			actionid;
-	char				*value;
-	char				*value2;
-	unsigned char			conditiontype;
-	unsigned char			op;
-	zbx_vector_uint64_t		eventids;
-}
-zbx_condition_t;
 
 ZBX_PTR_VECTOR_DECL(db_action_ptr, zbx_db_action*)
 

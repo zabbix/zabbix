@@ -372,6 +372,8 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
+ZBX_PTR_VECTOR_IMPL(condition_ptr, zbx_condition_t *)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: creates action evaluation data from configuration cache action    *
@@ -398,12 +400,14 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 	action->evaltype = dc_action->evaltype;
 	action->opflags = dc_action->opflags;
 	action->formula = zbx_strdup(NULL, dc_action->formula);
-	zbx_vector_ptr_create(&action->conditions);
+	zbx_vector_condition_ptr_create(&action->conditions);
 
 	dc_action_copy_conditions_cb_arg(dc_action, &action->conditions);
 
 	return action;
 }
+
+ZBX_PTR_VECTOR_IMPL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
 
 /*************************************************************************************
  *                                                                                   *

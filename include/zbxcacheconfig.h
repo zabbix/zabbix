@@ -397,12 +397,25 @@ zbx_dc_proxy_t;
 
 typedef struct
 {
-	zbx_uint64_t		actionid;
-	char			*formula;
-	unsigned char		eventsource;
-	unsigned char		evaltype;
-	unsigned char		opflags;
-	zbx_vector_ptr_t	conditions;
+	zbx_uint64_t			conditionid;
+	zbx_uint64_t			actionid;
+	char				*value;
+	char				*value2;
+	unsigned char			conditiontype;
+	unsigned char			op;
+	zbx_vector_uint64_t		eventids;
+}
+zbx_condition_t;
+ZBX_PTR_VECTOR_DECL(condition_ptr, zbx_condition_t *)
+
+typedef struct
+{
+	zbx_uint64_t			actionid;
+	char				*formula;
+	unsigned char			eventsource;
+	unsigned char			evaltype;
+	unsigned char			opflags;
+	zbx_vector_condition_ptr_t	conditions;
 }
 zbx_action_eval_t;
 
@@ -935,17 +948,6 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 
 typedef struct
 {
-	zbx_uint64_t		actionid;
-	const char		*formula;
-	unsigned char		eventsource;
-	unsigned char		evaltype;
-	unsigned char		opflags;
-	zbx_vector_ptr_t	conditions;
-}
-zbx_dc_action_t;
-
-typedef struct
-{
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
 	unsigned char	conditiontype;
@@ -955,7 +957,20 @@ typedef struct
 }
 zbx_dc_action_condition_t;
 
-typedef void (dc_action_copy_conditions_f)(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions);
+ZBX_PTR_VECTOR_DECL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
+
+typedef struct
+{
+	zbx_uint64_t				actionid;
+	const char				*formula;
+	unsigned char				eventsource;
+	unsigned char				evaltype;
+	unsigned char				opflags;
+	zbx_vector_dc_action_condition_ptr_t	conditions;
+}
+zbx_dc_action_t;
+
+typedef void (dc_action_copy_conditions_f)(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions);
 void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags,
 		dc_action_copy_conditions_f dc_action_copy_conditions_cb_arg);
 

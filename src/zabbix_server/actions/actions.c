@@ -22,6 +22,7 @@
 #include "../server_constants.h"
 #include "../operations/operations.h"
 
+#include "zbxcacheconfig.h"
 #include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
@@ -3037,7 +3038,7 @@ static void	zbx_action_eval_free(zbx_action_eval_t *action)
 {
 	zbx_free(action->formula);
 
-	zbx_vector_ptr_destroy(&action->conditions);
+	zbx_vector_condition_ptr_destroy(&action->conditions);
 
 	zbx_free(action);
 }
@@ -3109,8 +3110,6 @@ static void	prepare_actions_conditions_eval(zbx_vector_ptr_t *actions, zbx_hashs
 	}
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: copies configuration cache action conditions to specified vector  *
@@ -3119,16 +3118,16 @@ static void	prepare_actions_conditions_eval(zbx_vector_ptr_t *actions, zbx_hashs
  *             conditions - [OUT]                                             *
  *                                                                            *
  ******************************************************************************/
-static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions)
 {
 	zbx_condition_t			*condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
-	zbx_vector_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
+	zbx_vector_condition_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
 
 	for (int i = 0; i < dc_action->conditions.values_num; i++)
 	{
-		dc_condition = (zbx_dc_action_condition_t *)dc_action->conditions.values[i];
+		dc_condition = dc_action->conditions.values[i];
 
 		condition = (zbx_condition_t *)zbx_malloc(NULL, sizeof(zbx_condition_t));
 
@@ -3140,7 +3139,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
 		zbx_vector_uint64_create(&condition->eventids);
 
-		zbx_vector_ptr_append(conditions, condition);
+		zbx_vector_condition_ptr_append(conditions, condition);
 	}
 }
 
