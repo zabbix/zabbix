@@ -31,6 +31,7 @@
 #include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
+ZBX_PTR_VECTOR_IMPL(action_eval_ptr, zbx_action_eval_t *)
 
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
@@ -433,7 +434,7 @@ ZBX_PTR_VECTOR_IMPL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
  *           zbx_action_eval_free() function later.                                  *
  *                                                                                   *
  *************************************************************************************/
-void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags,
+void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags,
 		dc_action_copy_conditions_f dc_action_copy_conditions_cb_arg)
 {
 	const zbx_dc_action_t		*dc_action;
@@ -449,7 +450,7 @@ void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsi
 	{
 		if (0 != (opflags & dc_action->opflags))
 		{
-			zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action,
+			zbx_vector_action_eval_ptr_append(actions, dc_action_eval_create(dc_action,
 					dc_action_copy_conditions_cb_arg));
 		}
 	}
