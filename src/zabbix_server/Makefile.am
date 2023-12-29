@@ -45,7 +45,7 @@ libzbxserver_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
 zabbix_server_SOURCES = \
-	server.h \
+	server_constants.h \
 	server.c
 
 zabbix_server_LDADD = \
