@@ -38,17 +38,6 @@ zbx_ack_task_t;
 
 void	zbx_ack_task_free(zbx_ack_task_t *ack_task);
 ZBX_PTR_VECTOR_DECL(ack_task_ptr, zbx_ack_task_t *)
-
-typedef struct
-{
-	zbx_uint64_t	taskid;
-	zbx_uint64_t	actionid;
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	triggerid;
-	zbx_uint64_t	acknowledgeid;
-}
-zbx_ack_escalation_t;
-
 ZBX_PTR_VECTOR_DECL(db_action_ptr, zbx_db_action*)
 
 int	check_action_condition(zbx_db_event *event, zbx_condition_t *condition);
