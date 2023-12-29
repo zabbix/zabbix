@@ -557,6 +557,7 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-provision-status')
 	]);
 
+$form->addVar('mfa_default_row_index', $data['mfa_default_row_index']);
 $mfa_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable multi-factor authentication'), 'mfa_status'),

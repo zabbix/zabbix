@@ -274,7 +274,7 @@
 
 				this.form.querySelectorAll('[data-disable_remove] .js-remove').forEach(field => field.disabled = true);
 
-				if (is_readonly && default_index && mfa_default_row_index) {
+				if (is_readonly && default_index) {
 					default_index_hidden.value = default_index.value;
 				}
 			});

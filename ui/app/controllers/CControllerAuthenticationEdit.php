@@ -437,18 +437,20 @@ class CControllerAuthenticationEdit extends CController {
 		$totp_methods = API::Mfa()->get([
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length'],
 			'selectUsrgrps' => API_OUTPUT_COUNT,
-			'filter' => ['type' => MFA_TYPE_TOTP],
-			'sortfield' => ['name']
+			'filter' => ['type' => MFA_TYPE_TOTP]
 		]);
 
 		$duo_methods = API::Mfa()->get([
 			'output' => ['mfaid', 'type', 'name', 'api_hostname', 'clientid', 'client_secret'],
 			'selectUsrgrps' => API_OUTPUT_COUNT,
-			'filter' => ['type' => MFA_TYPE_DUO],
-			'sortfield' => ['name']
+			'filter' => ['type' => MFA_TYPE_DUO]
 		]);
 
 		$mfa_methods = array_merge($totp_methods, $duo_methods);
+
+		CArrayHelper::sort($mfa_methods, ['name']);
+
+		$mfa_methods = array_values($mfa_methods);
 
 		foreach ($mfa_methods as &$mfa_method) {
 			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');

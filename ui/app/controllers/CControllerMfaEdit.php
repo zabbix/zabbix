@@ -34,7 +34,8 @@ class CControllerMfaEdit extends CController {
 			'code_length' =>	'in '.TOTP_CODE_LENGTH_6.','.TOTP_CODE_LENGTH_8,
 			'api_hostname' =>	'db mfa.api_hostname',
 			'clientid' =>		'db mfa.clientid',
-			'client_secret' =>	'db mfa.client_secret'
+			'client_secret' =>	'db mfa.client_secret',
+			'add_mfa_method' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -70,7 +71,8 @@ class CControllerMfaEdit extends CController {
 			'client_secret' => '',
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'add_mfa_method' => 1
 		];
 
 		$this->getInputs($data, array_keys($data));

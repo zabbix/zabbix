@@ -29,9 +29,11 @@ $form_action = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $form = (new CForm('post', $form_action))
-	->addItem(getMessages())
-	->addVar('row_index', $data['row_index'])
-	->addVar('mfaid', $data['mfaid']);
+	->addItem(getMessages());
+
+if (array_key_exists('mfaid', $data)) {
+	$form->addVar('mfaid', $data['mfaid']);
+}
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
