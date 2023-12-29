@@ -58,6 +58,10 @@ abstract class CControllerUserUpdateGeneral extends CController {
 				? GROUP_GUI_ACCESS_INTERNAL
 				: GROUP_GUI_ACCESS_LDAP;
 
+		if (!$usrgrps) {
+			return $system_gui_access == GROUP_GUI_ACCESS_INTERNAL;
+		}
+
 		foreach($usrgrps as $usrgrp) {
 			$gui_access = ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM)
 				? $system_gui_access
@@ -174,19 +178,13 @@ abstract class CControllerUserUpdateGeneral extends CController {
 		if ($this instanceof CControllerUserProfileUpdate) {
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['gui_access'],
-				'userids' => CWebUser::$data['userid'],
-				'filter' => [
-					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
-				]
+				'userids' => CWebUser::$data['userid']
 			]);
 		}
 		elseif ($this->getInput('user_groups', [])) {
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['gui_access'],
-				'usrgrpids' => $this->getInput('user_groups'),
-				'filter' => [
-					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
-				]
+				'usrgrpids' => $this->getInput('user_groups')
 			]);
 		}
 

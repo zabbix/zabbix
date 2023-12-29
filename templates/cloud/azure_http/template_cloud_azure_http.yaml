@@ -817,7 +817,7 @@ zabbix_export:
         - uuid: 3b9bde32dd6b4e3aa2dd8d7949f655e9
           name: 'Storage accounts discovery'
           type: DEPENDENT
-          key: azure.starage.acc.discovery
+          key: azure.storage.acc.discovery
           delay: '0'
           filter:
             evaltype: AND

@@ -1793,7 +1793,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: |
-                'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using. 
+                'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using.
                 This metric is only collected for tasks that have a defined memory reservation in their task definition.'
               preprocessing:
                 - type: JSONPATH
@@ -2057,7 +2057,7 @@ zabbix_export:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         - macro: '{$AWS.AUTH_TYPE}'
-          value: role_base
+          value: access_key
           description: 'Authorization method. Possible values: role_base, access_key.'
         - macro: '{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}'
           value: '70'

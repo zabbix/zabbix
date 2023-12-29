@@ -2526,7 +2526,7 @@ zabbix_export:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         - macro: '{$AWS.AUTH_TYPE}'
-          value: role_base
+          value: access_key
           description: 'Authorization method. Possible values: role_base, access_key.'
         - macro: '{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}'
           value: '20'
