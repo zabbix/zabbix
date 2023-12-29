@@ -470,6 +470,8 @@ New features:
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
+.......PS. [ZBX-23631] removed tag 'tags' in case of an error collecting tags from *discovery items (MVekslers)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23497] fixed user edit form fields validation for user without user group (dpetra)
 ..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
