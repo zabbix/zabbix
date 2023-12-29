@@ -648,28 +648,6 @@ ZBX_DC_STATUS;
 
 typedef struct
 {
-	zbx_uint64_t	conditionid;
-	zbx_uint64_t	actionid;
-	unsigned char	conditiontype;
-	unsigned char	op;
-	const char	*value;
-	const char	*value2;
-}
-zbx_dc_action_condition_t;
-
-typedef struct
-{
-	zbx_uint64_t		actionid;
-	const char		*formula;
-	unsigned char		eventsource;
-	unsigned char		evaltype;
-	unsigned char		opflags;
-	zbx_vector_ptr_t	conditions;
-}
-zbx_dc_action_t;
-
-typedef struct
-{
 	zbx_uint64_t	triggertagid;
 	zbx_uint64_t	triggerid;
 	const char	*tag;

@@ -933,7 +933,31 @@ int	zbx_dc_set_interfaces_availability(zbx_vector_availability_ptr_t *availabili
 
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
 
-void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
+typedef struct
+{
+	zbx_uint64_t		actionid;
+	const char		*formula;
+	unsigned char		eventsource;
+	unsigned char		evaltype;
+	unsigned char		opflags;
+	zbx_vector_ptr_t	conditions;
+}
+zbx_dc_action_t;
+
+typedef struct
+{
+	zbx_uint64_t	conditionid;
+	zbx_uint64_t	actionid;
+	unsigned char	conditiontype;
+	unsigned char	op;
+	const char	*value;
+	const char	*value2;
+}
+zbx_dc_action_condition_t;
+
+typedef void (dc_action_copy_conditions_f)(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions);
+void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags,
+		dc_action_copy_conditions_f dc_action_copy_conditions_cb_arg);
 
 int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	zbx_dc_touch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);

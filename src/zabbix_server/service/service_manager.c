@@ -18,7 +18,7 @@
 **/
 
 #include "service_manager.h"
-#include "../server.h"
+#include "../server_constants.h"
 
 #include "zbxlog.h"
 #include "zbxself.h"

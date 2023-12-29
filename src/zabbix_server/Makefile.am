@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	actions \
 	dbconfig \
 	diag \
 	discoverer \
@@ -34,8 +35,6 @@ noinst_LIBRARIES = libzbxserver.a
 
 libzbxserver_a_SOURCES = \
 	db_lengths.h \
-	actions.c \
-	actions.h \
 	zbxreport.h
 
 libzbxserver_a_CFLAGS = \
@@ -56,6 +55,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
+	actions/libzbxactions.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \

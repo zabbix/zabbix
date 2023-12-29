@@ -19,9 +19,9 @@
 
 #include "taskmanager_server.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
 #include "../events/events.h"
-#include "../actions.h"
+#include "../actions/actions.h"
 
 #include "zbxservice.h"
 #include "zbxnix.h"

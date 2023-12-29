@@ -18,9 +18,10 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
+
+#include "zbxexpression.h"
 #include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"

@@ -19,11 +19,10 @@
 
 #include "report_manager.h"
 #include "report_protocol.h"
+#include "../server_constants.h"
+#include "../db_lengths_constants.h"
 
-#include "../server.h"
-#include "../db_lengths.h"
 #include "zbxalerter.h"
-
 #include "zbxcrypto.h"
 #include "zbxexpression.h"
 #include "zbxself.h"

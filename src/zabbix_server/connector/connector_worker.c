@@ -19,7 +19,7 @@
 
 #include "connector_worker.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"

@@ -19,7 +19,7 @@
 
 #include "postinit.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
 
 #include "zbxexpression.h"
 #include "zbxtasks.h"
