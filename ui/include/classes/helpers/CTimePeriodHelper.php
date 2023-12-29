@@ -110,7 +110,7 @@ class CTimePeriodHelper {
 		$max_period = self::getMaxPeriod();
 
 		if ($time_period['to_ts'] - $time_period['from_ts'] + 1 > $max_period) {
-			$time_period['from_ts'] = $time_period['to_ts'] - $max_period + 1;
+			$time_period['from_ts'] = $time_period['to_ts'] - $max_period;
 		}
 
 		$time_period['from'] = date(ZBX_FULL_DATE_TIME, $time_period['from_ts']);
