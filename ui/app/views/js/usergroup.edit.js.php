@@ -27,9 +27,11 @@
 <script>
 	const view = new class {
 
-		init({templategroup_rights, hostgroup_rights, tag_filters}) {
+		init({templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status}) {
 			this.tag_filters = tag_filters;
 			this.templategroup_rights = templategroup_rights;
+			this.ldap_status = ldap_status;
+			this.mfa_status = mfa_status;
 			this.template_permission_template = new Template(
 				document.getElementById('templategroup-right-row-template').innerHTML
 			);
@@ -74,8 +76,14 @@
 			});
 
 			document.getElementById('user-group-form').addEventListener('change', event => {
-				if (event.target.name === 'gui_access') {
+				if (event.target.name == 'gui_access') {
 					this.#toggleUserdirectory(event.target.value);
+				}
+				if (event.target.name == 'mfaid') {
+					this.#toggleMfaWarningIcon(event.target.value);
+				}
+				if (event.target.name == 'userdirectoryid') {
+					this.#toggleLdapWarningIcon(event.target.value);
 				}
 			})
 
@@ -83,6 +91,8 @@
 			this.#setMultiselectDisabling('ms_hostgroup');
 			this.#setMultiselectDisabling('ms_templategroup');
 			this.#toggleUserdirectory(document.querySelector('[name="gui_access"]').value);
+			this.#toggleMfaWarningIcon(document.querySelector('[name="mfaid"]').value);
+			this.#toggleLdapWarningIcon(document.querySelector('[name="userdirectoryid"]').value);
 		}
 
 		/**
@@ -293,6 +303,28 @@
 				default:
 					userdirectory.disabled = false;
 					mfa.disabled = false;
+			}
+		}
+
+		#toggleMfaWarningIcon(mfa_value) {
+			const icon = document.getElementById('mfa-warning');
+
+			if (this.mfa_status == <?= MFA_DISABLED ?> && mfa_value != -1) {
+				icon.style.display = '';
+			}
+			else {
+				icon.style.display = 'none';
+			}
+		}
+
+		#toggleLdapWarningIcon(userdirectory_value) {
+			const icon = document.getElementById('ldap-warning');
+
+			if (this.ldap_status == <?= ZBX_AUTH_LDAP_DISABLED ?> && userdirectory_value != 0) {
+				icon.style.display = '';
+			}
+			else {
+				icon.style.display = 'none';
 			}
 		}
 	};

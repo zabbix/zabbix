@@ -159,6 +159,8 @@ class CControllerUsergroupEdit extends CController {
 			CArrayHelper::sort($userdirectories, ['name']);
 			$data['userdirectories'] = array_column($userdirectories, 'name', 'userdirectoryid');
 
+			$data['ldap_status'] = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_AUTH_ENABLED);
+
 			$mfas = API::Mfa()->get([
 				'output' => ['mfaid', 'name'],
 				'sortfield' => ['name']

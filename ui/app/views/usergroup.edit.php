@@ -93,6 +93,8 @@ if ($data['can_update_group']) {
 		->addOptions(CSelect::createOptionsFromArray($data['userdirectories']))
 		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
+	$ldap_warning = (makeWarningIcon(_('LDAP authentication is disabled system-wide.')))->setId('ldap-warning');
+
 	if ($data['usrgrpid']) {
 		if ($data['group_mfa_status'] == GROUP_MFA_ENABLED) {
 			$mfa = $data['mfaid'] ?: 0;
@@ -105,11 +107,7 @@ if ($data['can_update_group']) {
 		$mfa = $data['mfa_config_status'] == MFA_ENABLED ? 0 : -1;
 	}
 
-	$mfa_error = null;
-	if ($data['mfa_config_status'] == MFA_DISABLED && $mfa != -1) {
-		$mfa_error = makeWarningIcon(_('Multi-factor authentication is disabled system-wide'));
-	}
-
+	$mfa_warning = (makeWarningIcon(_('Multi-factor authentication is disabled system-wide.')))->setId('mfa-warning');
 	$mfas = (new CSelect('mfaid'))
 		->setValue($mfa)
 		->setFocusableElementId('mfaid')
@@ -133,11 +131,11 @@ if ($data['can_update_group']) {
 			new CFormField($select_gui_access)
 		])
 		->addItem([
-			(new CLabel(_('LDAP Server'), $userdirectory->getFocusableElementId())),
+			(new CLabel([_('LDAP Server'), $ldap_warning], $userdirectory->getFocusableElementId())),
 			new CFormField($userdirectory)
 		])
 		->addItem([
-			(new CLabel([_('Multi-factor authentication'), $mfa_error], $mfas->getFocusableElementId())),
+			(new CLabel([_('Multi-factor authentication'), $mfa_warning], $mfas->getFocusableElementId())),
 			new CFormField($mfas)
 		])
 		->addItem([
@@ -348,7 +346,9 @@ $form
 		(new CScriptTag('view.init('.json_encode([
 			'templategroup_rights' => $data['templategroup_rights'],
 			'hostgroup_rights' => $data['hostgroup_rights'],
-			'tag_filters' => $data['tag_filters']
+			'tag_filters' => $data['tag_filters'],
+			'ldap_status' => $data['ldap_status'],
+			'mfa_status' => $data['mfa_config_status']
 		]).');'))->setOnDocumentReady()
 	);
 
