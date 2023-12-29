@@ -51,6 +51,8 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxkvs.h"
+#include "zbxcomms.h"
+#include "zbxdb.h"
 
 int	sync_in_progress = 0;
 

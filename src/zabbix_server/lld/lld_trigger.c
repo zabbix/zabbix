@@ -28,6 +28,13 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 #include "zbxvariant.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 typedef struct
 {

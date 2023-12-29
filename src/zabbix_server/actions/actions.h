@@ -22,6 +22,7 @@
 
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxalgo.h"
 
 #define ZBX_ACTION_RECOVERY_NONE	0
 #define ZBX_ACTION_RECOVERY_OPERATIONS	1

@@ -27,7 +27,6 @@
 #include "zbxself.h"
 #include "../actions/actions.h"
 #include "zbxscripts.h"
-#include "zbxcrypto.h"
 #include "zbxevent.h"
 #include "zbxservice.h"
 #include "zbxnum.h"

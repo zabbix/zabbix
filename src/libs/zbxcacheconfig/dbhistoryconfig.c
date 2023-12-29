@@ -19,9 +19,16 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
+#include "user_macro.h"
+
+#include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxtagfilter.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 

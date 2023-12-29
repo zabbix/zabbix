@@ -20,7 +20,6 @@
 #include "lld.h"
 
 #include "lld_audit.h"
-#include "../db_lengths_constants.h"
 
 #include "zbxexpression.h"
 #include "zbxregexp.h"
@@ -30,9 +29,17 @@
 #include "zbxdbwrap.h"
 #include "zbxhttp.h"
 #include "zbxvariant.h"
-
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 #define	ZBX_DEPENDENT_ITEM_MAX_COUNT	29999
 #define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
