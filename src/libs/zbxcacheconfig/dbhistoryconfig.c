@@ -19,7 +19,6 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
-//#include "actions.h"
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"
 #include "zbxtagfilter.h"
@@ -377,9 +376,11 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
  *                                                                            *
  * Purpose: creates action evaluation data from configuration cache action    *
  *                                                                            *
- * Parameters: dc_action - [IN] the source action                             *
+ * Parameters:                                                                *
+ *             dc_action                        - [IN] source action          *
+ *             dc_action_copy_conditions_cb_arg - [IN]                        *
  *                                                                            *
- * Return value: the action evaluation data                                   *
+ * Return value: action evaluation data                                       *
  *                                                                            *
  * Comments: The returned value must be freed with zbx_action_eval_free()     *
  *           function later.                                                  *
@@ -404,21 +405,23 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 	return action;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: gets action evaluation data                                       *
- *                                                                            *
- * Parameters: actions         - [OUT] the action evaluation data             *
- *             uniq_conditions - [OUT] unique conditions that actions         *
- *                                     point to (several sources)             *
- *             opflags         - [IN] flags specifying which actions to get   *
- *                                    based on their operation classes        *
- *                                    (see ZBX_ACTION_OPCLASS_* defines)      *
- *                                                                            *
- * Comments: The returned actions and conditions must be freed with           *
- *           zbx_action_eval_free() function later.                           *
- *                                                                            *
- ******************************************************************************/
+/*************************************************************************************
+ *                                                                                   *
+ * Purpose: gets action evaluation data                                              *
+ *                                                                                   *
+ * Parameters:                                                                       *
+ *     actions                          - [OUT] action evaluation data               *
+ *     uniq_conditions                  - [OUT] unique conditions that actions       *
+ *                                              point to (several sources)           *
+ *     opflags                          - [IN] flags specifying which actions to get *
+ *                                             based on their operation classes      *
+ *                                             (see ZBX_ACTION_OPCLASS_* defines)    *
+ *     dc_action_copy_conditions_cb_arg - [IN]                                       *
+ *                                                                                   *
+ * Comments: The returned actions and conditions must be freed with                  *
+ *           zbx_action_eval_free() function later.                                  *
+ *                                                                                   *
+ *************************************************************************************/
 void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags,
 		dc_action_copy_conditions_f dc_action_copy_conditions_cb_arg)
 {

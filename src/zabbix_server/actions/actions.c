@@ -3119,7 +3119,7 @@ static void	prepare_actions_conditions_eval(zbx_vector_ptr_t *actions, zbx_hashs
  *             conditions - [OUT]                                             *
  *                                                                            *
  ******************************************************************************/
-static void    dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
 {
 	zbx_condition_t			*condition;
 	zbx_dc_action_condition_t	*dc_condition;
