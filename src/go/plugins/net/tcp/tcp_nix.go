@@ -42,7 +42,6 @@ func init() {
 	}
 
 	impl.SetHandleTimeout(true)
-
 }
 
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {

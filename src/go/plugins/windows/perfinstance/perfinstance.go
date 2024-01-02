@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/pdh"
 	"zabbix.com/pkg/win32"
 )
@@ -30,7 +30,7 @@ func init() {
 		"perf_instance_en.discovery", "Get Windows performance instance object English list.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
 	impl.SetCapacity(1)

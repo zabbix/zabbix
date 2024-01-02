@@ -74,7 +74,6 @@ var dnsTypes = map[string]uint16{
 	"SRV":   dns.TypeSRV,
 }
 
-<<<<<<< HEAD
 type options struct {
 	ip       string
 	name     string
@@ -87,17 +86,19 @@ type options struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
-=======
+}
+
 func init() {
 	err := plugin.RegisterMetrics(
 		&impl, "DNS",
 		"net.dns", "Checks if DNS service is up.",
+		"net.dns.perf", "Measures DNS query time in seconds.",
 		"net.dns.record", "Performs a DNS query.",
+		"net.dns.get", "Performs a DNS query. (Returns verbose response in JSON).",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metric"))
 	}
->>>>>>> d0bd6456ffb (...G...... [ZBX-23540] added error checks for RegisterMetrics calls)
 }
 
 // Export -
@@ -547,15 +548,3 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 
 	return r, nil
 }
-<<<<<<< HEAD
-
-func init() {
-	plugin.RegisterMetrics(&impl, "DNS",
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.perf", "Measures DNS query time in seconds.",
-		"net.dns.record", "Performs a DNS query.",
-		"net.dns.get", "Performs a DNS query. (Returns verbose response in JSON).",
-	)
-}
-=======
->>>>>>> d0bd6456ffb (...G...... [ZBX-23540] added error checks for RegisterMetrics calls)

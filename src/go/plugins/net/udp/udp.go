@@ -148,7 +148,7 @@ func (p *Plugin) validateResponse(rsp []byte, ln int, req []byte) int {
 	return 1
 }
 
-func (p *Plugin) udpExpect(service, address string, timeout int) (result int) {
+func (p *Plugin) udpExpect(address string, timeout int) (result int) {
 	var conn net.Conn
 	var err error
 
@@ -197,7 +197,7 @@ func (p *Plugin) exportNetService(params []string, timeout int) int {
 		port = service
 	}
 
-	return p.udpExpect(service, net.JoinHostPort(ip, port), timeout)
+	return p.udpExpect(net.JoinHostPort(ip, port), timeout)
 }
 
 func toFixed(num float64, precision int) float64 {

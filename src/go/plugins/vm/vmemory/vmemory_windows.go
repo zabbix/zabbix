@@ -20,6 +20,7 @@
 package vmemory
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/win32"
@@ -40,7 +41,7 @@ func init() {
 		"vm.vmemory.size", "Returns virtual memory size in bytes or in percentage.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

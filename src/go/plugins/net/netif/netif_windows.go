@@ -26,8 +26,8 @@ import (
 	"net"
 	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/win32"
 )
@@ -48,7 +48,7 @@ func init() {
 		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 

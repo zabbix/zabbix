@@ -23,8 +23,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/wmi"
 )
 
@@ -42,7 +42,7 @@ func init() {
 		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 
