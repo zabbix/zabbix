@@ -172,7 +172,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 		double	time_now;
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-		zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		if (NULL != message)
