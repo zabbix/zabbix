@@ -20,6 +20,7 @@
 
 
 require_once __DIR__.'/../include/CAPITest.php';
+
 require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CTimezoneHelper.php';
 
@@ -2973,7 +2974,7 @@ class testSla extends CAPITest {
 	 * @dataProvider sla_update_data_invalid
 	 * @dataProvider sla_update_data_valid
 	 */
-	public function testServices_Update(array $slas, ?string $expected_error): void {
+	public function testSla_Update(array $slas, ?string $expected_error): void {
 		$response = $this->call('sla.update', $slas, $expected_error);
 
 		if ($expected_error !== null) {
@@ -4538,7 +4539,7 @@ class testSla extends CAPITest {
 	 * @dataProvider sla_get_data_invalid
 	 * @dataProvider sla_get_data_valid
 	 */
-	public function testServices_Get(array $request, array $expected): void {
+	public function testSla_Get(array $request, array $expected): void {
 		$response = $this->call('sla.get', $request, $expected['error']);
 
 		if ($expected['error'] !== null) {
@@ -4602,7 +4603,7 @@ class testSla extends CAPITest {
 	 * @dataProvider sla_delete_data_invalid
 	 * @dataProvider sla_delete_data_valid
 	 */
-	public function testServices_Delete(array $slas, ?string $expected_error): void {
+	public function testSla_Delete(array $slas, ?string $expected_error): void {
 		$response = $this->call('sla.delete', $slas, $expected_error);
 
 		if ($expected_error !== null) {
@@ -4969,7 +4970,7 @@ class testSla extends CAPITest {
 	 * @dataProvider sla_getSli_data_invalid
 	 * @dataProvider sla_getSli_data_valid
 	 */
-	public function testServices_GetSli(array $request, array $expected): void {
+	public function testSla_GetSli(array $request, array $expected): void {
 		$response = $this->call('sla.getSli', $request, $expected['error']);
 
 		if ($expected['error'] !== null || !array_key_exists('result', $expected)) {
