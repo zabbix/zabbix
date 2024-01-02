@@ -19,11 +19,15 @@
 
 #include "operations.h"
 
-#include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
-#include "zbxnum.h"
 #include "zbxdbwrap.h"
+#include "zbxcomms.h"
+#include "zbxdb.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_discoverer_constants.h"
 
@@ -45,12 +49,13 @@ zbx_host_tag_op_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: select hostid of discovered host                                  *
+ * Purpose: selects hostid of discovered host                                 *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
  *             hostname       - [OUT] hostname where event occurred           *
  *                                                                            *
- * Return value: hostid - existing hostid, 0 - if not found                   *
+ * Return value: hostid - existing hostid,                                    *
+ *                    0 - if not found                                        *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, char **hostname)
@@ -134,10 +139,10 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add group to host if not added already                            *
+ * Purpose: adds group to host if not added already                           *
  *                                                                            *
- * Parameters: hostid         - [IN]  host identifier                         *
- *             groupids       - [IN]  array of group identifiers              *
+ * Parameters: hostid         - [IN]                                          *
+ *             groupids       - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
@@ -188,26 +193,23 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add discovered host if it was not added already                   *
+ * Purpose: adds discovered host if it was not added already                  *
  *                                                                            *
- * Parameters: event          - [IN] the source event                         *
+ * Parameters: event          - [IN] source event                             *
  *             status         - [OUT] found or created host status            *
- *             cfg            - [IN] the global configuration data            *
+ *             cfg            - [IN] global configuration data                *
  *                                                                            *
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, zbx_config_t *cfg)
 {
-	zbx_db_result_t		result;
-	zbx_db_result_t		result2;
-	zbx_db_row_t		row;
-	zbx_db_row_t		row2;
-	zbx_uint64_t		dhostid, hostid = 0, proxyid, druleid;
-	char			*host, *host_esc, *host_unique, *host_visible, *hostname = NULL;
+	zbx_db_result_t		result, result2;
+	zbx_db_row_t		row, row2;
+	zbx_uint64_t		hostid = 0, proxyid;
+	char			*host_visible, *hostname = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
-	unsigned char		svc_type, interface_type;
 	zbx_db_insert_t		db_insert, db_insert_host_rtdata;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, event->eventid);
@@ -258,7 +260,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	interfaceid;
+			zbx_uint64_t	interfaceid, dhostid, druleid;
+			unsigned char	svc_type, interface_type;
 
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_STR2UINT64(druleid, row[8]);
@@ -350,6 +353,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					}
 				}
 
+				char	*host;
+
 				if (ZBX_DISCOVERY_VALUE == host_source)
 					host = zbx_strdup(NULL, row3[0]);
 				else if (ZBX_DISCOVERY_IP == host_source || '\0' == *row[3])
@@ -358,6 +363,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					host = zbx_strdup(NULL, row[3]);
 
 				zbx_db_free_result(result3);
+
+				char	*host_unique;
 
 				/* for host uniqueness purposes */
 				zbx_make_hostname(host);	/* replace not-allowed symbols */
@@ -491,7 +498,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
-			char			*sql = NULL;
+			char			*host_esc, *sql = NULL;
 			zbx_uint64_t		host_proxyid;
 			zbx_conn_flags_t	flags;
 			int			flags_int, tls_accepted;
@@ -644,9 +651,9 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the event is discovery or autoregistration event        *
+ * Purpose: checks if event is discovery or autoregistration event            *
  *                                                                            *
- * Parameters: event          - [IN] source event data                        *
+ * Parameters: event - [IN] source event data                                 *
  *                                                                            *
  * Return value: SUCCEED - it's discovery or autoregistration event           *
  *               FAIL    - otherwise                                          *
@@ -670,9 +677,9 @@ static int	is_discovery_or_autoregistration(const zbx_db_event *event)
  *                                                                            *
  * Purpose: auxiliary function for op_add_del_tags()                          *
  *                                                                            *
- * Parameters: op             - [IN] operation type: add or delete            *
- *             optagids       - [IN] operation tag IDs to add or delete       *
- *             host_tags      - [IN/OUT]                                      *
+ * Parameters: op        - [IN] operation type: add or delete                 *
+ *             optagids  - [IN] operation tag IDs to add or delete            *
+ *             host_tags - [IN/OUT]                                           *
  *                                                                            *
  ******************************************************************************/
 static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64_t *optagids,
@@ -717,18 +724,17 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: auxiliary function for op_add_del_tags()                          *
- *                                                                            *
- * Parameters: hostid               - [IN] discovered host ID                 *
- *             host_tags            - [IN] the new state of host tags to save *
- *                                         if not saved yet                   *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: auxiliary function for op_add_del_tags()                            *
+ *                                                                              *
+ * Parameters: hostid    - [IN] discovered host ID                              *
+ *             host_tags - [IN] new state of host tags to save if not saved yet *
+ *                                                                              *
+ *******************************************************************************/
 static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags)
 {
-	int			i, new_tags_cnt = 0, res = SUCCEED;
+	int			new_tags_cnt = 0, res = SUCCEED;
 	zbx_vector_db_tag_ptr_t	upd_tags;
 	zbx_vector_uint64_t	del_tagids;
 
@@ -737,7 +743,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 	zbx_vector_db_tag_ptr_create(&upd_tags);
 	zbx_vector_uint64_create(&del_tagids);
 
-	for (i = 0; i < host_tags->values_num; i++)
+	for (int i = 0; i < host_tags->values_num; i++)
 	{
 		zbx_db_tag_t	*tag = host_tags->values[i];
 
@@ -757,7 +763,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", "automatic",
 				(char *)NULL);
 
-		for (i = 0; i < host_tags->values_num; i++)
+		for (int i = 0; i < host_tags->values_num; i++)
 		{
 			zbx_db_tag_t	*tag = host_tags->values[i];
 
@@ -777,7 +783,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 		{
 			hosttagid = first_hosttagid;
 
-			for (i = 0; i < host_tags->values_num; i++)
+			for (int i = 0; i < host_tags->values_num; i++)
 			{
 				zbx_db_tag_t	*tag = host_tags->values[i];
 
@@ -807,7 +813,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 		if (ZBX_DB_OK == zbx_db_execute("%s", sql))
 		{
-			for (i = 0; i < host_tags->values_num; i++)
+			for (int i = 0; i < host_tags->values_num; i++)
 			{
 				zbx_db_tag_t	*tag = host_tags->values[i];
 
@@ -832,10 +838,10 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add discovered host                                               *
+ * Purpose: adds discovered host                                              *
  *                                                                            *
- * Parameters: event          - [IN] source event data                        *
- *             cfg            - [IN] the global configuration data            *
+ * Parameters: event - [IN] source event data                                 *
+ *             cfg   - [IN] global configuration data                         *
  *                                                                            *
  ******************************************************************************/
 void	op_host_add(const zbx_db_event *event, zbx_config_t *cfg)
@@ -854,9 +860,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete host                                                       *
+ * Purpose: deletes host                                                      *
  *                                                                            *
- * Parameters: event          - [IN] source event data                        *
+ * Parameters: event - [IN] source event data                                 *
  *                                                                            *
  ******************************************************************************/
 void	op_host_del(const zbx_db_event *event)
@@ -895,10 +901,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: enable discovered                                                 *
+ * Purpose: enables discovered hosts                                          *
  *                                                                            *
- * Parameters: event          - [IN] the source event                         *
- *             cfg            - [IN] the global configuration data            *
+ * Parameters: event - [IN] source event                                      *
+ *             cfg   - [IN] global configuration data                         *
  *                                                                            *
  ******************************************************************************/
 void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg)
@@ -929,10 +935,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: disable host                                                      *
+ * Purpose: disables host                                                     *
  *                                                                            *
- * Parameters: event          - [IN] the source event                         *
- *             cfg            - [IN] the global configuration data            *
+ * Parameters: event - [IN] source event                                      *
+ *             cfg   - [IN] global configuration data                         *
  *                                                                            *
  ******************************************************************************/
 void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
@@ -965,10 +971,10 @@ out:
  *                                                                            *
  * Purpose: sets host inventory mode                                          *
  *                                                                            *
- * Parameters: event          - [IN] the source event                         *
- *             cfg            - [IN] the global configuration data            *
- *             inventory_mode - [IN] the new inventory mode, see              *
- *                              HOST_INVENTORY_ defines                       *
+ * Parameters: event          - [IN] source event                             *
+ *             cfg            - [IN] global configuration data                *
+ *             inventory_mode - [IN] new inventory mode, see                  *
+ *                                   HOST_INVENTORY_ defines                  *
  *                                                                            *
  * Comments: This function does not allow disabling host inventory - only     *
  *           setting manual or automatic host inventory mode is supported.    *
@@ -994,10 +1000,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add groups to discovered host                                     *
+ * Purpose: adds groups to discovered host                                    *
  *                                                                            *
- * Parameters: event    - [IN] the source event data                          *
- *             cfg      - [IN] the global configuration data                  *
+ * Parameters: event    - [IN] source event data                              *
+ *             cfg      - [IN] global configuration data                      *
  *             groupids - [IN] IDs of groups to add                           *
  *                                                                            *
  ******************************************************************************/
@@ -1021,7 +1027,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete groups from discovered host                                *
+ * Purpose: deletes groups from discovered host                               *
  *                                                                            *
  * Parameters: event    - [IN] source event data                              *
  *             groupids - [IN] IDs of groups to delete                        *
@@ -1080,7 +1086,8 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 				" where hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
+				groupids->values_num);
 
 		result2 = zbx_db_select("%s", sql);
 
@@ -1115,10 +1122,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: link host with template                                           *
+ * Purpose: links host with template                                          *
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
- *             cfg             - [IN] the global configuration data           *
+ *             cfg             - [IN] global configuration data               *
  *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
@@ -1147,7 +1154,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unlink and clear host from template                               *
+ * Purpose: unlinks and clears host from template                             *
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
  *             del_templateids - [IN] array of template IDs                   *
@@ -1178,11 +1185,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add and delete tags from discovered host if they are not already  *
- *          added deleted                                                     *
+ * Purpose: adds and deletes tags from discovered host if they are not        *
+ *          already added/deleted                                             *
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
- *             cfg             - [IN] the global configuration data           *
+ *             cfg             - [IN] global configuration data               *
  *             new_optagids    - [IN]                                         *
  *             del_optagids    - [IN]                                         *
  *                                                                            *

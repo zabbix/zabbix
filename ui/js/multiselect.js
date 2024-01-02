@@ -35,7 +35,7 @@
 		options = $.extend({objectOptions: {}}, options);
 
 		var curl = new Curl('jsrpc.php');
-		curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+		curl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
 		curl.setArgument('method', 'multiselect.get');
 		curl.setArgument('object_name', options.object_name);
 

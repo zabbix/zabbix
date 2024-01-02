@@ -124,6 +124,21 @@ class CExpressionMacroParserTest extends TestCase {
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'length' => 0
+			]],
+			['text {?nodata(/Zabbix server/system.cpu.load, "\\\\")}', [], 5, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{?nodata(/Zabbix server/system.cpu.load, "\\\\")}',
+				'length' => 47
+			]],
+			['text {?nodata(/Zabbix server/system.cpu.load, "\\\\")}', ['escape_backslashes' => false], 5, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'length' => 0
+			]],
+			['text {?nodata(/Zabbix server/system.cpu.load, "\\ ")}', ['escape_backslashes' => false], 5, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{?nodata(/Zabbix server/system.cpu.load, "\\ ")}',
+				'length' => 47
 			]]
 		];
 	}
