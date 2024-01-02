@@ -790,22 +790,22 @@ class testDashboardPieChartWidget extends CWebTest {
 	 * @dataProvider getPieChartDisplayData
 	 */
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
-		// Delete item history data in DB.
+		// Delete item history in DB.
 		foreach ([1, 2, 3, 4] as $id) {
 			CDataHelper::removeItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':item-'.$id]);
 		}
 
-		// Set the new item history data.
+		// Set new item history.
 		foreach($data['item_data'] as $item_key => $item_data) {
 			// One item may have more than one history record.
 			foreach ($item_data as $record) {
-				// Always minus 10 seconds for safety.
+				// Minus 10 seconds for safety.
 				$time = time() - 10 + CTestArrayHelper::get($record, 'time');
 				CDataHelper::addItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$item_key], $record['value'], $time);
 			}
 		}
 
-		// Fill in the actual Item ids into the data set data (this only applies to Item list data sets).
+		// Fill in Item ids (this only applies to Item list data sets).
 		foreach ($data['widget_fields'] as $id => $field) {
 			if (preg_match('/^ds\.[0-9]\.itemids\.[0-9]$/', $field['name'])) {
 				$field['value'] = self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$field['value']];
@@ -813,7 +813,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			}
 		}
 
-		// Recreate the dashboard and create the widget.
+		// Create the Pie chart.
 		CDataHelper::call('dashboard.update',
 			[
 				'dashboardid' => self::$dashboardid,
@@ -839,9 +839,9 @@ class testDashboardPieChartWidget extends CWebTest {
 		$widget = $dashboard->getWidgets()->first();
 		$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilReady()->all()->asArray();
 
-		// Assert expected sectors.
+		// Assert Pie chart sectors by inspecting 'data-hintbox-contents' attribute.
 		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {
-			// The name that should be shown in the legend and in the hintbox.
+			// The name shown in the legend and in the hintbox.
 			$legend_name = self::HOST_NAME_SCREENSHOTS.': '.$item_name;
 
 			// Special case - legend name includes aggregation function.
@@ -849,7 +849,7 @@ class testDashboardPieChartWidget extends CWebTest {
 				$legend_name = CTestArrayHelper::get($data, 'expected_legend_function').'('.$legend_name.')';
 			}
 
-			// Special case - legend name set in UI.
+			// Special case - custom legend name.
 			if (CTestArrayHelper::get($data, 'expected_dataset_name')) {
 				$legend_name = $data['expected_dataset_name'];
 			}
@@ -863,7 +863,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			foreach ($sectors as $sector) {
 				$hintbox_html = $sector->getAttribute('data-hintbox-contents');
 
-				// Find matching sector by inspecting the 'data-hintbox-contents'.
+				// If 'data-hintbox-contents' attribute matches the sector.
 				if (strpos($hintbox_html, $legend_name)) {
 					// Assert hintbox value.
 					$matches = [];
@@ -878,7 +878,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					preg_match('/fill: (.*?);/', $sector->getAttribute('style'), $matches);
 					$this->assertEquals($expected_sector['color'], $matches[1]);
 
-					// Match successful, continue to the next expected sector.
+					// Assertion successful, continue to the next expected sector.
 					continue 2;
 				}
 			}
@@ -969,7 +969,6 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertTrue($input->isClickable());
 		$this->assertEquals($expected_values['value'], $input->getValue());
 	}
-
 
 	/**
 	 * Checks that a given label exists in a form.
