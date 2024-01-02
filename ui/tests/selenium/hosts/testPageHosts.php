@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 /**
  * @dataSource TagFilter, Proxies, WebScenarios
  *
- * @backup hosts
+ * @backup hosts, httptest
  *
  * @onBefore prepareHostsData
  */
