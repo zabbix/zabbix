@@ -24,46 +24,37 @@ window.correlation_condition_popup = new class {
 	init() {
 		this.overlay = overlays_stack.getById('correlation-condition-form');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 
-		this.form.querySelector('#condition-type')
-			.onchange = () => reloadPopup(this.form, 'correlation.condition.edit');
+		this.form_element.querySelector('#condition-type')
+			.onchange = () => reloadPopup(this.form_element, 'correlation.condition.edit');
 
-		const $event_ms = $('#groupids_');
+		const $event_ms = $('#groupid_');
 
 		$event_ms.on('change', () => {
 			$event_ms.multiSelect('setDisabledEntries',
-				[...this.form.querySelectorAll('[name^="groupids[]"]')].map((input) => input.value)
+				[...this.form_element.querySelectorAll('[name^="groupid[]"]')].map((input) => input.value)
 			);
 		});
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = this.form.getAllValues();
 
-		switch (parseInt(fields.conditiontype)) {
-			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-				fields.tag = fields.tag.trim();
-				break;
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					return;
+				}
 
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
-			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-				fields.tag = fields.tag.trim();
-				fields.value = fields.value.trim();
-				break;
-
-			case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-				fields.oldtag = fields.oldtag.trim();
-				fields.newtag = fields.newtag.trim();
-				break;
-		}
-
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', 'correlation.condition.check');
-
-		this.#post(curl.getUrl(), fields);
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'correlation.condition.check');
+				this.#post(curl.getUrl(), fields);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
 
 	/**
@@ -80,16 +71,20 @@ window.correlation_condition_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('error' in response) {
+				if ('form_errors' in response) {
+					this.form.renderErrors(response.form_errors, true, true);
+				}
+				else if ('error' in response) {
 					throw {error: response.error};
 				}
-				overlayDialogueDestroy(this.overlay.dialogueid);
+				else {
+					overlayDialogueDestroy(this.overlay.dialogueid, true);
 
-				document.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
-				this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+					this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+				}
 			})
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -108,7 +103,7 @@ window.correlation_condition_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => this.overlay.unsetLoading());
 	}

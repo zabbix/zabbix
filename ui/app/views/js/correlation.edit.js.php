@@ -21,10 +21,11 @@
 
 window.correlation_edit_popup = new class {
 
-	init({correlation}) {
+	init({correlation, rules}) {
 		this.overlay = overlays_stack.getById('correlation.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_class = new Form(this.form_element, rules);
 		this.correlation = correlation;
 		this.correlationid = correlation.correlationid;
 
@@ -55,7 +56,7 @@ window.correlation_edit_popup = new class {
 			this.#addConditionRow(correlation.conditions[i]);
 		}
 
-		this.form.querySelector('#evaltype').onchange = () => this.#processTypeOfCalculation();
+		this.form_element.querySelector('#evaltype').onchange = () => this.#processTypeOfCalculation();
 		this.#processTypeOfCalculation();
 	}
 
@@ -63,17 +64,17 @@ window.correlation_edit_popup = new class {
 	 * Checks the conditions list and shows either expression or custom input formula field.
 	 */
 	#processTypeOfCalculation() {
-		const condition_count = this.form.querySelectorAll('#condition_table tr[id^=conditions_]').length;
-		const evaltype = this.form.querySelector('#evaltype');
+		const condition_count = this.form_element.querySelectorAll('#condition_table tr[id^=conditions_]').length;
+		const evaltype = this.form_element.querySelector('#evaltype');
 
 		if (condition_count <= 1) {
 			evaltype.value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
 		}
 
 		const show_formula = condition_count > 1 && evaltype.value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-		const evaltype_label = this.form.querySelector('#label-evaltype');
-		const expression = this.form.querySelector('#expression');
-		const formula = this.form.querySelector('#formula');
+		const evaltype_label = this.form_element.querySelector('#label-evaltype');
+		const expression = this.form_element.querySelector('#expression');
+		const formula = this.form_element.querySelector('#formula');
 
 		if (condition_count > 1) {
 			evaltype.closest('.form-field').style.display = '';
@@ -96,7 +97,7 @@ window.correlation_edit_popup = new class {
 		}
 
 		const conditions = [];
-		const labels = this.form.querySelectorAll('#condition_table .label');
+		const labels = this.form_element.querySelectorAll('#condition_table .label');
 
 		[...labels].forEach((label) => {
 			conditions.push({
@@ -116,7 +117,7 @@ window.correlation_edit_popup = new class {
 	#addConditionRow(condition) {
 		const row_ids = [];
 
-		this.form.querySelectorAll('#condition_table tr[id^=conditions_]').forEach((row) => row_ids.push(row.id));
+		this.form_element.querySelectorAll('#condition_table tr[id^=conditions_]').forEach((row) => row_ids.push(row.id));
 
 		condition.row_index ??= 0;
 
@@ -153,9 +154,9 @@ window.correlation_edit_popup = new class {
 					element.groupid = key;
 					condition.row_index++;
 
-					const template = new Template(this.form.querySelector('#condition-hostgr-row-tmpl').innerHTML);
+					const template = new Template(this.form_element.querySelector('#condition-hostgr-row-tmpl').innerHTML);
 
-					this.form
+					this.form_element
 						.querySelector('#condition_table tbody')
 						.insertAdjacentHTML('beforeend', template.evaluate(element));
 				}
@@ -179,7 +180,7 @@ window.correlation_edit_popup = new class {
 				switch (parseInt(condition.conditiontype)) {
 					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-						template = new Template(this.form.querySelector('#condition-tag-row-tmpl').innerHTML);
+						template = new Template(this.form_element.querySelector('#condition-tag-row-tmpl').innerHTML);
 						break;
 
 					case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
@@ -187,7 +188,7 @@ window.correlation_edit_popup = new class {
 						condition.condition_operator = this.#getConditionData(condition)[2];
 						condition.data_old_tag = this.#getConditionData(condition)[3];
 						condition.data_new_tag = this.#getConditionData(condition)[4];
-						template = new Template(this.form.querySelector('#condition-tag-pair-row-tmpl').innerHTML);
+						template = new Template(this.form_element.querySelector('#condition-tag-pair-row-tmpl').innerHTML);
 						break;
 
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
@@ -196,7 +197,7 @@ window.correlation_edit_popup = new class {
 						condition.condition_operator = this.#getConditionData(condition)[1];
 						condition.tag = this.#getConditionData(condition)[2];
 						condition.value = this.#getConditionData(condition)[3];
-						template = new Template(this.form.querySelector('#condition-old-new-tag-row-tmpl').innerHTML);
+						template = new Template(this.form_element.querySelector('#condition-old-new-tag-row-tmpl').innerHTML);
 						break;
 				}
 
@@ -204,7 +205,7 @@ window.correlation_edit_popup = new class {
 				condition.data = this.#getConditionData(condition)[1];
 				condition.conditiontype = condition.conditiontype;
 
-				this.form
+				this.form_element
 					.querySelector('#condition_table tbody')
 					.insertAdjacentHTML('beforeend', template.evaluate(condition));
 
@@ -283,7 +284,7 @@ window.correlation_edit_popup = new class {
 	#checkConditionRow(condition) {
 		const result = [];
 
-		[...this.form.querySelectorAll('#condition_table tr[id^=conditions_]')].forEach((element) => {
+		[...this.form_element.querySelectorAll('#condition_table tr[id^=conditions_]')].forEach((element) => {
 			const type = element.querySelector('input[name*="type"]').value;
 
 			switch (parseInt(type)) {
@@ -323,6 +324,11 @@ window.correlation_edit_popup = new class {
 	clone({title, buttons}) {
 		this.correlationid = null;
 
+<<<<<<< HEAD
+=======
+		this.form.reload(rules);
+
+>>>>>>> 60e4259d879 (..F....... [ZBXNEXT-8791] fixed variable naming)
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
@@ -343,18 +349,47 @@ window.correlation_edit_popup = new class {
 	}
 
 	submit() {
+<<<<<<< HEAD
 		const fields = getFormFields(this.form);
 
 		['name', 'description'].forEach((field) => fields[field] = fields[field].trim());
 
+=======
+		const fields = this.form.getAllValues();
+>>>>>>> 60e4259d879 (..F....... [ZBXNEXT-8791] fixed variable naming)
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.correlationid === null ? 'correlation.create' : 'correlation.update');
 
+<<<<<<< HEAD
 		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+=======
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				this.overlay.unsetLoading();
+
+				if (!result) {
+					return;
+				}
+
+				this.#post(curl.getUrl(), fields, (response) => {
+					if ('form_errors' in response) {
+						this.form.renderErrors(response.form_errors, true, true);
+
+						return;
+					}
+					else if ('error' in response) {
+						throw {error: response.error};
+					}
+					else {
+						overlayDialogueDestroy(this.overlay.dialogueid);
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+					}
+				});
+>>>>>>> 60e4259d879 (..F....... [ZBXNEXT-8791] fixed variable naming)
 		});
 	}
 
@@ -381,7 +416,7 @@ window.correlation_edit_popup = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -400,7 +435,7 @@ window.correlation_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => this.overlay.unsetLoading());
 	}
